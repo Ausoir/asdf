@@ -1,0 +1,8 @@
+package com.ga.unit;
+
+/**
+ * Created by Ga on 7/28/2016.
+ */
+public enum Actions {
+    IDLE, WALKL, WALKR, JUMP, ATTACK, HIT, DEAD, SWING, KICK, SKILL, SKILL1, SKILL2, SUMMON, DROP, WHIRLWIND, ENTER, CAST, DUCK, CONSUME, EXHAUSTED, DOWN
+}

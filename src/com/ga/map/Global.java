@@ -1,0 +1,71 @@
+package com.ga.map;
+
+import com.ga.game.Settings;
+import com.ga.intelligence.PlayerInput;
+import com.ga.tool.P;
+
+import java.util.Random;
+
+/**
+ * Created by Ga on 7/25/2016.
+ */
+public class Global {
+    public static Map map;
+    public static PlayerInput player;
+    public static P camera = new P();
+    public static Random r = new Random();
+    private static float[] sinv = new float[360];
+    private static float[] cosv = new float[360];
+    private static int time = 0;
+    public static void init(){
+        for (int i=0;i<360;i++){
+            sinv[i] = (float)Math.sin(Math.toRadians(i));
+            cosv[i] = (float)Math.cos(Math.toRadians(i));
+        }
+    }
+    public static P getRelPos(float x, float y){
+        return new P(x-camera.x+ Settings.centerX, y-camera.y+Settings.centerY);
+    }
+    public static float sin(float p){
+        return sin((int)Math.toDegrees(p));
+    }
+    public static float cos(float p){
+        return cos((int)Math.toDegrees(p));
+    }
+    public static float sin(int p){
+        int angleCircle = Math.abs(p % 360);
+        return p >= 0 ? sinv[angleCircle] : -sinv[angleCircle];
+    }
+    public static float cos(int p){
+        int angleCircle = Math.abs(p % 360);
+        return cosv[angleCircle % 360];
+    }
+    public static float clamp(float p, float min, float max){
+        return Math.max(Math.min(p,max),min);
+    }
+    public static float rng(float max){
+        return clamp((float)r.nextGaussian(),-max,max);
+    }
+    public static void p(String p){
+        System.out.println(p);
+    }
+    public static void mapEdge(){
+        Global.camera.set(
+                Global.clamp(Global.camera.x, Settings.centerX,Global.map.map.size.x-Settings.centerX),
+                Global.clamp(Global.camera.y,Settings.centerY,Global.map.map.size.y-Settings.centerY)
+        );
+    }
+    public static String wordify(String p){
+        return p.substring(0,1).toUpperCase()+p.substring(1);
+    }
+    public static boolean cooldown(int[] p, int cd){
+        if (time - p[0] >= cd){
+            p[0] = time;
+            return true;
+        }
+        return false;
+    }
+    public static void update(){
+        time++;
+    }
+}
