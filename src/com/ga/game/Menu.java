@@ -124,7 +124,7 @@ public class Menu extends JPanel {
     }
     public void setVisible(boolean visible){
         super.setVisible(visible);
-        if (visible){
+        if (visible && Global.player != null){
             statspanel.refresh();
             inventorypanel.refresh();
         }
@@ -175,8 +175,8 @@ class StatPanel extends JPanel{
         ((JButton)getComponent(1)).setText("Strength - "+player.get("arms").max);
         ((JButton)getComponent(2)).setText("Stamina - "+player.get("legs").max);
         ((JButton)getComponent(3)).setText("Memory - "+player.get("damage").max);
-        ((JButton)getComponent(4)).setText("Reset Points - "+player.get("adapt").max);
-        ((JButton)getComponent(5)).setText("Level Points - "+player.get("points").max);
+        ((JButton)getComponent(4)).setText("Reset Points - "+player.get("adapt").get());
+        ((JButton)getComponent(5)).setText("Level Points - "+player.get("points").get());
         if (player.get("points").get() > 0)
             for (int i=6;i<10;i++)
                 getComponent(i).setVisible(true);
@@ -232,10 +232,6 @@ class StatPanel extends JPanel{
         statgrid.gridy++;
         return button;
     }
-    public void setVisible(boolean visible){
-        super.setVisible(visible);
-        refresh();
-    }
 }
 
 class InventoryPanel extends JPanel {
@@ -271,7 +267,7 @@ class InventoryPanel extends JPanel {
         panel.setBounds(0,0,1000,1000);
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel,BoxLayout.PAGE_AXIS));
-        refresh();
+//        refresh();
         add(panel);
     }
     public void refresh(){
@@ -285,7 +281,7 @@ class InventoryPanel extends JPanel {
             makeSlot(item.name, item.image, i);
         }
         for (int i = 0; i < inv.pockets.length; i++) {
-            int slot = inv.items.indexOf(inv.pockets[i]);
+            int slot = inv.pockets[i];
             if (slot != -1) {
                 equip(slot);
             }

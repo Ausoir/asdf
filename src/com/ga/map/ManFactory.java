@@ -1,12 +1,9 @@
 package com.ga.map;
 
 import com.ga.tool.P;
-import com.ga.unit.Armor;
 import com.ga.unit.ItemFactory;
 import com.ga.unit.Man;
-import com.ga.unit.Weapon;
 
-import java.awt.*;
 import java.util.HashMap;
 
 /**
@@ -35,7 +32,10 @@ public class ManFactory {
             "", "peasant", "soldier", "soldier"
     };
     public static Man produce(String name, P pt){
-        Man p = new Man(name, pt);
+        return produce(name,pt,0);
+    }
+    public static Man produce(String name, P pt, int seed){
+        Man p = new Man(name, pt, seed);
         if (name.startsWith("Man")) name = "Man";
         Integer type = manType.get(name);
         if (type == -1) type = Global.r.nextInt(4);

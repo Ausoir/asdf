@@ -29,17 +29,19 @@ public class Command {
         } else if (p.equals("editor")){
             Updater.editor = true;
             Display.input = new EditorInput();
+        } else if (p.equals("save")){
+            FileManager.saveMap("Map");
         }
     }
     public static void order(String p){
         try {
             String[] cmds = p.split(",");
-            for (int i = 0; i < cmds.length; i++) {
-                String[] cmd = cmds[i].split("@");
+            for (String i : cmds) {
+                String[] cmd = i.split("@");
                 if (cmd[0].equals("say")) host.say(cmd[1]);
                 else if (cmd[0].equals("delevel")) host.stats.delevel(cmd[1]);
                 else if (cmd[0].equals("level")) host.stats.level(cmd[1]);
-                else if (cmd[0].equals("stat")) host.get(cmd[1].split(":")[0]).add(Integer.parseInt(cmd[1].split(":")[1]));
+                else if (cmd[0].equals("stat")) host.get(cmd[1].split(":")[0]).addTotal(Integer.parseInt(cmd[1].split(":")[1]));
                 else if (cmd[0].equals("obj")) ManFactory.produce(Global.wordify(cmd[1]), host.pos.getAdd(150, -50));
                 else if (cmd[0].equals("dummy")) ManFactory.produce(Global.wordify(cmd[1]), host.pos.getAdd(150, -50)).brain = null;
                 else if (cmd[0].equals("wpn"))

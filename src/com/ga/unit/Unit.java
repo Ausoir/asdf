@@ -1,11 +1,15 @@
 package com.ga.unit;
 
+import com.ga.game.Settings;
+import com.ga.map.Global;
+import com.ga.tool.Line;
 import com.ga.tool.P;
 
 /**
  * Created by Ga on 8/12/2016.
  */
 public class Unit extends Thing {
+    public boolean gravity = true;
     public int faction = 2;
     public P vel = new P(0, 0);
     public Unit(String name, P pt, int depth) {
@@ -16,7 +20,25 @@ public class Unit extends Thing {
     }
     public void hit(Unit hitter, int dmg){
     }
+    public void collide(){
+        P vp = pos.getAdd(vel);
+        Line pp = new Line(pos,vp);
+        for (Line i : Global.map.land){
+            if (i.lineCross(pp)){
+                onCollide(i);
+            }
+        }
+    }
+    public void onCollide(Line l){
+        float slope = l.getSlope();
+        vel.y = (slope * vel.x * 10000 - 5) / 10000f;
+    }
     public void update(){
+        collide();
         pos.add(vel);
+        if (gravity) {
+            vel.y += Settings.gravity;
+            if (vel.y > Settings.gravityMax) vel.y = Settings.gravityMax;
+        }
     }
 }

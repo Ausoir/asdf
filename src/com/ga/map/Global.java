@@ -51,8 +51,8 @@ public class Global {
     }
     public static void mapEdge(){
         Global.camera.set(
-                Global.clamp(Global.camera.x, Settings.centerX,Global.map.map.size.x-Settings.centerX),
-                Global.clamp(Global.camera.y,Settings.centerY,Global.map.map.size.y-Settings.centerY)
+                Global.clamp(Global.camera.x, Settings.centerX, Global.map.map.size.x-Settings.centerX),
+                Global.clamp(Global.camera.y, Settings.centerY, Global.map.map.size.y-Settings.centerY)
         );
     }
     public static String wordify(String p){

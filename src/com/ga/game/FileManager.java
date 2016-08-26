@@ -8,6 +8,7 @@ import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.unit.Clip;
 import com.ga.unit.Player;
+import com.ga.unit.Updater;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -20,6 +21,16 @@ import java.util.HashMap;
  * Created by Ga on 7/26/2016.
  */
 public class FileManager {
+    public static void saveMap(String name){
+        String result = "" + Global.map.toString();
+        result += "\n";
+        result += Updater.toMapString();
+        FileManager.save(name+".map", result);
+        Global.p(result);
+    }
+    public static void saveCharacter(){
+        FileManager.save("map/"+"Player"+".char", Global.player.host.toCharacterString());
+    }
     public static void save(String dir, String input) {
         try {
             BufferedWriter writer = null;
@@ -34,7 +45,7 @@ public class FileManager {
         }
     }
 
-    public static String read(String dir) {
+    private static String read(String dir) {
         String result = null;
         try {
             BufferedReader br = new BufferedReader(new FileReader("Data/"+dir));
@@ -55,6 +66,20 @@ public class FileManager {
 //        System.out.println(result);
         return result;
     }
+    static void loadFirst(){
+        String data = read("map/"+"Player"+".char");
+        String[] line = data.split("%");
+        String[] values = line[0].split("@");
+        readMap(values[3],0);
+        Global.player.host.pos.load(values[2]);
+    }
+    private static void readCharacter(String dir){
+        String data = read("map/"+dir+".char");
+        String[] line = data.split("%");
+        Player player = Global.player.host;
+        player.stats.load(line[1]);
+        if (line.length > 2) player.inventory.load(line[2]);
+    }
     public static void readMap(String dir, int player) {
         String data = read("map/"+dir+".map");
         String[] line = data.split("%");
@@ -73,25 +98,31 @@ public class FileManager {
                 Global.map.land.add(new Line(v[0], v[1], v[2], v[3], v[4]));
             }
 
-            sections = line[2].split(";");
-            if (sections.length > 0)
-                for (int section = 0; section < sections.length; section++) {
-                    String[] type = sections[section].split("@");
-                    String unit = type[0];
-                    P pos;
-                    String[] values = type[1].split(",");
-                    int[] v = new int[values.length];
-                    for (int i = 0; i < values.length; i++) {
-                        v[i] = Integer.parseInt(values[i]);
+            if (line.length > 2) {
+                sections = line[2].split(";");
+                if (sections.length > 0)
+                    for (int section = 0; section < sections.length; section++) {
+                        String[] type = sections[section].split("@");
+                        String unit = type[0];
+                        P pos;
+                        int seed = Integer.parseInt(type[1]);
+                        String[] values = type[2].split(",");
+                        int[] v = new int[values.length];
+                        for (int i = 0; i < values.length; i++) {
+                            v[i] = Integer.parseInt(values[i]);
+                        }
+                        pos = new P(v[0], v[1]);
+                        if (unit.equals("Player")) {
+                            if (player == 0 || player == -2){
+                                new PlayerInput(new Player(pos,seed));
+                                FileManager.readCharacter("Player");
+                                FileManager.saveCharacter();
+                            }
+                            if (player > -1) player--;
+                        } else if (unit.equals("Man")) ManFactory.produce(unit + Global.r.nextInt(Settings.manTypes), pos, seed);
+                        else ManFactory.produce(unit, pos, seed);
                     }
-                    pos = new P(v[0], v[1]);
-                    if (unit.equals("Player")){
-                        if (player == 0) new PlayerInput(new Player(pos));
-                        player--;
-                    }
-                    else if (unit.equals("Man")) ManFactory.produce(unit+Global.r.nextInt(Settings.manTypes), pos);
-                    else ManFactory.produce(unit, pos);
-                }
+            }
         }
     }
 

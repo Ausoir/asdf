@@ -3,7 +3,10 @@ package com.ga.intelligence;
 import com.ga.map.Global;
 import com.ga.tool.P;
 import com.ga.tool.Timer;
-import com.ga.unit.*;
+import com.ga.unit.Actions;
+import com.ga.unit.Man;
+import com.ga.unit.Unit;
+import com.ga.unit.Updater;
 import com.ga.unit.skill.Adrenaline;
 import com.ga.unit.skill.Skill;
 
@@ -19,13 +22,20 @@ public class Intelligence {
     private ArrayList<Unit> seen;
     public Man target;
     public Task task;
-    public ArrayList<Actions> moveset = new ArrayList<Actions>(){{
-        add(Actions.ATTACK);
-        add(Actions.ATTACK);
-        add(Actions.KICK);
-        add(Actions.SWING);
-        add(Actions.WHIRLWIND);
-    }};
+    enum Moves{
+        STANDING(new Actions[]{Actions.KICK, Actions.WHIRLWIND, Actions.SWING}),
+        OVERLAP(new Actions[]{Actions.WHIRLWIND, Actions.SWING}),
+        CLOSE(new Actions[]{Actions.KICK}),
+        CHASING(new Actions[]{Actions.ATTACK});
+        private Actions[] actions;
+        Moves(Actions[] actions){
+            this.actions = actions;
+        }
+        Actions get(){
+            int r = Global.r.nextInt(actions.length);
+            return actions[r];
+        }
+    }
     public ArrayList<Skill> skillset = new ArrayList<Skill>(){{
         add(new Adrenaline());
     }};
@@ -49,18 +59,9 @@ public class Intelligence {
     public void setState(Actions state){
         if (target != null) {
             P tgt = target.pos;
-            host.face(tgt);
             P p = new P(tgt.x-host.pos.x,tgt.y-host.pos.y);
-            float rot = (float) Math.atan2(p.y,p.x);
+            host.target = p;
             host.getWeapon().rotate(p.getMult(host.dir,host.dir));
-            switch (state) {
-                case ATTACK:
-                    host.clip.setPunch(rot, host.dir);
-                    break;
-                case KICK:
-                    host.clip.setKick(rot, host.dir);
-                    break;
-            }
         }
     }
     private void perceive(){
@@ -116,8 +117,7 @@ public class Intelligence {
             host.setState(Actions.SKILL);
         }
     }
-    public void useMove(){
-        int r = Global.r.nextInt(moveset.size());
-        host.setState(moveset.get(r));
+    public void setMove(Moves move){
+        host.setState(move.get());
     }
 }

@@ -2,8 +2,10 @@ package com.ga.unit;
 
 import com.ga.game.Command;
 import com.ga.game.Display;
+import com.ga.game.FileManager;
 import com.ga.map.Global;
 import com.ga.map.ManFactory;
+import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.tool.Timer;
@@ -48,13 +50,15 @@ public class Player extends Man {
     public Inventory inventory = new Inventory(this);
     private Companions companions = new Companions();
     private Skill[] skills = new Skill[3];
-    public Player(P pt) {
-        super("Player",pt);
+    private Timer save = new Timer(150, true);
+    public Player(P pt, int seed) {
+        super("Player",pt,seed);
         Command.host = this;
         get("health").set(30);
         stats.stats.put("points",new Stat(0));
         stats.stats.put("adapt",new Stat(0));
         get("points").max = 25;
+        get("points").add(10);
         get("adapt").max = 25;
         clip.organs[1].setStyle(new Color(0,140,20),9);
         clip.organs[2].setStyle(new Color(20,20,180),13);
@@ -88,8 +92,8 @@ public class Player extends Man {
     }
     public void useItem(int p){
         if (!delay.over() || !jump) return;
-        if (inventory.pockets.length > p && inventory.pockets[p] != null) {
-            final Item item = inventory.pockets[p];
+        if (inventory.pockets.length > p && inventory.pockets[p] != -1) {
+            final Item item = inventory.items.get(inventory.pockets[p]);
             delay.set(item.delay);
             final Man host = this;
             delay.performer = new Performer(){
@@ -103,6 +107,7 @@ public class Player extends Man {
                     delay.performer = null;
                 }
             };
+            target = Global.player.mP;
             clip.setState(item.action);
         }
     }
@@ -111,6 +116,7 @@ public class Player extends Man {
     }
     public void setState(Actions state){
         face(Global.player.mP.x > 0 ? 1 : -1);
+        target = Global.player.mP;
         switch (state){
             case SUMMON:
                 summon();
@@ -127,14 +133,20 @@ public class Player extends Man {
                 skill = skills[2];
                 state = Actions.SKILL;
                 break;
-            case ATTACK:
-                clip.setPunch(Global.player.mR, dir);
-                break;
-            case KICK:
-                clip.setKick(Global.player.mR, dir);
-                break;
         }
         super.setState(state);
+    }
+
+    public void onCollide(Line r){
+        super.onCollide(r);
+        if (r.opt == 2) {
+            vel.set(0, 0);
+            Global.map.teleport(pos, r);
+            pos.add(0, -height);
+        } else if (r.opt >= 100){
+            if (r.opt >= 200) Global.map.loadMap(r.opt-200, Global.player.teleportReady());
+            else Global.map.loadMap(r.opt-100, true);
+        }
     }
     public void update(){
         companions.update();
@@ -144,9 +156,14 @@ public class Player extends Man {
             if (get("arms").get() < weapon.weight && delay.over()) weapon.rotate(6f*weapon.dir);
         }
         super.update();
+        Global.camera = new P(pos); //to be able to walk to edge
         Global.mapEdge();
+        if (save.update() && pos.y < Global.map.map.size.y) FileManager.saveCharacter();
     }
-    public String toString(){
-        return "";
+    public String toCharacterString(){
+        String r = super.toString()+"@"+Global.map.maps[1]+"\n";
+        r += stats.toString()+"\n";
+        r += inventory.toString();
+        return r;
     }
 }

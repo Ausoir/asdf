@@ -73,7 +73,7 @@ public class Stats {
         String[] data = p.split(";");
         for (int i=0;i<data.length;i++){
             String[] pair = data[i].split(":");
-            stats.put(pair[0], new Stat(Integer.parseInt(pair[1])));
+            stats.put(pair[0], new Stat(Integer.parseInt(pair[1].split(",")[0]),Integer.parseInt(pair[1].split(",")[1])));
         }
     }
     public String toString(){

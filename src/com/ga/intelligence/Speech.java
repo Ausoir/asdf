@@ -35,7 +35,7 @@ public class Speech implements Drawable{
             int x = (int) t.x - w + 25;
             int y = (int) t.y - h - 60;
             String txt = msg.get(0);
-            w = (txt.length() * 10)+80;
+            w = (txt.length() * 11)+80;
             h = (txt.length() / 40)+80;
             xp = new int[]{
                     x, x + w, x + w, x + w - 50, x + w - 50, x + (w / 2), x

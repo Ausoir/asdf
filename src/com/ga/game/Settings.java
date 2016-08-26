@@ -8,9 +8,9 @@ public class Settings {
     public static int screenY = 720;
     public static int centerX = screenX/2;
     public static int centerY = screenY/2;
-    public static int gravity = 9;
+    public static int gravity = 8;
     public static int gravityMax = 100;
-    public static int manTypes = 7;
+    protected static int manTypes = 7;
     public static void setScreenSize(int x, int y){
         screenX = x;
         screenY = y;

@@ -1,10 +1,11 @@
 package com.ga.unit;
 
+import com.ga.game.Settings;
 import com.ga.intelligence.Intelligence;
 import com.ga.intelligence.Speech;
 import com.ga.map.Global;
-import com.ga.tool.Clips;
 import com.ga.tool.EventTimer;
+import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.unit.skill.Adrenaline;
@@ -26,17 +27,20 @@ public class Man extends Unit {
     public EventTimer delay = new EventTimer(new Performer(), 0, false);
     protected Weapon weapon;
     private Armor armor = new Armor(null);
+    public P target = new P();
     public Skill skill = new Adrenaline();
     private Speech speech = new Speech(this);
     public Stats stats = new Stats();
     protected HealthBar hp;
-    public Man(String name, P pt) {
+
+    public Man(String name, P pt, int seed) {
         super(name, pt, 10);
         clip = new ClipMan(this);
         height = clip.getHeight();
         brain = new Intelligence(this);
         hp = new HealthBar(get("health"), pos);
         setWeapon(ItemFactory.produceWeapon("Fist"));
+        new Shadow(pos);
     }
 
     public void setWeapon(Weapon p){
@@ -76,7 +80,7 @@ public class Man extends Unit {
     public void setState(Actions state) {
         if (!delay.over() || !jump) return;
         if (this.state != state) {
-            String statreq = "health";
+            String statreq = null;
             int req = 0;
             float velx = 1;
             int del = 0;
@@ -137,8 +141,9 @@ public class Man extends Unit {
                     del = 30;
                     break;
             }
-            if (get(statreq).require(req)){
+            if (statreq == null || get(statreq).require(req)){
                 if (brain != null) brain.setState(state);
+                face(target.x<0?-1:1);
                 delay.set(del);
                 vel.x *= velx;
                 this.state = state;
@@ -155,6 +160,10 @@ public class Man extends Unit {
                     if (get("arms").get() < weapon.weight || get("legs").get() < 2)
                         clip.setState(Actions.EXHAUSTED);
                 }
+                break;
+            case DUCK:
+                vel.x = 0;
+                if (Global.map.fallSafe(pos.getAdd(vel))) pos.y+= Settings.gravity;
                 break;
             case JUMP:
                 vel.y -= 50;
@@ -201,6 +210,8 @@ public class Man extends Unit {
                     brain.hit((Man) hitter);
                 }
             }
+        } else {
+            say("@tickle");
         }
     }
 
@@ -229,14 +240,14 @@ public class Man extends Unit {
         delay.set(5);
         jump = true;
         state = Actions.DEAD;
-        height = 15;
+        height = 0;
         clip.setState(Actions.DEAD);
         Updater.setDepth(this, 9);
         delay.set(-1);
     }
 
     public void attack() {
-        boolean hit;
+        Unit hit = null;
         int r = 625, dam = weapon.damage + get("damage").get();
         if (state == Actions.WHIRLWIND) {
             r = (int) Math.max(r,(weapon.length*weapon.length));
@@ -244,13 +255,47 @@ public class Man extends Unit {
             hit = Updater.collide(this, clip.organs[ClipMan.FIST].ptd.getAdd(pos), dam, r, true);
         } else if (state == Actions.SWING) {
             hit = Updater.collide(this, weapon.getLine(), dam, true);
-        } else {
+        } else if (state == Actions.ATTACK){
+            dam += Math.abs(vel.x);
             hit = Updater.collide(this, weapon.getPoint(), dam, r, false);
-            if (hit) stats.endEffect("Cleave");
+            if (hit == null) hit = Updater.collide(this, clip.organs[ClipMan.FIST].ptd.getAdd(pos), dam, (int) Math.max(r,(weapon.length*weapon.length)), true);
+            if (hit == null) stats.endEffect("Cleave");
         }
-        if (hit && brain != null) brain.attacked();
+        if (hit != null && brain != null) brain.attacked();
     }
 
+    @Override
+    public void collide(){
+        P op = pos.getAdd(0,height);
+        P vp = op.getAdd(vel);
+        Line pp = new Line(op,vp);
+        for (Line i : Global.map.land){
+            if (i.lineCross(pp)){
+                float slope = i.getSlope();
+                float t = (slope * vel.x * 10000 - 5) / 10000f;
+                if (t < vel.y) {
+                    if (Math.abs(vel.x) > 0 && t < 0) {
+                        float xforce = (float) Math.cos(Math.atan(t));
+                        if (xforce < .07){
+                            vel.set(0,0);
+                        } else vel.x *= xforce;
+                    }
+                    vel.x *= .9f;
+                } else if (i.opt == 1){
+                    vel.y = 0;
+                }
+                onCollide(i);
+            }
+        }
+    }
+
+    @Override
+    public void onCollide(Line l){
+        super.onCollide(l);
+        jump = true;
+    }
+
+    @Override
     public void update() {
         stats.update();
         delay.update();
@@ -268,7 +313,6 @@ public class Man extends Unit {
                 if (delay.time < 12) attack();
             }
         }
-        if (Global.map.collide(pos, vel, height)) jump = true;
         super.update();
         if (brain != null) brain.update();
     }
@@ -301,5 +345,13 @@ public class Man extends Unit {
         }
         super.draw(g, clip.organs[0].ptd);
 //        drawDebug(g);
+    }
+
+    @Override
+    public String toString(){
+        pos.y -= height;
+        String r = super.toString();
+        pos.y += height;
+        return r;
     }
 }

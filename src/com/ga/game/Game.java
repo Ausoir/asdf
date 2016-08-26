@@ -12,7 +12,7 @@ import java.awt.*;
 public class Game extends JFrame {
     public Game(boolean editor, int x, int y){
         Global.init();
-        FileManager.readMap("Map",0);
+        FileManager.loadFirst();
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
         if (x == 0 && y == 0) {
             x = screen.width;

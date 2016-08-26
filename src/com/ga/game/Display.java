@@ -1,5 +1,6 @@
 package com.ga.game;
 
+import com.ga.intelligence.PlayerInput;
 import com.ga.map.Global;
 import com.ga.unit.Updater;
 
@@ -14,7 +15,7 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
     private int mode = 0;
     public JTextField chatbox;
     public static Input input;
-    public static Menu menu = new Menu();
+    public static Menu menu;
     public Display(Input input) {
         setLayout(null);
         this.input = input;
@@ -41,6 +42,7 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
             public void keyReleased(KeyEvent e) {}
         });
         add(chatbox);
+        menu = new Menu();
         add(menu);
     }
 

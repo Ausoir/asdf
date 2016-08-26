@@ -13,15 +13,16 @@ import java.awt.image.BufferedImage;
  * Created by Ga on 5/6/2016.
  */
 public class Thing implements Drawable {
+    int seed = 0;
     public BufferedImage image;
-    public boolean visible = true;
+    private boolean visible = true;
     public P pos;
     public P size;
     public String name;
-    public int depth;
+    int depth;
     public int dir = 1;
     protected float rotation = 0;
-    public Thing(String name){
+    Thing(String name){
         this.name = name;
         if (name != null) {
             String dir = "";
@@ -34,10 +35,10 @@ public class Thing implements Drawable {
     public void rotate(P p){
         rotate((float) Math.atan2(p.y,p.x));
     }
-    public void rotate(float p){
+    void rotate(float p){
         rotation = p;
     }
-    public Thing(String name, P pt, int depth){
+    protected Thing(String name, P pt, int depth){
         this(name);
         this.depth = depth;
         pos = pt;
@@ -68,6 +69,6 @@ public class Thing implements Drawable {
         Updater.remove(this);
     }
     public String toString(){
-        return name + "@" + pos;
+        return name + "@" + seed + "@" + pos;
     }
 }

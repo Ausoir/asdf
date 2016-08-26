@@ -7,6 +7,6 @@ import com.ga.tool.P;
  */
 public class Merchant extends Man {
     public Merchant(P pt) {
-        super("Merchant", pt);
+        super("Merchant", pt, 0);
     }
 }

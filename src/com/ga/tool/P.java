@@ -6,11 +6,10 @@ import com.ga.map.Global;
  * Created by Ga on 5/6/2016.
  */
 public class P {
-    public static P zero = new P();
+    static P zero = new P();
     public float x, y;
     public P(String p){
-        String[] t = p.split(",");
-        set(Float.parseFloat(t[0]), Float.parseFloat(t[1]));
+        load(p);
     }
     public P(){
         set(0,0);
@@ -58,6 +57,10 @@ public class P {
         float r = (float) Math.atan2(y-pt.y,x-pt.x);
         return new P(Global.cos(r)*mag,Global.sin(r)*mag);
     }
+    public P getAtan(float mag){
+        float r = (float) Math.atan2(y,x);
+        return new P(Global.cos(r)*mag,Global.sin(r)*mag);
+    }
     public float getDist(){
         return (float) Math.sqrt((this.x*this.x)+(this.y*this.y));
     }
@@ -81,5 +84,9 @@ public class P {
     }
     public String toString(){
         return ((int)x) + "," + ((int)y);
+    }
+    public void load(String p){
+        String[] t = p.split(",");
+        set(Float.parseFloat(t[0]), Float.parseFloat(t[1]));
     }
 }

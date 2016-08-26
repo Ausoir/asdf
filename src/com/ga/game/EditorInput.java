@@ -1,10 +1,12 @@
 package com.ga.game;
 
+import com.ga.intelligence.PlayerInput;
 import com.ga.map.Global;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.unit.Man;
 import com.ga.unit.Player;
+import com.ga.unit.Unit;
 import com.ga.unit.Updater;
 
 import java.awt.*;
@@ -17,9 +19,8 @@ import java.util.Iterator;
  */
 public class EditorInput implements Input, Observer {
     enum Tool {
-        NONE, CREATE, PLAYER, DELETE, REMOVE, MAN
+        NONE, CREATE, DELETE, REMOVE, MAN
     }
-    String map = "Map";
     String cunit = "Player";
     boolean control = false;
     boolean shift = false;
@@ -70,10 +71,9 @@ public class EditorInput implements Input, Observer {
         } else if (p.equals("black")) {
             Updater.landColor = Color.black;
         } else if (p.startsWith("save")){
-            save(p.substring(5));
+            FileManager.saveMap(p.substring(5));
         } else if (p.startsWith("load")){
             Updater.changeMap = p.substring(5);
-            map = Updater.changeMap;
             Updater.changeMap();
             Display.input = this;
             Updater.other.add(this);
@@ -81,7 +81,7 @@ public class EditorInput implements Input, Observer {
         } else {
             try {
                 cunit = p;
-                currentU = new Man(cunit, currentU.pos);
+                currentU = new Man(cunit, currentU.pos, -1);
             } catch (Exception e) {
                 Global.p(p + " Not found");
             }
@@ -95,22 +95,42 @@ public class EditorInput implements Input, Observer {
             y = (int) (y - Settings.centerY + Global.camera.y);
         }
         if (mode < -3) v.set(0, 0);
-        if (shift) y = (int) current.pt.y;
+        if (shift && current != null){
+            boolean snap = false;
+            for (Line i : Global.map.land){
+                if (i != current) {
+                    if (Math.abs(i.pt.x - x) < 30 && Math.abs(i.pt.y - y) < 30) {
+                        x = (int) i.pt.x;
+                        y = (int) i.pt.y;
+                        snap = true;
+                        break;
+                    } else if (Math.abs(i.ptd.x - x) < 30 && Math.abs(i.ptd.y - y) < 30) {
+                        x = (int) i.ptd.x;
+                        y = (int) i.ptd.y;
+                        snap = true;
+                        break;
+                    }
+                }
+            }
+            if (!snap) y = (int) current.pt.y;
+        }
         switch (mode) {
             case 0:
                 if (tool == Tool.CREATE) {
                     if (connected) {
                         current.ptd.set(x, y);
                     }
-                } else if (tool == Tool.MAN || tool == Tool.PLAYER) {
+                } else if (tool == Tool.MAN) {
                     currentU.pos.set(x, y);
                 } else if (tool == Tool.REMOVE && lmb){
                     Iterator it = Updater.updatee.iterator();
-                    Man i;
+                    Unit i;
                     while (it.hasNext()){
-                        i = (Man) it.next();
+                        i = (Unit) it.next();
+                        String name = i.name;
                         if (800 - (Math.pow(x - i.pos.x, 2) + Math.pow(y - i.pos.y, 2)) > 0){
-                            try{i.remove();}catch(Exception e){}
+                            try{i.remove();}catch(Exception e){Global.p("Error deleting "+name);}
+                            Global.p("Deleted "+name);
                         }
                     }
                 }
@@ -127,15 +147,13 @@ public class EditorInput implements Input, Observer {
                     add(current);
                     connected = true;
                 } else if (tool == Tool.MAN) {
-                    currentU = new Man(cunit, new P(x, y));
-                } else if (tool == Tool.PLAYER){
-                    currentU = new Player(new P(x, y));
+                    currentU = new Man(cunit, new P(x, y), -1);
                 }
                 break;
             case -1:
                 if (tool == Tool.DELETE && lmb){
                     Iterator it = Global.map.land.iterator();
-                    Line i = null;
+                    Line i;
                     while (it.hasNext()){
                         i = (Line) it.next();
                         if (i.lineCross(new Line(new P(x,y),lmbP))){
@@ -170,7 +188,7 @@ public class EditorInput implements Input, Observer {
                 break;
             case KeyEvent.VK_5:
                 if (!shift) selectTool(Tool.MAN);
-                currentU = new Man(cunit, new P(x, y));
+                currentU = new Man(cunit, new P(x, y), -1);
                 break;
             case KeyEvent.VK_W:
                 setSpeed(0,-1);
@@ -179,7 +197,7 @@ public class EditorInput implements Input, Observer {
                 setSpeed(0,1);
                 if (control) {
                     Global.p("Saved");
-                    save(map);
+                    FileManager.saveMap(Global.map.map.name);
                 }
                 break;
             case KeyEvent.VK_A:
@@ -203,6 +221,7 @@ public class EditorInput implements Input, Observer {
             case KeyEvent.VK_INSERT:
                 if (Updater.editor) {
                     Updater.editor = false;
+                    Global.player = new PlayerInput(new Player(new P(Global.camera),0));
                     Display.input = Global.player;
                     Global.camera = Global.player.host.pos;
                 }
@@ -219,20 +238,12 @@ public class EditorInput implements Input, Observer {
     private void selectTool(Tool tool) {
         this.tool = tool;
         Global.p(tool.toString());
-        if (current != null) remove(current);
+        if (current != null && connected) remove(current);
         if (currentU != null) currentU.remove();
     }
 
     public void update() {
         Global.camera.add(v);
         Global.mapEdge();
-    }
-
-    private void save(String name) {
-        String result = "" + Global.map.toString();
-        result += "\n";
-        result += Updater.toMapString();
-        FileManager.save("map/"+name+".map", result);
-        Global.p(result);
     }
 }

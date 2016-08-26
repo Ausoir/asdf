@@ -12,6 +12,10 @@ public class Stat {
     public Stat(int p){
         set(p);
     }
+    public Stat(int p, int max){
+        set(max);
+        current = p;
+    }
     public void set(int p){
         max = p;
         current = p;
@@ -50,5 +54,8 @@ public class Stat {
     }
     public void onChange(){
         if (onChange != null) onChange.perform();
+    }
+    public String toString(){
+        return current+","+max;
     }
 }

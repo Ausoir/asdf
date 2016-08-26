@@ -14,5 +14,6 @@ soldier:flee@I'll see you next time.../I'll come back for you!/Retreeeeeat!///
 soldier:agro@You're as good as dead!/You'll pay for this!/Is that all you've got?!/Die!
 soldier:c x@a corpse?/what's this?/someone's killed./a corpse.../
 soldier:atk tgt@Die!/Eyaa!/You're going down!//////
+soldier:tickle@That tickles!/Get yourself a weapon first, punk./HAHAHA! IS THAT SUPPOSED TO HURT?/hmm? what's this?/
 p:hit@Ouch!/Oof!/Urgh!/Ow!///
 p:x@Nooooooo!/Not like this.../I'm dead.../...

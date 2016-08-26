@@ -1,6 +1,7 @@
 package com.ga.unit;
 
 import com.ga.map.Global;
+import com.ga.tool.Line;
 
 import java.awt.*;
 
@@ -8,7 +9,7 @@ import java.awt.*;
  * Created by Ga on 8/7/2016.
  */
 public class ItemFactory {
-    enum FactoryWeapon{
+    private enum FactoryWeapon{
         Fist(3,0), Mace(30,6), Sword(15,3), Stick1(7,1), Stick2(7,1), Stick3(9,2), Katana(14,2), Spear(15,3), Axe(12,3);
         private int damage, weight;
         FactoryWeapon(int dmg, int weight){
@@ -16,7 +17,7 @@ public class ItemFactory {
             this.weight = weight;
         }
     }
-    enum FactoryArmor{
+    private enum FactoryArmor{
         Cloth(1, 1,  0,255,0,125),
         Leather(2, 5f,  90,200,40,120,20,80,140,160,80,100,65,75),
         Chainmail(3, 8f,  50,130,40,120),
@@ -58,17 +59,24 @@ public class ItemFactory {
             int r = (int) ((color1rd - color1r)*ratio)+color1r;
             int g = (int) ((color1gd - color1g)*ratio)+color1g;
             int b = (int) ((color1bd - color1b)*ratio)+color1b;
-            Color c1 = new Color(r,g,b);
-            return c1;
+            return new Color(r,g,b);
         }
         Color getColor2(){
             float ratio = Global.r.nextFloat();
             int r = (int) ((color2rd - color2r)*ratio)+color2r;
             int g = (int) ((color2gd - color2g)*ratio)+color2g;
             int b = (int) ((color2bd - color2b)*ratio)+color2b;
-            Color c2 = new Color(r,g,b);
-            return c2;
+            return new Color(r,g,b);
         }
+    }
+    static Item produce(String p){
+        for (FactoryWeapon w : FactoryWeapon.values()){
+            if (w.name().equals(p)) return produceWeapon(p);
+        }
+        for (FactoryArmor w : FactoryArmor.values()){
+            if (w.name().equals(p)) return produceArmor(p);
+        }
+        return produceItem(p);
     }
     public static Weapon produceWeapon(String p) {
         FactoryWeapon wp;
@@ -101,38 +109,79 @@ public class ItemFactory {
     }
     public static Item produceItem(String p) {
         Item item;
-        if (p.equals("Potion")){
-            item = new Item(p){
-                @Override
-                public boolean use(Man host){
-                    if (super.use(host)) {
-                        host.get("health").add(100);
-                        host.clip.setState(Actions.CONSUME);
-                        return true;
+        switch (p){
+            case "Potion":
+                item = new Item(p){
+                    @Override
+                    public boolean use(Man host){
+                        if (super.use(host)) {
+                            host.get("health").add(100);
+                            host.clip.setState(Actions.CONSUME);
+                            return true;
+                        }
+                        return false;
                     }
-                    return false;
-                }
-            };
-            item.delay = 70;
-            item.cooldown = 1000;
-            item.uses = 3;
-        } else if (p.equals("Fireball")){
-            item = new Item(p){
-                @Override
-                public boolean use(Man host){
-                    if (super.use(host)) {
-                        new Projectile("item/Fireball",host.pos.getAdd(host.dir*60,-20),Global.player.mP.getAdd(host.pos),5).faction = 1;
-                        return true;
+                };
+                item.delay = 60;
+                item.cooldown = 1000;
+                item.uses = 3;
+                break;
+            case "Fireball":
+                item = new Item(p) {
+                    @Override
+                    public boolean use(Man host) {
+                        if (super.use(host)) {
+                            Projectile p = new Projectile("item/Fireball", host.pos.getAdd(host.clip.organs[ClipMan.FIST].ptd), Global.player.mP.getAdd(host.pos), 15+host.get("arms").get());
+                            p.faction = 1;
+                            p.damage = 50;
+                            p.gravity = true;
+                            p.range = 150;
+                            return true;
+                        }
+                        return false;
                     }
-                    return false;
-                }
-            };
-            item.delay = 10;
-            item.action = Actions.CAST;
-            item.cooldown = 1000;
-            item.uses = 1;
-        } else {
-            item = new Item("None");
+                };
+                item.delay = 10;
+                item.action = Actions.THROW;
+                item.cooldown = 1000;
+                item.uses = 3;
+                break;
+            case "Dagger":
+                item = new Item("Sword"){
+                    @Override
+                    public boolean use(Man host){
+                        if (super.use(host)) {
+                            Projectile p = new Projectile("item/Sword",host.pos.getAdd(host.clip.organs[ClipMan.OFIST].ptd),Global.player.mP.getAdd(host.pos),50){
+                                @Override
+                                public void onCollide(Line l){
+                                    vel.set(0,0);
+                                }
+                                @Override
+                                public void onAttack(Unit p){
+                                    vel.set(0,0);
+                                    range = 0;
+                                    gravity = true;
+                                }
+                            };
+                            p.rotSpeed = 0;
+                            p.faction = 1;
+                            p.damage = 10;
+                            p.gravity = false;
+                            return true;
+                        }
+                        return false;
+                    }
+                };
+                item.name = "Dagger";
+                item.delay = 8;
+                item.action = Actions.SHOOT;
+                item.cooldown = 20;
+                item.uses = 10;
+                break;
+            default:
+                Global.p("Can't find item "+p);
+                item = new Item("None");
+                break;
         }
         return item;
     }

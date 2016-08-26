@@ -13,7 +13,7 @@ import java.util.HashMap;
  * Created by Ga on 8/1/2016.
  */
 public class ClipMan {
-    public static final HashMap<Actions, int[]> animation = new HashMap<Actions, int[]>() {{
+    private static final HashMap<Actions, int[]> animation = new HashMap<Actions, int[]>() {{
         put(Actions.IDLE, new int[]{0, -1});
         put(Actions.WALKL, new int[]{1, 2, 3, 2});
         put(Actions.WALKR, new int[]{1, 2, 3, 2});
@@ -30,27 +30,30 @@ public class ClipMan {
         put(Actions.WHIRLWIND, new int[]{8, 9, 10, 11, -1});
         put(Actions.ENTER, new int[]{19, -1});
         put(Actions.CAST, new int[]{19, -1});
-        put(Actions.DUCK, new int[]{23, -1});
+//        put(Actions.DUCK, new int[]{23, -1});
+        put(Actions.DUCK, new int[]{19, -1});
         put(Actions.CONSUME, new int[]{24,2, -1});
         put(Actions.EXHAUSTED, new int[]{25, 26});
+        put(Actions.THROW, new int[]{20,21,22,-1});
+        put(Actions.SHOOT, new int[]{27,28,-1});
     }};
-    public static final int FIST = 1, FOOT = 3, BODY = 4;
+    static final int FIST = 1, OFIST = 5, FOOT = 3;
     public Man host;
     private int[] nextAnimation = animation.get(Actions.IDLE);
-    public Organ[] organs = new Organ[6];
-    private P[] organsChange = new P[organs.length];
+    Organ[] organs = new Organ[6];
     private Timer frame;
     private int[][] nextClip;
-    public int[][][] localAnimation;
+    int[][][] localAnimation;
     private int clip = 0;
-    protected int height = 0;
+    private int height = 0;
+    private Actions state = Actions.IDLE;
 
-    public ClipMan(Man host) {
+    ClipMan(Man host) {
         this.host = host;
         reset();
     }
 
-    public void reset() {
+    private void reset() {
         frame = new Timer(0);
         Clips.man = FileManager.readClip("unit/Man.2d");
         nextClip = Clips.clone(Clips.man.model);
@@ -58,15 +61,19 @@ public class ClipMan {
         randomize();
         for (int i = 0; i < nextClip.length; i++) {
             initializeOrgan(i);
-            organsChange[i] = new P();
         }
         organs[0].setStyle(new Color(0, 0, 0, 0), 0);
         organs[1].damage = 1;
         organs[3].damage = 2;
     }
 
-    public void resetLocalAnimation(int p){
+    void resetLocalAnimation(int p){
         localAnimation[p] = Clips.man.clip[p];
+        localAnimation[p][4][1] -= height;
+        localAnimation[p][3][1] += height;
+        localAnimation[p][2][1] += height;
+        localAnimation[p][1][1] += height / 2;
+        localAnimation[p][5][1] += height / 2;
     }
 
     private void randomize() {
@@ -106,12 +113,33 @@ public class ClipMan {
     }
 
     public void setState(Actions state) {
+        this.state = state;
         clip = 0;
         nextAnimation = animation.get(state);
+        switch (state){
+            case SHOOT:
+                rotateAppendage(OFIST,28);
+                break;
+            case THROW:
+                rotateAppendage(FIST,21);
+                break;
+            case ATTACK:
+                rotateAppendage(FIST,6);
+                break;
+            case KICK:
+                rotateAppendage(FOOT,13);
+                break;
+        }
         setClip();
     }
+    private void rotateAppendage(int organ, int frame){
+        int length = Math.abs(Clips.man.clip[frame][organ][0])+Math.abs(Clips.man.clip[frame][organ][1]);
+        P atanDir = host.target.getAdd(localAnimation[frame][organ][0]*host.dir,localAnimation[frame][organ][1]).getAtan(1);
+        localAnimation[frame][organ][0] = (int) (length*atanDir.x)*host.dir;
+        localAnimation[frame][organ][1] = (int) (length*atanDir.y);
+    }
 
-    public void setClip() {
+    void setClip() {
         if (clip >= nextAnimation.length) clip = 0;
         if (nextAnimation[clip] == -1) {
             clip--;
@@ -120,27 +148,19 @@ public class ClipMan {
         nextClip = localAnimation[nextAnimation[clip]];
         frame.set(Clips.man.frames[nextAnimation[clip]]);
     }
-    public void setKick(float rot, int dir){
-        int length = Math.abs(Clips.man.clip[13][3][0])+Math.abs(Clips.man.clip[13][3][1]);
-        localAnimation[13][3][0] = (int) (length*Global.cos(rot))*dir;
-        localAnimation[13][3][1] = (int) (length*Global.sin(rot));
-    }
-    public void setPunch(float rot, int dir){
-        int length = Math.abs(Clips.man.clip[6][1][0]);
-        localAnimation[6][1][0] = (int) (length*Global.cos(rot))*dir;
-        localAnimation[6][1][1] = (int) (length*Global.sin(rot));
-    }
 
     public void update() {
         if (!frame.update()) {
             for (int i = 0; i < nextClip.length; i++) {
-                float x = (((nextClip[i][0] * host.dir) + organs[i].pt.x) - organs[i].ptd.x) / (frame.max-1);
-                float y = ((nextClip[i][1] + organs[i].pt.y) - organs[i].ptd.y) / (frame.max-1);
-                if ((x*x)+(y*y) > 50) {
-                    if (i == 1) host.attack();
-                    else if (i == 3){
-                        Updater.collide(host, organs[i].ptd.getAdd(host.pos), organs[i].damage + host.get("damage").get());
-                        Updater.collide(host, organs[i].getAdd(host.pos), organs[i].damage + host.get("damage").get() ,false);
+                float x = (((nextClip[i][0] * host.dir) + organs[i].pt.x) - organs[i].ptd.x) / (frame.max - 1);
+                float y = ((nextClip[i][1] + organs[i].pt.y) - organs[i].ptd.y) / (frame.max - 1);
+                if (state == Actions.ATTACK || state == Actions.KICK || state == Actions.WHIRLWIND) {
+                    if ((x * x) + (y * y) > 50) {
+                        if (i == 1) host.attack();
+                        else if (i == 3) {
+                            Updater.collide(host, organs[i].ptd.getAdd(host.pos), organs[i].damage + host.get("damage").get());
+                            Updater.collide(host, organs[i].getAdd(host.pos), organs[i].damage + host.get("damage").get(), false);
+                        }
                     }
                 }
                 organs[i].ptd.add(x, y);
