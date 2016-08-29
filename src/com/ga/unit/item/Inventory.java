@@ -1,4 +1,6 @@
-package com.ga.unit;
+package com.ga.unit.item;
+
+import com.ga.unit.Player;
 
 import java.util.ArrayList;
 
@@ -7,19 +9,23 @@ import java.util.ArrayList;
  */
 public class Inventory {
     public int[] pockets = new int[]{-1,-1,-1};
-    public ArrayList<Item> items = new ArrayList<>();
-    public int wielded = -1;
+    private ArrayList<Item> items = new ArrayList<>();
+    public int wielded = -1, worn = -1, weight = 0;
     private Player player;
-    Inventory(Player player){
+    public Inventory(Player player){
         this.player = player;
     }
     public int equip(int index){
-        int result = 0;
+        int result;
         Item item = items.get(index);
-        if (item instanceof Weapon){
+        if (item instanceof Weapon) {
             result = 1;
             player.setWeapon((Weapon) items.get(index));
             wielded = index;
+        } else if (item instanceof Armor){
+            result = 2;
+            player.setArmor((Armor) items.get(index));
+            worn = index;
         } else {
             result = 10;
             int pocket = getEmptyPocket(item);
@@ -29,6 +35,16 @@ public class Inventory {
             }
         }
         return result;
+    }
+    public void addItem(Item p){
+        items.add(p);
+        weight += p.weight;
+    }
+    public Item getItem(int p){
+        return items.get(p);
+    }
+    public int getItemSize(){
+        return items.size();
     }
     private int getEmptyPocket(Item item){
         int r = 0;
@@ -43,23 +59,29 @@ public class Inventory {
     private int indexOf(Item item){
         for (int j = 0; j < pockets.length; j++) {
             int pocket = pockets[j];
-            if (items.get(pocket) == item) return j;
+            if (pocket != -1 && items.size() > pocket && items.get(pocket) == item) return j;
         }
         return -1;
     }
     public void unequip(int index){
         Item item = items.get(index);
-        if (item instanceof Weapon){
-            if (player.weapon == item) player.setWeapon(ItemFactory.produceWeapon("Fist"));
+        if (item instanceof Weapon) {
+            if (player.weapon == item) player.setWeapon((Weapon) ItemFactory.produce("Fist", 0));
             if (index == wielded) wielded = -1;
+        } else if (item instanceof Armor){
+            if (player.armor == item) player.setArmor((Armor) ItemFactory.produce("Underwear", 0));
+            if (index == worn) worn = -1;
         } else {
             removePocket(item);
         }
     }
     public void removePocket(Item item){
         for (int i = 0; i < pockets.length; i++) {
-            if (items.get(pockets[i]) == item) pockets[i] = -1;
+            if (pockets[i] != -1 && items.get(pockets[i]) == item) pockets[i] = -1;
         }
+    }
+    public void remove(int p){
+        remove(getItem(p));
     }
     public void remove(Item item){
         removePocket(item);
@@ -69,14 +91,17 @@ public class Inventory {
         String[] data = p.split(";");
         for (int i=0;i<data.length;i++){
             String[] pair = data[i].split("@");
-            Item item = ItemFactory.produce(pair[0]);
-            item.seed = Integer.parseInt(pair[2].split(",")[0]);
-            item.uses = Integer.parseInt(pair[2].split(",")[1]);
+            Item item = ItemFactory.produce(pair[0],Integer.parseInt(pair[2].split(",")[0]));
+            item.uses.setTotal(Integer.parseInt(pair[2].split(",")[2]));
+            item.uses.set(Integer.parseInt(pair[2].split(",")[1]));
+            weight += item.weight;
             if (pair[1].equals("w")){
                 wielded = i;
                 player.setWeapon((Weapon) item);
-            }
-            else if (!pair[1].equals("")){
+            } else if (pair[1].equals("e")){
+                worn = i;
+                player.setArmor((Armor) item);
+            } else if (!pair[1].equals("")){
                 pockets[Integer.parseInt(pair[1])] = i;
             }
             items.add(item);
@@ -88,6 +113,7 @@ public class Inventory {
             String prefix = "";
             Item item = items.get(i);
             if (wielded == i) prefix = "w";
+            else if (worn == i) prefix = "e";
             else if (indexOf(item) != -1) prefix = ""+indexOf(item);
             r += item.name+"@"+prefix+"@"+item.seed+","+item.uses + ";";
         }

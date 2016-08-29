@@ -1,4 +1,4 @@
-package com.ga.intelligence;
+package com.ga.unit.intelligence;
 
 import com.ga.map.Global;
 import com.ga.tool.Timer;
@@ -11,12 +11,14 @@ import com.ga.unit.Unit;
  */
 public class Hunt implements Task {
     private Man host;
+    private EnemyIntelligence ai;
     private Unit target;
     private Timer skill;
     private float range;
 
     public Hunt(Man host, Unit target) {
         this.host = host;
+        ai = (EnemyIntelligence) host.brain;
         this.target = target;
         skill = new Timer(Global.r.nextInt(30));
         range = host.getWeapon().getPoint().getAdd(host.pos.getMinus()).getDist();
@@ -25,7 +27,7 @@ public class Hunt implements Task {
     public void update() {
         if (skill.update()){
             skill.set(Global.r.nextInt(150));
-            host.brain.useSkill();
+            ai.useSkill();
         }
         int x = (int) ((target.pos.x+target.vel.x) - (host.pos.x+host.vel.x));
         int y = (int) (target.pos.y - host.pos.y);
@@ -43,15 +45,15 @@ public class Hunt implements Task {
             }
         } else if (dist <= 0) {
             if (dist < -range+10) {
-                host.brain.setMove(Intelligence.Moves.OVERLAP);
+                ai.setMove(EnemyIntelligence.Moves.OVERLAP);
             } else if (dist < -range+50) {
-                host.brain.setMove(Intelligence.Moves.CLOSE);
+                ai.setMove(EnemyIntelligence.Moves.CLOSE);
             } else if (dist > -10) { //edge
-                host.brain.setMove(Intelligence.Moves.CHASING);
+                ai.setMove(EnemyIntelligence.Moves.CHASING);
             } else if (target.vel.x == 0){
-                host.brain.setMove(Intelligence.Moves.STANDING);
+                ai.setMove(EnemyIntelligence.Moves.STANDING);
             } else {
-                host.brain.setMove(Intelligence.Moves.CHASING);
+                ai.setMove(EnemyIntelligence.Moves.CHASING);
             }
         } else {
             if (x > 0) host.setState(Actions.WALKR);

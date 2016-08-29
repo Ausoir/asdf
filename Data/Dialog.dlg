@@ -6,6 +6,7 @@ peasant:flee@See ya sucker!/You're good as dead now!/Pretty strong, aren't ye?//
 peasant:agro@You're as good as dead!/I'm coming for you!/You little...!/That tickles!/Rawr!!
 peasant:c x@a dead body./dead meat./poor guy../he's dead./a dead man./
 peasant:atk tgt@Die!/Eyaaaa!/Raaaaaawr!///////
+peasant:hear@I hear something!/What's that?/huh?///
 soldier:c tgt@Enemy!/Come here!/!!!
 soldier:hit@I'm hit!/Oof!/Urgh!////
 soldier:x@Urgh!/.../I'm down!/Someone help!/Medic!///
@@ -14,6 +15,8 @@ soldier:flee@I'll see you next time.../I'll come back for you!/Retreeeeeat!///
 soldier:agro@You're as good as dead!/You'll pay for this!/Is that all you've got?!/Die!
 soldier:c x@a corpse?/what's this?/someone's killed./a corpse.../
 soldier:atk tgt@Die!/Eyaa!/You're going down!//////
-soldier:tickle@That tickles!/Get yourself a weapon first, punk./HAHAHA! IS THAT SUPPOSED TO HURT?/hmm? what's this?/
+soldier:hear@I hear something!/What's that?/huh?///
 p:hit@Ouch!/Oof!/Urgh!/Ow!///
 p:x@Nooooooo!/Not like this.../I'm dead.../...
+merchant:ad@Selling goodies!/An honest merchant here!/Good wares, better prices!/
+merchant:c@Buy something!/Come see my wares!/Check out the newest wares here!/Need anything?

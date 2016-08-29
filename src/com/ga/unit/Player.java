@@ -9,6 +9,10 @@ import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.tool.Timer;
+import com.ga.unit.item.Inventory;
+import com.ga.unit.item.Item;
+import com.ga.unit.item.ItemFactory;
+import com.ga.unit.item.Weapon;
 import com.ga.unit.skill.*;
 
 import java.awt.*;
@@ -34,9 +38,8 @@ public class Player extends Man {
             for (int i=0;i<companions.size();i++){
                 if (cooldowns.get(i).over()){
                     cooldowns.get(i).reset();
-                    Man p = ManFactory.produce(companions.get(i), pos.getAdd(0,-50));
+                    Man p = ManFactory.produce(companions.get(i), pos.getAdd(0,-50), -1);
                     p.dir = -dir;
-                    p.brain.skillset.clear();
                     p.faction = 1;
                     break;
                 }
@@ -54,7 +57,7 @@ public class Player extends Man {
     public Player(P pt, int seed) {
         super("Player",pt,seed);
         Command.host = this;
-        get("health").set(30);
+        get("health").setTotal(30);
         stats.stats.put("points",new Stat(0));
         stats.stats.put("adapt",new Stat(0));
         get("points").max = 25;
@@ -69,38 +72,33 @@ public class Player extends Man {
         skills[1] = new Rejuvenate();
         skills[2] = new Cleave();
         speechType = "p";
-        hp = new PlayerHealthBar(get("health"),get("arms"),get("legs"),pos);
-        get("arms").onChange = (new Performer(){
-            @Override
-            public void perform(){
-                if (get("arms").get() >= weapon.weight && state == Actions.IDLE) clip.setState(Actions.IDLE);
-                hp.show(15);
-            }
-        });
-        get("legs").onChange = (new Performer(){
-            @Override
-            public void perform(){
-                if (get("legs").get() >= 2 && state == Actions.IDLE) clip.setState(Actions.IDLE);
-                hp.show(15);
-            }
-        });
+        setWeapon((Weapon) ItemFactory.produce("Fist",0));
     }
     @Override
     public void say(String p){
         Display.menu.setVisible(false);
         super.say(p);
     }
+    public void addItem(Item p){
+        inventory.addItem(p);
+        get("speed").add(-p.weight);
+    }
+    public void describeItem(int p) {
+        Item item = inventory.getItem(p);
+        String r = item.getDescription();
+        say(r);
+    }
     public void useItem(int p){
         if (!delay.over() || !jump) return;
         if (inventory.pockets.length > p && inventory.pockets[p] != -1) {
-            final Item item = inventory.items.get(inventory.pockets[p]);
+            final Item item = inventory.getItem(inventory.pockets[p]);
             delay.set(item.delay);
             final Man host = this;
             delay.performer = new Performer(){
                 public void perform(){
                     if (!item.use(host)){
                         say(item.name+" is not working!");
-                    } else if (item.uses == 0) {
+                    } else if (item.uses.get() == 0) {
                         say("Used up "+item.name);
                         inventory.remove(item);
                     }
@@ -139,13 +137,15 @@ public class Player extends Man {
 
     public void onCollide(Line r){
         super.onCollide(r);
-        if (r.opt == 2) {
-            vel.set(0, 0);
-            Global.map.teleport(pos, r);
-            pos.add(0, -height);
-        } else if (r.opt >= 100){
-            if (r.opt >= 200) Global.map.loadMap(r.opt-200, Global.player.teleportReady());
-            else Global.map.loadMap(r.opt-100, true);
+        if (state != Actions.DEAD) {
+            if (r.opt == 2) {
+                vel.set(0, 0);
+                Global.map.teleport(pos, r);
+                pos.add(0, -height);
+            } else if (r.opt >= 100) {
+                if (r.opt >= 200) Global.map.loadMap(r.opt - 200, Global.player.teleportReady());
+                else Global.map.loadMap(r.opt - 100, true);
+            }
         }
     }
     public void update(){
@@ -165,5 +165,28 @@ public class Player extends Man {
         r += stats.toString()+"\n";
         r += inventory.toString();
         return r;
+    }
+    public void load(String p){
+        String[] line = p.split("%");
+        stats.load(line[1]);
+        hp = new PlayerHealthBar(get("health"),get("arms"),get("legs"),pos);
+        get("arms").onChange = (new Performer(){
+            @Override
+            public void perform(){
+                if (get("arms").isFull() && state == Actions.IDLE) clip.setState(Actions.IDLE);
+                hp.show(15);
+            }
+        });
+        get("legs").onChange = (new Performer(){
+            @Override
+            public void perform(){
+                if (get("legs").isFull() && state == Actions.IDLE) clip.setState(Actions.IDLE);
+                hp.show(15);
+            }
+        });
+        if (line.length > 2) inventory.load(line[2]);
+        for (int i=0;i<inventory.getItemSize();i++){
+            get("speed").add(-inventory.getItem(i).weight);
+        }
     }
 }

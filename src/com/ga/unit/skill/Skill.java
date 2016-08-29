@@ -28,7 +28,7 @@ public class Skill {
         active = true;
         timer.reset();
     }
-    protected void end(){
+    public void end(){
         active = false;
         this.host = null;
     }

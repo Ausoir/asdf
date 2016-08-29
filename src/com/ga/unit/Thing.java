@@ -5,15 +5,18 @@ import com.ga.game.Texture;
 import com.ga.map.Drawable;
 import com.ga.map.Global;
 import com.ga.tool.P;
+import com.ga.unit.item.Item;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.Random;
 
 /**
  * Created by Ga on 5/6/2016.
  */
 public class Thing implements Drawable {
-    int seed = 0;
+    public int seed = 0;
+    public Random rand;
     public BufferedImage image;
     private boolean visible = true;
     public P pos;
@@ -22,8 +25,11 @@ public class Thing implements Drawable {
     int depth;
     public int dir = 1;
     protected float rotation = 0;
-    Thing(String name){
+    public Thing(String name, int seed){
         this.name = name;
+        if (seed == -1) this.seed = Global.getSeed();
+        else this.seed = seed;
+        rand = new Random(seed);
         if (name != null) {
             String dir = "";
             if (this instanceof Man) dir = "unit/";
@@ -35,11 +41,11 @@ public class Thing implements Drawable {
     public void rotate(P p){
         rotate((float) Math.atan2(p.y,p.x));
     }
-    void rotate(float p){
+    public void rotate(float p){
         rotation = p;
     }
-    protected Thing(String name, P pt, int depth){
-        this(name);
+    protected Thing(String name, int seed, P pt, int depth){
+        this(name, seed);
         this.depth = depth;
         pos = pt;
         Updater.addQueue.add(this);

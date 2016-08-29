@@ -1,8 +1,12 @@
 package com.ga.map;
 
 import com.ga.tool.P;
-import com.ga.unit.ItemFactory;
+import com.ga.unit.intelligence.EnemyIntelligence;
+import com.ga.unit.item.Armor;
+import com.ga.unit.item.ItemFactory;
 import com.ga.unit.Man;
+import com.ga.unit.Merchant;
+import com.ga.unit.item.Weapon;
 
 import java.util.HashMap;
 
@@ -10,55 +14,58 @@ import java.util.HashMap;
  * Created by Ga on 8/2/2016.
  */
 public class ManFactory {
-    static final HashMap<String, Integer> manType = new HashMap<String,Integer>(){{
-        put("Player",0);
-        put("Man",1);
-        put("Soldier",2);
-        put("Knight",3);
-    }};
-    static final String[][] weaponType = new String[][]{
-            new String[]{ "Fist" },
-            new String[]{ "Stick1", "Stick2", "Stick3", "Axe" },
-            new String[]{ "Sword", "Spear" },
-            new String[]{ "Sword", "Mace", "Katana" },
-    };
-    static final String[][] armorType = new String[][]{
-            new String[]{ "Cloth" },
-            new String[]{ "Cloth" },
-            new String[]{ "Leather", "Chainmail" },
-            new String[]{ "Platemail" },
-    };
-    static final String[] speechType = new String[]{
-            "", "peasant", "soldier", "soldier"
-    };
-    public static Man produce(String name, P pt){
-        return produce(name,pt,0);
+    enum ManType{
+        Merchant(null, new String[]{"Fist"}, new String[]{"Cotton_Clothing"}, 0,0,0,0),
+        Peasant(new String[]{"Man0","Man1","Man2","Man3","Man4","Man5","Man6"}, new String[]{"Stick1","Stick2","Stick3","Axe","Fist"}, new String[]{"Cotton_Clothing","Fabric_Clothing"}, 0,0,0,0),
+        Soldier(null,new String[]{"Sword","Spear"}, new String[]{"Leather_Armor", "Chainmail"}, 20,2,8,5),
+        Knight(null,new String[]{"Sword","Mace","Katana"}, new String[]{"Platemail"}, 20,1,5,5);
+        String[] face, weapon, armor;
+        int health,speed,arms,legs;
+        ManType(String[] face, String[] weapons, String[] armors, int hp, int spd, int arm, int leg){
+            this.face = face;
+            this.weapon = weapons;
+            this.armor = armors;
+            this.health = hp;
+            this.speed = spd;
+            this.arms = arm;
+            this.legs = leg;
+        }
+        String getFace(){
+            if (face == null) return name();
+            return face[Global.r.nextInt(face.length)];
+        }
+        String getWeapon(){
+            return weapon[Global.r.nextInt(weapon.length)];
+        }
+        String getArmor(){
+            return armor[Global.r.nextInt(armor.length)];
+        }
+        Man get(P p, int seed){
+            Man r = new Man(getFace(),p,seed);
+            r.setWeapon((Weapon) ItemFactory.produce(getWeapon(),-1));
+            r.setArmor((Armor) ItemFactory.produce(getArmor(),-1));
+            r.get("health").addTotal(health);
+            r.get("speed").addTotal(speed);
+            r.get("legs").addTotal(legs);
+            r.get("arms").addTotal(arms);
+            return r;
+        }
     }
     public static Man produce(String name, P pt, int seed){
-        Man p = new Man(name, pt, seed);
-        if (name.startsWith("Man")) name = "Man";
-        Integer type = manType.get(name);
-        if (type == -1) type = Global.r.nextInt(4);
-        String weapon = weaponType[type][Global.r.nextInt(weaponType[type].length)];
-        String armor = armorType[type][Global.r.nextInt(armorType[type].length)];
-        p.setWeapon(ItemFactory.produceWeapon(weapon));
-        p.setArmor(ItemFactory.produceArmor(armor));
-        if (type == 1) {
-            p.get("health").addTotal(10);
-            p.get("speed").addTotal(1);
-            p.get("legs").set(Global.r.nextInt(2)+1);
-            p.get("arms").set(Global.r.nextInt(2)+1);
-        } else if (type == 2) {
-            p.get("health").addTotal(10);
-            p.get("speed").addTotal(1);
-            p.get("arms").addTotal(Global.r.nextInt(10)+5);
-            p.get("legs").addTotal(Global.r.nextInt(4)+5);
-        } else if (type == 3) {
-            p.get("health").addTotal(50);
-            p.get("arms").addTotal(Global.r.nextInt(5)+20);
-            p.get("legs").addTotal(Global.r.nextInt(5)+20);
+        Man result;
+        try {
+            result = ManType.valueOf(name).get(pt, seed);
+        } catch (Exception e) {
+            Global.p("Can't find man ["+name+"]");
+            result = ManType.Peasant.get(pt, seed);
         }
-        p.speechType = speechType[type];
-        return p;
+        switch (name){
+            case "Merchant":
+                result.brain = new Merchant(result);
+                break;
+            default:
+                result.brain = new EnemyIntelligence(result);
+        }
+        return result;
     }
 }

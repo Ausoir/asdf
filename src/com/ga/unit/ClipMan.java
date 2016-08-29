@@ -34,13 +34,13 @@ public class ClipMan {
         put(Actions.DUCK, new int[]{19, -1});
         put(Actions.CONSUME, new int[]{24,2, -1});
         put(Actions.EXHAUSTED, new int[]{25, 26});
-        put(Actions.THROW, new int[]{20,21,22,-1});
-        put(Actions.SHOOT, new int[]{27,28,-1});
+        put(Actions.THROW, new int[]{20,21,22,2,-1});
+        put(Actions.SHOOT, new int[]{27,28,2,-1});
     }};
-    static final int FIST = 1, OFIST = 5, FOOT = 3;
+    public static final int FIST = 1, OFIST = 5, FOOT = 3;
     public Man host;
     private int[] nextAnimation = animation.get(Actions.IDLE);
-    Organ[] organs = new Organ[6];
+    public Organ[] organs = new Organ[6];
     private Timer frame;
     private int[][] nextClip;
     int[][][] localAnimation;
@@ -63,8 +63,6 @@ public class ClipMan {
             initializeOrgan(i);
         }
         organs[0].setStyle(new Color(0, 0, 0, 0), 0);
-        organs[1].damage = 1;
-        organs[3].damage = 2;
     }
 
     void resetLocalAnimation(int p){
@@ -77,9 +75,9 @@ public class ClipMan {
     }
 
     private void randomize() {
-        height = (int) Math.max(Math.min(Global.r.nextGaussian() * 5, 15), -15);
+        height = (int) Math.max(Math.min(host.rand.nextGaussian() * 5, 15), -15);
         for (int i = 0; i < localAnimation.length; i++) {
-            randomizeSection(i, (int) (Global.rng(1) * 2), (int) (Global.rng(1) * 2));
+            randomizeSection(i, (int) (Global.clamp((float) host.rand.nextGaussian(),-1,1) * 2), (int) (Global.clamp((float) host.rand.nextGaussian(),-1,1) * 2));
             localAnimation[i][4][1] -= height;
             localAnimation[i][3][1] += height;
             localAnimation[i][2][1] += height;
@@ -158,8 +156,7 @@ public class ClipMan {
                     if ((x * x) + (y * y) > 50) {
                         if (i == 1) host.attack();
                         else if (i == 3) {
-                            Updater.collide(host, organs[i].ptd.getAdd(host.pos), organs[i].damage + host.get("damage").get());
-                            Updater.collide(host, organs[i].getAdd(host.pos), organs[i].damage + host.get("damage").get(), false);
+                            Updater.collide(host, organs[i].getAdd(host.pos), 5 + host.get("damage").get(), false);
                         }
                     }
                 }

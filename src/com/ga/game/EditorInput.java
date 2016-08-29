@@ -1,6 +1,6 @@
 package com.ga.game;
 
-import com.ga.intelligence.PlayerInput;
+import com.ga.unit.intelligence.PlayerInput;
 import com.ga.map.Global;
 import com.ga.tool.Line;
 import com.ga.tool.P;
@@ -35,6 +35,8 @@ public class EditorInput implements Input, Observer {
     int speed = 50;
 
     public EditorInput() {
+        Display.input = this;
+        Updater.editor = true;
         Updater.other.add(this);
         if (Global.camera == null) Global.camera = new P();
         else Global.camera = new P(Global.camera);

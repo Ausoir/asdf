@@ -1,4 +1,4 @@
-package com.ga.intelligence;
+package com.ga.unit.intelligence;
 
 import com.ga.unit.Actions;
 import com.ga.unit.Man;
@@ -17,7 +17,6 @@ public class Flee implements Task {
     }
 
     public void update() {
-        host.brain.useSkill("Adrenaline");
         int x = (int) (target.pos.x - host.pos.x);
         host.face(x < 0 ? -1 : 1);
         if (x > 0) host.setState(Actions.WALKL);

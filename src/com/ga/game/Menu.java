@@ -2,8 +2,8 @@ package com.ga.game;
 
 import com.ga.map.Global;
 import com.ga.tool.P;
-import com.ga.unit.Inventory;
-import com.ga.unit.Item;
+import com.ga.unit.item.Inventory;
+import com.ga.unit.item.Item;
 import com.ga.unit.Player;
 
 import javax.swing.*;
@@ -250,13 +250,24 @@ class InventoryPanel extends JPanel {
             public void mouseDragged(MouseEvent e) {
                 int y = e.getY();
                 if (mRelease) mRelease = false;
-                else panel.setLocation(0, (int) Global.clamp(panel.getY() + (y - prevY),-600,0));
+                else panel.setLocation(0, Math.min(panel.getY() + (y - prevY),0));
                 prevY = y;
+            }
+        });
+        addMouseWheelListener(new MouseWheelListener() {
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                int notches = e.getWheelRotation();
+                if (notches < 0) panel.setLocation(0, Math.min(panel.getY() - 30,0));
+                else if (notches > 0) panel.setLocation(0, Math.min(panel.getY() + 30,0));
             }
         });
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
+                if (e.getButton() == 2){
+                    panel.setLocation(0, 0);
+                }
             }
             @Override
             public void mouseReleased(MouseEvent e){
@@ -264,7 +275,7 @@ class InventoryPanel extends JPanel {
             }
         });
         panel = new JPanel();
-        panel.setBounds(0,0,1000,1000);
+        panel.setBounds(0,0,1000,10000);
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel,BoxLayout.PAGE_AXIS));
 //        refresh();
@@ -273,12 +284,12 @@ class InventoryPanel extends JPanel {
     public void refresh(){
         panel.removeAll();
         Inventory inv = Global.player.host.inventory;
-        int itemsize = inv.items.size();
+        int itemsize = inv.getItemSize();
         selected = new int[itemsize];
         for (int i = 0; i < itemsize; i++) {
-            Item item = inv.items.get(i);
+            Item item = inv.getItem(i);
             grid.gridy = i;
-            makeSlot(item.name, item.image, i);
+            makeSlot(item.getFullName(), item.image, i, item.getRarity());
         }
         for (int i = 0; i < inv.pockets.length; i++) {
             int slot = inv.pockets[i];
@@ -287,10 +298,17 @@ class InventoryPanel extends JPanel {
             }
         }
         if (inv.wielded != -1) equip(inv.wielded);
+        if (inv.worn != -1) equip(inv.worn);
     }
-    public void makeSlot(final String p, Image img, final int item){
-        final JLabel result = new JLabel(p);
+    public void makeSlot(final String p, Image img, final int item, int rarity){
+        JPanel panel = new JPanel();
+        panel.setOpaque(false);
+        panel.setLayout(new BoxLayout(panel,BoxLayout.PAGE_AXIS));
+        panel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
+        final JLabel result = new JLabel();
         result.setIcon(new ImageIcon(img));
+        result.setHorizontalTextPosition(JLabel.CENTER);
+        result.setVerticalTextPosition(JLabel.TOP);
         result.setBorder(emptyborder);
         result.addMouseListener(new MouseAdapter() {
             @Override
@@ -299,7 +317,60 @@ class InventoryPanel extends JPanel {
                 else unequip(item);
             }
         });
+        JPanel options = new JPanel();
+        options.setOpaque(false);
+        options.setLayout(new BoxLayout(options,BoxLayout.LINE_AXIS));
+        final JLabel describe = new JLabel(" [?]");
+        describe.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                describe(item);
+            }
+        });
+        final JLabel drop = new JLabel(p);
+        drop.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                drop(item);
+            }
+        });
+        drop.setForeground(getRarityColor(rarity));
+        drop.setIcon(new ImageIcon(Texture.load("item/Drop.png")));
+        options.add(describe);
+        options.add(drop);
+        panel.add(options);
         panel.add(result);
+        this.panel.add(panel);
+    }
+    private Color getRarityColor(int rarity){
+        Color result = Color.black;
+        switch (rarity){
+            case 1:
+                result = Color.GRAY;
+                break;
+            case 2:
+                result = Color.DARK_GRAY;
+                break;
+            case 3:
+                result = Color.GREEN;
+                break;
+            case 4:
+                return Color.ORANGE;
+            case 5:
+                return Color.MAGENTA;
+        }
+        if (rarity >= 100){
+            result = Color.BLUE;
+        }
+        return result;
+    }
+    private void describe(int p){
+        Global.player.host.describeItem(p);
+    }
+    private void drop(int p){
+        unequip(p);
+        Global.player.host.inventory.remove(p);
+        refresh();
     }
     public void equip(int p){
         final Inventory inv = Global.player.host.inventory;
@@ -309,13 +380,14 @@ class InventoryPanel extends JPanel {
         }
         TitledBorder b = BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder());
         if (r == 1) b.setTitle("Wielded");
+        else if (r == 2) b.setTitle("Equipped");
         else if (r >= 10) b.setTitle(""+(r-9));
-        ((JLabel) panel.getComponent(p)).setBorder(b);
+        ((JPanel) panel.getComponent(p)).setBorder(b);
         selected[p] = r;
     }
     public void unequip(int p){
         Global.player.host.inventory.unequip(p);
-        ((JLabel) panel.getComponent(p)).setBorder(emptyborder);
+        ((JPanel) panel.getComponent(p)).setBorder(emptyborder);
         selected[p] = 0;
     }
 }

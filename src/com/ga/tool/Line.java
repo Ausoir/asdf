@@ -50,8 +50,8 @@ public class Line {
     public void draw(Graphics2D g, P offset, int dir){
         P t = Global.getRelPos(offset.x+(pt.x*dir),offset.y+pt.y);
         P td = Global.getRelPos(offset.x+(ptd.x*dir),offset.y+ptd.y);
-        if ((t.x > -100 && t.y > -100 && t.x < Settings.screenX + 100 && t.y < Settings.screenY + 100)
-            || (td.x > -100 && td.y > -100 && td.x < Settings.screenX + 100 && td.y < Settings.screenY + 100))
+//        if ((t.x > -100 && t.y > -100 && t.x < Settings.screenX + 100 && t.y < Settings.screenY + 100)
+//            || (td.x > -100 && td.y > -100 && td.x < Settings.screenX + 100 && td.y < Settings.screenY + 100))
             g.drawLine((int)t.x, (int)t.y, (int)td.x, (int)td.y);
     }
     public String toString(){

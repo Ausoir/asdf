@@ -3,7 +3,6 @@ package com.ga.unit;
 import com.ga.game.Display;
 import com.ga.game.FileManager;
 import com.ga.game.Observer;
-import com.ga.intelligence.PlayerInput;
 import com.ga.map.Drawable;
 import com.ga.map.Global;
 import com.ga.tool.Line;
@@ -33,7 +32,9 @@ public class Updater {
     }
     public static void changeMap(){
         clear();
-        FileManager.readMap(changeMap, editor?-2:changeMapPos);
+        addQueue.add(Global.player.host);
+        Global.player.host.pos.set(FileManager.readMap(changeMap, editor?-2:changeMapPos));
+        new Shadow(Global.player.host.pos);
         Display.input = Global.player;
         changeMap = null;
     }
@@ -88,39 +89,28 @@ public class Updater {
         result = result.substring(0,result.length()-1);
         return result;
     }
-    public static Unit collide(Man host, Line p, int force, boolean cleave){
-        Unit result = null;
+    public static void sound(P p, String msg){
         for (Unit i : updatee){
-            if (host.faction != i.faction) {
-                if (i instanceof Man) {
-                    Man ii = (Man) i;
-                    Line body = ii.clip.organs[4].getAdd(ii.pos);
-                    if (p.lineCross(body)) {
-                        ii.hit(host, force);
-                        result = i;
-                        if (!cleave) return result;
+            if (i.pos != p) {
+                if (Math.abs(i.pos.x - p.x) < 600 && Math.abs(i.pos.y - p.y) < 300) {
+                    if (i instanceof Man) {
+                        ((Man) i).hear(p, msg);
                     }
                 }
             }
         }
-        return result;
     }
-    public static Unit collide(Unit host, P p, int force, int range, boolean cleave){
+    public static Unit collide(Unit host, Line p, int force, boolean cleave){
         Unit result = null;
         for (Unit i : updatee){
             if (host.faction != i.faction) {
-                P head = i.getCollisionPoint();
-                if (range - (Math.pow(p.x - head.x, 2) + Math.pow(p.y - head.y, 2)) > 0) {
-                    i.hit(host, force);
-                    result = i;
-                    if (!cleave) return result;
+                if (i.checkHit(host,p,force)){
+                    if (!cleave) return i;
+                    else result = i;
                 }
             }
         }
         return result;
-    }
-    public static Unit collide(Man host, P p, int force){
-        return collide(host,p,force,625,false);
     }
     public static ArrayList<Unit> perceive(Man host, P vision, int r){
         ArrayList<Unit> seen = new ArrayList<>();

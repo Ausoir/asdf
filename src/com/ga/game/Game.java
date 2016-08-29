@@ -12,7 +12,6 @@ import java.awt.*;
 public class Game extends JFrame {
     public Game(boolean editor, int x, int y){
         Global.init();
-        FileManager.loadFirst();
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
         if (x == 0 && y == 0) {
             x = screen.width;
@@ -22,11 +21,8 @@ public class Game extends JFrame {
         setSize(Settings.screenX, Settings.screenY);
         JPanel display;
 //        Updater.showTerrain = true;
-        if (!editor) display = new Display(Global.player);
-        else{
-            display = new Display(new EditorInput());
-            Updater.editor = true;
-        }
+        display = new Display();
+        FileManager.loadFirst(editor);
         add(display);
         setVisible(true);
         setExtendedState( getExtendedState()|JFrame.MAXIMIZED_BOTH );

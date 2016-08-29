@@ -13,10 +13,14 @@ class Shadow extends Unit {
     private static final P size = new P(50,20);
     private P hostPos;
     Shadow(P pt) {
-        super(null, new P(), 9);
+        super(null, 0, new P(), 9);
         hostPos = pt;
         gravity = false;
         pos.set(hostPos);
+    }
+    @Override
+    public boolean checkHit(Unit hitter, Line p, int force){
+        return false;
     }
     @Override
     public void collide(){

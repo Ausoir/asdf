@@ -13,7 +13,7 @@ public class Rejuvenate extends Skill {
         super.start();
         host.get("arms").add(100,false);
     }
-    protected void end(){
+    public void end(){
         super.end();
     }
 }

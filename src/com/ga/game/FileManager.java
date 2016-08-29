@@ -1,6 +1,5 @@
 package com.ga.game;
 
-import com.ga.intelligence.PlayerInput;
 import com.ga.map.Global;
 import com.ga.map.ManFactory;
 import com.ga.map.Map;
@@ -9,6 +8,7 @@ import com.ga.tool.P;
 import com.ga.unit.Clip;
 import com.ga.unit.Player;
 import com.ga.unit.Updater;
+import com.ga.unit.intelligence.PlayerInput;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -66,21 +66,17 @@ public class FileManager {
 //        System.out.println(result);
         return result;
     }
-    static void loadFirst(){
+    static void loadFirst(boolean editor){
         String data = read("map/"+"Player"+".char");
         String[] line = data.split("%");
         String[] values = line[0].split("@");
-        readMap(values[3],0);
-        Global.player.host.pos.load(values[2]);
+        readMap(values[3],editor?-2:0);
+        if (!editor){
+            Global.player = new PlayerInput(new Player(new P(values[2]), Integer.parseInt(values[1])));
+            Global.player.host.load(read("map/Player.char"));
+        }
     }
-    private static void readCharacter(String dir){
-        String data = read("map/"+dir+".char");
-        String[] line = data.split("%");
-        Player player = Global.player.host;
-        player.stats.load(line[1]);
-        if (line.length > 2) player.inventory.load(line[2]);
-    }
-    public static void readMap(String dir, int player) {
+    public static P readMap(String dir, int player) {
         String data = read("map/"+dir+".map");
         String[] line = data.split("%");
         P mapPos = new P();
@@ -114,16 +110,15 @@ public class FileManager {
                         pos = new P(v[0], v[1]);
                         if (unit.equals("Player")) {
                             if (player == 0 || player == -2){
-                                new PlayerInput(new Player(pos,seed));
-                                FileManager.readCharacter("Player");
-                                FileManager.saveCharacter();
+                                return pos;
                             }
                             if (player > -1) player--;
-                        } else if (unit.equals("Man")) ManFactory.produce(unit + Global.r.nextInt(Settings.manTypes), pos, seed);
+                        }
                         else ManFactory.produce(unit, pos, seed);
                     }
             }
         }
+        return null;
     }
 
     public static int[] readClipFrames(String dir) {

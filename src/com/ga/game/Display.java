@@ -1,6 +1,5 @@
 package com.ga.game;
 
-import com.ga.intelligence.PlayerInput;
 import com.ga.map.Global;
 import com.ga.unit.Updater;
 
@@ -16,9 +15,9 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
     public JTextField chatbox;
     public static Input input;
     public static Menu menu;
-    public Display(Input input) {
+    public Display() {
+        Global.display = this;
         setLayout(null);
-        this.input = input;
         addKeyListener(this);
         addMouseListener(this);
         addMouseMotionListener(this);

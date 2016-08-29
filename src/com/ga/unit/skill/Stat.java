@@ -10,28 +10,32 @@ public class Stat {
     public int current;
     public Performer onChange;
     public Stat(int p){
-        set(p);
+        setTotal(p);
     }
     public Stat(int p, int max){
-        set(max);
+        setTotal(max);
         current = p;
     }
-    public void set(int p){
+    public void setTotal(int p){
         max = p;
         current = p;
         onChange();
     }
+    public void set(int p){
+        current = p;
+        if (current > max) current = max;
+        else if (current < 0) current = 0;
+        else if (p != 0) onChange();
+    }
     public void addTotal(int p){
-        set(max + p);
+        setTotal(max + p);
     }
     public void add(int p){
         add(p, false);
     }
     public void add(int p, boolean force){
-        current += p;
-        if (!force && current > max) current = max;
-        else if (current < 0) current = 0;
-        else if (p != 0) onChange();
+        if (!force) set(current+p);
+        else current += p;
     }
     public float getByPercentage(float p){
         return max*p;
@@ -45,6 +49,9 @@ public class Stat {
             return true;
         }
         return false;
+    }
+    public boolean isFull(){
+        return max == current;
     }
     public void heal(){
         current = max;

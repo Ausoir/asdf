@@ -22,29 +22,29 @@ public class Map {
     public Map(String[] maps, P pt) {
         this.maps = maps;
         final int mag = 3;
-        panorama = new Thing("map/"+maps[0], pt, 1){
+        panorama = new Thing("map/"+maps[0],  0, pt, 1){
             @Override
             public void draw(Graphics2D g){
                 P t = Global.getRelPos(pos.x,pos.y).getMult(.1f,.1f);
-                t.x = Global.clamp(t.x,-size.x+Settings.screenX+50,0);
+                t.x = Global.clamp(t.x,-size.x+Settings.screenX,0);
                 t.y = Global.clamp(t.y,-size.y+Settings.screenY,0);
                 g.drawImage(image,(int)(t.x),(int)(t.y),(int)size.x,(int)size.y,null);
             }
         };
         panorama.size.mult(mag,mag);
         panorama.pos = panorama.pos.getAdd(500,0);
-        map = new Thing("map/"+maps[1], pt, 2){
+        map = new Thing("map/"+maps[1], 0, pt, 2){
             public void draw(Graphics2D g){
                 P t = Global.getRelPos(pos.x,pos.y);
-                t.x = Global.clamp(t.x,(-size.x)+Settings.screenX+50,0);
+                t.x = Global.clamp(t.x,(-size.x)+Settings.screenX,0);
                 t.y = Global.clamp(t.y,(-size.y)+Settings.screenY,0);
                 g.drawImage(image,(int)t.x,(int)t.y,(int)size.x,(int)size.y,null);
             }
         };
-        fmap = new Thing("map/"+maps[2], pt, 30){
+        fmap = new Thing("map/"+maps[2], 0, pt, 30){
             public void draw(Graphics2D g){
                 P t = Global.getRelPos(pos.x,pos.y);
-                t.x = Global.clamp(t.x,(-size.x)+Settings.screenX+50,0);
+                t.x = Global.clamp(t.x,(-size.x)+Settings.screenX,0);
                 t.y = Global.clamp(t.y,(-size.y)+Settings.screenY,0);
                 g.drawImage(image,(int)t.x,(int)t.y,(int)size.x,(int)size.y,null);
             }
@@ -74,6 +74,7 @@ public class Map {
     }
     public void loadMap(int opt, boolean rdy){
         if (rdy){
+            Global.player.host.stats.end();
             FileManager.saveCharacter();
             int mapnum = opt / 10, posnum = opt % 10;
             Updater.changeMap = maps[mapnum+3];

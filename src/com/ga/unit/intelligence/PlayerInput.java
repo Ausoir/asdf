@@ -1,4 +1,4 @@
-package com.ga.intelligence;
+package com.ga.unit.intelligence;
 
 import com.ga.game.Command;
 import com.ga.game.Input;
@@ -39,6 +39,7 @@ public class PlayerInput implements Input, Observer {
     public P mP = new P();
     public float mR;
     public PlayerInput(Player unit){
+        Global.display.input = this;
         host = unit;
         host.faction = 1;
         unit.brain = null;

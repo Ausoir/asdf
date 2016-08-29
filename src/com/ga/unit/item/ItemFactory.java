@@ -1,7 +1,12 @@
-package com.ga.unit;
+package com.ga.unit.item;
 
 import com.ga.map.Global;
 import com.ga.tool.Line;
+import com.ga.tool.Performer;
+import com.ga.unit.Actions;
+import com.ga.unit.ClipMan;
+import com.ga.unit.Man;
+import com.ga.unit.Unit;
 
 import java.awt.*;
 
@@ -10,19 +15,24 @@ import java.awt.*;
  */
 public class ItemFactory {
     private enum FactoryWeapon{
-        Fist(3,0), Mace(30,6), Sword(15,3), Stick1(7,1), Stick2(7,1), Stick3(9,2), Katana(14,2), Spear(15,3), Axe(12,3);
-        private int damage, weight;
-        FactoryWeapon(int dmg, int weight){
-            this.damage = dmg;
+        Fist(1,-1,1,2), Mace(4,1000,3,8), Sword(3,600,2,6), Stick1(1,10,1,6), Stick2(1,10,1,6), Stick3(1,10,1,6), Katana(2,100,1,10), Spear(3,160,1,12), Axe(3,100,1,12),
+        Dagger(1,800,1,6), Pick(4,100,1,24), Cleaver(6,600,2,12), Halberd(6,100,1,36), Greatsword(8,400,2,18), Warhammer(9,400,3,12);
+        private int damageNum, damageSides, weight, uses;
+        FactoryWeapon(int weight, int uses, int dmgNum, int dmgSide){
             this.weight = weight;
+            this.damageNum = dmgNum;
+            this.damageSides = dmgSide;
+            this.uses = uses;
         }
     }
     private enum FactoryArmor{
-        Cloth(1, 1,  0,255,0,125),
-        Leather(2, 5f,  90,200,40,120,20,80,140,160,80,100,65,75),
-        Chainmail(3, 8f,  50,130,40,120),
-        Platemail(4, 15,  130,200,130,200,130,200);
-        private int weight;
+        Underwear(0, -1, 1,  250,255,220,240,180,220),
+        Cotton_Clothing(1, 50, 1,  0,255,0,125),
+        Fabric_Clothing(1, 100, 1,  0,125,0,125),
+        Leather_Armor(2, 500, 5f,  90,200,40,120,20,80,140,160,80,100,65,75),
+        Chainmail(3, 200, 8f,  50,130,40,120),
+        Platemail(4, 200, 15,  130,200,130,200,130,200);
+        private int weight, uses;
         private float armor;
         private int color1r = 0, color1rd = 255;
         private int color1g = 0, color1gd = 255;
@@ -31,7 +41,8 @@ public class ItemFactory {
         private int color2g = 0, color2gd = 255;
         private int color2b = 0, color2bd = 255;
         boolean uniform = true;
-        FactoryArmor(int weight, float armor, int r1, int r1d, int g1, int g1d, int b1, int b1d){
+        FactoryArmor(int weight, int uses, float armor, int r1, int r1d, int g1, int g1d, int b1, int b1d){
+            this.uses = uses;
             this.armor = armor;
             this.weight = weight;
             color1r = r1;
@@ -41,8 +52,8 @@ public class ItemFactory {
             color1b = b1;
             color1bd = b1d;
         }
-        FactoryArmor(int weight, float armor, int r1, int r1d, int g1, int g1d, int b1, int b1d, int r2, int r2d, int g2, int g2d, int b2, int b2d){
-            this(weight, armor, r1,r1d,g1,g1d,b1,b1d);
+        FactoryArmor(int weight, int uses, float armor, int r1, int r1d, int g1, int g1d, int b1, int b1d, int r2, int r2d, int g2, int g2d, int b2, int b2d){
+            this(weight, uses, armor, r1,r1d,g1,g1d,b1,b1d);
             uniform = false;
             color2r = r2;
             color2rd = r2d;
@@ -51,8 +62,8 @@ public class ItemFactory {
             color2b = b2;
             color2bd = b2d;
         }
-        FactoryArmor(int weight, float armor, int c1, int c1d, int c2, int c2d){
-            this(weight, armor,c1,c1d,c1,c1d,c1,c1d,c2,c2d,c2,c2d,c2,c2d);
+        FactoryArmor(int weight, int uses, float armor, int c1, int c1d, int c2, int c2d){
+            this(weight, uses, armor,c1,c1d,c1,c1d,c1,c1d,c2,c2d,c2,c2d,c2,c2d);
         }
         Color getColor1(){
             float ratio = Global.r.nextFloat();
@@ -69,16 +80,16 @@ public class ItemFactory {
             return new Color(r,g,b);
         }
     }
-    static Item produce(String p){
+    public static Item produce(String p, int seed){
         for (FactoryWeapon w : FactoryWeapon.values()){
-            if (w.name().equals(p)) return produceWeapon(p);
+            if (w.name().equals(p)) return produceWeapon(p, seed);
         }
         for (FactoryArmor w : FactoryArmor.values()){
-            if (w.name().equals(p)) return produceArmor(p);
+            if (w.name().equals(p)) return produceArmor(p, seed);
         }
-        return produceItem(p);
+        return produceItem(p, seed);
     }
-    public static Weapon produceWeapon(String p) {
+    private static Weapon produceWeapon(String p, int seed) {
         FactoryWeapon wp;
         try {
             wp = FactoryWeapon.valueOf(p);
@@ -86,32 +97,28 @@ public class ItemFactory {
             Global.p("Can't find weapon "+p);
             wp = FactoryWeapon.Fist;
         }
-        Weapon r = new Weapon(wp.toString());
-        r.damage = wp.damage;
-        r.weight = wp.weight;
+        Weapon r = new Weapon(wp.toString(), seed, wp.weight, wp.uses, wp.damageNum, wp.damageSides);
         return r;
     }
-    public static Armor produceArmor(String p) {
+    private static Armor produceArmor(String p, int seed) {
         FactoryArmor ar;
         try {
             ar = FactoryArmor.valueOf(p);
         } catch (Exception e) {
             Global.p("Can't find armor "+p);
-            ar = FactoryArmor.Cloth;
+            ar = FactoryArmor.Underwear;
         }
-        Armor r = new Armor(ar.toString());
-        r.armor = ar.armor;
+        Armor r = new Armor(ar.toString(), seed, ar.weight, ar.uses, ar.armor);
         r.color1 = ar.getColor1();
         if (ar.uniform) r.color2 = r.color1;
         else r.color2 = ar.getColor2();
-        r.weight = ar.weight;
         return r;
     }
-    public static Item produceItem(String p) {
+    private static Item produceItem(String p, int seed) {
         Item item;
         switch (p){
             case "Potion":
-                item = new Item(p){
+                item = new Item(p, seed, 1, 1, 1000){
                     @Override
                     public boolean use(Man host){
                         if (super.use(host)) {
@@ -123,19 +130,24 @@ public class ItemFactory {
                     }
                 };
                 item.delay = 60;
-                item.cooldown = 1000;
-                item.uses = 3;
                 break;
             case "Fireball":
-                item = new Item(p) {
+                item = new Item(p, seed, 1, 3, 1000) {
                     @Override
                     public boolean use(Man host) {
                         if (super.use(host)) {
-                            Projectile p = new Projectile("item/Fireball", host.pos.getAdd(host.clip.organs[ClipMan.FIST].ptd), Global.player.mP.getAdd(host.pos), 15+host.get("arms").get());
+                            final Projectile p = new Projectile("item/Fireball", host.pos.getAdd(host.clip.organs[ClipMan.FIST].ptd), Global.player.mP.getAdd(host.pos), 20+(host.get("arms").get()*2));
                             p.faction = 1;
                             p.damage = 50;
                             p.gravity = true;
                             p.range = 150;
+                            p.delay.set(50);
+                            p.delay.performer = new Performer(){
+                                @Override
+                                public void perform(){
+                                    p.remove();
+                                }
+                            };
                             return true;
                         }
                         return false;
@@ -143,11 +155,9 @@ public class ItemFactory {
                 };
                 item.delay = 10;
                 item.action = Actions.THROW;
-                item.cooldown = 1000;
-                item.uses = 3;
                 break;
             case "Dagger":
-                item = new Item("Sword"){
+                item = new Item("Sword", seed, 1, 10, 20){
                     @Override
                     public boolean use(Man host){
                         if (super.use(host)) {
@@ -175,12 +185,10 @@ public class ItemFactory {
                 item.name = "Dagger";
                 item.delay = 8;
                 item.action = Actions.SHOOT;
-                item.cooldown = 20;
-                item.uses = 10;
                 break;
             default:
                 Global.p("Can't find item "+p);
-                item = new Item("None");
+                item = null;
                 break;
         }
         return item;

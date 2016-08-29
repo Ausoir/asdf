@@ -14,7 +14,7 @@ public class Frenzy extends Skill {
         host.get("arms").add(100,true);
         host.get("health").add(-5,false);
     }
-    protected void end(){
+    public void end(){
         host.get("arms").add(-100,false);
         host.get("legs").add(-100,false);
         super.end();

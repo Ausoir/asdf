@@ -1,4 +1,4 @@
-package com.ga.intelligence;
+package com.ga.unit.intelligence;
 
 import com.ga.map.Global;
 import com.ga.tool.Timer;

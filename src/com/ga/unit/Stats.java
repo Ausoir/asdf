@@ -17,7 +17,7 @@ public class Stats {
     protected ArrayList<Skill> effects = new ArrayList<>();
     public HashMap<String, Stat> stats = new HashMap<String, Stat>(){{
         put("health", new Stat((int) (Global.rng(100)+Global.r.nextInt(20)+5)));
-        put("speed", new Stat((int) (Global.rng(5)+Global.r.nextInt(3)+5)));
+        put("speed", new Stat((int) (Global.rng(50)+Global.r.nextInt(30)+50)));
         put("arms", new Stat(3));
         put("legs", new Stat(3));
         put("damage", new Stat(1));
@@ -36,10 +36,21 @@ public class Stats {
         }
         return false;
     }
+    public void end(){
+        for (int i = 0; i < effects.size(); i++) {
+            if (effects.get(i).active){
+                effects.get(i).end();
+                effects.remove(i);
+            }
+        }
+    }
     public void endEffect(String p){
         for (int i = 0; i < effects.size(); i++) {
             if (effects.get(i).getClass().getSimpleName().equals(p)){
-                if (effects.get(i).active) effects.remove(i);
+                if (effects.get(i).active){
+                    effects.get(i).end();
+                    effects.remove(i);
+                }
             }
         }
     }
@@ -73,7 +84,9 @@ public class Stats {
         String[] data = p.split(";");
         for (int i=0;i<data.length;i++){
             String[] pair = data[i].split(":");
-            stats.put(pair[0], new Stat(Integer.parseInt(pair[1].split(",")[0]),Integer.parseInt(pair[1].split(",")[1])));
+            Stat newstat = new Stat(Integer.parseInt(pair[1].split(",")[0]),Integer.parseInt(pair[1].split(",")[1]));
+            newstat.onChange = stats.get(pair[0]).onChange;
+            stats.put(pair[0], newstat);
         }
     }
     public String toString(){

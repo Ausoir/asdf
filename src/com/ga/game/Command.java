@@ -2,9 +2,10 @@ package com.ga.game;
 
 import com.ga.map.Global;
 import com.ga.map.ManFactory;
-import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.unit.*;
+import com.ga.unit.item.ItemFactory;
+import com.ga.unit.item.Projectile;
 
 /**
  * Created by Ga on 8/7/2016.
@@ -42,16 +43,15 @@ public class Command {
                 else if (cmd[0].equals("delevel")) host.stats.delevel(cmd[1]);
                 else if (cmd[0].equals("level")) host.stats.level(cmd[1]);
                 else if (cmd[0].equals("stat")) host.get(cmd[1].split(":")[0]).addTotal(Integer.parseInt(cmd[1].split(":")[1]));
-                else if (cmd[0].equals("obj")) ManFactory.produce(Global.wordify(cmd[1]), host.pos.getAdd(150, -50));
-                else if (cmd[0].equals("dummy")) ManFactory.produce(Global.wordify(cmd[1]), host.pos.getAdd(150, -50)).brain = null;
-                else if (cmd[0].equals("wpn"))
-                    host.setWeapon(ItemFactory.produceWeapon(Global.wordify(cmd[1])));
+                else if (cmd[0].equals("obj")) ManFactory.produce(Global.wordify(cmd[1]), host.pos.getAdd(150, -50), -1);
+                else if (cmd[0].equals("dummy")) ManFactory.produce(Global.wordify(cmd[1]), host.pos.getAdd(150, -50), -1).brain = null;
+                else if (cmd[0].equals("item")) host.addItem(ItemFactory.produce(Global.wordify(cmd[1]) ,-1));
                 else if (p.equals("revive")) {
                     host.state = Actions.DOWN;
                     host.delay.set(50);
-                    host.vel.y -= 30;
                     host.get("health").heal();
                     host.height = host.clip.getHeight();
+                    host.pos.y -= host.height;
                 }
             }
         } catch (Exception e){

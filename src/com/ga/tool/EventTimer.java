@@ -5,7 +5,7 @@ package com.ga.tool;
  */
 public class EventTimer extends Timer {
     public Performer performer;
-    public EventTimer(Performer performer, int time, boolean repeat) {
+    public EventTimer(int time, boolean repeat, Performer performer) {
         super(time, repeat);
         this.performer = performer;
     }

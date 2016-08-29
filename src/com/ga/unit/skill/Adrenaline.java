@@ -16,7 +16,7 @@ public class Adrenaline extends Skill {
         host.get("speed").add(added,true);
         timer.set(40+(host.get("legs").max*3));
     }
-    protected void end(){
+    public void end(){
         host.get("speed").add(-added,true);
         super.end();
     }

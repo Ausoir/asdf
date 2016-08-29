@@ -15,7 +15,7 @@ public class Empower extends Skill {
         mag = host.get("damage").get();
         host.get("damage").add(mag,true);
     }
-    protected void end(){
+    public void end(){
         host.get("damage").add(-mag,true);
         super.end();
     }

@@ -1,13 +1,15 @@
 package com.ga.unit;
 
 import com.ga.game.Settings;
-import com.ga.intelligence.Intelligence;
-import com.ga.intelligence.Speech;
 import com.ga.map.Global;
 import com.ga.tool.EventTimer;
 import com.ga.tool.Line;
 import com.ga.tool.P;
-import com.ga.tool.Performer;
+import com.ga.unit.intelligence.Intelligence;
+import com.ga.unit.intelligence.Speech;
+import com.ga.unit.item.Armor;
+import com.ga.unit.item.ItemFactory;
+import com.ga.unit.item.Weapon;
 import com.ga.unit.skill.Adrenaline;
 import com.ga.unit.skill.Skill;
 import com.ga.unit.skill.Stat;
@@ -19,14 +21,14 @@ import java.awt.*;
  */
 public class Man extends Unit {
     public int height;
-    public String speechType = "";
+    public String speechType;
     public ClipMan clip;
     public Actions state = Actions.IDLE;
     public boolean jump = false;
     public Intelligence brain;
-    public EventTimer delay = new EventTimer(new Performer(), 0, false);
-    protected Weapon weapon;
-    private Armor armor = new Armor(null);
+    public EventTimer delay = new EventTimer(5, false, null);
+    public Weapon weapon;
+    public Armor armor;
     public P target = new P();
     public Skill skill = new Adrenaline();
     private Speech speech = new Speech(this);
@@ -34,13 +36,12 @@ public class Man extends Unit {
     protected HealthBar hp;
 
     public Man(String name, P pt, int seed) {
-        super(name, pt, 10);
+        super(name, seed, pt, 10);
         clip = new ClipMan(this);
         height = clip.getHeight();
-        brain = new Intelligence(this);
         hp = new HealthBar(get("health"), pos);
-        setWeapon(ItemFactory.produceWeapon("Fist"));
         new Shadow(pos);
+        speechType = name.toLowerCase();
     }
 
     public void setWeapon(Weapon p){
@@ -57,8 +58,8 @@ public class Man extends Unit {
 
     public void setArmor(Armor p){
         armor = p;
-        clip.organs[1].setStyle(p.color1, 9);
-        clip.organs[2].setStyle(p.color2, 13);
+        clip.organs[1].setStyle(p.color1.darker(), 9);
+        clip.organs[2].setStyle(p.color2.darker(), 13);
         clip.organs[3].setStyle(p.color2, 13);
         clip.organs[4].setStyle(p.color1, 15);
         clip.organs[5].setStyle(p.color1, 9);
@@ -75,6 +76,10 @@ public class Man extends Unit {
 
     public void say(String p) {
         speech.say(p);
+    }
+
+    public void hear(P pos, String p){
+        if (brain != null) brain.hear(pos, p);
     }
 
     public void setState(Actions state) {
@@ -143,7 +148,7 @@ public class Man extends Unit {
             }
             if (statreq == null || get(statreq).require(req)){
                 if (brain != null) brain.setState(state);
-                face(target.x<0?-1:1);
+//                face(target.x<0?-1:1);
                 delay.set(del);
                 vel.x *= velx;
                 this.state = state;
@@ -157,7 +162,7 @@ public class Man extends Unit {
         switch (state){
             case IDLE:
                 if (!weapon.name.equals("Fist")){
-                    if (get("arms").get() < weapon.weight || get("legs").get() < 2)
+                    if (!get("arms").isFull() || !get("legs").isFull())
                         clip.setState(Actions.EXHAUSTED);
                 }
                 break;
@@ -189,35 +194,35 @@ public class Man extends Unit {
     public void hit(Unit hitter, int damage) {
         if (state == Actions.DOWN || state == Actions.HIT) return;
         if (stats.hasEffect("Evade")) return;
-        damage = (int) Math.max(0,damage - armor.armor);
-        if (damage > 0) {
-            delay.set(0);
-            damage = Global.r.nextInt(damage);
-            float ratio;
-            int x = hitter.pos.x - pos.x > 0 ? 1 : -1;
-            face(x < 0 ? -1 : 1);
-            ratio = (float) damage * 50 / get("health").max;
-            float knockback = Math.min(ratio, 50);
-            if (ratio > 100) setState(Actions.DOWN);
-            else setState(Actions.HIT);
-            vel.x = knockback*x;
-            vel.y = -knockback * 1.5f - 10;
-            jump = false;
-            hurt(damage);
-            if (state != Actions.DEAD) {
-                say("@hit");
-                if (brain != null && hitter instanceof Man){
-                    brain.hit((Man) hitter);
-                }
+        damage = (int) Math.max(0,damage - armor.getArmor());
+        delay.set(0);
+        int x = hitter.pos.x - pos.x > 0 ? 1 : -1;
+        face(x < 0 ? -1 : 1);
+        float ratio = (float) damage * 10 / get("health").max;
+        float knockback = Math.min(ratio, 50);
+        if (ratio > 100) setState(Actions.DOWN);
+        else setState(Actions.HIT);
+        vel.x = knockback*x;
+        vel.y = -knockback * 1.5f - 10;
+        jump = false;
+        hurt(damage);
+        if (state != Actions.DEAD) {
+            say("@hit");
+            if (brain != null && hitter instanceof Man){
+                brain.hit((Man) hitter);
             }
-        } else {
-            say("@tickle");
         }
     }
 
     @Override
-    public P getCollisionPoint(){
-        return clip.organs[0].pt.getAdd(pos);
+    public boolean checkHit(Unit hitter, Line p, int force){
+        if (faction != hitter.faction) {
+            if (p.lineCross(new Line(clip.organs[0].ptd,clip.organs[2].ptd).getAdd(pos))){
+                hit(hitter, force);
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean isExhausted(){
@@ -248,18 +253,16 @@ public class Man extends Unit {
 
     public void attack() {
         Unit hit = null;
-        int r = 625, dam = weapon.damage + get("damage").get();
+        int dam = weapon.getDamage() + get("damage").get();
         if (state == Actions.WHIRLWIND) {
-            r = (int) Math.max(r,(weapon.length*weapon.length));
             dam *= 2;
-            hit = Updater.collide(this, clip.organs[ClipMan.FIST].ptd.getAdd(pos), dam, r, true);
+            hit = Updater.collide(this, new Line(clip.organs[ClipMan.FIST].ptd.getAdd(pos),weapon.getPoint()), dam, true);
         } else if (state == Actions.SWING) {
             hit = Updater.collide(this, weapon.getLine(), dam, true);
         } else if (state == Actions.ATTACK){
             dam += Math.abs(vel.x);
-            hit = Updater.collide(this, weapon.getPoint(), dam, r, false);
-            if (hit == null) hit = Updater.collide(this, clip.organs[ClipMan.FIST].ptd.getAdd(pos), dam, (int) Math.max(r,(weapon.length*weapon.length)), true);
-            if (hit == null) stats.endEffect("Cleave");
+            hit = Updater.collide(this, weapon.getLine(), dam, false);
+            if (hit != null) stats.endEffect("Cleave");
         }
         if (hit != null && brain != null) brain.attacked();
     }
@@ -300,8 +303,8 @@ public class Man extends Unit {
         stats.update();
         delay.update();
         clip.update();
-        if (state == Actions.WALKL) vel.x = -get("speed").get();
-        else if (state == Actions.WALKR) vel.x = get("speed").get();
+        if (state == Actions.WALKL) vel.x = -get("speed").get()/10;
+        else if (state == Actions.WALKR) vel.x = get("speed").get()/10;
         if (!weapon.name.equals("Fist")) {
             if (state == Actions.WHIRLWIND) {
                 if (delay.time < 20) {

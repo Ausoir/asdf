@@ -1,4 +1,4 @@
-package com.ga.intelligence;
+package com.ga.unit.intelligence;
 
 /**
  * Created by Ga on 7/30/2016.

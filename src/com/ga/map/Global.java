@@ -1,7 +1,8 @@
 package com.ga.map;
 
+import com.ga.game.Display;
 import com.ga.game.Settings;
-import com.ga.intelligence.PlayerInput;
+import com.ga.unit.intelligence.PlayerInput;
 import com.ga.tool.P;
 
 import java.util.Random;
@@ -13,6 +14,7 @@ public class Global {
     public static Map map;
     public static PlayerInput player;
     public static P camera = new P();
+    public static Display display;
     public static Random r = new Random();
     private static float[] sinv = new float[360];
     private static float[] cosv = new float[360];
@@ -22,6 +24,9 @@ public class Global {
             sinv[i] = (float)Math.sin(Math.toRadians(i));
             cosv[i] = (float)Math.cos(Math.toRadians(i));
         }
+    }
+    public static int getSeed(){
+        return r.nextInt(9999);
     }
     public static P getRelPos(float x, float y){
         return new P(x-camera.x+ Settings.centerX, y-camera.y+Settings.centerY);
@@ -57,6 +62,9 @@ public class Global {
     }
     public static String wordify(String p){
         return p.substring(0,1).toUpperCase()+p.substring(1);
+    }
+    public static int checkCooldown(int[] p, int cd){
+        return cd-(time-p[0]);
     }
     public static boolean cooldown(int[] p, int cd){
         if (time - p[0] >= cd){

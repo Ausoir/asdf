@@ -12,13 +12,20 @@ public class Unit extends Thing {
     public boolean gravity = true;
     public int faction = 2;
     public P vel = new P(0, 0);
-    public Unit(String name, P pt, int depth) {
-        super(name, pt, depth);
-    }
-    public P getCollisionPoint(){
-        return pos;
+    public Unit(String name, int seed, P pt, int depth) {
+        super(name, seed, pt, depth);
     }
     public void hit(Unit hitter, int dmg){
+    }
+    public boolean checkHit(Unit hitter, Line p, int force){
+        if (faction != hitter.faction) {
+            float s = (size.x*size.x)+(size.y+size.y);
+            if ((Math.pow(p.pt.x - pos.x, 2) + Math.pow(p.pt.y - pos.y, 2))-s < 0) {
+                hit(hitter, force);
+                return true;
+            }
+        }
+        return false;
     }
     public void collide(){
         P vp = pos.getAdd(vel);
