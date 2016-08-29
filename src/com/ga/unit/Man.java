@@ -8,7 +8,6 @@ import com.ga.tool.P;
 import com.ga.unit.intelligence.Intelligence;
 import com.ga.unit.intelligence.Speech;
 import com.ga.unit.item.Armor;
-import com.ga.unit.item.ItemFactory;
 import com.ga.unit.item.Weapon;
 import com.ga.unit.skill.Adrenaline;
 import com.ga.unit.skill.Skill;
@@ -78,7 +77,7 @@ public class Man extends Unit {
         speech.say(p);
     }
 
-    public void hear(P pos, String p){
+    public void hear(Unit pos, String p){
         if (brain != null) brain.hear(pos, p);
     }
 
@@ -247,7 +246,7 @@ public class Man extends Unit {
         state = Actions.DEAD;
         height = 0;
         clip.setState(Actions.DEAD);
-        Updater.setDepth(this, 9);
+        setDepth(9);
         delay.set(-1);
     }
 
@@ -308,11 +307,11 @@ public class Man extends Unit {
         if (!weapon.name.equals("Fist")) {
             if (state == Actions.WHIRLWIND) {
                 if (delay.time < 20) {
-                    weapon.rotate(delay.time * -weapon.dir);
+                    weapon.rotation = delay.time * -weapon.dir;
                     attack();
                 }
             } else if (state == Actions.SWING) {
-                weapon.rotate(weapon.dir + delay.time * .2f * -weapon.dir);
+                weapon.rotation = weapon.dir + delay.time * .2f * -weapon.dir;
                 if (delay.time < 12) attack();
             }
         }

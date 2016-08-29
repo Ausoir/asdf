@@ -16,7 +16,7 @@ import java.util.ArrayList;
 public class Intelligence {
     protected Man host;
     protected Timer think = new Timer(1, true);
-    protected Timer forget = new Timer(500, true);
+    protected Timer forget = new Timer(100, true);
     private ArrayList<Unit> seen;
     public Man target;
     public Task task;
@@ -28,7 +28,7 @@ public class Intelligence {
         if (think.update()){
             think();
         } else {
-            task.update();
+            if (target != null || task instanceof Wander) task.update();
         }
     }
     public void attacked(){
@@ -54,7 +54,7 @@ public class Intelligence {
             host.getWeapon().rotate(p.getMult(host.dir,host.dir));
         }
     }
-    public void hear(P pos, String p){
+    public void hear(Unit pos, String p){
     }
     protected void perceive(){
         seen = Updater.perceive(host, host.pos.getAdd(host.dir<0?-150:150,0), 300);

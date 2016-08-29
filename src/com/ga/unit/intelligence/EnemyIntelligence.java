@@ -37,9 +37,9 @@ public class EnemyIntelligence extends Intelligence {
         super(man);
     }
     @Override
-    public void hear(P pos, String p){
+    public void hear(Unit u, String p){
         if (target == null){
-            task = new Search(host,pos);
+            task = new Search(host,u.pos);
             host.say("@hear");
             forget.set(10);
         }

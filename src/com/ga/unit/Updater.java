@@ -7,6 +7,7 @@ import com.ga.map.Drawable;
 import com.ga.map.Global;
 import com.ga.tool.Line;
 import com.ga.tool.P;
+import com.ga.unit.item.Item;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -59,11 +60,6 @@ public class Updater {
             }
         if (changeMap != null) changeMap();
     }
-    public static void setDepth(Thing p, int depth){
-        p.depth = depth;
-        drawee.remove(p);
-        addDrawee(p);
-    }
     public static void remove(Thing p){
         drawee.remove(p);
         updatee.remove(p);
@@ -89,16 +85,24 @@ public class Updater {
         result = result.substring(0,result.length()-1);
         return result;
     }
-    public static void sound(P p, String msg){
+    public static void sound(Unit p, String msg){
         for (Unit i : updatee){
-            if (i.pos != p) {
-                if (Math.abs(i.pos.x - p.x) < 600 && Math.abs(i.pos.y - p.y) < 300) {
+            if (i != p && i.faction != p.faction) {
+                if (Math.abs(i.pos.x - p.pos.x) < 600 && Math.abs(i.pos.y - p.pos.y) < 300) {
                     if (i instanceof Man) {
                         ((Man) i).hear(p, msg);
                     }
                 }
             }
         }
+    }
+    public static Item collide(P p){
+        for (Drawable i : drawee){
+            if (i instanceof Item){
+                if (((Item) i).pos.getMinus().getAdd(p).getDist()<30) return (Item) i;
+            }
+        }
+        return null;
     }
     public static Unit collide(Unit host, Line p, int force, boolean cleave){
         Unit result = null;

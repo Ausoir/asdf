@@ -120,6 +120,47 @@ public class Item extends Thing {
     public int getRarity(){
         return pmod.ordinal()+(smod != SpecialtyMod.None?10:0)+(emod != EnchantMod.None?100:0);
     }
+    public int getValue(){
+        int r = 9999999;
+        boolean enchanted = emod != EnchantMod.None;
+        int adverb = admod.ordinal()+1;
+        boolean special = smod != SpecialtyMod.None;
+        switch (pmod.ordinal()){
+            case 0:
+                r = 100;
+                break;
+            case 1:
+                r = 20;
+                break;
+            case 2:
+                r = 50;
+                break;
+            case 3:
+                r = 1000;
+                break;
+            case 4:
+                r = 5000;
+                break;
+            case 5:
+                r = 50000;
+                break;
+        }
+        if (enchanted){
+            r += 500;
+            r *= 2;
+        }
+        if (special) r += (r*adverb);
+        return r;
+    }
+    public String getRarityDescription(){
+        String r = "common";
+        int rare = getRarity();
+        if (rare >= 10) r = "fine";
+        if (rare >= 100) r = "rare";
+        if (rare % 5 == 4) r = "ludicrous";
+        else if (rare % 5 == 5) r = "legendary";
+        return r;
+    }
     public String getFullName(){
         String r = "";
         if (admod != AdverbMod.None) r+=admod.name()+" ";
@@ -138,7 +179,7 @@ public class Item extends Thing {
         return false;
     }
     public String getDescription() {
-        String r = "A "+name+".";
+        String r = "a "+getFullName()+".";
         int uses = this.uses.get();
         r+= " Weighs "+weight+" and has "+(uses==-1?"infinite":uses)+" uses left.";
         if (emod != EnchantMod.None){

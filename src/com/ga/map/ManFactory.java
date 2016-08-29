@@ -1,6 +1,7 @@
 package com.ga.map;
 
 import com.ga.tool.P;
+import com.ga.tool.Word;
 import com.ga.unit.intelligence.EnemyIntelligence;
 import com.ga.unit.item.Armor;
 import com.ga.unit.item.ItemFactory;
@@ -53,13 +54,14 @@ public class ManFactory {
     }
     public static Man produce(String name, P pt, int seed){
         Man result;
+        String t = Word.wordify(name);
         try {
-            result = ManType.valueOf(name).get(pt, seed);
+            result = ManType.valueOf(t).get(pt, seed);
         } catch (Exception e) {
-            Global.p("Can't find man ["+name+"]");
+            Global.p("Can't find man ["+t+"]");
             result = ManType.Peasant.get(pt, seed);
         }
-        switch (name){
+        switch (t){
             case "Merchant":
                 result.brain = new Merchant(result);
                 break;

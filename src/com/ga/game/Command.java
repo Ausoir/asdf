@@ -36,16 +36,17 @@ public class Command {
     }
     public static void order(String p){
         try {
-            String[] cmds = p.split(",");
+            String[] cmds = p.split(";");
             for (String i : cmds) {
                 String[] cmd = i.split("@");
                 if (cmd[0].equals("say")) host.say(cmd[1]);
                 else if (cmd[0].equals("delevel")) host.stats.delevel(cmd[1]);
                 else if (cmd[0].equals("level")) host.stats.level(cmd[1]);
                 else if (cmd[0].equals("stat")) host.get(cmd[1].split(":")[0]).addTotal(Integer.parseInt(cmd[1].split(":")[1]));
-                else if (cmd[0].equals("obj")) ManFactory.produce(Global.wordify(cmd[1]), host.pos.getAdd(150, -50), -1);
-                else if (cmd[0].equals("dummy")) ManFactory.produce(Global.wordify(cmd[1]), host.pos.getAdd(150, -50), -1).brain = null;
-                else if (cmd[0].equals("item")) host.addItem(ItemFactory.produce(Global.wordify(cmd[1]) ,-1));
+                else if (cmd[0].equals("obj")) ManFactory.produce(cmd[1], host.pos.getAdd(150, -50), -1);
+                else if (cmd[0].equals("dummy")) ManFactory.produce(cmd[1], host.pos.getAdd(150, -50), -1).brain = null;
+                else if (cmd[0].equals("item")) host.addItem(ItemFactory.produce(cmd[1] ,-1));
+                else if (cmd[0].equals("tp")) host.pos.add(Integer.parseInt(cmd[1].split(",")[0]),Integer.parseInt(cmd[1].split(",")[1]));
                 else if (p.equals("revive")) {
                     host.state = Actions.DOWN;
                     host.delay.set(50);

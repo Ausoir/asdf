@@ -12,6 +12,7 @@ public class Inventory {
     private ArrayList<Item> items = new ArrayList<>();
     public int wielded = -1, worn = -1, weight = 0;
     private Player player;
+    public int maxSize = 5;
     public Inventory(Player player){
         this.player = player;
     }
@@ -36,9 +37,14 @@ public class Inventory {
         }
         return result;
     }
-    public void addItem(Item p){
+    public boolean addItem(Item p){
+        if (items.size() >= maxSize) return false;
         items.add(p);
         weight += p.weight;
+        return true;
+    }
+    public boolean vacant(){
+        return items.size() < maxSize;
     }
     public Item getItem(int p){
         return items.get(p);
@@ -67,7 +73,10 @@ public class Inventory {
         Item item = items.get(index);
         if (item instanceof Weapon) {
             if (player.weapon == item) player.setWeapon((Weapon) ItemFactory.produce("Fist", 0));
-            if (index == wielded) wielded = -1;
+            if (index == wielded){
+                ((Weapon) item).organ = null;
+                wielded = -1;
+            }
         } else if (item instanceof Armor){
             if (player.armor == item) player.setArmor((Armor) ItemFactory.produce("Underwear", 0));
             if (index == worn) worn = -1;
@@ -80,12 +89,17 @@ public class Inventory {
             if (pockets[i] != -1 && items.get(pockets[i]) == item) pockets[i] = -1;
         }
     }
-    public void remove(int p){
-        remove(getItem(p));
+    public Item remove(int p){
+        Item r = items.get(p);
+        removePocket(r);
+        if (wielded > p) wielded--;
+        if (worn > p) worn--;
+        items.remove(p);
+        return r;
     }
-    public void remove(Item item){
-        removePocket(item);
-        items.remove(item);
+    public Item remove(Item item){
+        int i = items.indexOf(item);
+        return remove(i);
     }
     public void load(String p){
         String[] data = p.split(";");

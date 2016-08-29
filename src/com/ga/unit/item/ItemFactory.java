@@ -3,6 +3,7 @@ package com.ga.unit.item;
 import com.ga.map.Global;
 import com.ga.tool.Line;
 import com.ga.tool.Performer;
+import com.ga.tool.Word;
 import com.ga.unit.Actions;
 import com.ga.unit.ClipMan;
 import com.ga.unit.Man;
@@ -81,13 +82,14 @@ public class ItemFactory {
         }
     }
     public static Item produce(String p, int seed){
+        String t = Word.wordify(p);
         for (FactoryWeapon w : FactoryWeapon.values()){
-            if (w.name().equals(p)) return produceWeapon(p, seed);
+            if (w.name().equals(t)) return produceWeapon(t, seed);
         }
         for (FactoryArmor w : FactoryArmor.values()){
-            if (w.name().equals(p)) return produceArmor(p, seed);
+            if (w.name().equals(t)) return produceArmor(t, seed);
         }
-        return produceItem(p, seed);
+        return produceItem(t, seed);
     }
     private static Weapon produceWeapon(String p, int seed) {
         FactoryWeapon wp;
@@ -140,7 +142,6 @@ public class ItemFactory {
                             p.faction = 1;
                             p.damage = 50;
                             p.gravity = true;
-                            p.range = 150;
                             p.delay.set(50);
                             p.delay.performer = new Performer(){
                                 @Override
@@ -156,21 +157,24 @@ public class ItemFactory {
                 item.delay = 10;
                 item.action = Actions.THROW;
                 break;
-            case "Dagger":
-                item = new Item("Sword", seed, 1, 10, 20){
+            case "Throwing_Knife":
+                item = new Item("Dagger", seed, 1, 10, 20){
                     @Override
                     public boolean use(Man host){
                         if (super.use(host)) {
-                            Projectile p = new Projectile("item/Sword",host.pos.getAdd(host.clip.organs[ClipMan.OFIST].ptd),Global.player.mP.getAdd(host.pos),50){
+                            Projectile p = new Projectile("item/Dagger",host.pos.getAdd(host.clip.organs[ClipMan.OFIST].ptd),Global.player.mP.getAdd(host.pos),50){
                                 @Override
                                 public void onCollide(Line l){
-                                    vel.set(0,0);
+                                    stuck();
                                 }
                                 @Override
                                 public void onAttack(Unit p){
+                                    stuck();
+                                }
+                                private void stuck(){
                                     vel.set(0,0);
-                                    range = 0;
                                     gravity = true;
+                                    tangible = false;
                                 }
                             };
                             p.rotSpeed = 0;
@@ -182,7 +186,7 @@ public class ItemFactory {
                         return false;
                     }
                 };
-                item.name = "Dagger";
+                item.name = "Throwing_Knife";
                 item.delay = 8;
                 item.action = Actions.SHOOT;
                 break;

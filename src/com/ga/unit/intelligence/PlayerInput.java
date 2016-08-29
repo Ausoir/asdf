@@ -30,6 +30,7 @@ public class PlayerInput implements Input, Observer {
         put(KeyEvent.VK_Q, Actions.SKILL1);
         put(KeyEvent.VK_R, Actions.SKILL2);
         put(KeyEvent.VK_G, Actions.DROP);
+        put(KeyEvent.VK_Z, Actions.PICKUP);
         put(1, Actions.ATTACK);
         put(3, Actions.SWING);
         put(KeyEvent.VK_SHIFT, Actions.WHIRLWIND);

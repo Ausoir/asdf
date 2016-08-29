@@ -22,12 +22,6 @@ public class Weapon extends Item {
         int getDamage(){
             return (Global.r.nextInt(sides)+1) * num;
         }
-        void upgrade(int num, int sides){
-            this.num += num;
-            this.sides += sides;
-            if (this.num < 1) this.num = 1;
-            if (this.sides < 1) this.sides = 1;
-        }
     }
     private Die damage = new Die(0,1);
     private float damageMod = 1;
@@ -78,6 +72,6 @@ public class Weapon extends Item {
         return r + " This weapon deals "+damage.num+"D"+damage.sides+" damage.";
     }
     public void draw(Graphics2D g){
-        super.draw(g, organ.ptd);
+        super.draw(g, organ==null?P.getZero():organ.ptd);
     }
 }

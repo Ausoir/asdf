@@ -9,10 +9,7 @@ import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.tool.Timer;
-import com.ga.unit.item.Inventory;
-import com.ga.unit.item.Item;
-import com.ga.unit.item.ItemFactory;
-import com.ga.unit.item.Weapon;
+import com.ga.unit.item.*;
 import com.ga.unit.skill.*;
 
 import java.awt.*;
@@ -49,7 +46,7 @@ public class Player extends Man {
             for (Timer i : cooldowns) i.update();
         }
     }
-    public int gold = 0;
+    public int gold;
     public Inventory inventory = new Inventory(this);
     private Companions companions = new Companions();
     private Skill[] skills = new Skill[3];
@@ -73,15 +70,37 @@ public class Player extends Man {
         skills[2] = new Cleave();
         speechType = "p";
         setWeapon((Weapon) ItemFactory.produce("Fist",0));
+        setArmor((Armor) ItemFactory.produce("Underwear",0));
     }
     @Override
     public void say(String p){
         Display.menu.setVisible(false);
         super.say(p);
     }
-    public void addItem(Item p){
-        inventory.addItem(p);
-        get("speed").add(-p.weight);
+    private void grabItem(){
+        Item t = Updater.collide(pos.getAdd(clip.organs[1].ptd));
+        if (t != null){
+            if (addItem(t)) {
+                say("Picking up " + t.getFullName());
+                t.remove();
+            } else say("Can't pick up "+t.getFullName()+"... Inventory is full!");
+        }
+    }
+    public void dropItem(int p) {
+        Item t = inventory.remove(p);
+        say("Dropping "+t.getFullName());
+        t.pos = new P(pos.getAdd(0,height));
+        t.setDepth(8);
+        t.rotation = (float)Global.r.nextInt(628)/100;
+        Updater.addQueue.add(t);
+        get("speed").add(t.weight);
+    }
+    public boolean addItem(Item p){
+        if (inventory.addItem(p)) {
+            get("speed").add(-p.weight);
+            return true;
+        }
+        return false;
     }
     public void describeItem(int p) {
         Item item = inventory.getItem(p);
@@ -131,6 +150,9 @@ public class Player extends Man {
                 skill = skills[2];
                 state = Actions.SKILL;
                 break;
+            case PICKUP:
+                grabItem();
+                break;
         }
         super.setState(state);
     }
@@ -153,7 +175,7 @@ public class Player extends Man {
         Global.player.update();
         if (weapon != null && state != Actions.DEAD){
             weapon.rotate(Global.player.mP.getMult(dir,dir));
-            if (get("arms").get() < weapon.weight && delay.over()) weapon.rotate(6f*weapon.dir);
+            if (get("arms").get() < weapon.weight && delay.over()) weapon.rotation = 6f*weapon.dir;
         }
         super.update();
         Global.camera = new P(pos); //to be able to walk to edge
@@ -161,13 +183,14 @@ public class Player extends Man {
         if (save.update() && pos.y < Global.map.map.size.y) FileManager.saveCharacter();
     }
     public String toCharacterString(){
-        String r = super.toString()+"@"+Global.map.maps[1]+"\n";
+        String r = super.toString()+"@"+Global.map.maps[1]+"@"+gold+"\n";
         r += stats.toString()+"\n";
         r += inventory.toString();
         return r;
     }
     public void load(String p){
         String[] line = p.split("%");
+        gold = Integer.parseInt(line[0].split("@")[4]);
         stats.load(line[1]);
         hp = new PlayerHealthBar(get("health"),get("arms"),get("legs"),pos);
         get("arms").onChange = (new Performer(){
@@ -185,8 +208,5 @@ public class Player extends Man {
             }
         });
         if (line.length > 2) inventory.load(line[2]);
-        for (int i=0;i<inventory.getItemSize();i++){
-            get("speed").add(-inventory.getItem(i).weight);
-        }
     }
 }

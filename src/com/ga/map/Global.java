@@ -60,9 +60,6 @@ public class Global {
                 Global.clamp(Global.camera.y, Settings.centerY, Global.map.map.size.y-Settings.centerY)
         );
     }
-    public static String wordify(String p){
-        return p.substring(0,1).toUpperCase()+p.substring(1);
-    }
     public static int checkCooldown(int[] p, int cd){
         return cd-(time-p[0]);
     }

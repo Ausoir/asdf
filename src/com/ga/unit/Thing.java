@@ -24,7 +24,7 @@ public class Thing implements Drawable {
     public String name;
     int depth;
     public int dir = 1;
-    protected float rotation = 0;
+    public float rotation = 0;
     public Thing(String name, int seed){
         this.name = name;
         if (seed == -1) this.seed = Global.getSeed();
@@ -39,10 +39,7 @@ public class Thing implements Drawable {
         }
     }
     public void rotate(P p){
-        rotate((float) Math.atan2(p.y,p.x));
-    }
-    public void rotate(float p){
-        rotation = p;
+        rotation = ((float) Math.atan2(p.y,p.x));
     }
     protected Thing(String name, int seed, P pt, int depth){
         this(name, seed);
@@ -69,6 +66,12 @@ public class Thing implements Drawable {
     @Override
     public int getDepth() {
         return depth;
+    }
+    public void setDepth(int depth) {
+        this.depth = depth;
+        if (Updater.drawee.remove(this)){
+            Updater.addDrawee(this);
+        }
     }
 
     public void remove(){

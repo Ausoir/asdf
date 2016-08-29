@@ -36,6 +36,7 @@ public class ClipMan {
         put(Actions.EXHAUSTED, new int[]{25, 26});
         put(Actions.THROW, new int[]{20,21,22,2,-1});
         put(Actions.SHOOT, new int[]{27,28,2,-1});
+        put(Actions.PICKUP, new int[]{23,-1});
     }};
     public static final int FIST = 1, OFIST = 5, FOOT = 3;
     public Man host;

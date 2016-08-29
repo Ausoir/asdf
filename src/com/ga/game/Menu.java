@@ -237,6 +237,7 @@ class StatPanel extends JPanel{
 class InventoryPanel extends JPanel {
     private GridBagConstraints grid = new GridBagConstraints();
     private JPanel panel;
+    private JLabel gold;
     private Border emptyborder = new EmptyBorder(5,8,5,8);
     private int[] selected;
     private boolean mRelease = true;
@@ -274,14 +275,17 @@ class InventoryPanel extends JPanel {
                 mRelease = true;
             }
         });
+        gold = new JLabel();
+        gold.setBounds(250,0,100,20);
         panel = new JPanel();
         panel.setBounds(0,0,1000,10000);
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel,BoxLayout.PAGE_AXIS));
-//        refresh();
         add(panel);
+        add(gold);
     }
     public void refresh(){
+        gold.setText("Gold: "+Global.player.host.gold);
         panel.removeAll();
         Inventory inv = Global.player.host.inventory;
         int itemsize = inv.getItemSize();
@@ -369,8 +373,7 @@ class InventoryPanel extends JPanel {
     }
     private void drop(int p){
         unequip(p);
-        Global.player.host.inventory.remove(p);
-        refresh();
+        Global.player.host.dropItem(p);
     }
     public void equip(int p){
         final Inventory inv = Global.player.host.inventory;

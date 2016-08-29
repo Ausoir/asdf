@@ -22,10 +22,11 @@ public class Stat {
         onChange();
     }
     public void set(int p){
+        int prev = current;
         current = p;
         if (current > max) current = max;
         else if (current < 0) current = 0;
-        else if (p != 0) onChange();
+        if (prev != current) onChange();
     }
     public void addTotal(int p){
         setTotal(max + p);
