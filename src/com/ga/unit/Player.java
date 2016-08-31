@@ -10,7 +10,7 @@ import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.tool.Timer;
 import com.ga.unit.item.*;
-import com.ga.unit.skill.*;
+import com.ga.unit.skill.Stat;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -49,25 +49,22 @@ public class Player extends Man {
     public int gold;
     public Inventory inventory = new Inventory(this);
     private Companions companions = new Companions();
-    private Skill[] skills = new Skill[3];
+    public SkillTree skillTree = new SkillTree();
     private Timer save = new Timer(150, true);
     public Player(P pt, int seed) {
         super("Player",pt,seed);
         Command.host = this;
         get("health").setTotal(30);
-        stats.stats.put("points",new Stat(0));
-        stats.stats.put("adapt",new Stat(0));
-        get("points").max = 25;
-        get("points").add(10);
-        get("adapt").max = 25;
+        stats.setStat("memory",new Stat(1));
+        stats.setStat("points",new Stat(0));
+        stats.setStat("adapt",new Stat(0));
+        get("points").setTotal(25);
+        get("adapt").setTotal(25);
         clip.organs[1].setStyle(new Color(0,140,20),9);
         clip.organs[2].setStyle(new Color(20,20,180),13);
         clip.organs[3].setStyle(new Color(50,50,200),13);
         clip.organs[4].setStyle(new Color(0,220,65),15);
         clip.organs[5].setStyle(Color.green,9);
-        skills[0] = new Adrenaline();
-        skills[1] = new Rejuvenate();
-        skills[2] = new Cleave();
         speechType = "p";
         setWeapon((Weapon) ItemFactory.produce("Fist",0));
         setArmor((Armor) ItemFactory.produce("Underwear",0));
@@ -116,7 +113,7 @@ public class Player extends Man {
             delay.performer = new Performer(){
                 public void perform(){
                     if (!item.use(host)){
-                        say(item.name+" is not working!");
+                        say(item.getFullName()+" is not working!");
                     } else if (item.uses.get() == 0) {
                         say("Used up "+item.name);
                         inventory.remove(item);
@@ -131,28 +128,18 @@ public class Player extends Man {
     public void summon(){
         companions.summon();
     }
-    public void setState(Actions state){
+    public void setState(Moveset state){
         face(Global.player.mP.x > 0 ? 1 : -1);
         target = Global.player.mP;
-        switch (state){
-            case SUMMON:
-                summon();
-                break;
-            case SKILL:
-                skill = skills[0];
-                state = Actions.SKILL;
-                break;
-            case SKILL1:
-                skill = skills[1];
-                state = Actions.SKILL;
-                break;
-            case SKILL2:
-                skill = skills[2];
-                state = Actions.SKILL;
-                break;
-            case PICKUP:
-                grabItem();
-                break;
+        if (state instanceof Actions) {
+            switch ((Actions) state) {
+                case SUMMON:
+                    summon();
+                    break;
+                case PICKUP:
+                    grabItem();
+                    break;
+            }
         }
         super.setState(state);
     }
@@ -185,7 +172,8 @@ public class Player extends Man {
     public String toCharacterString(){
         String r = super.toString()+"@"+Global.map.maps[1]+"@"+gold+"\n";
         r += stats.toString()+"\n";
-        r += inventory.toString();
+        r += inventory.toString()+"\n";
+        r += skillTree.toString();
         return r;
     }
     public void load(String p){
@@ -207,6 +195,7 @@ public class Player extends Man {
                 hp.show(15);
             }
         });
-        if (line.length > 2) inventory.load(line[2]);
+        inventory.load(line[2]);
+        skillTree.load(line[3]);
     }
 }

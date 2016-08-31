@@ -3,6 +3,7 @@ package com.ga.unit.intelligence;
 import com.ga.map.Global;
 import com.ga.tool.P;
 import com.ga.tool.Timer;
+import com.ga.tool.Word;
 import com.ga.unit.Actions;
 import com.ga.unit.Man;
 import com.ga.unit.Unit;
@@ -54,7 +55,12 @@ public class Intelligence {
             host.getWeapon().rotate(p.getMult(host.dir,host.dir));
         }
     }
-    public void hear(Unit pos, String p){
+    public void hear(Unit u, String p){
+        if (u.faction == host.faction || host.faction == -1){
+            if (Word.Greeting.is(p)){
+                host.say("@greet");
+            }
+        }
     }
     protected void perceive(){
         seen = Updater.perceive(host, host.pos.getAdd(host.dir<0?-150:150,0), 300);

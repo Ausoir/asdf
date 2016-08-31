@@ -18,7 +18,8 @@ soldier:atk tgt@////////Die!/Eyaa!/You're going down!
 soldier:hear@///I hear something!/What's that?/huh?
 p:hit@///Ouch!/Oof!/Urgh!/Ow!
 p:x@Nooooooo!/Not like this.../I'm dead.../...
-merchant:ad@//Selling goodies!/An honest merchant here!/Good wares, better prices!
-merchant:c@Buy something!/Come see my wares!/Check out the newest wares here!/Need anything?
+merchant:c@Buy something!/Come see my wares!/Check out the newest wares here!/Need anything?/Selling goodies!/An honest merchant here!/Good wares, better prices!
 merchant:sold@HUEHUEHUE! Thanks!/Making money is my profession./Thank you for your business./Thank you!/Come back anytime!
 merchant:x@//////Whyyyy....
+merchant:denied@Fine, you're the one on a loss!/Your loss./Whatever./Don't have the money?/You're missing out!/Others would pay double for these.
+:greet@Hello!/A fine day to you./Good day./Hello there.

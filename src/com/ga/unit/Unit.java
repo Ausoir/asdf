@@ -12,12 +12,25 @@ public class Unit extends Thing {
     public boolean gravity = true;
     public int faction = 2;
     public P vel = new P(0, 0);
+    public boolean tangible = true;
     public Unit(String name, int seed, P pt, int depth) {
         super(name, seed, pt, depth);
     }
     public void hit(Unit hitter, int dmg){
     }
+    public boolean checkHit(Unit p, int range, int force){
+        if (!tangible) return false;
+        if (p.faction != faction) {
+            float s = (size.x * size.x) + (size.y + size.y);
+            if ((Math.pow(p.pos.x - pos.x, 2) + Math.pow(p.pos.y - pos.y, 2)) - s - range < 0) {
+                hit(p, force);
+                return true;
+            }
+        }
+        return false;
+    }
     public boolean checkHit(Unit hitter, Line p, int force){
+        if (!tangible) return false;
         if (faction != hitter.faction) {
             float s = (size.x*size.x)+(size.y+size.y);
             if ((Math.pow(p.pt.x - pos.x, 2) + Math.pow(p.pt.y - pos.y, 2))-s < 0) {

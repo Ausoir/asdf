@@ -1,40 +1,34 @@
 package com.ga.unit.skill;
 
+import com.ga.tool.Performer;
 import com.ga.tool.Timer;
 import com.ga.unit.Man;
 
 /**
- * Created by Ga on 8/1/2016.
+ * Created by Ga on 8/30/2016.
  */
-public class Skill {
-    public String stat = "health";
-    public int cost = 0;
+public class Skill extends Performer {
+    protected Timer timer = new Timer(-1);
+    protected String stat;
+    protected float time, buff;
+    protected int added;
     protected Man host;
-    protected Timer timer = new Timer(50, false);
-    public boolean active = false;
-    private int[] lastused = new int[]{-9999};
-
-    public Skill(){}
-    public void init(Man host){
-        if (this.host != null) end();
-        setHost(host);
-        start();
+    Skill(int time, String stat, int buff){
+        this.time = time;
+        this.stat = stat;
+        this.buff = buff;
     }
-    public void setHost(Man host){
+    void start(Man host){
         this.host = host;
-        host.stats.addEffect(this);
+        if (buff >= 0) added = (int) buff;
+        else added = (int) host.get(stat).getByPercentage(-buff);
+        host.get(stat).add(added,true);
+        if (time >= 0) timer = new Timer((int) time);
+        else timer = new Timer((int) (host.get(stat).get()*-time));
     }
-    protected void start(){
-        active = true;
-        timer.reset();
-    }
-    public void end(){
-        active = false;
-        this.host = null;
-    }
-    public boolean update(){
-        if (active && timer.update()){
-            if (host != null) end();
+    boolean update(){
+        if (timer.update()){
+            host.get(stat).add(-added, true);
             return true;
         }
         return false;

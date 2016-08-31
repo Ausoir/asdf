@@ -37,8 +37,7 @@ public class Hunt implements Task {
             host.setState(Actions.JUMP);
         if (host.isExhausted()){
             if (dist > 300){
-                if (x > 0) host.setState(Actions.WALKR);
-                else if (x < 0) host.setState(Actions.WALKL);
+                host.setState(Actions.REST);
             } else if (dist < 300){
                 if (x > 0) host.setState(Actions.WALKL);
                 else if (x < 0) host.setState(Actions.WALKR);

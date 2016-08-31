@@ -19,12 +19,16 @@ class Shadow extends Unit {
         pos.set(hostPos);
     }
     @Override
+    public boolean checkHit(Unit hitter, int range, int force){
+        return false;
+    }
+    @Override
     public boolean checkHit(Unit hitter, Line p, int force){
         return false;
     }
     @Override
     public void collide(){
-        Line pp = new Line(hostPos,hostPos.getAdd(0,600));
+        Line pp = new Line(hostPos,hostPos.getAdd(0,150));
         for (Line i : Global.map.land){
             if (i.lineCross(pp)){
                 onCollide(i);

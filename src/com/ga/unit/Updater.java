@@ -19,6 +19,7 @@ public class Updater {
     public static boolean editor = false;
     public static boolean showTerrain = false;
     public static ArrayList<Drawable> drawee = new ArrayList<>();
+    public static ArrayList<Effect> effects = new ArrayList<>();
     public static ArrayList<Observer> other = new ArrayList<>();
     public static ArrayList<Unit> updatee = new ArrayList<>();
     public static ArrayList<Thing> addQueue = new ArrayList<>();
@@ -29,6 +30,7 @@ public class Updater {
         drawee.clear();
         other.clear();
         updatee.clear();
+        effects.clear();
         addQueue.clear();
     }
     public static void changeMap(){
@@ -45,6 +47,7 @@ public class Updater {
                 Thing p = addQueue.get(i);
                 addDrawee(p);
                 if (p instanceof Unit) updatee.add((Unit) p);
+                if (p instanceof Effect) effects.add((Effect) p);
                 addQueue.remove(i);
             }
         }
@@ -54,15 +57,20 @@ public class Updater {
             for (Line i : Global.map.land) i.draw(g2);
         }
         for (Observer i : other) i.update();
-        if (!editor)
+        if (!editor) {
             for (int i = 0; i < updatee.size(); i++) {
                 updatee.get(i).update();
             }
+            for (int i = 0; i < effects.size(); i++) {
+                if (effects.get(i).over()) remove((Thing) effects.get(i));
+            }
+        }
         if (changeMap != null) changeMap();
     }
     public static void remove(Thing p){
         drawee.remove(p);
         updatee.remove(p);
+        effects.remove(p);
     }
     public static void addDrawee(Drawable p){
         int size = drawee.size();
@@ -88,7 +96,7 @@ public class Updater {
     public static void sound(Unit p, String msg){
         for (Unit i : updatee){
             if (i != p && i.faction != p.faction) {
-                if (Math.abs(i.pos.x - p.pos.x) < 600 && Math.abs(i.pos.y - p.pos.y) < 300) {
+                if (Math.abs(i.pos.x - p.pos.x) < 600 && Math.abs(i.pos.y - p.pos.y) < 200) {
                     if (i instanceof Man) {
                         ((Man) i).hear(p, msg);
                     }
@@ -99,10 +107,19 @@ public class Updater {
     public static Item collide(P p){
         for (Drawable i : drawee){
             if (i instanceof Item){
-                if (((Item) i).pos.getMinus().getAdd(p).getDist()<30) return (Item) i;
+                if (((Item) i).pos.getMinus().getAdd(p).getDist()<25) return (Item) i;
             }
         }
         return null;
+    }
+    public static Unit collide(Unit p, int range, int force){
+        Unit result = null;
+        for (Unit i : updatee){
+            if (i.checkHit(p,range,force)){
+                result = i;
+            }
+        }
+        return result;
     }
     public static Unit collide(Unit host, Line p, int force, boolean cleave){
         Unit result = null;

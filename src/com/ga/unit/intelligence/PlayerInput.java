@@ -6,18 +6,21 @@ import com.ga.game.Observer;
 import com.ga.game.Settings;
 import com.ga.map.Global;
 import com.ga.tool.P;
+import com.ga.tool.Word;
 import com.ga.unit.Actions;
+import com.ga.unit.Moveset;
 import com.ga.unit.Player;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Ga on 7/25/2016.
  */
 public class PlayerInput implements Input, Observer {
-    private static HashMap<Integer, Actions> keyMap = new HashMap<Integer, Actions>(){{
+    private static HashMap<Integer, Moveset> keyMap = new HashMap<Integer, Moveset>(){{
         put(-1, Actions.IDLE);
         put(KeyEvent.VK_W, Actions.ENTER);
         put(KeyEvent.VK_A, Actions.WALKL);
@@ -26,14 +29,11 @@ public class PlayerInput implements Input, Observer {
         put(KeyEvent.VK_SPACE, Actions.JUMP);
         put(KeyEvent.VK_C, Actions.SUMMON);
         put(KeyEvent.VK_F, Actions.KICK);
-        put(KeyEvent.VK_E, Actions.SKILL);
-        put(KeyEvent.VK_Q, Actions.SKILL1);
-        put(KeyEvent.VK_R, Actions.SKILL2);
         put(KeyEvent.VK_G, Actions.DROP);
         put(KeyEvent.VK_Z, Actions.PICKUP);
-        put(1, Actions.ATTACK);
-        put(3, Actions.SWING);
-        put(KeyEvent.VK_SHIFT, Actions.WHIRLWIND);
+        put(1, Actions.WEAPON);
+        put(3, Actions.IDLE);
+        put(KeyEvent.VK_SHIFT, Actions.REST);
     }};
     private ArrayList<Integer> keyPressed = new ArrayList<>();
     public Player host;
@@ -51,8 +51,19 @@ public class PlayerInput implements Input, Observer {
         Command.speechOrder(p);
         host.say(p);
     }
+    public void changeMapping(int key, Moveset event){
+        keyMap.put(key, event);
+    }
+    public String getMapping(Moveset move){
+        String r = null;
+        for (Map.Entry<Integer, Moveset> i : keyMap.entrySet()) {
+            if (i.getValue() == move){
+                r = Word.getKeyName(i.getKey());
+            }
+        }
+        return r;
+    }
     public void input(boolean key, int mode, int x, int y){
-//        Global.p(mode+"");
         if (!key) {
             mP.x = x - Settings.centerX;
             mP.y = y - Settings.centerY;

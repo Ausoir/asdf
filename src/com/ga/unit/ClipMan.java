@@ -18,25 +18,26 @@ public class ClipMan {
         put(Actions.WALKL, new int[]{1, 2, 3, 2});
         put(Actions.WALKR, new int[]{1, 2, 3, 2});
         put(Actions.JUMP, new int[]{4, -1});
-        put(Actions.ATTACK, new int[]{5, 6, 7, 2, -1});
+        put(Actions.PIERCE, new int[]{5, 6, 7, 2, -1});
         put(Actions.SWING, new int[]{20, 21, 22, -1});
         put(Actions.KICK, new int[]{12, 13, 2, -1});
         put(Actions.HIT, new int[]{14, -1});
         put(Actions.DOWN, new int[]{15, -1});
         put(Actions.DEAD, new int[]{16, -1});
-        put(Actions.SKILL, new int[]{19, -1});
         put(Actions.SUMMON, new int[]{19, -1});
         put(Actions.DROP, new int[]{19, -1});
-        put(Actions.WHIRLWIND, new int[]{8, 9, 10, 11, -1});
+        put(Actions.WHIRLWIND, new int[]{29, 30});
         put(Actions.ENTER, new int[]{19, -1});
         put(Actions.CAST, new int[]{19, -1});
-//        put(Actions.DUCK, new int[]{23, -1});
         put(Actions.DUCK, new int[]{19, -1});
         put(Actions.CONSUME, new int[]{24,2, -1});
         put(Actions.EXHAUSTED, new int[]{25, 26});
         put(Actions.THROW, new int[]{20,21,22,2,-1});
         put(Actions.SHOOT, new int[]{27,28,2,-1});
         put(Actions.PICKUP, new int[]{23,-1});
+        put(Actions.STAB, new int[]{8, 9, 10, 11, -1});
+        put(Actions.DASH, new int[]{31, 32, -1});
+        put(Actions.REST, new int[]{33, 34});
     }};
     public static final int FIST = 1, OFIST = 5, FOOT = 3;
     public Man host;
@@ -122,7 +123,7 @@ public class ClipMan {
             case THROW:
                 rotateAppendage(FIST,21);
                 break;
-            case ATTACK:
+            case PIERCE:
                 rotateAppendage(FIST,6);
                 break;
             case KICK:
@@ -153,7 +154,7 @@ public class ClipMan {
             for (int i = 0; i < nextClip.length; i++) {
                 float x = (((nextClip[i][0] * host.dir) + organs[i].pt.x) - organs[i].ptd.x) / (frame.max - 1);
                 float y = ((nextClip[i][1] + organs[i].pt.y) - organs[i].ptd.y) / (frame.max - 1);
-                if (state == Actions.ATTACK || state == Actions.KICK || state == Actions.WHIRLWIND) {
+                if (state == Actions.PIERCE || state == Actions.KICK) {
                     if ((x * x) + (y * y) > 50) {
                         if (i == 1) host.attack();
                         else if (i == 3) {

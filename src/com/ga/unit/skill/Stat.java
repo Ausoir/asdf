@@ -6,8 +6,8 @@ import com.ga.tool.Performer;
  * Created by Ga on 8/1/2016.
  */
 public class Stat {
-    public int max;
-    public int current;
+    private int max;
+    private int current;
     public Performer onChange;
     public Stat(int p){
         setTotal(p);
@@ -65,5 +65,8 @@ public class Stat {
     }
     public String toString(){
         return current+","+max;
+    }
+    public int getMax() {
+        return max;
     }
 }

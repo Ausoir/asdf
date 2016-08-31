@@ -9,16 +9,20 @@ import java.awt.image.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by Ga on 5/6/2016.
  */
 public class Texture {
+    private static HashMap<String,BufferedImage> cache = new HashMap<>();
     public static BufferedImage load(String dir){
-        BufferedImage image = null;
+        BufferedImage image = cache.get(dir);
+        if (image != null) return image;
         try {
 //            if (dir.split("/")[0].equals("map")) p.image = imageToBufferedImage(ImageIO.read(new File("Data/"+dir)).getScaledInstance(4000,2000,Image.SCALE_FAST));
             image = ImageIO.read(new File("Data/"+dir));
+            cache.put(dir,image);
 //            ArrayList<P> collider = new ArrayList<>();
 //            ArrayList<P> collidee = new ArrayList<>();
 //            getCollision(p.image, collider, collidee);

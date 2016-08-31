@@ -1,14 +1,11 @@
 package com.ga.unit;
 
-import com.ga.tool.P;
 import com.ga.tool.Timer;
 import com.ga.tool.Word;
 import com.ga.unit.intelligence.Idle;
 import com.ga.unit.intelligence.Intelligence;
 import com.ga.unit.item.Item;
 import com.ga.unit.item.ItemFactory;
-
-import java.util.Dictionary;
 
 /**
  * Created by Ga on 7/31/2016.
@@ -32,7 +29,7 @@ public class Merchant extends Intelligence {
     private MerchantType type;
     private Item[] wares;
     private int[] values;
-    private Timer advertise = new Timer(200, true);
+    private Timer advertise = new Timer(200, false);
     private float low = .5f;
     private float high = 4f;
     private int offer = -1;
@@ -52,14 +49,18 @@ public class Merchant extends Intelligence {
         super.hear(u,p);
         task = new Idle(host);
         host.face(u.pos);
-        if (p.contains("what")) {
+        if (u.isFacing(host.pos) && Math.abs(u.pos.x-host.pos.x) < 160)
+        if (Word.Interest.is(p)) {
             String r = "I'm selling ";
             for (int i = 0; i < type.items.length - 1; i++) {
-                r += type.items[i].replace("_"," ") + ",";
+                r += type.items[i].replace("_"," ") + ", ";
             }
-            r += " and " + type.items[type.items.length - 1].replace("_"," ") + "!";
+            r += "and " + type.items[type.items.length - 1].replace("_"," ") + "!";
             host.say(r);
-        } else if (Word.Affirmitive.is(p) || p.contains("buy")) {
+        } else if (Word.Negative.is(p)) {
+            host.say("@denied");
+            offer = -1;
+        } else if (Word.Affirmitive.is(p) || Word.Buy.is(p)) {
             if (target != null && offer != -1){
                 if (target instanceof Player){
                     Player player = ((Player) target);
@@ -94,14 +95,17 @@ public class Merchant extends Intelligence {
         if (p instanceof Man) {
             if (target != p) {
                 target = (Man) p;
-                host.say("@c");
                 task = new Idle(host);
+                if (advertise.over() && !host.isSpeaking()){
+                    host.say("@c");
+                    advertise.reset();
+                }
             }
         }
     }
     @Override
-    public void think(){
-        if (advertise.update()) host.say("@ad");
-        super.think();
+    public void update(){
+        super.update();
+        advertise.update();
     }
 }

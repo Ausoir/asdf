@@ -2,6 +2,7 @@ package com.ga.game;
 
 import com.ga.map.Global;
 import com.ga.map.ManFactory;
+import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.unit.*;
 import com.ga.unit.item.ItemFactory;
@@ -47,6 +48,9 @@ public class Command {
                 else if (cmd[0].equals("dummy")) ManFactory.produce(cmd[1], host.pos.getAdd(150, -50), -1).brain = null;
                 else if (cmd[0].equals("item")) host.addItem(ItemFactory.produce(cmd[1] ,-1));
                 else if (cmd[0].equals("tp")) host.pos.add(Integer.parseInt(cmd[1].split(",")[0]),Integer.parseInt(cmd[1].split(",")[1]));
+                else if (cmd[0].equals("xplod")) new Animation("Explosion",host.pos,5);
+                else if (cmd[0].equals("test")) Particle.explode(host.pos, P.getZero(), 2000, 50, true);
+                else if (cmd[0].equals("act")) host.setState(Actions.valueOf(cmd[1].toUpperCase()));
                 else if (p.equals("revive")) {
                     host.state = Actions.DOWN;
                     host.delay.set(50);

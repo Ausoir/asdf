@@ -15,9 +15,8 @@ public class Projectile extends Unit {
     protected float rotSpeed = .03f;
     public int damage = 0;
     public EventTimer delay = new EventTimer(-1, false, null);
-    public boolean tangible = true;
     public Projectile(String name, P pt, P dest, int speed) {
-        super(name, 0, pt, 20);
+        super(name, 0, pt, 10);
         vel.set(dest.getAtan(pt, speed));
         rotation = (float) Math.atan2(dest.y-pt.y,dest.x-pt.x);
     }
@@ -25,8 +24,16 @@ public class Projectile extends Unit {
         super.hit(hitter,dmg);
         remove();
     }
-    public void onAttack(Unit p){
-        remove();
+    public void onCollide(Line l){
+        stuck();
+    }
+    private void onAttack(Unit p){
+        stuck();
+    }
+    public void stuck(){
+        vel.set(0,0);
+        gravity = true;
+        tangible = false;
     }
     public void update(){
         super.update();

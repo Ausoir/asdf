@@ -98,12 +98,12 @@ public class Item extends Thing {
         setModifier(SpecialtyMod.get(rand));
     }
     protected void setModifier(PrefixMod mod){
-        if (mod == PrefixMod.Broken) uses.addTotal((int) (uses.max*-.7f));
-        else if (mod == PrefixMod.Old) uses.addTotal((int) Math.min(-1,uses.max*-.3f));
-        else if (mod == PrefixMod.Fine) uses.addTotal(Math.max(1,uses.max));
+        if (mod == PrefixMod.Broken) uses.addTotal((int) (uses.getMax()*-.7f));
+        else if (mod == PrefixMod.Old) uses.addTotal((int) Math.min(-1,uses.getMax()*-.3f));
+        else if (mod == PrefixMod.Fine) uses.addTotal(Math.max(1,uses.getMax()));
         else if (mod == PrefixMod.Mastercraft) uses.setTotal(-1);
         else if (mod == PrefixMod.Legendary) uses.setTotal(-1);
-        if (uses.max < 0 && (mod != PrefixMod.Mastercraft && mod != PrefixMod.Legendary)) uses.setTotal(0);
+        if (uses.getMax() < 0 && (mod != PrefixMod.Mastercraft && mod != PrefixMod.Legendary)) uses.setTotal(0);
     }
     protected void setModifier(SpecialtyMod mod){
         if (mod == SpecialtyMod.None) admod = AdverbMod.None;
@@ -115,7 +115,7 @@ public class Item extends Thing {
         else if (mod == SpecialtyMod.Feather) this.weight /= 2*admod.magnitude;
         else if (mod == SpecialtyMod.Quick) cooldown *= 1-(.2f*admod.magnitude);
         else if (mod == SpecialtyMod.Slow) cooldown *= 1+(.2f*admod.magnitude);
-        else if (mod == SpecialtyMod.Durable) uses.addTotal(uses.max);
+        else if (mod == SpecialtyMod.Durable) uses.addTotal(uses.getMax());
     }
     public int getRarity(){
         return pmod.ordinal()+(smod != SpecialtyMod.None?10:0)+(emod != EnchantMod.None?100:0);
@@ -171,6 +171,7 @@ public class Item extends Thing {
         r = r.replace("_"," ");
         return r;
     }
+    public void unequip(){}
     public boolean use(Man host){
         if (uses.get() != 0 && Global.cooldown(lastused, cooldown)) {
             uses.add(-1);
@@ -183,7 +184,7 @@ public class Item extends Thing {
         int uses = this.uses.get();
         r+= " Weighs "+weight+" and has "+(uses==-1?"infinite":uses)+" uses left.";
         if (emod != EnchantMod.None){
-            r += " This item is magical and enchanted with "+emod.name()+". The item's cooldown is "+cooldown/10+" seconds.";
+            r += " This item is magically enchanted with "+emod.name()+". The item's cooldown is "+cooldown/10+" seconds.";
             int cd = Global.checkCooldown(lastused, cooldown);
             if (cd <= 0) r += " Currently the item is ready to use.";
             else r += " Currently the item needs "+cd/10+" more seconds to recharge.";

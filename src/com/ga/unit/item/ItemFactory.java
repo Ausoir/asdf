@@ -1,13 +1,10 @@
 package com.ga.unit.item;
 
 import com.ga.map.Global;
-import com.ga.tool.Line;
+import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.tool.Word;
-import com.ga.unit.Actions;
-import com.ga.unit.ClipMan;
-import com.ga.unit.Man;
-import com.ga.unit.Unit;
+import com.ga.unit.*;
 
 import java.awt.*;
 
@@ -16,14 +13,17 @@ import java.awt.*;
  */
 public class ItemFactory {
     private enum FactoryWeapon{
-        Fist(1,-1,1,2), Mace(4,1000,3,8), Sword(3,600,2,6), Stick1(1,10,1,6), Stick2(1,10,1,6), Stick3(1,10,1,6), Katana(2,100,1,10), Spear(3,160,1,12), Axe(3,100,1,12),
-        Dagger(1,800,1,6), Pick(4,100,1,24), Cleaver(6,600,2,12), Halberd(6,100,1,36), Greatsword(8,400,2,18), Warhammer(9,400,3,12);
+        Fist(1,-1,1,2,WeaponType.STAB), Mace(4,1000,3,8,WeaponType.SWING), Sword(3,600,2,6,WeaponType.STAB), Stick1(1,10,1,6,WeaponType.SWING), Stick2(1,10,1,6,WeaponType.SWING), Stick3(1,10,1,6,WeaponType.SWING),
+        Katana(2,100,1,12,WeaponType.SWING), Spear(3,160,1,12,WeaponType.SWING), Axe(3,100,1,12,WeaponType.SWING), Dagger(1,800,1,6,WeaponType.SWING), Pick(4,100,1,24,WeaponType.SWING), Cleaver(6,600,2,12,WeaponType.SWING),
+        Halberd(6,100,1,36,WeaponType.SWING), Greatsword(8,400,2,18,WeaponType.SWING), Warhammer(9,400,3,12,WeaponType.SWING);
         private int damageNum, damageSides, weight, uses;
-        FactoryWeapon(int weight, int uses, int dmgNum, int dmgSide){
+        private WeaponType type;
+        FactoryWeapon(int weight, int uses, int dmgNum, int dmgSide, WeaponType type){
             this.weight = weight;
             this.damageNum = dmgNum;
             this.damageSides = dmgSide;
             this.uses = uses;
+            this.type = type;
         }
     }
     private enum FactoryArmor{
@@ -99,7 +99,7 @@ public class ItemFactory {
             Global.p("Can't find weapon "+p);
             wp = FactoryWeapon.Fist;
         }
-        Weapon r = new Weapon(wp.toString(), seed, wp.weight, wp.uses, wp.damageNum, wp.damageSides);
+        Weapon r = new Weapon(wp.toString(), seed, wp.weight, wp.uses, wp.damageNum, wp.damageSides, wp.type);
         return r;
     }
     private static Armor produceArmor(String p, int seed) {
@@ -134,19 +134,31 @@ public class ItemFactory {
                 item.delay = 60;
                 break;
             case "Fireball":
-                item = new Item(p, seed, 1, 3, 1000) {
+                item = new Item(p, seed, 1, 3, 10) {
                     @Override
                     public boolean use(Man host) {
                         if (super.use(host)) {
-                            final Projectile p = new Projectile("item/Fireball", host.pos.getAdd(host.clip.organs[ClipMan.FIST].ptd), Global.player.mP.getAdd(host.pos), 20+(host.get("arms").get()*2));
+                            final Projectile p = new Projectile("item/Fireball", host.pos.getAdd(host.clip.organs[ClipMan.FIST].ptd), Global.player.mP.getAdd(host.pos), 20+(host.get("arms").get()*2)){
+                                @Override
+                                public void stuck(){
+                                    Particle.explode(pos, P.getZero(), 300, 20, false);
+                                    Updater.collide(this,10000,30);
+                                    remove();
+                                }
+                                @Override
+                                public void update(){
+                                    super.update();
+                                    Particle.explode(pos, P.getZero(), 15, 10, true);
+                                }
+                            };
                             p.faction = 1;
-                            p.damage = 50;
+                            p.damage = 30;
                             p.gravity = true;
                             p.delay.set(50);
                             p.delay.performer = new Performer(){
                                 @Override
                                 public void perform(){
-                                    p.remove();
+                                    p.stuck();
                                 }
                             };
                             return true;
@@ -164,17 +176,9 @@ public class ItemFactory {
                         if (super.use(host)) {
                             Projectile p = new Projectile("item/Dagger",host.pos.getAdd(host.clip.organs[ClipMan.OFIST].ptd),Global.player.mP.getAdd(host.pos),50){
                                 @Override
-                                public void onCollide(Line l){
-                                    stuck();
-                                }
-                                @Override
-                                public void onAttack(Unit p){
-                                    stuck();
-                                }
-                                private void stuck(){
-                                    vel.set(0,0);
-                                    gravity = true;
-                                    tangible = false;
+                                public void stuck(){
+                                    if (tangible) Particle.explode(pos, vel, 20, 10, true);
+                                    super.stuck();
                                 }
                             };
                             p.rotSpeed = 0;

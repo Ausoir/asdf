@@ -64,7 +64,9 @@ public class Speech extends JTextArea implements Drawable{
     public int getDepth() {
         return 99;
     }
-
+    public boolean isSpeaking(){
+        return msg.size() > 0;
+    }
     public void say(String p){
         String t;
         if (p.startsWith("@")) t = getRandom(p.substring(1));
@@ -80,7 +82,10 @@ public class Speech extends JTextArea implements Drawable{
     }
     public String getRandom(String p){
         ArrayList<String> results = dialogue.get(host.speechType+":"+p);
-        if (results == null) return "";
+        if (results == null){
+            results = dialogue.get(":"+p);
+            if (results == null) return "";
+        }
         return results.get(Global.r.nextInt(results.size()));
     }
 }

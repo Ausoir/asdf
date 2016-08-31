@@ -1,14 +1,10 @@
 package com.ga.unit.intelligence;
 
 import com.ga.map.Global;
-import com.ga.tool.P;
-import com.ga.tool.Timer;
 import com.ga.unit.Actions;
 import com.ga.unit.Man;
 import com.ga.unit.Unit;
-import com.ga.unit.Updater;
-import com.ga.unit.skill.Adrenaline;
-import com.ga.unit.skill.Skill;
+import com.ga.unit.skill.Skills;
 
 import java.util.ArrayList;
 
@@ -17,10 +13,10 @@ import java.util.ArrayList;
  */
 public class EnemyIntelligence extends Intelligence {
     enum Moves{
-        STANDING(new Actions[]{Actions.KICK, Actions.WHIRLWIND, Actions.SWING}),
-        OVERLAP(new Actions[]{Actions.WHIRLWIND, Actions.SWING}),
+        STANDING(new Actions[]{Actions.KICK, Actions.WEAPON, Actions.SWING}),
+        OVERLAP(new Actions[]{Actions.WEAPON, Actions.SWING}),
         CLOSE(new Actions[]{Actions.KICK}),
-        CHASING(new Actions[]{Actions.ATTACK});
+        CHASING(new Actions[]{Actions.PIERCE});
         private Actions[] actions;
         Moves(Actions[] actions){
             this.actions = actions;
@@ -30,8 +26,8 @@ public class EnemyIntelligence extends Intelligence {
             return actions[r];
         }
     }
-    public ArrayList<Skill> skillset = new ArrayList<Skill>(){{
-        add(new Adrenaline());
+    public ArrayList<Skills> skillset = new ArrayList<Skills>(){{
+        add(Skills.Adrenaline);
     }};
     public EnemyIntelligence(Man man){
         super(man);
@@ -57,10 +53,9 @@ public class EnemyIntelligence extends Intelligence {
         }
     }
     public void useSkill(String p){
-        for (Skill i : skillset){
+        for (Skills i : skillset){
             if (i.getClass().getSimpleName().equals(p)){
-                host.skill = i;
-                host.setState(Actions.SKILL);
+                host.setState(i);
             }
         }
     }
@@ -76,8 +71,7 @@ public class EnemyIntelligence extends Intelligence {
     public void useSkill(){
         if (skillset.size() > 0) {
             int r = Global.r.nextInt(skillset.size());
-            host.skill = skillset.get(r);
-            host.setState(Actions.SKILL);
+            host.setState(skillset.get(r));
         }
     }
     public void setMove(Moves move){

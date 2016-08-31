@@ -29,14 +29,17 @@ public class Thing implements Drawable {
         this.name = name;
         if (seed == -1) this.seed = Global.getSeed();
         else this.seed = seed;
-        rand = new Random(seed);
+        rand = new Random(this.seed);
         if (name != null) {
             String dir = "";
             if (this instanceof Man) dir = "unit/";
             else if (this instanceof Item) dir = "item/";
-            image = Texture.load(dir + name + ".png");
-            size = new P(image.getWidth(), image.getHeight());
+            setImage(Texture.load(dir + name + ".png"));
         }
+    }
+    protected void setImage(BufferedImage image){
+        this.image = image;
+        size = new P(this.image.getWidth(), this.image.getHeight());
     }
     public void rotate(P p){
         rotation = ((float) Math.atan2(p.y,p.x));
@@ -47,8 +50,11 @@ public class Thing implements Drawable {
         pos = pt;
         Updater.addQueue.add(this);
     }
+    public boolean isFacing(P p){
+        return (pos.x > p.x && dir == -1) || (pos.x < p.x && dir == 1);
+    }
     public void draw(Graphics2D g, P offset){
-        if (image != null && visible) {
+        if (visible) {
             P t = Global.getRelPos(pos.x - (size.x / 2), pos.y - (size.y / 2));
             t.add(offset.x + (dir < 0 ? size.x : 0), offset.y);
             P r = t.getAdd(dir < 0 ? -size.x / 2 : size.x / 2, size.y / 2);

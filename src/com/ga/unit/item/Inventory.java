@@ -74,7 +74,7 @@ public class Inventory {
         if (item instanceof Weapon) {
             if (player.weapon == item) player.setWeapon((Weapon) ItemFactory.produce("Fist", 0));
             if (index == wielded){
-                ((Weapon) item).organ = null;
+                item.unequip();
                 wielded = -1;
             }
         } else if (item instanceof Armor){
@@ -94,6 +94,9 @@ public class Inventory {
         removePocket(r);
         if (wielded > p) wielded--;
         if (worn > p) worn--;
+        for (int i=0;i<pockets.length;i++){
+            if (pockets[i] > p) pockets[i]--;
+        }
         items.remove(p);
         return r;
     }
@@ -102,7 +105,7 @@ public class Inventory {
         return remove(i);
     }
     public void load(String p){
-        String[] data = p.split(";");
+        String[] data = p.substring(1).split(";");
         for (int i=0;i<data.length;i++){
             String[] pair = data[i].split("@");
             Item item = ItemFactory.produce(pair[0],Integer.parseInt(pair[2].split(",")[0]));
@@ -122,7 +125,7 @@ public class Inventory {
         }
     }
     public String toString(){
-        String r = "";
+        String r = ";";
         for (int i = 0; i < items.size(); i++) {
             String prefix = "";
             Item item = items.get(i);
@@ -131,7 +134,6 @@ public class Inventory {
             else if (indexOf(item) != -1) prefix = ""+indexOf(item);
             r += item.name+"@"+prefix+"@"+item.seed+","+item.uses + ";";
         }
-        if (r.length() > 0) r = r.substring(0,r.length()-1);
         return r;
     }
 }

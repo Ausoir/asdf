@@ -9,11 +9,13 @@ import com.ga.unit.intelligence.Intelligence;
 import com.ga.unit.intelligence.Speech;
 import com.ga.unit.item.Armor;
 import com.ga.unit.item.Weapon;
-import com.ga.unit.skill.Adrenaline;
-import com.ga.unit.skill.Skill;
+import com.ga.unit.skill.Skills;
 import com.ga.unit.skill.Stat;
 
 import java.awt.*;
+
+import static com.ga.unit.Actions.WALKL;
+import static com.ga.unit.Actions.WALKR;
 
 /**
  * Created by Ga on 5/7/2016.
@@ -29,7 +31,6 @@ public class Man extends Unit {
     public Weapon weapon;
     public Armor armor;
     public P target = new P();
-    public Skill skill = new Adrenaline();
     private Speech speech = new Speech(this);
     public Stats stats = new Stats();
     protected HealthBar hp;
@@ -46,7 +47,7 @@ public class Man extends Unit {
     public void setWeapon(Weapon p){
         weapon = p;
         weapon.pos = pos;
-        weapon.organ = clip.organs[ClipMan.FIST];
+        weapon.setOrgan(clip.organs[ClipMan.FIST]);
         weapon.dir = dir;
         if (!p.name.equals("Fist")){
             clip.localAnimation[0] = clip.localAnimation[2];
@@ -77,82 +78,51 @@ public class Man extends Unit {
         speech.say(p);
     }
 
+    public boolean isSpeaking(){
+        return speech.isSpeaking();
+    }
+
     public void hear(Unit pos, String p){
         if (brain != null) brain.hear(pos, p);
     }
 
-    public void setState(Actions state) {
+    public void setState(Moveset state) {
         if (!delay.over() || !jump) return;
         if (this.state != state) {
-            String statreq = null;
-            int req = 0;
-            float velx = 1;
-            int del = 0;
-            switch (state) {
-                case HIT:
-                    del = 15;
-                    break;
-                case DOWN:
-                    del = 50;
-                    velx = 1.5f;
-                    break;
-                case SKILL:
-                    statreq = skill.stat;
-                    req = skill.cost;
-                    del = 15;
-                    velx = 0;
-                    break;
-                case IDLE:
-                    velx = 0;
-                    break;
-                case JUMP:
-                    statreq = "legs";
-                    req = 2;
-                    velx = 1.5f;
-                    jump = false;
-                    break;
-                case WALKL:
-                    face(-1);
-                    del = 5;
-                    break;
-                case WALKR:
-                    face(1);
-                    del = 5;
-                    break;
-                case ATTACK:
-                    statreq = "arms";
-                    req = weapon.weight;
-                    velx = 1.5f;
-                    del = 25;
-                    break;
-                case SWING:
-                    if (weapon.name.equals("Fist")) return;
-                    statreq = "arms";
-                    req = weapon.weight;
-                    velx = 0;
-                    del = 25;
-                    break;
-                case WHIRLWIND:
-                    statreq = "arms";
-                    req = weapon.weight*2;
-                    velx = 0;
-                    del = 50;
-                    break;
-                case KICK:
-                    statreq = "legs";
-                    req = armor.weight;
-                    velx = 1;
-                    del = 30;
-                    break;
+            stats.unrest();
+            String statreq = state.getStatReq();
+            float req = state.getCost();
+            Actions action = null;
+            if (state instanceof Actions) action = (Actions) state;
+            if (action != null) {
+                switch (action) {
+                    case WEAPON:
+                        setState(weapon.getMoveset());
+                        return;
+                    case WALKL:
+                        face(-1);
+                        break;
+                    case WALKR:
+                        face(1);
+                        break;
+                }
             }
-            if (statreq == null || get(statreq).require(req)){
-                if (brain != null) brain.setState(state);
-//                face(target.x<0?-1:1);
-                delay.set(del);
-                vel.x *= velx;
-                this.state = state;
-                clip.setState(state);
-                stateSet(state);
+            if (req < 0){
+                if (statreq.equals("arms")) req = weapon.weight*-req;
+                else if (statreq.equals("legs")) req = armor.weight*-req;
+            }
+            if (statreq == null || get(statreq).require((int) req)){
+                delay.set(state.getDel());
+                vel.x *= state.getVelX();
+                if (action != null) {
+                    this.state = action;
+                    clip.setState(action);
+                    stateSet(action);
+                    if (brain != null) brain.setState(action);
+                } else {
+                    clip.setState(((Skills)state).getAction());
+                    ((Skills)state).init(this);
+                }
             }
         }
     }
@@ -171,9 +141,7 @@ public class Man extends Unit {
                 break;
             case JUMP:
                 vel.y -= 50;
-                break;
-            case SKILL:
-                skill.init(this);
+                jump = false;
                 break;
         }
     }
@@ -197,7 +165,7 @@ public class Man extends Unit {
         delay.set(0);
         int x = hitter.pos.x - pos.x > 0 ? 1 : -1;
         face(x < 0 ? -1 : 1);
-        float ratio = (float) damage * 10 / get("health").max;
+        float ratio = (float) damage * 10 / get("health").getMax();
         float knockback = Math.min(ratio, 50);
         if (ratio > 100) setState(Actions.DOWN);
         else setState(Actions.HIT);
@@ -229,7 +197,7 @@ public class Man extends Unit {
     }
 
     public Stat get(String p){
-        return stats.stats.get(p);
+        return stats.getStat(p);
     }
 
     public void hurt(int damage) {
@@ -251,19 +219,19 @@ public class Man extends Unit {
     }
 
     public void attack() {
-        Unit hit = null;
+        Unit hit;
         int dam = weapon.getDamage() + get("damage").get();
-        if (state == Actions.WHIRLWIND) {
-            dam *= 2;
-            hit = Updater.collide(this, new Line(clip.organs[ClipMan.FIST].ptd.getAdd(pos),weapon.getPoint()), dam, true);
-        } else if (state == Actions.SWING) {
-            hit = Updater.collide(this, weapon.getLine(), dam, true);
-        } else if (state == Actions.ATTACK){
-            dam += Math.abs(vel.x);
-            hit = Updater.collide(this, weapon.getLine(), dam, false);
-            if (hit != null) stats.endEffect("Cleave");
+        boolean cleave = false;
+        if (state == Actions.STAB) dam *= 4;
+        else if (state == Actions.PIERCE) dam += Math.abs(vel.x);
+        else if (state == Actions.SWING) cleave = true;
+        hit = Updater.collide(this, weapon.getLine(), dam, cleave);
+        if (hit != null){
+            P pt = weapon.getPoint();
+            Particle.explode(pt,pt.getAdd(clip.organs[ClipMan.FIST].ptd.getMinus()),10,20,true);
+            stats.endEffect("Cleave");
+            if (brain != null) brain.attacked();
         }
-        if (hit != null && brain != null) brain.attacked();
     }
 
     @Override
@@ -283,10 +251,11 @@ public class Man extends Unit {
                         } else vel.x *= xforce;
                     }
                     vel.x *= .9f;
+                    onCollide(i);
                 } else if (i.opt == 1){
                     vel.y = 0;
+                    onCollide(i);
                 }
-                onCollide(i);
             }
         }
     }
@@ -297,24 +266,40 @@ public class Man extends Unit {
         jump = true;
     }
 
+    private void stateUpdate(){
+        if (state == WALKL) vel.x = -get("speed").get()/10;
+        else if (state == WALKR) vel.x = get("speed").get()/10;
+        else if (state == Actions.REST) stats.rest();
+        if (!weapon.name.equals("Fist")) {
+            switch (state){
+                case WHIRLWIND:
+                    weapon.rotation = delay.time * -weapon.dir;
+                    attack();
+                    break;
+                case SWING:
+                    weapon.rotation = weapon.dir + delay.time * .2f * -weapon.dir;
+                    if (delay.time < 12) attack();
+                    break;
+                case STAB:
+                    if (delay.time < 10) attack();
+                    break;
+                case DASH:
+                    if (delay.time == 20){
+                        vel.set(get("speed").get()*dir,-10);
+                    } else if (delay.time < 20){
+                        attack();
+                    }
+                    break;
+            }
+        }
+    }
+
     @Override
     public void update() {
         stats.update();
         delay.update();
         clip.update();
-        if (state == Actions.WALKL) vel.x = -get("speed").get()/10;
-        else if (state == Actions.WALKR) vel.x = get("speed").get()/10;
-        if (!weapon.name.equals("Fist")) {
-            if (state == Actions.WHIRLWIND) {
-                if (delay.time < 20) {
-                    weapon.rotation = delay.time * -weapon.dir;
-                    attack();
-                }
-            } else if (state == Actions.SWING) {
-                weapon.rotation = weapon.dir + delay.time * .2f * -weapon.dir;
-                if (delay.time < 12) attack();
-            }
-        }
+        stateUpdate();
         super.update();
         if (brain != null) brain.update();
     }

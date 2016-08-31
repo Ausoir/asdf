@@ -2,6 +2,9 @@ package com.ga.game;
 
 import com.ga.map.Global;
 import com.ga.tool.P;
+import com.ga.tool.Word;
+import com.ga.unit.Actions;
+import com.ga.unit.Moveset;
 import com.ga.unit.item.Inventory;
 import com.ga.unit.item.Item;
 import com.ga.unit.Player;
@@ -22,6 +25,8 @@ public class Menu extends JPanel {
     private JPanel mainpanel = new JPanel();
     private StatPanel statspanel = new StatPanel();
     private InventoryPanel inventorypanel = new InventoryPanel();
+    private SkillPanel skillpanel = new SkillPanel();
+    private HelpPanel helppanel = new HelpPanel();
     private JPanel optionspanel = new JPanel();
     private Image image;
     public Menu() {
@@ -44,15 +49,19 @@ public class Menu extends JPanel {
         grid.fill = GridBagConstraints.BOTH;
         add(statspanel,grid);
         add(inventorypanel,grid);
+        add(skillpanel,grid);
+        add(helppanel,grid);
         add(optionspanel,grid);
         command("");
     }
     private void addMainPanel(){
-        GridLayout gridlayout = new GridLayout(3,1,20,40);
+        GridLayout gridlayout = new GridLayout(5,1,20,40);
         mainpanel.setOpaque(false);
         mainpanel.setLayout(gridlayout);
         mainpanel.add(makeMenuButton("Stats", "stats"));
         mainpanel.add(makeMenuButton("Inventory", "inventory"));
+        mainpanel.add(makeMenuButton("Skills", "skill"));
+        mainpanel.add(makeMenuButton("Help", "help"));
         mainpanel.add(makeMenuButton("Options", "options"));
         grid.gridx = 0;
         add(mainpanel,grid);
@@ -106,9 +115,13 @@ public class Menu extends JPanel {
     private void command(String p){
         statspanel.setVisible(false);
         inventorypanel.setVisible(false);
+        skillpanel.setVisible(false);
+        helppanel.setVisible(false);
         optionspanel.setVisible(false);
         if (p.equals("stats")) statspanel.setVisible(true);
         else if (p.equals("inventory")) inventorypanel.setVisible(true);
+        else if (p.equals("skill")) skillpanel.setVisible(true);
+        else if (p.equals("help")) helppanel.setVisible(true);
         else if (p.equals("options")) optionspanel.setVisible(true);
     }
     public void toggle(){
@@ -127,6 +140,8 @@ public class Menu extends JPanel {
         if (visible && Global.player != null){
             statspanel.refresh();
             inventorypanel.refresh();
+            skillpanel.refresh();
+            helppanel.refresh();
         }
     }
 }
@@ -171,10 +186,10 @@ class StatPanel extends JPanel{
     }
     protected void refresh(){
         Player player = Global.player.host;
-        ((JButton)getComponent(0)).setText("Damage - "+player.get("damage").max);
-        ((JButton)getComponent(1)).setText("Strength - "+player.get("arms").max);
-        ((JButton)getComponent(2)).setText("Stamina - "+player.get("legs").max);
-        ((JButton)getComponent(3)).setText("Memory - "+player.get("damage").max);
+        ((JButton)getComponent(0)).setText("Damage - "+player.get("damage").getMax());
+        ((JButton)getComponent(1)).setText("Strength - "+player.get("arms").getMax());
+        ((JButton)getComponent(2)).setText("Stamina - "+player.get("legs").getMax());
+        ((JButton)getComponent(3)).setText("Memory - "+player.get("damage").getMax());
         ((JButton)getComponent(4)).setText("Reset Points - "+player.get("adapt").get());
         ((JButton)getComponent(5)).setText("Level Points - "+player.get("points").get());
         if (player.get("points").get() > 0)
@@ -392,5 +407,85 @@ class InventoryPanel extends JPanel {
         Global.player.host.inventory.unequip(p);
         ((JPanel) panel.getComponent(p)).setBorder(emptyborder);
         selected[p] = 0;
+    }
+}
+
+class SkillPanel extends JPanel{
+    private JLabel helper;
+    public SkillPanel(){
+        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        setOpaque(false);
+        setVisible(false);
+    }
+    protected void refresh(){
+        removeAll();
+        helper = new JLabel("Select a skill to re-map its keybinding.");
+        makeSlot(Actions.WEAPON);
+        makeSlot(Actions.JUMP);
+        makeSlot(Actions.KICK);
+        makeSlot(Actions.DROP);
+        makeSlot(Actions.REST);
+        for (Moveset i : Global.player.host.skillTree.getSkills()){
+            makeSlot(i);
+        }
+    }
+    protected void makeSlot(final Moveset move){
+        String key = Global.player.getMapping(move);
+        if (key == null) key = "";
+        else key = "["+key+"]";
+        JPanel panel = new JPanel();
+        panel.setOpaque(false);
+        panel.setLayout(new BoxLayout(panel,BoxLayout.LINE_AXIS));
+        panel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
+        final JLabel describe = new JLabel(" [?]");
+        describe.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                Global.player.host.say(move.getDescription());
+            }
+        });
+        final JLabel equip = new JLabel(" "+key+" "+Word.wordify(move.getName()));
+        equip.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                describe.setVisible(false);
+                equip.setText("Press a Key");
+                equip.requestFocus();
+            }
+        });
+        equip.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (equip.hasFocus()) {
+                    Global.player.changeMapping(e.getButton(), move);
+                    Global.display.requestFocus();
+                    equip.setText(" [" + Word.getKeyName(e.getButton()) + "] " + Word.wordify(move.getName()));
+                }
+            }
+        });
+        equip.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                Global.player.changeMapping(e.getKeyCode(), move);
+                Global.display.requestFocus();
+                describe.setVisible(true);
+                equip.setText(" ["+Word.getKeyName(e.getKeyCode())+"] "+ Word.wordify(move.getName()));
+            }
+        });
+        panel.add(describe);
+        panel.add(equip);
+        add(panel);
+        add(Box.createRigidArea(new Dimension(0,12)));
+    }
+}
+
+class HelpPanel extends JTextArea{
+    public HelpPanel(){
+        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        setOpaque(false);
+        setVisible(false);
+    }
+    protected void refresh(){
+        setText("This help section is not feeling helpful.");
     }
 }

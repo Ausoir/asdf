@@ -2,7 +2,7 @@ package com.ga.unit;
 
 import com.ga.map.Global;
 import com.ga.tool.Timer;
-import com.ga.unit.skill.Skill;
+import com.ga.unit.skill.Skills;
 import com.ga.unit.skill.Stat;
 
 import java.util.ArrayList;
@@ -14,8 +14,8 @@ import java.util.Map;
  * Created by Ga on 8/1/2016.
  */
 public class Stats {
-    protected ArrayList<Skill> effects = new ArrayList<>();
-    public HashMap<String, Stat> stats = new HashMap<String, Stat>(){{
+    protected ArrayList<Skills> effects = new ArrayList<>();
+    private HashMap<String, Stat> stats = new HashMap<String, Stat>(){{
         put("health", new Stat((int) (Global.rng(100)+Global.r.nextInt(20)+5)));
         put("speed", new Stat((int) (Global.rng(50)+Global.r.nextInt(30)+50)));
         put("arms", new Stat(3));
@@ -25,11 +25,17 @@ public class Stats {
     private Timer timer = new Timer(100, true);
     public Stats(){
     }
-    public void addEffect(Skill p){
+    public Stat getStat(String p) {
+        return stats.get(p);
+    }
+    public void setStat(String name, Stat p) {
+        stats.put(name,p);
+    }
+    public void addEffect(Skills p){
         effects.add(p);
     }
     public boolean hasEffect(String p){
-        for (Skill i : effects){
+        for (Skills i : effects){
             if (i.getClass().getSimpleName().equals(p)){
                 if (i.active) return true;
             }
@@ -67,17 +73,22 @@ public class Stats {
             stats.get(stat).addTotal(1);
         }
     }
-    public void update(){
-        Iterator it = effects.iterator();
-        while (it.hasNext()){
-            Skill i = (Skill) it.next();
-            if (i.update()) it.remove();
-        }
+    public void unrest(){
+        timer.reset();
+    }
+    public void rest(){
         if (timer.update()){
             Stat arm = stats.get("arms");
             Stat leg = stats.get("legs");
             arm.add(Math.round(arm.getByPercentage(.34f)));
             leg.add(Math.round(leg.getByPercentage(.34f)));
+        }
+    }
+    public void update(){
+        Iterator it = effects.iterator();
+        while (it.hasNext()){
+            Skills i = (Skills) it.next();
+            if (i.update()) it.remove();
         }
     }
     public void load(String p){

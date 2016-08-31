@@ -16,13 +16,14 @@ import java.util.HashMap;
  */
 public class ManFactory {
     enum ManType{
-        Merchant(null, new String[]{"Fist"}, new String[]{"Cotton_Clothing"}, 0,0,0,0),
-        Peasant(new String[]{"Man0","Man1","Man2","Man3","Man4","Man5","Man6"}, new String[]{"Stick1","Stick2","Stick3","Axe","Fist"}, new String[]{"Cotton_Clothing","Fabric_Clothing"}, 0,0,0,0),
-        Soldier(null,new String[]{"Sword","Spear"}, new String[]{"Leather_Armor", "Chainmail"}, 20,2,8,5),
-        Knight(null,new String[]{"Sword","Mace","Katana"}, new String[]{"Platemail"}, 20,1,5,5);
+        Merchant(null, "merchant", new String[]{"Fist"}, new String[]{"Cotton_Clothing"}, 0,0,0,0),
+        Peasant(new String[]{"Man0","Man1","Man2","Man3","Man4","Man5","Man6"}, "peasant", new String[]{"Stick1","Stick2","Stick3","Axe","Fist"}, new String[]{"Cotton_Clothing","Fabric_Clothing"}, 0,0,0,0),
+        Soldier(null,"soldier",new String[]{"Sword","Spear"}, new String[]{"Leather_Armor", "Chainmail"}, 20,2,8,5),
+        Knight(null,"soldier",new String[]{"Sword","Mace","Katana"}, new String[]{"Platemail"}, 20,1,5,5);
         String[] face, weapon, armor;
+        String speech;
         int health,speed,arms,legs;
-        ManType(String[] face, String[] weapons, String[] armors, int hp, int spd, int arm, int leg){
+        ManType(String[] face, String speech, String[] weapons, String[] armors, int hp, int spd, int arm, int leg){
             this.face = face;
             this.weapon = weapons;
             this.armor = armors;
