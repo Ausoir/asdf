@@ -34,7 +34,7 @@ public class Intelligence {
     }
     public void attacked(){
         if (target != null) {
-            if (target.state != Actions.DEAD) {
+            if (target.state != Actions.Dead) {
                 host.say("@atk tgt");
             } else {
                 host.say("@tgt x");

@@ -420,11 +420,11 @@ class SkillPanel extends JPanel{
     protected void refresh(){
         removeAll();
         helper = new JLabel("Select a skill to re-map its keybinding.");
-        makeSlot(Actions.WEAPON);
-        makeSlot(Actions.JUMP);
-        makeSlot(Actions.KICK);
-        makeSlot(Actions.DROP);
-        makeSlot(Actions.REST);
+        makeSlot(Actions.Weapon);
+        makeSlot(Actions.Jump);
+        makeSlot(Actions.Kick);
+        makeSlot(Actions.Drop);
+        makeSlot(Actions.Rest);
         for (Moveset i : Global.player.host.skillTree.getSkills()){
             makeSlot(i);
         }
@@ -459,7 +459,8 @@ class SkillPanel extends JPanel{
                 if (equip.hasFocus()) {
                     Global.player.changeMapping(e.getButton(), move);
                     Global.display.requestFocus();
-                    equip.setText(" [" + Word.getKeyName(e.getButton()) + "] " + Word.wordify(move.getName()));
+                    describe.setVisible(true);
+                    refresh();
                 }
             }
         });
@@ -469,7 +470,7 @@ class SkillPanel extends JPanel{
                 Global.player.changeMapping(e.getKeyCode(), move);
                 Global.display.requestFocus();
                 describe.setVisible(true);
-                equip.setText(" ["+Word.getKeyName(e.getKeyCode())+"] "+ Word.wordify(move.getName()));
+                refresh();
             }
         });
         panel.add(describe);

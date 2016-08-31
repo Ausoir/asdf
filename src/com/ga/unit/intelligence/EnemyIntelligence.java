@@ -13,10 +13,10 @@ import java.util.ArrayList;
  */
 public class EnemyIntelligence extends Intelligence {
     enum Moves{
-        STANDING(new Actions[]{Actions.KICK, Actions.WEAPON, Actions.SWING}),
-        OVERLAP(new Actions[]{Actions.WEAPON, Actions.SWING}),
-        CLOSE(new Actions[]{Actions.KICK}),
-        CHASING(new Actions[]{Actions.PIERCE});
+        STANDING(new Actions[]{Actions.Kick, Actions.Weapon, Actions.Swing}),
+        OVERLAP(new Actions[]{Actions.Weapon, Actions.Swing}),
+        CLOSE(new Actions[]{Actions.Kick}),
+        CHASING(new Actions[]{Actions.Pierce});
         private Actions[] actions;
         Moves(Actions[] actions){
             this.actions = actions;
@@ -43,7 +43,7 @@ public class EnemyIntelligence extends Intelligence {
     protected void perceived(Unit p){
         if (p.faction != host.faction && p.faction != -1) {
             if (p instanceof Man) {
-                if (((Man)p).state != Actions.DEAD) {
+                if (((Man)p).state != Actions.Dead) {
                     target = (Man) p;
                     forget.set(30);
                     host.say("@c tgt");

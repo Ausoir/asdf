@@ -133,10 +133,10 @@ public class Player extends Man {
         target = Global.player.mP;
         if (state instanceof Actions) {
             switch ((Actions) state) {
-                case SUMMON:
+                case Summon:
                     summon();
                     break;
-                case PICKUP:
+                case Pickup:
                     grabItem();
                     break;
             }
@@ -146,7 +146,7 @@ public class Player extends Man {
 
     public void onCollide(Line r){
         super.onCollide(r);
-        if (state != Actions.DEAD) {
+        if (state != Actions.Dead) {
             if (r.opt == 2) {
                 vel.set(0, 0);
                 Global.map.teleport(pos, r);
@@ -160,7 +160,7 @@ public class Player extends Man {
     public void update(){
         companions.update();
         Global.player.update();
-        if (weapon != null && state != Actions.DEAD){
+        if (weapon != null && state != Actions.Dead){
             weapon.rotate(Global.player.mP.getMult(dir,dir));
             if (get("arms").get() < weapon.weight && delay.over()) weapon.rotation = 6f*weapon.dir;
         }
@@ -171,6 +171,7 @@ public class Player extends Man {
     }
     public String toCharacterString(){
         String r = super.toString()+"@"+Global.map.maps[1]+"@"+gold+"\n";
+        r += Global.player.toString()+"\n";
         r += stats.toString()+"\n";
         r += inventory.toString()+"\n";
         r += skillTree.toString();
@@ -179,23 +180,24 @@ public class Player extends Man {
     public void load(String p){
         String[] line = p.split("%");
         gold = Integer.parseInt(line[0].split("@")[4]);
-        stats.load(line[1]);
+        Global.player.load(line[1]);
+        stats.load(line[2]);
         hp = new PlayerHealthBar(get("health"),get("arms"),get("legs"),pos);
         get("arms").onChange = (new Performer(){
             @Override
             public void perform(){
-                if (get("arms").isFull() && state == Actions.IDLE) clip.setState(Actions.IDLE);
+                if (get("arms").isFull() && state == Actions.Idle) clip.setState(Actions.Idle);
                 hp.show(15);
             }
         });
         get("legs").onChange = (new Performer(){
             @Override
             public void perform(){
-                if (get("legs").isFull() && state == Actions.IDLE) clip.setState(Actions.IDLE);
+                if (get("legs").isFull() && state == Actions.Idle) clip.setState(Actions.Idle);
                 hp.show(15);
             }
         });
-        inventory.load(line[2]);
-        skillTree.load(line[3]);
+        inventory.load(line[3]);
+        skillTree.load(line[4]);
     }
 }

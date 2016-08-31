@@ -11,13 +11,13 @@ import com.ga.unit.item.Projectile;
  * Created by Ga on 8/1/2016.
  */
 public enum Skills implements Moveset {
-    Adrenaline(25,"legs",-2,0,"Adrenaline doubles movement speed for 5 seconds.",new Skill(50,"speed",-1)),
-    Rejuvenate(25,"legs",-2,0,"Rejuvenate recovers strength to full at the cost of stamina.",new Skill(100,"arms",-1)),
-    Cleave(25,"arms",-1,0,"Cleave grants the next attack a cleaving property.",new Skill(1000,"health",0)),
-    Empower(25,"arms",-1,0,"Empower grants the next attack 10 bonus damage.",new Skill(80,"damage",10)),
-    Frenzy(25,"health",-.2f,0,"Frenzy gives you infinite stamina, but at the cost of health and restlessness for 10 seconds.",new Skill(1000,"health",0)),
-    Evade(25,"legs",-2,0,"Evade makes you invulnerable for 6 seconds.",new Skill(65,"health",0)),
-    Fireball(20,"legs",-2,0,"Shoot a fireball.",new Skill(0,"health",0){
+    Adrenaline(Actions.Cast, 25,"legs",-2,0,10,"Adrenaline doubles movement speed for 5 seconds.",new Skill(50,"speed",-1)),
+    Rejuvenate(Actions.Cast, 25,"legs",-2,0,1000,"Rejuvenate recovers strength to full at the cost of stamina.",new Skill(100,"arms",-1)),
+    Cleave(Actions.Cast, 25,"arms",-1,0,1000,"Cleave grants the next attack a cleaving property.",new Skill(1000,"health",0)),
+    Empower(Actions.Cast, 25,"arms",-1,0,1000,"Empower grants the next attack 10 bonus damage.",new Skill(80,"damage",10)),
+    Frenzy(Actions.Cast, 25,"health",-.2f,0,1000,"Frenzy gives you infinite stamina, but at the cost of health and restlessness for 10 seconds.",new Skill(1000,"health",0)),
+    Evade(Actions.Cast, 25,"legs",-2,0,1000,"Evade grants you invulnerability for 6 seconds.",new Skill(6500,"health",0)),
+    Fireball(Actions.Cast, 40,"legs",-2,0,300,"Shoot a fireball.",new Skill(0,"health",0){
         @Override
         boolean update(){
             final Projectile p = new Projectile("item/Fireball", host.pos.getAdd(host.clip.organs[ClipMan.FIST].ptd), Global.player.mP.getAdd(host.pos), 20+(host.get("arms").get()*2)){
@@ -46,29 +46,36 @@ public enum Skills implements Moveset {
             return super.update();
         }
     });
-    protected String stat = "health";
-    protected float cost, velx = 0;
-    protected Actions action = Actions.CAST;
+    protected String stat;
+    protected float cost, velx;
+    protected Actions action;
     protected Man host;
     protected EventTimer timer;
     protected String description;
     public boolean active = false;
+    protected int cooldown;
     private int[] lastused = new int[]{-9999};
 
-    Skills(int del, String statReq, float cost, float velx, String desc, Performer performer){
+    Skills(Actions action, int del, String statReq, float cost, float velx, int cooldown, String desc, Performer performer){
+        this.action = action;
         timer = new EventTimer(del,false,performer);
         this.stat = statReq;
         this.cost = cost;
         this.velx = velx;
+        this.cooldown = cooldown;
         this.description = desc;
     }
     public void init(Man host){
-        if (this.host != null) end();
-        this.host = host;
-        host.stats.addEffect(this);
-        active = true;
-        timer.reset();
-        if (timer.performer instanceof Skill) ((Skill) timer.performer).start(host);
+        if (Global.cooldown(lastused,cooldown)) {
+            if (this.host != null) end();
+            this.host = host;
+            host.stats.addEffect(this);
+            active = true;
+            timer.reset();
+            if (timer.performer instanceof Skill) ((Skill) timer.performer).start(host);
+        } else {
+            host.say(getName()+" is on cooldown!");
+        }
     }
     public void end(){
         active = false;
@@ -89,6 +96,15 @@ public enum Skills implements Moveset {
             }
         }
         return false;
+    }
+
+    public static Skills getByName(String p){
+        for (Skills s : values()) {
+            if (s.getName().equals(p)){
+                return s;
+            }
+        }
+        return null;
     }
 
     @Override

@@ -34,13 +34,13 @@ public class Hunt implements Task {
         host.face(target.pos);
         float dist = (float) (Math.sqrt((x*x)+(y*y))-range);
         if (y < -20)
-            host.setState(Actions.JUMP);
+            host.setState(Actions.Jump);
         if (host.isExhausted()){
             if (dist > 300){
-                host.setState(Actions.REST);
+                host.setState(Actions.Rest);
             } else if (dist < 300){
-                if (x > 0) host.setState(Actions.WALKL);
-                else if (x < 0) host.setState(Actions.WALKR);
+                if (x > 0) host.setState(Actions.WalkL);
+                else if (x < 0) host.setState(Actions.WalkR);
             }
         } else if (dist <= 0) {
             if (dist < -range+10) {
@@ -55,8 +55,8 @@ public class Hunt implements Task {
                 ai.setMove(EnemyIntelligence.Moves.CHASING);
             }
         } else {
-            if (x > 0) host.setState(Actions.WALKR);
-            else if (x < 0) host.setState(Actions.WALKL);
+            if (x > 0) host.setState(Actions.WalkR);
+            else if (x < 0) host.setState(Actions.WalkL);
         }
     }
 }

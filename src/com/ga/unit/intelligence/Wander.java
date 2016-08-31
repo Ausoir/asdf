@@ -18,8 +18,8 @@ public class Wander implements Task {
     public void update(){
         if (tick.update()) {
             int dir = Global.r.nextInt(3);
-            if (dir == 2) host.setState(Actions.IDLE);
-            else host.setState(dir == 1 ? Actions.WALKR : Actions.WALKL);
+            if (dir == 2) host.setState(Actions.Idle);
+            else host.setState(dir == 1 ? Actions.WalkR : Actions.WalkL);
             tick.set(Global.r.nextInt(500)+10);
         }
     }

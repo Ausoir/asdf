@@ -14,9 +14,6 @@ import com.ga.unit.skill.Stat;
 
 import java.awt.*;
 
-import static com.ga.unit.Actions.WALKL;
-import static com.ga.unit.Actions.WALKR;
-
 /**
  * Created by Ga on 5/7/2016.
  */
@@ -24,7 +21,7 @@ public class Man extends Unit {
     public int height;
     public String speechType;
     public ClipMan clip;
-    public Actions state = Actions.IDLE;
+    public Actions state = Actions.Idle;
     public boolean jump = false;
     public Intelligence brain;
     public EventTimer delay = new EventTimer(5, false, null);
@@ -96,13 +93,13 @@ public class Man extends Unit {
             if (state instanceof Actions) action = (Actions) state;
             if (action != null) {
                 switch (action) {
-                    case WEAPON:
+                    case Weapon:
                         setState(weapon.getMoveset());
                         return;
-                    case WALKL:
+                    case WalkL:
                         face(-1);
                         break;
-                    case WALKR:
+                    case WalkR:
                         face(1);
                         break;
                 }
@@ -129,17 +126,17 @@ public class Man extends Unit {
 
     public void stateSet(Actions state){
         switch (state){
-            case IDLE:
+            case Idle:
                 if (!weapon.name.equals("Fist")){
                     if (!get("arms").isFull() || !get("legs").isFull())
-                        clip.setState(Actions.EXHAUSTED);
+                        clip.setState(Actions.Exhausted);
                 }
                 break;
-            case DUCK:
+            case Duck:
                 vel.x = 0;
                 if (Global.map.fallSafe(pos.getAdd(vel))) pos.y+= Settings.gravity;
                 break;
-            case JUMP:
+            case Jump:
                 vel.y -= 50;
                 jump = false;
                 break;
@@ -159,7 +156,7 @@ public class Man extends Unit {
 
     @Override
     public void hit(Unit hitter, int damage) {
-        if (state == Actions.DOWN || state == Actions.HIT) return;
+        if (state == Actions.Down || state == Actions.Hit) return;
         if (stats.hasEffect("Evade")) return;
         damage = (int) Math.max(0,damage - armor.getArmor());
         delay.set(0);
@@ -167,13 +164,13 @@ public class Man extends Unit {
         face(x < 0 ? -1 : 1);
         float ratio = (float) damage * 10 / get("health").getMax();
         float knockback = Math.min(ratio, 50);
-        if (ratio > 100) setState(Actions.DOWN);
-        else setState(Actions.HIT);
+        if (ratio > 100) setState(Actions.Down);
+        else setState(Actions.Hit);
         vel.x = knockback*x;
         vel.y = -knockback * 1.5f - 10;
         jump = false;
         hurt(damage);
-        if (state != Actions.DEAD) {
+        if (state != Actions.Dead) {
             say("@hit");
             if (brain != null && hitter instanceof Man){
                 brain.hit((Man) hitter);
@@ -211,9 +208,9 @@ public class Man extends Unit {
         brain = null;
         delay.set(5);
         jump = true;
-        state = Actions.DEAD;
+        state = Actions.Dead;
         height = 0;
-        clip.setState(Actions.DEAD);
+        clip.setState(Actions.Dead);
         setDepth(9);
         delay.set(-1);
     }
@@ -222,9 +219,9 @@ public class Man extends Unit {
         Unit hit;
         int dam = weapon.getDamage() + get("damage").get();
         boolean cleave = false;
-        if (state == Actions.STAB) dam *= 4;
-        else if (state == Actions.PIERCE) dam += Math.abs(vel.x);
-        else if (state == Actions.SWING) cleave = true;
+        if (state == Actions.Stab) dam *= 4;
+        else if (state == Actions.Pierce) dam += Math.abs(vel.x);
+        else if (state == Actions.Swing) cleave = true;
         hit = Updater.collide(this, weapon.getLine(), dam, cleave);
         if (hit != null){
             P pt = weapon.getPoint();
@@ -267,23 +264,23 @@ public class Man extends Unit {
     }
 
     private void stateUpdate(){
-        if (state == WALKL) vel.x = -get("speed").get()/10;
-        else if (state == WALKR) vel.x = get("speed").get()/10;
-        else if (state == Actions.REST) stats.rest();
+        if (state == Actions.WalkL) vel.x = -get("speed").get()/10;
+        else if (state == Actions.WalkR) vel.x = get("speed").get()/10;
+        else if (state == Actions.Rest) stats.rest();
         if (!weapon.name.equals("Fist")) {
             switch (state){
-                case WHIRLWIND:
+                case Whirlwind:
                     weapon.rotation = delay.time * -weapon.dir;
                     attack();
                     break;
-                case SWING:
+                case Swing:
                     weapon.rotation = weapon.dir + delay.time * .2f * -weapon.dir;
                     if (delay.time < 12) attack();
                     break;
-                case STAB:
+                case Stab:
                     if (delay.time < 10) attack();
                     break;
-                case DASH:
+                case Dash:
                     if (delay.time == 20){
                         vel.set(get("speed").get()*dir,-10);
                     } else if (delay.time < 20){

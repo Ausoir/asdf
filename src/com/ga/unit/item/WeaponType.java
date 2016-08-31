@@ -6,7 +6,7 @@ import com.ga.unit.Actions;
  * Created by Ga on 8/30/2016.
  */
 enum WeaponType {
-    SWING(Actions.SWING), STAB(Actions.PIERCE);
+    SWING(Actions.Swing), STAB(Actions.Pierce);
     Actions action;
     WeaponType(Actions action){
         this.action = action;

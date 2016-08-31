@@ -10,6 +10,8 @@ import com.ga.tool.Word;
 import com.ga.unit.Actions;
 import com.ga.unit.Moveset;
 import com.ga.unit.Player;
+import com.ga.unit.SkillTree;
+import com.ga.unit.skill.Skills;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -21,19 +23,19 @@ import java.util.Map;
  */
 public class PlayerInput implements Input, Observer {
     private static HashMap<Integer, Moveset> keyMap = new HashMap<Integer, Moveset>(){{
-        put(-1, Actions.IDLE);
-        put(KeyEvent.VK_W, Actions.ENTER);
-        put(KeyEvent.VK_A, Actions.WALKL);
-        put(KeyEvent.VK_S, Actions.DUCK);
-        put(KeyEvent.VK_D, Actions.WALKR);
-        put(KeyEvent.VK_SPACE, Actions.JUMP);
-        put(KeyEvent.VK_C, Actions.SUMMON);
-        put(KeyEvent.VK_F, Actions.KICK);
-        put(KeyEvent.VK_G, Actions.DROP);
-        put(KeyEvent.VK_Z, Actions.PICKUP);
-        put(1, Actions.WEAPON);
-        put(3, Actions.IDLE);
-        put(KeyEvent.VK_SHIFT, Actions.REST);
+        put(-1, Actions.Idle);
+        put(KeyEvent.VK_W, Actions.Enter);
+        put(KeyEvent.VK_A, Actions.WalkL);
+        put(KeyEvent.VK_S, Actions.Duck);
+        put(KeyEvent.VK_D, Actions.WalkR);
+        put(KeyEvent.VK_SPACE, Actions.Jump);
+        put(KeyEvent.VK_C, Actions.Summon);
+        put(KeyEvent.VK_F, Actions.Kick);
+        put(KeyEvent.VK_G, Actions.Drop);
+        put(KeyEvent.VK_Z, Actions.Pickup);
+        put(1, Actions.Weapon);
+        put(3, Actions.Idle);
+        put(KeyEvent.VK_SHIFT, Actions.Rest);
     }};
     private ArrayList<Integer> keyPressed = new ArrayList<>();
     public Player host;
@@ -52,6 +54,8 @@ public class PlayerInput implements Input, Observer {
         host.say(p);
     }
     public void changeMapping(int key, Moveset event){
+        keyMap.remove(key);
+        keyMap.remove(event);
         keyMap.put(key, event);
     }
     public String getMapping(Moveset move){
@@ -89,8 +93,26 @@ public class PlayerInput implements Input, Observer {
     public boolean teleportReady(){
         if (keyPressed.size() > 0)
             for (Integer i : keyPressed){
-                if (keyMap.get(i) == Actions.ENTER) return true;
+                if (keyMap.get(i) == Actions.Enter) return true;
             }
         return false;
+    }
+    public void load(String p){
+        if (p.length() > 1) {
+            keyMap.clear();
+            String[] data = p.substring(1).split(";");
+            for (String i : data) {
+                String[] pair = i.split(":");
+                keyMap.put(Integer.parseInt(pair[0]), SkillTree.getByName(pair[1]));
+            }
+        }
+    }
+    @Override
+    public String toString(){
+        String r = ";";
+        for (Map.Entry<Integer, Moveset> i : keyMap.entrySet()){
+            r += i.getKey()+":"+i.getValue()+";";
+        }
+        return r;
     }
 }

@@ -14,7 +14,7 @@ import java.awt.*;
 public class ItemFactory {
     private enum FactoryWeapon{
         Fist(1,-1,1,2,WeaponType.STAB), Mace(4,1000,3,8,WeaponType.SWING), Sword(3,600,2,6,WeaponType.STAB), Stick1(1,10,1,6,WeaponType.SWING), Stick2(1,10,1,6,WeaponType.SWING), Stick3(1,10,1,6,WeaponType.SWING),
-        Katana(2,100,1,12,WeaponType.SWING), Spear(3,160,1,12,WeaponType.SWING), Axe(3,100,1,12,WeaponType.SWING), Dagger(1,800,1,6,WeaponType.SWING), Pick(4,100,1,24,WeaponType.SWING), Cleaver(6,600,2,12,WeaponType.SWING),
+        Katana(2,100,1,12,WeaponType.SWING), Spear(3,160,1,12,WeaponType.SWING), Axe(3,100,1,12,WeaponType.SWING), Dagger(1,800,1,6,WeaponType.STAB), Pick(4,100,1,24,WeaponType.SWING), Cleaver(6,600,2,12,WeaponType.SWING),
         Halberd(6,100,1,36,WeaponType.SWING), Greatsword(8,400,2,18,WeaponType.SWING), Warhammer(9,400,3,12,WeaponType.SWING);
         private int damageNum, damageSides, weight, uses;
         private WeaponType type;
@@ -125,7 +125,7 @@ public class ItemFactory {
                     public boolean use(Man host){
                         if (super.use(host)) {
                             host.get("health").add(100);
-                            host.clip.setState(Actions.CONSUME);
+                            host.clip.setState(Actions.Consume);
                             return true;
                         }
                         return false;
@@ -167,7 +167,7 @@ public class ItemFactory {
                     }
                 };
                 item.delay = 10;
-                item.action = Actions.THROW;
+                item.action = Actions.Throw;
                 break;
             case "Throwing_Knife":
                 item = new Item("Dagger", seed, 1, 10, 20){
@@ -192,7 +192,7 @@ public class ItemFactory {
                 };
                 item.name = "Throwing_Knife";
                 item.delay = 8;
-                item.action = Actions.SHOOT;
+                item.action = Actions.Shoot;
                 break;
             default:
                 Global.p("Can't find item "+p);

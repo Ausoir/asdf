@@ -2,87 +2,27 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b3f1cf2f-6723-4007-a9a3-83f98a816882" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/com/ga/unit/Animation.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/com/ga/unit/Effect.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/com/ga/unit/Moveset.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/com/ga/unit/Particle.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/com/ga/unit/SkillTree.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/com/ga/unit/item/WeaponType.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/com/ga/unit/skill/Skills.java" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/skill/Adrenaline.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/skill/Cleave.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/skill/Empower.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/skill/Evade.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/skill/Frenzy.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/skill/Rejuvenate.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/ga/unit/skill/Adrenaline.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/ga/unit/skill/Cleave.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/ga/unit/skill/Empower.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/ga/unit/skill/Evade.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/ga/unit/skill/Frenzy.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/ga/unit/skill/Rejuvenate.java" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/game/Command$1.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/game/Command$1.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/game/Command.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/game/Command.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/game/InventoryPanel$1.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/game/InventoryPanel$1.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/game/InventoryPanel$2.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/game/InventoryPanel$2.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/game/InventoryPanel$3.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/game/InventoryPanel$3.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/game/InventoryPanel.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/game/InventoryPanel.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/game/Menu$1.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/game/Menu$1.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/game/Menu$2.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/game/Menu$2.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/game/Menu.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/game/Menu.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/game/StatPanel$1.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/game/StatPanel$1.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/game/StatPanel$2.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/game/StatPanel$2.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/game/StatPanel.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/game/StatPanel.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/game/Texture$1.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/game/Texture$1.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/game/Texture.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/game/Texture.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/map/ManFactory.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/map/ManFactory.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Actions.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Actions.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/ClipMan$1.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/ClipMan$1.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/ClipMan.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/ClipMan.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Man$1.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Man$1.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Man.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Man.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Merchant.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Merchant.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Player$1.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Player$1.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Player$2.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Player$2.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Player$3.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Player$3.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Player$4.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Player$4.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Player.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Player.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Stats.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Stats.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Thing.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Thing.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Unit.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Unit.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Updater.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Updater.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/skill/Skill.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/skill/Skill.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/skill/Stat.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/skill/Stat.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Data/Dialog.dlg" afterPath="$PROJECT_DIR$/Data/Dialog.dlg" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Data/unit/Man.2d" afterPath="$PROJECT_DIR$/Data/unit/Man.2d" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/game/Command.java" afterPath="$PROJECT_DIR$/src/com/ga/game/Command.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/game/Menu.java" afterPath="$PROJECT_DIR$/src/com/ga/game/Menu.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/game/Texture.java" afterPath="$PROJECT_DIR$/src/com/ga/game/Texture.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/map/ManFactory.java" afterPath="$PROJECT_DIR$/src/com/ga/map/ManFactory.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/tool/Word.java" afterPath="$PROJECT_DIR$/src/com/ga/tool/Word.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/Actions.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/Actions.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/ClipMan.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/ClipMan.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/Man.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/Man.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/Merchant.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/Merchant.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/Player.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/Player.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/Shadow.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/Shadow.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/Stats.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/Stats.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/Thing.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/Thing.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/Unit.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/Unit.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/Updater.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/Updater.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/SkillTree.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/SkillTree.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/intelligence/EnemyIntelligence.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/intelligence/EnemyIntelligence.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/intelligence/Flee.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/intelligence/Flee.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/intelligence/Hunt.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/intelligence/Hunt.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/intelligence/Idle.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/intelligence/Idle.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/intelligence/Intelligence.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/intelligence/Intelligence.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/intelligence/PlayerInput.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/intelligence/PlayerInput.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/intelligence/Speech.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/intelligence/Speech.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/item/Inventory.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/item/Inventory.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/intelligence/Search.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/intelligence/Search.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/intelligence/Wander.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/intelligence/Wander.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/item/Item.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/item/Item.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/item/ItemFactory.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/item/ItemFactory.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/item/Projectile.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/item/Projectile.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/item/Weapon.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/item/Weapon.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/skill/Skill.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/skill/Skill.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/skill/Stat.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/skill/Stat.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/item/WeaponType.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/item/WeaponType.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/skill/Skills.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/skill/Skills.java" />
     </list>
     <ignored path="asdf.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -104,16 +44,13 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Skills.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/com/ga/unit/skill/Skills.java">
+      <file leaf-file-name="SkillTree.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/com/ga/unit/SkillTree.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="323">
-              <caret line="69" column="22" selection-start-line="69" selection-start-column="22" selection-end-line="69" selection-end-column="22" />
+            <state relative-caret-position="493">
+              <caret line="29" column="0" selection-start-line="29" selection-start-column="0" selection-end-line="29" selection-end-column="0" />
               <folding>
-                <element signature="e#1853#1997#0" expanded="true" />
-                <element signature="e#1996#1997#0" expanded="true" />
-                <element signature="e#3469#3470#0" expanded="true" />
-                <element signature="e#3498#3499#0" expanded="true" />
+                <element signature="imports" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -146,7 +83,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/com/ga/game/Settings.java" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/Organ.java" />
         <option value="$PROJECT_DIR$/src/com/ga/tool/Test.java" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/skill/Burden.java" />
@@ -164,7 +100,6 @@
         <option value="$PROJECT_DIR$/src/com/ga/unit/intelligence/Intelligence.java" />
         <option value="$PROJECT_DIR$/Data/Dialog.dlg" />
         <option value="$PROJECT_DIR$/src/com/ga/game/Command.java" />
-        <option value="$PROJECT_DIR$/Data/unit/Man.2d" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/intelligence/Hunt.java" />
         <option value="$PROJECT_DIR$/src/com/ga/map/ManFactory.java" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/Shadow.java" />
@@ -173,17 +108,12 @@
         <option value="$PROJECT_DIR$/src/com/ga/unit/item/Weapon.java" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/item/WeaponType.java" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/skill/Stat.java" />
-        <option value="$PROJECT_DIR$/src/com/ga/unit/item/Item.java" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/Stats.java" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/Moveset.java" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/skill/Adrenaline.java" />
-        <option value="$PROJECT_DIR$/src/com/ga/unit/ClipMan.java" />
         <option value="$PROJECT_DIR$/src/com/ga/tool/Word.java" />
-        <option value="$PROJECT_DIR$/src/com/ga/unit/intelligence/PlayerInput.java" />
         <option value="$PROJECT_DIR$/src/com/ga/tool/Performer.java" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/intelligence/EnemyIntelligence.java" />
-        <option value="$PROJECT_DIR$/src/com/ga/game/Menu.java" />
-        <option value="$PROJECT_DIR$/src/com/ga/unit/Player.java" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/item/Inventory.java" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/Skills.java" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/skill/Buff.java" />
@@ -192,11 +122,18 @@
         <option value="$PROJECT_DIR$/src/com/ga/unit/Unit.java" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/Particle.java" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/skill/Skill.java" />
+        <option value="$PROJECT_DIR$/src/com/ga/game/Menu.java" />
+        <option value="$PROJECT_DIR$/src/com/ga/unit/ClipMan.java" />
+        <option value="$PROJECT_DIR$/Data/unit/Man.2d" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/skill/Skills.java" />
+        <option value="$PROJECT_DIR$/src/com/ga/unit/SkillTree.java" />
+        <option value="$PROJECT_DIR$/src/com/ga/unit/item/Item.java" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/item/ItemFactory.java" />
-        <option value="$PROJECT_DIR$/Data/map/Player.char" />
-        <option value="$PROJECT_DIR$/src/com/ga/unit/Actions.java" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/Man.java" />
+        <option value="$PROJECT_DIR$/src/com/ga/unit/Actions.java" />
+        <option value="$PROJECT_DIR$/src/com/ga/unit/Player.java" />
+        <option value="$PROJECT_DIR$/Data/map/Player.char" />
+        <option value="$PROJECT_DIR$/src/com/ga/unit/intelligence/PlayerInput.java" />
       </list>
     </option>
   </component>
@@ -238,7 +175,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -340,7 +277,7 @@
         </subPane>
       </pane>
       <pane id="PackagesPane" />
-      <pane id="Scratches" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -519,7 +456,14 @@
       <option name="project" value="LOCAL" />
       <updated>1472471080073</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Skill &amp; Weapon system rework">
+      <created>1472610656117</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1472610656117</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -565,15 +509,16 @@
     <MESSAGE value="first" />
     <MESSAGE value="second" />
     <MESSAGE value="Inventory &amp; Skills &amp; Stuff" />
-    <option name="LAST_COMMIT_MESSAGE" value="Inventory &amp; Skills &amp; Stuff" />
+    <MESSAGE value="Skill &amp; Weapon system rework" />
+    <option name="LAST_COMMIT_MESSAGE" value="Skill &amp; Weapon system rework" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="654" />
+      <option name="time" value="655" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
-        <watch expression="e.keyCode" language="JAVA" custom="java.util.Random" />
+        <watch expression="keyMap.get(mode)" language="JAVA" custom="java.util.Random" />
         <watch expression="e.getKeyChar()" language="JAVA" custom="" />
       </configuration>
     </watches-manager>
@@ -583,19 +528,10 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/com/ga/game/Texture.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="20" column="40" selection-start-line="20" selection-start-column="40" selection-end-line="20" selection-end-column="40" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Effect.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="102">
           <caret line="6" column="12" selection-start-line="6" selection-start-column="12" selection-end-line="6" selection-end-column="12" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -626,13 +562,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Data/unit/Man.2d">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="493">
-          <caret line="29" column="33" selection-start-line="29" selection-start-column="33" selection-end-line="29" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/ga/unit/intelligence/Hunt.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="517">
@@ -645,7 +574,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="255">
           <caret line="15" column="67" selection-start-line="15" selection-start-column="67" selection-end-line="15" selection-end-column="67" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -698,17 +626,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/item/WeaponType.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="14" column="22" selection-start-line="14" selection-start-column="22" selection-end-line="14" selection-end-column="22" />
-          <folding>
-            <element signature="e#266#267#0" expanded="false" />
-            <element signature="e#295#296#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/ga/unit/item/Weapon.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="527">
@@ -724,7 +641,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="319">
           <caret line="201" column="28" selection-start-line="201" selection-start-column="28" selection-end-line="201" selection-end-column="28" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -735,14 +651,6 @@
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/item/Item.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="252">
-          <caret line="100" column="71" selection-start-line="100" selection-start-column="71" selection-end-line="100" selection-end-column="71" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -781,35 +689,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/ClipMan.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="391">
-          <caret line="30" column="42" selection-start-line="30" selection-start-column="42" selection-end-line="30" selection-end-column="42" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/intelligence/PlayerInput.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="336">
-          <caret line="58" column="24" selection-start-line="58" selection-start-column="24" selection-end-line="58" selection-end-column="24" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/tool/Word.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="12" column="25" selection-start-line="12" selection-start-column="25" selection-end-line="12" selection-end-column="25" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/ga/tool/Performer.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="170">
           <caret line="10" column="0" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -821,38 +704,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/skill/Rejuvenate.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="5" column="13" selection-start-line="5" selection-start-column="13" selection-end-line="5" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/skill/Cleave.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="5" column="13" selection-start-line="5" selection-start-column="13" selection-end-line="5" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/skill/Empower.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="5" column="13" selection-start-line="5" selection-start-column="13" selection-end-line="5" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/skill/Frenzy.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="5" column="13" selection-start-line="5" selection-start-column="13" selection-end-line="5" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/skill/Rejuvenate.java" />
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/skill/Cleave.java" />
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/skill/Empower.java" />
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/skill/Frenzy.java" />
     <entry file="file://$PROJECT_DIR$/src/com/ga/unit/skill/Stat.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="612">
@@ -861,52 +716,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/skill/Evade.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="5" column="13" selection-start-line="5" selection-start-column="13" selection-end-line="5" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/skill/Adrenaline.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="14" column="45" selection-start-line="14" selection-start-column="45" selection-end-line="14" selection-end-column="45" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/skill/Evade.java" />
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/skill/Adrenaline.java" />
     <entry file="file://$PROJECT_DIR$/src/com/ga/unit/intelligence/EnemyIntelligence.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="252">
           <caret line="29" column="28" selection-start-line="29" selection-start-column="28" selection-end-line="29" selection-end-column="28" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Moveset.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="102">
-          <caret line="6" column="11" selection-start-line="6" selection-start-column="11" selection-end-line="6" selection-end-column="11" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/game/Menu.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="438">
-          <caret line="447" column="73" selection-start-line="447" selection-start-column="73" selection-end-line="447" selection-end-column="73" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Player.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="517">
-          <caret line="174" column="38" selection-start-line="174" selection-start-column="38" selection-end-line="174" selection-end-column="38" />
           <folding />
         </state>
       </provider>
@@ -916,16 +731,6 @@
         <state relative-caret-position="670">
           <caret line="127" column="22" selection-start-line="127" selection-start-column="22" selection-end-line="127" selection-end-column="22" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/SkillTree.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
-          <caret line="19" column="35" selection-start-line="19" selection-start-column="35" selection-end-line="19" selection-end-column="35" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -969,6 +774,42 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/game/Menu.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="432">
+          <caret line="459" column="69" selection-start-line="459" selection-start-column="69" selection-end-line="459" selection-end-column="69" />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="e#15910#16158#0" expanded="false" />
+            <element signature="e#16157#16158#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Data/unit/Man.2d">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="442">
+          <caret line="26" column="49" selection-start-line="26" selection-start-column="49" selection-end-line="26" selection-end-column="49" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Moveset.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="6" column="11" selection-start-line="6" selection-start-column="11" selection-end-line="6" selection-end-column="11" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/tool/Word.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="561">
+          <caret line="35" column="0" selection-start-line="35" selection-start-column="0" selection-end-line="35" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/ga/unit/skill/Skill.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="510">
@@ -979,34 +820,58 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/item/ItemFactory.java">
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/item/Item.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="543">
-          <caret line="147" column="41" selection-start-line="147" selection-start-column="41" selection-end-line="147" selection-end-column="41" />
+        <state relative-caret-position="459">
+          <caret line="84" column="43" selection-start-line="84" selection-start-column="43" selection-end-line="84" selection-end-column="43" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Data/map/Player.char">
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/item/ItemFactory.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="1" column="30" selection-start-line="1" selection-start-column="30" selection-end-line="1" selection-end-column="30" />
+        <state relative-caret-position="524">
+          <caret line="194" column="43" selection-start-line="194" selection-start-column="43" selection-end-line="194" selection-end-column="43" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Actions.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="8" column="119" selection-start-line="8" selection-start-column="119" selection-end-line="8" selection-end-column="119" />
+        <state relative-caret-position="187">
+          <caret line="11" column="0" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Man.java">
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/ClipMan.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="186">
-          <caret line="92" column="20" selection-start-line="92" selection-start-column="20" selection-end-line="92" selection-end-column="20" />
+        <state relative-caret-position="170">
+          <caret line="17" column="19" selection-start-line="17" selection-start-column="19" selection-end-line="17" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/item/WeaponType.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="8" column="17" selection-start-line="8" selection-start-column="17" selection-end-line="8" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/intelligence/Flee.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="323">
+          <caret line="21" column="40" selection-start-line="21" selection-start-column="40" selection-end-line="21" selection-end-column="40" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Player.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="466">
+          <caret line="173" column="32" selection-start-line="173" selection-start-column="32" selection-end-line="173" selection-end-column="32" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -1015,13 +880,47 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/ga/unit/skill/Skills.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="69" column="22" selection-start-line="69" selection-start-column="22" selection-end-line="69" selection-end-column="22" />
+        <state relative-caret-position="442">
+          <caret line="31" column="35" selection-start-line="31" selection-start-column="35" selection-end-line="31" selection-end-column="35" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Data/map/Player.char">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="1" column="162" selection-start-line="1" selection-start-column="162" selection-end-line="1" selection-end-column="162" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Man.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-701">
+          <caret line="89" column="0" selection-start-line="89" selection-start-column="0" selection-end-line="89" selection-end-column="0" />
           <folding>
-            <element signature="e#1853#1997#0" expanded="true" />
-            <element signature="e#1996#1997#0" expanded="true" />
-            <element signature="e#3469#3470#0" expanded="true" />
-            <element signature="e#3498#3499#0" expanded="true" />
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/intelligence/PlayerInput.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="466">
+          <caret line="95" column="64" selection-start-line="95" selection-start-column="64" selection-end-line="95" selection-end-column="64" />
+          <folding>
+            <element signature="e#2568#2569#0" expanded="true" />
+            <element signature="e#2615#2616#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/SkillTree.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="493">
+          <caret line="29" column="0" selection-start-line="29" selection-start-column="0" selection-end-line="29" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>

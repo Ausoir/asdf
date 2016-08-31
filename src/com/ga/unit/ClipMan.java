@@ -14,41 +14,41 @@ import java.util.HashMap;
  */
 public class ClipMan {
     private static final HashMap<Actions, int[]> animation = new HashMap<Actions, int[]>() {{
-        put(Actions.IDLE, new int[]{0, -1});
-        put(Actions.WALKL, new int[]{1, 2, 3, 2});
-        put(Actions.WALKR, new int[]{1, 2, 3, 2});
-        put(Actions.JUMP, new int[]{4, -1});
-        put(Actions.PIERCE, new int[]{5, 6, 7, 2, -1});
-        put(Actions.SWING, new int[]{20, 21, 22, -1});
-        put(Actions.KICK, new int[]{12, 13, 2, -1});
-        put(Actions.HIT, new int[]{14, -1});
-        put(Actions.DOWN, new int[]{15, -1});
-        put(Actions.DEAD, new int[]{16, -1});
-        put(Actions.SUMMON, new int[]{19, -1});
-        put(Actions.DROP, new int[]{19, -1});
-        put(Actions.WHIRLWIND, new int[]{29, 30});
-        put(Actions.ENTER, new int[]{19, -1});
-        put(Actions.CAST, new int[]{19, -1});
-        put(Actions.DUCK, new int[]{19, -1});
-        put(Actions.CONSUME, new int[]{24,2, -1});
-        put(Actions.EXHAUSTED, new int[]{25, 26});
-        put(Actions.THROW, new int[]{20,21,22,2,-1});
-        put(Actions.SHOOT, new int[]{27,28,2,-1});
-        put(Actions.PICKUP, new int[]{23,-1});
-        put(Actions.STAB, new int[]{8, 9, 10, 11, -1});
-        put(Actions.DASH, new int[]{31, 32, -1});
-        put(Actions.REST, new int[]{33, 34});
+        put(Actions.Idle, new int[]{0, -1});
+        put(Actions.WalkL, new int[]{1, 2, 3, 2});
+        put(Actions.WalkR, new int[]{1, 2, 3, 2});
+        put(Actions.Jump, new int[]{4, -1});
+        put(Actions.Pierce, new int[]{5, 6, 7, 2, -1});
+        put(Actions.Swing, new int[]{20, 21, 22, -1});
+        put(Actions.Kick, new int[]{12, 13, 2, -1});
+        put(Actions.Hit, new int[]{14, -1});
+        put(Actions.Down, new int[]{15, -1});
+        put(Actions.Dead, new int[]{16, -1});
+        put(Actions.Summon, new int[]{19, -1});
+        put(Actions.Drop, new int[]{19, -1});
+        put(Actions.Whirlwind, new int[]{29, 30});
+        put(Actions.Enter, new int[]{19, -1});
+        put(Actions.Cast, new int[]{35, 35, 10, -1});
+        put(Actions.Duck, new int[]{19, -1});
+        put(Actions.Consume, new int[]{24,2, -1});
+        put(Actions.Exhausted, new int[]{25, 26});
+        put(Actions.Throw, new int[]{20,21,22,2,-1});
+        put(Actions.Shoot, new int[]{27,28,2,-1});
+        put(Actions.Pickup, new int[]{23,-1});
+        put(Actions.Stab, new int[]{8, 9, 10, 11, -1});
+        put(Actions.Dash, new int[]{31, 32, -1});
+        put(Actions.Rest, new int[]{33, 34});
     }};
     public static final int FIST = 1, OFIST = 5, FOOT = 3;
     public Man host;
-    private int[] nextAnimation = animation.get(Actions.IDLE);
+    private int[] nextAnimation = animation.get(Actions.Idle);
     public Organ[] organs = new Organ[6];
     private Timer frame;
     private int[][] nextClip;
     int[][][] localAnimation;
     private int clip = 0;
     private int height = 0;
-    private Actions state = Actions.IDLE;
+    private Actions state = Actions.Idle;
 
     ClipMan(Man host) {
         this.host = host;
@@ -86,7 +86,7 @@ public class ClipMan {
             localAnimation[i][1][1] += height / 2;
             localAnimation[i][5][1] += height / 2;
         }
-        int dead = animation.get(Actions.DEAD)[0];
+        int dead = animation.get(Actions.Dead)[0];
         localAnimation[dead] = localAnimation[dead + Global.r.nextInt(3)];
         randomizeSection(dead, Global.r.nextInt(30) - 15, Global.r.nextInt(30) - 15);
     }
@@ -117,16 +117,16 @@ public class ClipMan {
         clip = 0;
         nextAnimation = animation.get(state);
         switch (state){
-            case SHOOT:
+            case Shoot:
                 rotateAppendage(OFIST,28);
                 break;
-            case THROW:
+            case Throw:
                 rotateAppendage(FIST,21);
                 break;
-            case PIERCE:
+            case Pierce:
                 rotateAppendage(FIST,6);
                 break;
-            case KICK:
+            case Kick:
                 rotateAppendage(FOOT,13);
                 break;
         }
@@ -143,7 +143,7 @@ public class ClipMan {
         if (clip >= nextAnimation.length) clip = 0;
         if (nextAnimation[clip] == -1) {
             clip--;
-            host.setState(Actions.IDLE);
+            host.setState(Actions.Idle);
         }
         nextClip = localAnimation[nextAnimation[clip]];
         frame.set(Clips.man.frames[nextAnimation[clip]]);
@@ -154,7 +154,7 @@ public class ClipMan {
             for (int i = 0; i < nextClip.length; i++) {
                 float x = (((nextClip[i][0] * host.dir) + organs[i].pt.x) - organs[i].ptd.x) / (frame.max - 1);
                 float y = ((nextClip[i][1] + organs[i].pt.y) - organs[i].ptd.y) / (frame.max - 1);
-                if (state == Actions.PIERCE || state == Actions.KICK) {
+                if (state == Actions.Pierce || state == Actions.Kick) {
                     if ((x * x) + (y * y) > 50) {
                         if (i == 1) host.attack();
                         else if (i == 3) {

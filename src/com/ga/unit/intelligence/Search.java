@@ -16,9 +16,9 @@ public class Search implements Task {
     }
     public void update(){
         if (Math.abs(host.pos.x-target.x) > 100){
-            host.setState(host.pos.x<target.x ? Actions.WALKR : Actions.WALKL);
+            host.setState(host.pos.x<target.x ? Actions.WalkR : Actions.WalkL);
         } else{
-            host.setState(Actions.IDLE);
+            host.setState(Actions.Idle);
         }
     }
 }

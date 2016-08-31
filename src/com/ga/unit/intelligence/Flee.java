@@ -19,7 +19,7 @@ public class Flee implements Task {
     public void update() {
         int x = (int) (target.pos.x - host.pos.x);
         host.face(x < 0 ? -1 : 1);
-        if (x > 0) host.setState(Actions.WALKL);
-        else host.setState(Actions.WALKR);
+        if (x > 0) host.setState(Actions.WalkL);
+        else host.setState(Actions.WalkR);
     }
 }

@@ -82,7 +82,7 @@ public class Item extends Thing {
     public int weight;
     protected int cooldown = 100;
     public int delay = 10;
-    public Actions action = Actions.CONSUME;
+    public Actions action = Actions.Consume;
     private int[] lastused = new int[]{0};
     public Stat uses = new Stat(1);
     public Item(String name, int seed, int weight, int uses, int cooldown) {

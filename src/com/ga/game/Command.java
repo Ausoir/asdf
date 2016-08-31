@@ -20,7 +20,7 @@ public class Command {
         } else if (p.contains("rally")){
             host.summon();
         } else if (p.contains("fireball")){
-            host.setState(Actions.CAST);
+            host.setState(Actions.Cast);
             host.delay.set(30);
             host.delay.performer = new Performer(){
                 public void perform(){
@@ -52,7 +52,7 @@ public class Command {
                 else if (cmd[0].equals("test")) Particle.explode(host.pos, P.getZero(), 2000, 50, true);
                 else if (cmd[0].equals("act")) host.setState(Actions.valueOf(cmd[1].toUpperCase()));
                 else if (p.equals("revive")) {
-                    host.state = Actions.DOWN;
+                    host.state = Actions.Down;
                     host.delay.set(50);
                     host.get("health").heal();
                     host.height = host.clip.getHeight();

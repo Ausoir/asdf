@@ -1,7 +1,5 @@
 package com.ga.unit.intelligence;
 
-import com.ga.map.Global;
-import com.ga.tool.Timer;
 import com.ga.unit.Actions;
 import com.ga.unit.Man;
 
@@ -14,6 +12,6 @@ public class Idle implements Task {
         this.host = host;
     }
     public void update(){
-        host.setState(Actions.IDLE);
+        host.setState(Actions.Idle);
     }
 }
