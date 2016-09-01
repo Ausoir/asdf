@@ -9,6 +9,7 @@ import com.ga.unit.intelligence.Intelligence;
 import com.ga.unit.intelligence.Speech;
 import com.ga.unit.item.Armor;
 import com.ga.unit.item.Weapon;
+import com.ga.unit.skill.Buff;
 import com.ga.unit.skill.Skills;
 import com.ga.unit.skill.Stat;
 
@@ -117,8 +118,9 @@ public class Man extends Unit {
                     stateSet(action);
                     if (brain != null) brain.setState(action);
                 } else {
-                    clip.setState(((Skills)state).getAction());
-                    ((Skills)state).init(this);
+                    Skills t = (Skills) state;
+                    clip.setState(t.getAction());
+                    delay.performer = t.getEvent(this);
                 }
             }
         }
@@ -157,7 +159,7 @@ public class Man extends Unit {
     @Override
     public void hit(Unit hitter, int damage) {
         if (state == Actions.Down || state == Actions.Hit) return;
-        if (stats.hasEffect("Evade")) return;
+        if (stats.hasEffect(Buff.Evade)) return;
         damage = (int) Math.max(0,damage - armor.getArmor());
         delay.set(0);
         int x = hitter.pos.x - pos.x > 0 ? 1 : -1;
@@ -219,6 +221,7 @@ public class Man extends Unit {
         Unit hit;
         int dam = weapon.getDamage() + get("damage").get();
         boolean cleave = false;
+        if (stats.endEffect(Buff.Cleave)) cleave = true;
         if (state == Actions.Stab) dam *= 4;
         else if (state == Actions.Pierce) dam += Math.abs(vel.x);
         else if (state == Actions.Swing) cleave = true;
@@ -226,7 +229,6 @@ public class Man extends Unit {
         if (hit != null){
             P pt = weapon.getPoint();
             Particle.explode(pt,pt.getAdd(clip.organs[ClipMan.FIST].ptd.getMinus()),10,20,true);
-            stats.endEffect("Cleave");
             if (brain != null) brain.attacked();
         }
     }
@@ -333,6 +335,7 @@ public class Man extends Unit {
 
     @Override
     public String toString(){
+        if (state == Actions.Dead) return "";
         pos.y -= height;
         String r = super.toString();
         pos.y += height;

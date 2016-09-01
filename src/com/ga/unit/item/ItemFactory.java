@@ -28,8 +28,8 @@ public class ItemFactory {
     }
     private enum FactoryArmor{
         Underwear(0, -1, 1,  250,255,220,240,180,220),
-        Cotton_Clothing(1, 50, 1,  0,255,0,125),
-        Fabric_Clothing(1, 100, 1,  0,125,0,125),
+        Cotton_Clothing(1, 50, 1,  30,255,50,150),
+        Fabric_Clothing(1, 100, 1,  10,100,10,100,120,230),
         Leather_Armor(2, 500, 5f,  90,200,40,120,20,80,140,160,80,100,65,75),
         Chainmail(3, 200, 8f,  50,130,40,120),
         Platemail(4, 200, 15,  130,200,130,200,130,200);

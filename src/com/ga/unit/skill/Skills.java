@@ -11,16 +11,20 @@ import com.ga.unit.item.Projectile;
  * Created by Ga on 8/1/2016.
  */
 public enum Skills implements Moveset {
-    Adrenaline(Actions.Cast, 25,"legs",-2,0,10,"Adrenaline doubles movement speed for 5 seconds.",new Skill(50,"speed",-1)),
-    Rejuvenate(Actions.Cast, 25,"legs",-2,0,1000,"Rejuvenate recovers strength to full at the cost of stamina.",new Skill(100,"arms",-1)),
-    Cleave(Actions.Cast, 25,"arms",-1,0,1000,"Cleave grants the next attack a cleaving property.",new Skill(1000,"health",0)),
-    Empower(Actions.Cast, 25,"arms",-1,0,1000,"Empower grants the next attack 10 bonus damage.",new Skill(80,"damage",10)),
-    Frenzy(Actions.Cast, 25,"health",-.2f,0,1000,"Frenzy gives you infinite stamina, but at the cost of health and restlessness for 10 seconds.",new Skill(1000,"health",0)),
-    Evade(Actions.Cast, 25,"legs",-2,0,1000,"Evade grants you invulnerability for 6 seconds.",new Skill(6500,"health",0)),
-    Fireball(Actions.Cast, 40,"legs",-2,0,300,"Shoot a fireball.",new Skill(0,"health",0){
+    Adrenaline(Actions.Duck, 25,"legs",-2,0,10,"Adrenaline doubles movement speed for 5 seconds.",produceBuff(Buff.Adrenaline)),
+    Rejuvenate(Actions.Duck, 25,"legs",-2,0,1000,"Rejuvenate recovers strength for a short while at the cost of stamina.",produceBuff(Buff.Rejuvenate)),
+    Cleave(Actions.Duck, 25,"arms",-1,0,1000,"Cleave grants the user a cleaving property.",produceBuff(Buff.Cleave)),
+    Empower(Actions.Duck, 25,"arms",-1,0,1000,"Empower grants the next attack 10 bonus damage.",produceBuff(Buff.Empower)),
+    Frenzy(Actions.Duck, 25,"health",10,0,1000,"Frenzy grants the user infinite stamina at the cost of health and restlessness for 10 seconds.",produceBuff(Buff.Rejuvenate)),
+    Evade(Actions.Duck, 25,"legs",-2,0,1000,"Evade grants you invulnerability for 6 seconds.",produceBuff(Buff.Evade)),
+    Fireball(Actions.Cast, 40,"legs",-2,0,300,"Shoot a fireball.",new Skill(){
         @Override
-        boolean update(){
+        public void perform(){
             final Projectile p = new Projectile("item/Fireball", host.pos.getAdd(host.clip.organs[ClipMan.FIST].ptd), Global.player.mP.getAdd(host.pos), 20+(host.get("arms").get()*2)){
+                @Override
+                protected void onAttack(Unit p){
+                    if (!host.stats.hasEffect(Buff.Cleave)) super.onAttack(p);
+                }
                 @Override
                 public void stuck(){
                     Particle.explode(pos, P.getZero(), 300, 20, false);
@@ -43,18 +47,22 @@ public enum Skills implements Moveset {
                     p.stuck();
                 }
             };
-            return super.update();
         }
     });
+    private static Skill produceBuff(final Buff p){
+        return new Skill(){
+            void start(Man host){
+                host.stats.addEffect(p);
+            }
+        };
+    }
     protected String stat;
     protected float cost, velx;
     protected Actions action;
     protected Man host;
     protected EventTimer timer;
     protected String description;
-    public boolean active = false;
     protected int cooldown;
-    private int[] lastused = new int[]{-9999};
 
     Skills(Actions action, int del, String statReq, float cost, float velx, int cooldown, String desc, Performer performer){
         this.action = action;
@@ -65,39 +73,6 @@ public enum Skills implements Moveset {
         this.cooldown = cooldown;
         this.description = desc;
     }
-    public void init(Man host){
-        if (Global.cooldown(lastused,cooldown)) {
-            if (this.host != null) end();
-            this.host = host;
-            host.stats.addEffect(this);
-            active = true;
-            timer.reset();
-            if (timer.performer instanceof Skill) ((Skill) timer.performer).start(host);
-        } else {
-            host.say(getName()+" is on cooldown!");
-        }
-    }
-    public void end(){
-        active = false;
-        this.host = null;
-    }
-    public boolean update(){
-        if (active && timer.update()){
-            if (host != null) {
-                if (!(timer.performer instanceof Skill)) {
-                    end();
-                    return true;
-                } else {
-                    if (((Skill) timer.performer).update()) {
-                        end();
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
     public static Skills getByName(String p){
         for (Skills s : values()) {
             if (s.getName().equals(p)){
@@ -137,5 +112,10 @@ public enum Skills implements Moveset {
     @Override
     public int getDel() {
         return timer.max;
+    }
+
+    public Performer getEvent(Man host){
+        ((Skill) timer.performer).start(host);
+        return timer.performer;
     }
 }

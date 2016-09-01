@@ -50,7 +50,7 @@ public class Player extends Man {
     public Inventory inventory = new Inventory(this);
     private Companions companions = new Companions();
     public SkillTree skillTree = new SkillTree();
-    private Timer save = new Timer(150, true);
+    private Timer save = new Timer(50, true);
     public Player(P pt, int seed) {
         super("Player",pt,seed);
         Command.host = this;
@@ -170,7 +170,7 @@ public class Player extends Man {
         if (save.update() && pos.y < Global.map.map.size.y) FileManager.saveCharacter();
     }
     public String toCharacterString(){
-        String r = super.toString()+"@"+Global.map.maps[1]+"@"+gold+"\n";
+        String r = super.toString()+"@"+gold+"\n";
         r += Global.player.toString()+"\n";
         r += stats.toString()+"\n";
         r += inventory.toString()+"\n";
@@ -179,7 +179,7 @@ public class Player extends Man {
     }
     public void load(String p){
         String[] line = p.split("%");
-        gold = Integer.parseInt(line[0].split("@")[4]);
+        gold = Integer.parseInt(line[0].split("@")[3]);
         Global.player.load(line[1]);
         stats.load(line[2]);
         hp = new PlayerHealthBar(get("health"),get("arms"),get("legs"),pos);

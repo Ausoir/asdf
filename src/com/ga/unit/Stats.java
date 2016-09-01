@@ -2,19 +2,17 @@ package com.ga.unit;
 
 import com.ga.map.Global;
 import com.ga.tool.Timer;
-import com.ga.unit.skill.Skills;
+import com.ga.unit.skill.Buff;
 import com.ga.unit.skill.Stat;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Ga on 8/1/2016.
  */
 public class Stats {
-    protected ArrayList<Skills> effects = new ArrayList<>();
+    private ArrayList<Buff> effects = new ArrayList<>();
+    private ArrayList<Timer> effectTimes = new ArrayList<>();
     private HashMap<String, Stat> stats = new HashMap<String, Stat>(){{
         put("health", new Stat((int) (Global.rng(100)+Global.r.nextInt(20)+5)));
         put("speed", new Stat((int) (Global.rng(50)+Global.r.nextInt(30)+50)));
@@ -31,34 +29,33 @@ public class Stats {
     public void setStat(String name, Stat p) {
         stats.put(name,p);
     }
-    public void addEffect(Skills p){
+    public void addEffect(Buff p){
+        if (p.stat != null) {
+            if (p.buffRel != null) stats.get(p.stat).add((int) p.buff * stats.get(p.buffRel).getMax(), true);
+            else stats.get(p.stat).add((int) p.buff, true);
+        }
+        effectTimes.add(new Timer(p.time));
         effects.add(p);
     }
-    public boolean hasEffect(String p){
-        for (Skills i : effects){
-            if (i.getClass().getSimpleName().equals(p)){
-                if (i.active) return true;
-            }
-        }
-        return false;
+    public boolean hasEffect(Buff p){
+        return effects.contains(p);
     }
     public void end(){
         for (int i = 0; i < effects.size(); i++) {
-            if (effects.get(i).active){
-                effects.get(i).end();
-                effects.remove(i);
-            }
+            endEffect(effects.get(i));
         }
     }
-    public void endEffect(String p){
-        for (int i = 0; i < effects.size(); i++) {
-            if (effects.get(i).getClass().getSimpleName().equals(p)){
-                if (effects.get(i).active){
-                    effects.get(i).end();
-                    effects.remove(i);
-                }
+    public boolean endEffect(Buff p){
+        if (hasEffect(p)){
+            if (p.stat != null) {
+                if (p.buffRel != null) stats.get(p.stat).add(-(int) p.buff * stats.get(p.buffRel).getMax());
+                else stats.get(p.stat).add(-(int) p.buff);
             }
+            int i = effects.indexOf(p);
+            effects.remove(i);
+            effectTimes.remove(i);
         }
+        return false;
     }
     public void delevel(String stat){
         if (stats.get("adapt").get() > 0 && stats.get(stat).get() > 0) {
@@ -85,10 +82,10 @@ public class Stats {
         }
     }
     public void update(){
-        Iterator it = effects.iterator();
-        while (it.hasNext()){
-            Skills i = (Skills) it.next();
-            if (i.update()) it.remove();
+        for (int i = 0; i < effects.size(); i++) {
+            if (effectTimes.get(i).update()){
+                endEffect(effects.get(i));
+            }
         }
     }
     public void load(String p){

@@ -38,6 +38,7 @@ public class Speech extends JTextArea implements Drawable{
         setWrapStyleWord(true);
         Global.display.add(this);
         setMargin(new Insets(10,10,10,10));
+        setEditable(false);
     }
     public void draw(Graphics2D g){
         if (msg.size() > 0) {

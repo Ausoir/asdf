@@ -25,11 +25,11 @@ public class FileManager {
         String result = "" + Global.map.toString();
         result += "\n";
         result += Updater.toMapString();
-        FileManager.save(name+".map", result);
-        Global.p(result);
+        save(name+".map", result);
     }
     public static void saveCharacter(){
-        FileManager.save("map/"+"Player"+".char", Global.player.host.toCharacterString());
+        saveMap("map/Map");
+        save("map/"+"Player"+".char", Global.player.host.toCharacterString());
     }
     public static void save(String dir, String input) {
         try {
@@ -70,13 +70,14 @@ public class FileManager {
         String data = read("map/"+"Player"+".char");
         String[] line = data.split("%");
         String[] values = line[0].split("@");
-        readMap(values[3],editor?-2:0);
+        readMap("Map",editor?-2:0);
         if (!editor){
             Global.player = new PlayerInput(new Player(new P(values[2]), Integer.parseInt(values[1])));
             Global.player.host.load(read("map/Player.char"));
         }
     }
     public static P readMap(String dir, int player) {
+        P r = null;
         String data = read("map/"+dir+".map");
         String[] line = data.split("%");
         P mapPos = new P();
@@ -110,7 +111,7 @@ public class FileManager {
                         pos = new P(v[0], v[1]);
                         if (unit.equals("Player")) {
                             if (player == 0 || player == -2){
-                                return pos;
+                                r = pos;
                             }
                             if (player > -1) player--;
                         }
@@ -118,7 +119,7 @@ public class FileManager {
                     }
             }
         }
-        return null;
+        return r;
     }
 
     public static int[] readClipFrames(String dir) {

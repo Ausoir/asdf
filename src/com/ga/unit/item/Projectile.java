@@ -27,7 +27,7 @@ public class Projectile extends Unit {
     public void onCollide(Line l){
         stuck();
     }
-    private void onAttack(Unit p){
+    protected void onAttack(Unit p){
         stuck();
     }
     public void stuck(){

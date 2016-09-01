@@ -13,6 +13,7 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.plaf.basic.BasicScrollBarUI;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -252,13 +253,14 @@ class StatPanel extends JPanel{
 class InventoryPanel extends JPanel {
     private GridBagConstraints grid = new GridBagConstraints();
     private JPanel panel;
+    private JScrollPane scroll;
     private JLabel gold;
     private Border emptyborder = new EmptyBorder(5,8,5,8);
     private int[] selected;
     private boolean mRelease = true;
     private int prevY = 0;
     public InventoryPanel(){
-        setLayout(null);
+        setLayout(new BoxLayout(this,BoxLayout.PAGE_AXIS));
         setOpaque(false);
         setBorder(BorderFactory.createBevelBorder(1));
         addMouseMotionListener(new MouseMotionAdapter() {
@@ -291,13 +293,17 @@ class InventoryPanel extends JPanel {
             }
         });
         gold = new JLabel();
-        gold.setBounds(250,0,100,20);
         panel = new JPanel();
-        panel.setBounds(0,0,1000,10000);
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel,BoxLayout.PAGE_AXIS));
-        add(panel);
-        add(gold);
+        scroll = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scroll.getVerticalScrollBar().setUI(new ScrollBar());
+        scroll.getVerticalScrollBar().setOpaque(false);
+        scroll.getVerticalScrollBar().setUnitIncrement(16);
+        scroll.setOpaque(false);
+        scroll.getViewport().setOpaque(false);
+        add(scroll, BorderLayout.CENTER);
+        add(gold, BorderLayout.LINE_START);
     }
     public void refresh(){
         gold.setText("Gold: "+Global.player.host.gold);
@@ -411,15 +417,28 @@ class InventoryPanel extends JPanel {
 }
 
 class SkillPanel extends JPanel{
-    private JLabel helper;
+    private JScrollPane scroll;
+    private JPanel panel;
     public SkillPanel(){
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        setBorder(BorderFactory.createBevelBorder(1));
         setOpaque(false);
         setVisible(false);
+        panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+        panel.setOpaque(false);
+        scroll = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scroll.getVerticalScrollBar().setUI(new ScrollBar());
+        scroll.getVerticalScrollBar().setOpaque(false);
+        scroll.getVerticalScrollBar().setUnitIncrement(16);
+        scroll.setOpaque(false);
+        scroll.getViewport().setOpaque(false);
+        add(scroll, BorderLayout.CENTER);
     }
     protected void refresh(){
-        removeAll();
-        helper = new JLabel("Select a skill to re-map its keybinding.");
+        panel.removeAll();
+        panel.add(new JLabel("Select a skill to re-map its keybinding."));
+        panel.add(Box.createRigidArea(new Dimension(0,12)));
         makeSlot(Actions.Weapon);
         makeSlot(Actions.Jump);
         makeSlot(Actions.Kick);
@@ -475,8 +494,8 @@ class SkillPanel extends JPanel{
         });
         panel.add(describe);
         panel.add(equip);
-        add(panel);
-        add(Box.createRigidArea(new Dimension(0,12)));
+        this.panel.add(panel);
+        this.panel.add(Box.createRigidArea(new Dimension(0,4)));
     }
 }
 
@@ -488,5 +507,46 @@ class HelpPanel extends JTextArea{
     }
     protected void refresh(){
         setText("This help section is not feeling helpful.");
+    }
+}
+
+class ScrollBar extends BasicScrollBarUI{
+    @Override
+    protected void installComponents(){
+        switch (scrollbar.getOrientation()) {
+            case JScrollBar.VERTICAL:
+                incrButton = createIncreaseButton(SOUTH);
+                decrButton = createDecreaseButton(NORTH);
+                break;
+
+            case JScrollBar.HORIZONTAL:
+                if (scrollbar.getComponentOrientation().isLeftToRight()) {
+                    incrButton = createIncreaseButton(EAST);
+                    decrButton = createDecreaseButton(WEST);
+                } else {
+                    incrButton = createIncreaseButton(WEST);
+                    decrButton = createDecreaseButton(EAST);
+                }
+                break;
+        }
+        scrollbar.setEnabled(scrollbar.isEnabled());
+    }
+    @Override
+    protected void paintTrack(Graphics g, JComponent c, Rectangle bounds){ }
+    @Override
+    protected void paintThumb(Graphics g, JComponent c, Rectangle bounds){
+        if(bounds.isEmpty() || !scrollbar.isEnabled())     {
+            return;
+        }
+
+        int w = bounds.width;
+        int h = bounds.height;
+
+        g.translate(bounds.x, bounds.y);
+
+        g.setColor(new Color(180,180,180,125));
+        g.fillRect(0, 0, w-1, h-1);
+
+        g.translate(-bounds.x, -bounds.y);
     }
 }
