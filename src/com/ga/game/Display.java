@@ -1,6 +1,7 @@
 package com.ga.game;
 
 import com.ga.map.Global;
+import com.ga.map.Weather;
 import com.ga.unit.Updater;
 
 import javax.swing.*;
@@ -43,6 +44,7 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
         add(chatbox);
         menu = new Menu();
         add(menu);
+        Global.weather = new Weather();
     }
 
     private void chat(){
@@ -67,7 +69,6 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
             System.out.println("Thread Error");
             System.exit(1);
         }
-        Global.update();
     }
 
     private void input(boolean key, int mode, int x, int y){

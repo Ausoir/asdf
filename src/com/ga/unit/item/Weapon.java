@@ -4,8 +4,8 @@ import com.ga.map.Global;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.unit.Actions;
+import com.ga.unit.Man;
 import com.ga.unit.Organ;
-import com.ga.unit.item.Item;
 
 import java.awt.*;
 
@@ -24,29 +24,19 @@ public class Weapon extends Item {
             return (Global.r.nextInt(sides)+1) * num;
         }
     }
-    private WeaponType type;
     private Die damage = new Die(0,1);
     private float damageMod = 1;
-    public float length;
     private Organ organ = new Organ(new P(),0,0);
-    public Weapon(String name, int seed, int weight, int uses, int num, int sides, WeaponType type) {
-        super(name, seed, weight, uses, 100);
-        setDamage(num, sides);
-        if (name != null) length = size.x/2;
-        else length = 0;
-        rotation = 35;
+    public Weapon(String name, int seed, int weight, int uses, int num, int sides, Tag type) {
+        super(name, seed, weight, uses, 100, 0.03f);
         this.type = type;
-    }
-    public Actions getMoveset(){
-        return type.get();
+        cooldown = 0;
+        setDamage(num, sides);
+        rotation = 35;
+        setType(type);
     }
     public void setOrgan(Organ p){
         this.organ = p;
-        length = (size.x/2)+p.ptd.getDist();
-    }
-    @Override
-    public void unequip(){
-        organ = null;
     }
     protected void setModifier(PrefixMod mod){
         super.setModifier(mod);
@@ -72,18 +62,24 @@ public class Weapon extends Item {
         damage = new Die(num, sides);
     }
     public Line getLine(){
-        return new Line(pos, getPoint());
+        return new Line(pos.getAdd(organ.pt), getPoint());
     }
     public P getPoint(){
-        P result = new P();
-        if (length > 2) result.set((int)length*Global.cos(rotation)*dir,(int) (length*Global.sin(rotation))*dir);
-        result.add(organ.ptd.getAdd(pos));
+        P result = pos.getAdd(organ.ptd);
+        result.add(sizeRadius*.5f*Global.cos(rotation)*dir,(int) (sizeRadius*.5f*Global.sin(rotation))*dir);
         return result;
+    }
+    public void drop(Man host){
+        super.drop(host);
+        organ = null;
     }
     public String getDescription(){
         String r = super.getDescription();
         r = r.replace(" uses "," durability ");
-        return r + " This weapon deals "+damage.num+"D"+damage.sides+" damage.";
+        if (emod != null){
+            r += " This weapon has "+getProbability()*100+"% chance of activating its enchantment every hit.";
+        }
+        return r + " This weapon deals "+damage.num+"d"+damage.sides+" * "+damageMod+" damage.";
     }
     public void draw(Graphics2D g){
         super.draw(g, organ==null?P.getZero():organ.ptd);

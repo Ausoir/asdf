@@ -11,11 +11,11 @@ import com.ga.unit.Actions;
 import com.ga.unit.Moveset;
 import com.ga.unit.Player;
 import com.ga.unit.SkillTree;
-import com.ga.unit.skill.Skills;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -29,9 +29,8 @@ public class PlayerInput implements Input, Observer {
         put(KeyEvent.VK_S, Actions.Duck);
         put(KeyEvent.VK_D, Actions.WalkR);
         put(KeyEvent.VK_SPACE, Actions.Jump);
-        put(KeyEvent.VK_C, Actions.Summon);
+        put(KeyEvent.VK_C, Actions.Conjure);
         put(KeyEvent.VK_F, Actions.Kick);
-        put(KeyEvent.VK_G, Actions.Drop);
         put(KeyEvent.VK_Z, Actions.Pickup);
         put(1, Actions.Weapon);
         put(3, Actions.Idle);
@@ -44,9 +43,7 @@ public class PlayerInput implements Input, Observer {
     public PlayerInput(Player unit){
         Global.display.input = this;
         host = unit;
-        host.faction = 1;
         unit.brain = null;
-        Global.camera = unit.pos;
         Global.player = this;
     }
     public void chat(String p){
@@ -55,7 +52,11 @@ public class PlayerInput implements Input, Observer {
     }
     public void changeMapping(int key, Moveset event){
         keyMap.remove(key);
-        keyMap.remove(event);
+        Iterator i = keyMap.entrySet().iterator();
+        while (i.hasNext()){
+            Map.Entry e = (Map.Entry) i.next();
+            if (e.getValue() == event) i.remove();
+        }
         keyMap.put(key, event);
     }
     public String getMapping(Moveset move){
@@ -99,11 +100,12 @@ public class PlayerInput implements Input, Observer {
     }
     public void load(String p){
         if (p.length() > 1) {
-            keyMap.clear();
             String[] data = p.substring(1).split(";");
             for (String i : data) {
                 String[] pair = i.split(":");
-                keyMap.put(Integer.parseInt(pair[0]), SkillTree.getByName(pair[1]));
+                Moveset move = SkillTree.getByName(pair[1]);
+                if (host.skillTree.hasSkill(move))
+                    keyMap.put(Integer.parseInt(pair[0]), move);
             }
         }
     }

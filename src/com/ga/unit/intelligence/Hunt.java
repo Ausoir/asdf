@@ -3,31 +3,30 @@ package com.ga.unit.intelligence;
 import com.ga.map.Global;
 import com.ga.tool.Timer;
 import com.ga.unit.Actions;
-import com.ga.unit.Man;
+import com.ga.unit.Matter;
 import com.ga.unit.Unit;
 
 /**
  * Created by Ga on 7/30/2016.
  */
 public class Hunt implements Task {
-    private Man host;
-    private EnemyIntelligence ai;
-    private Unit target;
-    private Timer skill;
+    private Unit host;
+    private Matter target;
+    private Timer random;
     private float range;
 
-    public Hunt(Man host, Unit target) {
+    public Hunt(Unit host, Matter target) {
         this.host = host;
-        ai = (EnemyIntelligence) host.brain;
         this.target = target;
-        skill = new Timer(Global.r.nextInt(30));
-        range = host.getWeapon().getPoint().getAdd(host.pos.getMinus()).getDist();
+        random = new Timer(Global.r.nextInt(30));
+        range = host.getReach();
     }
 
     public void update() {
-        if (skill.update()){
-            skill.set(Global.r.nextInt(150));
-            ai.useSkill();
+        if (target == null) return;
+        if (random.update()){
+            random.set(Global.r.nextInt(150));
+            host.performMoveset("Random");
         }
         int x = (int) ((target.pos.x+target.vel.x) - (host.pos.x+host.vel.x));
         int y = (int) (target.pos.y - host.pos.y);
@@ -43,16 +42,10 @@ public class Hunt implements Task {
                 else if (x < 0) host.setState(Actions.WalkR);
             }
         } else if (dist <= 0) {
-            if (dist < -range+10) {
-                ai.setMove(EnemyIntelligence.Moves.OVERLAP);
-            } else if (dist < -range+50) {
-                ai.setMove(EnemyIntelligence.Moves.CLOSE);
+            if (dist < -range+50) {
+                host.performMoveset("Melee");
             } else if (dist > -10) { //edge
-                ai.setMove(EnemyIntelligence.Moves.CHASING);
-            } else if (target.vel.x == 0){
-                ai.setMove(EnemyIntelligence.Moves.STANDING);
-            } else {
-                ai.setMove(EnemyIntelligence.Moves.CHASING);
+                host.performMoveset("Range");
             }
         } else {
             if (x > 0) host.setState(Actions.WalkR);

@@ -1,13 +1,10 @@
 package com.ga.game;
 
+import com.ga.unit.*;
 import com.ga.unit.intelligence.PlayerInput;
 import com.ga.map.Global;
 import com.ga.tool.Line;
 import com.ga.tool.P;
-import com.ga.unit.Man;
-import com.ga.unit.Player;
-import com.ga.unit.Unit;
-import com.ga.unit.Updater;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -28,11 +25,13 @@ public class EditorInput implements Input, Observer {
     P lmbP = new P();
     ArrayList<Line> history = new ArrayList<>();
     Line current = new Line(0, 0, 0, 0);
-    Man currentU;
+    Thing currentU;
     boolean connected = false;
     Tool tool = Tool.NONE;
     P v = new P();
     int speed = 50;
+    String map = "Map";
+    boolean placingTp = false;
 
     public EditorInput() {
         Display.input = this;
@@ -61,6 +60,7 @@ public class EditorInput implements Input, Observer {
         } else if (p.equals("tp")) {
             Global.p("Teleporter");
             current.opt = 2;
+            placingTp = true;
         } else if (p.startsWith("tp")) {
             current.opt = Integer.parseInt(p.substring(2));
             Global.p("Level Teleporter: "+current.opt);
@@ -73,17 +73,18 @@ public class EditorInput implements Input, Observer {
         } else if (p.equals("black")) {
             Updater.landColor = Color.black;
         } else if (p.startsWith("save")){
-            FileManager.saveMap(p.substring(5));
+            FileManager.saveMap("map/"+p.substring(5));
         } else if (p.startsWith("load")){
             Updater.changeMap = p.substring(5);
-            Updater.changeMap();
+            map = Updater.changeMap;
+            Updater.changeMap(true);
             Display.input = this;
             Updater.other.add(this);
             Global.camera = new P(Global.camera);
         } else {
             try {
                 cunit = p;
-                currentU = new Man(cunit, currentU.pos, -1);
+                currentU = makeUnit(cunit, currentU.pos);
             } catch (Exception e) {
                 Global.p(p + " Not found");
             }
@@ -126,9 +127,9 @@ public class EditorInput implements Input, Observer {
                     currentU.pos.set(x, y);
                 } else if (tool == Tool.REMOVE && lmb){
                     Iterator it = Updater.updatee.iterator();
-                    Unit i;
+                    Matter i;
                     while (it.hasNext()){
-                        i = (Unit) it.next();
+                        i = (Matter) it.next();
                         String name = i.name;
                         if (800 - (Math.pow(x - i.pos.x, 2) + Math.pow(y - i.pos.y, 2)) > 0){
                             try{i.remove();}catch(Exception e){Global.p("Error deleting "+name);}
@@ -146,10 +147,14 @@ public class EditorInput implements Input, Observer {
                         Global.p(current.toString());
                     }
                     current = new Line(x, y, x, y);
+                    if (placingTp){
+                        placingTp = false;
+                        current.opt = -1;
+                    }
                     add(current);
                     connected = true;
                 } else if (tool == Tool.MAN) {
-                    currentU = new Man(cunit, new P(x, y), -1);
+                    currentU = makeUnit(cunit, new P(x, y));
                 }
                 break;
             case -1:
@@ -160,6 +165,15 @@ public class EditorInput implements Input, Observer {
                         i = (Line) it.next();
                         if (i.lineCross(new Line(new P(x,y),lmbP))){
                             it.remove();
+                        }
+                    }
+                } else if (tool == Tool.NONE && lmb){
+                    Iterator it = Global.map.land.iterator();
+                    Line i;
+                    while (it.hasNext()){
+                        i = (Line) it.next();
+                        if (i.lineCross(new Line(new P(x,y),lmbP))){
+                            Global.p(i.toString());
                         }
                     }
                 }
@@ -190,7 +204,7 @@ public class EditorInput implements Input, Observer {
                 break;
             case KeyEvent.VK_5:
                 if (!shift) selectTool(Tool.MAN);
-                currentU = new Man(cunit, new P(x, y), -1);
+                currentU = makeUnit(cunit, new P(x, y));
                 break;
             case KeyEvent.VK_W:
                 setSpeed(0,-1);
@@ -199,7 +213,7 @@ public class EditorInput implements Input, Observer {
                 setSpeed(0,1);
                 if (control) {
                     Global.p("Saved");
-                    FileManager.saveMap(Global.map.map.name);
+                    FileManager.saveMap("map/"+map);
                 }
                 break;
             case KeyEvent.VK_A:
@@ -224,11 +238,17 @@ public class EditorInput implements Input, Observer {
                 if (Updater.editor) {
                     Updater.editor = false;
                     Global.player = new PlayerInput(new Player(new P(Global.camera),0));
+                    Global.player.host.save.time = -1;
                     Display.input = Global.player;
                     Global.camera = Global.player.host.pos;
                 }
                 break;
         }
+    }
+    private Matter makeUnit(String name, P p){
+        Matter r = new Matter("unit/"+name,-1,p,9);
+        r.name = name;
+        return r;
     }
     private void setSpeed(int x, int y){
         v.x = x*speed;
@@ -246,6 +266,6 @@ public class EditorInput implements Input, Observer {
 
     public void update() {
         Global.camera.add(v);
-        Global.mapEdge();
+        Global.mapEdge(Global.camera);
     }
 }

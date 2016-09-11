@@ -1,32 +1,82 @@
 package com.ga.unit;
 
+import com.ga.game.Settings;
 import com.ga.game.Texture;
 import com.ga.map.Global;
+import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Timer;
 
 /**
  * Created by Ga on 8/29/2016.
  */
-public class Particle extends Unit implements Effect {
+public class Particle extends Thing implements Effect {
     private Timer timer = new Timer(4, false);
-    public Particle(P pt, P vel, float rotation, float speed, boolean gravity) {
+    private P vel;
+    private boolean gravity;
+    public Particle(String name, P pt, P vel, float rotation, float speed, boolean gravity, int lifetime) {
         super(null, 0, pt, 13);
-        setImage(Texture.load("effect/Particle.png"));
-        this.vel.set(Global.cos(rotation)*speed,Global.sin(rotation)*speed);
-        this.vel.add(vel);
+        setImage(Texture.load("effect/"+name+".png"));
+        this.vel = new P(vel);
+        this.vel.add(Global.cos(rotation)*speed,Global.sin(rotation)*speed);
         this.gravity = gravity;
         this.rotation = rotation;
-        tangible = false;
+        this.timer.set(lifetime);
     }
-    public static void explode(P pt, P vel, int num, int speed, boolean gravity){
+    public static void dripBlood(P pt){
+        explode("Blood",pt,P.getZero(),3,1,0,true,3);
+    }
+    public static void dripFire(P pt){
+        explode("Fire",pt,P.getZero(),3,1,0,true,3);
+    }
+    public static void dripHoly(P pt){
+        explode("Glare",pt,P.getZero(),1,4,0,true,4);
+    }
+    public static void explosion(P pt){
+        explode("Smoke",pt,new P(0,-15),50,15,15,false,7);
+        explode("Fire",pt,new P(0,-20),100,15,10,true,4);
+    }
+    public static void holyExplosion(P pt){
+        explode("Glare",pt,new P(0,-1),100,25,20,true,7);
+    }
+    public static void cleanse(P pt){
+        explode("Glare",pt,P.getZero(),1,15,0,false,2);
+    }
+    public static void frozen(P pt){
+        explode("Ice",pt,P.getZero(),3,3,0,false,12);
+    }
+    public static void smoke(P pt){
+        explode("Smoke",pt,P.getZero(),7,15,0,false,4);
+    }
+    public static void explode(String name, P pt, P vel, int num, int speed, int velSpeed, boolean gravity, int lifetime){
+        P v = vel.getAtan(velSpeed);
         for (int i=0;i<num;i++){
-            new Particle(new P(pt),new P(vel), Global.r.nextFloat()*6.28f,Global.r.nextFloat()*speed, gravity);
+            new Particle(name,new P(pt),v, Global.r.nextFloat()*6.28f,Global.r.nextFloat()*speed, gravity, lifetime);
         }
+    }
+    public void collide(){
+        P vp = pos.getAdd(vel);
+        Line pp = new Line(pos,vp);
+        for (Line i : Global.map.land){
+            if (i.lineCross(pp)){
+                if (i.opt != -1) {
+                    float slope = i.getSlope();
+                    vel.y = (slope * vel.x * 10000 - 5) / 10000f;
+                    vel.x /= 2;
+                }
+            }
+        }
+    }
+    @Override
+    public boolean over() {
+        if (gravity) vel.y += Settings.gravity;
+        collide();
+        pos.add(vel);
+        return timer.update();
     }
 
     @Override
-    public boolean over() {
-        return timer.update();
+    public String toString(){
+        return "";
     }
 }

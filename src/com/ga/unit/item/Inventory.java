@@ -37,6 +37,21 @@ public class Inventory {
         }
         return result;
     }
+    public void unequip(int index){
+        Item item = items.get(index);
+        item.unequip(player);
+        if (item instanceof Weapon) {
+            if (player.getWeapon() == item) player.setWeapon((Weapon) ItemFactory.produce("Fist", 0));
+            if (index == wielded){
+                wielded = -1;
+            }
+        } else if (item instanceof Armor){
+            if (player.getArmor() == item) player.setArmor((Armor) ItemFactory.produce("Underwear", 0));
+            if (index == worn) worn = -1;
+        } else {
+            removePocket(item);
+        }
+    }
     public boolean addItem(Item p){
         if (items.size() >= maxSize) return false;
         items.add(p);
@@ -69,21 +84,6 @@ public class Inventory {
         }
         return -1;
     }
-    public void unequip(int index){
-        Item item = items.get(index);
-        if (item instanceof Weapon) {
-            if (player.weapon == item) player.setWeapon((Weapon) ItemFactory.produce("Fist", 0));
-            if (index == wielded){
-                item.unequip();
-                wielded = -1;
-            }
-        } else if (item instanceof Armor){
-            if (player.armor == item) player.setArmor((Armor) ItemFactory.produce("Underwear", 0));
-            if (index == worn) worn = -1;
-        } else {
-            removePocket(item);
-        }
-    }
     public void removePocket(Item item){
         for (int i = 0; i < pockets.length; i++) {
             if (pockets[i] != -1 && items.get(pockets[i]) == item) pockets[i] = -1;
@@ -105,12 +105,13 @@ public class Inventory {
         return remove(i);
     }
     public void load(String p){
+        if (p.equals(";")) return;
         String[] data = p.substring(1).split(";");
         for (int i=0;i<data.length;i++){
             String[] pair = data[i].split("@");
             Item item = ItemFactory.produce(pair[0],Integer.parseInt(pair[2].split(",")[0]));
             item.uses.setTotal(Integer.parseInt(pair[2].split(",")[2]));
-            item.uses.set(Integer.parseInt(pair[2].split(",")[1]));
+            item.uses.set(Integer.parseInt(pair[2].split(",")[1]), true);
             weight += item.weight;
             if (pair[1].equals("w")){
                 wielded = i;

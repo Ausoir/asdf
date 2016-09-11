@@ -26,32 +26,39 @@ public class P {
     public P(double x, double y){
         set((float) x, (float) y);
     }
-    public P set(P p){
+    public boolean set(P p){
         return set(p.x,p.y);
     }
-    public P set(float x, float y){
+    public boolean set(float x, float y){
+        boolean r = this.x != x || this.y != y;
         this.x = x;
         this.y = y;
-        return this;
+        return r;
     }
     public boolean is(P p){
-        return p.x==x && p.y==y;
+        return is(p.x,p.y);
     }
-    public void add(P p){
-        add(p.x,p.y);
+    public boolean is(float x, float y){
+        return this.x == x && this.y == y;
     }
-    public void add(float x, float y){
+    public boolean isZero(){
+        return is(0,0);
+    }
+    public P add(P p){
+        return add(p.x,p.y);
+    }
+    public P add(float x, float y){
         this.x += x;
         this.y += y;
-    }
-    public P mult(float p){
-        this.x *= p;
-        this.y *= p;
         return this;
     }
-    public void mult(float x, float y){
+    public P mult(float p){
+        return mult(p,p);
+    }
+    public P mult(float x, float y){
         this.x *= x;
         this.y *= y;
+        return this;
     }
     public P getAtan(P pt, float mag){
         float r = (float) Math.atan2(y-pt.y,x-pt.x);
@@ -61,8 +68,19 @@ public class P {
         float r = (float) Math.atan2(y,x);
         return new P(Global.cos(r)*mag,Global.sin(r)*mag);
     }
+    public float getAtan(){
+        return (float) Math.atan2(y,x);
+    }
+    public P getSwapped(){
+        return new P(y,x);
+    }
     public float getDist(){
         return (float) Math.sqrt((this.x*this.x)+(this.y*this.y));
+    }
+    public float getDist(P p){
+        float x = p.x-this.x;
+        float y = p.y-this.y;
+        return (float) Math.sqrt((x*x)+(y*y));
     }
     public float getSum(){
         return this.x+this.y;
@@ -72,6 +90,9 @@ public class P {
     }
     public P getAdd(P p){
         return getAdd(p.x,p.y);
+    }
+    public P getSubtract(P p){
+        return getAdd(-p.x,-p.y);
     }
     public P getMinus(){
         return new P(-x,-y);
@@ -88,5 +109,9 @@ public class P {
     public void load(String p){
         String[] t = p.split(",");
         set(Float.parseFloat(t[0]), Float.parseFloat(t[1]));
+    }
+
+    public boolean collide(P p, float r) {
+        return getDist(p) <= r;
     }
 }

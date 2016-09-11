@@ -5,8 +5,8 @@ import com.ga.tool.P;
 import com.ga.tool.Timer;
 import com.ga.tool.Word;
 import com.ga.unit.Actions;
-import com.ga.unit.Man;
 import com.ga.unit.Unit;
+import com.ga.unit.Matter;
 import com.ga.unit.Updater;
 
 import java.util.ArrayList;
@@ -15,13 +15,13 @@ import java.util.ArrayList;
  * Created by Ga on 8/26/2016.
  */
 public class Intelligence {
-    protected Man host;
+    protected Unit host;
     protected Timer think = new Timer(1, true);
     protected Timer forget = new Timer(100, true);
-    private ArrayList<Unit> seen;
-    public Man target;
+    private ArrayList<Matter> seen;
+    public Unit target;
     public Task task;
-    public Intelligence(Man man){
+    public Intelligence(Unit man){
         host = man;
         task = new Wander(man);
     }
@@ -29,7 +29,7 @@ public class Intelligence {
         if (think.update()){
             think();
         } else {
-            if (target != null || task instanceof Wander) task.update();
+            task.update();
         }
     }
     public void attacked(){
@@ -42,35 +42,42 @@ public class Intelligence {
             }
         }
     }
-    public void hit(Man hitter){
+    public void hit(Matter hitter){
         if (target != hitter) host.say("@agro");
-        if (hitter != null) target = hitter;
-        else host.dir *= -1;
+        if (hitter != null && hitter instanceof Unit) target = (Unit) hitter;
+        else{
+            provoked(hitter.pos.x-host.pos.x>0?1:-1);
+            host.say("@hit");
+        }
     }
     public void setState(Actions state){
         if (target != null) {
-            P tgt = target.pos;
-            P p = new P(tgt.x-host.pos.x,tgt.y-host.pos.y);
+            P p = target.pos.getSubtract(host.pos);
             host.target = p;
-            host.getWeapon().rotate(p.getMult(host.dir,host.dir));
+            host.rotateWeapon(p.getMult(host.dir,host.dir));
         }
     }
-    public void hear(Unit u, String p){
-        if (u.faction == host.faction || host.faction == -1){
+    public void hear(Matter u, String p){
+        if (host.faction.canAttack(u.faction)){
             if (Word.Greeting.is(p)){
                 host.say("@greet");
             }
+        } else{
+            provoked(u.pos.x-host.pos.x>0?1:-1);
         }
     }
     protected void perceive(){
         seen = Updater.perceive(host, host.pos.getAdd(host.dir<0?-150:150,0), 300);
-        for (Unit t : seen) {
+        for (Matter t : seen) {
             if (target != t) {
                 perceived(t);
             }
         }
     }
-    protected void perceived(Unit p){
+    protected void provoked(int dir){
+        host.face(dir);
+    }
+    protected void perceived(Matter p){
     }
     protected void think(){
         if (forget.update()){

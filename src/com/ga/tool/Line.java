@@ -1,6 +1,5 @@
 package com.ga.tool;
 
-import com.ga.game.Settings;
 import com.ga.map.Global;
 
 import java.awt.*;
@@ -31,6 +30,10 @@ public class Line {
     public Line getAdd(P p){
         return new Line(pt.getAdd(p), ptd.getAdd(p));
     }
+    public float getAtan(){
+        float r = (float) Math.atan2(ptd.y-pt.y,ptd.x-pt.x);
+        return r;
+    }
     public boolean lineCross(Line i2){
         boolean a = i2.pt.x-pt.x >= 0, b = i2.pt.x-ptd.x > 0, c = i2.ptd.x-pt.x >= 0, d = i2.ptd.x-ptd.x > 0,
                 e = i2.pt.y-pt.y >= 0, f = i2.pt.y-ptd.y > 0, g = i2.ptd.y-pt.y >= 0, h = i2.ptd.y-ptd.y > 0;
@@ -44,12 +47,9 @@ public class Line {
     public float getSlope(){
         return (ptd.y-pt.y)/(ptd.x-pt.x);
     }
-    public void draw(Graphics2D g){
-        draw(g, new P(), 1);
-    }
-    public void draw(Graphics2D g, P offset, int dir){
-        P t = Global.getRelPos(offset.x+(pt.x*dir),offset.y+pt.y);
-        P td = Global.getRelPos(offset.x+(ptd.x*dir),offset.y+ptd.y);
+    public void draw(Graphics2D g, P offset){
+        P t = Global.getRelPos(offset.x+(pt.x),offset.y+pt.y);
+        P td = Global.getRelPos(offset.x+(ptd.x),offset.y+ptd.y);
 //        if ((t.x > -100 && t.y > -100 && t.x < Settings.screenX + 100 && t.y < Settings.screenY + 100)
 //            || (td.x > -100 && td.y > -100 && td.x < Settings.screenX + 100 && td.y < Settings.screenY + 100))
             g.drawLine((int)t.x, (int)t.y, (int)td.x, (int)td.y);

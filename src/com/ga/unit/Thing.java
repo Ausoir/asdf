@@ -21,6 +21,7 @@ public class Thing implements Drawable {
     private boolean visible = true;
     public P pos;
     public P size;
+    protected int sizeRadius;
     public String name;
     int depth;
     public int dir = 1;
@@ -32,19 +33,18 @@ public class Thing implements Drawable {
         rand = new Random(this.seed);
         if (name != null) {
             String dir = "";
-            if (this instanceof Man) dir = "unit/";
-            else if (this instanceof Item) dir = "item/";
             setImage(Texture.load(dir + name + ".png"));
         }
     }
     protected void setImage(BufferedImage image){
         this.image = image;
         size = new P(this.image.getWidth(), this.image.getHeight());
+        sizeRadius = (int) size.getMult(.5f,.5f).getDist();
     }
     public void rotate(P p){
         rotation = ((float) Math.atan2(p.y,p.x));
     }
-    protected Thing(String name, int seed, P pt, int depth){
+    public Thing(String name, int seed, P pt, int depth){
         this(name, seed);
         this.depth = depth;
         pos = pt;
@@ -57,12 +57,13 @@ public class Thing implements Drawable {
         if (visible) {
             P t = Global.getRelPos(pos.x - (size.x / 2), pos.y - (size.y / 2));
             t.add(offset.x + (dir < 0 ? size.x : 0), offset.y);
-            P r = t.getAdd(dir < 0 ? -size.x / 2 : size.x / 2, size.y / 2);
-            float rot = rotation;
-            g.rotate(rot, r.x, r.y);
-            if (t.x > -150 && t.y > -100 && t.x < Settings.screenX + 150 && t.y < Settings.screenY + 100)
+            if (t.x > -150 && t.y > -100 && t.x < Settings.screenX + 150 && t.y < Settings.screenY + 100) {
+                P r = t.getAdd(dir < 0 ? -size.x / 2 : size.x / 2, size.y / 2);
+                float rot = rotation;
+                g.rotate(rot, r.x, r.y);
                 g.drawImage(image, (int) t.x, (int) t.y, (int) size.x * dir, (int) size.y, null);
-            g.rotate(-rot, r.x, r.y);
+                g.rotate(-rot, r.x, r.y);
+            }
         }
     }
     public void draw(Graphics2D g){

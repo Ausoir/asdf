@@ -7,6 +7,7 @@ import com.ga.map.Drawable;
 import com.ga.map.Global;
 import com.ga.tool.Line;
 import com.ga.tool.P;
+import com.ga.tool.Timer;
 import com.ga.unit.item.Item;
 
 import java.awt.*;
@@ -21,11 +22,12 @@ public class Updater {
     public static ArrayList<Drawable> drawee = new ArrayList<>();
     public static ArrayList<Effect> effects = new ArrayList<>();
     public static ArrayList<Observer> other = new ArrayList<>();
-    public static ArrayList<Unit> updatee = new ArrayList<>();
+    public static ArrayList<Matter> updatee = new ArrayList<>();
     public static ArrayList<Thing> addQueue = new ArrayList<>();
     public static Color landColor = Color.pink;
     public static String changeMap = null;
     public static int changeMapPos = 0;
+    private static Timer time = new Timer(10,true);
     public static void clear(){
         drawee.clear();
         other.clear();
@@ -33,12 +35,16 @@ public class Updater {
         effects.clear();
         addQueue.clear();
     }
-    public static void changeMap(){
+    public static void changeMap(boolean editor){
         clear();
-        addQueue.add(Global.player.host);
-        Global.player.host.pos.set(FileManager.readMap(changeMap, editor?-2:changeMapPos));
-        new Shadow(Global.player.host.pos);
-        Display.input = Global.player;
+        if (!editor) {
+            addQueue.add(Global.player.host);
+            Global.player.host.pos.set(FileManager.readMap(changeMap, changeMapPos));
+            Global.player.host.reset();
+            Display.input = Global.player;
+        } else {
+            FileManager.readMap(changeMap, -2);
+        }
         changeMap = null;
     }
     public static void draw(Graphics2D g2){
@@ -46,7 +52,7 @@ public class Updater {
             for (int i=0;i<addQueue.size();i++){
                 Thing p = addQueue.get(i);
                 addDrawee(p);
-                if (p instanceof Unit) updatee.add((Unit) p);
+                if (p instanceof Matter) updatee.add((Matter) p);
                 if (p instanceof Effect) effects.add((Effect) p);
                 addQueue.remove(i);
             }
@@ -54,7 +60,7 @@ public class Updater {
         for (Drawable i : drawee) i.draw(g2);
         if (editor || showTerrain){
             g2.setColor(landColor);
-            for (Line i : Global.map.land) i.draw(g2);
+            for (Line i : Global.map.land) i.draw(g2,P.getZero());
         }
         for (Observer i : other) i.update();
         if (!editor) {
@@ -65,9 +71,11 @@ public class Updater {
                 if (effects.get(i).over()) remove((Thing) effects.get(i));
             }
         }
-        if (changeMap != null) changeMap();
+        if (changeMap != null) changeMap(false);
+        if (time.update()) Global.update();
     }
     public static void remove(Thing p){
+        addQueue.remove(p);
         drawee.remove(p);
         updatee.remove(p);
         effects.remove(p);
@@ -87,14 +95,14 @@ public class Updater {
     public static String toMapString(){
         if (updatee.size() == 0) return "";
         String result = "";
-        for (Unit i : updatee){
+        for (Matter i : updatee){
             if (!i.toString().equals("")) result += i.toString()+";";
         }
         result = result.substring(0,result.length()-1);
         return result;
     }
-    public static void sound(Unit p, String msg){
-        for (Unit i : updatee){
+    public static void sound(Matter p, String msg){
+        for (Matter i : updatee){
             if (i != p && i.faction != p.faction) {
                 if (Math.abs(i.pos.x - p.pos.x) < 600 && Math.abs(i.pos.y - p.pos.y) < 200) {
                     if (i instanceof Man) {
@@ -112,31 +120,35 @@ public class Updater {
         }
         return null;
     }
-    public static Unit collide(Unit p, int range, int force){
-        Unit result = null;
-        for (Unit i : updatee){
-            if (i.checkHit(p,range,force)){
-                result = i;
-            }
-        }
-        return result;
-    }
-    public static Unit collide(Unit host, Line p, int force, boolean cleave){
-        Unit result = null;
-        for (Unit i : updatee){
-            if (host.faction != i.faction) {
-                if (i.checkHit(host,p,force)){
-                    if (!cleave) return i;
-                    else result = i;
+    public static Matter collide(Matter p, int r){
+        Matter result = null;
+        for (int i = 0; i < updatee.size(); i++) {
+            Matter t = updatee.get(i);
+            if (p.faction != t.faction) {
+                if (t.checkHit(p,r)) {
+                    result = t;
                 }
             }
         }
         return result;
     }
-    public static ArrayList<Unit> perceive(Man host, P vision, int r){
-        ArrayList<Unit> seen = new ArrayList<>();
+    public static Matter collide(Matter host, Line p, boolean cleave){
+        Matter result = null;
+        for (int i = 0; i < updatee.size(); i++) {
+            Matter t = updatee.get(i);
+            if (host.faction != t.faction) {
+                if (t.checkHit(host,p)){
+                    if (!cleave) return t;
+                    else result = t;
+                }
+            }
+        }
+        return result;
+    }
+    public static ArrayList<Matter> perceive(Unit host, P vision, int r){
+        ArrayList<Matter> seen = new ArrayList<>();
         int max = r;
-        for (Unit i : updatee){
+        for (Matter i : updatee){
             if (host != i) {
                 float x = Math.abs(i.pos.x-vision.x), y = Math.abs(i.pos.y - vision.y);
                 if (x < r && y < r/3) {

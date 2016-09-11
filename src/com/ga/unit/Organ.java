@@ -15,8 +15,16 @@ public class Organ extends Line {
         this.pt = pt;
         this.ptd = new P(pt.x+x,pt.y+y);
     }
+    public float getWidth(){
+        return ((BasicStroke)stroke).getLineWidth();
+    }
     public void setStyle(Color color, int size){
         this.color = color;
         this.stroke = new BasicStroke(size);
+    }
+    public void draw(Graphics2D g, P pos){
+        g.setStroke(stroke);
+        g.setColor(color);
+        super.draw(g, pos);
     }
 }

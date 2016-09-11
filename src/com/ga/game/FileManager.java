@@ -5,6 +5,7 @@ import com.ga.map.ManFactory;
 import com.ga.map.Map;
 import com.ga.tool.Line;
 import com.ga.tool.P;
+import com.ga.unit.Beast;
 import com.ga.unit.Clip;
 import com.ga.unit.Player;
 import com.ga.unit.Updater;
@@ -70,10 +71,14 @@ public class FileManager {
         String data = read("map/"+"Player"+".char");
         String[] line = data.split("%");
         String[] values = line[0].split("@");
-        readMap("Map",editor?-2:0);
         if (!editor){
+            readMap("Map",0);
             Global.player = new PlayerInput(new Player(new P(values[2]), Integer.parseInt(values[1])));
             Global.player.host.load(read("map/Player.char"));
+            Global.setTime(Integer.parseInt(values[4]));
+        } else {
+            readMap("Map",-2);
+            new EditorInput();
         }
     }
     public static P readMap(String dir, int player) {
@@ -100,7 +105,7 @@ public class FileManager {
                 if (sections.length > 0)
                     for (int section = 0; section < sections.length; section++) {
                         String[] type = sections[section].split("@");
-                        String unit = type[0];
+                        String[] unit = type[0].split(":");
                         P pos;
                         int seed = Integer.parseInt(type[1]);
                         String[] values = type[2].split(",");
@@ -109,13 +114,16 @@ public class FileManager {
                             v[i] = Integer.parseInt(values[i]);
                         }
                         pos = new P(v[0], v[1]);
-                        if (unit.equals("Player")) {
-                            if (player == 0 || player == -2){
+                        if (unit[1].equals("Player")) {
+                            if (player == 0){
                                 r = pos;
+                            } else if (player == -2){
+                                new Player(pos, -1);
                             }
                             if (player > -1) player--;
                         }
-                        else ManFactory.produce(unit, pos, seed);
+                        else if (unit[0].equals("M:")) ManFactory.produce(unit[1], pos, seed);
+                        else new Beast(unit[0], unit[1], pos, seed);
                     }
             }
         }
@@ -125,10 +133,27 @@ public class FileManager {
     public static int[] readClipFrames(String dir) {
         String data = read(dir);
         int[] result;
-        String[] lines = data.split("%");
-        result = new int[lines.length-1];
-        for (int line = 1; line < lines.length; line++) {
-            result[line-1] = Integer.parseInt(lines[line].split("/")[1]);
+        String[] lines = data.split("%%")[1].split("%");
+        result = new int[lines.length];
+        for (int line = 0; line < lines.length; line++) {
+            result[line] = Integer.parseInt(lines[line].split("/")[1]);
+        }
+        return result;
+    }
+
+    public static int[][] readModelProperty(String dir) {
+        String data = read(dir);
+        int[][] result;
+        String line = data.split("%%")[0].split("%")[1];
+        String[] sections = line.split(";");
+        result = new int[sections.length][];
+        for (int section = 0; section < sections.length; section++) {
+            String values[] = sections[section].split(",");
+            int[] v = new int[values.length];
+            for (int i = 0; i < values.length; i++) {
+                v[i] = Integer.parseInt(values[i]);
+            }
+            result[section] = v;
         }
         return result;
     }
@@ -154,26 +179,43 @@ public class FileManager {
     public static int[][][] readAnimation(String dir) {
         String data = read(dir);
         int[][][] result;
-        String[] lines = data.split("%");
-        result = new int[lines.length - 1][][];
-        for (int line = 1; line < lines.length; line++) {
+        String[] lines = data.split("%%")[1].split("%");
+        result = new int[lines.length][][];
+        for (int line = 0; line < lines.length; line++) {
             String[] sections = lines[line].split("/")[0].split(";");
-            result[line - 1] = new int[sections.length][];
+            result[line] = new int[sections.length][];
             for (int section = 0; section < sections.length; section++) {
                 String values[] = sections[section].split(",");
-                result[line - 1][section] = new int[values.length];
+                result[line][section] = new int[values.length];
                 int[] v = new int[values.length];
                 for (int i = 0; i < values.length; i++) {
                     v[i] = Integer.parseInt(values[i]);
-                    result[line - 1][section][i] = v[i];
+                    result[line][section][i] = v[i];
                 }
             }
         }
         return result;
     }
 
+    public static HashMap<String, int[]> readMoveset(String dir) {
+        String data = read(dir);
+        HashMap<String, int[]> result;
+        String[] lines = data.split("%%")[2].split("%");
+        result = new HashMap<>();
+        for (int line = 0; line < lines.length; line++) {
+            String[] sections = lines[line].split("@");
+            String values[] = sections[1].split(",");
+            int[] v = new int[values.length];
+            for (int i = 0; i < values.length; i++) {
+                v[i] = Integer.parseInt(values[i]);
+            }
+            result.put(sections[0],v);
+        }
+        return result;
+    }
+
     public static Clip readClip(String dir) {
-        return new Clip(readModel(dir), readAnimation(dir), readClipFrames(dir));
+        return new Clip(readModelProperty(dir), readModel(dir), readAnimation(dir), readClipFrames(dir), readMoveset(dir));
     }
 
     public static HashMap<String, ArrayList<String>> readDialogue(String dir){

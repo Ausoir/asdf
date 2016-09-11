@@ -9,35 +9,42 @@ import java.awt.*;
 /**
  * Created by Ga on 8/23/2016.
  */
-class Shadow extends Unit {
+class Shadow extends Matter {
     private static final P size = new P(50,20);
     private P hostPos;
     Shadow(P pt) {
         super(null, 0, new P(), 9);
-        hostPos = pt;
         gravity = false;
+        setHostPos(pt);
+    }
+    public void setHostPos(P pt){
+        hostPos = pt;
         pos.set(hostPos);
     }
     @Override
-    public boolean checkHit(Unit hitter, int range, int force){
+    public boolean checkHit(Matter hitter, int r){
         return false;
     }
     @Override
-    public boolean checkHit(Unit hitter, Line p, int force){
+    public boolean checkHit(Matter hitter, Line p){
         return false;
     }
     @Override
     public void collide(){
-        Line pp = new Line(hostPos,hostPos.getAdd(0,150));
+        Line pp = new Line(hostPos,hostPos.getAdd(0,300));
+        float lowest = pos.y+300, current;
         for (Line i : Global.map.land){
             if (i.lineCross(pp)){
-                onCollide(i);
+                current = i.pt.y+(i.getSlope() * (hostPos.x-i.pt.x));
+                if (current < lowest){
+                    lowest = current;
+                }
             }
         }
+        pos.y = lowest;
     }
     @Override
     public void onCollide(Line l){
-        pos.y = l.pt.y+(l.getSlope() * (hostPos.x-l.pt.x));
     }
     public void draw(Graphics2D g){
         float mag = Global.clamp((300-(pos.y-hostPos.y))/300,0.1f,1);

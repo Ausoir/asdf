@@ -13,12 +13,12 @@ import java.awt.*;
  */
 public class ItemFactory {
     private enum FactoryWeapon{
-        Fist(1,-1,1,2,WeaponType.STAB), Mace(4,1000,3,8,WeaponType.SWING), Sword(3,600,2,6,WeaponType.STAB), Stick1(1,10,1,6,WeaponType.SWING), Stick2(1,10,1,6,WeaponType.SWING), Stick3(1,10,1,6,WeaponType.SWING),
-        Katana(2,100,1,12,WeaponType.SWING), Spear(3,160,1,12,WeaponType.SWING), Axe(3,100,1,12,WeaponType.SWING), Dagger(1,800,1,6,WeaponType.STAB), Pick(4,100,1,24,WeaponType.SWING), Cleaver(6,600,2,12,WeaponType.SWING),
-        Halberd(6,100,1,36,WeaponType.SWING), Greatsword(8,400,2,18,WeaponType.SWING), Warhammer(9,400,3,12,WeaponType.SWING);
+        Fist(1,-1,1,2, Item.Tag.Spear), Mace(4,1000,3,8, Item.Tag.Mace), Sword(3,600,2,6,Item.Tag.Spear), Stick1(1,10,1,6, Item.Tag.Mace), Stick2(1,10,1,6,Item.Tag.Spear), Stick3(1,10,1,6, Item.Tag.Sword),
+        Katana(2,100,1,12, Item.Tag.Sword), Spear(3,160,1,12,Item.Tag.Spear), Axe(3,100,1,12, Item.Tag.Sword), Dagger(1,80,1,6, Item.Tag.Dagger), Pick(4,100,1,24,Item.Tag.Sword), Cleaver(6,600,2,12, Item.Tag.Sword),
+        Halberd(6,100,1,36, Item.Tag.Spear), Greatsword(8,400,2,18, Item.Tag.Sword), Warhammer(9,400,3,12,Item.Tag.Mace);
         private int damageNum, damageSides, weight, uses;
-        private WeaponType type;
-        FactoryWeapon(int weight, int uses, int dmgNum, int dmgSide, WeaponType type){
+        private Item.Tag type;
+        FactoryWeapon(int weight, int uses, int dmgNum, int dmgSide, Item.Tag type){
             this.weight = weight;
             this.damageNum = dmgNum;
             this.damageSides = dmgSide;
@@ -28,11 +28,12 @@ public class ItemFactory {
     }
     private enum FactoryArmor{
         Underwear(0, -1, 1,  250,255,220,240,180,220),
-        Cotton_Clothing(1, 50, 1,  30,255,50,150),
+        Cotton_Clothing(0, 50, 1,  30,255,50,150),
         Fabric_Clothing(1, 100, 1,  10,100,10,100,120,230),
-        Leather_Armor(2, 500, 5f,  90,200,40,120,20,80,140,160,80,100,65,75),
-        Chainmail(3, 200, 8f,  50,130,40,120),
-        Platemail(4, 200, 15,  130,200,130,200,130,200);
+        Leather_Armor(2, 500, 3f,  90,200,40,120,20,80,140,160,80,100,65,75),
+        Chainmail(3, 200, 6f,  50,130,40,120),
+        Platemail(4, 200, 8,  130,200,130,200,130,200),
+        Shadowrobe(1, -1, 1,  10,50,10,50,10,50);
         private int weight, uses;
         private float armor;
         private int color1r = 0, color1rd = 255;
@@ -120,45 +121,72 @@ public class ItemFactory {
         Item item;
         switch (p){
             case "Potion":
-                item = new Item(p, seed, 1, 1, 1000){
+                item = new Item(p, seed, 1, 1, 1000, 1){
                     @Override
                     public boolean use(Man host){
                         if (super.use(host)) {
-                            host.get("health").add(100);
                             host.clip.setState(Actions.Consume);
                             return true;
                         }
                         return false;
                     }
                 };
-                item.delay = 60;
+                item.delay = 45;
+                break;
+            case "Spellbook":
+                item = new Item(p, seed, 1, 1, 0, 1){
+                    @Override
+                    public boolean use(Man host){
+                        if (super.use(host)) {
+                            ((Player)host).learnSkill(emod);
+                            return true;
+                        }
+                        return false;
+                    }
+                };
+                item.setType(Item.Tag.Scroll);
+                item.delay = 45;
+                break;
+            case "Scroll":
+                item = new Item(p, seed, 1, 1, 100, 1){
+                    @Override
+                    public boolean use(Man host){
+                        if (super.use(host)) {
+                            return true;
+                        }
+                        return false;
+                    }
+                };
+                item.setType(Item.Tag.Scroll);
+                item.delay = 45;
                 break;
             case "Fireball":
-                item = new Item(p, seed, 1, 3, 10) {
+                item = new Item(p, seed, 1, 3, 10, 0) {
                     @Override
                     public boolean use(Man host) {
                         if (super.use(host)) {
-                            final Projectile p = new Projectile("item/Fireball", host.pos.getAdd(host.clip.organs[ClipMan.FIST].ptd), Global.player.mP.getAdd(host.pos), 20+(host.get("arms").get()*2)){
+                            final Projectile p = new Projectile("item/Fireball", host.pos.getAdd(host.clip.organs[ClipMan.FIST].ptd), Global.player.mP.getAdd(host.pos), 20+(host.get("Stamina").get()*2)){
                                 @Override
                                 public void stuck(){
-                                    Particle.explode(pos, P.getZero(), 300, 20, false);
-                                    Updater.collide(this,10000,30);
+                                    Particle.explosion(pos);
+                                    Updater.collide(this,10000);
                                     remove();
                                 }
                                 @Override
                                 public void update(){
                                     super.update();
-                                    Particle.explode(pos, P.getZero(), 15, 10, true);
+                                    Particle.dripFire(pos);
                                 }
                             };
-                            p.faction = 1;
+                            p.faction = host.faction;
                             p.damage = 30;
                             p.gravity = true;
                             p.delay.set(50);
                             p.delay.performer = new Performer(){
                                 @Override
-                                public void perform(){
+                                public boolean perform(){
                                     p.stuck();
+                                    return true;
                                 }
                             };
                             return true;
@@ -167,22 +195,22 @@ public class ItemFactory {
                     }
                 };
                 item.delay = 10;
-                item.action = Actions.Throw;
+                item.setType(Item.Tag.Throwing);
                 break;
             case "Throwing_Knife":
-                item = new Item("Dagger", seed, 1, 10, 20){
+                item = new Item("Dagger", seed, 1, 10, 20, .04f){
                     @Override
                     public boolean use(Man host){
                         if (super.use(host)) {
                             Projectile p = new Projectile("item/Dagger",host.pos.getAdd(host.clip.organs[ClipMan.OFIST].ptd),Global.player.mP.getAdd(host.pos),50){
                                 @Override
                                 public void stuck(){
-                                    if (tangible) Particle.explode(pos, vel, 20, 10, true);
+                                    if (tangible) Particle.explode("Fire", pos, vel, 20, 10, 15, true,3);
                                     super.stuck();
                                 }
                             };
                             p.rotSpeed = 0;
-                            p.faction = 1;
+                            p.faction = host.faction;
                             p.damage = 10;
                             p.gravity = false;
                             return true;
@@ -192,7 +220,7 @@ public class ItemFactory {
                 };
                 item.name = "Throwing_Knife";
                 item.delay = 8;
-                item.action = Actions.Shoot;
+                item.setType(Item.Tag.Shooting);
                 break;
             default:
                 Global.p("Can't find item "+p);

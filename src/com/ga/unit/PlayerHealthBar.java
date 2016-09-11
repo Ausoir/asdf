@@ -11,11 +11,11 @@ import java.awt.*;
  */
 public class PlayerHealthBar extends HealthBar {
     Stroke substroke, bsubstroke;
-    Stat arms, legs;
-    public PlayerHealthBar(Stat stat, Stat arms, Stat legs, P pos){
+    Stat stamina, energy;
+    public PlayerHealthBar(Stat stat, Stat stamina, Stat energy, P pos){
         super(stat,pos);
-        this.arms = arms;
-        this.legs = legs;
+        this.stamina = stamina;
+        this.energy = energy;
         substroke = new BasicStroke(2);
         bsubstroke = new BasicStroke(10);
     }
@@ -31,14 +31,14 @@ public class PlayerHealthBar extends HealthBar {
             g.setStroke(substroke);
             g.setColor(Color.white);
             t = Global.getRelPos(pos.x, pos.y);
-            P c = t.getAdd(-46, 80), d = t.getAdd(-46 + (arms.getPercentage() * 92), 80);
+            P c = t.getAdd(-46, 80), d = t.getAdd(-46 + (stamina.getPercentage() * 92), 80);
             g.drawLine((int) c.x, (int) c.y, (int) d.x, (int) d.y);
 
             g.setStroke(substroke);
             g.setColor(Color.cyan);
             t = Global.getRelPos(pos.x, pos.y);
             c = t.getAdd(-46, 84);
-            d = t.getAdd(-46 + (legs.getPercentage() * 92), 84);
+            d = t.getAdd(-46 + (energy.getPercentage() * 92), 84);
             g.drawLine((int) c.x, (int) c.y, (int) d.x, (int) d.y);
         }
     }

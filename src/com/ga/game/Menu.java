@@ -167,40 +167,40 @@ class StatPanel extends JPanel{
         statgrid.ipadx = 5;
         statgrid.gridx = 1;
         statgrid.gridy = 0;
-        makeStatButton("[+]", "level@damage");
-        makeStatButton("[+]", "level@arms");
-        makeStatButton("[+]", "level@legs");
-        makeStatButton("[+]", "level@int");
+        makeStatButton("[+]", "level@Proficiency");
+        makeStatButton("[+]", "level@Stamina");
+        makeStatButton("[+]", "level@Energy");
+        makeStatButton("[+]", "level@Memory");
         statgrid.gridx = 2;
         statgrid.gridy = 0;
-        makeStatButton("[-]", "delevel@damage");
-        makeStatButton("[-]", "delevel@arms");
-        makeStatButton("[-]", "delevel@legs");
-        makeStatButton("[-]", "delevel@int");
+        makeStatButton("[-]", "delevel@Proficiency");
+        makeStatButton("[-]", "delevel@Stamina");
+        makeStatButton("[-]", "delevel@Energy");
+        makeStatButton("[-]", "delevel@Memory");
         statgrid.gridx = 3;
         statgrid.gridy = 0;
 //        statgrid.insets = new Insets(0,0,0,240);
-        makeStatButton("[?]", "say@increases maximum damage by 1.");
-        makeStatButton("[?]", "say@increases arm stamina by 1.");
-        makeStatButton("[?]", "say@increases leg stamina by 1.");
-        makeStatButton("[?]", "say@increases memory by 1.");
+        makeStatButton("[?]", "say@increases minimum/maximum damage by 1.");
+        makeStatButton("[?]", "say@increases Stamina by 1. Stamina recovers by 10% when idling or 50% when resting.");
+        makeStatButton("[?]", "say@increases Energy by 1. Energy recovers by 10% when idling or 50% when resting.");
+        makeStatButton("[?]", "say@increases Memory by 1. Each point can be used to learn with a Manual or a Spellbook. They can also be used to level up a Skill or Spell at the Skills menu.");
     }
     protected void refresh(){
         Player player = Global.player.host;
-        ((JButton)getComponent(0)).setText("Damage - "+player.get("damage").getMax());
-        ((JButton)getComponent(1)).setText("Strength - "+player.get("arms").getMax());
-        ((JButton)getComponent(2)).setText("Stamina - "+player.get("legs").getMax());
-        ((JButton)getComponent(3)).setText("Memory - "+player.get("damage").getMax());
-        ((JButton)getComponent(4)).setText("Reset Points - "+player.get("adapt").get());
-        ((JButton)getComponent(5)).setText("Level Points - "+player.get("points").get());
-        if (player.get("points").get() > 0)
+        ((JButton)getComponent(0)).setText("Proficiency - "+player.get("Proficiency").getMax());
+        ((JButton)getComponent(1)).setText("Stamina - "+player.get("Stamina").getMax());
+        ((JButton)getComponent(2)).setText("Energy - "+player.get("Energy").getMax());
+        ((JButton)getComponent(3)).setText("Memory - "+player.get("Memory").getMax());
+        ((JButton)getComponent(4)).setText("Reset Points - "+player.get("Reset Points").get());
+        ((JButton)getComponent(5)).setText("Level Points - "+player.get("Level Points").get());
+        if (player.get("Level Points").get() > 0)
             for (int i=6;i<10;i++)
                 getComponent(i).setVisible(true);
         else
             for (int i=6;i<10;i++)
                 getComponent(i).setVisible(false);
 
-        if (player.get("adapt").get() > 0)
+        if (player.get("Reset Points").get() > 0)
             for (int i=10;i<14;i++)
                 getComponent(i).setVisible(true);
         else
@@ -400,7 +400,10 @@ class InventoryPanel extends JPanel {
         final Inventory inv = Global.player.host.inventory;
         int r = inv.equip(p);
         for (int i = 0; i < selected.length; i++) {
-            if (i != p && r == selected[i]) unequip(i);
+            if (i != p && r == selected[i]){
+                unequip(i);
+                break;
+            }
         }
         TitledBorder b = BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder());
         if (r == 1) b.setTitle("Wielded");
@@ -419,6 +422,7 @@ class InventoryPanel extends JPanel {
 class SkillPanel extends JPanel{
     private JScrollPane scroll;
     private JPanel panel;
+    private JLabel skillpoints;
     public SkillPanel(){
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         setBorder(BorderFactory.createBevelBorder(1));
@@ -434,21 +438,25 @@ class SkillPanel extends JPanel{
         scroll.setOpaque(false);
         scroll.getViewport().setOpaque(false);
         add(scroll, BorderLayout.CENTER);
+        skillpoints = new JLabel();
+        add(skillpoints);
     }
     protected void refresh(){
         panel.removeAll();
         panel.add(new JLabel("Select a skill to re-map its keybinding."));
         panel.add(Box.createRigidArea(new Dimension(0,12)));
-        makeSlot(Actions.Weapon);
-        makeSlot(Actions.Jump);
-        makeSlot(Actions.Kick);
-        makeSlot(Actions.Drop);
-        makeSlot(Actions.Rest);
+        makeSlot(Actions.Weapon, false);
+        makeSlot(Actions.Jump, false);
+        makeSlot(Actions.Kick, false);
+        makeSlot(Actions.Pickup, false);
+        makeSlot(Actions.Rest, false);
         for (Moveset i : Global.player.host.skillTree.getSkills()){
-            makeSlot(i);
+            makeSlot(i, true);
         }
+        int points = Global.player.host.get("Memory").get();
+        skillpoints.setText("Memory Points: "+points);
     }
-    protected void makeSlot(final Moveset move){
+    protected void makeSlot(final Moveset move, boolean skill){
         String key = Global.player.getMapping(move);
         if (key == null) key = "";
         else key = "["+key+"]";
@@ -456,6 +464,33 @@ class SkillPanel extends JPanel{
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel,BoxLayout.LINE_AXIS));
         panel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
+        final JLabel advance = new JLabel(" [+ Proficiency]");
+        if (!Global.player.host.skillTree.advanceAble(move, false)) advance.setVisible(false);
+        final JLabel advanceCd = new JLabel(" [+ Cooldown]");
+        if (!Global.player.host.skillTree.advanceAble(move, true)) advanceCd.setVisible(false);
+        if (skill) {
+            int points = Global.player.host.get("Memory").get();
+            if (points <= 0) {
+                advance.setVisible(false);
+                advanceCd.setVisible(false);
+            }
+            advance.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    Global.player.host.say("Leveled up " + move.getName() + "!");
+                    Global.player.host.advanceSkill(move, false);
+                }
+            });
+            advanceCd.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    Global.player.host.say("Decreased the cooldown of " + move.getName() + " by half!");
+                    Global.player.host.advanceSkill(move, true);
+                }
+            });
+            panel.add(advance);
+            panel.add(advanceCd);
+        }
         final JLabel describe = new JLabel(" [?]");
         describe.addMouseListener(new MouseAdapter() {
             @Override
@@ -463,12 +498,16 @@ class SkillPanel extends JPanel{
                 Global.player.host.say(move.getDescription());
             }
         });
-        final JLabel equip = new JLabel(" "+key+" "+Word.wordify(move.getName()));
+        int level = Global.player.host.skillTree.getSkillLevel(move);
+        int cdlevel = Global.player.host.skillTree.getSkillCdLevel(move);
+        final JLabel equip = new JLabel(" "+key+" "+Word.wordify(move.getName())+" Level "+level+"/"+cdlevel);
         equip.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
                 describe.setVisible(false);
-                equip.setText("Press a Key");
+                advance.setVisible(false);
+                advanceCd.setVisible(false);
+                equip.setText(" Press a Key");
                 equip.requestFocus();
             }
         });
@@ -479,6 +518,8 @@ class SkillPanel extends JPanel{
                     Global.player.changeMapping(e.getButton(), move);
                     Global.display.requestFocus();
                     describe.setVisible(true);
+                    advance.setVisible(true);
+                    advanceCd.setVisible(true);
                     refresh();
                 }
             }
@@ -489,6 +530,8 @@ class SkillPanel extends JPanel{
                 Global.player.changeMapping(e.getKeyCode(), move);
                 Global.display.requestFocus();
                 describe.setVisible(true);
+                advance.setVisible(true);
+                advanceCd.setVisible(true);
                 refresh();
             }
         });

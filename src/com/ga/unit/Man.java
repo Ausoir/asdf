@@ -2,50 +2,54 @@ package com.ga.unit;
 
 import com.ga.game.Settings;
 import com.ga.map.Global;
-import com.ga.tool.EventTimer;
 import com.ga.tool.Line;
 import com.ga.tool.P;
-import com.ga.unit.intelligence.Intelligence;
-import com.ga.unit.intelligence.Speech;
 import com.ga.unit.item.Armor;
+import com.ga.unit.item.Projectile;
 import com.ga.unit.item.Weapon;
-import com.ga.unit.skill.Buff;
+import com.ga.unit.skill.Buffs;
 import com.ga.unit.skill.Skills;
 import com.ga.unit.skill.Stat;
 
 import java.awt.*;
 
+import static com.ga.unit.ClipMan.FIST;
+import static com.ga.unit.ClipMan.OFIST;
+
 /**
  * Created by Ga on 5/7/2016.
  */
 public class Man extends Unit {
-    public int height;
-    public String speechType;
-    public ClipMan clip;
-    public Actions state = Actions.Idle;
-    public boolean jump = false;
-    public Intelligence brain;
-    public EventTimer delay = new EventTimer(5, false, null);
-    public Weapon weapon;
-    public Armor armor;
-    public P target = new P();
-    private Speech speech = new Speech(this);
-    public Stats stats = new Stats();
-    protected HealthBar hp;
+    protected Weapon weapon;
+    protected Armor armor;
+    protected Shadow shadow;
 
     public Man(String name, P pt, int seed) {
-        super(name, seed, pt, 10);
+        super("unit/"+name, pt, seed);
+        shadow = new Shadow(pos);
+        this.name = name;
         clip = new ClipMan(this);
-        height = clip.getHeight();
-        hp = new HealthBar(get("health"), pos);
-        new Shadow(pos);
         speechType = name.toLowerCase();
+        moveset.put("Melee",new Moveset[]{Actions.Kick, Actions.Weapon, Actions.Swing, Actions.Pierce});
+        moveset.put("Range",new Moveset[]{Skills.Fireworks});
+        moveset.put("Random",new Moveset[]{Skills.Adrenaline});
+    }
+
+    public Man(String name, P pt){
+        super(name,pt,0);
+        shadow = new Shadow(pos);
+        clip = new ClipMan(this);
+    }
+
+    public void reset(){
+        super.reset();
+        Updater.addQueue.add(shadow);
     }
 
     public void setWeapon(Weapon p){
         weapon = p;
         weapon.pos = pos;
-        weapon.setOrgan(clip.organs[ClipMan.FIST]);
+        weapon.setOrgan(clip.organs[FIST]);
         weapon.dir = dir;
         if (!p.name.equals("Fist")){
             clip.localAnimation[0] = clip.localAnimation[2];
@@ -56,143 +60,129 @@ public class Man extends Unit {
 
     public void setArmor(Armor p){
         armor = p;
-        clip.organs[1].setStyle(p.color1.darker(), 9);
-        clip.organs[2].setStyle(p.color2.darker(), 13);
-        clip.organs[3].setStyle(p.color2, 13);
-        clip.organs[4].setStyle(p.color1, 15);
-        clip.organs[5].setStyle(p.color1, 9);
+        clip.organs[0].color = p.color1.darker();
+        clip.organs[1].color = p.color2.darker();
+        clip.organs[2].color = p.color2;
+        clip.organs[3].color = p.color1;
+        clip.organs[4].color = p.color1;
     }
 
     public Weapon getWeapon(){
         return weapon;
     }
 
+    @Override
     public void remove() {
         super.remove();
-        Updater.remove(this);
+        if (shadow != null) shadow.remove();
+        if (speech != null) speech.remove();
     }
 
-    public void say(String p) {
-        speech.say(p);
+    public void rotateWeapon(P p){
+        weapon.rotate(p);
     }
 
-    public boolean isSpeaking(){
-        return speech.isSpeaking();
+    public float getReach(){
+        return weapon.getPoint().getSubtract(pos).getDist();
     }
 
-    public void hear(Unit pos, String p){
-        if (brain != null) brain.hear(pos, p);
+    @Override
+    public P getHand(){
+        return pos.getAdd(clip.organs[FIST].ptd);
     }
-
-    public void setState(Moveset state) {
-        if (!delay.over() || !jump) return;
-        if (this.state != state) {
+    protected boolean stateSet(Moveset state){
+        if (state == Actions.Weapon){
+            setState(weapon.action);
+            return true;
+        }
+        String statreq = state.getStatReq();
+        float req = state.getCost();
+        if (req < 0){
+            if (statreq.equals("Stamina")) req = weapon.weight*-req;
+            else if (statreq.equals("Energy")) req = (armor.weight+weapon.weight)*-req;
+        }
+        if (statreq == null || get(statreq).require((int) req)) {
             stats.unrest();
-            String statreq = state.getStatReq();
-            float req = state.getCost();
-            Actions action = null;
-            if (state instanceof Actions) action = (Actions) state;
-            if (action != null) {
-                switch (action) {
-                    case Weapon:
-                        setState(weapon.getMoveset());
-                        return;
-                    case WalkL:
-                        face(-1);
-                        break;
-                    case WalkR:
-                        face(1);
-                        break;
-                }
-            }
-            if (req < 0){
-                if (statreq.equals("arms")) req = weapon.weight*-req;
-                else if (statreq.equals("legs")) req = armor.weight*-req;
-            }
-            if (statreq == null || get(statreq).require((int) req)){
-                delay.set(state.getDel());
-                vel.x *= state.getVelX();
-                if (action != null) {
-                    this.state = action;
-                    clip.setState(action);
-                    stateSet(action);
-                    if (brain != null) brain.setState(action);
-                } else {
-                    Skills t = (Skills) state;
-                    clip.setState(t.getAction());
-                    delay.performer = t.getEvent(this);
-                }
+            super.stateSet(state);
+            actionSet(state, 1);
+            return true;
+        }
+        return false;
+    }
+    protected void actionSet(Moveset state, int level){
+        if (state instanceof Actions) {
+            switch ((Actions) state) {
+                case Idle:
+                    if (!weapon.name.equals("Fist")) {
+                        if (!get("Stamina").isFull() || !get("Energy").isFull())
+                            clip.setState(Actions.Exhausted);
+                    }
+                    break;
+                case Duck:
+                    vel.x = 0;
+                    if (Global.map.fallSafe(pos.getAdd(vel))) pos.y += Settings.gravity;
+                    break;
+                case Jump:
+                    vel.y -= 40 - (level * 2);
+                    jump = false;
+                    break;
+                case Riposte:
+                    damageMod = 1 + (level * .5f);
+                    break;
+                case Stab:
+                    damageMod = 2 + level;
+                    break;
+                case Pierce:
+                    damageMod = .5f + ((Math.abs(vel.x) * level) / 20);
+                    break;
+                case Lunge:
+                    damageMod = level * .2f;
+                    break;
+                case Dash:
+                    vel.x -= 10 * dir;
+                    delay.time += 2 * level;
+                    delay.max += 2 * level;
+                    damageMod = level * .5f;
+                    break;
+                case Whirlwind:
+                    delay.time += 30 * level;
+                    damageMod = .5f + ((float) level * .5f);
+                    break;
+                case Throw:
+                    damageMod = level;
+                    break;
+                default:
+                    damageMod = .5f + (level * .5f);
             }
         }
     }
 
-    public void stateSet(Actions state){
-        switch (state){
-            case Idle:
-                if (!weapon.name.equals("Fist")){
-                    if (!get("arms").isFull() || !get("legs").isFull())
-                        clip.setState(Actions.Exhausted);
-                }
-                break;
-            case Duck:
-                vel.x = 0;
-                if (Global.map.fallSafe(pos.getAdd(vel))) pos.y+= Settings.gravity;
-                break;
-            case Jump:
-                vel.y -= 50;
-                jump = false;
-                break;
-        }
-    }
-
-    public void face(int dir) {
-        if (!delay.over() || !jump || this.dir == dir) return;
-        this.dir = dir;
-        weapon.dir = dir;
-        clip.setClip();
-    }
-
-    public void face(P p) {
-        face(p.x - pos.x > 0 ? 1 : -1);
-    }
-
-    @Override
-    public void hit(Unit hitter, int damage) {
-        if (state == Actions.Down || state == Actions.Hit) return;
-        if (stats.hasEffect(Buff.Evade)) return;
-        damage = (int) Math.max(0,damage - armor.getArmor());
-        delay.set(0);
-        int x = hitter.pos.x - pos.x > 0 ? 1 : -1;
-        face(x < 0 ? -1 : 1);
-        float ratio = (float) damage * 10 / get("health").getMax();
-        float knockback = Math.min(ratio, 50);
-        if (ratio > 100) setState(Actions.Down);
-        else setState(Actions.Hit);
-        vel.x = knockback*x;
-        vel.y = -knockback * 1.5f - 10;
-        jump = false;
-        hurt(damage);
-        if (state != Actions.Dead) {
-            say("@hit");
-            if (brain != null && hitter instanceof Man){
-                brain.hit((Man) hitter);
-            }
-        }
-    }
-
-    @Override
-    public boolean checkHit(Unit hitter, Line p, int force){
-        if (faction != hitter.faction) {
-            if (p.lineCross(new Line(clip.organs[0].ptd,clip.organs[2].ptd).getAdd(pos))){
-                hit(hitter, force);
-                return true;
-            }
+    public boolean face(int dir) {
+        if (super.face(dir)) {
+            weapon.dir = dir;
+            clip.setClip();
+            return true;
         }
         return false;
     }
 
+    @Override
+    public int getDamage(){
+        return (int) ((weapon.getDamage()+get("Proficiency").get())*damageMod);
+    }
+
+    @Override
+    public boolean hit(Matter hitter) {
+        if (super.hit(hitter)) {
+            armor.use(this);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public boolean isExhausted(){
-        return get("arms").get() < weapon.weight && get("legs").get() < armor.weight;
+        return get("Stamina").get() < weapon.weight && get("Energy").get() < armor.weight;
     }
 
     public Stat get(String p){
@@ -201,114 +191,100 @@ public class Man extends Unit {
 
     public void hurt(int damage) {
         hp.show();
-        get("health").add(-damage);
-        if (get("health").get() <= 0) die();
+        get("Health").add((int) -Math.max(0, damage-armor.getArmor()));
+        if (get("Health").get() <= 0) die();
     }
 
     public void die() {
         say("@x");
-        brain = null;
-        delay.set(5);
-        jump = true;
-        state = Actions.Dead;
-        height = 0;
-        clip.setState(Actions.Dead);
-        setDepth(9);
-        delay.set(-1);
+        super.die();
     }
 
-    public void attack() {
-        Unit hit;
-        int dam = weapon.getDamage() + get("damage").get();
+    private void attack() {
+        Matter hit;
         boolean cleave = false;
-        if (stats.endEffect(Buff.Cleave)) cleave = true;
-        if (state == Actions.Stab) dam *= 4;
-        else if (state == Actions.Pierce) dam += Math.abs(vel.x);
-        else if (state == Actions.Swing) cleave = true;
-        hit = Updater.collide(this, weapon.getLine(), dam, cleave);
+        if (state == Actions.Swing) cleave = true;
+        else if (stats.triggerEffect(Buffs.Cleave)) cleave = true;
+        Line hitbox = weapon.getLine();
+        hit = Updater.collide(this, hitbox, cleave);
         if (hit != null){
-            P pt = weapon.getPoint();
-            Particle.explode(pt,pt.getAdd(clip.organs[ClipMan.FIST].ptd.getMinus()),10,20,true);
+            if (state == Actions.Riposte){
+                cooldown.put(state,new int[]{Global.getTime()[0]+24});
+            }
             if (brain != null) brain.attacked();
-        }
-    }
-
-    @Override
-    public void collide(){
-        P op = pos.getAdd(0,height);
-        P vp = op.getAdd(vel);
-        Line pp = new Line(op,vp);
-        for (Line i : Global.map.land){
-            if (i.lineCross(pp)){
-                float slope = i.getSlope();
-                float t = (slope * vel.x * 10000 - 5) / 10000f;
-                if (t < vel.y) {
-                    if (Math.abs(vel.x) > 0 && t < 0) {
-                        float xforce = (float) Math.cos(Math.atan(t));
-                        if (xforce < .07){
-                            vel.set(0,0);
-                        } else vel.x *= xforce;
-                    }
-                    vel.x *= .9f;
-                    onCollide(i);
-                } else if (i.opt == 1){
-                    vel.y = 0;
-                    onCollide(i);
-                }
+            if (stats.triggerEffect(Buffs.Empower)){
+                Particle.explode("Blood",hitbox.ptd,P.getZero(),12,20,0,true,3);
+                Particle.explode("Fire",hitbox.ptd,P.getZero(),30,8,0,false,3);
             }
         }
     }
 
     @Override
-    public void onCollide(Line l){
-        super.onCollide(l);
-        jump = true;
-    }
-
-    private void stateUpdate(){
-        if (state == Actions.WalkL) vel.x = -get("speed").get()/10;
-        else if (state == Actions.WalkR) vel.x = get("speed").get()/10;
-        else if (state == Actions.Rest) stats.rest();
-        if (!weapon.name.equals("Fist")) {
-            switch (state){
-                case Whirlwind:
-                    weapon.rotation = delay.time * -weapon.dir;
+    protected void moveTriggered(int organ){
+        if (organ == FIST) {
+            switch (state) {
+                case Stab:
+                case Pierce:
+                case Riposte:
+                case Lunge:
                     attack();
                     break;
-                case Swing:
-                    weapon.rotation = weapon.dir + delay.time * .2f * -weapon.dir;
-                    if (delay.time < 12) attack();
-                    break;
-                case Stab:
-                    if (delay.time < 10) attack();
-                    break;
                 case Dash:
-                    if (delay.time == 20){
-                        vel.set(get("speed").get()*dir,-10);
-                    } else if (delay.time < 20){
-                        attack();
+                    vel.set(get("Speed").get() * dir * (damageMod / 2), -10);
+                    break;
+                case Throw:
+                    if (!weapon.name.equals("Fist")) {
+                        Projectile p = new Projectile("item/" + weapon.name, pos.getAdd(clip.organs[OFIST].ptd), Global.player.mP.getAdd(pos), 50) {
+                            @Override
+                            public void stuck() {
+                                if (tangible) Particle.explode("Fire", pos, vel, 20, 10, 15, true, 3);
+                                super.stuck();
+                            }
+                        };
+                        p.rotSpeed = .03f;
+                        p.faction = faction;
+                        p.damage = getDamage();
+                        p.gravity = true;
+                        cooldown.put(state, new int[]{Global.getTime()[0] + 30});
+                    }
+                    break;
+                case Leap:
+                    if (jump) {
+                        vel.y -= 80;
+                        vel.x = get("Speed").get() * dir;
+                        jump = false;
                     }
                     break;
             }
+        } else if (organ == clip.FOOT && state == Actions.Kick){
+            Updater.collide(this, clip.organs[clip.FOOT].getAdd(this.pos), false);
         }
     }
 
     @Override
-    public void update() {
-        stats.update();
-        delay.update();
-        clip.update();
-        stateUpdate();
-        super.update();
-        if (brain != null) brain.update();
+    protected void stateUpdate(){
+        super.stateUpdate();
+        switch (state) {
+            case Dash:
+                attack();
+                break;
+            case Whirlwind:
+                weapon.rotation = delay.time * -weapon.dir;
+                attack();
+                break;
+            case Swing:
+                weapon.rotation = weapon.dir + delay.time * .2f * -weapon.dir;
+                attack();
+                break;
+        }
     }
 
     public void drawDebug(Graphics2D g) {
         g.setColor(Color.white);
-        P fist = clip.organs[ClipMan.FIST].ptd.getAdd(pos);
-        P foot = clip.organs[ClipMan.FOOT].ptd.getAdd(pos);
+        P fist = clip.organs[FIST].ptd.getAdd(pos);
+        P foot = clip.organs[clip.FOOT].ptd.getAdd(pos);
         P t = Global.getRelPos((int) (clip.organs[0].pt.x + pos.x), (int) (clip.organs[0].pt.y + pos.y));
-        g.drawArc((int) t.x, (int) t.y, 20, 20, 0, 360);
+        g.drawArc((int)(t.x-(size.x/2)), (int) (t.y-(size.y/2)), (int)size.x, (int)size.y, 0, 360);
         t = Global.getRelPos((int) fist.x, (int) fist.y);
         g.drawArc((int) t.x, (int) t.y, 3, 3, 0, 360);
         t = Global.getRelPos((int) foot.x, (int) foot.y);
@@ -317,28 +293,30 @@ public class Man extends Unit {
         t = Global.getRelPos((int) weapon.getPoint().x, (int) weapon.getPoint().y);
         g.drawArc((int) t.x, (int) t.y, 3, 3, 0, 360);
         g.setColor(Color.blue);
-        t = Global.getRelPos((int) (pos.x), (int) (height + pos.y));
+        t = Global.getRelPos((int) (pos.x), (int) (pos.y));
         g.drawArc((int) t.x, (int) t.y, 5, 5, 0, 360);
     }
 
     @Override
     public void draw(Graphics2D g) {
-        weapon.draw(g);
-        for (Organ i : clip.organs) {
-            g.setStroke(i.stroke);
-            g.setColor(i.color);
-            i.draw(g, pos, 1);
-        }
-        super.draw(g, clip.organs[0].ptd);
+        if (weapon != null) weapon.draw(g);
+        super.draw(g);
 //        drawDebug(g);
+    }
+
+    public Armor getArmor() {
+        return armor;
+    }
+
+    public void revive() {
+        super.revive();
+        clip.setState(state);
     }
 
     @Override
     public String toString(){
-        if (state == Actions.Dead) return "";
-        pos.y -= height;
         String r = super.toString();
-        pos.y += height;
+        if (!r.equals("")) return "M:"+r;
         return r;
     }
 }

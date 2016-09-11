@@ -10,7 +10,7 @@ public interface Moveset {
 
     float getCost();
 
-    float getVelX();
-
     int getDel();
+
+    int getCooldown();
 }

@@ -11,7 +11,8 @@ public class Armor extends Item {
     public Color color1 = Color.green;
     public Color color2 = Color.blue;
     public Armor(String name, int seed, int weight, int uses, float armor) {
-        super(name, seed, weight, uses, 100);
+        super(name, seed, weight, uses, 100, .04f);
+        type = Tag.Armor;
         this.armor = armor;
         this.name = name;
     }
@@ -35,6 +36,9 @@ public class Armor extends Item {
     public String getDescription(){
         String r = super.getDescription();
         r = r.replace(" uses "," durability ");
-        return r + " This armor decreases damage by "+armor+" points.";
+        if (emod != null){
+            r += " This armor has "+getProbability()*100+"% chance of activating its enchantment on being hit.";
+        }
+        return r + " This armor decreases damage by "+getArmor()+" points.";
     }
 }

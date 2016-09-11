@@ -2,8 +2,8 @@ package com.ga.map;
 
 import com.ga.game.Display;
 import com.ga.game.Settings;
-import com.ga.unit.intelligence.PlayerInput;
 import com.ga.tool.P;
+import com.ga.unit.intelligence.PlayerInput;
 
 import java.util.Random;
 
@@ -12,13 +12,14 @@ import java.util.Random;
  */
 public class Global {
     public static Map map;
+    public static Weather weather;
     public static PlayerInput player;
     public static P camera = new P();
     public static Display display;
     public static Random r = new Random();
     private static float[] sinv = new float[360];
     private static float[] cosv = new float[360];
-    private static int time = 0;
+    private static int[] time = new int[]{0};
     public static void init(){
         for (int i=0;i<360;i++){
             sinv[i] = (float)Math.sin(Math.toRadians(i));
@@ -48,29 +49,40 @@ public class Global {
     public static float clamp(float p, float min, float max){
         return Math.max(Math.min(p,max),min);
     }
+    public static int nextGaussian(int p){
+        return (int) (r.nextGaussian()*p);
+    }
     public static float rng(float max){
         return clamp((float)r.nextGaussian(),-max,max);
     }
     public static void p(String p){
         System.out.println(p);
     }
-    public static void mapEdge(){
-        Global.camera.set(
-                Global.clamp(Global.camera.x, Settings.centerX, Global.map.map.size.x-Settings.centerX),
-                Global.clamp(Global.camera.y, Settings.centerY, Global.map.map.size.y-Settings.centerY)
-        );
+    public static boolean mapEdge(P p){
+        return p.set(clamp(p.x, 0, Global.map.map.size.x),
+            clamp(p.y, 0, Global.map.map.size.y));
+    }
+    public static void mapEdgeCenter(P p){
+        p.set(clamp(p.x, Settings.centerX, Global.map.map.size.x-Settings.centerX),
+                clamp(p.y, Settings.centerY, Global.map.map.size.y-Settings.centerY));
     }
     public static int checkCooldown(int[] p, int cd){
-        return cd-(time-p[0]);
+        return cd-(time[0]-p[0]);
     }
     public static boolean cooldown(int[] p, int cd){
-        if (time - p[0] >= cd){
-            p[0] = time;
+        if (time[0] - p[0] >= cd){
+            p[0] = time[0];
             return true;
         }
         return false;
     }
     public static void update(){
-        time++;
+        time[0]++;
+    }
+    public static void setTime(int p){
+        time[0] = p;
+    }
+    public static int[] getTime(){
+        return time;
     }
 }

@@ -35,7 +35,7 @@ public class Merchant extends Intelligence {
     private int offer = -1;
     public Merchant(Man man) {
         super(man);
-        host.faction = -1;
+        host.faction = Faction.Neutral;
         type = MerchantType.values()[man.rand.nextInt(MerchantType.values().length)];
         wares = type.get();
         values = new int[wares.length];
@@ -45,7 +45,7 @@ public class Merchant extends Intelligence {
         }
     }
     @Override
-    public void hear(Unit u, String p){
+    public void hear(Matter u, String p){
         super.hear(u,p);
         task = new Idle(host);
         host.face(u.pos);
@@ -53,9 +53,9 @@ public class Merchant extends Intelligence {
         if (Word.Interest.is(p)) {
             String r = "I'm selling ";
             for (int i = 0; i < type.items.length - 1; i++) {
-                r += type.items[i].replace("_"," ") + ", ";
+                r += wares[i].getFullName().replace("_"," ") + ", ";
             }
-            r += "and " + type.items[type.items.length - 1].replace("_"," ") + "!";
+            r += "and " + wares[type.items.length - 1].getFullName().replace("_"," ") + "!";
             host.say(r);
         } else if (Word.Negative.is(p)) {
             host.say("@denied");
@@ -80,7 +80,7 @@ public class Merchant extends Intelligence {
         }
     }
     private int fluctuate(int value){
-        float fluc = (host.rand.nextFloat()*(high-low))+low;
+        float fluc = (float) ((host.rand.nextFloat()*(high-low))+low);
         return (int) (value * fluc);
     }
     private void describe(int offer){
@@ -91,7 +91,7 @@ public class Merchant extends Intelligence {
         host.say(r);
     }
     @Override
-    public void perceived(Unit p){
+    public void perceived(Matter p){
         if (p instanceof Man) {
             if (target != p) {
                 target = (Man) p;

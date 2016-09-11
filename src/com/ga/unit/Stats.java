@@ -2,7 +2,8 @@ package com.ga.unit;
 
 import com.ga.map.Global;
 import com.ga.tool.Timer;
-import com.ga.unit.skill.Buff;
+import com.ga.unit.skill.Buffs;
+import com.ga.unit.skill.Skill;
 import com.ga.unit.skill.Stat;
 
 import java.util.*;
@@ -11,33 +12,46 @@ import java.util.*;
  * Created by Ga on 8/1/2016.
  */
 public class Stats {
-    private ArrayList<Buff> effects = new ArrayList<>();
+    private ArrayList<Buffs> effects = new ArrayList<>();
     private ArrayList<Timer> effectTimes = new ArrayList<>();
+    private ArrayList<int[]> effectLevels = new ArrayList<>();
+    private ArrayList<Skill> effectEffects = new ArrayList<>();
     private HashMap<String, Stat> stats = new HashMap<String, Stat>(){{
-        put("health", new Stat((int) (Global.rng(100)+Global.r.nextInt(20)+5)));
-        put("speed", new Stat((int) (Global.rng(50)+Global.r.nextInt(30)+50)));
-        put("arms", new Stat(3));
-        put("legs", new Stat(3));
-        put("damage", new Stat(1));
+        put("Health", new Stat(Global.nextGaussian(50)+15));
+        put("Speed", new Stat((int) (Global.rng(50)+Global.r.nextInt(30)+50)));
+        put("Stamina", new Stat(3));
+        put("Energy", new Stat(3));
+        put("Proficiency", new Stat(1));
     }};
-    private Timer timer = new Timer(100, true);
-    public Stats(){
+    private Timer timer = new Timer(150, true);
+    private Unit host;
+    public Stats(Unit host){
+        this.host = host;
     }
     public Stat getStat(String p) {
-        return stats.get(p);
+        Stat stat = stats.get(p);
+        if (stat == null) Global.p("Can't find stat "+p);
+        return stat;
     }
     public void setStat(String name, Stat p) {
         stats.put(name,p);
     }
-    public void addEffect(Buff p){
-        if (p.stat != null) {
-            if (p.buffRel != null) stats.get(p.stat).add((int) p.buff * stats.get(p.buffRel).getMax(), true);
-            else stats.get(p.stat).add((int) p.buff, true);
+    public void addEffect(Buffs p, int level){
+        if (!hasEffect(p)) {
+            if (p.stat != null) {
+                if (p.buffRel != null) stats.get(p.stat).add(Math.round(p.buff * stats.get(p.buffRel).getMax()), true);
+                else stats.get(p.stat).add((int) p.buff, true);
+            }
+            if (p.effect != null) {
+                p.effect.start(host, level);
+            }
+            effectTimes.add(new Timer(p.time * level));
+            effectLevels.add(new int[]{level});
+            effectEffects.add(p.effect);
+            effects.add(p);
         }
-        effectTimes.add(new Timer(p.time));
-        effects.add(p);
     }
-    public boolean hasEffect(Buff p){
+    public boolean hasEffect(Buffs p){
         return effects.contains(p);
     }
     public void end(){
@@ -45,46 +59,57 @@ public class Stats {
             endEffect(effects.get(i));
         }
     }
-    public boolean endEffect(Buff p){
+    public boolean triggerEffect(Buffs p){
         if (hasEffect(p)){
-            if (p.stat != null) {
-                if (p.buffRel != null) stats.get(p.stat).add(-(int) p.buff * stats.get(p.buffRel).getMax());
-                else stats.get(p.stat).add(-(int) p.buff);
-            }
-            int i = effects.indexOf(p);
-            effects.remove(i);
-            effectTimes.remove(i);
+            int[] t = effectLevels.get(effects.indexOf(p));
+            t[0]--;
+            if (t[0] <= 0) endEffect(p);
+            return true;
         }
         return false;
     }
+    public void endEffect(Buffs p){
+        if (p.stat != null) {
+            if (p.buffRel != null) stats.get(p.stat).add(-(int) p.buff * stats.get(p.buffRel).getMax());
+            else stats.get(p.stat).add(-(int) p.buff);
+        }
+        int i = effects.indexOf(p);
+        effects.remove(i);
+        effectTimes.remove(i);
+        effectLevels.remove(i);
+        effectEffects.remove(i);
+    }
     public void delevel(String stat){
-        if (stats.get("adapt").get() > 0 && stats.get(stat).get() > 0) {
-            stats.get("points").addTotal(1);
-            stats.get(stat).addTotal(-1);
-            stats.get("adapt").addTotal(-1);
+        if (stats.get("Reset Points").get() > 0 && stats.get(stat).get() > 0) {
+            stats.get("Level Points").addTotal(1);
+            stats.get(stat).addMax(-1);
+            stats.get("Reset Points").addTotal(-1);
         }
     }
     public void level(String stat){
-        if (stats.get("points").get() > 0) {
-            stats.get("points").addTotal(-1);
-            stats.get(stat).addTotal(1);
+        if (stats.get("Level Points").get() > 0) {
+            stats.get("Level Points").addTotal(-1);
+            stats.get(stat).addMax(1);
+            stats.get(stat).add(1);
         }
     }
     public void unrest(){
         timer.reset();
     }
-    public void rest(){
+    public void rest(float mag){
         if (timer.update()){
-            Stat arm = stats.get("arms");
-            Stat leg = stats.get("legs");
-            arm.add(Math.round(arm.getByPercentage(.34f)));
-            leg.add(Math.round(leg.getByPercentage(.34f)));
+            Stat arm = stats.get("Stamina");
+            Stat leg = stats.get("Energy");
+            arm.add(Math.round(arm.getByPercentage(mag)));
+            leg.add(Math.round(leg.getByPercentage(mag)));
         }
     }
     public void update(){
         for (int i = 0; i < effects.size(); i++) {
-            if (effectTimes.get(i).update()){
+            if (effectEffects.get(i).perform() || effectTimes.get(i).update()){
                 endEffect(effects.get(i));
+            } else{
+
             }
         }
     }
@@ -93,6 +118,7 @@ public class Stats {
         for (int i=0;i<data.length;i++){
             String[] pair = data[i].split(":");
             Stat newstat = new Stat(Integer.parseInt(pair[1].split(",")[0]),Integer.parseInt(pair[1].split(",")[1]));
+            newstat.add(0);
             newstat.onChange = stats.get(pair[0]).onChange;
             stats.put(pair[0], newstat);
         }

@@ -2,15 +2,15 @@ package com.ga.unit.intelligence;
 
 import com.ga.tool.P;
 import com.ga.unit.Actions;
-import com.ga.unit.Man;
+import com.ga.unit.Unit;
 
 /**
  * Created by Ga on 7/30/2016.
  */
 public class Search implements Task {
-    private Man host;
+    private Unit host;
     private P target;
-    public Search(Man host, P pos){
+    public Search(Unit host, P pos){
         this.host = host;
         target = pos;
     }

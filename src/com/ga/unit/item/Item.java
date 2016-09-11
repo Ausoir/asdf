@@ -1,9 +1,13 @@
 package com.ga.unit.item;
 
 import com.ga.map.Global;
+import com.ga.map.ManFactory;
+import com.ga.tool.P;
 import com.ga.unit.Actions;
 import com.ga.unit.Man;
 import com.ga.unit.Thing;
+import com.ga.unit.skill.Curse;
+import com.ga.unit.skill.Skills;
 import com.ga.unit.skill.Stat;
 
 import java.util.Random;
@@ -12,8 +16,19 @@ import java.util.Random;
  * Created by Ga on 8/5/2016.
  */
 public class Item extends Thing {
+    public enum Tag{
+        Sword(Actions.Swing), Spear(Actions.Pierce), Mace(Actions.Swing), Dagger(Actions.Riposte), Armor(Actions.Rest), Scroll(Actions.Cast),
+        Throwing(Actions.Throw), Shooting(Actions.Shoot), Consumable(Actions.Consume);
+        Actions action;
+        Tag(Actions p){
+            action = p;
+        }
+        public Actions getAction() {
+            return action;
+        }
+    }
     enum SpecialtyMod{
-        None, Light, Heavy, Feather, Sharp, Dull, Quick, Slow, Durable, Tough;
+        None, Light, Heavy, Feather, Sharp, Dull, Quick, Slow, Durable, Tough, Runic, Instant, Cursed;
         static SpecialtyMod get(Random seed){
             if (seed.nextGaussian() > 1) return values()[seed.nextInt(values().length)];
             return None;
@@ -54,55 +69,73 @@ public class Item extends Thing {
             else return None;
         }
     }
-    enum EnchantMod {
-        None(100), Vampirism(1), Whirlwind(1), Dashing(1), Adrenaline(1), Cleaving(1);
-        static int pool;
-        int weight;
-        EnchantMod(int weight){
-            expandPool(weight);
-            this.weight = weight;
+    enum AdenchantMod{
+        None(2,.15f), Minor(1,.1f), Major(3,.25f), Greater(4,.35f), Ultimate(5,.4f);
+        int level;
+        float magnitude;
+        AdenchantMod(int level, float mag){
+            this.level = level;
+            this.magnitude = mag;
         }
-        void expandPool(int weight){
-            pool += weight;
-        }
-        static EnchantMod get(Random seed){
-            int r = seed.nextInt(pool);
-            int t = 0;
-            for (EnchantMod i : values()){
-                t+=i.weight;
-                if (t >= r) return i;
-            }
-            return None;
+        static AdenchantMod get(Random seed){
+            float t = (float) seed.nextGaussian();
+            if (t > 2.5) return Ultimate;
+            else if (t > 2) return Greater;
+            else if (t > 1.5) return Major;
+            else if (t < -1) return Minor;
+            else return None;
         }
     }
     AdverbMod admod;
+    AdenchantMod ademod;
     SpecialtyMod smod;
     PrefixMod pmod;
-    EnchantMod emod;
+    Skills emod = null;
     public int weight;
     protected int cooldown = 100;
     public int delay = 10;
+    protected float probability;
     public Actions action = Actions.Consume;
     private int[] lastused = new int[]{0};
     public Stat uses = new Stat(1);
-    public Item(String name, int seed, int weight, int uses, int cooldown) {
-        super(name, seed);
+    protected Tag type = Tag.Consumable;
+    public Item(String name, int seed, int weight, int uses, int cooldown, float enchantRatio) {
+        super("item/"+name, seed);
+        this.name = name;
         this.weight = weight;
         this.uses.setTotal(uses);
         this.cooldown = cooldown;
         admod = AdverbMod.get(rand);
         pmod = PrefixMod.get(rand);
         smod = SpecialtyMod.get(rand);
-        emod = EnchantMod.get(rand);
-        setModifier(PrefixMod.get(rand));
-        setModifier(SpecialtyMod.get(rand));
+        probability = enchantRatio;
+        if (rand.nextFloat() < enchantRatio) {
+            ademod = AdenchantMod.get(rand);
+            emod = Skills.values()[rand.nextInt(Skills.values().length)];
+            probability = ademod.magnitude;
+        }
+        setModifier(pmod);
+        setModifier(smod);
+    }
+    public void setType(Tag p){
+        this.type = p;
+        this.action = p.getAction();
     }
     protected void setModifier(PrefixMod mod){
         if (mod == PrefixMod.Broken) uses.addTotal((int) (uses.getMax()*-.7f));
         else if (mod == PrefixMod.Old) uses.addTotal((int) Math.min(-1,uses.getMax()*-.3f));
-        else if (mod == PrefixMod.Fine) uses.addTotal(Math.max(1,uses.getMax()));
-        else if (mod == PrefixMod.Mastercraft) uses.setTotal(-1);
-        else if (mod == PrefixMod.Legendary) uses.setTotal(-1);
+        else if (mod == PrefixMod.Fine){
+            uses.addTotal(Math.max(1,uses.getMax()));
+            probability += .1f;
+        }
+        else if (mod == PrefixMod.Mastercraft){
+            uses.setTotal(-1);
+            probability += .2f;
+        }
+        else if (mod == PrefixMod.Legendary){
+            uses.setTotal(-1);
+            probability += .3f;
+        }
         if (uses.getMax() < 0 && (mod != PrefixMod.Mastercraft && mod != PrefixMod.Legendary)) uses.setTotal(0);
     }
     protected void setModifier(SpecialtyMod mod){
@@ -116,13 +149,14 @@ public class Item extends Thing {
         else if (mod == SpecialtyMod.Quick) cooldown *= 1-(.2f*admod.magnitude);
         else if (mod == SpecialtyMod.Slow) cooldown *= 1+(.2f*admod.magnitude);
         else if (mod == SpecialtyMod.Durable) uses.addTotal(uses.getMax());
+        else if (mod == SpecialtyMod.Runic) probability += .2f;
+        else if (mod == SpecialtyMod.Instant) delay = 1;
     }
     public int getRarity(){
-        return pmod.ordinal()+(smod != SpecialtyMod.None?10:0)+(emod != EnchantMod.None?100:0);
+        return pmod.ordinal()+(smod != SpecialtyMod.None?10:0)+(emod != null?100:0);
     }
     public int getValue(){
-        int r = 9999999;
-        boolean enchanted = emod != EnchantMod.None;
+        int r;
         int adverb = admod.ordinal()+1;
         boolean special = smod != SpecialtyMod.None;
         switch (pmod.ordinal()){
@@ -141,15 +175,17 @@ public class Item extends Thing {
             case 4:
                 r = 5000;
                 break;
-            case 5:
+            default:
                 r = 50000;
                 break;
         }
-        if (enchanted){
+        if (smod == SpecialtyMod.Cursed){
+            r = 1;
+        } else if (special) r += (r*adverb);
+        if (emod != null){
             r += 500;
             r *= 2;
         }
-        if (special) r += (r*adverb);
         return r;
     }
     public String getRarityDescription(){
@@ -167,27 +203,52 @@ public class Item extends Thing {
         if (smod != SpecialtyMod.None) r+=smod.name()+" ";
         if (pmod != PrefixMod.None) r+=pmod.name()+" ";
         r += name;
-        if (emod != EnchantMod.None) r+=" of "+emod.name();
+        if (emod != null){
+            r+=" of ";
+            if (ademod != AdenchantMod.None){
+                r += ademod.name()+" ";
+            }
+            r+=emod.getName();
+        }
         r = r.replace("_"," ");
         return r;
     }
-    public void unequip(){}
+    public void unequip(Man host){
+        if (smod == SpecialtyMod.Cursed){
+            Curse.get(host, 5);
+        }
+    }
+    protected float getProbability(){
+        return probability+ademod.magnitude;
+    }
     public boolean use(Man host){
         if (uses.get() != 0 && Global.cooldown(lastused, cooldown)) {
-            uses.add(-1);
+            if (uses.get() != -1) uses.add(-1);
+            if (emod != null && rand.nextFloat() < getProbability()){
+                emod.getEvent().start(host, ademod.level);
+                emod.getEvent().perform();
+            }
             return true;
         }
         return false;
+    }
+    public void drop(Man host) {
+        pos = new P(host.pos);
+        setDepth(8);
+        rotation = (float)Global.r.nextInt(628)/100;
     }
     public String getDescription() {
         String r = "a "+getFullName()+".";
         int uses = this.uses.get();
         r+= " Weighs "+weight+" and has "+(uses==-1?"infinite":uses)+" uses left.";
-        if (emod != EnchantMod.None){
-            r += " This item is magically enchanted with "+emod.name()+". The item's cooldown is "+cooldown/10+" seconds.";
+        if (emod != null){
+            String ade = "";
+            if (ademod != AdenchantMod.None) ade = "Level "+ademod.level+" ";
+            r += " This "+getRarityDescription()+" item is magically enchanted with "+ade+emod.name();
+            r += ". The item's cooldown is "+cooldown+" seconds.";
             int cd = Global.checkCooldown(lastused, cooldown);
             if (cd <= 0) r += " Currently the item is ready to use.";
-            else r += " Currently the item needs "+cd/10+" more seconds to recharge.";
+            else r += " Currently the item needs "+cd+" more seconds to recharge.";
         }
         return r;
     }

@@ -1,12 +1,11 @@
 package com.ga.unit.intelligence;
 
-import com.ga.game.Display;
 import com.ga.game.FileManager;
 import com.ga.map.Drawable;
 import com.ga.map.Global;
 import com.ga.tool.P;
 import com.ga.tool.Timer;
-import com.ga.unit.Man;
+import com.ga.unit.Unit;
 import com.ga.unit.Updater;
 
 import javax.swing.*;
@@ -19,15 +18,14 @@ import java.util.HashMap;
  */
 public class Speech extends JTextArea implements Drawable{
     public static final HashMap<String,ArrayList<String>> dialogue = FileManager.readDialogue("Dialog.dlg");
-    private Man host;
+    private Unit host;
     private int[] xp, yp;
-    private int w = 300, h = 120;
     public ArrayList<String> msg = new ArrayList<>();
     private Timer timer = new Timer(-1,false);
 //    private String recent = "";
     private Color color = new Color(255,255,255,150);
     private Font font;
-    public Speech(Man host){
+    public Speech(Unit host){
         super();
         this.host = host;
         Updater.addDrawee(this);
@@ -40,18 +38,21 @@ public class Speech extends JTextArea implements Drawable{
         setMargin(new Insets(10,10,10,10));
         setEditable(false);
     }
+    public void remove(){
+        Updater.drawee.remove(this);
+    }
     public void draw(Graphics2D g){
         if (msg.size() > 0) {
-            P t = Global.getRelPos(host.pos.x, host.pos.y);
+            P t = Global.getRelPos(host.pos.x, host.pos.y-150);
             int width = Math.min(g.getFontMetrics(font).stringWidth(getText())+30, 240);
             int height = (int) getPreferredSize().getHeight();
-            setBounds((int) t.x-(width/2), (int) t.y-80-height, width, height);
+            setBounds((int) t.x-(width/2), (int) t.y-height, width, height);
             g.setColor(color);
             xp = new int[]{
                     (int) (-10+t.x), (int) (10+t.x), (int) (0+t.x)
             };
             yp = new int[]{
-                    (int) (t.y)-80, (int) (t.y)-80, (int) (t.y)-40
+                    (int) (t.y), (int) (t.y), (int) (t.y)+40
             };
             g.fillPolygon(xp, yp, xp.length);
             if (timer.update()){
