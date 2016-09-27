@@ -246,7 +246,7 @@ public class EditorInput implements Input, Observer {
         }
     }
     private Matter makeUnit(String name, P p){
-        Matter r = new Matter("unit/"+name,-1,p,9);
+        Unit r = new Man(name,p,-1);
         r.name = name;
         return r;
     }

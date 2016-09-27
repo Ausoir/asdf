@@ -3,7 +3,7 @@ package com.ga.unit;
 import com.ga.map.Global;
 import com.ga.tool.Timer;
 import com.ga.unit.skill.Buffs;
-import com.ga.unit.skill.Skill;
+import com.ga.unit.skill.Spell;
 import com.ga.unit.skill.Stat;
 
 import java.util.*;
@@ -15,15 +15,15 @@ public class Stats {
     private ArrayList<Buffs> effects = new ArrayList<>();
     private ArrayList<Timer> effectTimes = new ArrayList<>();
     private ArrayList<int[]> effectLevels = new ArrayList<>();
-    private ArrayList<Skill> effectEffects = new ArrayList<>();
+    private ArrayList<Spell> effectEffects = new ArrayList<>();
     private HashMap<String, Stat> stats = new HashMap<String, Stat>(){{
-        put("Health", new Stat(Global.nextGaussian(50)+15));
+        put("Health", new Stat(Math.abs(Global.nextGaussian(50))+15));
         put("Speed", new Stat((int) (Global.rng(50)+Global.r.nextInt(30)+50)));
         put("Stamina", new Stat(3));
         put("Energy", new Stat(3));
         put("Proficiency", new Stat(1));
     }};
-    private Timer timer = new Timer(150, true);
+    private Timer timer = new Timer(125, true);
     private Unit host;
     public Stats(Unit host){
         this.host = host;
@@ -100,8 +100,10 @@ public class Stats {
         if (timer.update()){
             Stat arm = stats.get("Stamina");
             Stat leg = stats.get("Energy");
-            arm.add(Math.round(arm.getByPercentage(mag)));
-            leg.add(Math.round(leg.getByPercentage(mag)));
+            if (mag > 0) {
+                arm.add(Math.round(arm.getByPercentage(mag)));
+                leg.add(Math.round(leg.getByPercentage(mag)));
+            }
         }
     }
     public void update(){

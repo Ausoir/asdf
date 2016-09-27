@@ -34,6 +34,13 @@ public class Line {
         float r = (float) Math.atan2(ptd.y-pt.y,ptd.x-pt.x);
         return r;
     }
+    public P getAtan(int mag){
+        float r = (float) Math.atan2(ptd.y-pt.y,ptd.x-pt.x);
+        return new P(Global.cos(r)*mag,Global.sin(r)*mag);
+    }
+    public float getLength(){
+        return ptd.getSubtract(pt).getDist();
+    }
     public boolean lineCross(Line i2){
         boolean a = i2.pt.x-pt.x >= 0, b = i2.pt.x-ptd.x > 0, c = i2.ptd.x-pt.x >= 0, d = i2.ptd.x-ptd.x > 0,
                 e = i2.pt.y-pt.y >= 0, f = i2.pt.y-ptd.y > 0, g = i2.ptd.y-pt.y >= 0, h = i2.ptd.y-ptd.y > 0;

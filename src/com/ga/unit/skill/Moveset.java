@@ -1,4 +1,4 @@
-package com.ga.unit;
+package com.ga.unit.skill;
 
 /**
  * Created by Ga on 8/30/2016.

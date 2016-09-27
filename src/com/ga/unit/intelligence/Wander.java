@@ -2,7 +2,7 @@ package com.ga.unit.intelligence;
 
 import com.ga.map.Global;
 import com.ga.tool.Timer;
-import com.ga.unit.Actions;
+import com.ga.unit.skill.Actions;
 import com.ga.unit.Unit;
 
 /**

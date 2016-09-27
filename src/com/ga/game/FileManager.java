@@ -122,7 +122,7 @@ public class FileManager {
                             }
                             if (player > -1) player--;
                         }
-                        else if (unit[0].equals("M:")) ManFactory.produce(unit[1], pos, seed);
+                        else if (unit[0].equals("Man")) ManFactory.produce(unit[1], pos, seed);
                         else new Beast(unit[0], unit[1], pos, seed);
                     }
             }
@@ -144,7 +144,7 @@ public class FileManager {
     public static int[][] readModelProperty(String dir) {
         String data = read(dir);
         int[][] result;
-        String line = data.split("%%")[0].split("%")[1];
+        String line = data.split("%")[1];
         String[] sections = line.split(";");
         result = new int[sections.length][];
         for (int section = 0; section < sections.length; section++) {
@@ -158,19 +158,17 @@ public class FileManager {
         return result;
     }
 
-    public static int[][] readModel(String dir) {
+    public static String[][] readModel(String dir) {
         String data = read(dir);
-        int[][] result;
+        String[][] result;
         String line = data.split("%")[0];
         String[] sections = line.split(";");
-        result = new int[sections.length][];
+        result = new String[sections.length][];
         for (int section = 0; section < sections.length; section++) {
             String values[] = sections[section].split(",");
-            result[section] = new int[values.length];
-            int[] v = new int[values.length];
+            result[section] = new String[values.length];
             for (int i = 0; i < values.length; i++) {
-                v[i] = Integer.parseInt(values[i]);
-                result[section][i] = v[i];
+                result[section][i] = values[i];
             }
         }
         return result;

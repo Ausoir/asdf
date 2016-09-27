@@ -5,20 +5,16 @@ import com.ga.game.Texture;
 import com.ga.map.Drawable;
 import com.ga.map.Global;
 import com.ga.tool.P;
-import com.ga.unit.item.Item;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.Random;
 
 /**
  * Created by Ga on 5/6/2016.
  */
 public class Thing implements Drawable {
-    public int seed = 0;
-    public Random rand;
     public BufferedImage image;
-    private boolean visible = true;
+    protected boolean visible = true;
     public P pos;
     public P size;
     protected int sizeRadius;
@@ -26,15 +22,12 @@ public class Thing implements Drawable {
     int depth;
     public int dir = 1;
     public float rotation = 0;
-    public Thing(String name, int seed){
+    public Thing(String dir, String name){
         this.name = name;
-        if (seed == -1) this.seed = Global.getSeed();
-        else this.seed = seed;
-        rand = new Random(this.seed);
-        if (name != null) {
-            String dir = "";
-            setImage(Texture.load(dir + name + ".png"));
-        }
+        if (dir != null && name != null) {
+            setImage(Texture.load(dir + name));
+        } else visible = false;
+        pos = new P();
     }
     protected void setImage(BufferedImage image){
         this.image = image;
@@ -44,8 +37,8 @@ public class Thing implements Drawable {
     public void rotate(P p){
         rotation = ((float) Math.atan2(p.y,p.x));
     }
-    public Thing(String name, int seed, P pt, int depth){
-        this(name, seed);
+    public Thing(String dir, String name, P pt, int depth){
+        this(dir, name);
         this.depth = depth;
         pos = pt;
         Updater.addQueue.add(this);
@@ -85,6 +78,6 @@ public class Thing implements Drawable {
         Updater.remove(this);
     }
     public String toString(){
-        return name + "@" + seed + "@" + pos;
+        return name + "@" + pos;
     }
 }

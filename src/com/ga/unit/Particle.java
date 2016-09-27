@@ -15,8 +15,7 @@ public class Particle extends Thing implements Effect {
     private P vel;
     private boolean gravity;
     public Particle(String name, P pt, P vel, float rotation, float speed, boolean gravity, int lifetime) {
-        super(null, 0, pt, 13);
-        setImage(Texture.load("effect/"+name+".png"));
+        super("effect/", name, pt, 13);
         this.vel = new P(vel);
         this.vel.add(Global.cos(rotation)*speed,Global.sin(rotation)*speed);
         this.gravity = gravity;
@@ -47,6 +46,16 @@ public class Particle extends Thing implements Effect {
     }
     public static void smoke(P pt){
         explode("Smoke",pt,P.getZero(),7,15,0,false,4);
+    }
+    public static void implode(String name, P pt, P vel, int num, int speed, int velSpeed, boolean gravity, int lifetime){
+        P t;
+        for (int i=0;i<num;i++){
+            float rot = Global.r.nextFloat()*6.28f;
+            float spd = Global.r.nextFloat()*speed;
+            t = new P(pt);
+            t.add(Global.cos(rot)*spd*lifetime,Global.sin(rot)*spd*lifetime);
+            new Particle(name,t,P.getZero(),rot-3.14f,spd, gravity, lifetime);
+        }
     }
     public static void explode(String name, P pt, P vel, int num, int speed, int velSpeed, boolean gravity, int lifetime){
         P v = vel.getAtan(velSpeed);

@@ -1,7 +1,7 @@
 package com.ga.unit.intelligence;
 
 import com.ga.tool.P;
-import com.ga.unit.Actions;
+import com.ga.unit.skill.Actions;
 import com.ga.unit.Unit;
 
 /**

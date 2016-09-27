@@ -22,6 +22,14 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
         addKeyListener(this);
         addMouseListener(this);
         addMouseMotionListener(this);
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                Settings.setScreenSize(getWidth(), getHeight());
+                menu.resize();
+                chatbox.setBounds(0,Settings.screenY-40,500,40);
+            }
+        });
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
         setDoubleBuffered(true);
@@ -31,15 +39,11 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
         chatbox.setOpaque(false);
         chatbox.setBounds(0,Settings.screenY-100,500,40);
         chatbox.setFocusable(true);
-        chatbox.addKeyListener(new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent e) {}
+        chatbox.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) chat();
             }
-            @Override
-            public void keyReleased(KeyEvent e) {}
         });
         add(chatbox);
         menu = new Menu();

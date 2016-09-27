@@ -10,7 +10,9 @@ import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.tool.Timer;
 import com.ga.unit.item.*;
-import com.ga.unit.skill.Skill;
+import com.ga.unit.skill.Actions;
+import com.ga.unit.skill.Moveset;
+import com.ga.unit.skill.Spell;
 import com.ga.unit.skill.Stat;
 
 import java.util.ArrayList;
@@ -72,7 +74,7 @@ public class Player extends Man {
         super.say(p);
     }
     public void learnSkill(Moveset p){
-        say("Learned skill "+p.getName()+"!");
+        say("Learned spell "+p.getName()+"!");
         skillTree.addSkill(p);
     }
     public void advanceSkill(Moveset p, boolean cd){
@@ -97,6 +99,7 @@ public class Player extends Man {
     }
     public boolean addItem(Item p){
         if (inventory.addItem(p)) {
+            p.pickup(this);
             get("Speed").add(-p.weight);
             return true;
         }
@@ -141,7 +144,7 @@ public class Player extends Man {
         return new int[]{super.getCooldown(state)[0]-reduction};
     }
     @Override
-    protected void startSkill(Moveset move, Skill p){
+    protected void startSkill(Moveset move, Spell p){
         p.start(this, skillTree.getSkillLevel(move));
     }
     @Override
@@ -150,20 +153,17 @@ public class Player extends Man {
     }
     public int setState(Moveset state){
         face(Global.player.mP.x > pos.x-Global.camera.x ? 1 : -1);
-        target = Global.player.mP;
+        target = Global.player.mP.getSubtract(pos.getSubtract(Global.camera));
         if (state instanceof Actions) {
             switch ((Actions) state) {
                 case Pickup:
                     grabItem();
                     break;
-                case WalkL:
-                case WalkR:
-//                    if (jump) weapon.rotation = 6f*weapon.dir;
-                    break;
                 default:
-                    weapon.rotate(target.getSubtract(pos.getSubtract(Global.camera)).getMult(dir,dir));
+                    weapon.rotate(target.getMult(dir,dir));
             }
         }
+        if (weapon.getType() == Item.Tag.Claw) weapon.rotation = (weapon.getOrgan().getAtan()+(dir<0?3.14f:0));
         int r = super.setState(state);
         if (r == 1) {
         } else if (r == 2){
@@ -176,7 +176,7 @@ public class Player extends Man {
             say("Need "+req+" more "+ statreq+"!");
         } else if (r == 3){
             int[] cdinput = getCooldown(state);
-            say("Skill is available in "+Global.checkCooldown(cdinput, state.getCooldown())+" seconds!");
+            say("Spell is available in "+Global.checkCooldown(cdinput, state.getCooldown())+" seconds!");
         } else if (r == 4){
             say("Weapon broke!");
         }

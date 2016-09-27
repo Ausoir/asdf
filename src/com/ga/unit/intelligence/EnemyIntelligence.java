@@ -1,10 +1,10 @@
 package com.ga.unit.intelligence;
 
 import com.ga.map.Global;
-import com.ga.unit.Actions;
+import com.ga.unit.skill.Actions;
 import com.ga.unit.Unit;
 import com.ga.unit.Matter;
-import com.ga.unit.skill.Skills;
+import com.ga.unit.skill.Spells;
 
 import java.util.ArrayList;
 
@@ -12,8 +12,8 @@ import java.util.ArrayList;
  * Created by Ga on 7/30/2016.
  */
 public class EnemyIntelligence extends Intelligence {
-    public ArrayList<Skills> skillset = new ArrayList<Skills>(){{
-        add(Skills.Haste);
+    public ArrayList<Spells> skillset = new ArrayList<Spells>(){{
+        add(Spells.Haste);
     }};
     public EnemyIntelligence(Unit man){
         super(man);
@@ -22,7 +22,6 @@ public class EnemyIntelligence extends Intelligence {
     public void hear(Matter u, String p){
         if (target == null){
             task = new Search(host,u.pos);
-            host.say("@hear");
             forget.set(10);
         }
     }
@@ -45,7 +44,7 @@ public class EnemyIntelligence extends Intelligence {
         forget.set(30);
     }
     public void useSkill(String p){
-        for (Skills i : skillset){
+        for (Spells i : skillset){
             if (i.getClass().getSimpleName().equals(p)){
                 host.setState(i);
             }

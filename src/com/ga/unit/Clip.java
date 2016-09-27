@@ -7,11 +7,11 @@ import java.util.HashMap;
  */
 public class Clip {
     public int[][] property;
-    public int[][] model;
+    public String[][] model;
     public int[][][] clip;
     public int[] frames;
     public HashMap<String, int[]> moveset;
-    public Clip(int[][] property, int[][] model, int[][][] clip, int[] frames, HashMap<String, int[]> moveset){
+    public Clip(int[][] property, String[][] model, int[][][] clip, int[] frames, HashMap<String, int[]> moveset){
         this.property = property;
         this.model = model;
         this.clip = clip;

@@ -5,15 +5,17 @@ import com.ga.map.Global;
 import com.ga.tool.EventTimer;
 import com.ga.tool.Line;
 import com.ga.tool.P;
+import com.ga.tool.Performer;
 import com.ga.unit.intelligence.Intelligence;
 import com.ga.unit.intelligence.Speech;
-import com.ga.unit.skill.Buffs;
-import com.ga.unit.skill.Skill;
-import com.ga.unit.skill.Skills;
-import com.ga.unit.skill.Stat;
+import com.ga.unit.skill.*;
 
 import java.awt.*;
 import java.util.HashMap;
+
+import static com.ga.unit.skill.Actions.WalkL;
+import static com.ga.unit.skill.Actions.WalkR;
+import static com.ga.unit.skill.Skills.Rest;
 
 /**
  * Created by Ga on 5/7/2016.
@@ -21,8 +23,8 @@ import java.util.HashMap;
 public abstract class Unit extends Matter {
     protected HashMap<String, Moveset[]> moveset = new HashMap<String, Moveset[]>(){{
     }};
-    public ClipUnit clip;
-    public Actions state = Actions.Idle;
+    public Body clip;
+    public Moveset state = Actions.Idle;
     public boolean jump = false;
     public Intelligence brain;
     public EventTimer delay = new EventTimer(5, false, null);
@@ -35,15 +37,24 @@ public abstract class Unit extends Matter {
     protected Speech speech = new Speech(this);
 
     public Unit(String name, P pt, int seed) {
-        super(name, seed, pt, 10);
+        super("unit/", name, seed, pt, 10);
         hp = new HealthBar(get("Health"), pos);
+        get("Health").onChange = (new Performer(){
+            @Override
+            public boolean perform(){
+                int health = get("Health").get();
+                if (health <= 0) die();
+                hp.show(15);
+                return true;
+            }
+        });
     }
 
     public void performMoveset(String p){
         Moveset[] t = moveset.get(p);
         if (t == null){
 //            Global.p("Can't find moveset "+p);
-        } else setState(t[rand.nextInt(t.length)]);
+        } else setState(t[Global.r.nextInt(t.length)]);
     }
 
     public void reset(){
@@ -67,7 +78,7 @@ public abstract class Unit extends Matter {
         if (r == null) return new int[]{0};
         return new int[]{r[0]};
     }
-    protected void startSkill(Moveset move, Skill p){
+    protected void startSkill(Moveset move, Spell p){
         p.start(this, 1);
     }
     public P getHand(){
@@ -97,33 +108,28 @@ public abstract class Unit extends Matter {
         }
         return 0;
     }
-    public void setAnimation(Actions p){
+    public void setAnimation(Moveset p){
         clip.setState(p);
     }
     protected boolean stateSet(Moveset state){
-        Actions action = null;
-        if (state instanceof Actions) action = (Actions) state;
         delay.set(state.getDel());
-        if (action != null) {
-            switch (action) {
-                case WalkL:
-                    face(-1);
-                    break;
-                case WalkR:
-                    face(1);
-                    break;
+        if (state instanceof Actions || state instanceof Skills) {
+            if (state instanceof Skills) vel.x *= ((Skills)state).getVelX();
+            else {
+                if (state == WalkL) face(-1);
+                else if (state == WalkR) face(1);
+                vel.x = 0;
             }
-            vel.x *= action.getVelX();
-            this.state = action;
-            setAnimation(action);
-            if (brain != null) brain.setState(action);
+            this.state = state;
+            setAnimation(state);
+            if (brain != null) brain.setState(state);
         } else {
             damageMod = 1;
             vel.x = 0;
             this.state = Actions.Idle;
-            Skills t = (Skills) state;
+            Spells t = (Spells) state;
             setAnimation(t.getAction());
-            Skill k = t.getEvent();
+            Spell k = t.getEvent();
             delay.performer = k;
             startSkill(t, k);
         }
@@ -144,23 +150,21 @@ public abstract class Unit extends Matter {
         return (int) ((get("Proficiency").get())*damageMod);
     }
 
-    @Override
-    public boolean hit(Matter hitter) {
-        if (state == Actions.Down || state == Actions.Hit || state == Actions.Dead) return false;
-        if (stats.hasEffect(Buffs.Evade)) return false;
+    protected int getDamageReduction(){
+        return 0;
+    }
+
+    public boolean hit(Matter hitter, int damage) {
         delay.performer = null;
-        int damage = Math.max(0,hitter.getDamage());
         delay.set(0);
-        int x = hitter.pos.x - pos.x > 0 ? 1 : -1;
+        int x = pos.x-hitter.pos.x > 0 ? 1 : -1;
         face(x < 0 ? -1 : 1);
-        float ratio = (float) damage * 10 / get("Health").getMax();
+        float ratio = (float) damage * 8 / get("Health").getMax();
         float knockback = Math.min(ratio, 50);
-        if (ratio > 100) setState(Actions.Down);
-        else if (ratio > 8) setState(Actions.Hit); //ratio > stun threshold
         vel.x = knockback*-x;
-        vel.y = -knockback * 1.5f - 10;
+        vel.y = -knockback * 1.3f - 5;
         jump = false;
-        hurt(damage);
+        get("Health").add(-damage);
         if (state != Actions.Dead) {
             if (brain != null) brain.hit(hitter);
         }
@@ -168,30 +172,27 @@ public abstract class Unit extends Matter {
     }
 
     @Override
-    public boolean checkHit(P p, int r){
-        if (!tangible) return false;
-        P t = clip.HEAD.ptd.getAdd(pos);
-        if (Math.pow(sizeRadius+r,2) - ((Math.pow(p.x-t.x,2) + Math.pow(p.y-t.y,2))) > 0) {
-            return true;
-        }
-        return false;
-    }
-
-    @Override
     public boolean checkHit(Matter hitter, Line p){
         if (faction != hitter.faction) {
-            if (checkHit(p.ptd,0)){
-                P t = new P(pos.x,p.ptd.y);
-                Particle.explode("Blood",t,t.getSubtract(hitter.pos).mult(1,-1).add(0,-25),5,15,15,true,3);
-                hit(hitter);
-                return true;
-            }
-            for (Organ i : clip.organs){
-                if (p.lineCross(i.getAdd(pos))){
-                    P t = new P(pos.x,p.ptd.y);
-                    Particle.explode("Blood",t,t.getSubtract(hitter.pos).mult(1,-1).add(0,-25),3,15,15,true,2);
-                    hit(hitter);
-                    return true;
+            if (state != Actions.Down && state != Actions.Hit && state != Actions.Dead) {
+                if (!stats.hasEffect(Buffs.Evade)) {
+                    int dam = hitter.getDamage() - getDamageReduction();
+                    for (int i = 0; i < clip.organs.length; i++) {
+                        if (clip.organs[i].checkHit(p)) {
+                            P t = new P(pos.x, p.ptd.y);
+                            Particle.explode("Blood", t, t.getSubtract(hitter.pos), 3, 3, 12, true, 5);
+                            if (clip.organs[i].hit(p, dam)) {
+                                clip.setHeight();
+                                if (clip.organs[i].vital){
+                                    setState(Actions.Down);
+                                    die();
+                                }
+                            } else {
+                                hit(hitter, dam);
+                                return true;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -200,12 +201,6 @@ public abstract class Unit extends Matter {
 
     public Stat get(String p){
         return stats.getStat(p);
-    }
-
-    public void hurt(int damage) {
-        hp.show();
-        get("Health").add(-damage);
-        if (get("Health").get() <= 0) die();
     }
 
     public void die() {
@@ -258,20 +253,9 @@ public abstract class Unit extends Matter {
     }
 
     protected void stateUpdate(){
-        switch (state) {
-            case Idle:
-                stats.rest(.1f);
-                break;
-            case WalkL:
-                vel.x = -get("Speed").get()/10;
-                break;
-            case WalkR:
-                vel.x = get("Speed").get()/10;
-                break;
-            case Rest:
-                stats.rest(.5f);
-                break;
-        }
+        if (state == WalkL) vel.x = -get("Speed").get()/10;
+        else if (state == WalkR) vel.x = get("Speed").get()/10;
+        else if (state == Rest) stats.rest(.34f);
     }
 
     protected void moveTriggered(int p){
@@ -286,7 +270,7 @@ public abstract class Unit extends Matter {
         stateUpdate();
         super.update();
         if (brain != null) brain.update();
-        if (pos.y > Global.map.map.size.y){
+        if (pos.y >= Global.map.map.size.y){
             delay.time = -1;
             setState(Actions.Dead);
         }
@@ -294,11 +278,9 @@ public abstract class Unit extends Matter {
 
     @Override
     public void draw(Graphics2D g) {
-        for (Organ i : clip.organs) i.draw(g,pos);
-        float origRot = rotation;
-        rotation = clip.HEAD.getAtan()+1.57f;
-        super.draw(g, clip.HEAD.ptd);
-        rotation = origRot;
+        for (Organ i : clip.organs){
+            i.draw(g);
+        }
     }
 
     @Override

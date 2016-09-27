@@ -1,34 +1,31 @@
 package com.ga.unit.item;
 
 import com.ga.map.Global;
-import com.ga.map.ManFactory;
 import com.ga.tool.P;
-import com.ga.unit.Actions;
 import com.ga.unit.Man;
-import com.ga.unit.Thing;
-import com.ga.unit.skill.Curse;
-import com.ga.unit.skill.Skills;
-import com.ga.unit.skill.Stat;
+import com.ga.unit.Matter;
+import com.ga.unit.Updater;
+import com.ga.unit.skill.*;
 
 import java.util.Random;
 
 /**
  * Created by Ga on 8/5/2016.
  */
-public class Item extends Thing {
+public class Item extends Matter {
     public enum Tag{
-        Sword(Actions.Swing), Spear(Actions.Pierce), Mace(Actions.Swing), Dagger(Actions.Riposte), Armor(Actions.Rest), Scroll(Actions.Cast),
-        Throwing(Actions.Throw), Shooting(Actions.Shoot), Consumable(Actions.Consume);
-        Actions action;
-        Tag(Actions p){
+        Sword(Skills.Swing), Spear(Skills.Pierce), Mace(Skills.Swing), Dagger(Skills.Riposte), Armor(Skills.Rest), Scroll(Actions.Cast),
+        Throwing(Skills.Throw), Shooting(Actions.Shoot), Consumable(Actions.Consume), Claw(Skills.Riposte), Enchant(Actions.Buff);
+        Moveset action;
+        Tag(Moveset p){
             action = p;
         }
-        public Actions getAction() {
+        public Moveset getAction() {
             return action;
         }
     }
     enum SpecialtyMod{
-        None, Light, Heavy, Feather, Sharp, Dull, Quick, Slow, Durable, Tough, Runic, Instant, Cursed;
+        None, Light, Heavy, Feather, Sharp, Dull, Quick, Slow, Durable, Tough, Runic, Instant, Comfortable, Cursed;
         static SpecialtyMod get(Random seed){
             if (seed.nextGaussian() > 1) return values()[seed.nextInt(values().length)];
             return None;
@@ -90,36 +87,44 @@ public class Item extends Thing {
     AdenchantMod ademod;
     SpecialtyMod smod;
     PrefixMod pmod;
-    Skills emod = null;
+    Spells emod = null;
     public int weight;
     protected int cooldown = 100;
     public int delay = 10;
     protected float probability;
-    public Actions action = Actions.Consume;
+    public Moveset action = Actions.Consume;
     private int[] lastused = new int[]{0};
     public Stat uses = new Stat(1);
     protected Tag type = Tag.Consumable;
-    public Item(String name, int seed, int weight, int uses, int cooldown, float enchantRatio) {
-        super("item/"+name, seed);
+    public Item(String dir, String name, int seed, int weight, int uses, int cooldown, float enchantRatio) {
+        super("item/"+dir,name, seed, P.getZero(), -1);
         this.name = name;
         this.weight = weight;
         this.uses.setTotal(uses);
         this.cooldown = cooldown;
-        admod = AdverbMod.get(rand);
         pmod = PrefixMod.get(rand);
         smod = SpecialtyMod.get(rand);
+        if (smod != SpecialtyMod.None) admod = AdverbMod.get(rand);
         probability = enchantRatio;
         if (rand.nextFloat() < enchantRatio) {
             ademod = AdenchantMod.get(rand);
-            emod = Skills.values()[rand.nextInt(Skills.values().length)];
+            emod = Spells.values()[rand.nextInt(Spells.values().length)];
             probability = ademod.magnitude;
         }
         setModifier(pmod);
         setModifier(smod);
+        Updater.addQueue.remove(this);
+        init();
+    }
+    protected void init(){
+
     }
     public void setType(Tag p){
         this.type = p;
         this.action = p.getAction();
+    }
+    public Tag getType(){
+        return type;
     }
     protected void setModifier(PrefixMod mod){
         if (mod == PrefixMod.Broken) uses.addTotal((int) (uses.getMax()*-.7f));
@@ -151,6 +156,7 @@ public class Item extends Thing {
         else if (mod == SpecialtyMod.Durable) uses.addTotal(uses.getMax());
         else if (mod == SpecialtyMod.Runic) probability += .2f;
         else if (mod == SpecialtyMod.Instant) delay = 1;
+        else if (mod == SpecialtyMod.Comfortable) smod = SpecialtyMod.None;
     }
     public int getRarity(){
         return pmod.ordinal()+(smod != SpecialtyMod.None?10:0)+(emod != null?100:0);
@@ -232,10 +238,15 @@ public class Item extends Thing {
         }
         return false;
     }
+    public void pickup(Man host){
+        setDepth(-1);
+        gravity = false;
+    }
     public void drop(Man host) {
         pos = new P(host.pos);
         setDepth(8);
         rotation = (float)Global.r.nextInt(628)/100;
+        gravity = true;
     }
     public String getDescription() {
         String r = "a "+getFullName()+".";

@@ -3,7 +3,6 @@ package com.ga.unit.item;
 import com.ga.map.Global;
 import com.ga.tool.Line;
 import com.ga.tool.P;
-import com.ga.unit.Actions;
 import com.ga.unit.Man;
 import com.ga.unit.Organ;
 
@@ -26,9 +25,9 @@ public class Weapon extends Item {
     }
     private Die damage = new Die(0,1);
     private float damageMod = 1;
-    private Organ organ = new Organ(new P(),0,0);
+    private Organ organ = null;
     public Weapon(String name, int seed, int weight, int uses, int num, int sides, Tag type) {
-        super(name, seed, weight, uses, 100, 0.03f);
+        super("weapon/",name, seed, weight, uses, 100, 0.03f);
         this.type = type;
         cooldown = 0;
         setDamage(num, sides);
@@ -37,6 +36,9 @@ public class Weapon extends Item {
     }
     public void setOrgan(Organ p){
         this.organ = p;
+    }
+    public Organ getOrgan() {
+        return organ;
     }
     protected void setModifier(PrefixMod mod){
         super.setModifier(mod);
@@ -66,7 +68,7 @@ public class Weapon extends Item {
     }
     public P getPoint(){
         P result = pos.getAdd(organ.ptd);
-        result.add(sizeRadius*.5f*Global.cos(rotation)*dir,(int) (sizeRadius*.5f*Global.sin(rotation))*dir);
+        result.add(size.x*.5f*Global.cos(rotation)*dir,(int) (size.x*.5f*Global.sin(rotation))*dir);
         return result;
     }
     public void drop(Man host){

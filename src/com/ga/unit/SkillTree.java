@@ -1,8 +1,7 @@
 package com.ga.unit;
 
 import com.ga.map.Global;
-import com.ga.unit.skill.Skills;
-import com.ga.unit.skill.Stat;
+import com.ga.unit.skill.*;
 
 import java.util.ArrayList;
 
@@ -38,19 +37,19 @@ public class SkillTree {
         int level = Global.player.host.get("Level").get();
         int index = skills.indexOf(p);
         if (cd){
-            if (p instanceof Actions) {
-                switch ((Actions) p) {
+            if (p instanceof Skills) {
+                switch ((Skills) p) {
                     case Riposte:
                     case Lunge:
                     case Throw:
                         return false;
                 }
             } else {
-                if (p == Skills.Fireworks) return false;
+                if (p == Spells.Fireworks) return false;
             }
             if (index != -1 && level <= skillCdLevels.get(index).get()) return false;
         } else {
-            if (p == Skills.Fireworks) return false;
+            if (p == Spells.Fireworks) return false;
             if (index != -1 && level <= skillLevels.get(index).get()) return false;
         }
         return true;
@@ -67,9 +66,10 @@ public class SkillTree {
         return false;
     }
     public static Moveset getByName(String p){
-        Moveset move = Skills.getByName(p);
+        Moveset move = Spells.getByName(p);
         if (move == null) move = Actions.getByName(p);
-        if (move == null) System.out.println("Can't find skill "+p);
+        if (move == null) move = Skills.getByName(p);
+        if (move == null) System.out.println("Can't find spell "+p);
         return move;
     }
     @Override

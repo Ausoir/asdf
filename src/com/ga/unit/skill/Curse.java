@@ -9,38 +9,38 @@ import com.ga.unit.Man;
  * Created by Ga on 9/4/2016.
  */
 public enum Curse {
-    Death(new Skill(){
+    Death(new Spell(){
         @Override
         public boolean perform() {
             host.stats.addEffect(Buffs.Poison,level);
             return true;
         }
     }),
-    Shadowcurse(new Skill(){
+    Shadowcurse(new Spell(){
         @Override
         public boolean perform() {
             Man t = ManFactory.produce("Phantom",new P(host.pos.x, host.pos.y - 300),0);
-            Skills.Shadowtwin.getEvent().start(t, level);
-            Skills.Shadowtwin.getEvent().perform();
+            Spells.Shadowtwin.getEvent().start(t, level);
+            Spells.Shadowtwin.getEvent().perform();
             t.remove();
             return true;
         }
     }),
-    Elemental(new Skill(){
+    Elemental(new Spell(){
         @Override
         public boolean perform() {
-            Man d = new Man("Player",new P(host.pos));
+            Man d = new Man(new P(host.pos));
             d.target = P.getZero();
-            Skills.Meteor.getEvent().start(d, level);
-            Skills.Blizzard.getEvent().start(d, level);
-            for (int i=0;i<level*4;i++) Skills.Meteor.getEvent().perform();
-            for (int i=0;i<level*4;i++) Skills.Blizzard.getEvent().perform();
+            Spells.Meteor.getEvent().start(d, level);
+            Spells.Blizzard.getEvent().start(d, level);
+            for (int i=0;i<level*4;i++) Spells.Meteor.getEvent().perform();
+            for (int i=0;i<level*4;i++) Spells.Blizzard.getEvent().perform();
             d.remove();
             return true;
         }
     });
-    private Skill effect;
-    Curse(Skill p){
+    private Spell effect;
+    Curse(Spell p){
         effect = p;
     }
     public static void get(Man host, int severity){

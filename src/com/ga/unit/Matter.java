@@ -5,19 +5,26 @@ import com.ga.map.Global;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 
+import java.util.Random;
+
 /**
  * Created by Ga on 8/12/2016.
  */
 public class Matter extends Thing {
+    public int seed = 0;
+    public Random rand;
     public boolean gravity = true;
     public Faction faction = Faction.Hostile;
     public P vel = new P(0, 0);
     public boolean tangible = true;
-    public Matter(String name, int seed, P pt, int depth) {
-        super(name, seed, pt, depth);
+    public Matter(){
+        super(null,null);
     }
-    public boolean hit(Matter hitter){
-        return true;
+    public Matter(String dir, String name, int seed, P pt, int depth) {
+        super(dir, name, pt, depth);
+        if (seed == -1) this.seed = Global.getSeed();
+        else this.seed = seed;
+        rand = new Random(this.seed);
     }
     public int getDamage(){
         return 0;
@@ -32,7 +39,6 @@ public class Matter extends Thing {
     public boolean checkHit(Matter p, int r){
         if (p.faction != faction) {
             if (checkHit(p.pos,p.sizeRadius+r)) {
-                hit(p);
                 return true;
             }
         }
@@ -55,12 +61,20 @@ public class Matter extends Thing {
         vel.y = (slope * vel.x * 10000 - 5) / 10000f;
     }
     public void update(){
-        if (Global.mapEdge(pos.getAdd(vel))) vel.set(0,0);
+        int edge = Global.mapEdge(pos.getAdd(vel));
+        if (edge > 1) {
+            if (edge % 3 == 0) vel.x = 0;
+            if (edge % 2 == 0) vel.y = 0;
+        }
         collide();
         pos.add(vel);
         if (gravity) {
             vel.y += Settings.gravity;
             if (vel.y > Settings.gravityMax) vel.y = Settings.gravityMax;
         }
+    }
+    @Override
+    public String toString(){
+        return name + "@" + seed + "@" + pos;
     }
 }

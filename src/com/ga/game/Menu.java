@@ -3,11 +3,12 @@ package com.ga.game;
 import com.ga.map.Global;
 import com.ga.tool.P;
 import com.ga.tool.Word;
-import com.ga.unit.Actions;
-import com.ga.unit.Moveset;
+import com.ga.unit.Player;
 import com.ga.unit.item.Inventory;
 import com.ga.unit.item.Item;
-import com.ga.unit.Player;
+import com.ga.unit.skill.Actions;
+import com.ga.unit.skill.Moveset;
+import com.ga.unit.skill.Skills;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -32,7 +33,7 @@ public class Menu extends JPanel {
     private Image image;
     public Menu() {
         setLayout(new GridBagLayout());
-        image = Texture.load("Menu.png");
+        image = Texture.load("Menu");
         setBorder(new EmptyBorder(100,140,100,140));
         size = new P(image.getWidth(null), image.getHeight(null));
         resize();
@@ -61,7 +62,7 @@ public class Menu extends JPanel {
         mainpanel.setLayout(gridlayout);
         mainpanel.add(makeMenuButton("Stats", "stats"));
         mainpanel.add(makeMenuButton("Inventory", "inventory"));
-        mainpanel.add(makeMenuButton("Skills", "skill"));
+        mainpanel.add(makeMenuButton("Spells", "spell"));
         mainpanel.add(makeMenuButton("Help", "help"));
         mainpanel.add(makeMenuButton("Options", "options"));
         grid.gridx = 0;
@@ -121,7 +122,7 @@ public class Menu extends JPanel {
         optionspanel.setVisible(false);
         if (p.equals("stats")) statspanel.setVisible(true);
         else if (p.equals("inventory")) inventorypanel.setVisible(true);
-        else if (p.equals("skill")) skillpanel.setVisible(true);
+        else if (p.equals("spell")) skillpanel.setVisible(true);
         else if (p.equals("help")) helppanel.setVisible(true);
         else if (p.equals("options")) optionspanel.setVisible(true);
     }
@@ -183,7 +184,7 @@ class StatPanel extends JPanel{
         makeStatButton("[?]", "say@increases minimum/maximum damage by 1.");
         makeStatButton("[?]", "say@increases Stamina by 1. Stamina recovers by 10% when idling or 50% when resting.");
         makeStatButton("[?]", "say@increases Energy by 1. Energy recovers by 10% when idling or 50% when resting.");
-        makeStatButton("[?]", "say@increases Memory by 1. Each point can be used to learn with a Manual or a Spellbook. They can also be used to level up a Skill or Spell at the Skills menu.");
+        makeStatButton("[?]", "say@increases Memory by 1. Each point can be used to learn with a Manual or a Spellbook. They can also be used to level up a Spell or Spell at the Spells menu.");
     }
     protected void refresh(){
         Player player = Global.player.host;
@@ -360,7 +361,7 @@ class InventoryPanel extends JPanel {
             }
         });
         drop.setForeground(getRarityColor(rarity));
-        drop.setIcon(new ImageIcon(Texture.load("item/Drop.png")));
+        drop.setIcon(new ImageIcon(Texture.load("item/Drop")));
         options.add(describe);
         options.add(drop);
         panel.add(options);
@@ -443,13 +444,13 @@ class SkillPanel extends JPanel{
     }
     protected void refresh(){
         panel.removeAll();
-        panel.add(new JLabel("Select a skill to re-map its keybinding."));
+        panel.add(new JLabel("Select a spell to re-map its keybinding."));
         panel.add(Box.createRigidArea(new Dimension(0,12)));
-        makeSlot(Actions.Weapon, false);
-        makeSlot(Actions.Jump, false);
-        makeSlot(Actions.Kick, false);
+        makeSlot(Skills.Weapon, false);
+        makeSlot(Skills.Jump, false);
+        makeSlot(Skills.Kick, false);
         makeSlot(Actions.Pickup, false);
-        makeSlot(Actions.Rest, false);
+        makeSlot(Skills.Rest, false);
         for (Moveset i : Global.player.host.skillTree.getSkills()){
             makeSlot(i, true);
         }

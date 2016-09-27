@@ -2,9 +2,10 @@ package com.ga.unit.intelligence;
 
 import com.ga.map.Global;
 import com.ga.tool.Timer;
-import com.ga.unit.Actions;
 import com.ga.unit.Matter;
 import com.ga.unit.Unit;
+import com.ga.unit.skill.Actions;
+import com.ga.unit.skill.Skills;
 
 /**
  * Created by Ga on 7/30/2016.
@@ -33,18 +34,18 @@ public class Hunt implements Task {
         host.face(target.pos);
         float dist = (float) (Math.sqrt((x*x)+(y*y))-range);
         if (y < -20)
-            host.setState(Actions.Jump);
+            host.setState(Skills.Jump);
         if (host.isExhausted()){
             if (dist > 300){
-                host.setState(Actions.Rest);
+                host.setState(Skills.Rest);
             } else if (dist < 300){
                 if (x > 0) host.setState(Actions.WalkL);
                 else if (x < 0) host.setState(Actions.WalkR);
             }
         } else if (dist <= 0) {
-            if (dist < -range+50) {
+            if (dist <= -10) { //edge
                 host.performMoveset("Melee");
-            } else if (dist > -10) { //edge
+            } else if (dist > -10 && dist < 500) {
                 host.performMoveset("Range");
             }
         } else {

@@ -58,9 +58,11 @@ public class Global {
     public static void p(String p){
         System.out.println(p);
     }
-    public static boolean mapEdge(P p){
-        return p.set(clamp(p.x, 0, Global.map.map.size.x),
-            clamp(p.y, 0, Global.map.map.size.y));
+    public static int mapEdge(P p){
+        int result = 1;
+        if (p.x != clamp(p.x, 0, Global.map.map.size.x)) result += 2;
+        if (p.y != clamp(p.y, 0, Global.map.map.size.y)) result *= 2;
+        return result;
     }
     public static void mapEdgeCenter(P p){
         p.set(clamp(p.x, Settings.centerX, Global.map.map.size.x-Settings.centerX),

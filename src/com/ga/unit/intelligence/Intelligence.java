@@ -4,10 +4,11 @@ import com.ga.map.Global;
 import com.ga.tool.P;
 import com.ga.tool.Timer;
 import com.ga.tool.Word;
-import com.ga.unit.Actions;
-import com.ga.unit.Unit;
 import com.ga.unit.Matter;
+import com.ga.unit.Unit;
 import com.ga.unit.Updater;
+import com.ga.unit.skill.Actions;
+import com.ga.unit.skill.Moveset;
 
 import java.util.ArrayList;
 
@@ -50,7 +51,7 @@ public class Intelligence {
             host.say("@hit");
         }
     }
-    public void setState(Actions state){
+    public void setState(Moveset state){
         if (target != null) {
             P p = target.pos.getSubtract(host.pos);
             host.target = p;

@@ -10,11 +10,13 @@ public class Armor extends Item {
     private float armorMod = 1;
     public Color color1 = Color.green;
     public Color color2 = Color.blue;
-    public Armor(String name, int seed, int weight, int uses, float armor) {
-        super(name, seed, weight, uses, 100, .04f);
+    public float comfortability = 0;
+    public Armor(String name, int seed, int weight, int uses, float armor, float comfort) {
+        super("armor/", name, seed, weight, uses, 100, .04f);
         type = Tag.Armor;
         this.armor = armor;
         this.name = name;
+        comfortability = comfort;
     }
     public float getArmor(){
         return armor * armorMod;
@@ -28,8 +30,7 @@ public class Armor extends Item {
         else if (mod == PrefixMod.Legendary) armorMod = 2;
     }
     protected void setModifier(SpecialtyMod mod){
-        if (mod == SpecialtyMod.Sharp) smod = SpecialtyMod.None;
-        else if (mod == SpecialtyMod.Dull) smod = SpecialtyMod.None;
+        if (mod == SpecialtyMod.Comfortable) comfortability += admod.magnitude*.1f;
         else if (mod == SpecialtyMod.Tough) armorMod += .5f;
         else super.setModifier(mod);
     }

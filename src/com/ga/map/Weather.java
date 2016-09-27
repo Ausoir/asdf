@@ -20,8 +20,8 @@ public class Weather implements Drawable{
             new int[]{150,0,0,50},
             new int[]{0,0,150,70},
             new int[]{25,25,100,70},
-            new int[]{0,0,0,150},
-            new int[]{0,0,0,150}
+            new int[]{0,0,0,70},
+            new int[]{0,0,0,70}
     };
     public static boolean visible = true;
     private static final int hourLength = 100;

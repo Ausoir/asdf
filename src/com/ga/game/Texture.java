@@ -21,7 +21,8 @@ public class Texture {
         if (image != null) return image;
         try {
 //            if (dir.split("/")[0].equals("map")) p.image = imageToBufferedImage(ImageIO.read(new File("Data/"+dir)).getScaledInstance(4000,2000,Image.SCALE_FAST));
-            image = ImageIO.read(new File("Data/"+dir));
+            image = ImageIO.read(new File("Data/"+dir + ".png"));
+
             cache.put(dir,image);
 //            ArrayList<P> collider = new ArrayList<>();
 //            ArrayList<P> collidee = new ArrayList<>();
@@ -29,14 +30,14 @@ public class Texture {
 //            p.collidee = collidee.toArray(new P[collidee.size()]);
 //            p.collider = collider.toArray(new P[collider.size()]);
         } catch (IOException e) {
-            System.out.println("Can't read file Data/"+dir);
+            System.out.println("Can't read file Data/"+dir + ".png");
             e.printStackTrace();
         }
         return image;
     }
 
-    public static BufferedImage getTexture(BufferedImage image, int px, int py) {
-        BufferedImage result = image.getSubimage(px * 64, py * 96, 64, 96);
+    public static BufferedImage getTexture(BufferedImage image, int sx, int sy, int px, int py) {
+        BufferedImage result = image.getSubimage(px * sx, py * sy, sx, sy);
         return result;
     }
 

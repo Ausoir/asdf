@@ -11,34 +11,34 @@ import com.ga.unit.item.Projectile;
  */
 public enum Buffs {
     Haste(hostEffect(), 50, "Speed",1,"Speed"), Rejuvenate(hostEffect(), 100, "Stamina",.5f,"Stamina"), Empower(weaponEffect(1), 80, "Proficiency",10), Cleave(weaponEffect(2), 300),
-    Evade(new Skill(){
+    Evade(new Spell(){
         @Override
         public boolean perform(){
             Particle.smoke(new P(host.pos));
             return false;
         }
     }, 100),
-    Freeze(new Skill(){
+    Freeze(new Spell(){
         @Override
         public boolean perform(){
             Particle.frozen(host.pos);
             return false;
         }
     }, 50, "Speed",-1,"Speed"),
-    Poison(new Skill(){
+    Poison(new Spell(){
         private int tick = 1;
         @Override
         public boolean perform(){
             tick--;
             if (tick == 0) {
-                host.get("Health").add(-1);
+                host.get("Health").add((-level/2)-1);
                 tick = 30-level;
                 if (host.get("Health").get() == 1) return true;
             }
             return false;
         }
     },100),
-    Glacialwalk(new Skill(){
+    Glacialwalk(new Spell(){
         private int tick = 1;
         @Override
         public boolean perform(){
@@ -58,7 +58,7 @@ public enum Buffs {
                     public void update() {
                         super.update();
                         Particle.explode("Ice", pos, new P(0, -5), 1, 3, 2, false, 6);
-                        Matter t = Updater.collide(this, 500);
+                        Matter t = Updater.collide(this, 20);
                         if (t!=null) onAttack(t);
                     }
                 };
@@ -76,7 +76,7 @@ public enum Buffs {
             return false;
         }
     },50),
-    Flamestride(new Skill(){
+    Flamestride(new Spell(){
         private int tick = 1;
         @Override
         public boolean perform(){
@@ -93,7 +93,7 @@ public enum Buffs {
                     public void update() {
                         super.update();
                         Particle.explode("Flame", pos, new P(0, -5), 1, 12, 3, false, 3);
-                        Matter t = Updater.collide(this, 500);
+                        Matter t = Updater.collide(this, 30);
                         if (t!=null) onAttack(t);
                     }
                 };
@@ -111,14 +111,25 @@ public enum Buffs {
             }
             return false;
         }
-    },80);
+    },80),
+    Stun(new Spell(){
+        @Override
+        public boolean perform(){
+            host.delay.set(0);
+            host.jump = true;
+            host.setState(Actions.Hit);
+            host.delay.set(5);
+            Particle.implode("Glare", host.pos.getAdd(0,-25), P.getZero(), 1, 10, 1, false, 6);
+            return false;
+        }
+    }, 50);
     public int time;
     public float buff;
     public String stat;
     public String buffRel;
-    public Skill effect;
-    private static Skill weaponEffect(final int type){
-        return new Skill(){
+    public Spell effect;
+    private static Spell weaponEffect(final int type){
+        return new Spell(){
             @Override
             public boolean perform(){
                 Man t = (Man) host;
@@ -128,8 +139,8 @@ public enum Buffs {
             }
         };
     }
-    private static Skill hostEffect(){
-        return new Skill(){
+    private static Spell hostEffect(){
+        return new Spell(){
             @Override
             public boolean perform(){
                 if (Global.r.nextInt(5) == 0) {
@@ -140,16 +151,16 @@ public enum Buffs {
             }
         };
     }
-    Buffs(Skill effect, int time){
+    Buffs(Spell effect, int time){
         this.effect = effect;
         this.time = time;
     }
-    Buffs(Skill effect, int time, String stat, float buff){
+    Buffs(Spell effect, int time, String stat, float buff){
         this(effect, time);
         this.stat = stat;
         this.buff = buff;
     }
-    Buffs(Skill effect, int time, String stat, float buff, String buffRel){
+    Buffs(Spell effect, int time, String stat, float buff, String buffRel){
         this(effect, time, stat, buff);
         this.buffRel = buffRel;
     }

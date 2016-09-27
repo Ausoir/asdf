@@ -3,7 +3,6 @@ package com.ga.unit.item;
 import com.ga.tool.EventTimer;
 import com.ga.tool.Line;
 import com.ga.tool.P;
-import com.ga.unit.Man;
 import com.ga.unit.Matter;
 import com.ga.unit.Updater;
 
@@ -16,14 +15,10 @@ public class Projectile extends Matter {
     protected float radius;
     public EventTimer delay = new EventTimer(-1, false, null);
     public Projectile(String name, P pt, P dest, int speed) {
-        super(name, 0, pt, 10);
+        super("", name, 0, pt, 10);
         vel.set(dest.getAtan(pt, speed));
         rotation = (float) Math.atan2(dest.y-pt.y,dest.x-pt.x);
-        radius = size.getDist();
-    }
-    public void hit(Man hitter){
-        super.hit(hitter);
-        remove();
+        if (size != null) radius = size.getDist();
     }
     @Override
     public int getDamage(){
