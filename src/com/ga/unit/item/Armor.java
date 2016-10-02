@@ -1,6 +1,6 @@
 package com.ga.unit.item;
 
-import java.awt.*;
+import com.ga.unit.Man;
 
 /**
  * Created by Ga on 8/9/2016.
@@ -8,15 +8,14 @@ import java.awt.*;
 public class Armor extends Item {
     private float armor = 0;
     private float armorMod = 1;
-    public Color color1 = Color.green;
-    public Color color2 = Color.blue;
     public float comfortability = 0;
     public Armor(String name, int seed, int weight, int uses, float armor, float comfort) {
-        super("armor/", name, seed, weight, uses, 100, .04f);
-        type = Tag.Armor;
+        super(name, seed, weight, uses, 100, .04f);
+        setType(Tag.Armor);
         this.armor = armor;
         this.name = name;
         comfortability = comfort;
+        delay = 80;
     }
     public float getArmor(){
         return armor * armorMod;
@@ -33,6 +32,17 @@ public class Armor extends Item {
         if (mod == SpecialtyMod.Comfortable) comfortability += admod.magnitude*.1f;
         else if (mod == SpecialtyMod.Tough) armorMod += .5f;
         else super.setModifier(mod);
+    }
+    @Override
+    public boolean use(Man host){
+        if (host.getArmor() == this) return super.use(host);
+        else if (host.getWeapon() == this) {
+            host.setArmor(this);
+            host.setWeapon(null);
+            remove();
+            return true;
+        }
+        return false;
     }
     public String getDescription(){
         String r = super.getDescription();

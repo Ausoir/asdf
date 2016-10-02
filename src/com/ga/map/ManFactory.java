@@ -3,13 +3,12 @@ package com.ga.map;
 import com.ga.tool.P;
 import com.ga.tool.Word;
 import com.ga.unit.Faction;
+import com.ga.unit.Man;
+import com.ga.unit.Merchant;
 import com.ga.unit.Organ;
 import com.ga.unit.intelligence.EnemyIntelligence;
 import com.ga.unit.item.Armor;
 import com.ga.unit.item.ItemFactory;
-import com.ga.unit.Man;
-import com.ga.unit.Merchant;
-import com.ga.unit.item.Weapon;
 
 /**
  * Created by Ga on 8/2/2016.
@@ -50,10 +49,9 @@ public class ManFactory {
         }
         Man get(P p, int seed){
             Man r = new Man(getFace(),p,seed);
-            r.name = name();
             r.faction = faction;
             r.speechType = speech;
-            r.setWeapon((Weapon) ItemFactory.produce(getWeapon(),-1));
+            r.setWeapon(ItemFactory.produce(getWeapon(),-1));
             r.setArmor((Armor) ItemFactory.produce(getArmor(),-1));
             r.get("Health").addTotal(health);
             for (Organ i : r.clip.organs) i.health += health*.3f;
@@ -89,7 +87,7 @@ public class ManFactory {
             default:
                 p.brain = new EnemyIntelligence(p);
         }
-        p.setWeapon((Weapon) ItemFactory.produce(weapon,-1));
+        p.setWeapon(ItemFactory.produce(weapon,-1));
         p.setArmor((Armor) ItemFactory.produce(armor,-1));
         return p;
     }

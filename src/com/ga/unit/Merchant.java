@@ -67,7 +67,8 @@ public class Merchant extends Intelligence {
                     if (player.gold >= values[offer]){
                         if (player.inventory.vacant()){
                             player.gold -= values[offer];
-                            player.addItem(wares[offer]);
+                            wares[offer].field();
+                            wares[offer].pos = player.pos.getAdd(0,0);
                             host.say("@sold");
                         }
                     }

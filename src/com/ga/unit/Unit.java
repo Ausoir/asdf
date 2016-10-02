@@ -37,7 +37,7 @@ public abstract class Unit extends Matter {
     protected Speech speech = new Speech(this);
 
     public Unit(String name, P pt, int seed) {
-        super("unit/", name, seed, pt, 10);
+        super(name, seed, pt, 10);
         hp = new HealthBar(get("Health"), pos);
         get("Health").onChange = (new Performer(){
             @Override
@@ -95,7 +95,7 @@ public abstract class Unit extends Matter {
     public int setState(Moveset state) {
         if (!delay.over() || !jump) return 1;
         if (this.state != state) {
-            delay.performer = null;
+            if (state != Actions.Idle) delay.performer = null;
             int[] cdinput = getCooldown(state);
             int prevCd = cdinput[0];
             if (Global.cooldown(cdinput, state.getCooldown())) {
@@ -286,7 +286,7 @@ public abstract class Unit extends Matter {
     @Override
     public String toString(){
         if (state == Actions.Dead) return "";
-        String r = super.toString();
+        String r = getClass().getSimpleName()+":"+super.toString();
         return r;
     }
 

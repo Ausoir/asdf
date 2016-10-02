@@ -4,9 +4,11 @@ import com.ga.game.Settings;
 import com.ga.map.Global;
 import com.ga.tool.Line;
 import com.ga.tool.P;
+import com.ga.tool.Performer;
 import com.ga.unit.item.Armor;
+import com.ga.unit.item.Item;
+import com.ga.unit.item.ItemFactory;
 import com.ga.unit.item.Projectile;
-import com.ga.unit.item.Weapon;
 import com.ga.unit.skill.*;
 
 import java.awt.*;
@@ -19,9 +21,15 @@ import static com.ga.unit.skill.Skills.*;
  * Created by Ga on 5/7/2016.
  */
 public class Man extends Unit {
-    protected Weapon weapon;
+    protected Item weapon;
     protected Armor armor;
     protected Shadow shadow;
+
+    public Man(String p){
+        this(p.split("@")[0],new P(p.split("@")[2]),Integer.parseInt(p.split("@")[1]));
+        setWeapon(ItemFactory.load(p.split("@")[3]));
+        setArmor((Armor) ItemFactory.load(p.split("@")[4]));
+    }
 
     public Man(String name, P pt, int seed) {
         super(name, pt, seed);
@@ -45,12 +53,13 @@ public class Man extends Unit {
         Updater.addQueue.add(shadow);
     }
 
-    public void setWeapon(Weapon p){
+    public void setWeapon(Item p){
+        if (p == null) p = ItemFactory.produce("Fist",0);
         weapon = p;
         weapon.pos = pos;
         weapon.setOrgan(clip.organs[FIST]);
         weapon.dir = dir;
-        if (!p.name.equals("Fist")){
+        if (!wieldingNone()){
             clip.localAnimation[0] = clip.localAnimation[2];
         } else {
             clip.resetLocalAnimation(0);
@@ -58,24 +67,28 @@ public class Man extends Unit {
     }
 
     public void setArmor(Armor p){
+        if (p == null) p = (Armor) ItemFactory.produce("Underwear",0);
         armor = p;
-        if (!p.name.equals("Underwear")) {
-            clip.organs[0].setImage("item/armor/" + p.name + "_skin",2);
-            clip.organs[1].setImage("item/armor/" + p.name + "_skin",1);
-            clip.organs[2].setImage("item/armor/" + p.name + "_skin",1);
-            clip.organs[3].setImage("item/armor/" + p.name + "_skin",0);
-            clip.organs[4].setImage("item/armor/" + p.name + "_skin",2);
+        if (!equippingNone()) {
+            clip.organs[0].setImage(p.name + "_skin",2);
+            clip.organs[1].setImage(p.name + "_skin",1);
+            clip.organs[2].setImage(p.name + "_skin",1);
+            clip.organs[3].setImage(p.name + "_skin",0);
+            clip.organs[4].setImage(p.name + "_skin",2);
         } else {
             clip.organs[0].image = null;
             clip.organs[1].image = null;
             clip.organs[2].image = null;
             clip.organs[3].image = null;
             clip.organs[4].image = null;
-            clip.organs[5].setImage("unit/" + name);
+            clip.organs[5].setImage(name);
         }
     }
 
-    public Weapon getWeapon(){
+    public boolean wieldingNone(){ return weapon == null || weapon.name.equals("Fist"); }
+    public boolean equippingNone(){ return armor == null || armor.name.equals("Underwear"); }
+
+    public Item getWeapon(){
         return weapon;
     }
 
@@ -99,10 +112,6 @@ public class Man extends Unit {
         return pos.getAdd(clip.organs[FIST].ptd);
     }
     protected boolean stateSet(Moveset state){
-        if (state == Weapon){
-            setState(weapon.action);
-            return true;
-        }
         String statreq = state.getStatReq();
         float req = state.getCost();
         if (req < 0){
@@ -116,6 +125,24 @@ public class Man extends Unit {
             return true;
         }
         return false;
+    }
+    private void useItem(){
+        delay.set(weapon.delay);
+        final Man host = this;
+        final Item wpn = weapon;
+        delay.performer = new Performer(){
+            public boolean perform(){
+                if (!wpn.use(host)){
+                    say(wpn.getFullName()+" is not working!");
+                } else if (wpn.uses.get() == 0) {
+                    say(wpn.name+" has 0 uses left.");
+                    setWeapon(null);
+                }
+                delay.performer = null;
+                return true;
+            }
+        };
+        clip.setState(weapon.action);
     }
     protected void actionSet(Moveset state, int level){
         if (state instanceof Actions) {
@@ -133,11 +160,14 @@ public class Man extends Unit {
             }
         } else if (state instanceof Skills) {
             switch ((Skills) state) {
+                case Weapon:
+                    useItem();
+                    break;
                 case Jump:
                     vel.y -= 40 - (level * 2);
                     jump = false;
                     break;
-                case Riposte:
+                case Underhand:
                     damageMod = 1 + (level * .5f);
                     break;
                 case Stab:
@@ -216,7 +246,7 @@ public class Man extends Unit {
         Line hitbox = weapon.getLine();
         hit = Updater.collide(this, hitbox, cleave);
         if (hit != null){
-            if (state == Riposte){
+            if (state == Underhand){
                 cooldown.put(state,new int[]{Global.getTime()[0]+24});
             }
             if (brain != null) brain.attacked();
@@ -234,7 +264,7 @@ public class Man extends Unit {
                 switch ((Skills) state) {
                     case Stab:
                     case Pierce:
-                    case Riposte:
+                    case Underhand:
                     case Lunge:
                         attack();
                         break;
@@ -243,18 +273,24 @@ public class Man extends Unit {
                         break;
                     case Throw:
                         if (!weapon.name.equals("Fist")) {
-                            Projectile p = new Projectile("item/weapon/" + weapon.name, pos.getAdd(clip.organs[OFIST].ptd), Global.player.mP.getAdd(pos), 50) {
+                            Projectile p = new Projectile(null, pos.getAdd(clip.organs[OFIST].ptd), Global.player.mP.getAdd(pos), 50) {
+                                Item wpn = weapon;
                                 @Override
                                 public void stuck() {
                                     if (tangible) Particle.explode("Fire", pos, vel, 20, 10, 15, true, 3);
-                                    super.stuck();
+                                    wpn.pos = new P(pos);
+                                    wpn.field();
+                                    remove();
                                 }
                             };
+                            p.setImage(weapon.image);
+                            p.size.set(weapon.size);
+                            p.setVisible(true);
                             p.rotSpeed = .03f;
                             p.faction = faction;
                             p.damage = getDamage();
                             p.gravity = true;
-                            cooldown.put(state, new int[]{Global.getTime()[0] + 30});
+                            setWeapon(null);
                         }
                         break;
                     case Leap:
@@ -305,7 +341,7 @@ public class Man extends Unit {
 
     @Override
     public void draw(Graphics2D g) {
-        if (weapon != null) weapon.draw(g);
+        weapon.draw(g);
         super.draw(g);
 //        drawDebug(g);
     }
@@ -322,7 +358,7 @@ public class Man extends Unit {
     @Override
     public String toString(){
         String r = super.toString();
-        if (!r.equals("")) return "Man:"+r;
+        if (!r.equals("")) return r+"@"+weapon.toItemString()+"@"+armor.toItemString();
         return r;
     }
 }

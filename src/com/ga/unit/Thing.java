@@ -22,14 +22,14 @@ public class Thing implements Drawable {
     int depth;
     public int dir = 1;
     public float rotation = 0;
-    public Thing(String dir, String name){
+    public Thing(String name){
         this.name = name;
-        if (dir != null && name != null) {
-            setImage(Texture.load(dir + name));
+        if (name != null) {
+            setImage(Texture.load(name));
         } else visible = false;
         pos = new P();
     }
-    protected void setImage(BufferedImage image){
+    public void setImage(BufferedImage image){
         this.image = image;
         size = new P(this.image.getWidth(), this.image.getHeight());
         sizeRadius = (int) size.getMult(.5f,.5f).getDist();
@@ -37,14 +37,17 @@ public class Thing implements Drawable {
     public void rotate(P p){
         rotation = ((float) Math.atan2(p.y,p.x));
     }
-    public Thing(String dir, String name, P pt, int depth){
-        this(dir, name);
+    public Thing(String name, P pt, int depth){
+        this(name);
         this.depth = depth;
         pos = pt;
         Updater.addQueue.add(this);
     }
     public boolean isFacing(P p){
         return (pos.x > p.x && dir == -1) || (pos.x < p.x && dir == 1);
+    }
+    public void setVisible(boolean p){
+        visible = p;
     }
     public void draw(Graphics2D g, P offset){
         if (visible) {

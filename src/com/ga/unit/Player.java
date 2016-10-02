@@ -4,57 +4,28 @@ import com.ga.game.Command;
 import com.ga.game.Display;
 import com.ga.game.FileManager;
 import com.ga.map.Global;
-import com.ga.map.ManFactory;
 import com.ga.tool.Line;
-import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.tool.Timer;
-import com.ga.unit.item.*;
+import com.ga.unit.item.Inventory;
+import com.ga.unit.item.Item;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Moveset;
 import com.ga.unit.skill.Spell;
 import com.ga.unit.skill.Stat;
 
-import java.util.ArrayList;
+import static com.ga.unit.BodyHumanoid.FIST;
 
 /**
  * Created by Ga on 7/30/2016.
  */
 public class Player extends Man {
-    class Companions{
-        ArrayList<String> companions = new ArrayList<>();
-        ArrayList<Timer> cooldowns = new ArrayList<>();
-        public Companions(){
-            add("Player",100);
-            add("Man",200);
-            add("Knight",300);
-        }
-        public void add(String p, int cd){
-            companions.add(p);
-            cooldowns.add(new Timer(cd, false));
-        }
-        public void summon(){
-            for (int i=0;i<companions.size();i++){
-                if (cooldowns.get(i).over()){
-                    cooldowns.get(i).reset();
-                    Man p = ManFactory.produce(companions.get(i), pos.getAdd(0,-50), -1);
-                    p.dir = -dir;
-                    p.faction = Faction.Player;
-                    break;
-                }
-            }
-        }
-        public void update(){
-            for (Timer i : cooldowns) i.update();
-        }
-    }
     public int gold;
     public Inventory inventory = new Inventory(this);
-    private Companions companions = new Companions();
     public SkillTree skillTree = new SkillTree();
     public Timer save = new Timer(50, true);
-    public Player(P pt, int seed) {
-        super("Player",pt,seed);
+    public Player(String p) {
+        super(p);
         faction = Faction.Player;
         Command.host = this;
         get("Health").setTotal(30);
@@ -65,8 +36,6 @@ public class Player extends Man {
         get("Level Points").setTotal(25);
         get("Reset Points").setTotal(25);
         speechType = "p";
-        setWeapon((Weapon) ItemFactory.produce("Fist",0));
-        setArmor((Armor) ItemFactory.produce("Underwear",0));
     }
     @Override
     public void say(String p){
@@ -82,58 +51,48 @@ public class Player extends Man {
            skillTree.advanceSkill(p, cd);
     }
     private void grabItem(){
-        Item t = Updater.collide(pos.getAdd(clip.organs[1].ptd));
+        Item t = Updater.collide(pos.getAdd(clip.organs[FIST].ptd));
         if (t != null){
-            if (addItem(t)) {
-                say("Picking up " + t.getFullName());
-                t.remove();
-            } else say("Can't pick up "+t.getFullName()+"... Inventory is full!");
+            setWeapon(t);
         }
     }
-    public void dropItem(int p) {
-        Item t = inventory.remove(p);
-        say("Dropping "+t.getFullName());
-        t.drop(this);
-        Updater.addQueue.add(t);
-        get("Speed").add(t.weight);
+    public void setWeapon(Item p){
+        if (p == null || sheathe()) super.setWeapon(p);
+        else{
+            dropItem(weapon);
+            super.setWeapon(p);
+        }
     }
-    public boolean addItem(Item p){
-        if (inventory.addItem(p)) {
-            p.pickup(this);
-            get("Speed").add(-p.weight);
+    public boolean sheathe() {
+        if (wieldingNone()) return true;
+        if (inventory.addItem(weapon)){
+            say("Sheathed "+weapon.name);
+            weapon.remove();
+            setWeapon(null);
             return true;
         }
         return false;
     }
-    public void describeItem(int p) {
-        Item item = inventory.getItem(p);
-        String r = item.getDescription();
-        say(r);
+    public void dropItem(Item p) {
+        Item t = inventory.remove(p);
+        if (t != null) {
+            t.drop(this);
+        } else if (p == weapon) {
+            weapon.drop(this);
+            setWeapon(null);
+        } else if (p == armor){
+            armor.drop(this);
+            setArmor(null);
+        } else return;
+        say("Dropping " + p.getFullName());
     }
-    public void useItem(int p){
+    public void selectItem(int p){
         if (!delay.over() || !jump) return;
         if (inventory.pockets.length > p && inventory.pockets[p] != -1) {
-            final Item item = inventory.getItem(inventory.pockets[p]);
-            delay.set(item.delay);
-            final Man host = this;
-            delay.performer = new Performer(){
-                public boolean perform(){
-                    if (!item.use(host)){
-                        say(item.getFullName()+" is not working!");
-                    } else if (item.uses.get() == 0) {
-                        say("Used up "+item.name);
-                        inventory.remove(item);
-                    }
-                    delay.performer = null;
-                    return true;
-                }
-            };
-            target = Global.player.mP;
-            clip.setState(item.action);
+            Item item = inventory.getItem(inventory.pockets[p]);
+            inventory.remove(inventory.pockets[p]);
+            setWeapon(item);
         }
-    }
-    public void summon(){
-        companions.summon();
     }
     @Override
     protected int[] getCooldown(Moveset state){
@@ -157,7 +116,7 @@ public class Player extends Man {
         if (state instanceof Actions) {
             switch ((Actions) state) {
                 case Pickup:
-                    grabItem();
+                    if (weapon.name.equals("Fist")) grabItem();
                     break;
                 default:
                     weapon.rotate(target.getMult(dir,dir));
@@ -196,7 +155,6 @@ public class Player extends Man {
         }
     }
     public void update(){
-        companions.update();
         Global.player.update();
         super.update();
         Global.camera = pos.getAdd(0,-40); //to be able to walk to edge
@@ -204,7 +162,8 @@ public class Player extends Man {
         if (save.update() && state != Actions.Dead) FileManager.saveCharacter();
     }
     public String toCharacterString(){
-        String r = super.toString()+"@"+gold+"@"+Global.getTime()[0]+"\n";
+        String r = super.toString()+"\n";
+        r += gold+";"+Global.getTime()[0]+"\n";
         r += Global.player.toString()+"\n";
         r += stats.toString()+"\n";
         r += inventory.toString()+"\n";
@@ -213,8 +172,8 @@ public class Player extends Man {
     }
     public void load(String p){
         String[] line = p.split("%");
-        gold = Integer.parseInt(line[0].split("@")[3]);
-        stats.load(line[2]);
+        gold = Integer.parseInt(line[1].split(";")[1]);
+        stats.load(line[3]);
         hp = new PlayerHealthBar(get("Health"),get("Stamina"),get("Energy"),pos);
         get("Stamina").onChange = (new Performer(){
             @Override
@@ -232,15 +191,8 @@ public class Player extends Man {
                 return true;
             }
         });
-        get("Health").onChange = (new Performer(){
-            @Override
-            public boolean perform(){
-                hp.show(15);
-                return true;
-            }
-        });
-        inventory.load(line[3]);
-        skillTree.load(line[4]);
-        Global.player.load(line[1]);
+        inventory.load(line[4]);
+        skillTree.load(line[5]);
+        Global.player.load(line[2]);
     }
 }

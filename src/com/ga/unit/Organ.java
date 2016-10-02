@@ -17,15 +17,15 @@ import java.awt.image.BufferedImage;
 public class Organ extends Line {
     public Color color = Color.black;
     public Stroke stroke = new BasicStroke(10);
-    protected int strokeSize = 10;
-    protected String name;
+    public int strokeSize = 10;
+    public String name;
     protected BufferedImage image;
     protected boolean amputated = false;
     public Matter host;
     protected Organ parent;
-    protected P size;
+    public P size;
     protected int sizeRadius;
-    protected int type;
+    public int type;
     public int health = 1;
     protected boolean vital = false;
 
@@ -58,7 +58,7 @@ public class Organ extends Line {
         g.setStroke(stroke);
         g.setColor(color);
         if (image == null) super.draw(g, host.pos);
-        else {
+        else if (type != 0){
             P pos = host.pos.getAdd(pt);
             if (type == 1){
                 P t = Global.getRelPos(pos.x - (size.x*host.dir / 2), pos.y - (size.y / 2));
@@ -113,5 +113,9 @@ public class Organ extends Line {
     public float getHeight() {
         if (parent == null) return 0;
         return parent.getHeight()+(amputated?0:Math.abs(ptd.y-pt.y));
+    }
+
+    public BufferedImage getImage() {
+        return image;
     }
 }

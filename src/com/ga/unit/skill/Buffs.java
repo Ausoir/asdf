@@ -45,7 +45,7 @@ public enum Buffs {
             tick--;
             if (tick == 0) {
                 tick = 2;
-                final Projectile p = new Projectile("effect/Ice", host.pos.getAdd(0, -5), P.getZero(), 0) {
+                final Projectile p = new Projectile("Ice", host.pos.getAdd(0, -5), P.getZero(), 0) {
                     @Override
                     protected void onAttack(Matter p) {
                         if (p instanceof Unit){
@@ -83,7 +83,7 @@ public enum Buffs {
             tick--;
             if (tick == 0) {
                 tick = 1;
-                final Projectile p = new Projectile("effect/Flamecluster", host.pos.getAdd(0, -5), P.getZero(), 0) {
+                final Projectile p = new Projectile("Flamecluster", host.pos.getAdd(0, -5), P.getZero(), 0) {
                     @Override
                     protected void onAttack(Matter p) {
                         Particle.explode("Flame", pos, P.getZero(), 30, 20, 0, false, 2);

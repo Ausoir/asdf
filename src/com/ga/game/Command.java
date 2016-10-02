@@ -20,8 +20,6 @@ public class Command {
             order(p.substring(4));
         } else if (p.startsWith("cast")){
             host.setState(Spells.valueOf(p.substring(5)));
-        } else if (p.contains("rally")){
-            host.summon();
         } else if (p.contains("fireball")){
             host.setState(Actions.Cast);
             host.delay.set(30);
@@ -48,11 +46,15 @@ public class Command {
                 else if (cmd[0].equals("delevel")) host.stats.delevel(cmd[1]);
                 else if (cmd[0].equals("level")) host.stats.level(cmd[1]);
                 else if (cmd[0].equals("stat")) host.get(cmd[1].split(":")[0]).addTotal(Integer.parseInt(cmd[1].split(":")[1]));
+                else if (cmd[0].equals("advSkill")) for (int num=0;num<Integer.parseInt(cmd[1].split(":")[1]);num++) host.skillTree.advanceSkill(Skills.valueOf(cmd[1].split(":")[0]),false);
+                else if (cmd[0].equals("advSkillCd")) for (int num=0;num<Integer.parseInt(cmd[1].split(":")[1]);num++) host.skillTree.advanceSkill(Skills.valueOf(cmd[1].split(":")[0]),true);
+                else if (cmd[0].equals("advSpell")) for (int num=0;num<Integer.parseInt(cmd[1].split(":")[1]);num++) host.skillTree.advanceSkill(Spells.valueOf(cmd[1].split(":")[0]),false);
+                else if (cmd[0].equals("advSpellCd")) for (int num=0;num<Integer.parseInt(cmd[1].split(":")[1]);num++) host.skillTree.advanceSkill(Spells.valueOf(cmd[1].split(":")[0]),true);
                 else if (cmd[0].equals("man")) ManFactory.produce(cmd[1], host.pos.getAdd(host.target), -1);
                 else if (cmd[0].equals("mob")) for (int num=0;num<Integer.parseInt(cmd[1].split(":")[1]);num++) ManFactory.produce(cmd[1].split(":")[0], host.pos.getAdd(host.target), -1);
                 else if (cmd[0].equals("dog")) new Beast("Dog",cmd[1],host.pos.getAdd(host.target),-1);
                 else if (cmd[0].equals("dummy")) ManFactory.produce(cmd[1], host.pos.getAdd(host.target), -1).brain = null;
-                else if (cmd[0].equals("item")) host.addItem(ItemFactory.produce(cmd[1] ,-1));
+                else if (cmd[0].equals("item")) host.setWeapon(ItemFactory.produce(cmd[1] ,-1));
                 else if (cmd[0].equals("tp")) host.pos.add(Integer.parseInt(cmd[1].split(",")[0]),Integer.parseInt(cmd[1].split(",")[1]));
                 else if (cmd[0].equals("tpto")) host.pos.set(Integer.parseInt(cmd[1].split(",")[0]),Integer.parseInt(cmd[1].split(",")[1]));
                 else if (cmd[0].equals("act")) host.setState(Skills.valueOf(cmd[1]));

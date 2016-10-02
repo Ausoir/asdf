@@ -115,7 +115,7 @@ public class Updater {
     public static Item collide(P p){
         for (Drawable i : drawee){
             if (i instanceof Item){
-                if (((Item) i).pos.getMinus().getAdd(p).getDist()<25) return (Item) i;
+                if (((Item) i).pos.getMinus().getAdd(p).getDist()<=4) return (Item) i;
             }
         }
         return null;

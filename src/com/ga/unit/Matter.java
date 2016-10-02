@@ -18,10 +18,10 @@ public class Matter extends Thing {
     public P vel = new P(0, 0);
     public boolean tangible = true;
     public Matter(){
-        super(null,null);
+        super(null);
     }
-    public Matter(String dir, String name, int seed, P pt, int depth) {
-        super(dir, name, pt, depth);
+    public Matter(String name, int seed, P pt, int depth) {
+        super(name, pt, depth);
         if (seed == -1) this.seed = Global.getSeed();
         else this.seed = seed;
         rand = new Random(this.seed);

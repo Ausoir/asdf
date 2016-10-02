@@ -39,7 +39,7 @@ public class SkillTree {
         if (cd){
             if (p instanceof Skills) {
                 switch ((Skills) p) {
-                    case Riposte:
+                    case Underhand:
                     case Lunge:
                     case Throw:
                         return false;
@@ -54,7 +54,7 @@ public class SkillTree {
         }
         return true;
     }
-    boolean advanceSkill(Moveset p, boolean cd){
+    public boolean advanceSkill(Moveset p, boolean cd){
         if (!advanceAble(p, cd)) return false;
         for (int i=0;i<skills.size();i++){
             if (skills.get(i) == p){

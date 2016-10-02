@@ -102,12 +102,12 @@ public class EditorInput implements Input, Observer {
             boolean snap = false;
             for (Line i : Global.map.land){
                 if (i != current) {
-                    if (Math.abs(i.pt.x - x) < 30 && Math.abs(i.pt.y - y) < 30) {
+                    if (Math.abs(i.pt.x - x) < 40 && Math.abs(i.pt.y - y) < 40) {
                         x = (int) i.pt.x;
                         y = (int) i.pt.y;
                         snap = true;
                         break;
-                    } else if (Math.abs(i.ptd.x - x) < 30 && Math.abs(i.ptd.y - y) < 30) {
+                    } else if (Math.abs(i.ptd.x - x) < 40 && Math.abs(i.ptd.y - y) < 40) {
                         x = (int) i.ptd.x;
                         y = (int) i.ptd.y;
                         snap = true;
@@ -237,7 +237,7 @@ public class EditorInput implements Input, Observer {
             case KeyEvent.VK_INSERT:
                 if (Updater.editor) {
                     Updater.editor = false;
-                    Global.player = new PlayerInput(new Player(new P(Global.camera),0));
+                    Global.player = new PlayerInput(new Player("Player@0@"+Global.camera+"@Fist,0,0,0@Underwear,0,0,0"));
                     Global.player.host.save.time = -1;
                     Display.input = Global.player;
                     Global.camera = Global.player.host.pos;

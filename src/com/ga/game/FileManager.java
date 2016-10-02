@@ -5,10 +5,7 @@ import com.ga.map.ManFactory;
 import com.ga.map.Map;
 import com.ga.tool.Line;
 import com.ga.tool.P;
-import com.ga.unit.Beast;
-import com.ga.unit.Clip;
-import com.ga.unit.Player;
-import com.ga.unit.Updater;
+import com.ga.unit.*;
 import com.ga.unit.intelligence.PlayerInput;
 
 import java.io.BufferedReader;
@@ -70,12 +67,11 @@ public class FileManager {
     static void loadFirst(boolean editor){
         String data = read("map/"+"Player"+".char");
         String[] line = data.split("%");
-        String[] values = line[0].split("@");
         if (!editor){
             readMap("Map",0);
-            Global.player = new PlayerInput(new Player(new P(values[2]), Integer.parseInt(values[1])));
+            Global.player = new PlayerInput(new Player(line[0].split(":")[1]));
             Global.player.host.load(read("map/Player.char"));
-            Global.setTime(Integer.parseInt(values[4]));
+            Global.setTime(Integer.parseInt(line[1].split(";")[0]));
         } else {
             readMap("Map",-2);
             new EditorInput();
@@ -104,25 +100,20 @@ public class FileManager {
                 sections = line[2].split(";");
                 if (sections.length > 0)
                     for (int section = 0; section < sections.length; section++) {
-                        String[] type = sections[section].split("@");
-                        String[] unit = type[0].split(":");
+                        String[] unit = sections[section].split(":");
+                        String[] type = unit[1].split("@");
                         P pos;
                         int seed = Integer.parseInt(type[1]);
-                        String[] values = type[2].split(",");
-                        int[] v = new int[values.length];
-                        for (int i = 0; i < values.length; i++) {
-                            v[i] = Integer.parseInt(values[i]);
-                        }
-                        pos = new P(v[0], v[1]);
-                        if (unit[1].equals("Player")) {
+                        pos = new P(type[2]);
+                        if (unit[0].equals("Player")) {
                             if (player == 0){
                                 r = pos;
                             } else if (player == -2){
-                                new Player(pos, -1);
+                                new Player(unit[1]);
                             }
                             if (player > -1) player--;
                         }
-                        else if (unit[0].equals("Man")) ManFactory.produce(unit[1], pos, seed);
+                        else if (unit[0].equals("Man")) new Man(unit[1]);
                         else new Beast(unit[0], unit[1], pos, seed);
                     }
             }
@@ -226,6 +217,17 @@ public class FileManager {
             ArrayList<String> values = new ArrayList<>();
             for (String i : results) values.add(i);
             result.put(type[0],values);
+        }
+        return result;
+    }
+
+    public static HashMap<String, String> readTextureDirectory(String dir){
+        String data = read(dir);
+        String[] lines = data.split("%");
+        HashMap<String,String> result = new HashMap<>();
+        for (int line = 0; line < lines.length; line++) {
+            String[] type = lines[line].split("@");
+            if (type.length >= 2) result.put(type[0],type[1]);
         }
         return result;
     }

@@ -16,12 +16,13 @@ import java.util.HashMap;
  */
 public class Texture {
     private static HashMap<String,BufferedImage> cache = new HashMap<>();
+    private static HashMap<String,String> directory = FileManager.readTextureDirectory("Texture.dir");
     public static BufferedImage load(String dir){
         BufferedImage image = cache.get(dir);
         if (image != null) return image;
         try {
 //            if (dir.split("/")[0].equals("map")) p.image = imageToBufferedImage(ImageIO.read(new File("Data/"+dir)).getScaledInstance(4000,2000,Image.SCALE_FAST));
-            image = ImageIO.read(new File("Data/"+dir + ".png"));
+            image = ImageIO.read(new File("Data/"+directory.get(dir) + ".png"));
 
             cache.put(dir,image);
 //            ArrayList<P> collider = new ArrayList<>();
@@ -30,7 +31,7 @@ public class Texture {
 //            p.collidee = collidee.toArray(new P[collidee.size()]);
 //            p.collider = collider.toArray(new P[collider.size()]);
         } catch (IOException e) {
-            System.out.println("Can't read file Data/"+dir + ".png");
+            System.out.println("Can't read file ["+dir + "]");
             e.printStackTrace();
         }
         return image;

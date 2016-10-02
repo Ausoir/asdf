@@ -1,12 +1,15 @@
 package com.ga.unit.item;
 
 import com.ga.map.Global;
+import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.unit.Man;
 import com.ga.unit.Matter;
+import com.ga.unit.Organ;
 import com.ga.unit.Updater;
 import com.ga.unit.skill.*;
 
+import java.awt.*;
 import java.util.Random;
 
 /**
@@ -14,8 +17,8 @@ import java.util.Random;
  */
 public class Item extends Matter {
     public enum Tag{
-        Sword(Skills.Swing), Spear(Skills.Pierce), Mace(Skills.Swing), Dagger(Skills.Riposte), Armor(Skills.Rest), Scroll(Actions.Cast),
-        Throwing(Skills.Throw), Shooting(Actions.Shoot), Consumable(Actions.Consume), Claw(Skills.Riposte), Enchant(Actions.Buff);
+        Sword(Skills.Swing), Spear(Skills.Pierce), Mace(Skills.Swing), Dagger(Skills.Underhand), Armor(Skills.Rest), Scroll(Actions.Cast),
+        Throwing(Skills.Throw), Shooting(Actions.Shoot), Consumable(Actions.Consume), Claw(Skills.Underhand), Enchant(Actions.Buff);
         Moveset action;
         Tag(Moveset p){
             action = p;
@@ -95,9 +98,10 @@ public class Item extends Matter {
     public Moveset action = Actions.Consume;
     private int[] lastused = new int[]{0};
     public Stat uses = new Stat(1);
-    protected Tag type = Tag.Consumable;
-    public Item(String dir, String name, int seed, int weight, int uses, int cooldown, float enchantRatio) {
-        super("item/"+dir,name, seed, P.getZero(), -1);
+    private Tag type = Tag.Consumable;
+    private Organ organ = null;
+    public Item(String name, int seed, int weight, int uses, int cooldown, float enchantRatio) {
+        super(name, seed, P.getZero(), -1);
         this.name = name;
         this.weight = weight;
         this.uses.setTotal(uses);
@@ -126,9 +130,15 @@ public class Item extends Matter {
     public Tag getType(){
         return type;
     }
+    public void setOrgan(Organ p){
+        this.organ = p;
+    }
+    public Organ getOrgan() {
+        return organ;
+    }
     protected void setModifier(PrefixMod mod){
-        if (mod == PrefixMod.Broken) uses.addTotal((int) (uses.getMax()*-.7f));
-        else if (mod == PrefixMod.Old) uses.addTotal((int) Math.min(-1,uses.getMax()*-.3f));
+        if (mod == PrefixMod.Broken) uses.add((int) (uses.getMax()*-.7f));
+        else if (mod == PrefixMod.Old) uses.add((int) Math.min(-1,uses.getMax()*-.3f));
         else if (mod == PrefixMod.Fine){
             uses.addTotal(Math.max(1,uses.getMax()));
             probability += .1f;
@@ -141,7 +151,6 @@ public class Item extends Matter {
             uses.setTotal(-1);
             probability += .3f;
         }
-        if (uses.getMax() < 0 && (mod != PrefixMod.Mastercraft && mod != PrefixMod.Legendary)) uses.setTotal(0);
     }
     protected void setModifier(SpecialtyMod mod){
         if (mod == SpecialtyMod.None) admod = AdverbMod.None;
@@ -239,14 +248,21 @@ public class Item extends Matter {
         return false;
     }
     public void pickup(Man host){
-        setDepth(-1);
-        gravity = false;
+        host.setWeapon(this);
+        host.get("Speed").add(-weight);
+        remove();
     }
     public void drop(Man host) {
         pos = new P(host.pos);
-        setDepth(8);
+        field();
         rotation = (float)Global.r.nextInt(628)/100;
+        host.get("Speed").add(weight);
+    }
+    public void field(){
+        setDepth(8);
         gravity = true;
+        Updater.addQueue.add(this);
+        setOrgan(null);
     }
     public String getDescription() {
         String r = "a "+getFullName()+".";
@@ -263,7 +279,26 @@ public class Item extends Matter {
         }
         return r;
     }
+    public int getDamage() {
+        return weight;
+    }
+    public Line getLine(){
+        return new Line(pos.getAdd(organ.pt), getPoint());
+    }
+    public P getPoint(){
+        P result = pos.getAdd(organ.ptd);
+        result.add(size.x*.5f*Global.cos(rotation)*dir,(int) (size.x*.5f*Global.sin(rotation))*dir);
+        return result;
+    }
+    @Override
+    public void draw(Graphics2D g){
+        super.draw(g, organ==null?P.getZero():organ.ptd);
+    }
+    @Override
     public String toString(){
         return "";
+    }
+    public String toItemString(){
+        return name + "," + seed + "," + uses;
     }
 }

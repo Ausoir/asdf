@@ -14,7 +14,7 @@ public class BodyHumanoid extends Body {
 
     BodyHumanoid(Unit host) {
         super(host, "Man");
-        organs[5].setImage("unit/"+host.name);
+        organs[5].setImage(host.name);
     }
 
     protected void resetLocalAnimation(int p){
@@ -43,6 +43,9 @@ public class BodyHumanoid extends Body {
     public void setState(Moveset state) {
         if (state instanceof Actions) {
             switch ((Actions) state) {
+                case Pickup:
+                    rotateAppendage(FIST, 23);
+                    break;
                 case Shoot:
                     rotateAppendage(OFIST, 28);
                     break;
@@ -59,7 +62,7 @@ public class BodyHumanoid extends Body {
                 case Throw:
                     rotateAppendage(FIST, 6);
                     break;
-                case Riposte:
+                case Underhand:
                     rotateAppendage(FIST, 22);
                     break;
                 case Lunge:

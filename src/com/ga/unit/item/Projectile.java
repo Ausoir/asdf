@@ -15,7 +15,7 @@ public class Projectile extends Matter {
     protected float radius;
     public EventTimer delay = new EventTimer(-1, false, null);
     public Projectile(String name, P pt, P dest, int speed) {
-        super("", name, 0, pt, 10);
+        super(name, 0, pt, 10);
         vel.set(dest.getAtan(pt, speed));
         rotation = (float) Math.atan2(dest.y-pt.y,dest.x-pt.x);
         if (size != null) radius = size.getDist();

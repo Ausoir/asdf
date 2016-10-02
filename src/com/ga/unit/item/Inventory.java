@@ -10,47 +10,26 @@ import java.util.ArrayList;
 public class Inventory {
     public int[] pockets = new int[]{-1,-1,-1};
     private ArrayList<Item> items = new ArrayList<>();
-    public int wielded = -1, worn = -1, weight = 0;
+    public int weight = 0;
     private Player player;
     public int maxSize = 5;
     public Inventory(Player player){
         this.player = player;
     }
     public int equip(int index){
-        int result;
+        int result = 0;
         Item item = items.get(index);
-        if (item instanceof Weapon) {
-            result = 1;
-            player.setWeapon((Weapon) items.get(index));
-            wielded = index;
-        } else if (item instanceof Armor){
-            result = 2;
-            player.setArmor((Armor) items.get(index));
-            worn = index;
-        } else {
-            result = 10;
-            int pocket = getEmptyPocket(item);
-            if (pocket > -1){
-                result += pocket;
-                pockets[pocket] = index;
-            }
+        int pocket = getEmptyPocket(item);
+        if (pocket > -1){
+            result += pocket;
+            pockets[pocket] = index;
         }
         return result;
     }
     public void unequip(int index){
         Item item = items.get(index);
         item.unequip(player);
-        if (item instanceof Weapon) {
-            if (player.getWeapon() == item) player.setWeapon((Weapon) ItemFactory.produce("Fist", 0));
-            if (index == wielded){
-                wielded = -1;
-            }
-        } else if (item instanceof Armor){
-            if (player.getArmor() == item) player.setArmor((Armor) ItemFactory.produce("Underwear", 0));
-            if (index == worn) worn = -1;
-        } else {
-            removePocket(item);
-        }
+        removePocket(item);
     }
     public boolean addItem(Item p){
         if (items.size() >= maxSize) return false;
@@ -92,8 +71,6 @@ public class Inventory {
     public Item remove(int p){
         Item r = items.get(p);
         removePocket(r);
-        if (wielded > p) wielded--;
-        if (worn > p) worn--;
         for (int i=0;i<pockets.length;i++){
             if (pockets[i] > p) pockets[i]--;
         }
@@ -102,25 +79,18 @@ public class Inventory {
     }
     public Item remove(Item item){
         int i = items.indexOf(item);
+        if (i == -1) return null;
         return remove(i);
     }
     public void load(String p){
         if (p.equals(";")) return;
         String[] data = p.substring(1).split(";");
         for (int i=0;i<data.length;i++){
-            String[] pair = data[i].split("@");
-            Item item = ItemFactory.produce(pair[0],Integer.parseInt(pair[2].split(",")[0]));
-            item.uses.setTotal(Integer.parseInt(pair[2].split(",")[2]));
-            item.uses.set(Integer.parseInt(pair[2].split(",")[1]), true);
+            String[] prefix = data[i].split(":");
+            Item item = ItemFactory.load(prefix[0]);
             weight += item.weight;
-            if (pair[1].equals("w")){
-                wielded = i;
-                player.setWeapon((Weapon) item);
-            } else if (pair[1].equals("e")){
-                worn = i;
-                player.setArmor((Armor) item);
-            } else if (!pair[1].equals("")){
-                pockets[Integer.parseInt(pair[1])] = i;
+            if (!prefix[1].equals("x")){
+                pockets[Integer.parseInt(prefix[1])] = i;
             }
             items.add(item);
         }
@@ -128,12 +98,10 @@ public class Inventory {
     public String toString(){
         String r = ";";
         for (int i = 0; i < items.size(); i++) {
-            String prefix = "";
+            String prefix = "x";
             Item item = items.get(i);
-            if (wielded == i) prefix = "w";
-            else if (worn == i) prefix = "e";
-            else if (indexOf(item) != -1) prefix = ""+indexOf(item);
-            r += item.name+"@"+prefix+"@"+item.seed+","+item.uses + ";";
+            if (indexOf(item) != -1) prefix = "" + indexOf(item);
+            r += item.toItemString()+":"+prefix+";";
         }
         return r;
     }

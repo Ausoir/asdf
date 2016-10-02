@@ -15,11 +15,11 @@ import com.ga.unit.item.Weapon;
  * Created by Ga on 8/1/2016.
  */
 public enum Spells implements Moveset {
-    Focus(Actions.Conjure, 15, null, 0, 240,"Focus grants you free Stamina and Energy. [3*Level Stamina and Energy]", new Spell(){
+    Focus(Actions.Conjure, 15, null, 0, 240,"Focus grants you free Stamina and Energy. [2+Level^2 Stamina and Energy]", new Spell(){
         @Override
         public boolean perform(){
-            host.get("Stamina").add(3*level);
-            host.get("Energy").add(3*level);
+            host.get("Stamina").add(2+level*level);
+            host.get("Energy").add(2+level*level);
             return true;
         }
     }),
@@ -131,7 +131,7 @@ public enum Spells implements Moveset {
         @Override
         public boolean perform(){
             for (int i=0;i<2;i++) {
-                final Projectile p = new Projectile("effect/Fire", host.getHand(), host.target.getAdd(host.pos).getAdd(Global.r.nextInt(50)-25, Global.r.nextInt(50)-25), Global.r.nextInt(12)+3) {
+                final Projectile p = new Projectile("Fire", host.getHand(), host.target.getAdd(host.pos).getAdd(Global.r.nextInt(50)-25, Global.r.nextInt(50)-25), Global.r.nextInt(12)+3) {
                     @Override
                     protected void onAttack(Matter p) {
                         if (!host.stats.hasEffect(Buffs.Cleave)) super.onAttack(p);
@@ -163,7 +163,7 @@ public enum Spells implements Moveset {
         @Override
         public boolean perform(){
             for (int i=0;i<3;i++) {
-                final Projectile p = new Projectile("effect/Flame", host.getHand(), host.target.getAdd(host.pos).getAdd(Global.r.nextInt(50)-25, Global.r.nextInt(50)-25), Global.r.nextInt(10+level)+6+level) {
+                final Projectile p = new Projectile("Flame", host.getHand(), host.target.getAdd(host.pos).getAdd(Global.r.nextInt(50)-25, Global.r.nextInt(50)-25), Global.r.nextInt(10+level)+6+level) {
                     @Override
                     protected void onAttack(Matter p) {
                         if (!host.stats.hasEffect(Buffs.Cleave)) super.onAttack(p);
@@ -195,7 +195,7 @@ public enum Spells implements Moveset {
         @Override
         public boolean perform(){
             for (int i=0;i<3;i++) {
-                final Projectile p = new Projectile("effect/Ice", host.getHand(), host.target.getAdd(host.pos).getAdd(Global.r.nextInt(150)-75, Global.r.nextInt(150)-75), 20) {
+                final Projectile p = new Projectile("Ice", host.getHand(), host.target.getAdd(host.pos).getAdd(Global.r.nextInt(150)-75, Global.r.nextInt(150)-75), 20) {
                     private int tick = 200;
                     @Override
                     protected void onAttack(Matter p) {
@@ -230,7 +230,7 @@ public enum Spells implements Moveset {
     Fireball(Actions.Cast, 40,"Energy",5,50,"Shoot a fireball. [Range:Extreme] [Damage:15] [Radius:20+10*Level]",new Spell(){
         @Override
         public boolean perform(){
-            final Projectile p = new Projectile("item/Fireball", host.getHand(), host.target.getAdd(host.pos), 20+(host.get("Stamina").get()*2)){
+            final Projectile p = new Projectile("Fireball", host.getHand(), host.target.getAdd(host.pos), 20+(host.get("Stamina").get()*2)){
                 @Override
                 protected void onAttack(Matter p){
                     if (!host.stats.hasEffect(Buffs.Cleave)) super.onAttack(p);
@@ -266,7 +266,7 @@ public enum Spells implements Moveset {
         @Override
         public boolean perform(){
             if (Global.r.nextInt(40) > (level*8)-4) return false;
-            final Projectile p = new Projectile("effect/Ice", host.pos.getAdd(Global.nextGaussian(500),-500), host.pos.getAdd(Global.nextGaussian(500),0), 8+Global.r.nextInt(6*level)){
+            final Projectile p = new Projectile("Ice", host.pos.getAdd(Global.nextGaussian(500),-500), host.pos.getAdd(Global.nextGaussian(500),0), 8+Global.r.nextInt(6*level)){
                 @Override
                 protected void onAttack(Matter p){
                     if (p instanceof Unit){
@@ -305,7 +305,7 @@ public enum Spells implements Moveset {
         @Override
         public boolean perform(){
             if (Global.r.nextInt(60) > level*2) return false;
-            final Projectile p = new Projectile("item/Fireball", host.pos.getAdd(Global.nextGaussian(50),-500), host.pos.getAdd((host.target.x)+Global.nextGaussian(50),0), 12+Global.r.nextInt(6)){
+            final Projectile p = new Projectile("Fireball", host.pos.getAdd(Global.nextGaussian(50),-500), host.pos.getAdd((host.target.x)+Global.nextGaussian(50),0), 12+Global.r.nextInt(6)){
                 @Override
                 public void stuck(){
                     Particle.explode("Fire", pos, P.getZero(), 30, 25, 0, false, 4);

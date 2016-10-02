@@ -1,7 +1,6 @@
 package com.ga.unit.item;
 
 import com.ga.map.Global;
-import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.unit.Matter;
 import com.ga.unit.Organ;
@@ -28,6 +27,25 @@ public class FlyingOrgan extends Projectile {
     public void stuck(){
         super.stuck();
         flying = false;
+        final FlyingOrgan me = this;
+        Item t = new Item(null,0,1,3,1,6){
+            @Override
+            public void init(){
+                me.remove();
+            }
+            @Override
+            public String toItemString(){
+                return "";
+            }
+        };
+        t.field();
+        t.setVisible(true);
+        t.pos = pos.getAdd(organ.pt);
+        t.rotation = rotation;
+        t.name = "Organ";
+        t.setImage(organ.getImage());
+        if (organ.type == 2) t.size = new P(organ.strokeSize/2,organ.getLength()+(organ.strokeSize/2));
+        organ.type = 0;
     }
     @Override
     protected void onAttack(Matter p){

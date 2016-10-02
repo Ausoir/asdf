@@ -15,7 +15,7 @@ public class Particle extends Thing implements Effect {
     private P vel;
     private boolean gravity;
     public Particle(String name, P pt, P vel, float rotation, float speed, boolean gravity, int lifetime) {
-        super("effect/", name, pt, 13);
+        super(name, pt, 13);
         this.vel = new P(vel);
         this.vel.add(Global.cos(rotation)*speed,Global.sin(rotation)*speed);
         this.gravity = gravity;

@@ -12,8 +12,8 @@ public enum Skills implements Moveset {
     Whirlwind(0,"Stamina",-3,0,40,"Swing your weapon back and forth. Costly, but quick and effective even to multiple enemies. Hits multiple times. [Level*3 seconds duration]"),
     Stab(40,"Stamina",-2,0,30,"Stab with your weapon, dealing enormous damage. [Damage:4*Level]"), Weapon(0,null,0,0,0,"Use the current weapon's basic moveset."),
     Dash(35,"Stamina",-1,0,20,"Dash through enemies with a piercing attack. [10*Level Distance] [Damage:.5*Level]"), Rest(0,null,0,0,1,"Resting regenerates stamina and energy by 50% every 3 seconds."),
-    Riposte(0,null,0,0,0,"A careful stab from the waist with no stamina cost. Successful stab causes cooldown."),
-    Throw(0,null,0,0,0,"Throw your weapon to deal ranged damage. Don't worry about retrieval."),
+    Underhand(0,null,0,0,0,"A careful stab from the waist with no stamina cost. Successful stab causes cooldown."),
+    Throw(0,null,0,0,0,"Throw your weapon to deal damage from afar."),
     Leap(40,"Stamina",-2,3,80,"Perform a leap over great distances.");
     private String description;
     private String statReq;

@@ -6,6 +6,7 @@ import com.ga.tool.Word;
 import com.ga.unit.*;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Skills;
+import com.ga.unit.skill.Stat;
 
 /**
  * Created by Ga on 8/7/2016.
@@ -42,8 +43,13 @@ public class ItemFactory {
             this.comfort = comfort;
         }
     }
+    public static Item load(String p){
+        Item result = ItemFactory.produce(p.split(",")[0],Integer.parseInt(p.split(",")[1]));
+        result.uses = new Stat(p.split(",")[2]+","+p.split(",")[3]);
+        return result;
+    }
     public static Item produce(String p, int seed){
-        String t = Word.wordify(p);
+        String t = p;
         for (FactoryWeapon w : FactoryWeapon.values()){
             if (w.name().equals(t)) return produceWeapon(t, seed);
         }
@@ -78,7 +84,7 @@ public class ItemFactory {
         Item item;
         switch (p){
             case "Potion":
-                item = new Item("",p, seed, 1, 1, 1000, 1){
+                item = new Item(p, seed, 1, 1, 1000, 1){
                     @Override
                     public boolean use(Man host){
                         if (super.use(host)) {
@@ -91,7 +97,7 @@ public class ItemFactory {
                 item.delay = 45;
                 break;
             case "Spellbook":
-                item = new Item("",p, seed, 1, 1, 0, 1){
+                item = new Item(p, seed, 1, 1, 0, 1){
                     @Override
                     public boolean use(Man host){
                         if (super.use(host)) {
@@ -105,7 +111,7 @@ public class ItemFactory {
                 item.delay = 45;
                 break;
             case "Manual":
-                item = new Item("",p, seed, 1, 1, 0, 0){
+                item = new Item(p, seed, 1, 1, 0, 0){
                     public Skills skill;
                     @Override
                     public boolean use(Man host){
@@ -127,7 +133,7 @@ public class ItemFactory {
                 item.delay = 45;
                 break;
             case "Scroll":
-                item = new Item("",p, seed, 1, 1, 100, 1){
+                item = new Item(p, seed, 1, 1, 100, 1){
                     @Override
                     public boolean use(Man host){
                         if (super.use(host)) {
@@ -140,11 +146,11 @@ public class ItemFactory {
                 item.delay = 45;
                 break;
             case "Fireball":
-                item = new Item("",p, seed, 1, 3, 10, 0) {
+                item = new Item(p, seed, 1, 3, 10, 0) {
                     @Override
                     public boolean use(Man host) {
                         if (super.use(host)) {
-                            final Projectile p = new Projectile("item/Fireball", host.pos.getAdd(host.clip.organs[BodyHumanoid.FIST].ptd), Global.player.mP.getAdd(host.pos), 20+(host.get("Stamina").get()*2)){
+                            final Projectile p = new Projectile("Fireball", host.pos.getAdd(host.clip.organs[BodyHumanoid.FIST].ptd), Global.player.mP.getAdd(host.pos), 20+(host.get("Stamina").get()*2)){
                                 @Override
                                 public void stuck(){
                                     Particle.explosion(pos);
@@ -176,12 +182,12 @@ public class ItemFactory {
                 item.delay = 10;
                 item.setType(Item.Tag.Throwing);
                 break;
-            case "Throwing_Knife":
-                item = new Item("weapon/","Dagger", seed, 1, 10, 20, .04f){
+            case "Throwing Knife":
+                item = new Item("Throwing Knife", seed, 1, 10, 20, .04f){
                     @Override
                     public boolean use(Man host){
                         if (super.use(host)) {
-                            Projectile p = new Projectile("item/weapon/Dagger",host.pos.getAdd(host.clip.organs[BodyHumanoid.OFIST].ptd),Global.player.mP.getAdd(host.pos),50){
+                            Projectile p = new Projectile("Dagger",host.pos.getAdd(host.clip.organs[BodyHumanoid.OFIST].ptd),Global.player.mP.getAdd(host.pos),50){
                                 @Override
                                 public void stuck(){
                                     if (tangible) Particle.explode("Fire", pos, vel, 20, 10, 15, true,3);
@@ -197,7 +203,6 @@ public class ItemFactory {
                         return false;
                     }
                 };
-                item.name = "Throwing_Knife";
                 item.delay = 8;
                 item.setType(Item.Tag.Shooting);
                 break;

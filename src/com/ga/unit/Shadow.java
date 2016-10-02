@@ -13,7 +13,7 @@ class Shadow extends Thing {
     private static final P size = new P(50,20);
     private P hostPos;
     Shadow(P pt) {
-        super(null, null, new P(), 9);
+        super(null, new P(), 9);
         setHostPos(pt);
     }
     public void setHostPos(P pt){

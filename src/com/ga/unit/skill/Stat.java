@@ -10,6 +10,11 @@ public class Stat {
     private int current;
     public Performer onChange;
     public int reserve = 0;
+    public Stat(String p){
+        String[] t = p.split(",");
+        current = Integer.parseInt(t[0]);
+        max = Integer.parseInt(t[1]);
+    }
     public Stat(int p){
         setTotal(p);
     }

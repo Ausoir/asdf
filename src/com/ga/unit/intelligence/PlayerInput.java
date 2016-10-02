@@ -79,7 +79,7 @@ public class PlayerInput implements Input, Observer {
             if (mode > 0 && keyPressed.indexOf(mode) == -1) keyPressed.add(mode);
         if (mode < 0)
             keyPressed.remove((Object) (-mode));
-        if (mode > 48 && mode < 57) host.useItem(mode-49);
+        if (mode > 48 && mode < 57) host.selectItem(mode-49);
     }
     public void command(int mode){
         host.setState(keyMap.get(mode));
