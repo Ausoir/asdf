@@ -11,6 +11,13 @@ import com.ga.unit.item.Projectile;
  */
 public enum Buffs {
     Haste(hostEffect(), 50, "Speed",1,"Speed"), Rejuvenate(hostEffect(), 100, "Stamina",.5f,"Stamina"), Empower(weaponEffect(1), 80, "Proficiency",10), Cleave(weaponEffect(2), 300),
+    Burden(new Spell(){
+        @Override
+        public boolean perform(){
+            Particle.smoke(new P(host.pos));
+            return false;
+        }
+    }, -1, "Speed", 1),
     Evade(new Spell(){
         @Override
         public boolean perform(){
@@ -25,19 +32,26 @@ public enum Buffs {
             return false;
         }
     }, 50, "Speed",-1,"Speed"),
+    Pain(new Spell(){
+        @Override
+        public boolean perform(){
+            Particle.dripBlood(host.pos);
+            return false;
+        }
+    }, 50, "Speed",-.5f,"Speed"),
     Poison(new Spell(){
         private int tick = 1;
         @Override
         public boolean perform(){
             tick--;
             if (tick == 0) {
-                host.get("Health").add((-level/2)-1);
+                host.get("Health").add(-level-1);
                 tick = 30-level;
                 if (host.get("Health").get() == 1) return true;
             }
             return false;
         }
-    },100),
+    }, 100),
     Glacialwalk(new Spell(){
         private int tick = 1;
         @Override
@@ -99,6 +113,7 @@ public enum Buffs {
                 };
                 p.faction = host.faction;
                 p.damage = 10+host.get("Proficiency").get();
+                p.damageType = DamageType.Burn;
                 p.gravity = true;
                 p.delay.set(level*20);
                 p.delay.performer = new Performer(){

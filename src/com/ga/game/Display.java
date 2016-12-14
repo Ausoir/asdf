@@ -12,10 +12,15 @@ import java.awt.event.*;
  * Created by Ga on 5/6/2016.
  */
 public class Display extends JPanel implements KeyListener, MouseListener, MouseMotionListener {
-    private int mode = 0;
-    public JTextField chatbox;
+    private long lastTime = System.currentTimeMillis();
+    public static JTextField chatbox;
     public static Input input;
+    public static Dialog dialog;
     public static Menu menu;
+    public static Shop shop;
+    private int mode = 0;
+    private int mX = 0;
+    private int mY = 0;
     public Display() {
         Global.display = this;
         setLayout(null);
@@ -26,7 +31,9 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
             @Override
             public void componentResized(ComponentEvent e) {
                 Settings.setScreenSize(getWidth(), getHeight());
+                dialog.resize();
                 menu.resize();
+                shop.resize();
                 chatbox.setBounds(0,Settings.screenY-40,500,40);
             }
         });
@@ -46,8 +53,12 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
             }
         });
         add(chatbox);
+        dialog = new Dialog();
+        add(dialog);
         menu = new Menu();
         add(menu);
+        shop = new Shop();
+        add(shop);
         Global.weather = new Weather();
     }
 
@@ -58,30 +69,26 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
         input.chat(text);
     }
 
-    private void enter(){
-        chatbox.requestFocus();
-    }
-
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g.create();//.getDrawGraphics();
         Updater.draw(g2);
         repaint();
         try {
-            Thread.sleep(30);
+            long t = (long) Global.clamp(System.currentTimeMillis()-lastTime,0,30);
+            Thread.sleep(30-t);
+            lastTime = System.currentTimeMillis();
         } catch (Exception e) {
             System.out.println("Thread Error");
             System.exit(1);
         }
     }
 
-    private void input(boolean key, int mode, int x, int y){
-        if (mode == 0 || this.mode != mode) {
-            if (mode != 0) this.mode = mode;
+    private void input(int mode){
+        if (this.mode != mode) {
+            this.mode = mode;
             if (input != null)
-                input.input(key, mode, x, y);
-            if (mode == KeyEvent.VK_ENTER) enter();
-            else if (mode == KeyEvent.VK_TAB) menu.toggle();
+                input.input(mode, mX, mY);
         }
     }
 
@@ -91,45 +98,53 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
 
     @Override
     public void keyPressed(KeyEvent e) {
-        input(true,e.getKeyCode(),0,0);
+        input(e.getKeyCode());
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-        input(true,-e.getKeyCode(),0,0);
+        int t = e.getKeyCode();
+        if (t == 65 || t == 68) input(-t);
+        if (t == mode) mode = -1;
     }
 
     @Override
-    public void mouseClicked(java.awt.event.MouseEvent e) {
+    public void mouseClicked(MouseEvent e) {
+
     }
 
     @Override
     public void mousePressed(java.awt.event.MouseEvent e) {
-        input(false,e.getButton(),e.getX(),e.getY());
+        mX = e.getX();
+        mY = e.getY();
+        input(e.getButton());
     }
 
     @Override
     public void mouseReleased(java.awt.event.MouseEvent e) {
-        input(false,-e.getButton(),e.getX(),e.getY());
+        mX = e.getX();
+        mY = e.getY();
+        if (mode == e.getButton()) mode = -1;
     }
 
     @Override
-    public void mouseEntered(java.awt.event.MouseEvent e) {
+    public void mouseEntered(MouseEvent e) {
 
     }
 
     @Override
-    public void mouseExited(java.awt.event.MouseEvent e) {
+    public void mouseExited(MouseEvent e) {
 
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        input(false,0,e.getX(),e.getY());
+
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        input(false,0,e.getX(),e.getY());
+        mX = e.getX();
+        mY = e.getY();
     }
 }

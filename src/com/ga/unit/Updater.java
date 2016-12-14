@@ -23,6 +23,7 @@ public class Updater {
     public static ArrayList<Effect> effects = new ArrayList<>();
     public static ArrayList<Observer> other = new ArrayList<>();
     public static ArrayList<Matter> updatee = new ArrayList<>();
+    public static ArrayList<Unit> colidee = new ArrayList<>();
     public static ArrayList<Thing> addQueue = new ArrayList<>();
     public static Color landColor = Color.pink;
     public static String changeMap = null;
@@ -32,6 +33,7 @@ public class Updater {
         drawee.clear();
         other.clear();
         updatee.clear();
+        colidee.clear();
         effects.clear();
         addQueue.clear();
     }
@@ -54,6 +56,7 @@ public class Updater {
                 addDrawee(p);
                 if (p instanceof Matter) updatee.add((Matter) p);
                 if (p instanceof Effect) effects.add((Effect) p);
+                if (p instanceof Unit) colidee.add((Unit) p);
                 addQueue.remove(i);
             }
         }
@@ -78,6 +81,7 @@ public class Updater {
         addQueue.remove(p);
         drawee.remove(p);
         updatee.remove(p);
+        colidee.remove(p);
         effects.remove(p);
     }
     public static void addDrawee(Drawable p){
@@ -93,16 +97,16 @@ public class Updater {
         drawee.add(p);
     }
     public static String toMapString(){
-        if (updatee.size() == 0) return "";
         String result = "";
         for (Matter i : updatee){
             if (!i.toString().equals("")) result += i.toString()+";";
         }
+        if (result.length() == 0) return "";
         result = result.substring(0,result.length()-1);
         return result;
     }
     public static void sound(Matter p, String msg){
-        for (Matter i : updatee){
+        for (Matter i : colidee){
             if (i != p && i.faction != p.faction) {
                 if (Math.abs(i.pos.x - p.pos.x) < 600 && Math.abs(i.pos.y - p.pos.y) < 200) {
                     if (i instanceof Man) {
@@ -112,18 +116,17 @@ public class Updater {
             }
         }
     }
-    public static Item collide(P p){
-        for (Drawable i : drawee){
-            if (i instanceof Item){
-                if (((Item) i).pos.getMinus().getAdd(p).getDist()<=4) return (Item) i;
-            }
+    public static ArrayList<Matter> collide(P p, int r){
+        ArrayList<Matter> result = new ArrayList<>();
+        for (Matter i : updatee){
+            if (i.pos.getMinus().getAdd(p).getDist() <= r) result.add(i);
         }
-        return null;
+        return result;
     }
-    public static Matter collide(Matter p, int r){
-        Matter result = null;
-        for (int i = 0; i < updatee.size(); i++) {
-            Matter t = updatee.get(i);
+    public static Unit collide(Matter p, int r){
+        Unit result = null;
+        for (int i = 0; i < colidee.size(); i++) {
+            Unit t = colidee.get(i);
             if (p.faction != t.faction) {
                 if (t.checkHit(p,r)) {
                     result = t;
@@ -132,10 +135,10 @@ public class Updater {
         }
         return result;
     }
-    public static Matter collide(Matter host, Line p, boolean cleave){
-        Matter result = null;
-        for (int i = 0; i < updatee.size(); i++) {
-            Matter t = updatee.get(i);
+    public static Unit collide(Matter host, Line p, boolean cleave){
+        Unit result = null;
+        for (int i = 0; i < colidee.size(); i++) {
+            Unit t = colidee.get(i);
             if (host.faction != t.faction) {
                 if (t.checkHit(host,p)){
                     if (!cleave) return t;

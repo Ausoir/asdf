@@ -1,7 +1,8 @@
 package com.ga.game;
 
+import com.ga.connection.Server;
 import com.ga.map.Global;
-import com.ga.unit.Updater;
+import com.ga.tool.Clips;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,6 +23,11 @@ public class Game extends JFrame {
         JPanel display;
 //        Updater.showTerrain = true;
         display = new Display();
+//        Server.start();
+        Clips.init();
+        Texture.init();
+        Global.server = new Server();
+        Global.server.start();
         FileManager.loadFirst(editor);
         add(display);
         setVisible(true);

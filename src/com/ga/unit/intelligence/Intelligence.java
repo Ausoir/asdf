@@ -1,9 +1,10 @@
 package com.ga.unit.intelligence;
 
 import com.ga.map.Global;
+import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Timer;
-import com.ga.tool.Word;
+import com.ga.unit.Man;
 import com.ga.unit.Matter;
 import com.ga.unit.Unit;
 import com.ga.unit.Updater;
@@ -15,16 +16,26 @@ import java.util.ArrayList;
 /**
  * Created by Ga on 8/26/2016.
  */
-public class Intelligence {
+public abstract class Intelligence {
     protected Unit host;
     protected Timer think = new Timer(1, true);
     protected Timer forget = new Timer(100, true);
     private ArrayList<Matter> seen;
     public Unit target;
-    public Task task;
+    private Task task;
+    protected Communication comm;
+    private int[] base;
+    private int alertness = 0;
     public Intelligence(Unit man){
         host = man;
-        task = new Wander(man);
+        base = new int[]{host.rand.nextInt(Global.map.getWidth()),
+            host.rand.nextInt(Global.map.getWidth()),
+            host.rand.nextInt(Global.map.getWidth())};
+        task = new Idle(host);
+        defaultTask();
+    }
+    protected void defaultTask(){
+        setTask(new Wander(host, base));
     }
     public void update(){
         if (think.update()){
@@ -32,6 +43,14 @@ public class Intelligence {
         } else {
             task.update();
         }
+    }
+    protected void setTask(Task p){
+        if (!task.getClass().equals(p.getClass())) this.task = p;
+        alertness = task.getAlertness();
+        forget.set(50);
+    }
+    protected Task getTask(){
+        return task;
     }
     public void attacked(){
         if (target != null) {
@@ -57,14 +76,34 @@ public class Intelligence {
             host.target = p;
             host.rotateWeapon(p.getMult(host.dir,host.dir));
         }
+        if ((state == Actions.WalkL || state == Actions.WalkR) && blocked(host.dir)){
+            host.setState(Actions.Idle);
+            task.blocked();
+        }
+    }
+    protected boolean blocked(int dir){
+        Line pp = new Line(host.pos,host.pos.getAdd(120*dir,0));
+        for (Line i : Global.map.land){
+            if (i.lineCross(pp) && Math.abs(i.getSlope()) > 5){
+                return true;
+            }
+        }
+        return false;
     }
     public void hear(Matter u, String p){
-        if (host.faction.canAttack(u.faction)){
-            if (Word.Greeting.is(p)){
-                host.say("@greet");
+        if (alertness < 1) {
+            int dir = u.pos.x - host.pos.x > 0 ? 1 : -1;
+            if (!host.faction.canAttack(u.faction)) {
+                if (comm != null && u instanceof Man) {
+                    if (u.isFacing(host.pos) && Math.abs(u.pos.x - host.pos.x) < 240) {
+                        host.face(dir);
+                        setTask(new Idle(host));
+                        host.say(comm.hear(p));
+                    }
+                }
+            } else {
+                provoked(dir);
             }
-        } else{
-            provoked(u.pos.x-host.pos.x>0?1:-1);
         }
     }
     protected void perceive(){
@@ -83,9 +122,12 @@ public class Intelligence {
     protected void think(){
         if (forget.update()){
             target = null;
-            if (!(task instanceof Wander)) task = new Wander(host);
+            defaultTask();
         }
-        think.set(Global.r.nextInt(10)+2);
+        think.set(5);
         perceive();
+    }
+    public void setComm(Communication comm) {
+        this.comm = comm;
     }
 }

@@ -5,7 +5,7 @@ package com.ga.unit.skill;
  */
 public enum Actions implements Moveset {
     Idle, WalkL, WalkR, Hit(15,null), Dead,
-    Shoot, Conjure, Enter, Cast, Duck, Consume, Exhausted, Pickup, Down(50,null), Buff, Revive;
+    Conjure, Wait(80,null), Cast, Duck, Consume, Exhausted, Interact(8,null), Down(50,null), Buff, Revive, Sheathe(18,null);
     private String description;
     private int del;
     Actions(){
@@ -21,6 +21,9 @@ public enum Actions implements Moveset {
     public String getName(){
         return name();
     }
+    public String getCodeName(){
+        return "A"+name();
+    }
 
     @Override
     public String getStatReq() {
@@ -30,7 +33,6 @@ public enum Actions implements Moveset {
     public float getCost() {
         return 0;
     }
-
 
     @Override
     public int getDel() {

@@ -1,9 +1,6 @@
 package com.ga.unit.intelligence;
 
-import com.ga.game.Command;
-import com.ga.game.Input;
-import com.ga.game.Observer;
-import com.ga.game.Settings;
+import com.ga.game.*;
 import com.ga.map.Global;
 import com.ga.tool.P;
 import com.ga.tool.Word;
@@ -12,9 +9,9 @@ import com.ga.unit.SkillTree;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Moveset;
 import com.ga.unit.skill.Skills;
+import com.ga.unit.skill.Spells;
 
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -23,21 +20,22 @@ import java.util.Map;
  * Created by Ga on 7/25/2016.
  */
 public class PlayerInput implements Input, Observer {
-    private static HashMap<Integer, Moveset> keyMap = new HashMap<Integer, Moveset>(){{
+    private HashMap<Integer, Moveset> keyMap = new HashMap<Integer, Moveset>(){{
         put(-1, Actions.Idle);
-        put(KeyEvent.VK_W, Actions.Enter);
+        put(-65, Actions.Idle);
+        put(-68, Actions.Idle);
+        put(KeyEvent.VK_W, Actions.Wait);
         put(KeyEvent.VK_A, Actions.WalkL);
         put(KeyEvent.VK_S, Actions.Duck);
         put(KeyEvent.VK_D, Actions.WalkR);
-        put(KeyEvent.VK_SPACE, Skills.Jump);
-        put(KeyEvent.VK_C, Actions.Conjure);
         put(KeyEvent.VK_F, Skills.Kick);
-        put(KeyEvent.VK_Z, Actions.Pickup);
-        put(1, Skills.Weapon);
+        put(KeyEvent.VK_R, Actions.Sheathe);
+        put(KeyEvent.VK_Z, Actions.Interact);
+        put(1, Skills.Use);
         put(3, Actions.Idle);
         put(KeyEvent.VK_SHIFT, Skills.Rest);
     }};
-    private ArrayList<Integer> keyPressed = new ArrayList<>();
+    private String key;
     public Player host;
     public P mP = new P();
     public float mR;
@@ -69,34 +67,35 @@ public class PlayerInput implements Input, Observer {
         }
         return r;
     }
-    public void input(boolean key, int mode, int x, int y){
-        if (!key) {
-            mP.x = x - Settings.centerX;
-            mP.y = y - Settings.centerY;
-            mR = (float) Math.atan2(mP.y,mP.x);
-        }
-        if (keyMap.containsKey(mode))
-            if (mode > 0 && keyPressed.indexOf(mode) == -1) keyPressed.add(mode);
-        if (mode < 0)
-            keyPressed.remove((Object) (-mode));
-        if (mode > 48 && mode < 57) host.selectItem(mode-49);
+    public void inputEcho(String action, int x, int y){
+        mP.x = x - Settings.centerX;
+        mP.y = y - Settings.centerY;
+        mR = (float) Math.atan2(mP.y,mP.x);
+        host.face(mP.x > host.pos.x-Global.camera.x ? 1 : -1);
+        key = action;
     }
-    public void command(int mode){
-        host.setState(keyMap.get(mode));
+    public void input(int mode, int x, int y){
+        if (mode == KeyEvent.VK_ENTER) Display.chatbox.requestFocus();
+        else if (mode == KeyEvent.VK_TAB) Display.menu.toggle();
+        else if (mode > 48 && mode < 57) {
+            Global.server.send("IN@I" + (mode-49) + "," + x + "," + y);
+        } else if (keyMap.containsKey(mode)){
+            Global.server.send("IN@" + keyMap.get(mode).getCodeName() + "," + x + "," + y);
+        }
     }
     @Override
     public void update(){
-        if (keyPressed.size() > 0)
-            for (Integer i : keyPressed){
-                command(i);
-            }
-        else command(-1);
+        if (key != null) {
+            String t = key.substring(1);
+            if (key.startsWith("A")) host.setState(Actions.getByName(t));
+            else if (key.startsWith("K")) host.setState(Skills.getByName(t));
+            else if (key.startsWith("M")) host.setState(Spells.getByName(t));
+            else if (key.startsWith("I")) host.selectItem(Integer.parseInt(t));
+            key = null;
+        }
     }
     public boolean teleportReady(){
-        if (keyPressed.size() > 0)
-            for (Integer i : keyPressed){
-                if (keyMap.get(i) == Actions.Enter) return true;
-            }
+        if (keyMap.get(key) == Actions.Wait) return true;
         return false;
     }
     public void load(String p){

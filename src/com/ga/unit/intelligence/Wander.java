@@ -11,16 +11,37 @@ import com.ga.unit.Unit;
 public class Wander implements Task {
     private Unit host;
     private Timer tick;
-    public Wander(Unit host){
+    private int[] base;
+    private int current;
+    public Wander(Unit host, int[] base){
         this.host = host;
-        tick = new Timer(1);
+        tick = new Timer(2, true);
+        this.base = base;
+        current = Global.r.nextInt(3);
     }
+
+    @Override
+    public void blocked() {
+        if (host.dir == 1) base[current] = host.rand.nextInt((int) host.pos.x);
+        if (host.dir == -1) base[current] = host.rand.nextInt((int) (Global.map.getWidth()-host.pos.x))+(int) host.pos.x;
+    }
+
     public void update(){
         if (tick.update()) {
             int dir = Global.r.nextInt(3);
-            if (dir == 2) host.setState(Actions.Idle);
-            else host.setState(dir == 1 ? Actions.WalkR : Actions.WalkL);
-            tick.set(Global.r.nextInt(500)+10);
+            if (Math.random() < .3f) current = dir;
+            if (dir == 0) host.setState(Actions.Idle);
+            else if (dir == 1) host.setState(dir == 1 ? Actions.WalkR : Actions.WalkL);
+            else if (dir >= 2) {
+                if (host.pos.x > base[current]) host.setState(Actions.WalkL);
+                else host.setState(Actions.WalkR);
+            }
+            tick.set(Global.r.nextInt(25)+1);
         }
+    }
+
+    @Override
+    public int getAlertness() {
+        return 0;
     }
 }

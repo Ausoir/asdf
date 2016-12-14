@@ -29,7 +29,7 @@ public enum Curse {
     Elemental(new Spell(){
         @Override
         public boolean perform() {
-            Man d = new Man(new P(host.pos));
+            Man d = new Man(host.toString());
             d.target = P.getZero();
             Spells.Meteor.getEvent().start(d, level);
             Spells.Blizzard.getEvent().start(d, level);

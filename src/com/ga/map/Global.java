@@ -1,5 +1,6 @@
 package com.ga.map;
 
+import com.ga.connection.Server;
 import com.ga.game.Display;
 import com.ga.game.Settings;
 import com.ga.tool.P;
@@ -14,6 +15,7 @@ public class Global {
     public static Map map;
     public static Weather weather;
     public static PlayerInput player;
+    public static Server server;
     public static P camera = new P();
     public static Display display;
     public static Random r = new Random();
@@ -60,13 +62,13 @@ public class Global {
     }
     public static int mapEdge(P p){
         int result = 1;
-        if (p.x != clamp(p.x, 0, Global.map.map.size.x)) result += 2;
-        if (p.y != clamp(p.y, 0, Global.map.map.size.y)) result *= 2;
+        if (p.x != clamp(p.x, 0, Global.map.getWidth())) result += 2;
+        if (p.y != clamp(p.y, 0, Global.map.getHeight())) result *= 2;
         return result;
     }
     public static void mapEdgeCenter(P p){
-        p.set(clamp(p.x, Settings.centerX, Global.map.map.size.x-Settings.centerX),
-                clamp(p.y, Settings.centerY, Global.map.map.size.y-Settings.centerY));
+        p.set(clamp(p.x, Settings.centerX, Global.map.getWidth()-Settings.centerX),
+                clamp(p.y, Settings.centerY, Global.map.getHeight()-Settings.centerY));
     }
     public static int checkCooldown(int[] p, int cd){
         return cd-(time[0]-p[0]);

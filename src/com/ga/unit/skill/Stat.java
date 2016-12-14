@@ -12,8 +12,12 @@ public class Stat {
     public int reserve = 0;
     public Stat(String p){
         String[] t = p.split(",");
-        current = Integer.parseInt(t[0]);
-        max = Integer.parseInt(t[1]);
+        if (t.length == 1){
+            setTotal(Integer.parseInt(p));
+        } else {
+            current = Integer.parseInt(t[0]);
+            max = Integer.parseInt(t[1]);
+        }
     }
     public Stat(int p){
         setTotal(p);

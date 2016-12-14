@@ -9,10 +9,9 @@ import com.ga.tool.Performer;
 import com.ga.tool.Timer;
 import com.ga.unit.item.Inventory;
 import com.ga.unit.item.Item;
-import com.ga.unit.skill.Actions;
-import com.ga.unit.skill.Moveset;
-import com.ga.unit.skill.Spell;
-import com.ga.unit.skill.Stat;
+import com.ga.unit.skill.*;
+
+import java.util.ArrayList;
 
 import static com.ga.unit.BodyHumanoid.FIST;
 
@@ -24,6 +23,7 @@ public class Player extends Man {
     public Inventory inventory = new Inventory(this);
     public SkillTree skillTree = new SkillTree();
     public Timer save = new Timer(50, true);
+    private int selectingItem = -1;
     public Player(String p) {
         super(p);
         faction = Faction.Player;
@@ -50,12 +50,6 @@ public class Player extends Man {
         if (get("Memory").require(1))
            skillTree.advanceSkill(p, cd);
     }
-    private void grabItem(){
-        Item t = Updater.collide(pos.getAdd(clip.organs[FIST].ptd));
-        if (t != null){
-            setWeapon(t);
-        }
-    }
     public void setWeapon(Item p){
         if (p == null || sheathe()) super.setWeapon(p);
         else{
@@ -65,8 +59,7 @@ public class Player extends Man {
     }
     public boolean sheathe() {
         if (wieldingNone()) return true;
-        if (inventory.addItem(weapon)){
-            say("Sheathed "+weapon.name);
+        if (inventory.sheathe(weapon)){
             weapon.remove();
             setWeapon(null);
             return true;
@@ -87,12 +80,8 @@ public class Player extends Man {
         say("Dropping " + p.getFullName());
     }
     public void selectItem(int p){
-        if (!delay.over() || !jump) return;
-        if (inventory.pockets.length > p && inventory.pockets[p] != -1) {
-            Item item = inventory.getItem(inventory.pockets[p]);
-            inventory.remove(inventory.pockets[p]);
-            setWeapon(item);
-        }
+        selectingItem = p;
+        setState(Actions.Sheathe);
     }
     @Override
     protected int[] getCooldown(Moveset state){
@@ -111,16 +100,64 @@ public class Player extends Man {
         super.actionSet(state, skillTree.getSkillLevel(state));
     }
     public int setState(Moveset state){
-        face(Global.player.mP.x > pos.x-Global.camera.x ? 1 : -1);
         target = Global.player.mP.getSubtract(pos.getSubtract(Global.camera));
         if (state instanceof Actions) {
             switch ((Actions) state) {
-                case Pickup:
-                    if (weapon.name.equals("Fist")) grabItem();
+                case Sheathe:
+                    delay.performer = new Performer() {
+                        public boolean perform() {
+                            if (selectingItem == -1 || selectingItem == inventory.wielded) {
+                                sheathe();
+                            } else if (!wieldingNone()) {
+                                sheathe();
+                                return false;
+                            } else {
+                                if (inventory.pockets.length > selectingItem && inventory.pockets[selectingItem] != -1) {
+                                    Item item = inventory.getItem(inventory.pockets[selectingItem]);
+                                    inventory.wielded = selectingItem;
+                                    inventory.remove(inventory.pockets[selectingItem]);
+                                    setWeapon(item);
+                                }
+                                selectingItem = -1;
+                            }
+                            return true;
+                        }
+                    };
                     break;
-                default:
-                    weapon.rotate(target.getMult(dir,dir));
+                case WalkL:
+                case WalkR:
+                    if (delay.over()) {
+                        if (Global.cos(weapon.rotation) < .8f) weapon.rotation *= .9f;
+                    }
+                    break;
+                case Interact:
+                    ArrayList<Matter> obj = Updater.collide(pos.getAdd(clip.organs[FIST].ptd), 8);
+                    for (Matter i : obj){
+                        if (i.interactive){
+                            i.interact(this);
+                            break;
+                        }
+                    }
+                    break;
             }
+        } else if (state instanceof Skills) {
+            switch ((Skills) state) {
+                case Snipe:
+                case Shoot:
+                    weapon.rotate(target.getMult(dir,dir));
+                    weapon.rotation += .1*dir;
+            }
+            Moveset a = this.state;
+            Moveset b = state;
+            if (a == Skills.Use) a = weapon.action;
+            if (b == Skills.Use) b = weapon.action;
+            if (a != b){
+                delay.set(0);
+            }
+        }
+        if (state != Actions.Idle && state != Actions.Wait){
+            Display.shop.setVisible(false);
+            Display.dialog.setVisible(false);
         }
         if (weapon.getType() == Item.Tag.Claw) weapon.rotation = (weapon.getOrgan().getAtan()+(dir<0?3.14f:0));
         int r = super.setState(state);
@@ -137,7 +174,7 @@ public class Player extends Man {
             int[] cdinput = getCooldown(state);
             say("Spell is available in "+Global.checkCooldown(cdinput, state.getCooldown())+" seconds!");
         } else if (r == 4){
-            say("Weapon broke!");
+            say("Use broke!");
         }
         return r;
     }
@@ -146,11 +183,14 @@ public class Player extends Man {
         super.onCollide(r);
         if (state != Actions.Dead) {
             if (r.opt == 2) {
-                vel.set(0, 0);
-                Global.map.teleport(pos, r);
+                if (Global.player.teleportReady()){
+                    vel.set(0, 0);
+                    Global.map.teleport(pos, r);
+                }
             } else if (r.opt >= 100) {
-                if (r.opt >= 200) Global.map.loadMap(r.opt - 200, Global.player.teleportReady());
-                else Global.map.loadMap(r.opt - 100, true);
+                if (r.opt >= 200){
+                    if (Global.player.teleportReady()) Global.map.loadMap(r.opt - 200);
+                } else Global.map.loadMap(r.opt - 100);
             }
         }
     }
@@ -165,15 +205,17 @@ public class Player extends Man {
         String r = super.toString()+"\n";
         r += gold+";"+Global.getTime()[0]+"\n";
         r += Global.player.toString()+"\n";
-        r += stats.toString()+"\n";
         r += inventory.toString()+"\n";
         r += skillTree.toString();
         return r;
     }
+    @Override
+    public String toString(){
+        return "";
+    }
     public void load(String p){
         String[] line = p.split("%");
         gold = Integer.parseInt(line[1].split(";")[1]);
-        stats.load(line[3]);
         hp = new PlayerHealthBar(get("Health"),get("Stamina"),get("Energy"),pos);
         get("Stamina").onChange = (new Performer(){
             @Override
@@ -191,8 +233,8 @@ public class Player extends Man {
                 return true;
             }
         });
-        inventory.load(line[4]);
-        skillTree.load(line[5]);
+        inventory.load(line[3]);
+        skillTree.load(line[4]);
         Global.player.load(line[2]);
     }
 }

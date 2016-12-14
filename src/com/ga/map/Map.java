@@ -8,6 +8,7 @@ import com.ga.unit.Thing;
 import com.ga.unit.Updater;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 /**
@@ -19,38 +20,57 @@ public class Map {
     public static Thing fmap;
     public ArrayList<Line> land = new ArrayList<>();
     public String[] maps;
-    public Map(String[] maps, P pt) {
+    private MapEvent event;
+    public static final int magnify = 3;
+    public Map(final String[] maps, P pt) {
         this.maps = maps;
-        final int mag = 3;
-        panorama = new Thing(maps[0], pt, 1){
+        event = new MapEvent(maps[0]);
+        final boolean noPanorama = maps[1].equals("None");
+        panorama = new Thing(noPanorama?null:maps[1], pt, 1) {
+            private boolean none = noPanorama;
             @Override
-            public void draw(Graphics2D g){
-                P t = Global.getRelPos(pos.x,pos.y).getMult(.1f,.1f);
-                t.x = Global.clamp(t.x,-size.x+Settings.screenX,0);
-                t.y = Global.clamp(t.y,-size.y+Settings.screenY,0);
-                g.drawImage(image,(int)(t.x),(int)(t.y),(int)size.x,(int)size.y,null);
+            public void draw(Graphics2D g) {
+                if (none) {
+                    g.setColor(Color.black);
+                    g.fillRect(0,0, Settings.screenX, Settings.screenY);
+                } else {
+                    P t = Global.getRelPos(pos.x, pos.y).getMult(.1f, .1f);
+                    t.x = Global.clamp(t.x, -image.size.x + Settings.screenX, 0);
+                    t.y = Global.clamp(t.y, -image.size.y + Settings.screenY, 0);
+                    g.drawImage(image.getImage(), (int) (t.x), (int) (t.y), (int) image.size.x, (int) image.size.y, null);
+                }
             }
         };
-        panorama.size.mult(mag,mag);
-        panorama.pos = panorama.pos.getAdd(500,0);
-        map = new Thing(maps[1], pt, 2){
+        if (!noPanorama) {
+            panorama.image.size.mult(magnify, magnify);
+            panorama.pos = panorama.pos.getAdd(500, 0);
+        }
+        map = new Thing(maps[2], pt, 2){
             public void draw(Graphics2D g){
                 P t = Global.getRelPos(pos.x,pos.y);
-                t.x = Global.clamp(t.x,(-size.x)+Settings.screenX,0);
-                t.y = Global.clamp(t.y,(-size.y)+Settings.screenY,0);
-                g.drawImage(image,(int)t.x,(int)t.y,(int)size.x,(int)size.y,null);
+                t.x = Global.clamp(t.x,(-image.size.x)+Settings.screenX,0);
+                t.y = Global.clamp(t.y,(-image.size.y)+Settings.screenY,0);
+                g.drawImage(image.getImage(),(int)t.x,(int)t.y,(int)image.size.x,(int)image.size.y,null);
             }
         };
-        fmap = new Thing(maps[2], pt, 30){
-            public void draw(Graphics2D g){
-                P t = Global.getRelPos(pos.x,pos.y);
-                t.x = Global.clamp(t.x,(-size.x)+Settings.screenX,0);
-                t.y = Global.clamp(t.y,(-size.y)+Settings.screenY,0);
-                g.drawImage(image,(int)t.x,(int)t.y,(int)size.x,(int)size.y,null);
-            }
-        };
-        fmap.size.mult(mag,mag);
-        map.size.mult(mag,mag);
+        map.image.size.mult(magnify,magnify);
+        if (!maps[3].equals("None")) {
+            fmap = new Thing(maps[3], pt, 30) {
+                public void draw(Graphics2D g) {
+                    P t = Global.getRelPos(pos.x, pos.y);
+                    t.x = Global.clamp(t.x, (-image.size.x) + Settings.screenX, 0);
+                    t.y = Global.clamp(t.y, (-image.size.y) + Settings.screenY, 0);
+                    g.drawImage(image.getImage(), (int) t.x, (int) t.y, (int) image.size.x, (int) image.size.y, null);
+                }
+            };
+            fmap.image.size.mult(magnify, magnify);
+        }
+    }
+    public int getHeight(){
+        return (int) map.image.size.y;
+    }
+    public int getWidth(){
+        return (int) map.image.size.x;
     }
     public String toString(){
         String result = "";
@@ -60,7 +80,7 @@ public class Map {
         result = result.substring(0,result.length()-1)+"\n";
         if (land.size() == 0) return result;
         for (Line i : land){
-            result += i+";";
+            if (!i.equals("")) result += i+";";
         }
         result = result.substring(0,result.length()-1);
         return result;
@@ -72,14 +92,12 @@ public class Map {
             }
         }
     }
-    public void loadMap(int opt, boolean rdy){
-        if (rdy){
-            Global.player.host.stats.end();
-            FileManager.saveCharacter();
-            int mapnum = opt / 10, posnum = opt % 10;
-            Updater.changeMap = maps[mapnum+3];
-            Updater.changeMapPos = posnum;
-        }
+    public void loadMap(int opt){
+        Global.player.host.stats.end();
+        FileManager.saveCharacter();
+        int mapnum = opt / 10, posnum = opt % 10;
+        Updater.changeMap = maps[mapnum+4];
+        Updater.changeMapPos = posnum;
     }
     public boolean fallSafe(P pos){
         Line line = new Line(pos.getAdd(0,100), pos.getAdd(0,9999));
@@ -87,5 +105,46 @@ public class Map {
             if (i.lineCross(line)) return true;
         }
         return false;
+    }
+
+    public void setShader() {
+        BufferedImage image = map.image.getImage();
+        for (Line i : land){
+            int origX = (int) (i.pt.x/magnify);
+            int origY = (int) (i.pt.y/magnify);
+            int x = origX;
+            int x2 = (int) (i.ptd.x/magnify);
+            if (origX > x2){
+                x = x2;
+                x2 = origX;
+            }
+            for (int ix = x; ix < x2; ix++){
+                int ty = origY+(int)((ix-origX)*i.getSlope());
+                for (int iy = 0; iy < 20; iy++) {
+                    int rgb = image.getRGB(ix, ty+iy);
+                    int alpha = (rgb & 0xff000000) >>> 24;
+                    int shadeMag = -(21-iy);
+                    int red = Math.max(((rgb & 0xff0000) >>> 16)+shadeMag, 0);
+                    int green = Math.max(((rgb & 0xff00) >>> 8)+shadeMag, 0);
+                    int blue = Math.max(((rgb & 0xff))+shadeMag, 0);
+                    image.setRGB(ix, ty + iy, new Color(red, green, blue, alpha).getRGB());
+                }
+            }
+        }
+    }
+
+    public P randomSurface(){
+        Line i = land.get((int) (Math.random()*land.size()));
+        int origX = (int) (i.pt.x);
+        int origY = (int) (i.pt.y);
+        int x = origX;
+        int x2 = (int) (i.ptd.x);
+        if (origX > x2){
+         x = x2;
+         x2 = origX;
+        }
+        int tx = (int) (Math.random()*(x2-x));
+        int ty = origY+(int)(tx*i.getSlope());
+        return new P(origX+tx,ty);
     }
 }

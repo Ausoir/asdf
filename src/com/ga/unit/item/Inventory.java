@@ -13,6 +13,7 @@ public class Inventory {
     public int weight = 0;
     private Player player;
     public int maxSize = 5;
+    public int wielded = -1;
     public Inventory(Player player){
         this.player = player;
     }
@@ -36,6 +37,12 @@ public class Inventory {
         items.add(p);
         weight += p.weight;
         return true;
+    }
+    public boolean sheathe(Item p){
+        boolean r = addItem(p);
+        if (r && wielded != -1) pockets[wielded] = items.size() - 1;
+        wielded = -1;
+        return r;
     }
     public boolean vacant(){
         return items.size() < maxSize;
@@ -70,6 +77,7 @@ public class Inventory {
     }
     public Item remove(int p){
         Item r = items.get(p);
+        weight -= r.weight;
         removePocket(r);
         for (int i=0;i<pockets.length;i++){
             if (pockets[i] > p) pockets[i]--;
@@ -84,7 +92,9 @@ public class Inventory {
     }
     public void load(String p){
         if (p.equals(";")) return;
-        String[] data = p.substring(1).split(";");
+        String[] wield = p.substring(1).split("]");
+        wielded = Integer.parseInt(wield[0]);
+        String[] data = wield[1].split(";");
         for (int i=0;i<data.length;i++){
             String[] prefix = data[i].split(":");
             Item item = ItemFactory.load(prefix[0]);
@@ -96,7 +106,7 @@ public class Inventory {
         }
     }
     public String toString(){
-        String r = ";";
+        String r = ";"+wielded+"]";
         for (int i = 0; i < items.size(); i++) {
             String prefix = "x";
             Item item = items.get(i);

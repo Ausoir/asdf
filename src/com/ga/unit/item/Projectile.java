@@ -12,13 +12,12 @@ import com.ga.unit.Updater;
 public class Projectile extends Matter {
     public float rotSpeed = .03f;
     public int damage = 0;
-    protected float radius;
     public EventTimer delay = new EventTimer(-1, false, null);
     public Projectile(String name, P pt, P dest, int speed) {
         super(name, 0, pt, 10);
         vel.set(dest.getAtan(pt, speed));
         rotation = (float) Math.atan2(dest.y-pt.y,dest.x-pt.x);
-        if (size != null) radius = size.getDist();
+        gravity = true;
     }
     @Override
     public int getDamage(){
@@ -36,12 +35,12 @@ public class Projectile extends Matter {
         tangible = false;
     }
     public void update(){
-        super.update();
         rotation+=rotSpeed*vel.x;
         if (tangible) {
             Matter u = Updater.collide(this, new Line(pos, pos.getAdd(vel)), false);
             if (u != null) onAttack(u);
         }
+        super.update();
         delay.update();
     }
     public String toString(){

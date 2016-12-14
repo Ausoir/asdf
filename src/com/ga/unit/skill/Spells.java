@@ -6,10 +6,8 @@ import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.tool.Word;
 import com.ga.unit.*;
-import com.ga.unit.intelligence.EnemyIntelligence;
-import com.ga.unit.item.ItemFactory;
+import com.ga.unit.intelligence.UnitIntelligence;
 import com.ga.unit.item.Projectile;
-import com.ga.unit.item.Weapon;
 
 /**
  * Created by Ga on 8/1/2016.
@@ -33,12 +31,12 @@ public enum Spells implements Moveset {
             return true;
         }
     }),
-    Haste(Actions.Conjure, 25,"Energy",-2,100,"Haste doubles movement speed for 5 seconds. [Duration:10*Level]",produceBuff(Buffs.Haste)),
+    Haste(Actions.Conjure, 25,"Energy",2,100,"Haste doubles movement speed for 5 seconds. [Duration:10*Level]",produceBuff(Buffs.Haste)),
     Adrenaline(Actions.Conjure, 25,"Energy",3,100,"Haste grants the user a burst of Stamina for a short time. [Duration:10*Level]",produceBuff(Buffs.Rejuvenate)),
-    Cleave(Actions.Conjure, 25,"Stamina",-1,100,"Cleave grants the user a cleaving property. [Level*1 Uses] [Duration:10*Level]",produceBuff(Buffs.Cleave)),
-    Empower(Actions.Conjure, 25,"Stamina",-1,100,"Empower grants the next attack 10 bonus damage. [Level*1 Uses] [Duration:10*Level]",produceBuff(Buffs.Empower)),
+    Cleave(Actions.Conjure, 25,"Stamina",1,100,"Cleave grants the user a cleaving property. [Level*1 Uses] [Duration:10*Level]",produceBuff(Buffs.Cleave)),
+    Empower(Actions.Conjure, 25,"Stamina",1,100,"Empower grants the next attack 10 bonus damage. [Level*1 Uses] [Duration:10*Level]",produceBuff(Buffs.Empower)),
     Frenzy(Actions.Conjure, 25,"Health",10,100,"Frenzy grants the user infinite Stamina and Energy at the cost of Health and restlessness for 10 seconds. [Duration:10*Level]",produceBuff(Buffs.Rejuvenate)),
-    Evade(Actions.Conjure, 25,"Energy",-2,100,"Evade grants you invulnerability to physical attacks for 10 seconds. [Level*1 Uses] [Duration:10*Level]",produceBuff(Buffs.Evade)),
+    Evade(Actions.Conjure, 25,"Energy",2,100,"Evade grants you invulnerability to physical attacks for 10 seconds. [Level*1 Uses] [Duration:10*Level]",produceBuff(Buffs.Evade)),
     Flamestride(Actions.Buff, 10,"Energy",4,100,"Flamestride leaves damaging flames in the trails of the caster. [Level*1 Uses] [Duration:8*Level] [Damage:10] [Damage Scale:2 per Proficiency]",produceBuff(Buffs.Flamestride)),
     Glacialwalk(Actions.Buff, 10,"Energy",4,100,"Glacialwalk leaves freezing trails behind the caster. [Level*1 Uses] [Duration:8*Level] [Trail Duration:15*Level] [Freeze Duration:5*Level] [Damage:0]",produceBuff(Buffs.Glacialwalk)),
     Stun(Actions.Cast, 40, "Energy",4,50,"Stun a single enemy. [Duration:5*Level]",new Spell(){
@@ -47,10 +45,8 @@ public enum Spells implements Moveset {
             Matter t = new Matter();
             t.faction = host.faction;
             t.pos = host.target.getAdd(host.pos);
-            Matter target = Updater.collide(t,40);
-            if (target instanceof Unit){
-                ((Unit) target).stats.addEffect(Buffs.Stun,level);
-            }
+            Unit target = Updater.collide(t,40);
+            if (target!= null) target.stats.addEffect(Buffs.Stun,level);
             return true;
         }
     }),
@@ -60,18 +56,16 @@ public enum Spells implements Moveset {
             Matter t = new Matter();
             t.faction = host.faction;
             t.pos = host.target.getAdd(host.pos);
-            Matter target = Updater.collide(t,40);
-            if (target instanceof Unit){
-                ((Unit) target).stats.addEffect(Buffs.Poison,level);
-            }
+            Unit target = Updater.collide(t,40);
+            target.stats.addEffect(Buffs.Poison,level);
             return true;
         }
     }),
-    Shadowtwin(Actions.Buff, 40,"Energy",-1,100,"Summon a mirror of yourself to aid you in battle. [Level*1 Shadows] [Duration:30*Level] [6 Energy Reserve/Shadow] [3 Stamina Reserve/Shadow]",new Spell() {
+    Shadowtwin(Actions.Buff, 40,"Energy",1,100,"Summon a mirror of yourself to aid you in battle. [Level*1 Shadows] [Duration:30*Level] [6 Energy Reserve/Shadow] [3 Stamina Reserve/Shadow]",new Spell() {
         @Override
         public boolean perform() {
             for (int i=0;i<level;i++) {
-                Man p = new Man(host.name, host.pos.getAdd(0, 0), host.seed) {
+                Man p = new Man(host.toString()) {
                     @Override
                     public void die() {
                         super.die();
@@ -98,12 +92,7 @@ public enum Spells implements Moveset {
                 host.get("Stamina").reserve += 3;
                 host.get("Energy").add(0);
                 host.get("Stamina").add(0);
-                p.brain = new EnemyIntelligence(p);
-                if (host instanceof Man) {
-                    Man t = (Man) host;
-                    p.setWeapon((Weapon) ItemFactory.produce(t.getWeapon().name, t.getWeapon().seed));
-                    p.setArmor(t.getArmor());
-                }
+                p.brain = new UnitIntelligence(p);
                 p.dir = -host.dir;
                 p.faction = host.faction;
                 p.clip.setState(Actions.Buff);
@@ -127,7 +116,7 @@ public enum Spells implements Moveset {
             return false;
         }
     }),
-    Fireworks(Actions.Cast, 40,"Energy",2,60,"Shoot streams of cackling sparks. [Range:100] [Damage:1 Constant] [Upkeep:.1 Energy]",new Spell(){
+    Fireworks(Actions.Cast, 40,"Energy",2,60,"Dart streams of cackling sparks. [Range:100] [Damage:1 Constant] [Upkeep:.1 Energy]",new Spell(){
         @Override
         public boolean perform(){
             for (int i=0;i<2;i++) {
@@ -159,7 +148,7 @@ public enum Spells implements Moveset {
             return false;
         }
     }),
-    Fireblast(Actions.Cast, 40,"Energy",4,60,"Shoot streams of blazing flame. [Range:10*Level+100] [Damage:10] [Damage Scale:.3 per Proficiency] [Upkeep:1/5+Level chance to consume 1 Energy]",new Spell(){
+    Fireblast(Actions.Cast, 40,"Energy",4,60,"Dart streams of blazing flame. [Range:10*Level+100] [Damage:10] [Damage Scale:.3 per Proficiency] [Upkeep:1/5+Level chance to consume 1 Energy]",new Spell(){
         @Override
         public boolean perform(){
             for (int i=0;i<3;i++) {
@@ -177,6 +166,7 @@ public enum Spells implements Moveset {
                 };
                 p.faction = host.faction;
                 p.damage = (int) (10+(host.get("Proficiency").get()*.3f));
+                p.damageType = DamageType.Burn;
                 p.gravity = false;
                 p.delay.set(8+level);
                 p.delay.performer = new Performer() {
@@ -191,7 +181,7 @@ public enum Spells implements Moveset {
             return false;
         }
     }),
-    Freeze(Actions.Cast, 40,"Energy",3,24,"Shoot a stream of freezing blast. [Range:Low] [Damage:0 Constant]",new Spell(){
+    Freeze(Actions.Cast, 40,"Energy",3,24,"Dart a stream of freezing blast. [Range:Low] [Damage:0 Constant]",new Spell(){
         @Override
         public boolean perform(){
             for (int i=0;i<3;i++) {
@@ -227,10 +217,10 @@ public enum Spells implements Moveset {
             return false;
         }
     }),
-    Fireball(Actions.Cast, 40,"Energy",5,50,"Shoot a fireball. [Range:Extreme] [Damage:15] [Radius:20+10*Level]",new Spell(){
+    Fireball(Actions.Cast, 40,"Energy",5,50,"Dart a fireball. [Range:Extreme] [Damage:15] [Radius:20+10*Level]",new Spell(){
         @Override
         public boolean perform(){
-            final Projectile p = new Projectile("Fireball", host.getHand(), host.target.getAdd(host.pos), 20+(host.get("Stamina").get()*2)){
+            final Projectile p = new Projectile("Fireball", host.getHand(), host.target.getAdd(host.pos), 26){
                 @Override
                 protected void onAttack(Matter p){
                     if (!host.stats.hasEffect(Buffs.Cleave)) super.onAttack(p);
@@ -250,7 +240,6 @@ public enum Spells implements Moveset {
             };
             p.faction = host.faction;
             p.damage = 15+host.get("Proficiency").get();
-            p.gravity = false;
             p.delay.set(50);
             p.delay.performer = new Performer(){
                 @Override
@@ -371,6 +360,9 @@ public enum Spells implements Moveset {
     }
 
     @Override
+    public String getCodeName() {
+        return "M"+getName();
+    }
     public String getName() {
         return name();
     }

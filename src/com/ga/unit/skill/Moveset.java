@@ -5,6 +5,7 @@ package com.ga.unit.skill;
  */
 public interface Moveset {
     String getName();
+    String getCodeName();
     String getDescription();
     String getStatReq();
 

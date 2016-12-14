@@ -22,7 +22,7 @@ public class Speech extends JTextArea implements Drawable{
     private int[] xp, yp;
     public ArrayList<String> msg = new ArrayList<>();
     private Timer timer = new Timer(-1,false);
-//    private String recent = "";
+    private String recent = "";
     private Color color = new Color(255,255,255,150);
     private Font font;
     public Speech(Unit host){
@@ -40,6 +40,7 @@ public class Speech extends JTextArea implements Drawable{
     }
     public void remove(){
         Updater.drawee.remove(this);
+        Global.display.remove(this);
     }
     public void draw(Graphics2D g){
         if (msg.size() > 0) {
@@ -58,6 +59,7 @@ public class Speech extends JTextArea implements Drawable{
             if (timer.update()){
                 msg.remove(0);
                 setVisible(false);
+                recent = "";
             }
         }
     }
@@ -66,20 +68,20 @@ public class Speech extends JTextArea implements Drawable{
     public int getDepth() {
         return 99;
     }
-    public boolean isSpeaking(){
-        return msg.size() > 0;
-    }
     public void say(String p){
         String t;
         if (p.startsWith("@")) t = getRandom(p.substring(1));
         else t = p;
         if (!t.equals("")) {
-            msg.clear();
-            setVisible(true);
-            msg.add(t);
-            timer.set(120+t.length());
-            Updater.sound(host,p.toLowerCase());
-            setText(t);
+            if (!recent.equals(p)) {
+                recent = p;
+                msg.clear();
+                setVisible(true);
+                msg.add(t);
+                setText(t);
+            }
+            timer.set(120 + t.length());
+            Updater.sound(host, p.toLowerCase());
         }
     }
     public String getRandom(String p){

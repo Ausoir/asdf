@@ -38,14 +38,13 @@ public class FlyingOrgan extends Projectile {
                 return "";
             }
         };
+        t.gravity = false;
         t.field();
-        t.setVisible(true);
         t.pos = pos.getAdd(organ.pt);
         t.rotation = rotation;
         t.name = "Organ";
-        t.setImage(organ.getImage());
-        if (organ.type == 2) t.size = new P(organ.strokeSize/2,organ.getLength()+(organ.strokeSize/2));
-        organ.type = 0;
+        t.image = organ.getImage();
+        if (organ.type != 0) t.image.size = new P(organ.strokeSize/2,organ.getLength()+(organ.strokeSize/2));
     }
     @Override
     protected void onAttack(Matter p){

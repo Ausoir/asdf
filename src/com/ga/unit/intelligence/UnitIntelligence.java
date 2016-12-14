@@ -11,37 +11,44 @@ import java.util.ArrayList;
 /**
  * Created by Ga on 7/30/2016.
  */
-public class EnemyIntelligence extends Intelligence {
+public class UnitIntelligence extends Intelligence {
     public ArrayList<Spells> skillset = new ArrayList<Spells>(){{
         add(Spells.Haste);
     }};
-    public EnemyIntelligence(Unit man){
+    private Unit leader;
+    public UnitIntelligence(Unit man){
         super(man);
-    }
-    @Override
-    public void hear(Matter u, String p){
-        if (target == null){
-            task = new Search(host,u.pos);
-            forget.set(10);
-        }
+        leader = host.rand.nextInt(3) == 0 ? host : null;
     }
     protected void perceived(Matter p){
-        if (host.faction.canAttack(p.faction)) {
-            if (p instanceof Unit) {
-                if (((Unit)p).state != Actions.Dead) {
+        if (p instanceof Unit) {
+            if (host.faction.canAttack(p.faction)) {
+                if (((Unit) p).state != Actions.Dead) {
                     target = (Unit) p;
-                    forget.set(30);
                     host.say("@c tgt");
-                    task = new Hunt(host, target);
+                    setTask(new Hunt(host, target));
+                }
+            } else if (host.faction == p.faction){
+                if (leader == null) {
+                    leader = (Unit) p;
                 }
             }
         }
     }
     @Override
+    protected void defaultTask(){
+        if (leader == null || leader == host) super.defaultTask();
+        else if (leader.state == Actions.Dead){
+            leader = null;
+        } else {
+            target = leader;
+            setTask(new Follow(host, target));
+        }
+    }
+    @Override
     protected void provoked(int dir){
         super.provoked(dir);
-        task = new Search(host,host.pos.getAdd(dir*1200,0));
-        forget.set(30);
+        setTask(new Search(host,host.pos.getAdd(dir*1200,0)));
     }
     public void useSkill(String p){
         for (Spells i : skillset){
@@ -55,9 +62,9 @@ public class EnemyIntelligence extends Intelligence {
         super.think();
         if (host.get("Health").getPercentage() < .1f){
             host.say("@flee");
-            task = new Flee(host, target);
+            setTask(new Flee(host, target));
         }
-        else if (task instanceof Flee && target != null) task = new Hunt(host, target);
+        else if (getTask() instanceof Flee && target != null) setTask(new Hunt(host, target));
     }
     public void useSkill(){
         if (skillset.size() > 0) {

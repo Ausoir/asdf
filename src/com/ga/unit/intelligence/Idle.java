@@ -11,7 +11,18 @@ public class Idle implements Task {
     public Idle(Unit host){
         this.host = host;
     }
+
+    @Override
+    public void blocked() {
+
+    }
+
     public void update(){
         host.setState(Actions.Idle);
+    }
+
+    @Override
+    public int getAlertness() {
+        return 0;
     }
 }

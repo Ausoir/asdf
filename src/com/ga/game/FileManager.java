@@ -1,11 +1,16 @@
 package com.ga.game;
 
+import com.ga.connection.Server;
+import com.ga.map.BeastFactory;
 import com.ga.map.Global;
-import com.ga.map.ManFactory;
 import com.ga.map.Map;
+import com.ga.map.ObjectFactory;
 import com.ga.tool.Line;
 import com.ga.tool.P;
-import com.ga.unit.*;
+import com.ga.unit.Clip;
+import com.ga.unit.Man;
+import com.ga.unit.Player;
+import com.ga.unit.Updater;
 import com.ga.unit.intelligence.PlayerInput;
 
 import java.io.BufferedReader;
@@ -27,7 +32,7 @@ public class FileManager {
     }
     public static void saveCharacter(){
         saveMap("map/Map");
-        save("map/"+"Player"+".char", Global.player.host.toCharacterString());
+        save("map/127.0.0.1", Global.player.host.toCharacterString());
     }
     public static void save(String dir, String input) {
         try {
@@ -65,17 +70,21 @@ public class FileManager {
         return result;
     }
     static void loadFirst(boolean editor){
-        String data = read("map/"+"Player"+".char");
-        String[] line = data.split("%");
         if (!editor){
             readMap("Map",0);
-            Global.player = new PlayerInput(new Player(line[0].split(":")[1]));
-            Global.player.host.load(read("map/Player.char"));
-            Global.setTime(Integer.parseInt(line[1].split(";")[0]));
         } else {
             readMap("Map",-2);
             new EditorInput();
         }
+    }
+    public static PlayerInput loadPlayer(String dir){
+        String data = read("map/"+dir);
+        String[] line = data.split("%");
+        PlayerInput pi;
+        pi = new PlayerInput(new Player(line[0].split("]")[1]));
+        pi.host.load(read("map/"+dir));
+//        Global.setTime(Integer.parseInt(line[1].split(";")[0]));
+        return pi;
     }
     public static P readMap(String dir, int player) {
         P r = null;
@@ -95,27 +104,29 @@ public class FileManager {
                 }
                 Global.map.land.add(new Line(v[0], v[1], v[2], v[3], v[4]));
             }
-
             if (line.length > 2) {
                 sections = line[2].split(";");
-                if (sections.length > 0)
+                if (sections.length > 0) {
                     for (int section = 0; section < sections.length; section++) {
-                        String[] unit = sections[section].split(":");
-                        String[] type = unit[1].split("@");
-                        P pos;
-                        int seed = Integer.parseInt(type[1]);
-                        pos = new P(type[2]);
-                        if (unit[0].equals("Player")) {
-                            if (player == 0){
-                                r = pos;
-                            } else if (player == -2){
-                                new Player(unit[1]);
-                            }
-                            if (player > -1) player--;
+                        String[] unit = sections[section].split("]");
+                        if (unit.length == 1) {
+                            String[] type = unit[0].split("@");
+                            ObjectFactory.produce(type[0], new P(type[2]), Integer.parseInt(type[1]), 9);
+                        } else {
+                            String[] type = unit[1].split("@");
+                            if (unit[0].equals("Player")) {
+                                P pos = new P(type[2]);
+                                if (player == 0) {
+                                    r = pos;
+                                } else if (player == -2) {
+                                    new Player(unit[1]);
+                                }
+                                if (player > -1) player--;
+                            } else if (unit[0].equals("Man")) new Man(unit[1]);
+                            else BeastFactory.produce(unit[1]);
                         }
-                        else if (unit[0].equals("Man")) new Man(unit[1]);
-                        else new Beast(unit[0], unit[1], pos, seed);
                     }
+                }
             }
         }
         return r;
@@ -217,17 +228,6 @@ public class FileManager {
             ArrayList<String> values = new ArrayList<>();
             for (String i : results) values.add(i);
             result.put(type[0],values);
-        }
-        return result;
-    }
-
-    public static HashMap<String, String> readTextureDirectory(String dir){
-        String data = read(dir);
-        String[] lines = data.split("%");
-        HashMap<String,String> result = new HashMap<>();
-        for (int line = 0; line < lines.length; line++) {
-            String[] type = lines[line].split("@");
-            if (type.length >= 2) result.put(type[0],type[1]);
         }
         return result;
     }

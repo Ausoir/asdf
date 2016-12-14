@@ -40,7 +40,7 @@ public class Stats {
         if (!hasEffect(p)) {
             if (p.stat != null) {
                 if (p.buffRel != null) stats.get(p.stat).add(Math.round(p.buff * stats.get(p.buffRel).getMax()), true);
-                else stats.get(p.stat).add((int) p.buff, true);
+                else stats.get(p.stat).add((int) (p.buff*level), true);
             }
             if (p.effect != null) {
                 p.effect.start(host, level);
@@ -49,6 +49,9 @@ public class Stats {
             effectLevels.add(new int[]{level});
             effectEffects.add(p.effect);
             effects.add(p);
+        } else {
+            int i = effects.indexOf(p);
+            effectTimes.get(i).set(p.time * level);
         }
     }
     public boolean hasEffect(Buffs p){
@@ -70,7 +73,7 @@ public class Stats {
     }
     public void endEffect(Buffs p){
         if (p.stat != null) {
-            if (p.buffRel != null) stats.get(p.stat).add(-(int) p.buff * stats.get(p.buffRel).getMax());
+            if (p.buffRel != null) stats.get(p.stat).add(-Math.round(p.buff * stats.get(p.buffRel).getMax()));
             else stats.get(p.stat).add(-(int) p.buff);
         }
         int i = effects.indexOf(p);
@@ -116,12 +119,13 @@ public class Stats {
         }
     }
     public void load(String p){
-        String[] data = p.split(";");
+        String[] data = p.split("&");
         for (int i=0;i<data.length;i++){
             String[] pair = data[i].split(":");
-            Stat newstat = new Stat(Integer.parseInt(pair[1].split(",")[0]),Integer.parseInt(pair[1].split(",")[1]));
+            Stat newstat = new Stat(pair[1]);
             newstat.add(0);
-            newstat.onChange = stats.get(pair[0]).onChange;
+            Stat oldstat = stats.get(pair[0]);
+            if (oldstat != null) newstat.onChange = oldstat.onChange;
             stats.put(pair[0], newstat);
         }
     }
@@ -130,7 +134,7 @@ public class Stats {
         Iterator it = stats.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
-            result += pair.getKey() + ":" + pair.getValue()+";";
+            result += pair.getKey() + ":" + pair.getValue()+"&";
         }
         result = result.substring(0,result.length()-1);
         return result;

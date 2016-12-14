@@ -1,36 +1,32 @@
 package com.ga.unit;
 
-import com.ga.game.Settings;
 import com.ga.game.Texture;
-import com.ga.map.Global;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.unit.item.FlyingOrgan;
-import com.ga.unit.item.Projectile;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 /**
  * Created by Ga on 7/29/2016.
  */
 public class Organ extends Line {
-    public Color color = Color.black;
-    public Stroke stroke = new BasicStroke(10);
     public int strokeSize = 10;
-    public String name;
-    protected BufferedImage image;
+    protected Texture image;
     protected boolean amputated = false;
     public Matter host;
     protected Organ parent;
-    public P size;
+    protected ArrayList<Organ> children = new ArrayList<>();
     protected int sizeRadius;
     public int type;
     public int health = 1;
     protected boolean vital = false;
+    protected boolean leg = false;
 
     public Organ(Organ p, boolean tip){
         parent = p;
+        if (parent != null) parent.children.add(this);
         if (p != null) {
             if (tip) pt = p.ptd;
             else pt = p.pt;
@@ -38,56 +34,39 @@ public class Organ extends Line {
         ptd = new P();
     }
     public void setImage(String p){
-        name = p;
-        image = Texture.load(p);
-        size = new P(image.getWidth(), image.getHeight());
-        sizeRadius = (int) size.getMult(.5f,.5f).getDist();
+        image = new Texture(p);
     }
-    public void setImage(String p, int sub){
-        name = p;
-        image = Texture.getTexture(Texture.load(p),32,64,sub,0);
-        size = new P(image.getWidth(), image.getHeight());
-        sizeRadius = (int) size.getMult(.5f,.5f).getDist();
+    public void setImage(String p, int index){
+        image = new Texture(p, index);
+        image.size.x = strokeSize;
+        image.size.y = 0;
+        image.setShader(Texture.Shader.XYLinearGradient);
     }
-    public void setStyle(Color color, int size){
-        this.color = color;
-        this.stroke = new BasicStroke(size);
+    public Texture getImage(){
+        return image;
+    }
+    public void setSize(int size){
         this.strokeSize = size;
     }
     public void draw(Graphics2D g){
-        g.setStroke(stroke);
-        g.setColor(color);
-        if (image == null) super.draw(g, host.pos);
-        else if (type != 0){
-            P pos = host.pos.getAdd(pt);
-            if (type == 1){
-                P t = Global.getRelPos(pos.x - (size.x*host.dir / 2), pos.y - (size.y / 2));
-                if (t.x > -150 && t.y > -100 && t.x < Settings.screenX + 150 && t.y < Settings.screenY + 100) {
-                    P r = t.getAdd(size.x*host.dir / 2, size.y / 2);
-                    float rot = parent.getAtan() + 1.57f;
-                    g.rotate(rot, r.x, r.y);
-                    g.drawImage(image, (int) t.x, (int) t.y, (int) size.x*host.dir, (int) size.y, null);
-                    g.rotate(-rot, r.x, r.y);
-                }
-            }else if (type == 2){
-                int size = strokeSize/2;
-                P t = Global.getRelPos(pos.x - (size*host.dir), pos.y);
-                if (t.x > -150 && t.y > -100 && t.x < Settings.screenX + 150 && t.y < Settings.screenY + 100) {
-                    P r = t.getAdd(size*host.dir, 0);
-                    float rot = getAtan() + 1.57f;
-                    g.rotate(rot, r.x, r.y);
-                    float test = -(getLength() + size);
-                    g.drawImage(image, (int) t.x, (int) t.y, strokeSize*host.dir, (int) test, null);
-                    g.rotate(-rot, r.x, r.y);
-                }
-            }
+        P pos = host.pos.getAdd(pt);
+        if (type != 0){
+            image.draw(g, pos.x, pos.y, getAtan()-1.57f, host.dir, strokeSize, getLength()+3);
+        } else if (image != null && !amputated){
+            image.draw(g, pos.x, pos.y, getAtan()+1.57f, host.dir);
         }
     }
-    protected boolean hit(Line p, int damage){
+    protected boolean hit(Line p, int damage, DamageType type){
         health -= damage;
-        if (health <= 0) {
-            host = new FlyingOrgan(this, p.ptd.getAdd(0, -15), 30);
+        if (health <= 0 && (type == DamageType.Cut || type == DamageType.Burn)) {
+            if (type == DamageType.Cut){
+                host = new FlyingOrgan(this, p.ptd.getAdd(0, -15), 30);
+                Particle.explode("Blood", p.ptd, P.getZero(), 5, 40, 0, true, 2);
+            } else {
+                Particle.explode("Flame", p.ptd, new P(0, -5), 1, 12, 3, false, 3);
+            }
             amputated = true;
+            for (Organ i : children) i.hit(p, 999, type);
             return true;
         } else ptd.add(p.getAtan(16));
         return false;
@@ -108,14 +87,5 @@ public class Organ extends Line {
     }
     public String toString(){
         return "";
-    }
-
-    public float getHeight() {
-        if (parent == null) return 0;
-        return parent.getHeight()+(amputated?0:Math.abs(ptd.y-pt.y));
-    }
-
-    public BufferedImage getImage() {
-        return image;
     }
 }

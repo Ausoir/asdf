@@ -1,10 +1,13 @@
 package com.ga.unit;
 
-import com.ga.game.Settings;
 import com.ga.map.Global;
+import com.ga.tool.EventTimer;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
+import com.ga.unit.intelligence.Communication;
+import com.ga.unit.intelligence.MerchantIntelligence;
+import com.ga.unit.intelligence.UnitIntelligence;
 import com.ga.unit.item.Armor;
 import com.ga.unit.item.Item;
 import com.ga.unit.item.ItemFactory;
@@ -13,8 +16,8 @@ import com.ga.unit.skill.*;
 
 import java.awt.*;
 
-import static com.ga.unit.BodyHumanoid.*;
-import static com.ga.unit.skill.Actions.Idle;
+import static com.ga.unit.BodyHumanoid.FIST;
+import static com.ga.unit.BodyHumanoid.OFIST;
 import static com.ga.unit.skill.Skills.*;
 
 /**
@@ -23,64 +26,62 @@ import static com.ga.unit.skill.Skills.*;
 public class Man extends Unit {
     protected Item weapon;
     protected Armor armor;
-    protected Shadow shadow;
 
     public Man(String p){
-        this(p.split("@")[0],new P(p.split("@")[2]),Integer.parseInt(p.split("@")[1]));
-        setWeapon(ItemFactory.load(p.split("@")[3]));
-        setArmor((Armor) ItemFactory.load(p.split("@")[4]));
-    }
-
-    public Man(String name, P pt, int seed) {
-        super(name, pt, seed);
-        shadow = new Shadow(pos);
-        this.name = name;
+        super(p);
         clip = new BodyHumanoid(this);
-        speechType = name.toLowerCase();
-        moveset.put("Melee",new Moveset[]{Kick, Weapon, Swing, Pierce});
-        moveset.put("Range",new Moveset[]{Spells.Fireworks});
-        moveset.put("Random",new Moveset[]{Spells.Adrenaline});
+        speechType = faction.name().toLowerCase();
+        if (faction == Faction.Merchant){
+            brain = new MerchantIntelligence(this);
+        } else if (faction != Faction.Player) {
+            brain = new UnitIntelligence(this);
+            brain.setComm(new Communication());
+            moveset.put("Melee",new Moveset[]{Kick, Use, Swing, Pierce});
+            moveset.put("Range",new Moveset[]{Spells.Shadowstep});
+            moveset.put("Random",new Moveset[]{Spells.Haste});
+        }
+        String[] t = p.split("@");
+        setWeapon(ItemFactory.load(t[5]));
+        setArmor((Armor) ItemFactory.load(t[6]));
+        for (Organ i : clip.organs) i.health += get("Health").get()*.3f;
     }
 
-    public Man(P pt){
-        super(null,pt,0);
-        shadow = new Shadow(pos);
-        clip = new BodyHumanoid(this);
-    }
-
-    public void reset(){
-        super.reset();
-        Updater.addQueue.add(shadow);
+    @Override
+    public String toString(){
+        String r = super.toString();
+        if (!r.equals("")){
+            r += "@"+weapon.toItemString()+"@"+armor.toItemString();
+        }
+        return r;
     }
 
     public void setWeapon(Item p){
-        if (p == null) p = ItemFactory.produce("Fist",0);
+        if (p == null){
+            weapon.field();
+            weapon.remove();
+            p = ItemFactory.produce("Fist",0);
+        }
         weapon = p;
         weapon.pos = pos;
         weapon.setOrgan(clip.organs[FIST]);
         weapon.dir = dir;
-        if (!wieldingNone()){
-            clip.localAnimation[0] = clip.localAnimation[2];
-        } else {
-            clip.resetLocalAnimation(0);
-        }
     }
 
     public void setArmor(Armor p){
         if (p == null) p = (Armor) ItemFactory.produce("Underwear",0);
         armor = p;
         if (!equippingNone()) {
-            clip.organs[0].setImage(p.name + "_skin",2);
-            clip.organs[1].setImage(p.name + "_skin",1);
-            clip.organs[2].setImage(p.name + "_skin",1);
-            clip.organs[3].setImage(p.name + "_skin",0);
-            clip.organs[4].setImage(p.name + "_skin",2);
+            clip.organs[0].setImage("item/armor/"+p.name + "_skin",2);
+            clip.organs[1].setImage("item/armor/"+p.name + "_skin",1);
+            clip.organs[2].setImage("item/armor/"+p.name + "_skin",1);
+            clip.organs[3].setImage("item/armor/"+p.name + "_skin",0);
+            clip.organs[4].setImage("item/armor/"+p.name + "_skin",2);
         } else {
-            clip.organs[0].image = null;
-            clip.organs[1].image = null;
-            clip.organs[2].image = null;
-            clip.organs[3].image = null;
-            clip.organs[4].image = null;
+            clip.organs[0].setImage("unit/Man_skin",2);
+            clip.organs[1].setImage("unit/Man_skin",1);
+            clip.organs[2].setImage("unit/Man_skin",1);
+            clip.organs[3].setImage("unit/Man_skin",0);
+            clip.organs[4].setImage("unit/Man_skin",2);
             clip.organs[5].setImage(name);
         }
     }
@@ -95,7 +96,6 @@ public class Man extends Unit {
     @Override
     public void remove() {
         super.remove();
-        if (shadow != null) shadow.remove();
         if (speech != null) speech.remove();
     }
 
@@ -111,61 +111,44 @@ public class Man extends Unit {
     public P getHand(){
         return pos.getAdd(clip.organs[FIST].ptd);
     }
-    protected boolean stateSet(Moveset state){
-        String statreq = state.getStatReq();
-        float req = state.getCost();
-        if (req < 0){
-            if (statreq.equals("Stamina")) req = weapon.weight*-req;
-            else if (statreq.equals("Energy")) req = (armor.weight+weapon.weight)*-req;
-        }
-        if (statreq == null || get(statreq).require((int) req)) {
-            stats.unrest();
-            super.stateSet(state);
-            actionSet(state, 1);
-            return true;
-        }
-        return false;
-    }
     private void useItem(){
-        delay.set(weapon.delay);
+        delay.set(Math.max(0,weapon.delay-weapon.speed));
         final Man host = this;
         final Item wpn = weapon;
         delay.performer = new Performer(){
             public boolean perform(){
                 if (!wpn.use(host)){
-                    say(wpn.getFullName()+" is not working!");
+                    //Beep sound
+//                    say(wpn.getFullName()+" is not working!");
                 } else if (wpn.uses.get() == 0) {
-                    say(wpn.name+" has 0 uses left.");
-                    setWeapon(null);
+//                    say(wpn.name+" has been used up.");
                 }
                 delay.performer = null;
                 return true;
             }
         };
+        if (delay.over()){ //insta cast (weapons etc)
+            delay.performer.perform();
+            delay.performer = null;
+        }
         clip.setState(weapon.action);
     }
     protected void actionSet(Moveset state, int level){
-        if (state instanceof Actions) {
-            switch ((Actions) state) {
-                case Idle:
-                    if (!weapon.name.equals("Fist")) {
-                        if (!get("Stamina").isFull() || !get("Energy").isFull())
-                            clip.setState(Actions.Exhausted);
-                    }
-                    break;
-                case Duck:
-                    vel.x = 0;
-                    if (Global.map.fallSafe(pos.getAdd(vel))) pos.y += Settings.gravity;
-                    break;
-            }
-        } else if (state instanceof Skills) {
+        super.actionSet(state, level);
+        if (state instanceof Skills) {
+            int speed = weapon.speed;
             switch ((Skills) state) {
-                case Weapon:
+                case Use:
                     useItem();
+                    return;
+                case Kick:
+                    speed = 0;
+                case Lunge:
+                    damageMod = -1;
                     break;
-                case Jump:
-                    vel.y -= 40 - (level * 2);
-                    jump = false;
+                case Slash:
+                    damageMod = 1 + level;
+                    speed = 0;
                     break;
                 case Underhand:
                     damageMod = 1 + (level * .5f);
@@ -175,9 +158,6 @@ public class Man extends Unit {
                     break;
                 case Pierce:
                     damageMod = .5f + ((Math.abs(vel.x) * level) / 20);
-                    break;
-                case Lunge:
-                    damageMod = level * .3f;
                     break;
                 case Dash:
                     vel.x -= 10 * dir;
@@ -192,15 +172,22 @@ public class Man extends Unit {
                 case Throw:
                     damageMod = level;
                     break;
+                case Swing:
+                    damageMod = .5f*level;
+                    speed = Math.min(10,speed);
+                    break;
                 default:
                     damageMod = .5f + (level * .5f);
             }
+            delay.set(Math.max(3, delay.time - speed));
+            clip.setSpeed(speed);
         }
     }
 
     public boolean face(int dir) {
         if (super.face(dir)) {
             weapon.dir = dir;
+            weapon.rotation *= -1;
             clip.setClip();
             return true;
         }
@@ -218,9 +205,23 @@ public class Man extends Unit {
     }
 
     @Override
-    public boolean hit(Matter hitter, int damage) {
+    protected int getStatPenalty() {
+        return armor.weight+weapon.weight;
+    }
+
+    @Override
+    public boolean hit(Matter hitter, int damage, DamageType type) {
+        target = hitter.pos;
         armor.use(this);
-        return super.hit(hitter, damage);
+        boolean r = super.hit(hitter, damage, type);
+        if (weapon.getOrgan().amputated){
+            Item wpn = weapon;
+            setWeapon(null);
+            wpn.pos = new P(pos);
+            wpn.field();
+            wpn.gravity = false;
+        }
+        return r;
     }
 
     @Override
@@ -235,14 +236,12 @@ public class Man extends Unit {
     public void die() {
         say("@x");
         super.die();
-        shadow.remove();
     }
 
     private void attack() {
         Matter hit;
         boolean cleave = false;
-        if (state == Swing) cleave = true;
-        else if (stats.triggerEffect(Buffs.Cleave)) cleave = true;
+        if (stats.triggerEffect(Buffs.Cleave)) cleave = true;
         Line hitbox = weapon.getLine();
         hit = Updater.collide(this, hitbox, cleave);
         if (hit != null){
@@ -260,12 +259,20 @@ public class Man extends Unit {
     @Override
     protected void moveTriggered(int organ){
         if (organ == FIST) {
+            weapon.rotate(target.getMult(dir, dir));
+            weapon.rotation += .1 * dir;
             if (state instanceof Skills) {
                 switch ((Skills) state) {
+                    case Slash:
+                        weapon.rotation = delay.time * -.3f * -weapon.dir;
+                        vel.set(dir * Global.cos(weapon.rotation)*15, -1);
                     case Stab:
                     case Pierce:
-                    case Underhand:
                     case Lunge:
+                        attack();
+                        break;
+                    case Underhand:
+                        vel.set(5*dir,-1);
                         attack();
                         break;
                     case Dash:
@@ -280,16 +287,14 @@ public class Man extends Unit {
                                     if (tangible) Particle.explode("Fire", pos, vel, 20, 10, 15, true, 3);
                                     wpn.pos = new P(pos);
                                     wpn.field();
+                                    wpn.gravity = false;
                                     remove();
                                 }
                             };
-                            p.setImage(weapon.image);
-                            p.size.set(weapon.size);
-                            p.setVisible(true);
+                            p.setImage(weapon.name);
                             p.rotSpeed = .03f;
                             p.faction = faction;
-                            p.damage = getDamage();
-                            p.gravity = true;
+                            p.damage = getDamage()+weapon.weight;
                             setWeapon(null);
                         }
                         break;
@@ -300,33 +305,77 @@ public class Man extends Unit {
                             jump = false;
                         }
                         break;
+                    case Shoot:
+                    case Snipe:
+                        P tip = weapon.getPoint();
+                        final Projectile p = new Projectile("Bullet",tip,pos.getAdd(target), (int) (150+(Math.random()*50))){
+                            @Override
+                            public void onCollide(Line l){
+                                remove();
+                            }
+                        };
+                        p.delay = new EventTimer(4,false,new Performer(){
+                            public boolean perform(){
+                                p.remove();
+                                return true;
+                            }
+                        });
+                        if (state == Shoot) p.delay.set(2);
+                        p.dir = dir;
+                        p.rotSpeed = 0;
+                        p.rotate(target.getSubtract(tip).add(pos));
+                        p.faction = faction;
+                        p.damage = 10;
+                        p.gravity = false;
+                        Particle.explode("Spark", tip, p.vel, 10, 10, 15, false,3);
+                        float start = (float) Math.random();
+                        p.pos.add(p.vel.getMult(start, start));
+                        break;
                 }
             }
-        } else if (organ == FOOT && state == Kick){
-            Updater.collide(this, clip.organs[FOOT].getAdd(this.pos), false);
+        } else if (organ == clip.FOOT && state == Sidekick){
+            Updater.collide(this, clip.organs[organ].getAdd(this.pos), false);
+        } else if (organ == clip.FOOT-1 && state == Kick){
+            Updater.collide(this, clip.organs[organ].getAdd(this.pos), false);
         }
     }
 
     @Override
     protected void stateUpdate(){
         super.stateUpdate();
-            if (state == Rest || state == Idle) stats.rest(armor.comfortability); //in addition to previous
-            else if (state == Dash) attack();
-            else if (state == Whirlwind) {
-                weapon.rotation = delay.time * -weapon.dir;
-                attack();
-            } else if (state == Swing) {
-                weapon.rotation = weapon.dir + delay.time * .2f * -weapon.dir;
-                attack();
+        if (state instanceof Skills) {
+            switch ((Skills) state){
+                case Swing:
+                    if (delay.time <= 25 && delay.time > 12) {
+                        int t = 25 - delay.time;
+                        float rot = -((weapon.dir * 10) + t * t * .03f * -weapon.dir);
+                        weapon.rotation = rot;
+                        attack();
+                    }
+                    break;
+                case Jump:
+                    if (jump){
+                        weapon.rotation = 1f*dir;
+                        attack();
+                        break;
+                    }
+                case Whirlwind:
+                    weapon.rotation = delay.time * -weapon.dir;
+                    attack();
+                    break;
+                case Dash:
+                    if (!jump) attack();
+                    break;
             }
+        }
     }
 
     public void drawDebug(Graphics2D g) {
         g.setColor(Color.white);
         P fist = clip.organs[FIST].ptd.getAdd(pos);
-        P foot = clip.organs[FOOT].ptd.getAdd(pos);
+        P foot = clip.organs[clip.FOOT].ptd.getAdd(pos);
         P t = Global.getRelPos((int) (clip.organs[0].pt.x + pos.x), (int) (clip.organs[0].pt.y + pos.y));
-        g.drawArc((int)(t.x-(size.x/2)), (int) (t.y-(size.y/2)), (int)size.x, (int)size.y, 0, 360);
+//        g.drawArc((int)(t.x-(size.x/2)), (int) (t.y-(size.y/2)), (int)size.x, (int)size.y, 0, 360);
         t = Global.getRelPos((int) fist.x, (int) fist.y);
         g.drawArc((int) t.x, (int) t.y, 3, 3, 0, 360);
         t = Global.getRelPos((int) foot.x, (int) foot.y);
@@ -353,12 +402,5 @@ public class Man extends Unit {
     public void revive() {
         super.revive();
         clip.setState(state);
-    }
-
-    @Override
-    public String toString(){
-        String r = super.toString();
-        if (!r.equals("")) return r+"@"+weapon.toItemString()+"@"+armor.toItemString();
-        return r;
     }
 }

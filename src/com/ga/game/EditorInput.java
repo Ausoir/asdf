@@ -1,10 +1,12 @@
 package com.ga.game;
 
-import com.ga.unit.*;
-import com.ga.unit.intelligence.PlayerInput;
+import com.ga.map.BeastFactory;
 import com.ga.map.Global;
+import com.ga.map.ManFactory;
+import com.ga.map.ObjectFactory;
 import com.ga.tool.Line;
 import com.ga.tool.P;
+import com.ga.unit.*;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -16,7 +18,7 @@ import java.util.Iterator;
  */
 public class EditorInput implements Input, Observer {
     enum Tool {
-        NONE, CREATE, DELETE, REMOVE, MAN
+        NONE, CREATE, DELETE, REMOVE, MAN, UNIT, OBJECT
     }
     String cunit = "Player";
     boolean control = false;
@@ -25,7 +27,7 @@ public class EditorInput implements Input, Observer {
     P lmbP = new P();
     ArrayList<Line> history = new ArrayList<>();
     Line current = new Line(0, 0, 0, 0);
-    Thing currentU;
+    Thing currentU = new Thing(null);
     boolean connected = false;
     Tool tool = Tool.NONE;
     P v = new P();
@@ -61,7 +63,7 @@ public class EditorInput implements Input, Observer {
             Global.p("Teleporter");
             current.opt = 2;
             placingTp = true;
-        } else if (p.startsWith("tp")) {
+        } else if (p.startsWith("tp")) { //100 = force, 200 = input required, #0 = mapnum, # = posnum
             current.opt = Integer.parseInt(p.substring(2));
             Global.p("Level Teleporter: "+current.opt);
         } else if (p.equals("green")){
@@ -73,7 +75,7 @@ public class EditorInput implements Input, Observer {
         } else if (p.equals("black")) {
             Updater.landColor = Color.black;
         } else if (p.startsWith("save")){
-            FileManager.saveMap("map/"+p.substring(5));
+            save("map/"+p.substring(5));
         } else if (p.startsWith("load")){
             Updater.changeMap = p.substring(5);
             map = Updater.changeMap;
@@ -84,7 +86,8 @@ public class EditorInput implements Input, Observer {
         } else {
             try {
                 cunit = p;
-                currentU = makeUnit(cunit, currentU.pos);
+                currentU.remove();
+                selectTool(tool);
             } catch (Exception e) {
                 Global.p(p + " Not found");
             }
@@ -92,8 +95,8 @@ public class EditorInput implements Input, Observer {
     }
 
     @Override
-    public void input(boolean key, int mode, int x, int y) {
-        if (!key) {
+    public void input(int mode, int x, int y) {
+        if (mode < 4 && mode > 0) {
             x = (int) (x - Settings.centerX + Global.camera.x);
             y = (int) (y - Settings.centerY + Global.camera.y);
         }
@@ -102,12 +105,13 @@ public class EditorInput implements Input, Observer {
             boolean snap = false;
             for (Line i : Global.map.land){
                 if (i != current) {
-                    if (Math.abs(i.pt.x - x) < 40 && Math.abs(i.pt.y - y) < 40) {
+                    final int snapThreshold = 25;
+                    if (Math.abs(i.pt.x - x) < snapThreshold && Math.abs(i.pt.y - y) < snapThreshold) {
                         x = (int) i.pt.x;
                         y = (int) i.pt.y;
                         snap = true;
                         break;
-                    } else if (Math.abs(i.ptd.x - x) < 40 && Math.abs(i.ptd.y - y) < 40) {
+                    } else if (Math.abs(i.ptd.x - x) < snapThreshold && Math.abs(i.ptd.y - y) < snapThreshold) {
                         x = (int) i.ptd.x;
                         y = (int) i.ptd.y;
                         snap = true;
@@ -123,7 +127,7 @@ public class EditorInput implements Input, Observer {
                     if (connected) {
                         current.ptd.set(x, y);
                     }
-                } else if (tool == Tool.MAN) {
+                } else if (tool == Tool.MAN || tool == Tool.UNIT || tool == Tool.OBJECT) {
                     currentU.pos.set(x, y);
                 } else if (tool == Tool.REMOVE && lmb){
                     Iterator it = Updater.updatee.iterator();
@@ -154,7 +158,11 @@ public class EditorInput implements Input, Observer {
                     add(current);
                     connected = true;
                 } else if (tool == Tool.MAN) {
+                    currentU = makeMan(cunit, new P(x, y));
+                } else if (tool == Tool.UNIT) {
                     currentU = makeUnit(cunit, new P(x, y));
+                } else if (tool == Tool.OBJECT) {
+                    currentU = makeObject(cunit, new P(x, y));
                 }
                 break;
             case -1:
@@ -190,6 +198,9 @@ public class EditorInput implements Input, Observer {
                     }
                 }
                 break;
+            case KeyEvent.VK_ENTER:
+                Display.chatbox.requestFocus();
+                break;
             case KeyEvent.VK_1:
                 if (!shift) selectTool(Tool.NONE);
                 break;
@@ -204,7 +215,18 @@ public class EditorInput implements Input, Observer {
                 break;
             case KeyEvent.VK_5:
                 if (!shift) selectTool(Tool.MAN);
+                currentU.remove();
+                currentU = makeMan(cunit, new P(x, y));
+                break;
+            case KeyEvent.VK_6:
+                if (!shift) selectTool(Tool.UNIT);
+                currentU.remove();
                 currentU = makeUnit(cunit, new P(x, y));
+                break;
+            case KeyEvent.VK_7:
+                if (!shift) selectTool(Tool.OBJECT);
+                currentU.remove();
+                currentU = makeObject(cunit, new P(x, y));
                 break;
             case KeyEvent.VK_W:
                 setSpeed(0,-1);
@@ -212,8 +234,7 @@ public class EditorInput implements Input, Observer {
             case KeyEvent.VK_S:
                 setSpeed(0,1);
                 if (control) {
-                    Global.p("Saved");
-                    FileManager.saveMap("map/"+map);
+                    save("map/"+map);
                 }
                 break;
             case KeyEvent.VK_A:
@@ -221,6 +242,18 @@ public class EditorInput implements Input, Observer {
                 break;
             case KeyEvent.VK_D:
                 setSpeed(1,0);
+                break;
+            case KeyEvent.VK_UP:
+                currentU.pos.add(0,-1);
+                break;
+            case KeyEvent.VK_DOWN:
+                currentU.pos.add(0,1);
+                break;
+            case KeyEvent.VK_LEFT:
+                currentU.pos.add(-1,0);
+                break;
+            case KeyEvent.VK_RIGHT:
+                currentU.pos.add(1,0);
                 break;
             case KeyEvent.VK_CONTROL:
                 control = true;
@@ -237,17 +270,34 @@ public class EditorInput implements Input, Observer {
             case KeyEvent.VK_INSERT:
                 if (Updater.editor) {
                     Updater.editor = false;
-                    Global.player = new PlayerInput(new Player("Player@0@"+Global.camera+"@Fist,0,0,0@Underwear,0,0,0"));
-                    Global.player.host.save.time = -1;
+                    FileManager.loadPlayer("Player.char");
                     Display.input = Global.player;
+                    Global.player.host.pos.set(Global.camera);
+                    Global.player.host.save.time = -1;
                     Global.camera = Global.player.host.pos;
                 }
                 break;
         }
     }
+    private Matter makeObject(String name, P p){
+        Matter r;
+        int seed = 10*Global.map.magnify;
+        if (name.contains(":")){
+            seed = Integer.parseInt(name.split(":")[1]);
+            name = name.substring(0,name.indexOf(":"));
+        }
+        r = ObjectFactory.produce(name, p, seed, 10);
+        return r;
+    }
     private Matter makeUnit(String name, P p){
-        Unit r = new Man(name,p,-1);
-        r.name = name;
+        Unit r;
+        r = BeastFactory.produce(name, p, -1);
+        return r;
+    }
+    private Matter makeMan(String name, P p){
+        Unit r;
+        r = ManFactory.produce(name, p, -1);
+        if (name.equals("Player")) r = new Player(r.toString().substring(4));
         return r;
     }
     private void setSpeed(int x, int y){
@@ -267,5 +317,11 @@ public class EditorInput implements Input, Observer {
     public void update() {
         Global.camera.add(v);
         Global.mapEdge(Global.camera);
+    }
+
+    private void save(String p){
+        Global.p("Saved ("+p+")");
+        currentU.remove();
+        FileManager.saveMap(p);
     }
 }

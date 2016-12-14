@@ -1,12 +1,13 @@
-peasant:c tgt@Come here!/What you got there buddy?/I might let you live!/I'm gonna eat your corpse!/What's this eh?
-peasant:hit@///I'm hit!/ugh!/eeekk/Oof!/Urgh!/Owwwww
-peasant:x@//WAAAAAAAH!/EEEEEEEK!!/I see light!
-peasant:tgt x@Let's see what you got here, heh../Down already?/I can do this all day, buddy./You stay down!
-peasant:flee@///See ya sucker!/You're good as dead now!/Pretty strong, aren't ye?
-peasant:agro@You're as good as dead!/I'm coming for you!/You little...!/That tickles!/Rawr!!
-peasant:c x@////a dead body./dead meat./poor guy../he's dead./a dead man.
-peasant:atk tgt@///////Die!/Eyaaaa!/Raaaaaawr!
-peasant:hear@/I hear something!/What's that?/huh?
+punk:c tgt@Come here!/What you got there buddy?/I might let you live!/I'm gonna eat your corpse!/What's this eh?
+punk:hit@///I'm hit!/ugh!/eeekk/Oof!/Urgh!/Owwwww
+punk:x@//WAAAAAAAH!/EEEEEEEK!!/I see light!
+punk:tgt x@Let's see what you got here, heh../Down already?/I can do this all day, buddy./You stay down!
+punk:flee@///See ya sucker!/You're good as dead now!/Pretty strong, aren't ye?
+punk:agro@You're as good as dead!/I'm coming for you!/You little...!/That tickles!/Rawr!!
+punk:c x@////a dead body./dead meat./poor guy../he's dead./a dead man.
+punk:atk tgt@///////Die!/Eyaaaa!/Raaaaaawr!
+punk:hear@/I hear something!/What's that?/huh?
+punk:greet@Hello.
 soldier:c tgt@Enemy!/Come here!/!!!
 soldier:hit@////I'm hit!/Oof!/Urgh!
 soldier:x@///Urgh!/.../I'm down!/Someone help!/Medic!
@@ -20,6 +21,7 @@ p:hit@///Ouch!/Oof!/Urgh!/Ow!
 p:x@Nooooooo!/Not like this.../I'm dead.../...
 merchant:c@Buy something!/Come see my wares!/Check out the newest wares here!/Need anything?/Selling goodies!/An honest merchant here!/Good wares, better prices!
 merchant:sold@HUEHUEHUE! Thanks!/Making money is my profession./Thank you for your business./Thank you!/Come back anytime!
+merchant:shop@Only the best!/Take a look!/Honest wares!
 merchant:x@//////Whyyyy....
 merchant:denied@Fine, you're the one on a loss!/Your loss./Whatever./Don't have the money?/You're missing out!/Others would pay double for these.
 :greet@Hello!/A fine day to you./Good day./Hello there.

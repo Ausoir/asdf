@@ -1,22 +1,17 @@
 package com.ga.unit;
 
-import com.ga.game.Settings;
 import com.ga.game.Texture;
 import com.ga.map.Drawable;
-import com.ga.map.Global;
 import com.ga.tool.P;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
 
 /**
  * Created by Ga on 5/6/2016.
  */
 public class Thing implements Drawable {
-    public BufferedImage image;
-    protected boolean visible = true;
+    public Texture image;
     public P pos;
-    public P size;
     protected int sizeRadius;
     public String name;
     int depth;
@@ -25,14 +20,15 @@ public class Thing implements Drawable {
     public Thing(String name){
         this.name = name;
         if (name != null) {
-            setImage(Texture.load(name));
-        } else visible = false;
+            setImage(name);
+        } else {
+            image = new Texture();
+            image.visible = false;
+        }
         pos = new P();
     }
-    public void setImage(BufferedImage image){
-        this.image = image;
-        size = new P(this.image.getWidth(), this.image.getHeight());
-        sizeRadius = (int) size.getMult(.5f,.5f).getDist();
+    public void setImage(String p){
+        image = new Texture(p);
     }
     public void rotate(P p){
         rotation = ((float) Math.atan2(p.y,p.x));
@@ -46,21 +42,8 @@ public class Thing implements Drawable {
     public boolean isFacing(P p){
         return (pos.x > p.x && dir == -1) || (pos.x < p.x && dir == 1);
     }
-    public void setVisible(boolean p){
-        visible = p;
-    }
     public void draw(Graphics2D g, P offset){
-        if (visible) {
-            P t = Global.getRelPos(pos.x - (size.x / 2), pos.y - (size.y / 2));
-            t.add(offset.x + (dir < 0 ? size.x : 0), offset.y);
-            if (t.x > -150 && t.y > -100 && t.x < Settings.screenX + 150 && t.y < Settings.screenY + 100) {
-                P r = t.getAdd(dir < 0 ? -size.x / 2 : size.x / 2, size.y / 2);
-                float rot = rotation;
-                g.rotate(rot, r.x, r.y);
-                g.drawImage(image, (int) t.x, (int) t.y, (int) size.x * dir, (int) size.y, null);
-                g.rotate(-rot, r.x, r.y);
-            }
-        }
+        image.draw(g, pos.x+offset.x, pos.y+offset.y, rotation, dir);
     }
     public void draw(Graphics2D g){
         draw(g, P.getZero());

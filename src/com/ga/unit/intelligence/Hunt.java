@@ -23,6 +23,13 @@ public class Hunt implements Task {
         range = host.getReach();
     }
 
+    @Override
+    public void blocked() {
+        host.say("Blocked!");
+        if (host.dir > 0) host.setState(Actions.WalkL);
+        else host.setState(Actions.WalkR);
+    }
+
     public void update() {
         if (target == null) return;
         if (random.update()){
@@ -36,21 +43,25 @@ public class Hunt implements Task {
         if (y < -20)
             host.setState(Skills.Jump);
         if (host.isExhausted()){
-            if (dist > 300){
+            if (dist > 100){
                 host.setState(Skills.Rest);
-            } else if (dist < 300){
+            } else if (dist < 100){
                 if (x > 0) host.setState(Actions.WalkL);
                 else if (x < 0) host.setState(Actions.WalkR);
             }
-        } else if (dist <= 0) {
-            if (dist <= -10) { //edge
-                host.performMoveset("Melee");
-            } else if (dist > -10 && dist < 500) {
-                host.performMoveset("Range");
-            }
+        } else if (dist <= -10) {
+            host.performMoveset("Melee");
+        } else if (dist > 200 && dist < 600) {
+            host.target = target.pos.getSubtract(host.pos).add(0,-30);
+            host.performMoveset("Range");
         } else {
             if (x > 0) host.setState(Actions.WalkR);
             else if (x < 0) host.setState(Actions.WalkL);
         }
+    }
+
+    @Override
+    public int getAlertness() {
+        return 1;
     }
 }

@@ -13,10 +13,12 @@ import java.util.Random;
 public class Matter extends Thing {
     public int seed = 0;
     public Random rand;
-    public boolean gravity = true;
+    public boolean gravity = false;
     public Faction faction = Faction.Hostile;
     public P vel = new P(0, 0);
+    public DamageType damageType = DamageType.Bash;
     public boolean tangible = true;
+    public boolean interactive = false;
     public Matter(){
         super(null);
     }
@@ -52,13 +54,32 @@ public class Matter extends Thing {
         Line pp = new Line(pos,vp);
         for (Line i : Global.map.land){
             if (i.lineCross(pp)){
-                if (i.opt != -1) onCollide(i);
+                if (i.opt != -1) {
+                    float slope = i.getSlope();
+                    float t = (slope * vel.x * 10000 - 5) / 10000f;
+                    if (t < vel.y) {
+                        if (Math.abs(vel.x) > 0 && t < 0) {
+                            float xforce = (float) Math.cos(Math.atan(slope));
+                            if (xforce < .1) {
+                                vel.set(0, 0);
+                            } else vel.x *= xforce*xforce;
+                        }
+                        vel.x *= .9f;
+                        onCollide(i);
+                    } else if (i.opt == 1) {
+                        vel.y = 0;
+                        onCollide(i);
+                    }
+                }
             }
         }
     }
     public void onCollide(Line l){
         float slope = l.getSlope();
         vel.y = (slope * vel.x * 10000 - 5) / 10000f;
+    }
+    public P getPoint(){
+        return pos.getAdd(image.size.x*.5f*Global.cos(rotation)*dir,(int) (image.size.x*.5f*Global.sin(rotation))*dir);
     }
     public void update(){
         int edge = Global.mapEdge(pos.getAdd(vel));
@@ -72,6 +93,8 @@ public class Matter extends Thing {
             vel.y += Settings.gravity;
             if (vel.y > Settings.gravityMax) vel.y = Settings.gravityMax;
         }
+    }
+    public void interact(Unit p){
     }
     @Override
     public String toString(){

@@ -43,14 +43,14 @@ public class Weather implements Drawable{
     }
     @Override
     public void draw(Graphics2D g) {
-        if (visible) {
-            g.setColor(getColor());
-            g.fillRect(0, 0, Settings.screenX, Settings.screenY);
-        }
+//        if (visible) {
+//            g.setColor(getColor());
+//            g.fillRect(0, 0, Settings.screenX, Settings.screenY);
+//        }
     }
 
     @Override
     public int getDepth() {
-        return 30;
+        return 31;
     }
 }

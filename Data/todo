@@ -1,2 +1,3 @@
 Optimizable:
 -Load texture once
+-Matter collision (with terrain) uses x^2 for x calc
