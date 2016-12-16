@@ -3,6 +3,7 @@ package com.ga.map;
 import com.ga.tool.P;
 import com.ga.unit.Matter;
 import com.ga.unit.Unit;
+import com.ga.unit.Updater;
 import com.ga.unit.skill.Actions;
 
 /**
@@ -29,6 +30,9 @@ public class ObjectFactory {
                 }
             };
             result.setDepth(11);
+        } else if (name.equals("PlayerSpawn")) {
+            result = new Matter(name, seed, pt, Updater.editor?10:0);
+            result.name = "PlayerSpawn";
         } else if (name.equals("Phone_Booth")) {
             result = new Matter(name, seed, pt, depth){
                 public void interact(Unit p){

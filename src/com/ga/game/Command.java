@@ -1,11 +1,11 @@
 package com.ga.game;
 
-import com.ga.connection.Server;
 import com.ga.map.BeastFactory;
 import com.ga.map.Global;
 import com.ga.map.ManFactory;
 import com.ga.tool.Performer;
-import com.ga.unit.*;
+import com.ga.unit.Player;
+import com.ga.unit.Updater;
 import com.ga.unit.item.ItemFactory;
 import com.ga.unit.skill.Skills;
 import com.ga.unit.skill.Spells;
@@ -17,33 +17,6 @@ import static com.ga.game.Display.dialog;
  */
 public class Command {
     public static Player host;
-    public static void speechOrder(String p){
-        if (p.startsWith("cmd")) {
-            order(p.substring(4));
-        } else if (p.startsWith("cast")){
-            host.setState(Spells.valueOf(p.substring(5)));
-        } else if (p.equals("editor")){
-            Updater.editor = true;
-            Display.input = new EditorInput();
-        } else if (p.equals("save")){
-            FileManager.saveMap("Map");
-        } else if (p.equals("choice")) {
-            dialog.show("Command Choice","Message",new String[]{"yes","no"},new Performer[]{
-                    new Performer(){
-                        public boolean perform(){
-                            host.say("Yes");
-                            return true;
-                        }
-                    },
-                    new Performer(){
-                        public boolean perform(){
-                            host.say("No");
-                            return true;
-                        }
-                    }
-            });
-        }
-    }
     public static void order(String p){
         try {
             String[] cmds = p.split(";");
@@ -71,6 +44,17 @@ public class Command {
                 else if (p.equals("revive")) host.revive();
                 else if (p.equals("terrain")) Updater.showTerrain = true;
                 else if (p.equals("produce")) ItemFactory.produce("Fireball",0,Global.map.randomSurface());
+                else if (p.startsWith("cast")){
+                    host.setState(Spells.valueOf(p.substring(5)));
+                } else if (p.equals("editor")){
+                    Updater.editor = true;
+                    Display.input = new EditorInput();
+                } else if (p.equals("online")) {
+                    Global.server.online();
+                } else if (p.startsWith("cellcall")) {
+                    Global.server.online();
+                    Global.server.requestConnection(p.substring(9));
+                }
             }
         } catch (Exception e){
             Global.p("Command order failed for \""+p+"\"");

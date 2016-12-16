@@ -64,6 +64,8 @@ public abstract class Unit extends Matter {
     }
 
     public void reset(){
+        state = Actions.Idle;
+        Updater.addDrawee(speech);
         Updater.addDrawee(hp);
         Updater.addQueue.add(shadow);
     }

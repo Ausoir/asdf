@@ -111,35 +111,13 @@ public class Man extends Unit {
     public P getHand(){
         return pos.getAdd(clip.organs[FIST].ptd);
     }
-    private void useItem(){
-        delay.set(Math.max(0,weapon.delay-weapon.speed));
-        final Man host = this;
-        final Item wpn = weapon;
-        delay.performer = new Performer(){
-            public boolean perform(){
-                if (!wpn.use(host)){
-                    //Beep sound
-//                    say(wpn.getFullName()+" is not working!");
-                } else if (wpn.uses.get() == 0) {
-//                    say(wpn.name+" has been used up.");
-                }
-                delay.performer = null;
-                return true;
-            }
-        };
-        if (delay.over()){ //insta cast (weapons etc)
-            delay.performer.perform();
-            delay.performer = null;
-        }
-        clip.setState(weapon.action);
-    }
     protected void actionSet(Moveset state, int level){
         super.actionSet(state, level);
         if (state instanceof Skills) {
             int speed = weapon.speed;
             switch ((Skills) state) {
                 case Use:
-                    useItem();
+                    weapon.use(this);
                     return;
                 case Kick:
                     speed = 0;
@@ -327,9 +305,10 @@ public class Man extends Unit {
                         p.faction = faction;
                         p.damage = 10;
                         p.gravity = false;
-                        Particle.explode("Spark", tip, p.vel, 10, 10, 15, false,3);
+                        Particle.explode("Spark", tip, p.vel, 5, 10, 15, false,3);
                         float start = (float) Math.random();
                         p.pos.add(p.vel.getMult(start, start));
+                        getWeapon().rotation += dir * -.3f;
                         break;
                 }
             }

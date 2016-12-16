@@ -37,7 +37,6 @@ public class EditorInput implements Input, Observer {
 
     public EditorInput() {
         Display.input = this;
-        Updater.editor = true;
         Updater.other.add(this);
         if (Global.camera == null) Global.camera = new P();
         else Global.camera = new P(Global.camera);
@@ -96,10 +95,8 @@ public class EditorInput implements Input, Observer {
 
     @Override
     public void input(int mode, int x, int y) {
-        if (mode < 4 && mode > 0) {
-            x = (int) (x - Settings.centerX + Global.camera.x);
-            y = (int) (y - Settings.centerY + Global.camera.y);
-        }
+        x = (int) (x - Settings.centerX + Global.camera.x);
+        y = (int) (y - Settings.centerY + Global.camera.y);
         if (mode < -3) v.set(0, 0);
         if (shift && current != null){
             boolean snap = false;

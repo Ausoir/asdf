@@ -84,15 +84,23 @@ public class ItemFactory {
             case "Potion":
                 item = new Item(p, seed, 1, 1, 30, 1){
                     @Override
-                    public boolean use(Man host){
-                        if (super.use(host)) {
-                            host.clip.setState(Actions.Consume);
-                            return true;
-                        }
+                    public boolean use(final Man host){
+                        host.setState(Actions.Consume);
+                        host.delay.performer = new Performer(){
+                            public boolean perform(){
+                                if (canUse()) {
+                                    Global.cooldown(lastused, cooldown);
+                                    if (uses.get() != -1) uses.add(-1);
+                                    emod.getEvent().start(host, ademod.level);
+                                    emod.getEvent().perform();
+                                }
+                                return true;
+                            }
+                        };
+                        host.delay.set(15);
                         return false;
                     }
                 };
-                item.delay = 45;
                 break;
             case "Spellbook":
                 item = new Item(p, seed, 1, 1, 0, 1){

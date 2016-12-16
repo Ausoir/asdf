@@ -3,6 +3,7 @@ package com.ga.game;
 import com.ga.connection.Server;
 import com.ga.map.Global;
 import com.ga.tool.Clips;
+import com.ga.unit.Updater;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,6 +14,7 @@ import java.awt.*;
 public class Game extends JFrame {
     public Game(boolean editor, int x, int y){
         Global.init();
+        Updater.editor = editor;
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
         if (x == 0 && y == 0) {
             x = screen.width;

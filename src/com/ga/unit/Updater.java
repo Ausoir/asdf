@@ -7,6 +7,7 @@ import com.ga.map.Drawable;
 import com.ga.map.Global;
 import com.ga.tool.Line;
 import com.ga.tool.P;
+import com.ga.tool.Performer;
 import com.ga.tool.Timer;
 import com.ga.unit.item.Item;
 
@@ -28,6 +29,7 @@ public class Updater {
     public static Color landColor = Color.pink;
     public static String changeMap = null;
     public static int changeMapPos = 0;
+    public static Performer changeMapEvent = null;
     private static Timer time = new Timer(10,true);
     public static void clear(){
         drawee.clear();
@@ -44,6 +46,10 @@ public class Updater {
             Global.player.host.pos.set(FileManager.readMap(changeMap, changeMapPos));
             Global.player.host.reset();
             Display.input = Global.player;
+            if (changeMapEvent != null){
+                changeMapEvent.perform();
+                changeMapEvent = null;
+            }
         } else {
             FileManager.readMap(changeMap, -2);
         }
@@ -60,6 +66,7 @@ public class Updater {
                 addQueue.remove(i);
             }
         }
+        Global.camera = Global.player.host.pos.getAdd(0,-40);
         for (Drawable i : drawee) i.draw(g2);
         if (editor || showTerrain){
             g2.setColor(landColor);
@@ -163,5 +170,15 @@ public class Updater {
             }
         }
         return seen;
+    }
+    public static P getEntrancePos(int p){
+        int index = 0;
+        for (Matter i : updatee){
+            if (i.name.equals("PlayerSpawn")){
+                if (index == p) return i.pos;
+                else index++;
+            }
+        }
+        return P.getZero();
     }
 }

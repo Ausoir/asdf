@@ -122,10 +122,10 @@ public class Item extends Matter {
     Spells emod = null;
     public int weight;
     protected int cooldown = 100;
-    public int delay = 10;
+    public int delay = 0;
     protected float probability;
     public Moveset action = Actions.Consume;
-    private int[] lastused = new int[]{0};
+    public int[] lastused = new int[]{0};
     public Stat uses = new Stat(1);
     private Tag type = Tag.Consumable;
     private Organ organ = null;

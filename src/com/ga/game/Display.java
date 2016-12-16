@@ -48,6 +48,10 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
         chatbox.setFocusable(true);
         chatbox.addKeyListener(new KeyAdapter() {
             @Override
+            public void keyTyped(KeyEvent e){
+                if (chatbox.getText().length() > 18) e.consume();
+            }
+            @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) chat();
             }
@@ -85,10 +89,10 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
     }
 
     private void input(int mode){
-        if (this.mode != mode) {
+        if (this.mode != mode || Updater.editor) {
             this.mode = mode;
             if (input != null)
-                input.input(mode, mX, mY);
+                input.input(mode, (int) (mX-Settings.centerX+Global.camera.x), (int) (mY-Settings.centerY+Global.camera.y));
         }
     }
 
@@ -104,7 +108,7 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
     @Override
     public void keyReleased(KeyEvent e) {
         int t = e.getKeyCode();
-        if (t == 65 || t == 68) input(-t);
+        if (t == KeyEvent.VK_A || t == KeyEvent.VK_D || Updater.editor) input(-t);
         if (t == mode) mode = -1;
     }
 
@@ -124,7 +128,8 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
     public void mouseReleased(java.awt.event.MouseEvent e) {
         mX = e.getX();
         mY = e.getY();
-        if (mode == e.getButton()) mode = -1;
+        if (Updater.editor) input(-e.getButton());
+        else if (mode == e.getButton()) mode = -1;
     }
 
     @Override
@@ -146,5 +151,6 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
     public void mouseMoved(MouseEvent e) {
         mX = e.getX();
         mY = e.getY();
+        if (Updater.editor) input(0);
     }
 }

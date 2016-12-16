@@ -9,8 +9,6 @@ import com.ga.unit.skill.Skills;
  */
 public class BodyHumanoid extends Body {
     public static final int FIST = 0, OFIST = 4;
-    private int height = 0;
-
     BodyHumanoid(Unit host) {
         super(host, "Man");
         organs[5].setImage(host.name);
@@ -40,6 +38,7 @@ public class BodyHumanoid extends Body {
                     break;
                 case Snipe:
                     rotateAppendage(OFIST, 40);
+                    rotateAppendage(OFIST, 41);
                     break;
                 case Dart:
                     rotateAppendage(OFIST, 28);

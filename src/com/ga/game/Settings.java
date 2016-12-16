@@ -5,7 +5,7 @@ package com.ga.game;
  */
 public class Settings {
     public static int receiverPort = 1992;
-    public static int senderPort = 1993;
+    public static int senderPort = 1992;
     public static int tcpPort = 2016;
     public static int screenX = 1024;
     public static int screenY = 720;

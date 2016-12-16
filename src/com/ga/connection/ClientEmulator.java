@@ -9,10 +9,6 @@ public class ClientEmulator extends UDPClient {
     private String message;
     private boolean on = true;
     public ClientEmulator() {}
-    @Override
-    public void send(String p){
-        message = p+";";
-    }
     public String receive(){
         try {
             while (on) {
@@ -38,6 +34,9 @@ public class ClientEmulator extends UDPClient {
         message = p+";";
     }
     public void send(String msg, String ip, int port) {
-
+        message = msg+";";
+    }
+    public void send(String msg) {
+        message = msg+";";
     }
 }

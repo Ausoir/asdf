@@ -81,7 +81,7 @@ public class UDPClient {
         return result;
     }
     public String getClientIP(){
-        return receiver.getAddress().getHostName();
+        return receiver.getAddress().getHostAddress();
     }
     public int getClientPort(){
         return receiver.getPort();

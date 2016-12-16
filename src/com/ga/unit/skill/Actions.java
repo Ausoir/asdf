@@ -5,7 +5,7 @@ package com.ga.unit.skill;
  */
 public enum Actions implements Moveset {
     Idle, WalkL, WalkR, Hit(15,null), Dead,
-    Conjure, Wait(80,null), Cast, Duck, Consume, Exhausted, Interact(8,null), Down(50,null), Buff, Revive, Sheathe(18,null);
+    Conjure, Wait(50,null), Cast, Duck, Consume, Exhausted, Interact(8,null), Down(50,null), Buff, Revive, Sheathe(18,null);
     private String description;
     private int del;
     Actions(){

@@ -1,6 +1,5 @@
 package com.ga.game;
 
-import com.ga.connection.Server;
 import com.ga.map.BeastFactory;
 import com.ga.map.Global;
 import com.ga.map.Map;
@@ -32,7 +31,7 @@ public class FileManager {
     }
     public static void saveCharacter(){
         saveMap("map/Map");
-        save("map/127.0.0.1", Global.player.host.toCharacterString());
+        save("map/0", Global.player.host.toCharacterString());
     }
     public static void save(String dir, String input) {
         try {
@@ -70,10 +69,8 @@ public class FileManager {
         return result;
     }
     static void loadFirst(boolean editor){
-        if (!editor){
-            readMap("Map",0);
-        } else {
-            readMap("Map",-2);
+        readMap("Map",0);
+        if (editor){
             new EditorInput();
         }
     }
@@ -83,6 +80,7 @@ public class FileManager {
         PlayerInput pi;
         pi = new PlayerInput(new Player(line[0].split("]")[1]));
         pi.host.load(read("map/"+dir));
+        pi.load(line[2]);
 //        Global.setTime(Integer.parseInt(line[1].split(";")[0]));
         return pi;
     }
@@ -109,20 +107,15 @@ public class FileManager {
                 if (sections.length > 0) {
                     for (int section = 0; section < sections.length; section++) {
                         String[] unit = sections[section].split("]");
-                        if (unit.length == 1) {
+                        if (unit.length == 1) { //object
                             String[] type = unit[0].split("@");
+                            if (type[0].equals("PlayerSpawn")){
+                                if (player == 0) r = new P(type[2]);
+                                else if (player > -1) player--;
+                            }
                             ObjectFactory.produce(type[0], new P(type[2]), Integer.parseInt(type[1]), 9);
-                        } else {
-                            String[] type = unit[1].split("@");
-                            if (unit[0].equals("Player")) {
-                                P pos = new P(type[2]);
-                                if (player == 0) {
-                                    r = pos;
-                                } else if (player == -2) {
-                                    new Player(unit[1]);
-                                }
-                                if (player > -1) player--;
-                            } else if (unit[0].equals("Man")) new Man(unit[1]);
+                        } else { //unit
+                            if (unit[0].equals("Man")) new Man(unit[1]);
                             else BeastFactory.produce(unit[1]);
                         }
                     }

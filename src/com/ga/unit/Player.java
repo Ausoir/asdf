@@ -7,6 +7,7 @@ import com.ga.map.Global;
 import com.ga.tool.Line;
 import com.ga.tool.Performer;
 import com.ga.tool.Timer;
+import com.ga.unit.intelligence.PlayerInput;
 import com.ga.unit.item.Inventory;
 import com.ga.unit.item.Item;
 import com.ga.unit.skill.*;
@@ -24,10 +25,10 @@ public class Player extends Man {
     public SkillTree skillTree = new SkillTree();
     public Timer save = new Timer(50, true);
     private int selectingItem = -1;
+    public PlayerInput input;
     public Player(String p) {
         super(p);
         faction = Faction.Player;
-        Command.host = this;
         get("Health").setTotal(30);
         stats.setStat("Level",new Stat(1));
         stats.setStat("Memory",new Stat(1));
@@ -98,9 +99,6 @@ public class Player extends Man {
     @Override
     protected void actionSet(Moveset state, int level){
         super.actionSet(state, skillTree.getSkillLevel(state));
-    }
-    public int setState(Moveset state){
-        target = Global.player.mP.getSubtract(pos.getSubtract(Global.camera));
         if (state instanceof Actions) {
             switch ((Actions) state) {
                 case Sheathe:
@@ -124,6 +122,14 @@ public class Player extends Man {
                         }
                     };
                     break;
+            }
+        }
+    }
+    public int setState(Moveset state){
+        target = input.mP.getSubtract(pos);
+        face(input.mP.x > pos.x ? 1 : -1);
+        if (state instanceof Actions) {
+            switch ((Actions) state) {
                 case WalkL:
                 case WalkR:
                     if (delay.over()) {
@@ -131,7 +137,7 @@ public class Player extends Man {
                     }
                     break;
                 case Interact:
-                    ArrayList<Matter> obj = Updater.collide(pos.getAdd(clip.organs[FIST].ptd), 8);
+                    ArrayList<Matter> obj = Updater.collide(pos.getAdd(clip.organs[FIST].ptd), 12);
                     for (Matter i : obj){
                         if (i.interactive){
                             i.interact(this);
@@ -183,35 +189,34 @@ public class Player extends Man {
         super.onCollide(r);
         if (state != Actions.Dead) {
             if (r.opt == 2) {
-                if (Global.player.teleportReady()){
+                if (state == Actions.Wait){
                     vel.set(0, 0);
                     Global.map.teleport(pos, r);
                 }
             } else if (r.opt >= 100) {
                 if (r.opt >= 200){
-                    if (Global.player.teleportReady()) Global.map.loadMap(r.opt - 200);
+                    if (state == Actions.Wait) Global.map.loadMap(r.opt - 200);
                 } else Global.map.loadMap(r.opt - 100);
             }
         }
     }
     public void update(){
-        Global.player.update();
+        input.update();
         super.update();
-        Global.camera = pos.getAdd(0,-40); //to be able to walk to edge
         Global.mapEdgeCenter(Global.camera);
         if (save.update() && state != Actions.Dead) FileManager.saveCharacter();
-    }
-    public String toCharacterString(){
-        String r = super.toString()+"\n";
-        r += gold+";"+Global.getTime()[0]+"\n";
-        r += Global.player.toString()+"\n";
-        r += inventory.toString()+"\n";
-        r += skillTree.toString();
-        return r;
     }
     @Override
     public String toString(){
         return "";
+    }
+    public String toCharacterString(){
+        String r = super.toString()+"\n";
+        r += gold+";"+Global.getTime()[0]+"\n";
+        r += input.toString()+"\n";
+        r += inventory.toString()+"\n";
+        r += skillTree.toString();
+        return r;
     }
     public void load(String p){
         String[] line = p.split("%");
@@ -235,6 +240,5 @@ public class Player extends Man {
         });
         inventory.load(line[3]);
         skillTree.load(line[4]);
-        Global.player.load(line[2]);
     }
 }

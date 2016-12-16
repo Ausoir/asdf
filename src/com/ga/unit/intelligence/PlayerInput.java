@@ -40,14 +40,13 @@ public class PlayerInput implements Input, Observer {
     public P mP = new P();
     public float mR;
     public PlayerInput(Player unit){
-        Global.display.input = this;
         host = unit;
         unit.brain = null;
-        Global.player = this;
+        unit.input = this;
     }
     public void chat(String p){
-        Command.speechOrder(p);
-        host.say(p);
+        if (p.startsWith("/")) Command.order(p.substring(1));
+        else Global.server.sendFromLocal("IN@"+p);
     }
     public void changeMapping(int key, Moveset event){
         keyMap.remove(key);
@@ -68,19 +67,18 @@ public class PlayerInput implements Input, Observer {
         return r;
     }
     public void inputEcho(String action, int x, int y){
-        mP.x = x - Settings.centerX;
-        mP.y = y - Settings.centerY;
+        mP.x = x;
+        mP.y = y;
         mR = (float) Math.atan2(mP.y,mP.x);
-        host.face(mP.x > host.pos.x-Global.camera.x ? 1 : -1);
         key = action;
     }
     public void input(int mode, int x, int y){
         if (mode == KeyEvent.VK_ENTER) Display.chatbox.requestFocus();
         else if (mode == KeyEvent.VK_TAB) Display.menu.toggle();
         else if (mode > 48 && mode < 57) {
-            Global.server.send("IN@I" + (mode-49) + "," + x + "," + y);
+            Global.server.sendFromLocal("IN@I" + (mode-49) + "," + x + "," + y);
         } else if (keyMap.containsKey(mode)){
-            Global.server.send("IN@" + keyMap.get(mode).getCodeName() + "," + x + "," + y);
+            Global.server.sendFromLocal("IN@" + keyMap.get(mode).getCodeName() + "," + x + "," + y);
         }
     }
     @Override
@@ -93,10 +91,6 @@ public class PlayerInput implements Input, Observer {
             else if (key.startsWith("I")) host.selectItem(Integer.parseInt(t));
             key = null;
         }
-    }
-    public boolean teleportReady(){
-        if (keyMap.get(key) == Actions.Wait) return true;
-        return false;
     }
     public void load(String p){
         if (p.length() > 1) {

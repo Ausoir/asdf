@@ -3,6 +3,7 @@ package com.ga.connection;
 import com.ga.game.Settings;
 
 import java.io.*;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -10,72 +11,69 @@ import java.net.Socket;
  * Created by Ga on 12/12/2016.
  */
 public class TCPClient {
-    public void download(String ip, String output) {
-        byte[] aByte = new byte[1];
+    public void download(String ip, String[] output) throws IOException {
         int bytesRead;
         Socket clientSocket = null;
         InputStream is = null;
         try {
-            clientSocket = new Socket(ip , Settings.tcpPort);
+            clientSocket = new Socket();
+            clientSocket.connect(new InetSocketAddress(ip, Settings.tcpPort), 3000);
             is = clientSocket.getInputStream();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         if (is != null) {
             FileOutputStream fos;
             BufferedOutputStream bos;
             try {
-                fos = new FileOutputStream(output);
-                bos = new BufferedOutputStream(fos);
-                bytesRead = is.read(aByte, 0, aByte.length);
-                do {
-                    baos.write(aByte);
-                    bytesRead = is.read(aByte);
-                } while (bytesRead != -1);
-                bos.write(baos.toByteArray());
-                bos.flush();
-                bos.close();
-                clientSocket.close();
+                for (int i=0;i<output.length;i++) {
+                    fos = new FileOutputStream(output[i]);
+                    bos = new BufferedOutputStream(fos);
+                    byte[] one = new byte[1];
+                    bytesRead = is.read(one);
+                    do {
+                        bos.write(one);
+                        bytesRead = is.read(one);
+                    } while (bytesRead != -1 && one[0] != 28);
+                    bos.flush();
+                    bos.close();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+        clientSocket.close();
     }
-    public void send(String input) {
-        while (true) {
-            ServerSocket welcomeSocket = null;
-            Socket connectionSocket = null;
-            BufferedOutputStream outToClient = null;
-            try {
-                welcomeSocket = new ServerSocket(Settings.tcpPort);
-                connectionSocket = welcomeSocket.accept();
-                outToClient = new BufferedOutputStream(connectionSocket.getOutputStream());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+    public String send(String[] input) {
+        String result = "";
+        ServerSocket welcomeSocket = null;
+        Socket connectionSocket = null;
+        BufferedOutputStream outToClient = null;
+        try {
+            welcomeSocket = new ServerSocket(Settings.tcpPort);
+            connectionSocket = welcomeSocket.accept();
+            outToClient = new BufferedOutputStream(connectionSocket.getOutputStream());
             if (outToClient != null) {
-                File myFile = new File(input);
-                byte[] mybytearray = new byte[(int) myFile.length()];
-                FileInputStream fis = null;
-                try {
+                for (int i=0;i<input.length;i++) {
+                    File myFile = new File(input[i]);
+                    byte[] mybytearray = new byte[(int) myFile.length()];
+                    FileInputStream fis = null;
                     fis = new FileInputStream(myFile);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                BufferedInputStream bis = new BufferedInputStream(fis);
-                try {
+                    BufferedInputStream bis = new BufferedInputStream(fis);
                     bis.read(mybytearray, 0, mybytearray.length);
+                    result += mybytearray;
                     outToClient.write(mybytearray, 0, mybytearray.length);
-                    outToClient.flush();
-                    outToClient.close();
-                    connectionSocket.close();
-                    return;
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    result += ((char)28);
+                    outToClient.write(28);
                 }
+                outToClient.flush();
+                outToClient.close();
+                connectionSocket.close();
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        return result;
     }
 }
 
