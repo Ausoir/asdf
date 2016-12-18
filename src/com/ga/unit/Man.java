@@ -34,15 +34,15 @@ public class Man extends Unit {
         if (faction == Faction.Merchant){
             brain = new MerchantIntelligence(this);
         } else if (faction != Faction.Player) {
-            brain = new UnitIntelligence(this);
+            if (Global.server.server) brain = new UnitIntelligence(this);
             brain.setComm(new Communication());
             moveset.put("Melee",new Moveset[]{Kick, Use, Swing, Pierce});
-            moveset.put("Range",new Moveset[]{Spells.Shadowstep});
+            moveset.put("Range",new Moveset[]{Spells.Stun, Spells.Fireball, Spells.Fireblast});
             moveset.put("Random",new Moveset[]{Spells.Haste});
         }
         String[] t = p.split("@");
-        setWeapon(ItemFactory.load(t[5]));
-        setArmor((Armor) ItemFactory.load(t[6]));
+        setWeapon(ItemFactory.load(t[6]));
+        setArmor((Armor) ItemFactory.load(t[7]));
         for (Organ i : clip.organs) i.health += get("Health").get()*.3f;
     }
 
@@ -146,6 +146,12 @@ public class Man extends Unit {
                 case Whirlwind:
                     delay.time += 35+(8 * level);
                     damageMod = .5f + ((float) level * .5f);
+                    delay.performer = new Performer(){
+                        public boolean perform(){
+                            setState(Skills.Rest);
+                            return true;
+                        }
+                    };
                     break;
                 case Throw:
                     damageMod = level;
@@ -189,7 +195,7 @@ public class Man extends Unit {
 
     @Override
     public boolean hit(Matter hitter, int damage, DamageType type) {
-        target = hitter.pos;
+        target = hitter.pos.getAdd(0,0);
         armor.use(this);
         boolean r = super.hit(hitter, damage, type);
         if (weapon.getOrgan().amputated){
@@ -258,7 +264,7 @@ public class Man extends Unit {
                         break;
                     case Throw:
                         if (!weapon.name.equals("Fist")) {
-                            Projectile p = new Projectile(null, pos.getAdd(clip.organs[OFIST].ptd), Global.player.mP.getAdd(pos), 50) {
+                            Projectile p = new Projectile(null, pos.getAdd(clip.organs[OFIST].ptd), pos.getAdd(target), 50) {
                                 Item wpn = weapon;
                                 @Override
                                 public void stuck() {
@@ -286,7 +292,7 @@ public class Man extends Unit {
                     case Shoot:
                     case Snipe:
                         P tip = weapon.getPoint();
-                        final Projectile p = new Projectile("Bullet",tip,pos.getAdd(target), (int) (150+(Math.random()*50))){
+                        final Projectile p = new Projectile("Bullet",tip,pos.getAdd(target), (int) (150+(rand.nextFloat()*50))){
                             @Override
                             public void onCollide(Line l){
                                 remove();
@@ -306,7 +312,7 @@ public class Man extends Unit {
                         p.damage = 10;
                         p.gravity = false;
                         Particle.explode("Spark", tip, p.vel, 5, 10, 15, false,3);
-                        float start = (float) Math.random();
+                        float start = rand.nextFloat();
                         p.pos.add(p.vel.getMult(start, start));
                         getWeapon().rotation += dir * -.3f;
                         break;

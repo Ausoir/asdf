@@ -1,5 +1,6 @@
 package com.ga.unit;
 
+import com.ga.map.Global;
 import com.ga.unit.intelligence.UnitIntelligence;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Moveset;
@@ -12,7 +13,7 @@ public class Beast extends Unit {
     public Beast(String p) {
         super(p);
         clip = new Body(this, name);
-        brain = new UnitIntelligence(this);
+        if (Global.server.server) brain = new UnitIntelligence(this);
         moveset.put("Melee",new Moveset[]{Actions.WalkL});
     }
 

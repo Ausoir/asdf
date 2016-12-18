@@ -23,6 +23,7 @@ import static com.ga.unit.skill.Skills.Rest;
 public abstract class Unit extends Matter {
     protected HashMap<String, Moveset[]> moveset = new HashMap<String, Moveset[]>(){{
     }};
+    public int id;
     public Body clip;
     public Shadow shadow;
     public Moveset state = Actions.Idle;
@@ -36,12 +37,14 @@ public abstract class Unit extends Matter {
     protected float damageMod = 1;
     public String speechType;
     protected Speech speech = new Speech(this);
+    private Moveset prevState = Actions.Idle;
 
     public Unit(String p) {
         super(p.split("@")[0],Integer.parseInt(p.split("@")[1]),new P(p.split("@")[2]),10);
         String[] t = p.split("@");
-        stats.load(t[3]);
-        faction = Faction.valueOf(t[4]);
+        id = Integer.parseInt(t[3]);
+        stats.load(t[4]);
+        faction = Faction.valueOf(t[5]);
         hp = new HealthBar(get("Health"), pos);
         get("Health").onChange = (new Performer(){
             @Override
@@ -107,8 +110,22 @@ public abstract class Unit extends Matter {
     public boolean isExhausted(){
         return false;
     }
-    public int setState(Moveset state) {
-        if (!delay.over() || !jump || this.state == state) return 1;
+    public void setState(Moveset state) {
+        setState(state, target.x, target.y);
+    }
+    public void setState(Moveset state, float x, float y) {
+        if (delay.over() && jump && this.state != state) {
+            prevState = state;
+            Global.server.sendFromLocal("IN@" + id + "@" + state.getCodeName() + "@" + (int)x + "@" + (int)y);
+        }
+    }
+    public void setStateEcho(String p){
+        String t = p.substring(1);
+        if (p.startsWith("A")) setStateEcho(Actions.getByName(t));
+        else if (p.startsWith("K")) setStateEcho(Skills.getByName(t));
+        else if (p.startsWith("M")) setStateEcho(Spells.getByName(t));
+    }
+    public int setStateEcho(Moveset state) {
         if (state != Actions.Idle) delay.performer = null;
         int[] cdinput = getCooldown(state);
         int prevCd = cdinput[0];
@@ -299,7 +316,7 @@ public abstract class Unit extends Matter {
     @Override
     public String toString(){
         if (state == Actions.Dead) return "";
-        String r = getClass().getSimpleName()+"]"+super.toString();
+        String r = getClass().getSimpleName()+"]"+super.toString()+"@"+id;
         r += "@"+stats.toString()+"@"+faction.name();
         return r;
     }

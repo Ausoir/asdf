@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * Created by Ga on 7/25/2016.
  */
-public class PlayerInput implements Input, Observer {
+public class PlayerInput implements Input {
     private HashMap<Integer, Moveset> keyMap = new HashMap<Integer, Moveset>(){{
         put(-1, Actions.Idle);
         put(-65, Actions.Idle);
@@ -33,6 +33,9 @@ public class PlayerInput implements Input, Observer {
         put(KeyEvent.VK_Z, Actions.Interact);
         put(1, Skills.Use);
         put(3, Actions.Idle);
+        put(49, Actions.Pull1);
+        put(50, Actions.Pull2);
+        put(51, Actions.Pull3);
         put(KeyEvent.VK_SHIFT, Skills.Rest);
     }};
     private String key;
@@ -66,30 +69,15 @@ public class PlayerInput implements Input, Observer {
         }
         return r;
     }
-    public void inputEcho(String action, int x, int y){
+    public void input(int mode, int x, int y){
         mP.x = x;
         mP.y = y;
         mR = (float) Math.atan2(mP.y,mP.x);
-        key = action;
-    }
-    public void input(int mode, int x, int y){
         if (mode == KeyEvent.VK_ENTER) Display.chatbox.requestFocus();
         else if (mode == KeyEvent.VK_TAB) Display.menu.toggle();
-        else if (mode > 48 && mode < 57) {
-            Global.server.sendFromLocal("IN@I" + (mode-49) + "," + x + "," + y);
-        } else if (keyMap.containsKey(mode)){
-            Global.server.sendFromLocal("IN@" + keyMap.get(mode).getCodeName() + "," + x + "," + y);
-        }
-    }
-    @Override
-    public void update(){
-        if (key != null) {
-            String t = key.substring(1);
-            if (key.startsWith("A")) host.setState(Actions.getByName(t));
-            else if (key.startsWith("K")) host.setState(Skills.getByName(t));
-            else if (key.startsWith("M")) host.setState(Spells.getByName(t));
-            else if (key.startsWith("I")) host.selectItem(Integer.parseInt(t));
-            key = null;
+        else if (keyMap.containsKey(mode)){
+            P t = mP.getSubtract(host.pos);
+            host.setState(keyMap.get(mode), t.x, t.y);
         }
     }
     public void load(String p){

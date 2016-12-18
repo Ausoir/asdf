@@ -156,7 +156,7 @@ public class ItemFactory {
                     @Override
                     public boolean use(Man host) {
                         if (super.use(host)) {
-                            final Projectile p = new Projectile("Fireball", host.pos.getAdd(host.clip.organs[BodyHumanoid.FIST].ptd), Global.player.mP.getAdd(host.pos), 20+host.get("Stamina").get()){
+                            final Projectile p = new Projectile("Fireball", host.pos.getAdd(host.clip.organs[BodyHumanoid.FIST].ptd), host.pos.getAdd(host.target), 20+host.get("Stamina").get()){
                                 @Override
                                 public void stuck(){
                                     Particle.explosion(pos);
@@ -188,28 +188,39 @@ public class ItemFactory {
                 item.delay = 10;
                 item.setType(Item.Tag.Throwing);
                 break;
-            case "Throwing Knife":
-                item = new Item("Dagger", seed, 1, 10, 0, .04f){
+            case "Tanto":
+                item = new Item(p, seed, 1, 10, 0, .04f){
                     @Override
-                    public boolean use(Man host){
+                    public boolean use(final Man host){
                         if (super.use(host)) {
-                            Projectile p = new Projectile("Dagger",host.pos.getAdd(host.clip.organs[BodyHumanoid.OFIST].ptd),Global.player.mP.getAdd(host.pos),50){
-                                @Override
-                                public void stuck(){
-                                    if (tangible) Particle.explode("Fire", pos, vel, 20, 10, 15, true,3);
-                                    super.stuck();
+                            host.delay.performer = new Performer(){
+                                public boolean perform(){
+                                    final Projectile p = new Projectile("Tanto",host.pos.getAdd(host.clip.organs[BodyHumanoid.OFIST].ptd),host.pos.getAdd(host.target),50){
+                                        @Override
+                                        public void stuck(){
+                                            if (tangible) Particle.explode("Fire", pos, vel, 20, 10, 15, true,3);
+                                            super.stuck();
+                                        }
+                                    };
+                                    p.rotSpeed = 0;
+                                    p.faction = host.faction;
+                                    p.damage = 10;
+                                    p.gravity = false;
+                                    p.delay.performer = new Performer(){
+                                        @Override
+                                        public boolean perform(){
+                                            p.stuck();
+                                            return true;
+                                        }
+                                    };
+                                    return true;
                                 }
                             };
-                            p.rotSpeed = 0;
-                            p.faction = host.faction;
-                            p.damage = 10;
-                            p.gravity = false;
                             return true;
                         }
                         return false;
                     }
                 };
-                item.name = "Throwing Knife";
                 item.delay = 11;
                 item.setType(Item.Tag.Darting);
                 break;

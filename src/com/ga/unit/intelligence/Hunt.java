@@ -54,6 +54,7 @@ public class Hunt implements Task {
         } else if (dist > 200 && dist < 600) {
             host.target = target.pos.getSubtract(host.pos).add(0,-30);
             host.performMoveset("Range");
+            host.delay.set(host.delay.time*2+10);
         } else {
             if (x > 0) host.setState(Actions.WalkR);
             else if (x < 0) host.setState(Actions.WalkL);

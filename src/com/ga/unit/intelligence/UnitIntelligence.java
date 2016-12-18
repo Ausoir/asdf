@@ -1,36 +1,33 @@
 package com.ga.unit.intelligence;
 
-import com.ga.map.Global;
-import com.ga.unit.skill.Actions;
-import com.ga.unit.Unit;
 import com.ga.unit.Matter;
-import com.ga.unit.skill.Spells;
-
-import java.util.ArrayList;
+import com.ga.unit.Unit;
+import com.ga.unit.skill.Actions;
 
 /**
  * Created by Ga on 7/30/2016.
  */
 public class UnitIntelligence extends Intelligence {
-    public ArrayList<Spells> skillset = new ArrayList<Spells>(){{
-        add(Spells.Haste);
-    }};
     private Unit leader;
+    private int charisma;
     public UnitIntelligence(Unit man){
         super(man);
-        leader = host.rand.nextInt(3) == 0 ? host : null;
+        charisma = host.rand.nextInt(7);
+        leader = host;
     }
     protected void perceived(Matter p){
         if (p instanceof Unit) {
+            Unit unit = (Unit) p;
             if (host.faction.canAttack(p.faction)) {
-                if (((Unit) p).state != Actions.Dead) {
+                if (unit.state != Actions.Dead) {
                     target = (Unit) p;
                     host.say("@c tgt");
-                    setTask(new Hunt(host, target));
+                    setTaskEcho(new Hunt(host, target));
                 }
-            } else if (host.faction == p.faction){
-                if (leader == null) {
-                    leader = (Unit) p;
+            } else if (host.faction == p.faction && host.name.equals(unit.name)){
+                if (leader == null && ((UnitIntelligence)unit.brain).charisma > charisma) {
+                    ((UnitIntelligence)unit.brain).charisma--;
+                    leader = unit;
                 }
             }
         }
@@ -42,19 +39,7 @@ public class UnitIntelligence extends Intelligence {
             leader = null;
         } else {
             target = leader;
-            setTask(new Follow(host, target));
-        }
-    }
-    @Override
-    protected void provoked(int dir){
-        super.provoked(dir);
-        setTask(new Search(host,host.pos.getAdd(dir*1200,0)));
-    }
-    public void useSkill(String p){
-        for (Spells i : skillset){
-            if (i.getClass().getSimpleName().equals(p)){
-                host.setState(i);
-            }
+            setTaskEcho(new Follow(host, target));
         }
     }
     @Override
@@ -62,14 +47,8 @@ public class UnitIntelligence extends Intelligence {
         super.think();
         if (host.get("Health").getPercentage() < .1f){
             host.say("@flee");
-            setTask(new Flee(host, target));
+            setTaskEcho(new Flee(host, target));
         }
-        else if (getTask() instanceof Flee && target != null) setTask(new Hunt(host, target));
-    }
-    public void useSkill(){
-        if (skillset.size() > 0) {
-            int r = Global.r.nextInt(skillset.size());
-            host.setState(skillset.get(r));
-        }
+        else if (getTask() instanceof Flee && target != null) setTaskEcho(new Hunt(host, target));
     }
 }

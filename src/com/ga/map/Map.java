@@ -92,12 +92,15 @@ public class Map {
             }
         }
     }
-    public void loadMap(int opt){
-        Global.player.host.stats.end();
-        FileManager.saveCharacter();
+    public void loadMap(boolean host, int opt){
         int mapnum = opt / 10, posnum = opt % 10;
-        Updater.changeMap = maps[mapnum+4];
-        Updater.changeMapPos = posnum;
+        if (host) {
+            Global.player.host.stats.end();
+            FileManager.saveCharacter();
+            Updater.changeMap = maps[mapnum + 4];
+            Updater.changeMapPos = posnum;
+        }
+        Global.server.sendFromLocal("DC@"+maps[mapnum+4]+"@"+posnum);
     }
     public boolean fallSafe(P pos){
         Line line = new Line(pos.getAdd(0,100), pos.getAdd(0,9999));
@@ -134,7 +137,7 @@ public class Map {
     }
 
     public P randomSurface(){
-        Line i = land.get((int) (Math.random()*land.size()));
+        Line i = land.get((int) (Global.r.nextFloat()*land.size()));
         int origX = (int) (i.pt.x);
         int origY = (int) (i.pt.y);
         int x = origX;
@@ -143,7 +146,7 @@ public class Map {
          x = x2;
          x2 = origX;
         }
-        int tx = (int) (Math.random()*(x2-x));
+        int tx = (int) (Global.r.nextFloat()*(x2-x));
         int ty = origY+(int)(tx*i.getSlope());
         return new P(origX+tx,ty);
     }

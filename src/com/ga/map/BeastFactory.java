@@ -5,6 +5,7 @@ import com.ga.tool.Word;
 import com.ga.unit.Beast;
 import com.ga.unit.Faction;
 import com.ga.unit.Man;
+import com.ga.unit.Updater;
 import com.ga.unit.item.Armor;
 import com.ga.unit.item.ItemFactory;
 import com.ga.unit.skill.Moveset;
@@ -45,7 +46,7 @@ public class BeastFactory {
         }
         Beast get(int seed, P p){
             String stat = "Stamina:"+stamina+"&Speed:"+speed+"&Energy:"+energy+"&Proficiency:"+proficiency+"&Health:"+health;
-            String t = name()+"@"+seed+"@"+p+"@"+stat+"@"+faction.name();
+            String t = name()+"@"+seed+"@"+p+"@"+Updater.getId()+"@"+stat+"@"+faction.name();
             return get(t);
         }
     }

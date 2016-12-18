@@ -10,21 +10,26 @@ import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.tool.Timer;
 import com.ga.unit.item.Item;
+import com.ga.unit.skill.Actions;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by Ga on 5/6/2016.
  */
 public class Updater {
+    public static boolean pause = false;
     public static boolean editor = false;
     public static boolean showTerrain = false;
+    public static int id = 1;
     public static ArrayList<Drawable> drawee = new ArrayList<>();
     public static ArrayList<Effect> effects = new ArrayList<>();
     public static ArrayList<Observer> other = new ArrayList<>();
     public static ArrayList<Matter> updatee = new ArrayList<>();
     public static ArrayList<Unit> colidee = new ArrayList<>();
+    public static HashMap<Integer, Unit> unitList = new HashMap<>();
     public static ArrayList<Thing> addQueue = new ArrayList<>();
     public static Color landColor = Color.pink;
     public static String changeMap = null;
@@ -38,6 +43,10 @@ public class Updater {
         colidee.clear();
         effects.clear();
         addQueue.clear();
+        unitList.clear();
+    }
+    public static int getId(){
+        return id++;
     }
     public static void changeMap(boolean editor){
         clear();
@@ -62,27 +71,33 @@ public class Updater {
                 addDrawee(p);
                 if (p instanceof Matter) updatee.add((Matter) p);
                 if (p instanceof Effect) effects.add((Effect) p);
-                if (p instanceof Unit) colidee.add((Unit) p);
+                if (p instanceof Unit){
+                    Unit unit = (Unit) p;
+                    colidee.add(unit);
+                    unitList.put(unit.id, unit);
+                }
                 addQueue.remove(i);
             }
         }
-        Global.camera = Global.player.host.pos.getAdd(0,-40);
         for (Drawable i : drawee) i.draw(g2);
         if (editor || showTerrain){
             g2.setColor(landColor);
             for (Line i : Global.map.land) i.draw(g2,P.getZero());
-        }
+        } else Global.camera = Global.player.host.pos.getAdd(0,-40);
         for (Observer i : other) i.update();
-        if (!editor) {
+        if (!editor && !pause) {
             for (int i = 0; i < updatee.size(); i++) {
                 updatee.get(i).update();
             }
             for (int i = 0; i < effects.size(); i++) {
                 if (effects.get(i).over()) remove((Thing) effects.get(i));
             }
+            if (time.update()){
+                Global.update();
+                FileManager.saveCharacter();
+            }
         }
         if (changeMap != null) changeMap(false);
-        if (time.update()) Global.update();
     }
     public static void remove(Thing p){
         addQueue.remove(p);
@@ -90,6 +105,7 @@ public class Updater {
         updatee.remove(p);
         colidee.remove(p);
         effects.remove(p);
+        unitList.remove(p);
     }
     public static void addDrawee(Drawable p){
         int size = drawee.size();

@@ -23,7 +23,6 @@ public class UDPClient {
         }catch(Exception e){
             System.out.println("Establishing UDP connection failed");
             e.printStackTrace();
-            System.exit(1);
         }
     }
     public int size(){

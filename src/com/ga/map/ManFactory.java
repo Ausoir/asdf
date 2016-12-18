@@ -2,10 +2,7 @@ package com.ga.map;
 
 import com.ga.tool.P;
 import com.ga.tool.Word;
-import com.ga.unit.Faction;
-import com.ga.unit.Man;
-import com.ga.unit.Organ;
-import com.ga.unit.Stats;
+import com.ga.unit.*;
 import com.ga.unit.item.Armor;
 import com.ga.unit.item.ItemFactory;
 
@@ -48,7 +45,7 @@ public class ManFactory {
         Man get(int seed, P p){
             String face = getFace();
             String stat = "Stamina:"+stamina+"&Speed:"+speed+"&Energy:"+energy+"&Proficiency:"+proficiency+"&Health:"+health;
-            String t = face+"@"+seed+"@"+p+"@"+stat+"@"+faction.name();
+            String t = face+"@"+seed+"@"+p+"@"+ Updater.getId()+"@"+stat+"@"+faction.name();
             t += "@"+ItemFactory.produce(getWeapon(),-1).toItemString();
             t += "@"+ItemFactory.produce(getArmor(),-1).toItemString();
             Man r = new Man(t);

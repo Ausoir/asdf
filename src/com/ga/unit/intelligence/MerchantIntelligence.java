@@ -96,9 +96,9 @@ public class MerchantIntelligence extends Intelligence {
         if (p instanceof Man) {
             if (target != p) {
                 target = (Man) p;
-                setTask(new Idle(host));
+                setTaskEcho(new Idle(host));
                 if (advertise.over() && host.getConversation().equals("")){
-                    if (Math.random() < .5f) host.say("@c");
+                    if (host.rand.nextFloat() < .5f) host.say("@c");
                     else host.say(ad);
                     advertise.reset();
                 }

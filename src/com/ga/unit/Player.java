@@ -1,12 +1,9 @@
 package com.ga.unit;
 
-import com.ga.game.Command;
 import com.ga.game.Display;
-import com.ga.game.FileManager;
 import com.ga.map.Global;
 import com.ga.tool.Line;
 import com.ga.tool.Performer;
-import com.ga.tool.Timer;
 import com.ga.unit.intelligence.PlayerInput;
 import com.ga.unit.item.Inventory;
 import com.ga.unit.item.Item;
@@ -23,7 +20,6 @@ public class Player extends Man {
     public int gold;
     public Inventory inventory = new Inventory(this);
     public SkillTree skillTree = new SkillTree();
-    public Timer save = new Timer(50, true);
     private int selectingItem = -1;
     public PlayerInput input;
     public Player(String p) {
@@ -125,9 +121,11 @@ public class Player extends Man {
             }
         }
     }
-    public int setState(Moveset state){
-        target = input.mP.getSubtract(pos);
-        face(input.mP.x > pos.x ? 1 : -1);
+    public int setStateEcho(Moveset state){
+        if (state != Actions.Idle && state != Actions.Wait){
+            Display.shop.setVisible(false);
+            Display.dialog.setVisible(false);
+        }
         if (state instanceof Actions) {
             switch ((Actions) state) {
                 case WalkL:
@@ -145,6 +143,15 @@ public class Player extends Man {
                         }
                     }
                     break;
+                case Pull1:
+                    selectItem(0);
+                    break;
+                case Pull2:
+                    selectItem(1);
+                    break;
+                case Pull3:
+                    selectItem(2);
+                    break;
             }
         } else if (state instanceof Skills) {
             switch ((Skills) state) {
@@ -161,12 +168,8 @@ public class Player extends Man {
                 delay.set(0);
             }
         }
-        if (state != Actions.Idle && state != Actions.Wait){
-            Display.shop.setVisible(false);
-            Display.dialog.setVisible(false);
-        }
         if (weapon.getType() == Item.Tag.Claw) weapon.rotation = (weapon.getOrgan().getAtan()+(dir<0?3.14f:0));
-        int r = super.setState(state);
+        int r = super.setStateEcho(state);
         if (r == 1) {
         } else if (r == 2){
             String statreq = state.getStatReq();
@@ -194,17 +197,16 @@ public class Player extends Man {
                     Global.map.teleport(pos, r);
                 }
             } else if (r.opt >= 100) {
+                boolean host = Global.player == input ? true : false;
                 if (r.opt >= 200){
-                    if (state == Actions.Wait) Global.map.loadMap(r.opt - 200);
-                } else Global.map.loadMap(r.opt - 100);
+                    if (state == Actions.Wait) Global.map.loadMap(host, r.opt - 200);
+                } else Global.map.loadMap(host, r.opt - 100);
             }
         }
     }
     public void update(){
-        input.update();
         super.update();
         Global.mapEdgeCenter(Global.camera);
-        if (save.update() && state != Actions.Dead) FileManager.saveCharacter();
     }
     @Override
     public String toString(){

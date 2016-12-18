@@ -12,7 +12,6 @@ public class MapEvent implements Observer {
     private enum Map{
         Town(new Performer(){
             public boolean perform(){
-//                if (Math.random() < .1f) Command.order("man@Punk");
                 return true;
             }
         }),

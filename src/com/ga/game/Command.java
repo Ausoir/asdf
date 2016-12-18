@@ -3,14 +3,11 @@ package com.ga.game;
 import com.ga.map.BeastFactory;
 import com.ga.map.Global;
 import com.ga.map.ManFactory;
-import com.ga.tool.Performer;
 import com.ga.unit.Player;
 import com.ga.unit.Updater;
 import com.ga.unit.item.ItemFactory;
 import com.ga.unit.skill.Skills;
 import com.ga.unit.skill.Spells;
-
-import static com.ga.game.Display.dialog;
 
 /**
  * Created by Ga on 8/7/2016.

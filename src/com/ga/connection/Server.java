@@ -1,16 +1,22 @@
 package com.ga.connection;
 
+import com.ga.game.Command;
 import com.ga.game.FileManager;
 import com.ga.game.Observer;
 import com.ga.game.Settings;
 import com.ga.map.Global;
+import com.ga.tool.P;
 import com.ga.tool.Performer;
+import com.ga.tool.Timer;
+import com.ga.unit.Unit;
 import com.ga.unit.Updater;
 import com.ga.unit.intelligence.PlayerInput;
 
 import java.net.DatagramPacket;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Created by Ga on 12/10/2016.
@@ -23,10 +29,10 @@ public class Server implements Observer {
     private ArrayList<DatagramPacket> clientShortcuts = new ArrayList<>();
     private ArrayList<String> clientIPs = new ArrayList<>();
     private Thread serverThread;
-    private boolean online = false;
-    private boolean server = true;
+    private static boolean online = false;
+    public static boolean server = true;
     private String syncommand = null;
-    private String[] clientsList;
+    private Timer syncCheck = new Timer(500,true);
 
     public void start(){
         udp = new ClientEmulator();
@@ -63,15 +69,17 @@ public class Server implements Observer {
                     clientControllers.put(0, pi);
                     Global.display.input = pi;
                     Global.player = pi;
+                    Command.host = pi.host;
                     clientShortcuts.add(UDPClient.getAckPacket(t, Settings.receiverPort));
                     break;
                 case "HI":
                     System.out.println("Request received");
                     t = udp.getClientIP();
-                    acknowledgeConnection(t, clientIPs.size());
+                    int client = clientIPs.size();
+                    acknowledgeConnection(t, client);
                     clientShortcuts.add(UDPClient.getAckPacket(t, Settings.senderPort));
-                    String[] entry = new String[clientIPs.size()+1];
-                    for (int i=0;i<clientIPs.size();i++) entry[i+1] = "Data/map/"+i;
+                    String[] entry = new String[client+1];
+                    for (int i=0;i<client;i++) entry[i+1] = "Data/map/"+i;
                     entry[0] = "Data/map/Map.map";
                     tcp.send(entry);
                     clientIPs.add(t);
@@ -102,6 +110,7 @@ public class Server implements Observer {
                                 return true;
                             }
                         };
+                        Global.player.host.id = -clientSize-1;
                         udp.send("KK@1",t,Settings.senderPort);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -111,7 +120,7 @@ public class Server implements Observer {
                 case "KK":
                     System.out.println("Request Followup Received");
                     t = udp.getClientIP();
-                    int client = clientIPs.indexOf(t);
+                    client = clientIPs.indexOf(t);
                     try {
                         tcp.download(t, new String[]{"Data/map/" + client});
                         syncommand = "HI@" + client;
@@ -119,21 +128,65 @@ public class Server implements Observer {
                         e.printStackTrace();
                     }
                     break;
-                case "IN":
+                case "QT": //client
+                    break;
+                case "DC":
                     t = udp.getClientIP();
-                    broadcast("OT@" + clientIPs.indexOf(t) + "," + cmd[1]);
+                    removeClient(t);
+                    System.out.println(t+" Disconnected - moved to "+cmd[1]+" at Position "+cmd[2]);
+                    break;
+                case "IN":
+                    if (Integer.parseInt(cmd[1]) < 0 || server)
+                        broadcast("OT@" + cmd[1] + "@" + cmd[2] + "@" + cmd[3] + "@" + cmd[4]);
                     break;
                 case "OT": //client
-                    String[] outputs = cmd[1].split(",");
                     try {
-                        if (outputs.length == 2) clientControllers.get(Integer.parseInt(outputs[0])).host.say(outputs[1]);
-                        else clientControllers.get(Integer.parseInt(outputs[0])).inputEcho(outputs[1], Integer.parseInt(outputs[2]), Integer.parseInt(outputs[3]));
+                        Unit unit = Updater.unitList.get(Integer.parseInt(cmd[1]));
+                        unit.target = new P(Integer.parseInt(cmd[3]),Integer.parseInt(cmd[4]));
+                        unit.face(unit.target.x > 0 ? 1 : -1);
+                        unit.setStateEcho(cmd[2]);
                     } catch (Exception e){
                         e.printStackTrace();
                         System.out.println("Null ? "+p);
                     }
                     break;
+                case "SYNC":
+                    client = clientIPs.size();
+                    broadcast("SYNCC@"+client);
+                    entry = new String[client+1];
+                    for (int i=0;i<client;i++) entry[i+1] = "Data/map/"+i;
+                    entry[0] = "Data/map/Map.map";
+                    tcp.send(entry);
+                    break;
+                case "SYNCC": //client
+                    if (!server){
+                        try {
+                            t = udp.getClientIP();
+                            final int clientSize = Integer.parseInt(cmd[1]);
+                            entry = new String[clientSize + 1];
+                            for (int i = 0; i < clientSize; i++) {
+                                entry[i + 1] = "Data/map/" + i;
+                            }
+                            entry[0] = "Data/map/Server.map";
+                            tcp.download(t, entry);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    break;
             }
+        }
+    }
+    private void removeClient(String p){
+        for (DatagramPacket i : clientShortcuts){
+            if (i.getAddress().getHostAddress().equals(p)) clientShortcuts.remove(i);
+        }
+        for (String i : clientIPs){
+            if (i.equals(p)) clientIPs.remove(i);
+        }
+        Iterator it = clientControllers.entrySet().iterator();
+        while (it.hasNext()){
+            if (((Map.Entry)it.next()).getKey().equals(p)) it.remove();
         }
     }
     private void broadcast(String p){
@@ -170,7 +223,6 @@ public class Server implements Observer {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            clientShortcuts.add(UDPClient.getAckPacket(local, Settings.senderPort));
             online = true;
         }
     }
@@ -195,6 +247,8 @@ public class Server implements Observer {
                     break;
             }
             syncommand = null;
+        } else if (syncCheck.update() && server && clientIPs.size() > 1){
+//            sendFromLocal("SYNC@1");
         }
     }
 

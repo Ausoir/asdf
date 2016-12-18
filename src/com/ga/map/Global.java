@@ -4,6 +4,7 @@ import com.ga.connection.Server;
 import com.ga.game.Display;
 import com.ga.game.Settings;
 import com.ga.tool.P;
+import com.ga.unit.Updater;
 import com.ga.unit.intelligence.PlayerInput;
 
 import java.util.Random;
@@ -27,6 +28,7 @@ public class Global {
             sinv[i] = (float)Math.sin(Math.toRadians(i));
             cosv[i] = (float)Math.cos(Math.toRadians(i));
         }
+        Updater.unitList.put(0,null);
     }
     public static int getSeed(){
         return r.nextInt(9999);

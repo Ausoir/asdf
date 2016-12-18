@@ -29,7 +29,7 @@ public class Wander implements Task {
     public void update(){
         if (tick.update()) {
             int dir = Global.r.nextInt(3);
-            if (Math.random() < .3f) current = dir;
+            if (host.rand.nextFloat() < .3f) current = dir;
             if (dir == 0) host.setState(Actions.Idle);
             else if (dir == 1) host.setState(dir == 1 ? Actions.WalkR : Actions.WalkL);
             else if (dir >= 2) {

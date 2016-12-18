@@ -11,6 +11,7 @@ import com.ga.unit.Man;
 import com.ga.unit.Player;
 import com.ga.unit.Updater;
 import com.ga.unit.intelligence.PlayerInput;
+import com.ga.unit.skill.Actions;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -23,15 +24,11 @@ import java.util.HashMap;
  * Created by Ga on 7/26/2016.
  */
 public class FileManager {
-    public static void saveMap(String name){
-        String result = "" + Global.map.toString();
-        result += "\n";
-        result += Updater.toMapString();
-        save(name+".map", result);
-    }
     public static void saveCharacter(){
-        saveMap("map/Map");
-        save("map/0", Global.player.host.toCharacterString());
+        if (Global.player.host.state != Actions.Dead) {
+            saveMap("map/Map");
+            save("map/0", Global.player.host.toCharacterString());
+        }
     }
     public static void save(String dir, String input) {
         try {
@@ -46,7 +43,12 @@ public class FileManager {
             e.printStackTrace();
         }
     }
-
+    public static void saveMap(String name){
+        String result = "" + Global.map.toString();
+        result += "\n";
+        result += Updater.toMapString();
+        save(name+".map", result);
+    }
     private static String read(String dir) {
         String result = null;
         try {
@@ -80,6 +82,7 @@ public class FileManager {
         PlayerInput pi;
         pi = new PlayerInput(new Player(line[0].split("]")[1]));
         pi.host.load(read("map/"+dir));
+        pi.host.id = -Integer.parseInt(dir)-1;
         pi.load(line[2]);
 //        Global.setTime(Integer.parseInt(line[1].split(";")[0]));
         return pi;
@@ -115,6 +118,8 @@ public class FileManager {
                             }
                             ObjectFactory.produce(type[0], new P(type[2]), Integer.parseInt(type[1]), 9);
                         } else { //unit
+                            int id = Integer.parseInt(unit[1].split("@")[3]);
+                            if (id >= Updater.id) Updater.id = id+1;
                             if (unit[0].equals("Man")) new Man(unit[1]);
                             else BeastFactory.produce(unit[1]);
                         }

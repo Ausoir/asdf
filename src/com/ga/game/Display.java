@@ -49,7 +49,7 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
         chatbox.addKeyListener(new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e){
-                if (chatbox.getText().length() > 18) e.consume();
+                if (chatbox.getText().length() > 36) e.consume();
             }
             @Override
             public void keyPressed(KeyEvent e) {

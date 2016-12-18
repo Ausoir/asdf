@@ -95,8 +95,6 @@ public class EditorInput implements Input, Observer {
 
     @Override
     public void input(int mode, int x, int y) {
-        x = (int) (x - Settings.centerX + Global.camera.x);
-        y = (int) (y - Settings.centerY + Global.camera.y);
         if (mode < -3) v.set(0, 0);
         if (shift && current != null){
             boolean snap = false;
@@ -270,7 +268,6 @@ public class EditorInput implements Input, Observer {
                     FileManager.loadPlayer("Player.char");
                     Display.input = Global.player;
                     Global.player.host.pos.set(Global.camera);
-                    Global.player.host.save.time = -1;
                     Global.camera = Global.player.host.pos;
                 }
                 break;

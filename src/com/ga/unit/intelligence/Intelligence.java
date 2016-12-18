@@ -18,8 +18,8 @@ import java.util.ArrayList;
  */
 public abstract class Intelligence {
     protected Unit host;
-    protected Timer think = new Timer(1, true);
-    protected Timer forget = new Timer(100, true);
+    protected Timer think = new Timer(3, true);
+    protected Timer forget = new Timer(50, true);
     private ArrayList<Matter> seen;
     public Unit target;
     private Task task;
@@ -32,10 +32,9 @@ public abstract class Intelligence {
             host.rand.nextInt(Global.map.getWidth()),
             host.rand.nextInt(Global.map.getWidth())};
         task = new Idle(host);
-        defaultTask();
     }
     protected void defaultTask(){
-        setTask(new Wander(host, base));
+        setTaskEcho(new Wander(host, base));
     }
     public void update(){
         if (think.update()){
@@ -44,10 +43,10 @@ public abstract class Intelligence {
             task.update();
         }
     }
-    protected void setTask(Task p){
-        if (!task.getClass().equals(p.getClass())) this.task = p;
-        alertness = task.getAlertness();
-        forget.set(50);
+    protected void setTaskEcho(Task p){
+        task = p;
+        alertness = p.getAlertness();
+        forget.reset();
     }
     protected Task getTask(){
         return task;
@@ -76,7 +75,10 @@ public abstract class Intelligence {
             host.target = p;
             host.rotateWeapon(p.getMult(host.dir,host.dir));
         }
-        if ((state == Actions.WalkL || state == Actions.WalkR) && blocked(host.dir)){
+        if (state == Actions.Dead){
+            think.set(-1);
+            task = new Idle(host);
+        } else if ((state == Actions.WalkL || state == Actions.WalkR) && blocked(host.dir)){
             host.setState(Actions.Idle);
             task.blocked();
         }
@@ -97,7 +99,7 @@ public abstract class Intelligence {
                 if (comm != null && u instanceof Man) {
                     if (u.isFacing(host.pos) && Math.abs(u.pos.x - host.pos.x) < 240) {
                         host.face(dir);
-                        setTask(new Idle(host));
+                        setTaskEcho(new Idle(host));
                         host.say(comm.hear(p));
                     }
                 }
@@ -124,8 +126,7 @@ public abstract class Intelligence {
             target = null;
             defaultTask();
         }
-        think.set(5);
-        perceive();
+        if (alertness < 1) perceive();
     }
     public void setComm(Communication comm) {
         this.comm = comm;
