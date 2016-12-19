@@ -110,22 +110,8 @@ public abstract class Unit extends Matter {
     public boolean isExhausted(){
         return false;
     }
-    public void setState(Moveset state) {
-        setState(state, target.x, target.y);
-    }
-    public void setState(Moveset state, float x, float y) {
-        if (delay.over() && jump && this.state != state) {
-            prevState = state;
-            Global.server.sendFromLocal("IN@" + id + "@" + state.getCodeName() + "@" + (int)x + "@" + (int)y);
-        }
-    }
-    public void setStateEcho(String p){
-        String t = p.substring(1);
-        if (p.startsWith("A")) setStateEcho(Actions.getByName(t));
-        else if (p.startsWith("K")) setStateEcho(Skills.getByName(t));
-        else if (p.startsWith("M")) setStateEcho(Spells.getByName(t));
-    }
-    public int setStateEcho(Moveset state) {
+    public int setState(Moveset state) {
+        if (!delay.over() || !jump || this.state == state) return 1;
         if (state != Actions.Idle) delay.performer = null;
         int[] cdinput = getCooldown(state);
         int prevCd = cdinput[0];
@@ -228,7 +214,7 @@ public abstract class Unit extends Matter {
 
     @Override
     public boolean checkHit(Matter hitter, Line p){
-        if (faction != hitter.faction) {
+        if (faction.canAttack(hitter.faction)) {
             if (state != Actions.Down && state != Actions.Hit && state != Actions.Dead) {
                 if (!stats.hasEffect(Buffs.Evade)) {
                     int dam = hitter.getDamage() - getDamageReduction();

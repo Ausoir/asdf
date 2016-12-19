@@ -1,9 +1,6 @@
 package com.ga.game;
 
-import com.ga.map.BeastFactory;
-import com.ga.map.Global;
-import com.ga.map.ManFactory;
-import com.ga.map.ObjectFactory;
+import com.ga.map.*;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.unit.*;
@@ -16,7 +13,7 @@ import java.util.Iterator;
 /**
  * Created by Ga on 7/31/2016.
  */
-public class EditorInput implements Input, Observer {
+public class EditorInput implements Input, Updatable {
     enum Tool {
         NONE, CREATE, DELETE, REMOVE, MAN, UNIT, OBJECT
     }
@@ -37,7 +34,7 @@ public class EditorInput implements Input, Observer {
 
     public EditorInput() {
         Display.input = this;
-        Updater.other.add(this);
+        Updater.addQueue.add(this);
         if (Global.camera == null) Global.camera = new P();
         else Global.camera = new P(Global.camera);
     }
@@ -80,7 +77,7 @@ public class EditorInput implements Input, Observer {
             map = Updater.changeMap;
             Updater.changeMap(true);
             Display.input = this;
-            Updater.other.add(this);
+            Updater.addQueue.add(this);
             Global.camera = new P(Global.camera);
         } else {
             try {
@@ -125,7 +122,7 @@ public class EditorInput implements Input, Observer {
                 } else if (tool == Tool.MAN || tool == Tool.UNIT || tool == Tool.OBJECT) {
                     currentU.pos.set(x, y);
                 } else if (tool == Tool.REMOVE && lmb){
-                    Iterator it = Updater.updatee.iterator();
+                    Iterator it = Updater.matter.iterator();
                     Matter i;
                     while (it.hasNext()){
                         i = (Matter) it.next();

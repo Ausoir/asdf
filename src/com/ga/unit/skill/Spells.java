@@ -308,7 +308,7 @@ public enum Spells implements Moveset {
                     Particle.explode("Fire", pos, P.getZero(), 3, 10, 0, false, 1);
                 }
             };
-            p.faction = Faction.Hostile;
+            p.faction = Faction.Destructive;
             p.damage = 15+host.get("Proficiency").get();
             p.gravity = false;
             p.delay.set(150);

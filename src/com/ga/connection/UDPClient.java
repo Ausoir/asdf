@@ -15,7 +15,7 @@ public class UDPClient {
     private static String host;
     public UDPClient(){}
     public UDPClient(int receiverPort){
-        length = 36; //32 mapsize
+        length = 4096; //32 mapsize
         receiver = new DatagramPacket(new byte[length], length);
         try{
             clientSocket = new DatagramSocket(receiverPort);

@@ -8,7 +8,7 @@ import com.ga.unit.Updater;
 /**
  * Created by Ga on 10/31/2016.
  */
-public class MapEvent implements Observer {
+public class MapEvent implements Updatable {
     private enum Map{
         Town(new Performer(){
             public boolean perform(){
@@ -32,7 +32,7 @@ public class MapEvent implements Observer {
     private Timer timer;
     public MapEvent(String p){
         event = Map.valueOf(p);
-        Updater.other.add(this);
+        Updater.addQueue.add(this);
         timer = new Timer(100, true);
     }
     @Override

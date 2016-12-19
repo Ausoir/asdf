@@ -21,6 +21,7 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
     private int mode = 0;
     private int mX = 0;
     private int mY = 0;
+    private int timeDebt = -100;
     public Display() {
         Global.display = this;
         setLayout(null);
@@ -79,7 +80,14 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
         Updater.draw(g2);
         repaint();
         try {
-            long t = (long) Global.clamp(System.currentTimeMillis()-lastTime,0,30);
+            long t = System.currentTimeMillis()-lastTime;
+            if (t >= 30){
+                timeDebt += t-30;
+                t = 30;
+            } else if (timeDebt > 0){
+                timeDebt -= 30-t;
+                t = 30;
+            }
             Thread.sleep(30-t);
             lastTime = System.currentTimeMillis();
         } catch (Exception e) {

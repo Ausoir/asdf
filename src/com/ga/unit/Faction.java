@@ -5,12 +5,13 @@ package com.ga.unit;
  */
 public enum Faction {
     Player(1),
+    Player2(10),
     Neutral(1),
     Merchant(1),
     Guard(1),
     Punk(2),
     Evil(3),
-    Hostile(0);
+    Destructive(0);
     private int side;
     Faction(int side) {
         this.side = side;

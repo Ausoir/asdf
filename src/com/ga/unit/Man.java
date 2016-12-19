@@ -34,7 +34,7 @@ public class Man extends Unit {
         if (faction == Faction.Merchant){
             brain = new MerchantIntelligence(this);
         } else if (faction != Faction.Player) {
-            if (Global.server.server) brain = new UnitIntelligence(this);
+            brain = new UnitIntelligence(this);
             brain.setComm(new Communication());
             moveset.put("Melee",new Moveset[]{Kick, Use, Swing, Pierce});
             moveset.put("Range",new Moveset[]{Spells.Stun, Spells.Fireball, Spells.Fireblast});

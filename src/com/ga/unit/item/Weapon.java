@@ -70,7 +70,7 @@ public class Weapon extends Item {
     }
     public boolean use(Man host){
         if (canUse()) {
-            if (host.setStateEcho(action) == 0) {
+            if (host.setState(action) == 0) {
                 super.use(host);
                 return true;
             }

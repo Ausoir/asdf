@@ -4,11 +4,7 @@ import com.ga.tool.P;
 import com.ga.tool.Word;
 import com.ga.unit.Beast;
 import com.ga.unit.Faction;
-import com.ga.unit.Man;
 import com.ga.unit.Updater;
-import com.ga.unit.item.Armor;
-import com.ga.unit.item.ItemFactory;
-import com.ga.unit.skill.Moveset;
 
 /**
  * Created by Ga on 8/2/2016.
@@ -16,7 +12,7 @@ import com.ga.unit.skill.Moveset;
 public class BeastFactory {
     enum Type{
         Dog(Faction.Neutral, 10,30,10,10,3),
-        Spider(Faction.Hostile, 10,30,10,10,3),
+        Spider(Faction.Destructive, 10,30,10,10,3),
         Mantis(Faction.Evil, 100,40,10,10,3);
         int health,speed,stamina,energy,proficiency;
         Faction faction;

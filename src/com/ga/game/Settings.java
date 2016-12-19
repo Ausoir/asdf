@@ -4,6 +4,7 @@ package com.ga.game;
  * Created by Ga on 7/26/2016.
  */
 public class Settings {
+    public static int latency = 2;
     public static int receiverPort = 1992;
     public static int senderPort = 1992;
     public static int tcpPort = 2016;

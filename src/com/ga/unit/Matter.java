@@ -2,6 +2,7 @@ package com.ga.unit;
 
 import com.ga.game.Settings;
 import com.ga.map.Global;
+import com.ga.map.Updatable;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 
@@ -10,11 +11,11 @@ import java.util.Random;
 /**
  * Created by Ga on 8/12/2016.
  */
-public class Matter extends Thing {
+public class Matter extends Thing implements Updatable {
     public int seed = 0;
     public Random rand;
     public boolean gravity = false;
-    public Faction faction = Faction.Hostile;
+    public Faction faction = Faction.Destructive;
     public P vel = new P(0, 0);
     public DamageType damageType = DamageType.Bash;
     public boolean tangible = true;
@@ -81,6 +82,7 @@ public class Matter extends Thing {
     public P getPoint(){
         return pos.getAdd(image.size.x*.5f*Global.cos(rotation)*dir,(int) (image.size.x*.5f*Global.sin(rotation))*dir);
     }
+    @Override
     public void update(){
         int edge = Global.mapEdge(pos.getAdd(vel));
         if (edge > 1) {

@@ -24,7 +24,6 @@ public class Player extends Man {
     public PlayerInput input;
     public Player(String p) {
         super(p);
-        faction = Faction.Player;
         get("Health").setTotal(30);
         stats.setStat("Level",new Stat(1));
         stats.setStat("Memory",new Stat(1));
@@ -121,7 +120,7 @@ public class Player extends Man {
             }
         }
     }
-    public int setStateEcho(Moveset state){
+    public int setState(Moveset state){
         if (state != Actions.Idle && state != Actions.Wait){
             Display.shop.setVisible(false);
             Display.dialog.setVisible(false);
@@ -169,7 +168,7 @@ public class Player extends Man {
             }
         }
         if (weapon.getType() == Item.Tag.Claw) weapon.rotation = (weapon.getOrgan().getAtan()+(dir<0?3.14f:0));
-        int r = super.setStateEcho(state);
+        int r = super.setState(state);
         if (r == 1) {
         } else if (r == 2){
             String statreq = state.getStatReq();

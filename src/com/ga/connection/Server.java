@@ -5,9 +5,11 @@ import com.ga.game.FileManager;
 import com.ga.game.Observer;
 import com.ga.game.Settings;
 import com.ga.map.Global;
+import com.ga.map.Updatable;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.tool.Timer;
+import com.ga.unit.Faction;
 import com.ga.unit.Unit;
 import com.ga.unit.Updater;
 import com.ga.unit.intelligence.PlayerInput;
@@ -21,7 +23,7 @@ import java.util.Map;
 /**
  * Created by Ga on 12/10/2016.
  */
-public class Server implements Observer {
+public class Server implements Updatable {
     private static final String local = "127.0.0.1";
     protected UDPClient udp;
     protected TCPClient tcp;
@@ -30,9 +32,7 @@ public class Server implements Observer {
     private ArrayList<String> clientIPs = new ArrayList<>();
     private Thread serverThread;
     private static boolean online = false;
-    public static boolean server = true;
     private String syncommand = null;
-    private Timer syncCheck = new Timer(500,true);
 
     public void start(){
         udp = new ClientEmulator();
@@ -52,15 +52,20 @@ public class Server implements Observer {
             }
         });
         serverThread.start();
-        translate("ME@1;");
-        Updater.other.add(this);
+        try{
+            translate("ME@1;");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+        Updater.addQueue.add(this);
     }
 
-    private void translate(String p) {
+    private void translate(String p) throws Exception {
         int eol = p.indexOf(";");
         if (eol != -1) {
             String[] cmd = p.substring(0, p.indexOf(";")).split("@");
-            System.out.println(p);
+            System.out.println(p+" from "+udp.getClientIP());
             switch (cmd[0]) {
                 case "ME":
                     String t = local;
@@ -83,50 +88,43 @@ public class Server implements Observer {
                     entry[0] = "Data/map/Map.map";
                     tcp.send(entry);
                     clientIPs.add(t);
+                    Updater.tick = 0;
                     break;
                 case "OK": //client
-                    System.out.println("Acknowledgement received");
-                    server = false;
+                    Updater.tick = 0;
+                    System.out.println("Acknowledgement received ("+cmd[1]+")");
                     t = udp.getClientIP(); //server ip
                     clientIPs.add(0,t);
                     clientControllers.remove(0);
                     clientControllers.put(Integer.parseInt(cmd[1]), Global.player); //callname = local
-                    try {
-                        final int clientSize = Integer.parseInt(cmd[1]);
-                        entry = new String[clientSize+1];
-                        for (int i=0;i<clientSize;i++){
-                            entry[i+1] = "Data/map/"+i;
-                        }
-                        entry[0] = "Data/map/Server.map";
-                        tcp.download(t, entry);
-                        Updater.changeMap = "Server";
-                        Updater.changeMapPos = 0;
-                        Updater.changeMapEvent = new Performer(){
-                            public boolean perform() {
-                                for (int i = 0; i < clientSize; i++) {
-                                    PlayerInput pi = FileManager.loadPlayer("" + i);
-                                    clientControllers.put(i, pi);
-                                }
-                                return true;
-                            }
-                        };
-                        Global.player.host.id = -clientSize-1;
-                        udp.send("KK@1",t,Settings.senderPort);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    final int clientSize = Integer.parseInt(cmd[1]);
+                    entry = new String[clientSize+1];
+                    for (int i=0;i<clientSize;i++){
+                        entry[i+1] = "Data/map/"+i;
                     }
+                    entry[0] = "Data/map/Server.map";
+                    tcp.download(t, entry);
+                    Updater.changeMap = "Server";
+                    Updater.changeMapPos = 0;
+                    Updater.changeMapEvent = new Performer(){
+                        public boolean perform() {
+                            for (int i = 0; i < clientSize; i++) {
+                                PlayerInput pi = FileManager.loadPlayer("" + i);
+                                clientControllers.put(i, pi);
+                            }
+                            return true;
+                        }
+                    };
+                    Global.player.host.id = -clientSize-1;
+                    udp.send("KK@1",t,Settings.senderPort);
                     tcp.send(new String[]{"Data/map/0"});
                     break;
                 case "KK":
                     System.out.println("Request Followup Received");
                     t = udp.getClientIP();
                     client = clientIPs.indexOf(t);
-                    try {
-                        tcp.download(t, new String[]{"Data/map/" + client});
-                        syncommand = "HI@" + client;
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    tcp.download(t, new String[]{"Data/map/" + client});
+                    syncommand = "HI@" + client;
                     break;
                 case "QT": //client
                     break;
@@ -136,42 +134,34 @@ public class Server implements Observer {
                     System.out.println(t+" Disconnected - moved to "+cmd[1]+" at Position "+cmd[2]);
                     break;
                 case "IN":
-                    if (Integer.parseInt(cmd[1]) < 0 || server)
-                        broadcast("OT@" + cmd[1] + "@" + cmd[2] + "@" + cmd[3] + "@" + cmd[4]);
+                    if (online && Math.random() < .2f) return;
+                    String[] outputs = cmd[1].split(",");
+                    client = clientIPs.indexOf(udp.getClientIP());
+                    if (outputs.length == 1) clientControllers.get(client).host.say(outputs[0]);
+                    else if (outputs.length == 4) {
+                        udp.send("OT@"+cmd[1]);
+                        clientControllers.get(client).inputDirect(outputs[1], Integer.parseInt(outputs[2]), Integer.parseInt(outputs[3]));
+                    }
                     break;
                 case "OT": //client
+                    if (online && Math.random() < .2f) return;
+                    outputs = cmd[1].split(",");
+                    client = clientIPs.indexOf(local);
+                    if (outputs.length == 1) clientControllers.get(client).host.say(outputs[0]);
+                    else if (outputs.length == 4) clientControllers.get(client).inputEcho(Integer.parseInt(outputs[0]), outputs[1], Integer.parseInt(outputs[2]), Integer.parseInt(outputs[3]));
+                    udp.send("OO@"+cmd[1]);
+                    break;
+                case "OO":
+                    break;
+                case "AT": //client
                     try {
                         Unit unit = Updater.unitList.get(Integer.parseInt(cmd[1]));
                         unit.target = new P(Integer.parseInt(cmd[3]),Integer.parseInt(cmd[4]));
                         unit.face(unit.target.x > 0 ? 1 : -1);
-                        unit.setStateEcho(cmd[2]);
+//                        unit.setStateEcho(cmd[2]);
                     } catch (Exception e){
                         e.printStackTrace();
                         System.out.println("Null ? "+p);
-                    }
-                    break;
-                case "SYNC":
-                    client = clientIPs.size();
-                    broadcast("SYNCC@"+client);
-                    entry = new String[client+1];
-                    for (int i=0;i<client;i++) entry[i+1] = "Data/map/"+i;
-                    entry[0] = "Data/map/Map.map";
-                    tcp.send(entry);
-                    break;
-                case "SYNCC": //client
-                    if (!server){
-                        try {
-                            t = udp.getClientIP();
-                            final int clientSize = Integer.parseInt(cmd[1]);
-                            entry = new String[clientSize + 1];
-                            for (int i = 0; i < clientSize; i++) {
-                                entry[i + 1] = "Data/map/" + i;
-                            }
-                            entry[0] = "Data/map/Server.map";
-                            tcp.download(t, entry);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
                     }
                     break;
             }
@@ -228,8 +218,7 @@ public class Server implements Observer {
     }
     public void sendFromLocal(String msg){
         try {
-            if (!server) udp.send(msg);
-            else udp.send(msg,local,Settings.receiverPort);
+            udp.send(msg);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -239,17 +228,18 @@ public class Server implements Observer {
     public void update() { //Sync
         if (syncommand != null) {
             String[] cmd = syncommand.split("@");
-            switch (cmd[0]) {
-                case "HI":
-                    PlayerInput pi = FileManager.loadPlayer(cmd[1]);
-                    clientControllers.put(Integer.parseInt(cmd[1]), pi);
-                    pi.host.pos.set(Updater.getEntrancePos(0));
-                    break;
+            try {
+                switch (cmd[0]) {
+                    case "HI":
+                        PlayerInput pi = FileManager.loadPlayer(cmd[1]);
+                        clientControllers.put(Integer.parseInt(cmd[1]), pi);
+                        pi.host.pos.set(Updater.getEntrancePos(0));
+                        break;
+                }
+            } catch (Exception e){
+                e.printStackTrace();
             }
             syncommand = null;
-        } else if (syncCheck.update() && server && clientIPs.size() > 1){
-//            sendFromLocal("SYNC@1");
         }
     }
-
 }

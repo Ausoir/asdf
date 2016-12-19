@@ -1,5 +1,6 @@
 package com.ga.unit;
 
+import com.ga.game.Observer;
 import com.ga.game.Texture;
 import com.ga.map.Drawable;
 import com.ga.tool.P;
@@ -9,7 +10,7 @@ import java.awt.*;
 /**
  * Created by Ga on 5/6/2016.
  */
-public class Thing implements Drawable {
+public class Thing implements Drawable, Observer {
     public Texture image;
     public P pos;
     protected int sizeRadius;
@@ -61,7 +62,7 @@ public class Thing implements Drawable {
     }
 
     public void remove(){
-        Updater.remove(this);
+        Updater.removeQueue.add(this);
     }
     public String toString(){
         return name + "@" + pos;

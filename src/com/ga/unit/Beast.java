@@ -13,7 +13,7 @@ public class Beast extends Unit {
     public Beast(String p) {
         super(p);
         clip = new Body(this, name);
-        if (Global.server.server) brain = new UnitIntelligence(this);
+        brain = new UnitIntelligence(this);
         moveset.put("Melee",new Moveset[]{Actions.WalkL});
     }
 
