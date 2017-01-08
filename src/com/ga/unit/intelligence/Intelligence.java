@@ -19,7 +19,7 @@ import java.util.ArrayList;
 public abstract class Intelligence {
     protected Unit host;
     protected Timer think = new Timer(3, true);
-    protected Timer forget = new Timer(50, true);
+    protected Timer forget = new Timer(500, true);
     private ArrayList<Matter> seen;
     public Unit target;
     private Task task;
@@ -32,6 +32,7 @@ public abstract class Intelligence {
             host.rand.nextInt(Global.map.getWidth()),
             host.rand.nextInt(Global.map.getWidth())};
         task = new Idle(host);
+        forget.time = 1;
     }
     protected void defaultTask(){
         setTaskEcho(new Wander(host, base));
@@ -113,7 +114,7 @@ public abstract class Intelligence {
         for (Matter t : seen) {
             if (target != t) {
                 perceived(t);
-            }
+            } else if (target.state == Actions.Dead) forget.time = 0;
         }
     }
     protected void provoked(int dir){

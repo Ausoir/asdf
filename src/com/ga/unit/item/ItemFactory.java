@@ -13,10 +13,10 @@ import com.ga.unit.skill.Stat;
  */
 public class ItemFactory {
     private enum FactoryWeapon{
-        Fist(1,-1,1,2, Item.Tag.Spear), Mace(4,-1,3,8, Item.Tag.Mace), Sword(3,600,2,6,Item.Tag.Spear), Stick1(1,10,1,6, Item.Tag.Mace), Stick2(1,10,1,6,Item.Tag.Spear), Stick3(1,10,1,6, Item.Tag.Sword),
+        Mace(4,-1,3,8, Item.Tag.Mace), Sword(3,600,2,6,Item.Tag.Sword), Stick1(1,10,1,6, Item.Tag.Mace), Stick2(1,10,1,6,Item.Tag.Spear), Stick3(1,10,1,6, Item.Tag.Sword),
         Katana(2,100,1,12, Item.Tag.Sword), Spear(3,160,1,12,Item.Tag.Spear), Axe(3,100,1,12, Item.Tag.Sword), Dagger(1,80,1,6, Item.Tag.Dagger), Pick(4,100,1,24,Item.Tag.Sword), Cleaver(6,600,2,12, Item.Tag.Sword),
         Halberd(6,100,1,36, Item.Tag.Spear), Greatsword(8,400,2,18, Item.Tag.Sword), Warhammer(10,-1,3,10,Item.Tag.Mace), Claw(1,200,2,3,Item.Tag.Claw),
-        Rifle(4,200,3,12, Item.Tag.Snipe), Pistol(2,30,2,12, Item.Tag.Shoot), Revolver(3,7,2,16, Item.Tag.Shoot);
+        Rifle(4,200,1,4, Item.Tag.Snipe), Pistol(2,30,1,2, Item.Tag.Shoot), Revolver(3,7,1,2, Item.Tag.Shoot);
         private int damageNum, damageSides, weight, uses;
         private Item.Tag type;
         FactoryWeapon(int weight, int uses, int dmgNum, int dmgSide, Item.Tag type){
@@ -47,6 +47,7 @@ public class ItemFactory {
         }
     }
     public static Item load(String p){
+        if (p.equals("")) return null;
         String[] section = p.split(",");
         Item result = ItemFactory.produce(section[0],Integer.parseInt(section[1]));
         result.uses = new Stat(section[2]+","+section[3]);
@@ -81,6 +82,15 @@ public class ItemFactory {
     private static Item produceItem(String p, int seed) {
         Item item;
         switch (p){
+            case "Fist":
+                item = new Item(p, seed, 0, 1, 30, 1){
+                    @Override
+                    public boolean use(final Man host){
+                        host.setState(Actions.Interact);
+                        return false;
+                    }
+                };
+                break;
             case "Potion":
                 item = new Item(p, seed, 1, 1, 30, 1){
                     @Override

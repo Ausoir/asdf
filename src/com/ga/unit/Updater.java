@@ -19,19 +19,18 @@ import java.util.HashMap;
  * Created by Ga on 5/6/2016.
  */
 public class Updater {
-    public static int tick = 0;
     public static boolean pause = false;
     public static boolean editor = false;
     public static boolean showTerrain = false;
     public static int id = 1;
-    public static ArrayList<Drawable> drawee = new ArrayList<>();
+    private static ArrayList<Drawable> drawee = new ArrayList<>();
     public static ArrayList<Effect> effects = new ArrayList<>();
     public static ArrayList<Updatable> updatee = new ArrayList<>();
     public static ArrayList<Matter> matter = new ArrayList<>();
     public static ArrayList<Unit> colidee = new ArrayList<>();
     public static HashMap<Integer, Unit> unitList = new HashMap<>();
-    public static ArrayList<Observer> addQueue = new ArrayList<>();
-    public static ArrayList<Observer> removeQueue = new ArrayList<>();
+    private static ArrayList<Observer> addQueue = new ArrayList<>();
+    private static ArrayList<Observer> removeQueue = new ArrayList<>();
     public static Color landColor = Color.pink;
     public static String changeMap = null;
     public static int changeMapPos = 0;
@@ -43,6 +42,7 @@ public class Updater {
         colidee.clear();
         effects.clear();
         addQueue.clear();
+        removeQueue.clear();
         unitList.clear();
         matter.clear();
     }
@@ -53,7 +53,6 @@ public class Updater {
         clear();
         if (!editor) {
             addQueue.add(Global.player.host);
-            addQueue.add(Global.player);
             Global.player.host.pos.set(FileManager.readMap(changeMap, changeMapPos));
             Global.player.host.reset();
             Display.input = Global.player;
@@ -66,11 +65,10 @@ public class Updater {
         }
         changeMap = null;
     }
-    public static void draw(Graphics2D g2){
+    public static void update(){
         if (addQueue.size() > 0){
             for (int i=0;i<addQueue.size();i++){
-                Observer p = addQueue.get(i);
-                if (p instanceof Drawable) addDrawee((Drawable) p);
+                Observer p = addQueue.remove(i);
                 if (p instanceof Matter) matter.add((Matter) p);
                 else if (p instanceof Updatable) updatee.add((Updatable) p);
                 if (p instanceof Effect) effects.add((Effect) p);
@@ -79,20 +77,21 @@ public class Updater {
                     colidee.add(unit);
                     unitList.put(unit.id, unit);
                 }
-                addQueue.remove(i);
+                if (p instanceof Drawable) addDrawee((Drawable) p);
             }
         }
         if (removeQueue.size() > 0){
             for (int i=0;i<removeQueue.size();i++) {
-                Observer p = removeQueue.get(i);
-                remove(p);
+                Observer p = removeQueue.remove(i);
+                updatee.remove(p);
+                matter.remove(p);
+                colidee.remove(p);
+                effects.remove(p);
+                unitList.remove(p);
+                drawee.remove(p);
             }
         }
-        for (Drawable i : drawee) i.draw(g2);
-        if (editor || showTerrain){
-            g2.setColor(landColor);
-            for (Line i : Global.map.land) i.draw(g2,P.getZero());
-        } else Global.camera = Global.player.host.pos.getAdd(0,-40);
+        Global.camera.add(Global.cameraTo.getSubtract(Global.camera.getAdd(0,40)).getMult(.2f,.2f));
         for (Updatable i : updatee) i.update();
         if (!editor && !pause) {
             for (Matter i : matter) i.update();
@@ -103,20 +102,27 @@ public class Updater {
                 Global.update();
                 FileManager.saveCharacter();
             }
-            tick++;
         }
         if (changeMap != null) changeMap(false);
     }
-    private static void remove(Observer p){
-        addQueue.remove(p);
-        drawee.remove(p);
-        updatee.remove(p);
-        matter.remove(p);
-        colidee.remove(p);
-        effects.remove(p);
-        unitList.remove(p);
+    public static void draw(Graphics2D g2){
+        for (Drawable i : drawee) i.draw(g2);
+        if (editor || showTerrain){
+            g2.setColor(landColor);
+            for (Line i : Global.map.land) i.draw(g2,new P());
+        }
     }
-    public static void addDrawee(Drawable p){
+    public static void add(Observer p){
+        addQueue.add(p);
+    }
+    public static void remove(Observer p){
+        removeQueue.add(p);
+    }
+    public static void resetDepth(Drawable p){
+        drawee.remove(p);
+        addDrawee(p);
+    }
+    private static void addDrawee(Drawable p){
         int size = drawee.size();
         if (size > 0) {
             for (int i = 0; i < size; i++) {
@@ -131,7 +137,7 @@ public class Updater {
     public static String toMapString(){
         String result = "";
         for (Matter i : matter){
-            if (!i.toString().equals("")) result += i.toString()+";";
+            if (!i.toString().equals("") && !(i instanceof Player)) result += i.toString()+";";
         }
         if (result.length() == 0) return "";
         result = result.substring(0,result.length()-1);
@@ -204,6 +210,6 @@ public class Updater {
                 else index++;
             }
         }
-        return P.getZero();
+        return new P();
     }
 }

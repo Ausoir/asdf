@@ -23,7 +23,7 @@ public class Stats {
         put("Energy", new Stat(3));
         put("Proficiency", new Stat(1));
     }};
-    private Timer timer = new Timer(125, true);
+    private Timer timer = new Timer(75, true);
     private Unit host;
     public Stats(Unit host){
         this.host = host;
@@ -113,8 +113,6 @@ public class Stats {
         for (int i = 0; i < effects.size(); i++) {
             if (effectEffects.get(i).perform() || effectTimes.get(i).update()){
                 endEffect(effects.get(i));
-            } else{
-
             }
         }
     }

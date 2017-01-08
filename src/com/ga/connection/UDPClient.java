@@ -61,7 +61,7 @@ public class UDPClient {
     }
 
     private static byte[] stringToByte(String p){
-        String t = p + ";";
+        String t = p + "%";
         byte[] sendData = new byte[length];
         sendData = (byteConcat(t.getBytes(), t.getBytes())); //Concats or data corrupts?
         return sendData;

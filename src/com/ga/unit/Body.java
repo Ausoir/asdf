@@ -120,7 +120,7 @@ public class Body {
         current = 0;
         if (animation.containsKey(state)) nextAnimation = animation.get(state);
         else{
-            Global.p("Can't find current state "+state.getName());
+//            Global.p("Can't find current state "+state.getName());
             nextAnimation = animation.get(Actions.Idle);
         }
         setClip();
@@ -134,7 +134,7 @@ public class Body {
         if (current >= nextAnimation.length) current = 0;
         if (nextAnimation[current] == -1) {
             current--;
-            host.setState(Actions.Idle);
+            host.stateDone();
             state = Actions.Idle;
         }
         nextClip = localAnimation[nextAnimation[current]];
@@ -166,7 +166,7 @@ public class Body {
         }
     }
 
-    protected void getStatus(){
+    protected void updateStatus(){
         int legs = legNum;
         for (Organ o : organs) {
             if (o.amputated) {
@@ -187,7 +187,7 @@ public class Body {
     }
 
     protected float getLegStatus(){
-        return legCurrent/legNum;
+        return (float)legCurrent/legNum;
     }
 
     @Override

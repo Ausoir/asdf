@@ -1,7 +1,6 @@
 package com.ga.unit.item;
 
 import com.ga.map.Global;
-import com.ga.unit.DamageType;
 import com.ga.unit.Man;
 
 /**
@@ -28,7 +27,6 @@ public class Weapon extends Item {
         setDamage(num, sides);
         rotation = 35;
         delay = 0;
-        setModifierSeparate(mmod);
     }
     protected void setModifier(PrefixMod mod){
         super.setModifier(mod);
@@ -37,21 +35,6 @@ public class Weapon extends Item {
         else if (mod == PrefixMod.Fine) damageMod = 1.2f;
         else if (mod == PrefixMod.Mastercraft) damageMod = 1.5f;
         else if (mod == PrefixMod.Legendary) damageMod = 2;
-    }
-    protected void setModifierSeparate(MaterialMod mod){
-        DamageType type = getType().getDamageType();
-        if (mod == MaterialMod.Iron){
-        } else if (mod == MaterialMod.Steel){
-            if (type == DamageType.Cut) damageMod = 1.2f;
-        } else if (mod == MaterialMod.Brass){
-            if (type == DamageType.Cut) damageMod = 1.2f;
-            else if (type == DamageType.Bash) damageMod = .7f;
-        } else if (mod == MaterialMod.Titanium){
-            if (type == DamageType.Cut) damageMod = 1.5f;
-            else if (type == DamageType.Bash) damageMod = .8f;
-        } else if (mod == MaterialMod.Uranium){
-            damageMod = 2f;
-        }
     }
     protected void setModifier(SpecialtyMod mod){
         if (mod == SpecialtyMod.Feather){

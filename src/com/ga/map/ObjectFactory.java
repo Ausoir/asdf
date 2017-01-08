@@ -19,6 +19,9 @@ public class ObjectFactory {
         }
         return false;
     }
+    public static Matter produce(String name, P pt, int seed){
+        return produce(name, pt, seed, 5);
+    }
     public static Matter produce(String name, P pt, int seed, int depth){
         Matter result;
         if (has(rotors, name)){

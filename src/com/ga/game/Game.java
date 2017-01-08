@@ -22,10 +22,7 @@ public class Game extends JFrame {
         }
         Settings.setScreenSize(x, y);
         setSize(Settings.screenX, Settings.screenY);
-        JPanel display;
-//        Updater.showTerrain = true;
-        display = new Display();
-//        Server.start();
+        JPanel display = new Display();
         Clips.init();
         Texture.init();
         Global.server = new Server();
@@ -35,5 +32,6 @@ public class Game extends JFrame {
         setVisible(true);
         setExtendedState( getExtendedState()|JFrame.MAXIMIZED_BOTH );
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        new Process();
     }
 }

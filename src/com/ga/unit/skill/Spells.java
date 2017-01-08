@@ -45,8 +45,19 @@ public enum Spells implements Moveset {
             Matter t = new Matter();
             t.faction = host.faction;
             t.pos = host.target.getAdd(host.pos);
-            Unit target = Updater.collide(t,40);
+            Unit target = Updater.collide(t,50);
             if (target!= null) target.stats.addEffect(Buffs.Stun,level);
+            return true;
+        }
+    }),
+    Slow(Actions.Cast, 30, "Energy",1,3,"Slow a single enemy. [Duration:5*Level]",new Spell(){
+        @Override
+        public boolean perform(){
+            Matter t = new Matter();
+            t.faction = host.faction;
+            t.pos = host.target.getAdd(host.pos);
+            Unit target = Updater.collide(t,40);
+            if (target!= null) target.stats.addEffect(Buffs.Slow,level);
             return true;
         }
     }),
@@ -61,18 +72,18 @@ public enum Spells implements Moveset {
             return true;
         }
     }),
-    Shadowtwin(Actions.Buff, 40,"Energy",1,100,"Summon a mirror of yourself to aid you in battle. [Level*1 Shadows] [Duration:30*Level] [6 Energy Reserve/Shadow] [3 Stamina Reserve/Shadow]",new Spell() {
+    Shadowtwin(Actions.Buff, 40,"Energy",1,100,"Summon a mirror of yourself to aid you in battle. [Level*1 Shadows] [Duration:50+Level*10] [6 Energy Reserve/Shadow] [3 Stamina Reserve/Shadow]",new Spell() {
         @Override
         public boolean perform() {
             for (int i=0;i<level;i++) {
-                Man p = new Man(host.toString()) {
+                Man p = new Man(host.toString().split("]")[1]) {
                     @Override
                     public void die() {
                         super.die();
                         host.get("Energy").reserve -= 6;
                         host.get("Stamina").reserve -= 3;
                         remove();
-                        Particle.explode("Smoke", pos, P.getZero(), 80, 10, 0, true, 80);
+                        Particle.explode("Smoke", pos, new P(), 80, 10, 0, true, 80);
                     }
                     @Override
                     public void update(){
@@ -87,7 +98,8 @@ public enum Spells implements Moveset {
                         return "";
                     }
                 };
-                p.stats.setStat("expire",new Stat(300*level));
+                p.moveset.put("Melee",new Moveset[]{Skills.Use, Skills.Sidekick});
+                p.stats.setStat("expire",new Stat(500+(level*100)));
                 host.get("Energy").reserve += 6;
                 host.get("Stamina").reserve += 3;
                 host.get("Energy").add(0);
@@ -128,7 +140,7 @@ public enum Spells implements Moveset {
 
                     @Override
                     public void stuck() {
-                        Particle.explode("Fire", pos, P.getZero(), 10, 10, 0, false, 4);
+                        Particle.explode("Fire", pos, new P(), 10, 10, 0, false, 4);
                         remove();
                     }
                 };
@@ -160,7 +172,7 @@ public enum Spells implements Moveset {
 
                     @Override
                     public void stuck() {
-                        Particle.explode("Flame", pos, P.getZero(), 10, 10, 0, false, 4);
+                        Particle.explode("Flame", pos, new P(), 10, 10, 0, false, 4);
                         remove();
                     }
                 };
@@ -227,7 +239,7 @@ public enum Spells implements Moveset {
                 }
                 @Override
                 public void stuck(){
-                    Particle.explode("Fire", pos, P.getZero(), 100+(level*15), 10+(level*2), 0, false, 4);
+                    Particle.explode("Fire", pos, new P(), 100+(level*15), 10+(level*2), 0, false, 4);
                     Particle.smoke(pos);
                     Updater.collide(this,20+(level*10));
                     remove();
@@ -235,7 +247,7 @@ public enum Spells implements Moveset {
                 @Override
                 public void update(){
                     super.update();
-                    Particle.explode("Fire", pos, P.getZero(), 15, 10, 0, true, 4);
+                    Particle.explode("Fire", pos, new P(), 15, 10, 0, true, 4);
                 }
             };
             p.faction = host.faction;
@@ -265,13 +277,13 @@ public enum Spells implements Moveset {
                 }
                 @Override
                 public void stuck(){
-                    Particle.explode("Ice",pos, P.getZero(), 30, 20, 0, false, 1);
+                    Particle.explode("Ice",pos, new P(), 30, 20, 0, false, 1);
                     remove();
                 }
                 @Override
                 public void update(){
                     super.update();
-                    Particle.explode("Ice",pos, P.getZero(), 3, 10, 0, false, 1);
+                    Particle.explode("Ice",pos, new P(), 3, 10, 0, false, 1);
                 }
             };
             p.faction = host.faction;
@@ -297,7 +309,7 @@ public enum Spells implements Moveset {
             final Projectile p = new Projectile("Fireball", host.pos.getAdd(Global.nextGaussian(50),-500), host.pos.getAdd((host.target.x)+Global.nextGaussian(50),0), 12+Global.r.nextInt(6)){
                 @Override
                 public void stuck(){
-                    Particle.explode("Fire", pos, P.getZero(), 30, 25, 0, false, 4);
+                    Particle.explode("Fire", pos, new P(), 30, 25, 0, false, 4);
                     Particle.smoke(pos);
                     Updater.collide(this,50);
                     remove();
@@ -305,7 +317,7 @@ public enum Spells implements Moveset {
                 @Override
                 public void update(){
                     super.update();
-                    Particle.explode("Fire", pos, P.getZero(), 3, 10, 0, false, 1);
+                    Particle.explode("Fire", pos, new P(), 3, 10, 0, false, 1);
                 }
             };
             p.faction = Faction.Destructive;

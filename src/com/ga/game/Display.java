@@ -12,7 +12,6 @@ import java.awt.event.*;
  * Created by Ga on 5/6/2016.
  */
 public class Display extends JPanel implements KeyListener, MouseListener, MouseMotionListener {
-    private long lastTime = System.currentTimeMillis();
     public static JTextField chatbox;
     public static Input input;
     public static Dialog dialog;
@@ -21,7 +20,6 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
     private int mode = 0;
     private int mX = 0;
     private int mY = 0;
-    private int timeDebt = -100;
     public Display() {
         Global.display = this;
         setLayout(null);
@@ -50,7 +48,7 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
         chatbox.addKeyListener(new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e){
-                if (chatbox.getText().length() > 36) e.consume();
+                if (chatbox.getText().length() > 1024) e.consume();
             }
             @Override
             public void keyPressed(KeyEvent e) {
@@ -79,25 +77,10 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
         Graphics2D g2 = (Graphics2D) g.create();//.getDrawGraphics();
         Updater.draw(g2);
         repaint();
-        try {
-            long t = System.currentTimeMillis()-lastTime;
-            if (t >= 30){
-                timeDebt += t-30;
-                t = 30;
-            } else if (timeDebt > 0){
-                timeDebt -= 30-t;
-                t = 30;
-            }
-            Thread.sleep(30-t);
-            lastTime = System.currentTimeMillis();
-        } catch (Exception e) {
-            System.out.println("Thread Error");
-            System.exit(1);
-        }
     }
 
     private void input(int mode){
-        if (this.mode != mode || Updater.editor) {
+        if (this.mode != mode || mode < 0 || Updater.editor) {
             this.mode = mode;
             if (input != null)
                 input.input(mode, (int) (mX-Settings.centerX+Global.camera.x), (int) (mY-Settings.centerY+Global.camera.y));
@@ -116,7 +99,10 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
     @Override
     public void keyReleased(KeyEvent e) {
         int t = e.getKeyCode();
-        if (t == KeyEvent.VK_A || t == KeyEvent.VK_D || Updater.editor) input(-t);
+        if (t == KeyEvent.VK_UP || t == KeyEvent.VK_LEFT || t == KeyEvent.VK_DOWN || t == KeyEvent.VK_RIGHT ||
+            t == KeyEvent.VK_A || t == KeyEvent.VK_D)
+            input(-1);
+        else if (Updater.editor) input(-t);
         if (t == mode) mode = -1;
     }
 
@@ -152,7 +138,9 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
 
     @Override
     public void mouseDragged(MouseEvent e) {
-
+        mX = e.getX();
+        mY = e.getY();
+        if (Updater.editor) input(0);
     }
 
     @Override

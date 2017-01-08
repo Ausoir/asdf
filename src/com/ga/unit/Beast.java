@@ -14,7 +14,7 @@ public class Beast extends Unit {
         super(p);
         clip = new Body(this, name);
         brain = new UnitIntelligence(this);
-        moveset.put("Melee",new Moveset[]{Actions.WalkL});
+        moveset.put("Melee",new Moveset[]{Skills.Kick});
     }
 
     @Override

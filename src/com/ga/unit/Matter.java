@@ -57,15 +57,21 @@ public class Matter extends Thing implements Updatable {
             if (i.lineCross(pp)){
                 if (i.opt != -1) {
                     float slope = i.getSlope();
-                    float t = (slope * vel.x * 10000 - 5) / 10000f;
+                    float t = slope * vel.x;
                     if (t < vel.y) {
-                        if (Math.abs(vel.x) > 0 && t < 0) {
+                        if (vel.x != 0 && t < 0) {
                             float xforce = (float) Math.cos(Math.atan(slope));
                             if (xforce < .1) {
                                 vel.set(0, 0);
-                            } else vel.x *= xforce*xforce;
+                                onCollide(i);
+                                return;
+                            } else {
+                                vel.x *= xforce*xforce;
+                            }
                         }
                         vel.x *= .9f;
+                        vel.y = slope * vel.x;
+                        vel.y += (i.pt.y + (slope * (pos.x - i.pt.x)))-pos.y-1;
                         onCollide(i);
                     } else if (i.opt == 1) {
                         vel.y = 0;
@@ -76,8 +82,6 @@ public class Matter extends Thing implements Updatable {
         }
     }
     public void onCollide(Line l){
-        float slope = l.getSlope();
-        vel.y = (slope * vel.x * 10000 - 5) / 10000f;
     }
     public P getPoint(){
         return pos.getAdd(image.size.x*.5f*Global.cos(rotation)*dir,(int) (image.size.x*.5f*Global.sin(rotation))*dir);

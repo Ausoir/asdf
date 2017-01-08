@@ -30,7 +30,7 @@ public enum Curse {
         @Override
         public boolean perform() {
             Man d = new Man(host.toString());
-            d.target = P.getZero();
+            d.target = new P();
             Spells.Meteor.getEvent().start(d, level);
             Spells.Blizzard.getEvent().start(d, level);
             for (int i=0;i<level*4;i++) Spells.Meteor.getEvent().perform();

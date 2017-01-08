@@ -34,7 +34,7 @@ public class EditorInput implements Input, Updatable {
 
     public EditorInput() {
         Display.input = this;
-        Updater.addQueue.add(this);
+        Updater.add(this);
         if (Global.camera == null) Global.camera = new P();
         else Global.camera = new P(Global.camera);
     }
@@ -46,7 +46,6 @@ public class EditorInput implements Input, Updatable {
 
     private void remove(Line p) {
         Global.map.land.remove(p);
-        Updater.drawee.remove(p);
         history.remove(p);
     }
 
@@ -77,7 +76,7 @@ public class EditorInput implements Input, Updatable {
             map = Updater.changeMap;
             Updater.changeMap(true);
             Display.input = this;
-            Updater.addQueue.add(this);
+            Updater.add(this);
             Global.camera = new P(Global.camera);
         } else {
             try {
@@ -92,7 +91,7 @@ public class EditorInput implements Input, Updatable {
 
     @Override
     public void input(int mode, int x, int y) {
-        if (mode < -3) v.set(0, 0);
+        if (mode < 0) v.set(0, 0);
         if (shift && current != null){
             boolean snap = false;
             for (Line i : Global.map.land){
@@ -122,15 +121,11 @@ public class EditorInput implements Input, Updatable {
                 } else if (tool == Tool.MAN || tool == Tool.UNIT || tool == Tool.OBJECT) {
                     currentU.pos.set(x, y);
                 } else if (tool == Tool.REMOVE && lmb){
-                    Iterator it = Updater.matter.iterator();
-                    Matter i;
-                    while (it.hasNext()){
-                        i = (Matter) it.next();
+                    ArrayList<Matter> matters = Updater.collide(new P(x,y),100);
+                    for (Matter i : matters) {
                         String name = i.name;
-                        if (800 - (Math.pow(x - i.pos.x, 2) + Math.pow(y - i.pos.y, 2)) > 0){
-                            try{i.remove();}catch(Exception e){Global.p("Error deleting "+name);}
-                            Global.p("Deleted "+name);
-                        }
+                        try{i.remove();}catch(Exception e){Global.p("Error deleting "+name);}
+                        Global.p("Deleted "+name);
                     }
                 }
                 break;
@@ -262,10 +257,9 @@ public class EditorInput implements Input, Updatable {
             case KeyEvent.VK_INSERT:
                 if (Updater.editor) {
                     Updater.editor = false;
-                    FileManager.loadPlayer("Player.char");
+                    FileManager.loadPlayer(true, "0");
                     Display.input = Global.player;
                     Global.player.host.pos.set(Global.camera);
-                    Global.camera = Global.player.host.pos;
                 }
                 break;
         }
@@ -277,7 +271,7 @@ public class EditorInput implements Input, Updatable {
             seed = Integer.parseInt(name.split(":")[1]);
             name = name.substring(0,name.indexOf(":"));
         }
-        r = ObjectFactory.produce(name, p, seed, 10);
+        r = ObjectFactory.produce(name, p, seed);
         return r;
     }
     private Matter makeUnit(String name, P p){
@@ -306,8 +300,8 @@ public class EditorInput implements Input, Updatable {
     }
 
     public void update() {
-        Global.camera.add(v);
-        Global.mapEdge(Global.camera);
+        Global.cameraTo.add(v);
+        Global.mapEdgeCenter(Global.cameraTo);
     }
 
     private void save(String p){

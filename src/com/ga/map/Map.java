@@ -80,7 +80,17 @@ public class Map {
         result = result.substring(0,result.length()-1)+"\n";
         if (land.size() == 0) return result;
         for (Line i : land){
-            if (!i.equals("")) result += i+";";
+            if (!i.equals("")){
+                if (i.pt.x > i.ptd.x){
+                    float t = i.pt.x;
+                    i.pt.x = i.ptd.x;
+                    i.ptd.x = t;
+                    t = i.pt.y;
+                    i.pt.y = i.ptd.y;
+                    i.ptd.y = t;
+                }
+                result += i+";";
+            }
         }
         result = result.substring(0,result.length()-1);
         return result;
@@ -92,15 +102,13 @@ public class Map {
             }
         }
     }
-    public void loadMap(boolean host, int opt){
+    public void loadMap(int opt){
         int mapnum = opt / 10, posnum = opt % 10;
-        if (host) {
-            Global.player.host.stats.end();
-            FileManager.saveCharacter();
-            Updater.changeMap = maps[mapnum + 4];
-            Updater.changeMapPos = posnum;
-        }
-        Global.server.sendFromLocal("DC@"+maps[mapnum+4]+"@"+posnum);
+        Global.player.host.stats.end();
+        FileManager.saveCharacter();
+        Updater.changeMap = maps[mapnum + 4];
+        Updater.changeMapPos = posnum;
+//        Global.server.sendFromLocal("DC@"+maps[mapnum+4]+"@"+posnum);
     }
     public boolean fallSafe(P pos){
         Line line = new Line(pos.getAdd(0,100), pos.getAdd(0,9999));

@@ -131,12 +131,12 @@ public class Texture {
         switch (shader) {
             case XYLinearGradient:
                 for (int y = 0; y < height; y++) {
-                    float yShade = ((float) y / height) * 80;
+                    float yShade = ((float) y / height) * 64;
                     for (int x = 0; x < width; x++) {
                         int rgb = shade.getRGB(x, y);
                         int alpha = (rgb & 0xff000000) >>> 24;
                         if (alpha != 0) {
-                            float xShade = ((float) x / width) * 25;
+                            float xShade = ((float) x / width) * 24;
                             shade.setRGB(x, y, new Color(0, 0, 0, (int) Global.clamp(Math.max(xShade, yShade), 0, 255)).getRGB());
                         }
                     }

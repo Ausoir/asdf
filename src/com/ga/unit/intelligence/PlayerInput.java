@@ -1,16 +1,11 @@
 package com.ga.unit.intelligence;
 
-import com.ga.game.Command;
 import com.ga.game.Display;
 import com.ga.game.Input;
-import com.ga.game.Settings;
 import com.ga.map.Global;
-import com.ga.map.Updatable;
-import com.ga.tool.P;
 import com.ga.tool.Word;
 import com.ga.unit.Player;
 import com.ga.unit.SkillTree;
-import com.ga.unit.Updater;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Moveset;
 import com.ga.unit.skill.Skills;
@@ -24,40 +19,41 @@ import java.util.Map;
 /**
  * Created by Ga on 7/25/2016.
  */
-public class PlayerInput implements Input, Updatable {
+public class PlayerInput implements Input {
     private HashMap<Integer, Moveset> keyMap = new HashMap<Integer, Moveset>(){{
         put(-1, Actions.Idle);
-        put(-65, Actions.Idle);
-        put(-68, Actions.Idle);
         put(KeyEvent.VK_W, Actions.Wait);
         put(KeyEvent.VK_A, Actions.WalkL);
-        put(KeyEvent.VK_S, Actions.Duck);
+        put(KeyEvent.VK_S, Actions.Down);
         put(KeyEvent.VK_D, Actions.WalkR);
         put(KeyEvent.VK_F, Skills.Kick);
         put(KeyEvent.VK_R, Actions.Sheathe);
-        put(KeyEvent.VK_Z, Actions.Interact);
         put(49, Actions.Pull1);
         put(50, Actions.Pull2);
         put(51, Actions.Pull3);
         put(1, Skills.Use);
-        put(3, Actions.Idle);
+        put(KeyEvent.VK_UP, Actions.LookUp);
+        put(KeyEvent.VK_LEFT, Actions.LookLeft);
+        put(KeyEvent.VK_DOWN, Actions.LookDown);
+        put(KeyEvent.VK_RIGHT, Actions.LookRight);
         put(KeyEvent.VK_SHIFT, Skills.Rest);
     }};
-    private String key;
     public Player host;
-    public P mP = new P();
-    public float mR;
-    public int tick = -1;
-    private String resend;
+    public int moving = 0;
     public PlayerInput(Player unit){
         host = unit;
         unit.brain = null;
         unit.input = this;
-        Updater.addQueue.add(this);
     }
     public void chat(String p){
-        if (p.startsWith("/")) Command.order(p.substring(1));
-        else Global.server.sendFromLocal("IN@"+p);
+        if (p.startsWith("/") && Global.server.server) Global.server.order(p.substring(1));
+        else if (!p.equals("")){
+            host.say(p);
+            Global.server.sendFromLocal("IN@"+p);
+        }
+    }
+    public void chatDirect(String p){
+        host.say(p);
     }
     public void changeMapping(int key, Moveset event){
         keyMap.remove(key);
@@ -77,42 +73,29 @@ public class PlayerInput implements Input, Updatable {
         }
         return r;
     }
-    public void inputEcho(int when, String action, int x, int y){
-        tick = when;
-        mP.x = x;
-        mP.y = y;
-        mR = (float) Math.atan2(mP.y,mP.x);
-        key = action;
-    }
     public void input(int mode, int x, int y){
         if (mode == KeyEvent.VK_ENTER) Display.chatbox.requestFocus();
         else if (mode == KeyEvent.VK_TAB) Display.menu.toggle();
-        else if (keyMap.containsKey(mode) && key == null){
-            tick = Updater.tick + Settings.latency;
-            resend = "IN@"+tick+","+keyMap.get(mode).getCodeName() + "," + x + "," + y;
-            Global.server.sendFromLocal(resend);
+        else if (keyMap.containsKey(mode)){
+            int tx = (int) (x-host.pos.x);
+            int ty = (int) (y-host.pos.y);
+            Global.server.sendFromLocal("IN>"+keyMap.get(mode).getCodeName() + "@" + tx + "@" + ty);
+            inputDirect(keyMap.get(mode).getCodeName(), tx, ty);
         }
     }
-    public void inputDirect(String p, float x, float y){
+    public void inputDirect(String p, int x, int y){
         String t = p.substring(1);
-        host.target = new P(x,y).getSubtract(host.pos);
+        host.target.set(x,y);
         host.face(host.target.x > 0 ? 1 : -1);
-        if (p.startsWith("A")) host.setState(Actions.getByName(t));
+        if (p.startsWith("A")){
+            if (t.equals("Idle")) moving = 0;
+            else if (t.equals("WalkL")) moving = -1;
+            else if (t.equals("WalkR")) moving = 1;
+            host.setState(Actions.getByName(t));
+        }
         else if (p.startsWith("K")) host.setState(Skills.getByName(t));
         else if (p.startsWith("M")) host.setState(Spells.getByName(t));
         else if (p.startsWith("I")) host.selectItem(Integer.parseInt(t));
-    }
-    public void update(){
-        if (Updater.tick == tick) {
-            if (key == null){
-                Updater.pause = true;
-                Global.server.sendFromLocal(resend);
-            } else {
-                Updater.pause = false;
-                inputDirect(key, mP.x, mP.y);
-                key = null;
-            }
-        }
     }
     public void load(String p){
         if (p.length() > 1) {

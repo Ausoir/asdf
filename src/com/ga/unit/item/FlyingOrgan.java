@@ -27,24 +27,6 @@ public class FlyingOrgan extends Projectile {
     public void stuck(){
         super.stuck();
         flying = false;
-        final FlyingOrgan me = this;
-        Item t = new Item(null,0,1,3,1,6){
-            @Override
-            public void init(){
-                me.remove();
-            }
-            @Override
-            public String toItemString(){
-                return "";
-            }
-        };
-        t.gravity = false;
-        t.field();
-        t.pos = pos.getAdd(organ.pt);
-        t.rotation = rotation;
-        t.name = "Organ";
-        t.image = organ.getImage();
-        if (organ.type != 0) t.image.size = new P(organ.strokeSize/2,organ.getLength()+(organ.strokeSize/2));
     }
     @Override
     protected void onAttack(Matter p){

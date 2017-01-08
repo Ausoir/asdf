@@ -18,6 +18,7 @@ public class Global {
     public static PlayerInput player;
     public static Server server;
     public static P camera = new P();
+    public static P cameraTo = new P();
     public static Display display;
     public static Random r = new Random();
     private static float[] sinv = new float[360];

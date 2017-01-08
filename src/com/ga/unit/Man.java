@@ -31,19 +31,18 @@ public class Man extends Unit {
         super(p);
         clip = new BodyHumanoid(this);
         speechType = faction.name().toLowerCase();
-        if (faction == Faction.Merchant){
-            brain = new MerchantIntelligence(this);
-        } else if (faction != Faction.Player) {
-            brain = new UnitIntelligence(this);
-            brain.setComm(new Communication());
-            moveset.put("Melee",new Moveset[]{Kick, Use, Swing, Pierce});
-            moveset.put("Range",new Moveset[]{Spells.Stun, Spells.Fireball, Spells.Fireblast});
-            moveset.put("Random",new Moveset[]{Spells.Haste});
-        }
         String[] t = p.split("@");
         setWeapon(ItemFactory.load(t[6]));
         setArmor((Armor) ItemFactory.load(t[7]));
-        for (Organ i : clip.organs) i.health += get("Health").get()*.3f;
+        if (faction == Faction.Merchant){
+            brain = new MerchantIntelligence(this);
+        } else if (faction != Faction.Player && faction != Faction.Player2) {
+            brain = new UnitIntelligence(this);
+            brain.setComm(new Communication());
+            if (!wieldingNone()) moveset.put("Melee",new Moveset[]{Kick, Use, Swing, Pierce, Sidekick, Jump});
+            moveset.put("Range",new Moveset[]{Spells.Stun, Spells.Fireball, Spells.Fireblast});
+            moveset.put("Random",new Moveset[]{Spells.Haste});
+        }
     }
 
     @Override
@@ -115,18 +114,32 @@ public class Man extends Unit {
         super.actionSet(state, level);
         if (state instanceof Skills) {
             int speed = weapon.speed;
+            damageType = weapon.damageType;
             switch ((Skills) state) {
                 case Use:
                     weapon.use(this);
                     return;
+                case Duck:
+                    cooldown.put(state,new int[]{Global.getTime()[0]+(getStatPenalty()*4)});
+                    break;
+                case Sidekick:
+                    speed = 0;
+                    damageType = DamageType.Bash;
+                    break;
                 case Kick:
                     speed = 0;
+                    damageMod = 3;
+                    damageType = DamageType.Push;
+                    break;
                 case Lunge:
                     damageMod = -1;
                     break;
                 case Slash:
                     damageMod = 1 + level;
                     speed = 0;
+                    break;
+                case Backstep:
+                    vel.x -= getSpeed() * 5 * dir;
                     break;
                 case Underhand:
                     damageMod = 1 + (level * .5f);
@@ -138,7 +151,7 @@ public class Man extends Unit {
                     damageMod = .5f + ((Math.abs(vel.x) * level) / 20);
                     break;
                 case Dash:
-                    vel.x -= 10 * dir;
+                    vel.x -= getSpeed() * 2 * dir;
                     delay.time += 2 * level;
                     delay.max += 2 * level;
                     damageMod = level * .5f;
@@ -157,7 +170,7 @@ public class Man extends Unit {
                     damageMod = level;
                     break;
                 case Swing:
-                    damageMod = .5f*level;
+                    damageMod = 1+(level*.5f);
                     speed = Math.min(10,speed);
                     break;
                 default:
@@ -210,7 +223,7 @@ public class Man extends Unit {
 
     @Override
     public boolean isExhausted(){
-        return get("Stamina").get() < weapon.weight && get("Energy").get() < armor.weight;
+        return get("Stamina").get() < weapon.weight+armor.weight;
     }
 
     public Stat get(String p){
@@ -234,8 +247,8 @@ public class Man extends Unit {
             }
             if (brain != null) brain.attacked();
             if (stats.triggerEffect(Buffs.Empower)){
-                Particle.explode("Blood",hitbox.ptd,P.getZero(),12,20,0,true,3);
-                Particle.explode("Fire",hitbox.ptd,P.getZero(),30,8,0,false,3);
+                Particle.explode("Blood",hitbox.ptd,new P(),12,20,0,true,3);
+                Particle.explode("Fire",hitbox.ptd,new P(),30,8,0,false,3);
             }
         }
     }
@@ -260,7 +273,7 @@ public class Man extends Unit {
                         attack();
                         break;
                     case Dash:
-                        vel.set(get("Speed").get() * dir * (damageMod / 2), -5);
+                        vel.set(getSpeed() * 10 * dir * (damageMod / 2), -5);
                         break;
                     case Throw:
                         if (!weapon.name.equals("Fist")) {
@@ -268,10 +281,10 @@ public class Man extends Unit {
                                 Item wpn = weapon;
                                 @Override
                                 public void stuck() {
-                                    if (tangible) Particle.explode("Fire", pos, vel, 20, 10, 15, true, 3);
-                                    wpn.pos = new P(pos);
+                                    if (tangible) Particle.groundSlam(pos);
                                     wpn.field();
-                                    wpn.gravity = false;
+                                    wpn.pos = new P(pos);
+                                    wpn.rotation = rotation;
                                     remove();
                                 }
                             };
@@ -279,13 +292,14 @@ public class Man extends Unit {
                             p.rotSpeed = .03f;
                             p.faction = faction;
                             p.damage = getDamage()+weapon.weight;
+                            weapon.remove();
                             setWeapon(null);
                         }
                         break;
                     case Leap:
                         if (jump) {
                             vel.y -= 80;
-                            vel.x = get("Speed").get() * dir;
+                            vel.x = getSpeed() * 10 * dir;
                             jump = false;
                         }
                         break;
@@ -309,7 +323,7 @@ public class Man extends Unit {
                         p.rotSpeed = 0;
                         p.rotate(target.getSubtract(tip).add(pos));
                         p.faction = faction;
-                        p.damage = 10;
+                        p.damage = (weapon.getDamage()*10)+4;
                         p.gravity = false;
                         Particle.explode("Spark", tip, p.vel, 5, 10, 15, false,3);
                         float start = rand.nextFloat();

@@ -6,16 +6,13 @@ import com.ga.map.Global;
  * Created by Ga on 5/6/2016.
  */
 public class P {
-    static P zero = new P();
+    static final P zero = new P();
     public float x, y;
     public P(String p){
         load(p);
     }
     public P(){
         set(0,0);
-    }
-    public static P getZero(){
-        return zero;
     }
     public P(P p){
         set(p);
@@ -40,9 +37,6 @@ public class P {
     }
     public boolean is(float x, float y){
         return this.x == x && this.y == y;
-    }
-    public boolean isZero(){
-        return is(0,0);
     }
     public P add(P p){
         return add(p.x,p.y);

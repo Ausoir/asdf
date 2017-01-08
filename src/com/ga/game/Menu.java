@@ -259,8 +259,6 @@ class InventoryPanel extends JPanel {
     private JLabel gold;
     private Border emptyborder = new EmptyBorder(5,8,5,8);
     private int[] selected;
-    private boolean mRelease = true;
-    private int prevY = 0;
     public InventoryPanel(){
         setLayout(new BoxLayout(this,BoxLayout.PAGE_AXIS));
         setOpaque(false);
@@ -304,12 +302,6 @@ class InventoryPanel extends JPanel {
             grid.gridy = i+2;
             makeSlot(3, item, i);
         }
-        for (int i = 0; i < inv.pockets.length; i++) {
-            int slot = inv.pockets[i];
-            if (slot != -1) {
-                equip(slot);
-            }
-        }
     }
     public void makeSlot(int type, final Item item, final int index){
         JPanel panel = new JPanel();
@@ -325,8 +317,6 @@ class InventoryPanel extends JPanel {
             result.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    if (selected[index] == 0) equip(index);
-                    else unequip(index);
                 }
             });
         } else if (type == 1){
@@ -394,19 +384,6 @@ class InventoryPanel extends JPanel {
     }
     private void drop(Item item){
         Global.player.host.dropItem(item);
-    }
-    public void equip(int p){
-        final Inventory inv = Global.player.host.inventory;
-        int r = inv.equip(p);
-        TitledBorder b = BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder());
-        b.setTitle(""+(r+1));
-        ((JPanel) panel.getComponent(p+2)).setBorder(b);
-        selected[p] = r;
-    }
-    public void unequip(int p){
-        Global.player.host.inventory.unequip(p);
-        ((JPanel) panel.getComponent(p+2)).setBorder(emptyborder);
-        selected[p] = 0;
     }
 }
 

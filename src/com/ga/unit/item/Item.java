@@ -17,7 +17,7 @@ public class Item extends Matter {
         Sword(Skills.Swing, DamageType.Cut), Spear(Skills.Pierce, DamageType.Cut), Mace(Skills.Swing, DamageType.Bash),
         Dagger(Skills.Stab, DamageType.Cut), Armor(Skills.Rest, DamageType.Push), Scroll(Actions.Cast, DamageType.Push),
         Shoot(Skills.Shoot, DamageType.Cut), Snipe(Skills.Snipe, DamageType.Cut), Throwing(Skills.Throw, DamageType.Cut),
-        Darting(Skills.Dart, DamageType.Cut), Consumable(Actions.Consume, DamageType.Push), Claw(Skills.Pierce, DamageType.Cut),
+        Darting(Skills.Dart, DamageType.Cut), Consumable(Actions.Consume, DamageType.Push), Claw(Skills.Swing, DamageType.Cut),
         Enchant(Actions.Buff, DamageType.Push);
         Moveset action;
         DamageType type;
@@ -37,27 +37,6 @@ public class Item extends Matter {
         static SpecialtyMod get(Random seed){
             if (seed.nextGaussian() > 1) return values()[seed.nextInt(values().length)];
             return None;
-        }
-    }
-    enum MaterialMod{
-        Lead(8),Iron(20),Steel(5),Brass(10),Titanium(1),Uranium(1);
-        static int pool;
-        int weight;
-        MaterialMod(int weight){
-            expandPool(weight);
-            this.weight = weight;
-        }
-        void expandPool(int weight){
-            pool += weight;
-        }
-        static MaterialMod get(Random seed){
-            int r = seed.nextInt(pool);
-            int t = 0;
-            for (MaterialMod i : values()){
-                t+=i.weight;
-                if (t >= r) return i;
-            }
-            return Iron;
         }
     }
     enum PrefixMod{
@@ -118,7 +97,6 @@ public class Item extends Matter {
     AdenchantMod ademod;
     SpecialtyMod smod;
     PrefixMod pmod;
-    MaterialMod mmod;
     Spells emod = null;
     public int weight;
     protected int cooldown = 100;
@@ -131,14 +109,13 @@ public class Item extends Matter {
     private Organ organ = null;
     public int speed = 0;
     public Item(String name, int seed, int weight, int uses, int cooldown, float enchantRatio) {
-        super(name, seed, P.getZero(), -1);
+        super(name, seed, new P(), 8);
         this.name = name;
         this.weight = weight;
         this.uses.setTotal(uses);
         this.cooldown = cooldown;
         interactive = true;
         pmod = PrefixMod.get(rand);
-        mmod = MaterialMod.get(rand);
         smod = SpecialtyMod.get(rand);
         if (rand.nextFloat() < enchantRatio) {
             ademod = AdenchantMod.get(rand);
@@ -146,9 +123,8 @@ public class Item extends Matter {
             probability = ademod.magnitude;
         }
         setModifier(pmod);
-        setModifier(mmod);
         setModifier(smod);
-        Updater.addQueue.remove(this);
+        Updater.remove(this);
         gravity = true;
         init();
     }
@@ -158,6 +134,7 @@ public class Item extends Matter {
     public void setType(Tag p){
         this.type = p;
         this.action = p.getAction();
+        this.damageType = p.getDamageType();
     }
     public Tag getType(){
         return type;
@@ -186,24 +163,6 @@ public class Item extends Matter {
             uses.setTotal(-1);
             speed += 7;
             probability += .3f;
-        }
-    }
-    protected void setModifier(MaterialMod mod){
-        if (mod == MaterialMod.Iron){
-            speed -= 2;
-            weight += 2;
-        } else if (mod == MaterialMod.Steel){
-            speed -= 1;
-            weight += 1;
-        } else if (mod == MaterialMod.Brass){
-            if (uses.get() != -1) uses.add((int) Math.min(-1,uses.getMax()*-.5f));
-            weight = Math.max(1,weight-1);
-        } else if (mod == MaterialMod.Titanium){
-            if (uses.get() != -1) uses.addTotal(Math.max(1,uses.getMax()));
-        } else if (mod == MaterialMod.Uranium){
-            uses.setTotal(-1);
-            speed -= 4;
-            weight += 3;
         }
     }
     protected void setModifier(SpecialtyMod mod){
@@ -296,7 +255,6 @@ public class Item extends Matter {
         if (admod != AdverbMod.None) r+=admod.name()+" ";
         if (smod != SpecialtyMod.None) r+=smod.name()+" ";
         if (pmod != PrefixMod.None) r+=pmod.name()+" ";
-        r+=mmod.name()+" ";
         r += name;
         if (emod != null){
             r+=" of ";
@@ -342,15 +300,14 @@ public class Item extends Matter {
         host.get("Speed").add(weight);
     }
     public void field(){
-        setDepth(8);
         gravity = true;
-        Updater.addQueue.add(this);
+        Updater.add(this);
         setOrgan(null);
     }
     public String getDescription() {
         String r = "a "+getFullName()+".";
         int uses = this.uses.get();
-        r+= " Weighs "+weight+" and has "+(uses==-1?"infinite":uses)+" uses left.";
+        r+= " Weighs "+weight+" and has "+(uses==-1?"unlimited":uses)+" uses left.";
         if (emod != null){
             String ade = "";
             if (ademod != AdenchantMod.None) ade = "Level "+ademod.level+" ";
@@ -378,12 +335,12 @@ public class Item extends Matter {
     public void interact(Unit p){
         if (p instanceof Man) {
             Man t = ((Man)p);
-            if (t.wieldingNone()) t.setWeapon(this);
+            t.setWeapon(this);
         }
     }
     @Override
     public void draw(Graphics2D g){
-        P t = pos.getAdd(organ==null?P.getZero():organ.ptd);
+        P t = pos.getAdd(organ==null?new P():organ.ptd);
         image.draw(g, t.x, t.y, rotation, dir);
     }
     @Override
@@ -392,5 +349,8 @@ public class Item extends Matter {
     }
     public String toItemString(){
         return name + "," + seed + "," + uses + "," + admod;
+    }
+    public void update(){
+        if (organ == null) super.update();
     }
 }

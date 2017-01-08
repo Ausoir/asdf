@@ -20,7 +20,7 @@ public class Flee implements Task {
     @Override
     public void blocked() {
         if (host.rand.nextFloat() < .5f) host.setState(Skills.Jump);
-        else host.setState(Actions.Duck);
+        else host.setState(Actions.Down);
     }
 
     public void update() {

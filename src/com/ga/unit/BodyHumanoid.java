@@ -19,47 +19,48 @@ public class BodyHumanoid extends Body {
         if (state instanceof Actions) {
             switch ((Actions) state) {
                 case Interact:
-                    rotateAppendage(FIST, 14);
-                    rotateAppendage(BODY, 14);
-                    localAnimation[14][BODY][1] = Math.min(0,localAnimation[14][BODY][1]);
+                    rotateAppendage(FIST, 15);
+                    rotateAppendage(BODY, 15);
+                    localAnimation[15][BODY][1] = Math.min(0,localAnimation[15][BODY][1]);
                     break;
                 case Cast:
-                    rotateAppendage(OFIST, 10);
-                    rotateAppendage(FIST, 10);
+                    rotateAppendage(OFIST, 11);
+                    rotateAppendage(FIST, 11);
                     break;
                 case Conjure:
-                    rotateAppendage(FIST, 19);
+                    rotateAppendage(FIST, 20);
                     break;
             }
         } else if (state instanceof Skills) {
             switch ((Skills) state) {
                 case Shoot:
-                    rotateAppendage(FIST, 38);
+                    rotateAppendage(FIST, 39);
                     break;
                 case Snipe:
-                    rotateAppendage(OFIST, 40);
                     rotateAppendage(OFIST, 41);
+                    rotateAppendage(OFIST, 42);
                     break;
                 case Dart:
-                    rotateAppendage(OFIST, 28);
+                    rotateAppendage(OFIST, 29);
                     break;
                 case Underhand:
-                    rotateAppendage(FIST, 22);
+                    rotateAppendage(FIST, 23);
                     break;
                 case Throw:
                 case Lunge:
                 case Pierce:
-                    rotateAppendage(FIST, 6);
+                case Swing:
+                    rotateAppendage(FIST, 7);
                     break;
                 case Kick:
-                    rotateAppendage(FOOT-1, 4);
+                    rotateAppendage(FOOT-1, 5);
                     break;
                 case Sidekick:
-                    rotateAppendage(FOOT, 13);
+                    rotateAppendage(FOOT, 14);
                     break;
                 case Stab:
-                    rotateAppendage(OFIST, 10);
-                    rotateAppendage(FIST, 10);
+                    rotateAppendage(OFIST, 11);
+                    rotateAppendage(FIST, 11);
                     break;
             }
         }

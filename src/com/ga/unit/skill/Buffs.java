@@ -11,13 +11,13 @@ import com.ga.unit.item.Projectile;
  */
 public enum Buffs {
     Haste(hostEffect(), 50, "Speed",1,"Speed"), Rejuvenate(hostEffect(), 100, "Stamina",.5f,"Stamina"), Empower(weaponEffect(1), 80, "Proficiency",10), Cleave(weaponEffect(2), 300),
-    Burden(new Spell(){
+    Slow(new Spell(){
         @Override
         public boolean perform(){
-            Particle.smoke(new P(host.pos));
+            Particle.implode("Glare", host.pos.getAdd(0,-25), new P(), 1, 10, 1, false, 6);
             return false;
         }
-    }, -1, "Speed", 1),
+    }, 50, "Speed", -.5f, "Speed"),
     Evade(new Spell(){
         @Override
         public boolean perform(){
@@ -32,13 +32,6 @@ public enum Buffs {
             return false;
         }
     }, 50, "Speed",-1,"Speed"),
-    Pain(new Spell(){
-        @Override
-        public boolean perform(){
-            Particle.dripBlood(host.pos);
-            return false;
-        }
-    }, 50, "Speed",-.5f,"Speed"),
     Poison(new Spell(){
         private int tick = 1;
         @Override
@@ -59,7 +52,7 @@ public enum Buffs {
             tick--;
             if (tick == 0) {
                 tick = 2;
-                final Projectile p = new Projectile("Ice", host.pos.getAdd(0, -5), P.getZero(), 0) {
+                final Projectile p = new Projectile("Ice", host.pos.getAdd(0, -5), new P(), 0) {
                     @Override
                     protected void onAttack(Matter p) {
                         if (p instanceof Unit){
@@ -97,10 +90,10 @@ public enum Buffs {
             tick--;
             if (tick == 0) {
                 tick = 1;
-                final Projectile p = new Projectile("Flamecluster", host.pos.getAdd(0, -5), P.getZero(), 0) {
+                final Projectile p = new Projectile("Flamecluster", host.pos.getAdd(0, -5), new P(), 0) {
                     @Override
                     protected void onAttack(Matter p) {
-                        Particle.explode("Flame", pos, P.getZero(), 30, 20, 0, false, 2);
+                        Particle.explode("Flame", pos, new P(), 30, 20, 0, false, 2);
                         remove();
                     }
                     @Override
@@ -134,7 +127,7 @@ public enum Buffs {
             host.jump = true;
             host.setState(Actions.Hit);
             host.delay.set(5);
-            Particle.implode("Glare", host.pos.getAdd(0,-25), P.getZero(), 1, 10, 1, false, 6);
+            Particle.implode("Glare", host.pos.getAdd(0,-25), new P(), 1, 10, 1, false, 6);
             return false;
         }
     }, 50);

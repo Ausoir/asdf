@@ -20,7 +20,7 @@ public class Hunt implements Task {
         this.host = host;
         this.target = target;
         random = new Timer(Global.r.nextInt(30));
-        range = host.getReach();
+        range = host.getReach()+(target.image.sizeRadius/2);
     }
 
     @Override
@@ -31,7 +31,7 @@ public class Hunt implements Task {
     }
 
     public void update() {
-        if (target == null) return;
+        if (target == null || !host.delay.over()) return;
         if (random.update()){
             random.set(Global.r.nextInt(150));
             host.performMoveset("Random");
@@ -43,18 +43,13 @@ public class Hunt implements Task {
         if (y < -20)
             host.setState(Skills.Jump);
         if (host.isExhausted()){
-            if (dist > 100){
-                host.setState(Skills.Rest);
-            } else if (dist < 100){
-                if (x > 0) host.setState(Actions.WalkL);
-                else if (x < 0) host.setState(Actions.WalkR);
-            }
+            if (host.rand.nextFloat() < .1f) host.get("Stamina").heal();
+            host.setState(Skills.Rest);
         } else if (dist <= -10) {
             host.performMoveset("Melee");
         } else if (dist > 200 && dist < 600) {
-            host.target = target.pos.getSubtract(host.pos).add(0,-30);
-            host.performMoveset("Range");
-            host.delay.set(host.delay.time*2+10);
+            host.target = target.pos.getSubtract(host.pos).add(0, -30);
+            if (host.performMoveset("Range") == 0) host.delay.time += 20;
         } else {
             if (x > 0) host.setState(Actions.WalkR);
             else if (x < 0) host.setState(Actions.WalkL);

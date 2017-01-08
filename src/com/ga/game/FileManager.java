@@ -6,10 +6,7 @@ import com.ga.map.Map;
 import com.ga.map.ObjectFactory;
 import com.ga.tool.Line;
 import com.ga.tool.P;
-import com.ga.unit.Clip;
-import com.ga.unit.Man;
-import com.ga.unit.Player;
-import com.ga.unit.Updater;
+import com.ga.unit.*;
 import com.ga.unit.intelligence.PlayerInput;
 import com.ga.unit.skill.Actions;
 
@@ -76,11 +73,12 @@ public class FileManager {
             new EditorInput();
         }
     }
-    public static PlayerInput loadPlayer(String dir){
+    public static PlayerInput loadPlayer(boolean main, String dir){
         String data = read("map/"+dir);
         String[] line = data.split("%");
         PlayerInput pi;
-        pi = new PlayerInput(new Player(line[0].split("]")[1]));
+        String playerString = line[0].split("]")[1];
+        pi = new PlayerInput(main ? new MainPlayer(playerString) : new Player(playerString));
         pi.host.load(read("map/"+dir));
         pi.host.id = -Integer.parseInt(dir)-1;
         pi.load(line[2]);
@@ -116,7 +114,7 @@ public class FileManager {
                                 if (player == 0) r = new P(type[2]);
                                 else if (player > -1) player--;
                             }
-                            ObjectFactory.produce(type[0], new P(type[2]), Integer.parseInt(type[1]), 9);
+                            ObjectFactory.produce(type[0], new P(type[2]), Integer.parseInt(type[1]));
                         } else { //unit
                             int id = Integer.parseInt(unit[1].split("@")[3]);
                             if (id >= Updater.id) Updater.id = id+1;
@@ -127,6 +125,7 @@ public class FileManager {
                 }
             }
         }
+        if (r == null) System.out.println("Invalid Player Spawn Location");
         return r;
     }
 

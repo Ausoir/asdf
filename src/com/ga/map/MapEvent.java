@@ -32,7 +32,7 @@ public class MapEvent implements Updatable {
     private Timer timer;
     public MapEvent(String p){
         event = Map.valueOf(p);
-        Updater.addQueue.add(this);
+        Updater.add(this);
         timer = new Timer(100, true);
     }
     @Override

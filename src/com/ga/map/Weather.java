@@ -27,7 +27,7 @@ public class Weather implements Drawable{
     private static final int hourLength = 100;
     private int[] time = Global.getTime();
     public Weather(){
-        Updater.addDrawee(this);
+        Updater.add(this);
     }
     private Color addition(int[] a, int[] b, float rate){
         return new Color((int) Global.clamp(a[0]+((b[0]-a[0])*rate),0,255),

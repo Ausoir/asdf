@@ -11,8 +11,8 @@ import com.ga.unit.Updater;
  */
 public class BeastFactory {
     enum Type{
-        Dog(Faction.Neutral, 10,30,10,10,3),
-        Spider(Faction.Destructive, 10,30,10,10,3),
+        Dog(Faction.Evil, 10,30,10,10,3),
+        Spider(Faction.Evil, 10,30,10,10,3),
         Mantis(Faction.Evil, 100,40,10,10,3);
         int health,speed,stamina,energy,proficiency;
         Faction faction;

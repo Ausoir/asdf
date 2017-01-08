@@ -63,9 +63,4 @@ public class ManFactory {
         }
         return result;
     }
-    public static Man arm(Man p, String weapon, String armor){
-        p.setWeapon(ItemFactory.produce(weapon,-1));
-        p.setArmor((Armor) ItemFactory.produce(armor,-1));
-        return p;
-    }
 }

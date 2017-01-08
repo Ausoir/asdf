@@ -15,7 +15,7 @@ public class Thing implements Drawable, Observer {
     public P pos;
     protected int sizeRadius;
     public String name;
-    int depth;
+    int depth; //5:Object, 8:Corpse, 9:Shadow, 10:Unit
     public int dir = 1;
     public float rotation = 0;
     public Thing(String name){
@@ -38,7 +38,7 @@ public class Thing implements Drawable, Observer {
         this(name);
         this.depth = depth;
         pos = pt;
-        Updater.addQueue.add(this);
+        Updater.add(this);
     }
     public boolean isFacing(P p){
         return (pos.x > p.x && dir == -1) || (pos.x < p.x && dir == 1);
@@ -47,7 +47,7 @@ public class Thing implements Drawable, Observer {
         image.draw(g, pos.x+offset.x, pos.y+offset.y, rotation, dir);
     }
     public void draw(Graphics2D g){
-        draw(g, P.getZero());
+        image.draw(g, pos.x, pos.y, rotation, dir);
     }
 
     @Override
@@ -56,13 +56,11 @@ public class Thing implements Drawable, Observer {
     }
     public void setDepth(int depth) {
         this.depth = depth;
-        if (Updater.drawee.remove(this)){
-            Updater.addDrawee(this);
-        }
+        Updater.resetDepth(this);
     }
 
     public void remove(){
-        Updater.removeQueue.add(this);
+        Updater.remove(this);
     }
     public String toString(){
         return name + "@" + pos;

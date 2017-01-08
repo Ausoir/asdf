@@ -2,7 +2,6 @@ package com.ga.unit;
 
 import com.ga.game.Display;
 import com.ga.map.Global;
-import com.ga.tool.Line;
 import com.ga.tool.Performer;
 import com.ga.unit.intelligence.PlayerInput;
 import com.ga.unit.item.Inventory;
@@ -24,7 +23,6 @@ public class Player extends Man {
     public PlayerInput input;
     public Player(String p) {
         super(p);
-        get("Health").setTotal(30);
         stats.setStat("Level",new Stat(1));
         stats.setStat("Memory",new Stat(1));
         stats.setStat("Level Points",new Stat(0));
@@ -32,11 +30,6 @@ public class Player extends Man {
         get("Level Points").setTotal(25);
         get("Reset Points").setTotal(25);
         speechType = "p";
-    }
-    @Override
-    public void say(String p){
-        Display.menu.setVisible(false);
-        super.say(p);
     }
     public void learnSkill(Moveset p){
         say("Learned spell "+p.getName()+"!");
@@ -99,18 +92,14 @@ public class Player extends Man {
                 case Sheathe:
                     delay.performer = new Performer() {
                         public boolean perform() {
-                            if (selectingItem == -1 || selectingItem == inventory.wielded) {
-                                sheathe();
-                            } else if (!wieldingNone()) {
+                            if (!wieldingNone() || selectingItem == -1) {
                                 sheathe();
                                 return false;
-                            } else {
-                                if (inventory.pockets.length > selectingItem && inventory.pockets[selectingItem] != -1) {
-                                    Item item = inventory.getItem(inventory.pockets[selectingItem]);
-                                    inventory.wielded = selectingItem;
-                                    inventory.remove(inventory.pockets[selectingItem]);
-                                    setWeapon(item);
-                                }
+                            } else if (selectingItem < inventory.getItemSize()) {
+                                Item item = inventory.getItem(selectingItem);
+                                setWeapon(item);
+                                inventory.wielded = selectingItem;
+                                inventory.remove(item);
                                 selectingItem = -1;
                             }
                             return true;
@@ -121,25 +110,12 @@ public class Player extends Man {
         }
     }
     public int setState(Moveset state){
-        if (state != Actions.Idle && state != Actions.Wait){
-            Display.shop.setVisible(false);
-            Display.dialog.setVisible(false);
-        }
         if (state instanceof Actions) {
             switch ((Actions) state) {
                 case WalkL:
                 case WalkR:
                     if (delay.over()) {
                         if (Global.cos(weapon.rotation) < .8f) weapon.rotation *= .9f;
-                    }
-                    break;
-                case Interact:
-                    ArrayList<Matter> obj = Updater.collide(pos.getAdd(clip.organs[FIST].ptd), 12);
-                    for (Matter i : obj){
-                        if (i.interactive){
-                            i.interact(this);
-                            break;
-                        }
                     }
                     break;
                 case Pull1:
@@ -151,6 +127,15 @@ public class Player extends Man {
                 case Pull3:
                     selectItem(2);
                     break;
+                case Interact:
+                    ArrayList<Matter> obj = Updater.collide(pos.getAdd(clip.organs[FIST].ptd), 12);
+                    for (Matter i : obj) {
+                        if (i.interactive) {
+                            i.interact(this);
+                            break;
+                        }
+                    }
+                    break;
             }
         } else if (state instanceof Skills) {
             switch ((Skills) state) {
@@ -159,12 +144,14 @@ public class Player extends Man {
                     weapon.rotate(target.getMult(dir,dir));
                     weapon.rotation += .1*dir;
             }
-            Moveset a = this.state;
-            Moveset b = state;
-            if (a == Skills.Use) a = weapon.action;
-            if (b == Skills.Use) b = weapon.action;
-            if (a != b){
-                delay.set(0);
+            if (this.state instanceof Skills) {
+                Moveset a = this.state;
+                Moveset b = state;
+                if (a == Skills.Use) a = weapon.action;
+                if (b == Skills.Use) b = weapon.action;
+                if (a != b) {
+                    delay.set(0);
+                }
             }
         }
         if (weapon.getType() == Item.Tag.Claw) weapon.rotation = (weapon.getOrgan().getAtan()+(dir<0?3.14f:0));
@@ -182,34 +169,17 @@ public class Player extends Man {
             int[] cdinput = getCooldown(state);
             say("Spell is available in "+Global.checkCooldown(cdinput, state.getCooldown())+" seconds!");
         } else if (r == 4){
-            say("Use broke!");
+            say("Item broke!");
         }
         return r;
     }
-
-    public void onCollide(Line r){
-        super.onCollide(r);
-        if (state != Actions.Dead) {
-            if (r.opt == 2) {
-                if (state == Actions.Wait){
-                    vel.set(0, 0);
-                    Global.map.teleport(pos, r);
-                }
-            } else if (r.opt >= 100) {
-                boolean host = Global.player == input ? true : false;
-                if (r.opt >= 200){
-                    if (state == Actions.Wait) Global.map.loadMap(host, r.opt - 200);
-                } else Global.map.loadMap(host, r.opt - 100);
-            }
-        }
+    protected float getSpeed() {
+        return Math.max(0,super.getSpeed()-inventory.weight-getStatPenalty());
     }
-    public void update(){
-        super.update();
-        Global.mapEdgeCenter(Global.camera);
-    }
-    @Override
-    public String toString(){
-        return "";
+    protected void stateDone(){
+        if (input.moving == 0) setState(Actions.Idle);
+        else if (input.moving == -1) setState(Actions.WalkL);
+        else if (input.moving == 1) setState(Actions.WalkR);
     }
     public String toCharacterString(){
         String r = super.toString()+"\n";

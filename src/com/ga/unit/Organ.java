@@ -61,7 +61,7 @@ public class Organ extends Line {
         if (health <= 0 && (type == DamageType.Cut || type == DamageType.Burn)) {
             if (type == DamageType.Cut){
                 host = new FlyingOrgan(this, p.ptd.getAdd(0, -15), 30);
-                Particle.explode("Blood", p.ptd, P.getZero(), 5, 40, 0, true, 2);
+                Particle.explode("Blood", p.ptd, new P(), 5, 40, 0, true, 2);
             } else {
                 Particle.explode("Flame", p.ptd, new P(0, -5), 1, 12, 3, false, 3);
             }

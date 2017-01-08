@@ -23,29 +23,32 @@ public class Particle extends Thing implements Effect {
         this.timer.set(lifetime);
     }
     public static void dripBlood(P pt){
-        explode("Blood",pt,P.getZero(),3,1,0,true,3);
+        explode("Blood",pt,new P(),3,1,0,true,3);
     }
     public static void dripFire(P pt){
-        explode("Fire",pt,P.getZero(),3,1,0,true,3);
+        explode("Fire",pt,new P(),3,1,0,true,3);
     }
     public static void dripHoly(P pt){
-        explode("Glare",pt,P.getZero(),1,4,0,true,4);
+        explode("Glare",pt,new P(),1,4,0,true,4);
+    }
+    public static void groundSlam(P pt){
+        explode("Dirt",pt,new P(0,-16),1,4,0,true,4);
     }
     public static void explosion(P pt){
-        explode("Smoke",pt,new P(0,-15),50,15,15,false,7);
-        explode("Fire",pt,new P(0,-20),100,15,10,true,4);
+        explode("Smoke",pt,new P(0,-16),50,15,15,false,7);
+        explode("Fire",pt,new P(0,-24),100,15,10,true,4);
     }
     public static void holyExplosion(P pt){
-        explode("Glare",pt,new P(0,-1),100,25,20,true,7);
+        explode("Glare",pt,new P(0,-1),100,24,20,true,7);
     }
     public static void cleanse(P pt){
-        explode("Glare",pt,P.getZero(),1,15,0,false,2);
+        explode("Glare",pt,new P(),1,16,0,false,2);
     }
     public static void frozen(P pt){
-        explode("Ice",pt,P.getZero(),3,3,0,false,12);
+        explode("Ice",pt,new P(),3,3,0,false,12);
     }
     public static void smoke(P pt){
-        explode("Smoke",pt,P.getZero(),7,15,0,false,4);
+        explode("Smoke",pt,new P(),8,16,0,false,4);
     }
     public static void implode(String name, P pt, P vel, int num, int speed, int velSpeed, boolean gravity, int lifetime){
         P t;
@@ -54,7 +57,7 @@ public class Particle extends Thing implements Effect {
             float spd = Global.r.nextFloat()*speed;
             t = new P(pt);
             t.add(Global.cos(rot)*spd*lifetime,Global.sin(rot)*spd*lifetime);
-            new Particle(name,t,P.getZero(),rot-3.14f,spd, gravity, lifetime);
+            new Particle(name,t,new P(),rot-3.14f,spd, gravity, lifetime);
         }
     }
     public static void explode(String name, P pt, P vel, int num, int speed, int velSpeed, boolean gravity, int lifetime){
