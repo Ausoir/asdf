@@ -40,8 +40,6 @@ public abstract class Intelligence {
     public void update(){
         if (think.update()){
             think();
-        } else {
-            task.update();
         }
     }
     protected void setTaskEcho(Task p){
@@ -126,6 +124,8 @@ public abstract class Intelligence {
         if (forget.update()){
             target = null;
             defaultTask();
+        } else {
+            task.update();
         }
         if (alertness < 1) perceive();
     }

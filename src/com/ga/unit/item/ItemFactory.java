@@ -13,37 +13,41 @@ import com.ga.unit.skill.Stat;
  */
 public class ItemFactory {
     private enum FactoryWeapon{
-        Mace(4,-1,3,8, Item.Tag.Mace), Sword(3,600,2,6,Item.Tag.Sword), Stick1(1,10,1,6, Item.Tag.Mace), Stick2(1,10,1,6,Item.Tag.Spear), Stick3(1,10,1,6, Item.Tag.Sword),
-        Katana(2,100,1,12, Item.Tag.Sword), Spear(3,160,1,12,Item.Tag.Spear), Axe(3,100,1,12, Item.Tag.Sword), Dagger(1,80,1,6, Item.Tag.Dagger), Pick(4,100,1,24,Item.Tag.Sword), Cleaver(6,600,2,12, Item.Tag.Sword),
-        Halberd(6,100,1,36, Item.Tag.Spear), Greatsword(8,400,2,18, Item.Tag.Sword), Warhammer(10,-1,3,10,Item.Tag.Mace), Claw(1,200,2,3,Item.Tag.Claw),
-        Rifle(4,200,1,4, Item.Tag.Snipe), Pistol(2,30,1,2, Item.Tag.Shoot), Revolver(3,7,1,2, Item.Tag.Shoot);
-        private int damageNum, damageSides, weight, uses;
+        Mace(3,-1,2,8,0, Item.Tag.Mace), Broadsword(3,600,2,6,0,Item.Tag.Sword), Stick(2,10,1,6,2, Item.Tag.Mace), Wooden_Sword(2,100,1,8,1, Item.Tag.Mace),
+        Katana(3,100,1,12,1, Item.Tag.Sword), Spear(3,160,1,12,-3,Item.Tag.Spear), Axe(3,100,1,12,-2, Item.Tag.Sword), Dagger(1,80,1,8,3, Item.Tag.Dagger), Pick(4,100,1,12,-2,Item.Tag.Sword),
+        Cleaver(4,600,2,8,0, Item.Tag.Sword), Lancesword(1,100,1,6,0,Item.Tag.Spear), Cutlass(1,100,1,6,0,Item.Tag.Sword), Claymore(1,100,1,6,-1,Item.Tag.Sword),
+        Halberd(6,100,1,36,-5, Item.Tag.Spear), Greatsword(7,400,2,12,-3, Item.Tag.Sword), Warhammer(7,-1,3,8,-3,Item.Tag.Mace), Claw(1,200,3,4,4,Item.Tag.Claw),
+        Rifle(4,200,1,6,-3, Item.Tag.Snipe), Pistol(2,30,1,2,5, Item.Tag.Shoot), Revolver(3,7,1,2,0, Item.Tag.Shoot);
+        private int damageNum, damageSides, weight, uses, speed;
         private Item.Tag type;
-        FactoryWeapon(int weight, int uses, int dmgNum, int dmgSide, Item.Tag type){
+        FactoryWeapon(int weight, int uses, int dmgNum, int dmgSide, int speed, Item.Tag type){
             this.weight = weight;
             this.damageNum = dmgNum;
             this.damageSides = dmgSide;
             this.uses = uses;
+            this.speed = speed;
             this.type = type;
         }
     }
     private enum FactoryArmor{
-        Underwear(0, -1, 1, .3f),
-        Cotton_Clothing(0, 50, 1, .1f),
-        Fabric_Clothing(1, 100, 1, .1f),
-        Suit(1, 50, 2f, -.1f),
-        Leather_Armor(2, 500, 3f, -.1f),
-        Steel_Armor(2, 200, 4f, -.2f),
-        Chainmail(3, 200, 6f, -.2f),
-        Platemail(4, 200, 8, -.3f),
-        Shadowrobe(1, -1, 1, .2f);
+        Underwear(0, -1, 1, 0),
+        Cotton_Clothing(0, 50, 1, 1),
+        Suit(0, 50, 1f, 2),
+        Fabric_Clothing(1, 100, 1, 2),
+        Adventurewear(1, 100, 2, 0),
+        Leather_Armor(2, 500, 3f, 3),
+        Steel_Armor(2, 200, 4f, 5),
+        Chainmail(3, 200, 6f, 5),
+        Platemail(4, 200, 8, 8),
+        Shadowrobe(1, -1, 1, 0);
         private int weight, uses;
-        private float armor, comfort;
-        FactoryArmor(int weight, int uses, float armor, float comfort){
+        private float armor;
+        private int encumberance;
+        FactoryArmor(int weight, int uses, float armor, int encumberance){
             this.uses = uses;
             this.armor = armor;
             this.weight = weight;
-            this.comfort = comfort;
+            this.encumberance = encumberance;
         }
     }
     public static Item load(String p){
@@ -55,7 +59,7 @@ public class ItemFactory {
         return result;
     }
     public static Item produce(String p, int seed){
-        String t = p;//p.substring(0,1).toUpperCase()+p.substring(1).toLowerCase();
+        String t = p;
         for (FactoryWeapon w : FactoryWeapon.values()){
             if (w.name().equals(t)) return produceWeapon(w, seed);
         }
@@ -73,17 +77,26 @@ public class ItemFactory {
     }
     private static Weapon produceWeapon(FactoryWeapon wp, int seed) {
         Weapon r = new Weapon(wp.toString(), seed, wp.weight, wp.uses, wp.damageNum, wp.damageSides, wp.type);
+        r.speed = wp.speed;
         return r;
     }
     private static Armor produceArmor(FactoryArmor ar, int seed) {
-        Armor r = new Armor(ar.toString(), seed, ar.weight, ar.uses, ar.armor, ar.comfort);
+        Armor r = new Armor(ar.toString(), seed, ar.weight, ar.uses, ar.armor, ar.encumberance);
         return r;
     }
     private static Item produceItem(String p, int seed) {
         Item item;
         switch (p){
+            case "Blood": //amputated fist
+                item = new Item(p, seed, 0, -1, 1, 0){
+                    @Override
+                    public boolean use(final Man host){
+                        return false;
+                    }
+                };
+                break;
             case "Fist":
-                item = new Item(p, seed, 0, 1, 30, 1){
+                item = new Item(p, seed, 0, -1, 1, 0){
                     @Override
                     public boolean use(final Man host){
                         host.setState(Actions.Interact);

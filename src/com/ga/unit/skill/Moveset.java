@@ -7,7 +7,6 @@ public interface Moveset {
     String getName();
     String getCodeName();
     String getDescription();
-    String getStatReq();
 
     float getCost();
 

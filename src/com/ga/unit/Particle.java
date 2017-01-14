@@ -1,7 +1,6 @@
 package com.ga.unit;
 
 import com.ga.game.Settings;
-import com.ga.game.Texture;
 import com.ga.map.Global;
 import com.ga.tool.Line;
 import com.ga.tool.P;
@@ -26,13 +25,13 @@ public class Particle extends Thing implements Effect {
         explode("Blood",pt,new P(),3,1,0,true,3);
     }
     public static void dripFire(P pt){
-        explode("Fire",pt,new P(),3,1,0,true,3);
+        explode("Fire",pt,new P(0,-1),6,1,Settings.gravity,true,3);
     }
     public static void dripHoly(P pt){
         explode("Glare",pt,new P(),1,4,0,true,4);
     }
     public static void groundSlam(P pt){
-        explode("Dirt",pt,new P(0,-16),1,4,0,true,4);
+        explode("Dust",pt,new P(0,-16),1,4,0,true,4);
     }
     public static void explosion(P pt){
         explode("Smoke",pt,new P(0,-16),50,15,15,false,7);

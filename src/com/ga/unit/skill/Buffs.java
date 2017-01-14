@@ -172,4 +172,12 @@ public enum Buffs {
         this(effect, time, stat, buff);
         this.buffRel = buffRel;
     }
+    public static Buffs getByName(String p) {
+        for (Buffs s : values()) {
+            if (s.name().equals(p)){
+                return s;
+            }
+        }
+        return null;
+    }
 }

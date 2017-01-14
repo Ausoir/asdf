@@ -1,7 +1,7 @@
 package com.ga.unit;
 
 import com.ga.game.Observer;
-import com.ga.game.Texture;
+import com.ga.game.Picture;
 import com.ga.map.Drawable;
 import com.ga.tool.P;
 
@@ -11,7 +11,7 @@ import java.awt.*;
  * Created by Ga on 5/6/2016.
  */
 public class Thing implements Drawable, Observer {
-    public Texture image;
+    public Picture image;
     public P pos;
     protected int sizeRadius;
     public String name;
@@ -23,13 +23,13 @@ public class Thing implements Drawable, Observer {
         if (name != null) {
             setImage(name);
         } else {
-            image = new Texture();
+            image = new Picture();
             image.visible = false;
         }
         pos = new P();
     }
     public void setImage(String p){
-        image = new Texture(p);
+        image = new Picture(p);
     }
     public void rotate(P p){
         rotation = ((float) Math.atan2(p.y,p.x));

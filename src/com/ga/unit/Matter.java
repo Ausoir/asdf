@@ -32,7 +32,11 @@ public class Matter extends Thing implements Updatable {
     public int getDamage(){
         return 0;
     }
+    public boolean hittable(){
+        return true;
+    }
     public boolean checkHit(P p, int r){
+        if (!hittable()) return false;
         if (!tangible) return false;
         if (Math.pow(sizeRadius+r,2) - ((Math.pow(p.x-pos.x,2) + Math.pow(p.y-pos.y,2))) > 0) {
             return true;
@@ -40,6 +44,7 @@ public class Matter extends Thing implements Updatable {
         return false;
     }
     public boolean checkHit(Matter p, int r){
+        if (!hittable()) return false;
         if (p.faction != faction) {
             if (checkHit(p.pos,p.sizeRadius+r)) {
                 return true;
@@ -50,36 +55,52 @@ public class Matter extends Thing implements Updatable {
     public boolean checkHit(Matter hitter, Line p){
         return checkHit(hitter,0);
     }
+    public void attackDenied(){
+
+    }
     public void collide(){
-        P vp = pos.getAdd(vel);
-        Line pp = new Line(pos,vp);
-        for (Line i : Global.map.land){
-            if (i.lineCross(pp)){
-                if (i.opt != -1) {
-                    float slope = i.getSlope();
-                    float t = slope * vel.x;
-                    if (t < vel.y) {
-                        if (vel.x != 0 && t < 0) {
-                            float xforce = (float) Math.cos(Math.atan(slope));
-                            if (xforce < .1) {
-                                vel.set(0, 0);
-                                onCollide(i);
-                                return;
-                            } else {
-                                vel.x *= xforce*xforce;
-                            }
+        P vp;
+        Line pp;
+        boolean collided = true;
+        int timeout = 8;
+        while (collided) {
+            collided = false;
+            vp = pos.getAdd(vel);
+            pp = new Line(pos,vp);
+            for (Line i : Global.map.land) {
+                if (i.lineCross(pp)) {
+                    if (i.opt != -1) {
+                        float slope = i.getSlope();
+                        boolean cc = i.pt.x > i.ptd.x;
+                        float tangent = (float) Math.atan(slope);
+                        if ((cc && i.pt.y + (slope * (pos.x - i.pt.x)) < pos.y) || Math.abs(slope) > 4) {
+                            vel.set(0, 0);
+                            onCollide(i);
+                            return;
                         }
-                        vel.x *= .9f;
-                        vel.y = slope * vel.x;
-                        vel.y += (i.pt.y + (slope * (pos.x - i.pt.x)))-pos.y-1;
+                        vel.x += Global.sin(tangent) * Math.abs(vel.x);
+                        vel.y += (i.pt.y + (slope * (pos.x + vel.x - i.pt.x))) - (pos.y + vel.y) - 1;
                         onCollide(i);
-                    } else if (i.opt == 1) {
-                        vel.y = 0;
-                        onCollide(i);
+                        collided = true;
                     }
                 }
             }
+            timeout--;
+            if (timeout == 0){
+                System.out.println("TEST");
+                return;
+            }
         }
+    }
+    private boolean isInside(float x, float y){
+        Line pp = new Line((int)x,(int)y,999999,(int)y);
+        int num = 0;
+        for (Line i : Global.map.land){
+            if (i.lineCross(pp)){
+                num++;
+            }
+        }
+        return num % 2 == 1;
     }
     public void onCollide(Line l){
     }

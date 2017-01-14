@@ -45,10 +45,9 @@ public class UnitIntelligence extends Intelligence {
     @Override
     protected void think(){
         super.think();
-        if (host.get("Health").getPercentage() < .1f){
+        if (host.get("Health").getPercentage() < .15f){
             host.say("@flee");
             setTaskEcho(new Flee(host, target));
-        }
-        else if (getTask() instanceof Flee && target != null) setTaskEcho(new Hunt(host, target));
+        } else if (getTask() instanceof Flee && target != null) setTaskEcho(new Hunt(host, target));
     }
 }

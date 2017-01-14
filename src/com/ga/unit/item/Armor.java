@@ -1,5 +1,6 @@
 package com.ga.unit.item;
 
+import com.ga.game.Picture;
 import com.ga.unit.Man;
 
 /**
@@ -8,13 +9,14 @@ import com.ga.unit.Man;
 public class Armor extends Item {
     private float armor = 0;
     private float armorMod = 1;
-    public float comfortability = 0;
-    public Armor(String name, int seed, int weight, int uses, float armor, float comfort) {
+    public int encumberance = 0;
+    public Armor(String name, int seed, int weight, int uses, float armor, int encumberance) {
         super(name, seed, weight, uses, 100, .04f);
+        image = new Picture(name,0);
         setType(Tag.Armor);
         this.armor = armor;
         this.name = name;
-        comfortability = comfort;
+        this.encumberance = encumberance;
         delay = 80;
     }
     public float getArmor(){
@@ -29,7 +31,7 @@ public class Armor extends Item {
         else if (mod == PrefixMod.Legendary) armorMod = 2;
     }
     protected void setModifier(SpecialtyMod mod){
-        if (mod == SpecialtyMod.Comfortable) comfortability += admod.magnitude*.1f;
+        if (mod == SpecialtyMod.Comfortable) encumberance = Math.max(0,encumberance-admod.magnitude);
         else if (mod == SpecialtyMod.Tough) armorMod += .5f;
         else super.setModifier(mod);
     }

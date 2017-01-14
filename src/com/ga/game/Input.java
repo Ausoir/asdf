@@ -5,5 +5,5 @@ package com.ga.game;
  */
 public interface Input {
     void input(int mode, int x, int y);
-    void chat(String p);
+    void chat(String p, int x, int y);
 }

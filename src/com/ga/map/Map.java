@@ -1,6 +1,7 @@
 package com.ga.map;
 
 import com.ga.game.FileManager;
+import com.ga.game.Form;
 import com.ga.game.Settings;
 import com.ga.tool.Line;
 import com.ga.tool.P;
@@ -8,8 +9,10 @@ import com.ga.unit.Thing;
 import com.ga.unit.Updater;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
+import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * Created by Ga on 5/7/2016.
@@ -19,14 +22,16 @@ public class Map {
     public static Thing map;
     public static Thing fmap;
     public ArrayList<Line> land = new ArrayList<>();
+    public ArrayList<Form> landform = new ArrayList<>();
+    private HashMap<Form, ArrayList<Line>> formLines = new HashMap<>();
     public String[] maps;
     private MapEvent event;
-    public static final int magnify = 3;
+    public static final int magnify = 2;
     public Map(final String[] maps, P pt) {
         this.maps = maps;
         event = new MapEvent(maps[0]);
         final boolean noPanorama = maps[1].equals("None");
-        panorama = new Thing(noPanorama?null:maps[1], pt, 1) {
+        panorama = new Thing(maps[1], pt, 1) {
             private boolean none = noPanorama;
             @Override
             public void draw(Graphics2D g) {
@@ -34,7 +39,7 @@ public class Map {
                     g.setColor(Color.black);
                     g.fillRect(0,0, Settings.screenX, Settings.screenY);
                 } else {
-                    P t = Global.getRelPos(pos.x, pos.y).getMult(.1f, .1f);
+                    P t = new P(Global.getRelX()+pos.x, Global.getRelY()+pos.y).mult(.1f);
                     t.x = Global.clamp(t.x, -image.size.x + Settings.screenX, 0);
                     t.y = Global.clamp(t.y, -image.size.y + Settings.screenY, 0);
                     g.drawImage(image.getImage(), (int) (t.x), (int) (t.y), (int) image.size.x, (int) image.size.y, null);
@@ -44,27 +49,29 @@ public class Map {
         if (!noPanorama) {
             panorama.image.size.mult(magnify, magnify);
             panorama.pos = panorama.pos.getAdd(500, 0);
-        }
+        } else panorama.image.visible = false;
         map = new Thing(maps[2], pt, 2){
             public void draw(Graphics2D g){
-                P t = Global.getRelPos(pos.x,pos.y);
-                t.x = Global.clamp(t.x,(-image.size.x)+Settings.screenX,0);
-                t.y = Global.clamp(t.y,(-image.size.y)+Settings.screenY,0);
-                g.drawImage(image.getImage(),(int)t.x,(int)t.y,(int)image.size.x,(int)image.size.y,null);
+                g.setTransform(AffineTransform.getTranslateInstance(Global.getRelX(),Global.getRelY()));
+                g.drawImage(image.getImage(),(int)pos.x,(int)pos.y,(int)image.size.x,(int)image.size.y,null);
             }
         };
-        map.image.size.mult(magnify,magnify);
-        if (!maps[3].equals("None")) {
-            fmap = new Thing(maps[3], pt, 30) {
-                public void draw(Graphics2D g) {
-                    P t = Global.getRelPos(pos.x, pos.y);
-                    t.x = Global.clamp(t.x, (-image.size.x) + Settings.screenX, 0);
-                    t.y = Global.clamp(t.y, (-image.size.y) + Settings.screenY, 0);
-                    g.drawImage(image.getImage(), (int) t.x, (int) t.y, (int) image.size.x, (int) image.size.y, null);
-                }
-            };
-            fmap.image.size.mult(magnify, magnify);
+        if (maps[2].equals("None")){
+            map.image.visible = false;
+            map.image.size.set(Settings.screenX, Settings.screenY);
         }
+        else map.image.size.mult(magnify,magnify);
+        fmap = new Thing(maps[3], pt, 30) {
+            public void draw(Graphics2D g) {
+                for (Form i : landform){
+                    i.draw(g);
+                }
+                g.setTransform(AffineTransform.getTranslateInstance(Global.getRelX(),Global.getRelY()));
+                g.drawImage(image.getImage(),(int)pos.x,(int)pos.y,(int)image.size.x,(int)image.size.y,null);
+            }
+        };
+        if (maps[3].equals("None")) fmap.image.visible = false;
+        else fmap.image.size.mult(magnify, magnify);
     }
     public int getHeight(){
         return (int) map.image.size.y;
@@ -81,14 +88,6 @@ public class Map {
         if (land.size() == 0) return result;
         for (Line i : land){
             if (!i.equals("")){
-                if (i.pt.x > i.ptd.x){
-                    float t = i.pt.x;
-                    i.pt.x = i.ptd.x;
-                    i.ptd.x = t;
-                    t = i.pt.y;
-                    i.pt.y = i.ptd.y;
-                    i.ptd.y = t;
-                }
                 result += i+";";
             }
         }
@@ -119,28 +118,52 @@ public class Map {
     }
 
     public void setShader() {
-        BufferedImage image = map.image.getImage();
-        for (Line i : land){
-            int origX = (int) (i.pt.x/magnify);
-            int origY = (int) (i.pt.y/magnify);
-            int x = origX;
-            int x2 = (int) (i.ptd.x/magnify);
-            if (origX > x2){
-                x = x2;
-                x2 = origX;
-            }
-            for (int ix = x; ix < x2; ix++){
-                int ty = origY+(int)((ix-origX)*i.getSlope());
-                for (int iy = 0; iy < 20; iy++) {
-                    int rgb = image.getRGB(ix, ty+iy);
-                    int alpha = (rgb & 0xff000000) >>> 24;
-                    int shadeMag = -(21-iy);
-                    int red = Math.max(((rgb & 0xff0000) >>> 16)+shadeMag, 0);
-                    int green = Math.max(((rgb & 0xff00) >>> 8)+shadeMag, 0);
-                    int blue = Math.max(((rgb & 0xff))+shadeMag, 0);
-                    image.setRGB(ix, ty + iy, new Color(red, green, blue, alpha).getRGB());
+        for (Form i : landform){
+            ArrayList<Line> t = formLines.get(i);
+            for (Line ii : t){
+                int origX = (int) (ii.pt.x-i.pos.x);
+                int origY = (int) (ii.pt.y-i.pos.y);
+                int x2 = (int) (ii.ptd.x-i.pos.x);
+                for (int ix = origX; ix < x2; ix++) {
+                    int ty = origY + (int) ((ix - origX) * ii.getSlope());
+                    for (int iy = 0; iy < 24; iy++) {
+                        try {
+                            int rgb = i.image.getRGB(ix, ty + iy);
+                            int shadeMag = -(50 - (iy*2));
+                            int alpha = (rgb & 0xff000000) >>> 24;
+                            int red = Math.max(((rgb & 0xff0000) >>> 16) + shadeMag, 0);
+                            int green = Math.max(((rgb & 0xff00) >>> 8) + shadeMag, 0);
+                            int blue = Math.max(((rgb & 0xff)) + shadeMag, 0);
+                            i.image.setRGB(ix, ty + iy, new Color(red, green, blue, alpha).getRGB());
+                        }catch(Exception e){
+                            e.printStackTrace();
+                        }
+                    }
                 }
             }
+        }
+    }
+
+    public void setTexture(){
+        HashMap<Integer, Form> hashmap = new HashMap<>();
+        for (Line i : land){
+            if (i.next >= 0){
+                Form form = hashmap.get(i.next);
+                if (form == null){
+                    form = new Form("Dirt");
+                    hashmap.put(i.next, form);
+                }
+                if (formLines.get(form) == null) formLines.put(form, new ArrayList<Line>());
+                formLines.get(form).add(i);
+                form.addPoint(i.pt.x, i.pt.y);
+            }
+        }
+        Iterator it = hashmap.entrySet().iterator();
+        while (it.hasNext()) {
+            java.util.Map.Entry pair = (java.util.Map.Entry) it.next();
+            Form form = (Form) pair.getValue();
+            form.render();
+            landform.add(form);
         }
     }
 

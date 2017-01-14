@@ -1,12 +1,16 @@
 package com.ga.unit;
 
 import com.ga.map.Global;
+import com.ga.tool.P;
 import com.ga.tool.Timer;
 import com.ga.unit.skill.Buffs;
 import com.ga.unit.skill.Spell;
 import com.ga.unit.skill.Stat;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Created by Ga on 8/1/2016.
@@ -16,14 +20,9 @@ public class Stats {
     private ArrayList<Timer> effectTimes = new ArrayList<>();
     private ArrayList<int[]> effectLevels = new ArrayList<>();
     private ArrayList<Spell> effectEffects = new ArrayList<>();
-    private HashMap<String, Stat> stats = new HashMap<String, Stat>(){{
-        put("Health", new Stat(Math.abs(Global.nextGaussian(50))+15));
-        put("Speed", new Stat((int) (Global.rng(50)+Global.r.nextInt(30)+50)));
-        put("Stamina", new Stat(3));
-        put("Energy", new Stat(3));
-        put("Proficiency", new Stat(1));
-    }};
-    private Timer timer = new Timer(75, true);
+    private HashMap<String, Stat> stats = new HashMap<>();
+    private Timer timer = new Timer(25, true);
+    private Timer bloodTimer = new Timer(-1, true);
     private Unit host;
     public Stats(Unit host){
         this.host = host;
@@ -99,15 +98,14 @@ public class Stats {
     public void unrest(){
         timer.reset();
     }
-    public void rest(float mag){
+    public boolean rest(int mag){
         if (timer.update()){
-            Stat arm = stats.get("Stamina");
-            Stat leg = stats.get("Energy");
             if (mag > 0) {
-                arm.add(Math.round(arm.getByPercentage(mag)));
-                leg.add(Math.round(leg.getByPercentage(mag)));
+                stats.get("Stamina").add(mag);
+                return stats.get("Stamina").isFull();
             }
         }
+        return false;
     }
     public void update(){
         for (int i = 0; i < effects.size(); i++) {
@@ -115,16 +113,36 @@ public class Stats {
                 endEffect(effects.get(i));
             }
         }
+        if (bloodTimer.update()) Particle.explode("Blood",host.pos.getAdd(0,-40),new P(),Global.r.nextInt(4),5,0,true,24);
     }
     public void load(String p){
-        String[] data = p.split("&");
+        String[] statOrBuff = p.split("/");
+        String[] data = statOrBuff[0].split("&");
         for (int i=0;i<data.length;i++){
             String[] pair = data[i].split(":");
             Stat newstat = new Stat(pair[1]);
+            if (pair[0].equals("Health")) newstat = new Stat(pair[1]){
+                public void onChange(){
+                    if (isFull()) bloodTimer.set(-1);
+                    else bloodTimer.set((int) (getPercentage()*getPercentage()*100)+1, true);
+                }
+            };
             newstat.add(0);
-            Stat oldstat = stats.get(pair[0]);
-            if (oldstat != null) newstat.onChange = oldstat.onChange;
             stats.put(pair[0], newstat);
+            newstat.onChange();
+        }
+        if (statOrBuff.length > 1) {
+            data = statOrBuff[1].split(";");
+            for (int i = 0; i < data.length; i++) {
+                String[] t = data[i].split("&");
+                Buffs buff = Buffs.getByName(t[0]);
+                addEffect(buff,Integer.parseInt(t[2]));
+                effectTimes.get(effectTimes.size()-1).load(t[1]);
+                if (buff.stat != null) {
+                    if (buff.buffRel != null) stats.get(buff.stat).add(-Math.round(buff.buff * stats.get(buff.buffRel).getMax()));
+                    else stats.get(buff.stat).add(-(int) buff.buff);
+                }
+            }
         }
     }
     public String toString(){
@@ -134,7 +152,12 @@ public class Stats {
             Map.Entry pair = (Map.Entry)it.next();
             result += pair.getKey() + ":" + pair.getValue()+"&";
         }
-        result = result.substring(0,result.length()-1);
-        return result;
+        result = result.substring(0,result.length()-1)+"/";
+        for (int i=0;i<effects.size();i++){
+            result += effects.get(i).name()+"&";
+            result += effectTimes.get(i)+"&";
+            result += effectLevels.get(i)[0]+";";
+        }
+        return result.substring(0,result.length()-1);
     }
 }

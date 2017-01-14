@@ -46,7 +46,10 @@ public class Hunt implements Task {
             if (host.rand.nextFloat() < .1f) host.get("Stamina").heal();
             host.setState(Skills.Rest);
         } else if (dist <= -10) {
-            host.performMoveset("Melee");
+            if (host.performMoveset("Melee") == 2){
+                host.setState(Skills.Rest);
+                host.delay.time += 28;
+            }
         } else if (dist > 200 && dist < 600) {
             host.target = target.pos.getSubtract(host.pos).add(0, -30);
             if (host.performMoveset("Range") == 0) host.delay.time += 20;

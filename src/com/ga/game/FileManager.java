@@ -101,7 +101,7 @@ public class FileManager {
                 for (int i = 0; i < values.length; i++) {
                     v[i] = Integer.parseInt(values[i]);
                 }
-                Global.map.land.add(new Line(v[0], v[1], v[2], v[3], v[4]));
+                Global.map.land.add(new Line(v[0], v[1], v[2], v[3], v[4], v[5]));
             }
             if (line.length > 2) {
                 sections = line[2].split(";");
@@ -125,6 +125,8 @@ public class FileManager {
                 }
             }
         }
+        Global.map.setTexture();
+//        Global.map.setShader();
         if (r == null) System.out.println("Invalid Player Spawn Location");
         return r;
     }

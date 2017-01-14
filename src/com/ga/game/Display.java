@@ -7,6 +7,7 @@ import com.ga.unit.Updater;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.Rectangle2D;
 
 /**
  * Created by Ga on 5/6/2016.
@@ -48,7 +49,7 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
         chatbox.addKeyListener(new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e){
-                if (chatbox.getText().length() > 1024) e.consume();
+                if (chatbox.getText().length() > 256) e.consume();
             }
             @Override
             public void keyPressed(KeyEvent e) {
@@ -63,20 +64,26 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
         shop = new Shop();
         add(shop);
         Global.weather = new Weather();
+
+        new Timer(25, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                repaint();
+            }
+        }).start();
     }
 
     private void chat(){
         String text = chatbox.getText();
         requestFocus();
         chatbox.setText("");
-        input.chat(text);
+        input.chat(text, (int) (mX-Settings.centerX+Global.camera.x), (int) (mY-Settings.centerY+Global.camera.y));
     }
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g.create();//.getDrawGraphics();
         Updater.draw(g2);
-        repaint();
     }
 
     private void input(int mode){

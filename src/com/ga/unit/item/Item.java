@@ -286,7 +286,7 @@ public class Item extends Matter {
             if (uses.get() != -1) uses.add(-1);
             host.setState(action);
             if (emod != null && rand.nextFloat() < getProbability()){
-                emod.getEvent().start(host, ademod.level);
+                emod.getEvent().start(host, ademod.level*3);
                 emod.getEvent().perform();
             }
             return true;

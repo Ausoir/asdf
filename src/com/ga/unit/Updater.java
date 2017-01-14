@@ -109,6 +109,7 @@ public class Updater {
         for (Drawable i : drawee) i.draw(g2);
         if (editor || showTerrain){
             g2.setColor(landColor);
+            g2.setStroke(new BasicStroke(10));
             for (Line i : Global.map.land) i.draw(g2,new P());
         }
     }

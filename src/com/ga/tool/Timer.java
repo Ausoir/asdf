@@ -7,6 +7,9 @@ public class Timer {
     public int max;
     public int time;
     public boolean repeat = false;
+    public Timer(String p){
+        load(p);
+    }
     public Timer(int time, boolean repeat){
         set(time, repeat);
     }
@@ -29,6 +32,15 @@ public class Timer {
     }
     public boolean over(){
         return time == 0;
+    }
+    public String toString(){
+        return time+","+max+","+(repeat?"*":"1");
+    }
+    public void load(String p){
+        String[] t = p.split(",");
+        time = Integer.parseInt(t[0]);
+        max = Integer.parseInt(t[1]);
+        repeat = t[2].equals("*");
     }
     public boolean update(){
         if (over()){

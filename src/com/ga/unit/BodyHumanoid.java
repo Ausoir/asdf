@@ -1,5 +1,6 @@
 package com.ga.unit;
 
+import com.ga.map.Global;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Moveset;
 import com.ga.unit.skill.Skills;
@@ -15,12 +16,19 @@ public class BodyHumanoid extends Body {
     }
 
     @Override
+    public void setSkin(String p){
+        if (p.equals("Man_skin")) super.setSkin("Underwear");
+        else super.setSkin(p);
+    }
+
+    @Override
     public void setState(Moveset state) {
         if (state instanceof Actions) {
             switch ((Actions) state) {
                 case Interact:
                     rotateAppendage(FIST, 15);
                     rotateAppendage(BODY, 15);
+                    localAnimation[15][BODY][0] = (int) Global.clamp(localAnimation[15][BODY][0],-15,15);
                     localAnimation[15][BODY][1] = Math.min(0,localAnimation[15][BODY][1]);
                     break;
                 case Cast:

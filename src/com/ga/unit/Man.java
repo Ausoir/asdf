@@ -30,6 +30,16 @@ public class Man extends Unit {
     public Man(String p){
         super(p);
         clip = new BodyHumanoid(this);
+        final Man me = this;
+        clip.organs[FIST].onAmputate = new Performer(){
+            public boolean perform(){
+                if (me.weapon.getOrgan().amputated){
+                    me.weapon.drop(me);
+                    me.setWeapon(ItemFactory.produce("Fist",0));
+                }
+                return true;
+            }
+        };
         speechType = faction.name().toLowerCase();
         String[] t = p.split("@");
         setWeapon(ItemFactory.load(t[6]));
@@ -39,8 +49,8 @@ public class Man extends Unit {
         } else if (faction != Faction.Player && faction != Faction.Player2) {
             brain = new UnitIntelligence(this);
             brain.setComm(new Communication());
-            if (!wieldingNone()) moveset.put("Melee",new Moveset[]{Kick, Use, Swing, Pierce, Sidekick, Jump});
             moveset.put("Range",new Moveset[]{Spells.Stun, Spells.Fireball, Spells.Fireblast});
+            moveset.put("Melee",new Moveset[]{Skills.Swing, Skills.Dash, Skills.Pierce, Skills.Slash});
             moveset.put("Random",new Moveset[]{Spells.Haste});
         }
     }
@@ -69,20 +79,7 @@ public class Man extends Unit {
     public void setArmor(Armor p){
         if (p == null) p = (Armor) ItemFactory.produce("Underwear",0);
         armor = p;
-        if (!equippingNone()) {
-            clip.organs[0].setImage("item/armor/"+p.name + "_skin",2);
-            clip.organs[1].setImage("item/armor/"+p.name + "_skin",1);
-            clip.organs[2].setImage("item/armor/"+p.name + "_skin",1);
-            clip.organs[3].setImage("item/armor/"+p.name + "_skin",0);
-            clip.organs[4].setImage("item/armor/"+p.name + "_skin",2);
-        } else {
-            clip.organs[0].setImage("unit/Man_skin",2);
-            clip.organs[1].setImage("unit/Man_skin",1);
-            clip.organs[2].setImage("unit/Man_skin",1);
-            clip.organs[3].setImage("unit/Man_skin",0);
-            clip.organs[4].setImage("unit/Man_skin",2);
-            clip.organs[5].setImage(name);
-        }
+        clip.setSkin(p.name);
     }
 
     public boolean wieldingNone(){ return weapon == null || weapon.name.equals("Fist"); }
@@ -113,21 +110,21 @@ public class Man extends Unit {
     protected void actionSet(Moveset state, int level){
         super.actionSet(state, level);
         if (state instanceof Skills) {
-            int speed = weapon.speed;
+            int speed = weapon.speed-armor.encumberance;
             damageType = weapon.damageType;
             switch ((Skills) state) {
                 case Use:
-                    weapon.use(this);
+                    if (!clip.organs[FIST].amputated) weapon.use(this);
                     return;
                 case Duck:
                     cooldown.put(state,new int[]{Global.getTime()[0]+(getStatPenalty()*4)});
                     break;
                 case Sidekick:
-                    speed = 0;
+                    speed = armor.speed;
                     damageType = DamageType.Bash;
                     break;
                 case Kick:
-                    speed = 0;
+                    speed = armor.speed;
                     damageMod = 3;
                     damageType = DamageType.Push;
                     break;
@@ -178,7 +175,7 @@ public class Man extends Unit {
             }
             delay.set(Math.max(3, delay.time - speed));
             clip.setSpeed(speed);
-        }
+        } else if (state instanceof Spells) weapon.rotation = target.getAtan()+(dir<0?-3.14f:0);
     }
 
     public boolean face(int dir) {
@@ -211,13 +208,6 @@ public class Man extends Unit {
         target = hitter.pos.getAdd(0,0);
         armor.use(this);
         boolean r = super.hit(hitter, damage, type);
-        if (weapon.getOrgan().amputated){
-            Item wpn = weapon;
-            setWeapon(null);
-            wpn.pos = new P(pos);
-            wpn.field();
-            wpn.gravity = false;
-        }
         return r;
     }
 
@@ -243,7 +233,7 @@ public class Man extends Unit {
         hit = Updater.collide(this, hitbox, cleave);
         if (hit != null){
             if (state == Underhand){
-                cooldown.put(state,new int[]{Global.getTime()[0]+24});
+                get("Stamina").add(4);
             }
             if (brain != null) brain.attacked();
             if (stats.triggerEffect(Buffs.Empower)){
@@ -251,6 +241,26 @@ public class Man extends Unit {
                 Particle.explode("Fire",hitbox.ptd,new P(),30,8,0,false,3);
             }
         }
+    }
+
+    @Override
+    public void attackDenied(){
+        weapon.dir *= -1;
+    }
+
+    @Override
+    public boolean checkHit(Matter hitter, Line p){
+        if (state == Skills.Guard) {
+            if (faction.canAttack(hitter.faction)) {
+                if (hittable()) {
+                    if (p.lineCross(weapon.getLine())) {
+                        hitter.attackDenied();
+                        return false;
+                    }
+                }
+            }
+        }
+        return super.checkHit(hitter, p);
     }
 
     @Override
@@ -288,7 +298,7 @@ public class Man extends Unit {
                                     remove();
                                 }
                             };
-                            p.setImage(weapon.name);
+                            p.image = weapon.image;
                             p.rotSpeed = .03f;
                             p.faction = faction;
                             p.damage = getDamage()+weapon.weight;
@@ -344,6 +354,9 @@ public class Man extends Unit {
         super.stateUpdate();
         if (state instanceof Skills) {
             switch ((Skills) state){
+                case Guard:
+                    weapon.rotation = target.getAtan()+(dir<0?-3.14f:0);
+                    break;
                 case Swing:
                     if (delay.time <= 25 && delay.time > 12) {
                         int t = 25 - delay.time;
@@ -369,29 +382,10 @@ public class Man extends Unit {
         }
     }
 
-    public void drawDebug(Graphics2D g) {
-        g.setColor(Color.white);
-        P fist = clip.organs[FIST].ptd.getAdd(pos);
-        P foot = clip.organs[clip.FOOT].ptd.getAdd(pos);
-        P t = Global.getRelPos((int) (clip.organs[0].pt.x + pos.x), (int) (clip.organs[0].pt.y + pos.y));
-//        g.drawArc((int)(t.x-(size.x/2)), (int) (t.y-(size.y/2)), (int)size.x, (int)size.y, 0, 360);
-        t = Global.getRelPos((int) fist.x, (int) fist.y);
-        g.drawArc((int) t.x, (int) t.y, 3, 3, 0, 360);
-        t = Global.getRelPos((int) foot.x, (int) foot.y);
-        g.drawArc((int) t.x, (int) t.y, 3, 3, 0, 360);
-        g.setColor(Color.red);
-        t = Global.getRelPos((int) weapon.getPoint().x, (int) weapon.getPoint().y);
-        g.drawArc((int) t.x, (int) t.y, 3, 3, 0, 360);
-        g.setColor(Color.blue);
-        t = Global.getRelPos((int) (pos.x), (int) (pos.y));
-        g.drawArc((int) t.x, (int) t.y, 5, 5, 0, 360);
-    }
-
     @Override
     public void draw(Graphics2D g) {
         weapon.draw(g);
         super.draw(g);
-//        drawDebug(g);
     }
 
     public Armor getArmor() {

@@ -1,8 +1,9 @@
 package com.ga.unit;
 
-import com.ga.game.Texture;
+import com.ga.game.Picture;
 import com.ga.tool.Line;
 import com.ga.tool.P;
+import com.ga.tool.Performer;
 import com.ga.unit.item.FlyingOrgan;
 
 import java.awt.*;
@@ -13,7 +14,7 @@ import java.util.ArrayList;
  */
 public class Organ extends Line {
     public int strokeSize = 10;
-    protected Texture image;
+    protected Picture image;
     protected boolean amputated = false;
     public Matter host;
     protected Organ parent;
@@ -23,6 +24,7 @@ public class Organ extends Line {
     public int health = 1;
     protected boolean vital = false;
     protected boolean leg = false;
+    public Performer onAmputate = new Performer();
 
     public Organ(Organ p, boolean tip){
         parent = p;
@@ -34,15 +36,15 @@ public class Organ extends Line {
         ptd = new P();
     }
     public void setImage(String p){
-        image = new Texture(p);
+        image = new Picture(p);
     }
     public void setImage(String p, int index){
-        image = new Texture(p, index);
+        image = new Picture(p, index);
         image.size.x = strokeSize;
         image.size.y = 0;
-        image.setShader(Texture.Shader.XYLinearGradient);
+        image.setShader(Picture.Shader.XYLinearGradient);
     }
-    public Texture getImage(){
+    public Picture getImage(){
         return image;
     }
     public void setSize(int size){
@@ -67,6 +69,7 @@ public class Organ extends Line {
             }
             amputated = true;
             for (Organ i : children) i.hit(p, 999, type);
+            onAmputate.perform();
             return true;
         } else ptd.add(p.getAtan(16));
         return false;

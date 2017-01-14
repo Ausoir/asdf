@@ -14,14 +14,13 @@ public class BeastFactory {
         Dog(Faction.Evil, 10,30,10,10,3),
         Spider(Faction.Evil, 10,30,10,10,3),
         Mantis(Faction.Evil, 100,40,10,10,3);
-        int health,speed,stamina,energy,proficiency;
+        int health,speed,stamina,proficiency;
         Faction faction;
         Type(Faction faction, int hp, int spd, int arm, int leg, int prof){
             this.faction = faction;
             this.health = hp;
             this.speed = spd;
             this.stamina = arm;
-            this.energy = leg;
             this.proficiency = prof;
         }
         Beast get(String p){
@@ -29,7 +28,6 @@ public class BeastFactory {
             switch (this){
                 case Dog:
                     r = new Beast(p);
-                    r.shadow.offset.set(15,0);
                     break;
                 case Mantis:
                     r = new Beast(p);
@@ -41,7 +39,7 @@ public class BeastFactory {
             return r;
         }
         Beast get(int seed, P p){
-            String stat = "Stamina:"+stamina+"&Speed:"+speed+"&Energy:"+energy+"&Proficiency:"+proficiency+"&Health:"+health;
+            String stat = "Stamina:"+stamina+"&Speed:"+speed+"&Proficiency:"+proficiency+"&Health:"+health;
             String t = name()+"@"+seed+"@"+p+"@"+Updater.getId()+"@"+stat+"@"+faction.name();
             return get(t);
         }

@@ -31,6 +31,7 @@ public class Body {
     protected int BODY, FOOT;
     protected int legNum = 0, legCurrent = 0;
     protected float appendageSize = 1;
+    public P size;
 
     Body(Unit host, String current) {
         this.host = host;
@@ -39,9 +40,17 @@ public class Body {
         appendageSize = (float) Math.abs(host.rand.nextGaussian()*.3f)+.7f;
         randomize();
         organs[BODY].pt.y = -localAnimation[0][FOOT][1];
+        setSkin(current+"_skin");
+    }
+
+    public void setSkin(String p){
+        for (int i=0;i<organs.length;i++){
+            if (organs[i].type != 0) organs[i].setImage(p,organs[i].type-1);
+        }
     }
 
     protected void setProperties(int[][] p){
+        int hpPool = 0;
         for (int i=0;i<organs.length;i++){
             organs[i].setSize(p[1][i]);
             if (p[2][i] == 1) organs[i].vital = true;
@@ -52,8 +61,12 @@ public class Body {
                 legCurrent++;
             }
             organs[i].health = p[3][i];
+            hpPool += p[3][i];
         }
-        host.shadow.shadowSize.x = p[0][0];
+        for (int i=0;i<organs.length;i++){
+            organs[i].health = (int)(((float) organs[i].health / hpPool)*host.get("Health").get());
+        }
+        size = new P(p[0][0], p[0][1]);
     }
 
     private void reset(String name, Clip p) {
@@ -90,7 +103,6 @@ public class Body {
             if (model[p].length > 1){
                 organs[p].type = Integer.parseInt(model[p][1]);
                 if (model[p].length > 2) organs[p].setImage(model[p][2]);
-                else if (organs[p].type != 0) organs[p].setImage(name+"_skin", organs[p].type-1);
             }
         }
     }
@@ -128,6 +140,10 @@ public class Body {
 
     public void setSpeed(int p){
         frame.set(Math.max(1, frame.time-p));
+    }
+    public void setMoveSpeed(int p){
+        int[] t = animation.get(Actions.WalkL);
+        for (int i : t) localFrames[i] = Math.max(1, clip.frames[i]-p);
     }
 
     void setClip() {

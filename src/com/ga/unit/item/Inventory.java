@@ -12,7 +12,6 @@ public class Inventory {
     public int weight = 0;
     private Player player;
     public int maxSize = 5;
-    public int wielded = -1;
     public Inventory(Player player){
         this.player = player;
     }
@@ -24,7 +23,6 @@ public class Inventory {
     }
     public boolean sheathe(Item p){
         boolean r = addItem(p);
-        wielded = -1;
         return r;
     }
     public boolean vacant(){
@@ -49,9 +47,7 @@ public class Inventory {
     }
     public void load(String p){
         if (p.equals(";")) return;
-        String[] wield = p.substring(1).split("]");
-        wielded = Integer.parseInt(wield[0]);
-        String[] data = wield[1].split(";");
+        String[] data = p.substring(1).split(";");
         for (int i=0;i<data.length;i++){
             Item item = ItemFactory.load(data[i]);
             weight += item.weight;
@@ -59,7 +55,7 @@ public class Inventory {
         }
     }
     public String toString(){
-        String r = ";"+wielded+"]";
+        String r = ";";
         for (int i = 0; i < items.size(); i++) {
             Item item = items.get(i);
             r += item.toItemString()+";";

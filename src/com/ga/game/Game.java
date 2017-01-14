@@ -24,7 +24,7 @@ public class Game extends JFrame {
         setSize(Settings.screenX, Settings.screenY);
         JPanel display = new Display();
         Clips.init();
-        Texture.init();
+        Picture.init();
         Global.server = new Server();
         Global.server.start();
         FileManager.loadFirst(editor);

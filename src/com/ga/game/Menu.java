@@ -34,7 +34,7 @@ public class Menu extends JPanel {
     private Image image;
     public Menu() {
         setLayout(new GridBagLayout());
-        image = Texture.load("Menu");
+        image = Picture.load("Menu");
         setBorder(new EmptyBorder(100,140,100,140));
         size = new P(image.getWidth(null), image.getHeight(null));
         resize();
@@ -160,9 +160,9 @@ class StatPanel extends JPanel{
         statgrid.ipady = 20;
         statgrid.gridx = 0;
         statgrid.gridy = 0;
-        makeStatButton("Damage - ", null);
-        makeStatButton("Strength - ", null);
+        makeStatButton("Proficiency - ", null);
         makeStatButton("Stamina - ", null);
+        makeStatButton("Endurance - ", null);
         makeStatButton("Memory - ", null);
         makeStatButton("Reset Points - ", null);
         makeStatButton("Level Points - ", null);
@@ -171,27 +171,27 @@ class StatPanel extends JPanel{
         statgrid.gridy = 0;
         makeStatButton("[+]", "level@Proficiency");
         makeStatButton("[+]", "level@Stamina");
-        makeStatButton("[+]", "level@Energy");
+        makeStatButton("[+]", "level@Endurance");
         makeStatButton("[+]", "level@Memory");
         statgrid.gridx = 2;
         statgrid.gridy = 0;
         makeStatButton("[-]", "delevel@Proficiency");
         makeStatButton("[-]", "delevel@Stamina");
-        makeStatButton("[-]", "delevel@Energy");
+        makeStatButton("[-]", "delevel@Endurance");
         makeStatButton("[-]", "delevel@Memory");
         statgrid.gridx = 3;
         statgrid.gridy = 0;
 //        statgrid.insets = new Insets(0,0,0,240);
         makeStatButton("[?]", "say@increases minimum/maximum damage by 1.");
-        makeStatButton("[?]", "say@increases Stamina by 1. Stamina recovers by 10% when idling or 50% when resting.");
-        makeStatButton("[?]", "say@increases Energy by 1. Energy recovers by 10% when idling or 50% when resting.");
+        makeStatButton("[?]", "say@increases Stamina by 1. Stamina recovers by 4 when resting.");
+        makeStatButton("[?]", "say@increases Endurance by 100. Endurance recovers by sleeping.");
         makeStatButton("[?]", "say@increases Memory by 1. Each point can be used to learn with a Manual or a Spellbook. They can also be used to level up a Spell or Spell at the Spells menu.");
     }
     protected void refresh(){
         Player player = Global.player.host;
         ((JButton)getComponent(0)).setText("Proficiency - "+player.get("Proficiency").getMax());
         ((JButton)getComponent(1)).setText("Stamina - "+player.get("Stamina").getMax());
-        ((JButton)getComponent(2)).setText("Energy - "+player.get("Energy").getMax());
+        ((JButton)getComponent(2)).setText("Endurance - "+player.get("Endurance").getMax());
         ((JButton)getComponent(3)).setText("Memory - "+player.get("Memory").getMax());
         ((JButton)getComponent(4)).setText("Reset Points - "+player.get("Reset Points").get());
         ((JButton)getComponent(5)).setText("Level Points - "+player.get("Level Points").get());
@@ -355,7 +355,7 @@ class InventoryPanel extends JPanel {
         options.setOpaque(false);
         options.setLayout(new BoxLayout(options,BoxLayout.LINE_AXIS));
         final JLabel describe = new JLabel();
-        describe.setIcon(new ImageIcon(Texture.load("Describe")));
+        describe.setIcon(new ImageIcon(Picture.load("Describe")));
         describe.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -370,7 +370,7 @@ class InventoryPanel extends JPanel {
                     drop(item);
                 }
             });
-            drop.setIcon(new ImageIcon(Texture.load("Drop")));
+            drop.setIcon(new ImageIcon(Picture.load("Drop")));
         }
         drop.setForeground(item.getRarityColor());
         options.add(describe);

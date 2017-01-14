@@ -16,6 +16,10 @@ public class MainPlayer extends Player {
     @Override
     public void say(String p){
         Display.menu.setVisible(false);
+        if (p.startsWith("'") && p.endsWith("'")){
+            memorized = p.substring(1,p.length()-1);
+            p = "Memorized "+p;
+        }
         super.say(p);
     }
     @Override
@@ -23,7 +27,8 @@ public class MainPlayer extends Player {
         if (state != Actions.Idle && state != Actions.Wait) {
             Display.shop.setVisible(false);
             Display.dialog.setVisible(false);
-            if (!(state instanceof Actions) || !((Actions)state).isLooker()) Global.cameraTo = pos;
+            if (state == Actions.Recall) say(memorized);
+            else if (!(state instanceof Actions) || !((Actions)state).isLooker()) Global.cameraTo = pos;
         }
         return super.setState(state);
     }

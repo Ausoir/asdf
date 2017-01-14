@@ -22,11 +22,10 @@ import java.util.Map;
 public class PlayerInput implements Input {
     private HashMap<Integer, Moveset> keyMap = new HashMap<Integer, Moveset>(){{
         put(-1, Actions.Idle);
-        put(KeyEvent.VK_W, Actions.Wait);
+        put(KeyEvent.VK_W, Actions.Interact);
         put(KeyEvent.VK_A, Actions.WalkL);
         put(KeyEvent.VK_S, Actions.Down);
         put(KeyEvent.VK_D, Actions.WalkR);
-        put(KeyEvent.VK_F, Skills.Kick);
         put(KeyEvent.VK_R, Actions.Sheathe);
         put(49, Actions.Pull1);
         put(50, Actions.Pull2);
@@ -37,6 +36,7 @@ public class PlayerInput implements Input {
         put(KeyEvent.VK_DOWN, Actions.LookDown);
         put(KeyEvent.VK_RIGHT, Actions.LookRight);
         put(KeyEvent.VK_SHIFT, Skills.Rest);
+        put(KeyEvent.VK_BACK_QUOTE, Actions.Recall);
     }};
     public Player host;
     public int moving = 0;
@@ -45,24 +45,30 @@ public class PlayerInput implements Input {
         unit.brain = null;
         unit.input = this;
     }
-    public void chat(String p){
+    public void chat(String p, int x, int y){
         if (p.startsWith("/") && Global.server.server) Global.server.order(p.substring(1));
         else if (!p.equals("")){
+            int tx = (int) (x-host.pos.x);
+            int ty = (int) (y-host.pos.y);
+            host.target.set(tx,ty);
+            Global.server.sendFromLocal("CT>"+p + "@" + tx + "@" + ty);
             host.say(p);
-            Global.server.sendFromLocal("IN@"+p);
         }
     }
-    public void chatDirect(String p){
+    public void chatDirect(String p, int x, int y){
+        host.target.set(x,y);
         host.say(p);
     }
     public void changeMapping(int key, Moveset event){
-        keyMap.remove(key);
-        Iterator i = keyMap.entrySet().iterator();
-        while (i.hasNext()){
-            Map.Entry e = (Map.Entry) i.next();
-            if (e.getValue() == event) i.remove();
+        if (!(event instanceof Spells)) {
+            keyMap.remove(key);
+            Iterator i = keyMap.entrySet().iterator();
+            while (i.hasNext()) {
+                Map.Entry e = (Map.Entry) i.next();
+                if (e.getValue() == event) i.remove();
+            }
+            keyMap.put(key, event);
         }
-        keyMap.put(key, event);
     }
     public String getMapping(Moveset move){
         String r = null;
@@ -86,7 +92,6 @@ public class PlayerInput implements Input {
     public void inputDirect(String p, int x, int y){
         String t = p.substring(1);
         host.target.set(x,y);
-        host.face(host.target.x > 0 ? 1 : -1);
         if (p.startsWith("A")){
             if (t.equals("Idle")) moving = 0;
             else if (t.equals("WalkL")) moving = -1;
@@ -94,7 +99,6 @@ public class PlayerInput implements Input {
             host.setState(Actions.getByName(t));
         }
         else if (p.startsWith("K")) host.setState(Skills.getByName(t));
-        else if (p.startsWith("M")) host.setState(Spells.getByName(t));
         else if (p.startsWith("I")) host.selectItem(Integer.parseInt(t));
     }
     public void load(String p){

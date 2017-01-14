@@ -8,6 +8,7 @@ import com.ga.unit.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 
 /**
@@ -23,6 +24,7 @@ public class EditorInput implements Input, Updatable {
     boolean lmb = false;
     P lmbP = new P();
     ArrayList<Line> history = new ArrayList<>();
+    HashMap<Line, Integer> lineConnection = new HashMap<>();
     Line current = new Line(0, 0, 0, 0);
     Thing currentU = new Thing(null);
     boolean connected = false;
@@ -31,12 +33,20 @@ public class EditorInput implements Input, Updatable {
     int speed = 50;
     String map = "Map";
     boolean placingTp = false;
+    int nextPolygon = 0;
 
     public EditorInput() {
         Display.input = this;
         Updater.add(this);
         if (Global.camera == null) Global.camera = new P();
         else Global.camera = new P(Global.camera);
+        scanPolygon();
+    }
+
+    private void scanPolygon(){
+        for (Line i : Global.map.land){
+            if (i.next != -1) nextPolygon = i.next+1;
+        }
     }
 
     private void add(Line p) {
@@ -50,7 +60,7 @@ public class EditorInput implements Input, Updatable {
     }
 
     @Override
-    public void chat(String p){
+    public void chat(String p, int x, int y){
         if (p.equals("c")) {
             Global.p("Ceiling");
             current.opt = 1;
@@ -69,6 +79,11 @@ public class EditorInput implements Input, Updatable {
             Updater.landColor = Color.white;
         } else if (p.equals("black")) {
             Updater.landColor = Color.black;
+        } else if (p.equals("invisible")) {
+            Updater.landColor = new Color(0,0,0,0);
+        } else if (p.equals("render")){
+            Global.map.setTexture();
+//            Global.map.setShader();
         } else if (p.startsWith("save")){
             save("map/"+p.substring(5));
         } else if (p.startsWith("load")){
@@ -89,23 +104,45 @@ public class EditorInput implements Input, Updatable {
         }
     }
 
+    private void makePolygon(Line p){
+        Line i = p;
+        ArrayList<Line> result = new ArrayList<>();
+        while (lineConnection.get(i) != null){
+            result.add(i);
+            i = Global.map.land.get(lineConnection.get(i));
+            if (i == p) {
+                for (Line ii : result){
+                    ii.next = nextPolygon;
+                    lineConnection.remove(ii);
+                }
+                nextPolygon++;
+                return;
+            }
+        }
+    }
+
     @Override
     public void input(int mode, int x, int y) {
         if (mode < 0) v.set(0, 0);
         if (shift && current != null){
             boolean snap = false;
-            for (Line i : Global.map.land){
-                if (i != current) {
-                    final int snapThreshold = 25;
-                    if (Math.abs(i.pt.x - x) < snapThreshold && Math.abs(i.pt.y - y) < snapThreshold) {
-                        x = (int) i.pt.x;
-                        y = (int) i.pt.y;
+            for (int i=0;i<Global.map.land.size();i++){
+                Line l = Global.map.land.get(i);
+                if (l != current) {
+                    final int snapThreshold = 24;
+                    if (Math.abs(l.pt.x - x) < snapThreshold && Math.abs(l.pt.y - y) < snapThreshold) {
+                        x = (int) l.pt.x;
+                        y = (int) l.pt.y;
+                        lineConnection.put(current, i);
                         snap = true;
+                        if (connected) makePolygon(current);
                         break;
-                    } else if (Math.abs(i.ptd.x - x) < snapThreshold && Math.abs(i.ptd.y - y) < snapThreshold) {
-                        x = (int) i.ptd.x;
-                        y = (int) i.ptd.y;
+                    } else if (Math.abs(l.ptd.x - x) < snapThreshold && Math.abs(l.ptd.y - y) < snapThreshold) {
+                        x = (int) l.ptd.x;
+                        y = (int) l.ptd.y;
+                        lineConnection.put(current, i);
                         snap = true;
+                        if (connected) makePolygon(current);
                         break;
                     }
                 }
@@ -135,7 +172,7 @@ public class EditorInput implements Input, Updatable {
                 if (tool == Tool.CREATE) {
                     if (connected) {
                         current.ptd = new P(x, y);
-                        Global.p(current.toString());
+                        lineConnection.put(Global.map.land.get(Global.map.land.size()-1), Global.map.land.size());
                     }
                     current = new Line(x, y, x, y);
                     if (placingTp){
@@ -174,7 +211,7 @@ public class EditorInput implements Input, Updatable {
                 }
                 lmb = false;
                 break;
-            case 3:
+            case KeyEvent.VK_Z:
                 Global.p("Undo");
                 if (tool == Tool.CREATE) {
                     if (history.size() > 0) {
@@ -294,9 +331,9 @@ public class EditorInput implements Input, Updatable {
     }
     private void selectTool(Tool tool) {
         this.tool = tool;
-        Global.p(tool.toString());
         if (current != null && connected) remove(current);
         if (currentU != null) currentU.remove();
+        connected = false;
     }
 
     public void update() {

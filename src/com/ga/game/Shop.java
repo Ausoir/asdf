@@ -32,7 +32,7 @@ public class Shop extends JPanel {
 
     public Shop(){
         setLayout(new BoxLayout(this,BoxLayout.PAGE_AXIS));
-        image = Texture.load("Shop");
+        image = Picture.load("Shop");
         size = new P(image.getWidth(null), image.getHeight(null));
         resize();
         setBorder(BorderFactory.createTitledBorder(BorderFactory.createRaisedBevelBorder()));
@@ -131,7 +131,7 @@ public class Shop extends JPanel {
         options.setOpaque(false);
         options.setLayout(new BoxLayout(options,BoxLayout.LINE_AXIS));
         final JLabel drop = new JLabel(item.getFullName()+" - "+price);
-        drop.setIcon(new ImageIcon(Texture.load("Buy")));
+        drop.setIcon(new ImageIcon(Picture.load("Buy")));
         drop.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {

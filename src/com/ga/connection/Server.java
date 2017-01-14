@@ -55,7 +55,6 @@ public class Server implements Updatable {
         try{
             translate("ME>1%");
         } catch (Exception e) {
-
             e.printStackTrace();
             System.exit(1);
         }
@@ -134,11 +133,13 @@ public class Server implements Updatable {
                         tcp.download(t, new String[]{"Data/map/" + client});
                         syncommand = "HI>" + client;
                         break;
+                    case "CT":
+                        client = clientIPs.indexOf(udp.getClientIP());
+                        clientControllers.get(client).chatDirect(cmd[0], Integer.parseInt(cmd[1]), Integer.parseInt(cmd[2]));
+                        break;
                     case "IN":
                         client = clientIPs.indexOf(udp.getClientIP());
-                        if (cmd.length == 1) clientControllers.get(client).chatDirect(cmd[0]);
-                        else if (cmd.length == 3)
-                            clientControllers.get(client).inputDirect(cmd[0], Integer.parseInt(cmd[1]), Integer.parseInt(cmd[2]));
+                        clientControllers.get(client).inputDirect(cmd[0], Integer.parseInt(cmd[1]), Integer.parseInt(cmd[2]));
                         break;
                     case "AI": //client
                         try {
@@ -237,7 +238,7 @@ public class Server implements Updatable {
                         pi.host.pos.set(Updater.getEntrancePos(0));
                         break;
                     case "CMD":
-                        Command.order(cmd[1]);
+                        if (cmd.length > 1) Command.order(cmd[1]);
                         break;
                 }
             } catch (Exception e){

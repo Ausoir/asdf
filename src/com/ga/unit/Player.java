@@ -1,6 +1,5 @@
 package com.ga.unit;
 
-import com.ga.game.Display;
 import com.ga.map.Global;
 import com.ga.tool.Performer;
 import com.ga.unit.intelligence.PlayerInput;
@@ -11,11 +10,14 @@ import com.ga.unit.skill.*;
 import java.util.ArrayList;
 
 import static com.ga.unit.BodyHumanoid.FIST;
+import static com.ga.unit.skill.Actions.WalkL;
+import static com.ga.unit.skill.Actions.WalkR;
 
 /**
  * Created by Ga on 7/30/2016.
  */
 public class Player extends Man {
+    protected String memorized = "";
     public int gold;
     public Inventory inventory = new Inventory(this);
     public SkillTree skillTree = new SkillTree();
@@ -98,7 +100,6 @@ public class Player extends Man {
                             } else if (selectingItem < inventory.getItemSize()) {
                                 Item item = inventory.getItem(selectingItem);
                                 setWeapon(item);
-                                inventory.wielded = selectingItem;
                                 inventory.remove(item);
                                 selectingItem = -1;
                             }
@@ -112,11 +113,8 @@ public class Player extends Man {
     public int setState(Moveset state){
         if (state instanceof Actions) {
             switch ((Actions) state) {
-                case WalkL:
-                case WalkR:
-                    if (delay.over()) {
-                        if (Global.cos(weapon.rotation) < .8f) weapon.rotation *= .9f;
-                    }
+                case Idle:
+                    if (!get("Stamina").isFull()) state = Actions.Exhausted;
                     break;
                 case Pull1:
                     selectItem(0);
@@ -158,32 +156,38 @@ public class Player extends Man {
         int r = super.setState(state);
         if (r == 1) {
         } else if (r == 2){
-            String statreq = state.getStatReq();
             int req = (int) state.getCost();
-            if (req < 0){
-                if (statreq.equals("Stamina")) req = weapon.weight*-req;
-                else if (statreq.equals("Energy")) req = armor.weight*-req;
-            }
-            say("Need "+req+" more "+ statreq+"!");
+            req += getStatPenalty();
+            if (req > get("Stamina").getMax()) say("This skill is beyond my abilities!");
+            else say("Need " + (req - get("Stamina").get()) + " more stamina!");
         } else if (r == 3){
             int[] cdinput = getCooldown(state);
-            say("Spell is available in "+Global.checkCooldown(cdinput, state.getCooldown())+" seconds!");
+            say(state.getName() + " is available in "+Global.checkCooldown(cdinput, state.getCooldown())+" seconds!");
         } else if (r == 4){
             say("Item broke!");
         }
         return r;
     }
     protected float getSpeed() {
-        return Math.max(0,super.getSpeed()-inventory.weight-getStatPenalty());
+        float t = Math.max(0,super.getSpeed()-((inventory.weight+getStatPenalty())/get("Strength").get()));
+        clip.setMoveSpeed((int) Global.clamp(t-1,-20,4));
+        return t;
     }
     protected void stateDone(){
-        if (input.moving == 0) setState(Actions.Idle);
+        if (input.moving == 0) super.stateDone();
         else if (input.moving == -1) setState(Actions.WalkL);
         else if (input.moving == 1) setState(Actions.WalkR);
     }
+    @Override
+    public void stateUpdate(){
+        super.stateUpdate();
+        if (input.moving == 0 && (state == Actions.WalkL || state == Actions.WalkR)){
+            setState(Actions.Idle);
+        }
+    }
     public String toCharacterString(){
         String r = super.toString()+"\n";
-        r += gold+";"+Global.getTime()[0]+"\n";
+        r += gold+";"+memorized+";"+Global.getTime()[0]+"\n";
         r += input.toString()+"\n";
         r += inventory.toString()+"\n";
         r += skillTree.toString();
@@ -191,24 +195,8 @@ public class Player extends Man {
     }
     public void load(String p){
         String[] line = p.split("%");
-        gold = Integer.parseInt(line[1].split(";")[1]);
-        hp = new PlayerHealthBar(get("Health"),get("Stamina"),get("Energy"),pos);
-        get("Stamina").onChange = (new Performer(){
-            @Override
-            public boolean perform(){
-                if (get("Stamina").isFull() && state == Actions.Idle) clip.setState(Actions.Idle);
-                hp.show(15);
-                return true;
-            }
-        });
-        get("Energy").onChange = (new Performer(){
-            @Override
-            public boolean perform(){
-                if (get("Energy").isFull() && state == Actions.Idle) clip.setState(Actions.Idle);
-                hp.show(15);
-                return true;
-            }
-        });
+        gold = Integer.parseInt(line[1].split(";")[0]);
+        memorized = line[1].split(";")[1];
         inventory.load(line[3]);
         skillTree.load(line[4]);
     }

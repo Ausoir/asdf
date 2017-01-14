@@ -3,6 +3,7 @@ package com.ga.tool;
 import com.ga.map.Global;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 
 /**
  * Created by Ga on 7/26/2016.
@@ -10,6 +11,7 @@ import java.awt.*;
 public class Line {
     public P pt;
     public P ptd;
+    public int next = -1;
     public int opt = 0; //0:normal,1:ceiling,2:tp
     public Line(){
         pt = new P();
@@ -19,8 +21,9 @@ public class Line {
         pt = new P(x,y);
         ptd = new P(x1,y1);
     }
-    public Line(int x, int y, int x1, int y1, int opt){
+    public Line(int x, int y, int x1, int y1, int next, int opt){
         this(x,y,x1,y1);
+        this.next = next;
         this.opt = opt;
     }
     public Line(P p1, P p2){
@@ -55,13 +58,10 @@ public class Line {
         return (ptd.y-pt.y)/(ptd.x-pt.x);
     }
     public void draw(Graphics2D g, P offset){
-        P t = Global.getRelPos(offset.x+(pt.x),offset.y+pt.y);
-        P td = Global.getRelPos(offset.x+(ptd.x),offset.y+ptd.y);
-//        if ((t.x > -100 && t.y > -100 && t.x < Settings.screenX + 100 && t.y < Settings.screenY + 100)
-//            || (td.x > -100 && td.y > -100 && td.x < Settings.screenX + 100 && td.y < Settings.screenY + 100))
-            g.drawLine((int)t.x, (int)t.y, (int)td.x, (int)td.y);
+        g.setTransform(AffineTransform.getTranslateInstance(Global.getRelX(),Global.getRelY()));
+        g.drawLine((int) (offset.x+pt.x), (int) (offset.y+pt.y), (int) (offset.x+ptd.x), (int) (offset.y+ptd.y));
     }
     public String toString(){
-        return pt + "," + ptd + "," + opt;
+        return pt + "," + ptd + "," + next + "," + opt;
     }
 }

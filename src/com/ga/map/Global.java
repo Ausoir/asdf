@@ -34,8 +34,11 @@ public class Global {
     public static int getSeed(){
         return r.nextInt(9999);
     }
-    public static P getRelPos(float x, float y){
-        return new P(x-camera.x+ Settings.centerX, y-camera.y+Settings.centerY);
+    public static float getRelX(){
+        return -camera.x+Settings.centerX;
+    }
+    public static float getRelY(){
+        return -camera.y+Settings.centerY;
     }
     public static float sin(float p){
         return sin((int)Math.toDegrees(p));

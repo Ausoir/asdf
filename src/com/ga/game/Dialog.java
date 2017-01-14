@@ -22,7 +22,7 @@ public class Dialog extends JPanel {
     private Image image;
     public Dialog(){
         setLayout(new BoxLayout(this,BoxLayout.PAGE_AXIS));
-        image = Texture.load("Shop");
+        image = Picture.load("Shop");
         size = new P(image.getWidth(null), image.getHeight(null));
         resize();
         addMouseListener(new MouseAdapter() {
