@@ -1,22 +1,26 @@
 package com.ga.unit.item;
 
 import com.ga.game.Picture;
+import com.ga.tool.Clips;
+import com.ga.tool.Performer;
 import com.ga.unit.Man;
 
 /**
  * Created by Ga on 8/9/2016.
  */
 public class Armor extends Item {
+    public int piece = 0;
     private float armor = 0;
     private float armorMod = 1;
     public int encumberance = 0;
-    public Armor(String name, int seed, int weight, int uses, float armor, int encumberance) {
+    public Armor(String name, int seed, int weight, int uses, float armor, int encumberance, int piece) {
         super(name, seed, weight, uses, 100, .04f);
-        image = new Picture(name,0);
         setType(Tag.Armor);
         this.armor = armor;
         this.name = name;
         this.encumberance = encumberance;
+        this.piece = piece;
+        if (piece != 5) image = new Picture(name, Integer.parseInt(Clips.clip.get("Man").model[piece][1])-1);
         delay = 80;
     }
     public float getArmor(){
@@ -35,16 +39,30 @@ public class Armor extends Item {
         else if (mod == SpecialtyMod.Tough) armorMod += .5f;
         else super.setModifier(mod);
     }
+    protected void onHit(Man host){
+        super.use(host);
+    }
     @Override
-    public boolean use(Man host){
-        if (host.getArmor() == this) return super.use(host);
-        else if (host.getWeapon() == this) {
-            host.setArmor(this);
-            host.setWeapon(null);
-            remove();
-            return true;
-        }
+    public boolean use(final Man host){
+        host.setState(action);
+        final Armor me = this;
+        host.delay.performer = new Performer(){
+            public boolean perform(){
+                host.armor.set(me, piece);
+                host.setWeapon(null);
+                me.remove();
+                return true;
+            }
+        };
         return false;
+    }
+    @Override
+    public String getDisplayName(){
+        String r = super.getDisplayName();
+        if (piece == 0 || piece == 4) r+=" Arm";
+        else if (piece == 1 || piece == 2) r+=" Leggings";
+        else if (piece == 3) r+=" Armor";
+        return r;
     }
     public String getDescription(){
         String r = super.getDescription();
@@ -53,5 +71,9 @@ public class Armor extends Item {
             r += " This armor has "+getProbability()*100+"% chance of activating its enchantment on being hit.";
         }
         return r + " This armor decreases damage by "+getArmor()+" points.";
+    }
+    @Override
+    public String toItemString(){
+        return super.toItemString()+","+piece;
     }
 }

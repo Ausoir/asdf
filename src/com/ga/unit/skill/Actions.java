@@ -4,8 +4,8 @@ package com.ga.unit.skill;
  * Created by Ga on 7/28/2016.
  */
 public enum Actions implements Moveset {
-    Idle, LookUp, LookLeft, LookDown, LookRight, WalkL, WalkR, Hit(15,null), Dead(99999,null), Pull1, Pull2, Pull3, Recall,
-    Conjure, Wait(50,null), Cast, Consume, Exhausted, Interact(8,null), Down(50,null), Buff, Revive, Sheathe(18,null);
+    Idle, LookUp, LookLeft, LookDown, LookRight, WalkL, WalkR, Hit(45,null), Dead(99999,null), Wield(18, null), Recall,
+    Conjure, Wait(50,null), Cast, Consume, Exhausted, Interact(8,null), Down(50,null), Buff, Revive;
     private String description;
     private int del;
     Actions(){

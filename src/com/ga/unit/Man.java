@@ -8,10 +8,7 @@ import com.ga.tool.Performer;
 import com.ga.unit.intelligence.Communication;
 import com.ga.unit.intelligence.MerchantIntelligence;
 import com.ga.unit.intelligence.UnitIntelligence;
-import com.ga.unit.item.Armor;
-import com.ga.unit.item.Item;
-import com.ga.unit.item.ItemFactory;
-import com.ga.unit.item.Projectile;
+import com.ga.unit.item.*;
 import com.ga.unit.skill.*;
 
 import java.awt.*;
@@ -24,9 +21,9 @@ import static com.ga.unit.skill.Skills.*;
  * Created by Ga on 5/7/2016.
  */
 public class Man extends Unit {
+    private Item fist = ItemFactory.produce("Fist",0,0);
     protected Item weapon;
-    protected Armor armor;
-
+    public ArmorSet armor;
     public Man(String p){
         super(p);
         clip = new BodyHumanoid(this);
@@ -35,23 +32,21 @@ public class Man extends Unit {
             public boolean perform(){
                 if (me.weapon.getOrgan().amputated){
                     me.weapon.drop(me);
-                    me.setWeapon(ItemFactory.produce("Fist",0));
+                    me.setWeapon(fist);
                 }
                 return true;
             }
         };
         speechType = faction.name().toLowerCase();
         String[] t = p.split("@");
-        setWeapon(ItemFactory.load(t[6]));
-        setArmor((Armor) ItemFactory.load(t[7]));
+        if (t[7].startsWith("Fist,")) setWeapon(fist);
+        else setWeapon(ItemFactory.load(t[7]));
+        armor = new ArmorSet(this, t[8]);
         if (faction == Faction.Merchant){
             brain = new MerchantIntelligence(this);
         } else if (faction != Faction.Player && faction != Faction.Player2) {
             brain = new UnitIntelligence(this);
             brain.setComm(new Communication());
-            moveset.put("Range",new Moveset[]{Spells.Stun, Spells.Fireball, Spells.Fireblast});
-            moveset.put("Melee",new Moveset[]{Skills.Swing, Skills.Dash, Skills.Pierce, Skills.Slash});
-            moveset.put("Random",new Moveset[]{Spells.Haste});
         }
     }
 
@@ -66,9 +61,11 @@ public class Man extends Unit {
 
     public void setWeapon(Item p){
         if (p == null){
-            weapon.field();
-            weapon.remove();
-            p = ItemFactory.produce("Fist",0);
+            if (weapon != null) {
+                weapon.field();
+                weapon.remove();
+            }
+            p = fist;
         }
         weapon = p;
         weapon.pos = pos;
@@ -76,14 +73,8 @@ public class Man extends Unit {
         weapon.dir = dir;
     }
 
-    public void setArmor(Armor p){
-        if (p == null) p = (Armor) ItemFactory.produce("Underwear",0);
-        armor = p;
-        clip.setSkin(p.name);
-    }
-
-    public boolean wieldingNone(){ return weapon == null || weapon.name.equals("Fist"); }
-    public boolean equippingNone(){ return armor == null || armor.name.equals("Underwear"); }
+    public boolean wieldingNone(){ return weapon == null || weapon == fist; }
+//    public boolean equippingNone(){ return armor == null || armor.name.equals("Underwear"); }
 
     public Item getWeapon(){
         return weapon;
@@ -110,7 +101,7 @@ public class Man extends Unit {
     protected void actionSet(Moveset state, int level){
         super.actionSet(state, level);
         if (state instanceof Skills) {
-            int speed = weapon.speed-armor.encumberance;
+            int speed = weapon.speed-armor.getEncumberance();
             damageType = weapon.damageType;
             switch ((Skills) state) {
                 case Use:
@@ -118,13 +109,17 @@ public class Man extends Unit {
                     return;
                 case Duck:
                     cooldown.put(state,new int[]{Global.getTime()[0]+(getStatPenalty()*4)});
+                case Guard:
+                case Jump:
+                case Airstrike:
+                    speed = 0;
                     break;
                 case Sidekick:
-                    speed = armor.speed;
+                    speed = armor.getSpeed();
                     damageType = DamageType.Bash;
                     break;
                 case Kick:
-                    speed = armor.speed;
+                    speed = armor.getSpeed();
                     damageMod = 3;
                     damageType = DamageType.Push;
                     break;
@@ -194,26 +189,21 @@ public class Man extends Unit {
     }
 
     @Override
-    protected int getDamageReduction(){
-        return (int) armor.getArmor();
-    }
-
-    @Override
-    protected int getStatPenalty() {
-        return armor.weight+weapon.weight;
+    protected int getDamageReduction(int organ){
+        return (int) armor.getArmor(organ);
     }
 
     @Override
     public boolean hit(Matter hitter, int damage, DamageType type) {
         target = hitter.pos.getAdd(0,0);
-        armor.use(this);
+        armor.onHit();
         boolean r = super.hit(hitter, damage, type);
         return r;
     }
 
     @Override
     public boolean isExhausted(){
-        return get("Stamina").get() < weapon.weight+armor.weight;
+        return get("Stamina").get() < weapon.weight+armor.getWeight();
     }
 
     public Stat get(String p){
@@ -286,7 +276,7 @@ public class Man extends Unit {
                         vel.set(getSpeed() * 10 * dir * (damageMod / 2), -5);
                         break;
                     case Throw:
-                        if (!weapon.name.equals("Fist")) {
+                        if (weapon != fist) {
                             Projectile p = new Projectile(null, pos.getAdd(clip.organs[OFIST].ptd), pos.getAdd(target), 50) {
                                 Item wpn = weapon;
                                 @Override
@@ -342,10 +332,26 @@ public class Man extends Unit {
                         break;
                 }
             }
-        } else if (organ == clip.FOOT && state == Sidekick){
-            Updater.collide(this, clip.organs[organ].getAdd(this.pos), false);
-        } else if (organ == clip.FOOT-1 && state == Kick){
-            Updater.collide(this, clip.organs[organ].getAdd(this.pos), false);
+        } else if ((organ == clip.FOOT && state == Sidekick) || (organ == clip.FOOT-1 && state == Kick)){
+            for (Matter i : Updater.collide(clip.organs[organ].ptd.getAdd(this.pos), 50)){
+                if (i instanceof Unit) {
+                    if (faction.canAttack(i.faction)) {
+                        ((Unit)i).hit(this, getDamage()-weapon.getDamage()+1, damageType);
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onCollide(Line l){
+        boolean wasJump = jump;
+        super.onCollide(l);
+        if (!wasJump){
+            if (state == Skills.Jump){
+                setState(Actions.Hit);
+                delay.set(4);
+            }
         }
     }
 
@@ -362,10 +368,10 @@ public class Man extends Unit {
                         int t = 25 - delay.time;
                         float rot = -((weapon.dir * 10) + t * t * .03f * -weapon.dir);
                         weapon.rotation = rot;
-                        attack();
+                        if (Math.abs(rot) < 8) attack();
                     }
                     break;
-                case Jump:
+                case Airstrike:
                     if (jump){
                         weapon.rotation = 1f*dir;
                         attack();
@@ -386,10 +392,6 @@ public class Man extends Unit {
     public void draw(Graphics2D g) {
         weapon.draw(g);
         super.draw(g);
-    }
-
-    public Armor getArmor() {
-        return armor;
     }
 
     public void revive() {

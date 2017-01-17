@@ -20,13 +20,20 @@ public enum Spells implements Moveset {
             return true;
         }
     }),
-    Heal(Actions.Buff, 40, 3, 240, "Heal grants you immediate Health. [1*Level Health per Stamina]", new Spell(){
+    Heal(Actions.Buff, 40, 3, 240, "Heal grants you immediate Health. [2*Level Health per Stamina]", new Spell(){
         @Override
         public boolean perform(){
-            if (host.get("Stamina").require(1)) {
-                host.get("Health").add(level);
+            if (host.get("Stamina").require(1+host.getStatPenalty())) {
+                host.get("Health").add(level*2);
                 return false;
             }
+            return true;
+        }
+    }),
+    Frenzy(Actions.Buff, 40, 5, 240, "Frenzy grants you a burst of immense power. [20*Level Stamina]", new Spell(){
+        @Override
+        public boolean perform(){
+            host.get("Stamina").add(20*level,true);
             return true;
         }
     }),
@@ -34,7 +41,6 @@ public enum Spells implements Moveset {
     Adrenaline(Actions.Conjure, 25,3,100,"Haste grants the user a burst of Stamina for a short time. [Duration:10*Level]",produceBuff(Buffs.Rejuvenate)),
     Cleave(Actions.Conjure, 25,1,100,"Cleave grants the user a cleaving property. [Level*1 Uses] [Duration:10*Level]",produceBuff(Buffs.Cleave)),
     Empower(Actions.Conjure, 25,1,100,"Empower grants the next attack 10 bonus damage. [Level*1 Uses] [Duration:10*Level]",produceBuff(Buffs.Empower)),
-    Frenzy(Actions.Conjure, 25,10,100,"Frenzy grants the user infinite Stamina for a short duration. [Duration:10*Level]",produceBuff(Buffs.Rejuvenate)),
     Evade(Actions.Conjure, 25,2,100,"Evade grants you invulnerability to physical attacks for 10 seconds. [Level*1 Uses] [Duration:10*Level]",produceBuff(Buffs.Evade)),
     Flamestride(Actions.Buff, 10,4,100,"Flamestride leaves damaging flames in the trails of the caster. [Level*1 Uses] [Duration:8*Level] [Damage:10] [Damage Scale:2 per Proficiency]",produceBuff(Buffs.Flamestride)),
     Glacialwalk(Actions.Buff, 10,4,100,"Glacialwalk leaves freezing trails behind the caster. [Level*1 Uses] [Duration:8*Level] [Trail Duration:15*Level] [Freeze Duration:5*Level] [Damage:0]",produceBuff(Buffs.Glacialwalk)),
@@ -71,7 +77,7 @@ public enum Spells implements Moveset {
             return true;
         }
     }),
-    Shadowtwin(Actions.Buff, 40,1,100,"Summon a mirror of yourself to aid you in battle. [Level*1 Shadows] [Duration:50+Level*10] [3 Stamina Reserve/Shadow]",new Spell() {
+    Shadowtwin(Actions.Buff, 40,3,100,"Summon a mirror of yourself to aid you in battle. [Level*1 Shadows] [Duration:50+Level*10] [3 Stamina Reserve/Shadow]",new Spell() {
         @Override
         public boolean perform() {
             for (int i=0;i<level;i++) {
@@ -96,7 +102,8 @@ public enum Spells implements Moveset {
                         return "";
                     }
                 };
-                p.moveset.put("Melee",new Moveset[]{Skills.Use, Skills.Sidekick});
+                p.rangeZone = new int[]{-5};
+                p.moveset.put(0,new Moveset[]{Skills.Use, Skills.Sidekick});
                 p.stats.setStat("expire",new Stat(500+(level*100)));
                 host.get("Stamina").reserve += 3;
                 host.get("Stamina").add(0);
@@ -108,12 +115,12 @@ public enum Spells implements Moveset {
             return true;
         }
     }),
-    Shadowstep(Actions.Conjure, 20,2,40,"Blink to the target location.",new Spell() {
+    Shadowstep(Actions.Conjure, 20,0,40,"Blink to the target location.",new Spell() {
         @Override
         public boolean perform() {
             Particle.smoke(host.pos);
             P target = host.target.getAdd(host.pos);
-            Line pp = new Line(target, target.getAdd(0,600));
+            Line pp = new Line(target, target.getAdd(0,1200));
             for (Line i : Global.map.land){
                 if (i.lineCross(pp)){
                     host.pos.set(target);
@@ -124,7 +131,7 @@ public enum Spells implements Moveset {
             return false;
         }
     }),
-    Fireworks(Actions.Cast, 40,2,10,"Dart streams of cackling sparks. [Range:100] [No Damage] [Upkeep:.1 Stamina]",new Spell(){
+    Fireworks(Actions.Cast, 40,2,10,"Dart streams of cackling sparks. [Range:100] [No Damage] [Upkeep:1 Stamina, No Weight Penalty]",new Spell(){
         @Override
         public boolean perform(){
             for (int i=0;i<2;i++) {
@@ -185,7 +192,7 @@ public enum Spells implements Moveset {
                     }
                 };
             }
-            if (Global.r.nextInt(5+level) == 0 && !host.get("Stamina").require(1)) return true;
+            if (Global.r.nextInt(5+level) == 0 && !host.get("Stamina").require(1+host.getStatPenalty())) return true;
             return false;
         }
     }),
@@ -221,7 +228,7 @@ public enum Spells implements Moveset {
                     }
                 };
             }
-            if (Global.r.nextInt(5+level) == 0 && !host.get("Stamina").require(1)) return true;
+            if (Global.r.nextInt(5+level) == 0 && !host.get("Stamina").require(1+host.getStatPenalty())) return true;
             return false;
         }
     }),
@@ -293,7 +300,7 @@ public enum Spells implements Moveset {
                     return true;
                 }
             };
-            if (Global.r.nextInt(10+(level*3)) == 1 && !host.get("Stamina").require(2)) return true;
+            if (Global.r.nextInt(10+(level*3)) == 1 && !host.get("Stamina").require(1+host.getStatPenalty())) return true;
             return false;
         }
     }),
@@ -326,7 +333,7 @@ public enum Spells implements Moveset {
                     return true;
                 }
             };
-            if (Global.r.nextInt(3+level) == 0 && !host.get("Stamina").require(1)) return true;
+            if (Global.r.nextInt(3+level) == 0 && !host.get("Stamina").require(1+host.getStatPenalty())) return true;
             return false;
         }
     });

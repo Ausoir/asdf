@@ -24,6 +24,7 @@ public class Map {
     public ArrayList<Line> land = new ArrayList<>();
     public ArrayList<Form> landform = new ArrayList<>();
     private HashMap<Form, ArrayList<Line>> formLines = new HashMap<>();
+    public HashMap<Integer, String> formTextures = new HashMap<>();
     public String[] maps;
     private MapEvent event;
     public static final int magnify = 2;
@@ -50,17 +51,25 @@ public class Map {
             panorama.image.size.mult(magnify, magnify);
             panorama.pos = panorama.pos.getAdd(500, 0);
         } else panorama.image.visible = false;
-        map = new Thing(maps[2], pt, 2){
+        map = new Thing(null, pt, 2){
             public void draw(Graphics2D g){
                 g.setTransform(AffineTransform.getTranslateInstance(Global.getRelX(),Global.getRelY()));
                 g.drawImage(image.getImage(),(int)pos.x,(int)pos.y,(int)image.size.x,(int)image.size.y,null);
             }
         };
-        if (maps[2].equals("None")){
+        if (maps[2].startsWith("None")){
+            map.setImage("None");
             map.image.visible = false;
-            map.image.size.set(Settings.screenX, Settings.screenY);
+            if (maps[2].length() > 4) {
+                String[] size = maps[2].substring(5).split("x");
+                map.image.size.set(Integer.parseInt(size[0]), Integer.parseInt(size[1]));
+            } else {
+                map.image.size.set(Settings.screenX, Settings.screenY);
+            }
+        } else {
+            map.setImage(maps[2]);
+            map.image.size.mult(magnify,magnify);
         }
-        else map.image.size.mult(magnify,magnify);
         fmap = new Thing(maps[3], pt, 30) {
             public void draw(Graphics2D g) {
                 for (Form i : landform){
@@ -85,6 +94,13 @@ public class Map {
             result += i+",";
         }
         result = result.substring(0,result.length()-1)+"\n";
+        Iterator it = formTextures.entrySet().iterator();
+        while (it.hasNext()){
+            java.util.Map.Entry pair = (java.util.Map.Entry) it.next();
+            result += pair.getKey() + ":" + pair.getValue();
+            if (it.hasNext()) result += ";";
+        }
+        result += "\n";
         if (land.size() == 0) return result;
         for (Line i : land){
             if (!i.equals("")){
@@ -124,22 +140,7 @@ public class Map {
                 int origX = (int) (ii.pt.x-i.pos.x);
                 int origY = (int) (ii.pt.y-i.pos.y);
                 int x2 = (int) (ii.ptd.x-i.pos.x);
-                for (int ix = origX; ix < x2; ix++) {
-                    int ty = origY + (int) ((ix - origX) * ii.getSlope());
-                    for (int iy = 0; iy < 24; iy++) {
-                        try {
-                            int rgb = i.image.getRGB(ix, ty + iy);
-                            int shadeMag = -(50 - (iy*2));
-                            int alpha = (rgb & 0xff000000) >>> 24;
-                            int red = Math.max(((rgb & 0xff0000) >>> 16) + shadeMag, 0);
-                            int green = Math.max(((rgb & 0xff00) >>> 8) + shadeMag, 0);
-                            int blue = Math.max(((rgb & 0xff)) + shadeMag, 0);
-                            i.image.setRGB(ix, ty + iy, new Color(red, green, blue, alpha).getRGB());
-                        }catch(Exception e){
-                            e.printStackTrace();
-                        }
-                    }
-                }
+                i.shade(origX, x2, origY, ii.getSlope());
             }
         }
     }
@@ -150,7 +151,12 @@ public class Map {
             if (i.next >= 0){
                 Form form = hashmap.get(i.next);
                 if (form == null){
-                    form = new Form("Dirt");
+                    String formTexture = formTextures.get(i.next);
+                    if (formTexture == null) form = new Form("Dirt", null);
+                    else {
+                        String[] formName = formTextures.get(i.next).split("&");
+                        form = new Form(formName[0], formName.length > 1 ? formName[1] : null);
+                    }
                     hashmap.put(i.next, form);
                 }
                 if (formLines.get(form) == null) formLines.put(form, new ArrayList<Line>());

@@ -63,6 +63,7 @@ public class Matter extends Thing implements Updatable {
         Line pp;
         boolean collided = true;
         int timeout = 8;
+        float maxX = vel.x*1.15f;
         while (collided) {
             collided = false;
             vp = pos.getAdd(vel);
@@ -70,24 +71,24 @@ public class Matter extends Thing implements Updatable {
             for (Line i : Global.map.land) {
                 if (i.lineCross(pp)) {
                     if (i.opt != -1) {
+                        onCollide(i);
                         float slope = i.getSlope();
                         boolean cc = i.pt.x > i.ptd.x;
                         float tangent = (float) Math.atan(slope);
                         if ((cc && i.pt.y + (slope * (pos.x - i.pt.x)) < pos.y) || Math.abs(slope) > 4) {
                             vel.set(0, 0);
-                            onCollide(i);
                             return;
                         }
-                        vel.x += Global.sin(tangent) * Math.abs(vel.x);
+                        vel.x = vel.x > 0 ? Math.min(vel.x + (Global.sin(tangent) * Math.abs(vel.x)), maxX)
+                                : Math.max(vel.x + (Global.sin(tangent) * Math.abs(vel.x)), maxX);
                         vel.y += (i.pt.y + (slope * (pos.x + vel.x - i.pt.x))) - (pos.y + vel.y) - 1;
-                        onCollide(i);
                         collided = true;
                     }
                 }
             }
             timeout--;
             if (timeout == 0){
-                System.out.println("TEST");
+                System.out.println("Collision timeout pos@"+pos+"; vel@"+vel);
                 return;
             }
         }

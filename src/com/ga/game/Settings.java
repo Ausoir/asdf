@@ -13,7 +13,7 @@ public class Settings {
     public static int centerX = screenX/2;
     public static int centerY = screenY/2;
     public static int gravity = 4;
-    public static int gravityMax = 100;
+    public static int gravityMax = 64;
     public static void setScreenSize(int x, int y){
         screenX = x;
         screenY = y;

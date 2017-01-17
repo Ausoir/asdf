@@ -22,7 +22,8 @@ public enum Skills implements Moveset {
     Shoot(27,-1,0,0,"Fire your weapon."),
     Snipe(27,-1,.5f,0,"Fire your weapon."),
     Slash(60,2,0,30,"Slash forward twice, dealing massive damage. [Damage: (1+Level)*100%]"),
-    Jump(27,1,4f,0,"Jump into the air."),
+    Jump(47,1,4f,0,"Jump into the air."),
+    Airstrike(27,1,4f,0,"Jump into the air while attacking."),
     Leap(40,2,3,80,"Perform a leap over great distances."),
     Backstep(20,0,-1f,14,"Take a step backwards.");
     private String description;

@@ -11,6 +11,8 @@ import com.ga.unit.skill.*;
 
 import java.awt.*;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import static com.ga.unit.skill.Actions.WalkL;
 import static com.ga.unit.skill.Actions.WalkR;
@@ -20,8 +22,8 @@ import static com.ga.unit.skill.Skills.Rest;
  * Created by Ga on 5/7/2016.
  */
 public abstract class Unit extends Matter {
-    public HashMap<String, Moveset[]> moveset = new HashMap<String, Moveset[]>(){{
-    }};
+    public int[] rangeZone = new int[]{-5};
+    public HashMap<Integer, Moveset[]> moveset = new HashMap<>();
     public int id;
     public Body clip;
     public Moveset state = Actions.Idle;
@@ -42,16 +44,45 @@ public abstract class Unit extends Matter {
         id = Integer.parseInt(t[3]);
         stats.load(t[4]);
         faction = Faction.valueOf(t[5]);
+        String[] rangeMoves = t[6].split("/");
+        String[] ranges = rangeMoves[0].split(",");
+        String[] moveZones = rangeMoves[1].split("&");
+        rangeZone = new int[ranges.length];
+        for (int i=0;i<ranges.length;i++) rangeZone[i] = Integer.parseInt(ranges[i]);
+        for (int i=0;i<moveZones.length;i++) {
+            String[] moves = moveZones[i].split(",");
+            Moveset[] movesets = new Moveset[moves.length];
+            for (int ii=0;ii<moves.length;ii++){
+                movesets[ii] = getMoveset(moves[ii]);
+            }
+            this.moveset.put(i, movesets);
+        }
         gravity = true;
     }
 
-    public int performMoveset(String p){
-        Moveset[] t = moveset.get(p);
-        if (t == null){
-//            Global.p("Can't find moveset "+p);
-        } else {
-            Moveset move = t[Global.r.nextInt(t.length)];
-            return setState(move);
+    private Moveset getMoveset(String p){
+        Moveset r = Actions.getByName(p);
+        if (r == null) r = Skills.getByName(p);
+        if (r == null) r = Spells.getByName(p);
+        return r;
+    }
+
+    public int performMoveset(int dist){
+        int range = -1;
+        for (int i=0;i<rangeZone.length;i++){
+            if (dist <= rangeZone[i]){
+                range = i;
+                break;
+            }
+        }
+        if (range != -1) {
+            Moveset[] t = moveset.get(range);
+            if (t == null) {
+                Global.p("Can't find moveset for range " + dist + "@Zone " + range);
+            } else {
+                Moveset move = t[Global.r.nextInt(t.length)];
+                return setState(move);
+            }
         }
         return -1;
     }
@@ -95,18 +126,19 @@ public abstract class Unit extends Matter {
         return false;
     }
     public int setState(Moveset state) {
-        if (!delay.over() || !jump || this.state == state) return 1;
-        face(target.x > 0 ? 1 : -1);
-        if (state != Actions.Idle) delay.performer = null;
-        int[] cdinput = getCooldown(state);
-        int prevCd = cdinput[0];
-        if (Global.cooldown(cdinput, state.getCooldown())) {
-            cooldown.put(state, cdinput);
-            if (!stateSet(state)){
-                cooldown.put(state, new int[]{prevCd});
-                return 2;
-            }
-        } else return 3;
+        if ((delay.over() && jump && this.state != state) || state == Actions.Hit) {
+            face(target.x > 0 ? 1 : -1);
+            if (state != Actions.Idle) delay.performer = null;
+            int[] cdinput = getCooldown(state);
+            int prevCd = cdinput[0];
+            if (Global.cooldown(cdinput, state.getCooldown())) {
+                cooldown.put(state, cdinput);
+                if (!stateSet(state)) {
+                    cooldown.put(state, new int[]{prevCd});
+                    return 2;
+                }
+            } else return 3;
+        }
         return 0;
     }
     public void setAnimation(Moveset p){
@@ -155,7 +187,7 @@ public abstract class Unit extends Matter {
         if (state == Actions.Down){
             vel.x = 0;
             if (Global.map.fallSafe(pos.getAdd(vel))) pos.y += Settings.gravity;
-        } else if (state == Skills.Jump){
+        } else if (state == Skills.Jump || state == Skills.Airstrike){
             vel.y -= 40 + (level * 2);
         }
     }
@@ -174,19 +206,17 @@ public abstract class Unit extends Matter {
         return (int) ((get("Proficiency").get())*damageMod);
     }
 
-    protected int getDamageReduction(){
+    protected int getDamageReduction(int organ){
         return 0;
     }
 
-    protected int getStatPenalty() {
+    public int getStatPenalty() {
         return 0;
     }
 
     public boolean hit(Matter hitter, int damage, DamageType type) {
         delay.performer = null;
         delay.set(0);
-        int x = pos.x-hitter.pos.x > 0 ? 1 : -1;
-        face(x < 0 ? -1 : 1);
         float ratio = (float) damage * 8 / get("Health").getMax();
         float knockback = Math.min(ratio, 30);
         jump = false;
@@ -197,7 +227,10 @@ public abstract class Unit extends Matter {
                 if (brain != null) brain.hit(hitter);
             }
         }
-        vel.x = knockback*x;
+        if (hitter != null) {
+            int x = pos.x - hitter.pos.x > 0 ? 1 : -1;
+            vel.x = knockback * x;
+        }
         vel.y = -knockback * 1.3f - 5;
         return true;
     }
@@ -216,8 +249,8 @@ public abstract class Unit extends Matter {
     public boolean checkHit(Matter hitter, Line p){
         if (faction.canAttack(hitter.faction)) {
             if (hittable()) {
-                int dam = hitter.getDamage() - getDamageReduction();
                 for (int i = 0; i < clip.organs.length; i++) {
+                    int dam = hitter.getDamage() - getDamageReduction(i);
                     if (clip.organs[i].checkHit(p)) {
                         P t = new P(pos.x, p.ptd.y);
                         Particle.explode("Blood", t, t.getSubtract(hitter.pos), 3, 3, 12, true, 5);
@@ -258,7 +291,12 @@ public abstract class Unit extends Matter {
         super.onCollide(l);
         if (!jump) {
             jump = true;
-            if (vel.y > Settings.gravityMax/2) setState(Actions.Hit);
+            int mag = (int) (vel.y - Settings.gravityMax);
+            if (mag >= 0){
+                setState(Actions.Hit);
+                delay.time += getStatPenalty()*30;
+                get("Health").add(-(getStatPenalty()+1+mag));
+            }
         }
     }
 
@@ -283,6 +321,7 @@ public abstract class Unit extends Matter {
 
     @Override
     public void update() {
+        if (jump) vel.x *= .9f;
         stats.update();
         delay.update();
         stateUpdate();
@@ -306,7 +345,16 @@ public abstract class Unit extends Matter {
     public String toString(){
         if (state == Actions.Dead) return "";
         String r = getClass().getSimpleName()+"]"+super.toString()+"@"+id;
-        r += "@"+stats.toString()+"@"+faction.name();
+        r += "@"+stats.toString()+"@"+faction.name()+"@";
+        for (int i:rangeZone) r += i+",";
+        r = r.substring(0,r.length()-1)+"/";
+        Iterator it = moveset.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            Moveset[] moves = (Moveset[]) pair.getValue();
+            for (Moveset i : moves) r += i.getName() + ",";
+            r = r.substring(0,r.length()-1)+(it.hasNext()?"&":"");
+        }
         return r;
     }
 

@@ -53,7 +53,7 @@ public class MerchantIntelligence extends Intelligence {
         price = new int[length];
         action = new Performer[length];
         for (int i = 0; i < length; i++) {
-            Item item = ItemFactory.produce(items[i], -1);
+            Item item = ItemFactory.produce(items[i], -1, 0);
             int value = fluctuate(item.getValue());
             product[i] = item;
             price[i] = value;

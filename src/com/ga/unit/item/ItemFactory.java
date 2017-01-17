@@ -1,7 +1,6 @@
 package com.ga.unit.item;
 
 import com.ga.map.Global;
-import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.unit.*;
 import com.ga.unit.skill.Actions;
@@ -12,8 +11,8 @@ import com.ga.unit.skill.Stat;
  * Created by Ga on 8/7/2016.
  */
 public class ItemFactory {
-    private enum FactoryWeapon{
-        Mace(3,-1,2,8,0, Item.Tag.Mace), Broadsword(3,600,2,6,0,Item.Tag.Sword), Stick(2,10,1,6,2, Item.Tag.Mace), Wooden_Sword(2,100,1,8,1, Item.Tag.Mace),
+    public enum FactoryWeapon{
+        Mace(3,-1,2,8,0, Item.Tag.Mace), Broadsword(3,600,2,6,0,Item.Tag.Sword), Stick(0,10,1,4,2, Item.Tag.Mace), Wooden_Sword(2,100,1,8,1, Item.Tag.Mace),
         Katana(3,100,1,12,1, Item.Tag.Sword), Spear(3,160,1,12,-3,Item.Tag.Spear), Axe(3,100,1,12,-2, Item.Tag.Sword), Dagger(1,80,1,8,3, Item.Tag.Dagger), Pick(4,100,1,12,-2,Item.Tag.Sword),
         Cleaver(4,600,2,8,0, Item.Tag.Sword), Lancesword(1,100,1,6,0,Item.Tag.Spear), Cutlass(1,100,1,6,0,Item.Tag.Sword), Claymore(1,100,1,6,-1,Item.Tag.Sword),
         Halberd(6,100,1,36,-5, Item.Tag.Spear), Greatsword(7,400,2,12,-3, Item.Tag.Sword), Warhammer(7,-1,3,8,-3,Item.Tag.Mace), Claw(1,200,3,4,4,Item.Tag.Claw),
@@ -28,9 +27,20 @@ public class ItemFactory {
             this.speed = speed;
             this.type = type;
         }
+        public static Weapon produce(String p, int seed){
+            String t = p;
+            Weapon r = null;
+            for (FactoryWeapon w : FactoryWeapon.values()){
+                if (w.name().equals(t)){
+                    r = new Weapon(w.toString(), seed, w.weight, w.uses, w.damageNum, w.damageSides, w.type);
+                    r.speed = w.speed;
+                }
+            }
+            return r;
+        }
     }
-    private enum FactoryArmor{
-        Underwear(0, -1, 1, 0),
+    public enum FactoryArmor{ //Body armor by default
+        Underwear(0, -1, 0, 0),
         Cotton_Clothing(0, 50, 1, 1),
         Suit(0, 50, 1f, 2),
         Fabric_Clothing(1, 100, 1, 2),
@@ -39,7 +49,11 @@ public class ItemFactory {
         Steel_Armor(2, 200, 4f, 5),
         Chainmail(3, 200, 6f, 5),
         Platemail(4, 200, 8, 8),
-        Shadowrobe(1, -1, 1, 0);
+        Shadowrobe(1, -1, 1, 0),
+        Head(0,-1,0,0),
+        Lace_Helm(1,-1,2,0),
+        Full_Helm(2,1000,5,1),
+        Legion_Helm(2,1000,8,1);
         private int weight, uses;
         private float armor;
         private int encumberance;
@@ -49,42 +63,32 @@ public class ItemFactory {
             this.weight = weight;
             this.encumberance = encumberance;
         }
+        public static Armor produce(String p, int seed, int piece){
+            String t = p;
+            Armor r = null;
+            for (FactoryArmor w : FactoryArmor.values()){
+                if (w.name().equals(t)){
+                    r = new Armor(w.toString(), seed, w.weight, w.uses, w.armor, w.encumberance, piece);
+                }
+            }
+            return r;
+        }
     }
     public static Item load(String p){
         if (p.equals("")) return null;
         String[] section = p.split(",");
-        Item result = ItemFactory.produce(section[0],Integer.parseInt(section[1]));
+        Item result = produce(section[0],Integer.parseInt(section[1]),section.length >= 6 ? Integer.parseInt(section[5]) : 0);
         result.uses = new Stat(section[2]+","+section[3]);
         result.admod = Item.AdverbMod.load(section[4]);
         return result;
     }
-    public static Item produce(String p, int seed){
-        String t = p;
-        for (FactoryWeapon w : FactoryWeapon.values()){
-            if (w.name().equals(t)) return produceWeapon(w, seed);
-        }
-        for (FactoryArmor w : FactoryArmor.values()){
-            if (w.name().equals(t)) return produceArmor(w, seed);
-        }
-        return produceItem(t, seed);
-    }
-    public static Item produce(String p, int seed, P pos){
-        Item t = produce(p, seed);
-        t.pos = pos.getAdd(0,-1);
-        t.field();
-        t.rotation = (float) Global.r.nextInt(628)/100;
-        return t;
-    }
-    private static Weapon produceWeapon(FactoryWeapon wp, int seed) {
-        Weapon r = new Weapon(wp.toString(), seed, wp.weight, wp.uses, wp.damageNum, wp.damageSides, wp.type);
-        r.speed = wp.speed;
+    public static Item produce(String p, int seed, int opt){
+        Item r = produceItem(p, seed);
+        if (r == null) r = FactoryWeapon.produce(p, seed);
+        if (r == null) r = FactoryArmor.produce(p, seed, opt);
         return r;
     }
-    private static Armor produceArmor(FactoryArmor ar, int seed) {
-        Armor r = new Armor(ar.toString(), seed, ar.weight, ar.uses, ar.armor, ar.encumberance);
-        return r;
-    }
-    private static Item produceItem(String p, int seed) {
+    protected static Item produceItem(String p, int seed) {
         Item item;
         switch (p){
             case "Blood": //amputated fist
@@ -248,7 +252,6 @@ public class ItemFactory {
                 item.setType(Item.Tag.Darting);
                 break;
             default:
-                Global.p("Can't find item "+p);
                 item = null;
                 break;
         }

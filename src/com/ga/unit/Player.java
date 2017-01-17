@@ -10,8 +10,6 @@ import com.ga.unit.skill.*;
 import java.util.ArrayList;
 
 import static com.ga.unit.BodyHumanoid.FIST;
-import static com.ga.unit.skill.Actions.WalkL;
-import static com.ga.unit.skill.Actions.WalkR;
 
 /**
  * Created by Ga on 7/30/2016.
@@ -19,18 +17,12 @@ import static com.ga.unit.skill.Actions.WalkR;
 public class Player extends Man {
     protected String memorized = "";
     public int gold;
-    public Inventory inventory = new Inventory(this);
+    public Inventory inventory = new Inventory();
     public SkillTree skillTree = new SkillTree();
-    private int selectingItem = -1;
+    public int selectingItem = -1;
     public PlayerInput input;
     public Player(String p) {
         super(p);
-        stats.setStat("Level",new Stat(1));
-        stats.setStat("Memory",new Stat(1));
-        stats.setStat("Level Points",new Stat(0));
-        stats.setStat("Reset Points",new Stat(0));
-        get("Level Points").setTotal(25);
-        get("Reset Points").setTotal(25);
         speechType = "p";
     }
     public void learnSkill(Moveset p){
@@ -64,15 +56,8 @@ public class Player extends Man {
         } else if (p == weapon) {
             weapon.drop(this);
             setWeapon(null);
-        } else if (p == armor){
-            armor.drop(this);
-            setArmor(null);
         } else return;
         say("Dropping " + p.getFullName());
-    }
-    public void selectItem(int p){
-        selectingItem = p;
-        setState(Actions.Sheathe);
     }
     @Override
     protected int[] getCooldown(Moveset state){
@@ -91,10 +76,10 @@ public class Player extends Man {
         super.actionSet(state, skillTree.getSkillLevel(state));
         if (state instanceof Actions) {
             switch ((Actions) state) {
-                case Sheathe:
+                case Wield:
                     delay.performer = new Performer() {
                         public boolean perform() {
-                            if (!wieldingNone() || selectingItem == -1) {
+                            if (selectingItem == -1) {
                                 sheathe();
                                 return false;
                             } else if (selectingItem < inventory.getItemSize()) {
@@ -102,6 +87,11 @@ public class Player extends Man {
                                 setWeapon(item);
                                 inventory.remove(item);
                                 selectingItem = -1;
+                            } else if (selectingItem >= 10 && selectingItem <= 16){
+                                if (sheathe()) {
+                                    setWeapon(armor.armor[selectingItem-10]);
+                                    armor.set(null,selectingItem-10);
+                                }
                             }
                             return true;
                         }
@@ -115,15 +105,6 @@ public class Player extends Man {
             switch ((Actions) state) {
                 case Idle:
                     if (!get("Stamina").isFull()) state = Actions.Exhausted;
-                    break;
-                case Pull1:
-                    selectItem(0);
-                    break;
-                case Pull2:
-                    selectItem(1);
-                    break;
-                case Pull3:
-                    selectItem(2);
                     break;
                 case Interact:
                     ArrayList<Matter> obj = Updater.collide(pos.getAdd(clip.organs[FIST].ptd), 12);
@@ -154,8 +135,7 @@ public class Player extends Man {
         }
         if (weapon.getType() == Item.Tag.Claw) weapon.rotation = (weapon.getOrgan().getAtan()+(dir<0?3.14f:0));
         int r = super.setState(state);
-        if (r == 1) {
-        } else if (r == 2){
+        if (r == 2){
             int req = (int) state.getCost();
             req += getStatPenalty();
             if (req > get("Stamina").getMax()) say("This skill is beyond my abilities!");
@@ -168,8 +148,12 @@ public class Player extends Man {
         }
         return r;
     }
+    @Override
+    public int getStatPenalty() {
+        return (armor.getWeight()+weapon.weight)/get("Strength").get();
+    }
     protected float getSpeed() {
-        float t = Math.max(0,super.getSpeed()-((inventory.weight+getStatPenalty())/get("Strength").get()));
+        float t = Math.max(0,super.getSpeed()-(inventory.weight/get("Strength").get())-getStatPenalty());
         clip.setMoveSpeed((int) Global.clamp(t-1,-20,4));
         return t;
     }

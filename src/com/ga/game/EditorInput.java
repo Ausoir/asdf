@@ -19,6 +19,7 @@ public class EditorInput implements Input, Updatable {
         NONE, CREATE, DELETE, REMOVE, MAN, UNIT, OBJECT
     }
     String cunit = "Player";
+    String texture = "Dirt";
     boolean control = false;
     boolean shift = false;
     boolean lmb = false;
@@ -81,9 +82,12 @@ public class EditorInput implements Input, Updatable {
             Updater.landColor = Color.black;
         } else if (p.equals("invisible")) {
             Updater.landColor = new Color(0,0,0,0);
+        } else if (p.startsWith("tx")) {
+            texture = p.substring(2);
         } else if (p.equals("render")){
             Global.map.setTexture();
-//            Global.map.setShader();
+        } else if (p.equals("shader")){
+            Global.map.setShader();
         } else if (p.startsWith("save")){
             save("map/"+p.substring(5));
         } else if (p.startsWith("load")){
@@ -142,7 +146,6 @@ public class EditorInput implements Input, Updatable {
                         y = (int) l.ptd.y;
                         lineConnection.put(current, i);
                         snap = true;
-                        if (connected) makePolygon(current);
                         break;
                     }
                 }
@@ -206,6 +209,7 @@ public class EditorInput implements Input, Updatable {
                         i = (Line) it.next();
                         if (i.lineCross(new Line(new P(x,y),lmbP))){
                             Global.p(i.toString());
+                            if (!texture.equals("") && i.next != -1) Global.map.formTextures.put(i.next, texture);
                         }
                     }
                 }

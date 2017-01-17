@@ -61,11 +61,13 @@ public abstract class Intelligence {
         }
     }
     public void hit(Matter hitter){
-        if (target != hitter) host.say("@agro");
-        if (hitter != null && hitter instanceof Unit) target = (Unit) hitter;
-        else{
-            provoked(hitter.pos.x-host.pos.x>0?1:-1);
-            host.say("@hit");
+        if (hitter != null) {
+            if (target != hitter) host.say("@agro");
+            if (hitter instanceof Unit) target = (Unit) hitter;
+            else {
+                provoked(hitter.pos.x - host.pos.x > 0 ? 1 : -1);
+                host.say("@hit");
+            }
         }
     }
     public void setState(Moveset state){

@@ -1,7 +1,5 @@
 package com.ga.unit.item;
 
-import com.ga.unit.Player;
-
 import java.util.ArrayList;
 
 /**
@@ -10,10 +8,8 @@ import java.util.ArrayList;
 public class Inventory {
     private ArrayList<Item> items = new ArrayList<>();
     public int weight = 0;
-    private Player player;
-    public int maxSize = 5;
-    public Inventory(Player player){
-        this.player = player;
+    public int maxSize = 2;
+    public Inventory(){
     }
     public boolean addItem(Item p){
         if (items.size() >= maxSize) return false;

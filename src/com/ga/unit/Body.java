@@ -39,7 +39,7 @@ public class Body {
         reset(current, clip);
         appendageSize = (float) Math.abs(host.rand.nextGaussian()*.3f)+.7f;
         randomize();
-        organs[BODY].pt.y = -localAnimation[0][FOOT][1];
+        organs[BODY].pt.y = -getHeight();
         setSkin(current+"_skin");
     }
 
@@ -74,7 +74,7 @@ public class Body {
         localAnimation = Clips.clone(p.clip);
         localFrames = Clips.clone(p.frames);
         frame = new Timer(0);
-        setState(Actions.Idle);
+        nextClip = localAnimation[nextAnimation[current]];
         for (int i = 0; i < organs.length; i++) {
             initializeOrgan(name, p.model,i);
         }
@@ -125,9 +125,14 @@ public class Body {
         }
     }
 
+    public int getHeight(){
+        return localAnimation[0][FOOT][1];
+    }
+
     public void setState(Moveset state) {
         if (state == Actions.Dead) organs[BODY].pt.y = 0;
-        else if (state == Actions.Revive) organs[BODY].pt.y = -localAnimation[0][FOOT][1];
+        else if (state == Actions.Hit) organs[BODY].pt.y = 0;
+        else setHeight();
         this.state = state;
         current = 0;
         if (animation.containsKey(state)) nextAnimation = animation.get(state);
@@ -197,9 +202,14 @@ public class Body {
             }
         }
         if (legs != legNum){
-            if (legs == 0) organs[BODY].pt.y = 0;
             legCurrent = legs;
+            setHeight();
         }
+    }
+
+    private void setHeight(){
+        if (legCurrent == 0) organs[BODY].pt.y = 0;
+        else organs[BODY].pt.y = -getHeight();
     }
 
     protected float getLegStatus(){

@@ -4,7 +4,7 @@ package com.ga.unit;
  * Created by Ga on 9/5/2016.
  */
 public enum Faction {
-    Player(1),
+    Player(11),
     Player2(10),
     Neutral(1),
     Merchant(1),

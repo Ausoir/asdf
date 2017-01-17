@@ -290,12 +290,21 @@ class InventoryPanel extends JPanel {
         b.setTitle("Wielded");
         ((JPanel) panel.getComponent(0)).setBorder(b);
 
-        grid.gridy = 1;
-        Item equipped = Global.player.host.getArmor();
-        makeSlot(2, equipped, 0);
-        b = BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder());
-        b.setTitle("Equipped");
-        ((JPanel) panel.getComponent(1)).setBorder(b);
+        for (int i=0;i<5;i++) {
+            grid.gridy = 1+i;
+            Item equipped = Global.player.host.armor.armor[i];
+            makeSlot(2, equipped, i);
+            b = BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder());
+            String title = "Equipped";
+            if (i == 0) title += " - Right Arm";
+            else if (i == 1) title += " - Left Leg";
+            else if (i == 2) title += " - Right Leg";
+            else if (i == 3) title += " - Body";
+            else if (i == 4) title += " - Left Arm";
+            else if (i == 5) title += " - Head";
+            b.setTitle(title);
+            ((JPanel) panel.getComponent(i+1)).setBorder(b);
+        }
 
         for (int i = 0; i < itemsize; i++) {
             Item item = inv.getItem(i);
@@ -317,6 +326,16 @@ class InventoryPanel extends JPanel {
             result.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
+                    Global.player.input("I"+index,0,0);
+                    Display.menu.setVisible(false);
+                }
+            });
+        } else if (type == 2) { //armor
+            result.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    Global.player.input("I1"+index,0,0);
+                    Display.menu.setVisible(false);
                 }
             });
         } else if (type == 1){
@@ -324,30 +343,8 @@ class InventoryPanel extends JPanel {
             result.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    String t = Global.player.host.getWeapon().name;
-                    Global.player.host.sheathe();
-                    Global.player.host.say("Sheathed "+t);
-                }
-            });
-        } else if (type == 2){
-            if (Global.player.host.equippingNone()) panel.setVisible(false);
-            result.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    final Player player = Global.player.host;
-                    if (player.sheathe()) {
-                        player.say("Undressing...");
-                        player.delay.set(60);
-                        player.delay.performer = new Performer() {
-                            @Override
-                            public boolean perform() {
-                                player.say("Undressed " + player.getArmor().name);
-                                player.setWeapon(player.getArmor());
-                                player.setArmor(null);
-                                return true;
-                            }
-                        };
-                    }
+                    Global.player.input("AWield",0,0);
+                    Display.menu.setVisible(false);
                 }
             });
         }
@@ -362,16 +359,7 @@ class InventoryPanel extends JPanel {
                 describe(item);
             }
         });
-        final JLabel drop = new JLabel(item.getFullName());
-        if (type != 2) {
-            drop.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    drop(item);
-                }
-            });
-            drop.setIcon(new ImageIcon(Picture.load("Drop")));
-        }
+        final JLabel drop = new JLabel(item.getFullName()+"             ");
         drop.setForeground(item.getRarityColor());
         options.add(describe);
         options.add(drop);
@@ -381,9 +369,6 @@ class InventoryPanel extends JPanel {
     }
     private void describe(Item item){
         Display.dialog.show(item.getFullName(),item.getDescription());
-    }
-    private void drop(Item item){
-        Global.player.host.dropItem(item);
     }
 }
 

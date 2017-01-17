@@ -22,7 +22,7 @@ public class UnitIntelligence extends Intelligence {
                 if (unit.state != Actions.Dead) {
                     target = (Unit) p;
                     host.say("@c tgt");
-                    setTaskEcho(new Hunt(host, target));
+                    setTaskEcho(new Hunt(host));
                 }
             } else if (host.faction == p.faction && host.name.equals(unit.name)){
                 if (leader == null && ((UnitIntelligence)unit.brain).charisma > charisma) {
@@ -48,6 +48,6 @@ public class UnitIntelligence extends Intelligence {
         if (host.get("Health").getPercentage() < .15f){
             host.say("@flee");
             setTaskEcho(new Flee(host, target));
-        } else if (getTask() instanceof Flee && target != null) setTaskEcho(new Hunt(host, target));
+        } else if (getTask() instanceof Flee && target != null) setTaskEcho(new Hunt(host));
     }
 }

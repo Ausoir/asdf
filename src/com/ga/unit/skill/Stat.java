@@ -5,7 +5,7 @@ package com.ga.unit.skill;
  */
 public class Stat {
     private int max;
-    private int current;
+    protected int current;
     public int reserve = 0;
     public Stat(String p){
         String[] t = p.split(",");

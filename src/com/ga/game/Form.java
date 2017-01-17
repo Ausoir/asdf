@@ -2,6 +2,7 @@ package com.ga.game;
 
 import com.ga.map.Global;
 import com.ga.tool.P;
+import com.ga.tool.Performer;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -14,11 +15,19 @@ import java.awt.image.BufferedImage;
 public class Form extends Texture {
     private Polygon polygon;
     private TexturePaint imageTexture;
+    private ShaderType shader;
     public P pos;
-    public Form(String p){
+    public Form(String p, String shader){
         super(p);
         polygon = new Polygon();
         imageTexture = new TexturePaint(image, new Rectangle2D.Double(0,0,size.x,size.y));
+        setShader(shader);
+    }
+    public void setShader(String p){
+        shader = ShaderType.getByName(p);
+    }
+    public void shade(int x1, int x2, int y1, float slope){
+        shader.render(image, x1, x2, y1, slope);
     }
     public void addPoint(float x, float y){
         addPoint((int)x, (int)y);
@@ -43,7 +52,6 @@ public class Form extends Texture {
         pos = new P(lowX, lowY);
         image = new BufferedImage(highX-lowX, highY-lowY, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = image.createGraphics();
-//        g.setTransform(AffineTransform.getTranslateInstance(Global.getRelX(),Global.getRelY()));
         g.setPaint(imageTexture);
         g.fill(polygon);
     }

@@ -113,7 +113,7 @@ public class Stats {
                 endEffect(effects.get(i));
             }
         }
-        if (bloodTimer.update()) Particle.explode("Blood",host.pos.getAdd(0,-40),new P(),Global.r.nextInt(4),5,0,true,24);
+        if (bloodTimer.update()) Particle.explode("Blood",host.pos.getAdd(0,-host.clip.getHeight()),new P(),Global.r.nextInt(4),5,0,true,24);
     }
     public void load(String p){
         String[] statOrBuff = p.split("/");
@@ -125,11 +125,11 @@ public class Stats {
                 public void onChange(){
                     if (isFull()) bloodTimer.set(-1);
                     else bloodTimer.set((int) (getPercentage()*getPercentage()*100)+1, true);
+                    if (current <= 0) host.die();
                 }
             };
             newstat.add(0);
             stats.put(pair[0], newstat);
-            newstat.onChange();
         }
         if (statOrBuff.length > 1) {
             data = statOrBuff[1].split(";");

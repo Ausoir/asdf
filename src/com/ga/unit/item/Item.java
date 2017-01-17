@@ -250,12 +250,15 @@ public class Item extends Matter {
         else if (rare % 5 == 5) r = "legendary";
         return r;
     }
+    public String getDisplayName(){
+        return name;
+    }
     public String getFullName(){
         String r = "";
         if (admod != AdverbMod.None) r+=admod.name()+" ";
         if (smod != SpecialtyMod.None) r+=smod.name()+" ";
         if (pmod != PrefixMod.None) r+=pmod.name()+" ";
-        r += name;
+        r += getDisplayName();
         if (emod != null){
             r+=" of ";
             if (ademod != AdenchantMod.None){

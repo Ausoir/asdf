@@ -26,10 +26,7 @@ public class PlayerInput implements Input {
         put(KeyEvent.VK_A, Actions.WalkL);
         put(KeyEvent.VK_S, Actions.Down);
         put(KeyEvent.VK_D, Actions.WalkR);
-        put(KeyEvent.VK_R, Actions.Sheathe);
-        put(49, Actions.Pull1);
-        put(50, Actions.Pull2);
-        put(51, Actions.Pull3);
+        put(KeyEvent.VK_R, Actions.Wield);
         put(1, Skills.Use);
         put(KeyEvent.VK_UP, Actions.LookUp);
         put(KeyEvent.VK_LEFT, Actions.LookLeft);
@@ -83,11 +80,16 @@ public class PlayerInput implements Input {
         if (mode == KeyEvent.VK_ENTER) Display.chatbox.requestFocus();
         else if (mode == KeyEvent.VK_TAB) Display.menu.toggle();
         else if (keyMap.containsKey(mode)){
-            int tx = (int) (x-host.pos.x);
-            int ty = (int) (y-host.pos.y);
-            Global.server.sendFromLocal("IN>"+keyMap.get(mode).getCodeName() + "@" + tx + "@" + ty);
-            inputDirect(keyMap.get(mode).getCodeName(), tx, ty);
+            input(keyMap.get(mode).getCodeName(),x,y);
+        } else if (mode >= 49 && mode < 55) {
+            input("I"+(mode-49),x,y);
         }
+    }
+    public void input(String p, int x, int y){
+        int tx = (int) (x-host.pos.x);
+        int ty = (int) (y-host.pos.y);
+        Global.server.sendFromLocal("IN>"+p + "@" + tx + "@" + ty);
+        inputDirect(p, tx, ty);
     }
     public void inputDirect(String p, int x, int y){
         String t = p.substring(1);
@@ -96,10 +98,14 @@ public class PlayerInput implements Input {
             if (t.equals("Idle")) moving = 0;
             else if (t.equals("WalkL")) moving = -1;
             else if (t.equals("WalkR")) moving = 1;
+            host.selectingItem = -1;
             host.setState(Actions.getByName(t));
         }
         else if (p.startsWith("K")) host.setState(Skills.getByName(t));
-        else if (p.startsWith("I")) host.selectItem(Integer.parseInt(t));
+        else if (p.startsWith("I")){
+            host.selectingItem = Integer.parseInt(t);
+            host.setState(Actions.Wield);
+        }
     }
     public void load(String p){
         if (p.length() > 1) {

@@ -93,8 +93,13 @@ public class FileManager {
         String[] names = line[0].split(",");
         Global.map = new Map(names, mapPos);
 
-        if (line.length > 1) {
-            String[] sections = line[1].split(";");
+        String[] sections = line[1].split(";");
+        for (int section = 0; section < sections.length; section++) {
+            String values[] = sections[section].split(":");
+            Global.map.formTextures.put(Integer.parseInt(values[0]),values[1]);
+        }
+        if (line.length > 2) {
+            sections = line[2].split(";");
             for (int section = 0; section < sections.length; section++) {
                 String values[] = sections[section].split(",");
                 int[] v = new int[values.length];
@@ -103,8 +108,8 @@ public class FileManager {
                 }
                 Global.map.land.add(new Line(v[0], v[1], v[2], v[3], v[4], v[5]));
             }
-            if (line.length > 2) {
-                sections = line[2].split(";");
+            if (line.length > 3) {
+                sections = line[3].split(";");
                 if (sections.length > 0) {
                     for (int section = 0; section < sections.length; section++) {
                         String[] unit = sections[section].split("]");
@@ -126,7 +131,7 @@ public class FileManager {
             }
         }
         Global.map.setTexture();
-//        Global.map.setShader();
+        Global.map.setShader();
         if (r == null) System.out.println("Invalid Player Spawn Location");
         return r;
     }

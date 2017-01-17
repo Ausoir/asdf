@@ -31,7 +31,7 @@ public class Speech extends JTextArea implements Drawable, Updatable{
         super();
         this.host = host;
         Updater.add(this);
-        font = new Font("Arial",Font.BOLD,18); //Comic Sans MS
+        font = new Font("Helvetica",Font.PLAIN,18);
         setFont(font);
         setBackground(color);
         setLineWrap(true);
