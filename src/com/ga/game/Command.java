@@ -27,6 +27,7 @@ public class Command {
                 else if (cmd[0].equals("heal")) host.get("Health").add(Integer.parseInt(cmd[1]));
                 else if (cmd[0].equals("time")) Global.setTime(Global.getTime()[0]+Integer.parseInt(cmd[1]));
                 else if (cmd[0].equals("slow")) host.stats.addEffect(Buffs.Slow, 3);
+                else if (cmd[0].equals("status")) host.say("Stamina:"+host.get("Stamina")+" Penalty:"+host.getStatPenalty()+" Health:"+host.get("Health"));
                 else if (cmd[0].equals("delevel")) host.stats.delevel(cmd[1]);
                 else if (cmd[0].equals("level")) host.stats.level(cmd[1]);
                 else if (cmd[0].equals("stat")) host.get(cmd[1].split(":")[0]).addTotal(Integer.parseInt(cmd[1].split(":")[1]));
@@ -38,7 +39,7 @@ public class Command {
                 else if (cmd[0].equals("mob")) for (int num=0;num<Integer.parseInt(cmd[1].split(":")[1]);num++) ManFactory.produce(cmd[1].split(":")[0], host.pos.getAdd(host.target), -1);
                 else if (cmd[0].equals("dog")) BeastFactory.produce(cmd[1], host.pos.getAdd(host.target), -1);
                 else if (cmd[0].equals("dummy")) ManFactory.produce(cmd[1], host.pos.getAdd(host.target), -1).brain = null;
-                else if (cmd[0].equals("item")) host.setWeapon(ItemFactory.produce(cmd[1] ,-1,0));
+                else if (cmd[0].equals("item")) host.setWeapon(ItemFactory.produce(cmd[1] ,-1,cmd.length>2?Integer.parseInt(cmd[2]):3));
                 else if (cmd[0].equals("tp")) host.pos.add(Integer.parseInt(cmd[1].split(",")[0]),Integer.parseInt(cmd[1].split(",")[1]));
                 else if (cmd[0].equals("to")) host.pos.add(host.target);
 //                else if (cmd[0].equals("inside")) host.say(Matter.isInside(host.pos.getAdd(host.target).x, host.pos.getAdd(host.target).y)+"");
@@ -50,7 +51,9 @@ public class Command {
                 else if (cmd[0].equals("atkspd")) host.getWeapon().speed = Integer.parseInt(cmd[1]);
                 else if (p.equals("revive")) host.revive();
                 else if (p.equals("terrain")) Updater.showTerrain = true;
-                else if (p.equals("produce")){
+                else if (cmd[0].equals("randomObj")){
+                    new Matter(cmd[1],0,Global.map.randomSurface(),8);
+                } else if (cmd[0].equals("randomItem")){
                     Item t = ItemFactory.produce(cmd[1],0,0);
                     t.field();
                     t.pos = Global.map.randomSurface();

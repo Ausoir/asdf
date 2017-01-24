@@ -1,8 +1,7 @@
 package com.ga.game;
 
 import com.ga.map.Global;
-import com.ga.tool.P;
-import com.ga.tool.Performer;
+import com.ga.map.Picture;
 import com.ga.tool.Word;
 import com.ga.unit.Player;
 import com.ga.unit.item.Inventory;
@@ -22,38 +21,32 @@ import java.awt.event.*;
 /**
  * Created by Ga on 8/6/2016.
  */
-public class Menu extends JPanel {
-    public P size;
+public class Menu extends Panel {
     private GridBagConstraints grid = new GridBagConstraints();
     private JPanel mainpanel = new JPanel();
     private StatPanel statspanel = new StatPanel();
+    private EquipmentPanel equipmentPanel = new EquipmentPanel();
     private InventoryPanel inventorypanel = new InventoryPanel();
     private SkillPanel skillpanel = new SkillPanel();
-    private HelpPanel helppanel = new HelpPanel();
     private JPanel optionspanel = new JPanel();
-    private Image image;
     public Menu() {
+        targetSizeX = 764;
         setLayout(new GridBagLayout());
-        image = Picture.load("Menu");
-        setBorder(new EmptyBorder(100,140,100,140));
-        size = new P(image.getWidth(null), image.getHeight(null));
-        resize();
-        setVisible(false);
         grid.anchor = GridBagConstraints.LINE_START;
         grid.fill = GridBagConstraints.NONE;
 
-        grid.weightx = .1;
+        grid.weightx = 0;
         grid.weighty = 1;
         optionspanel.setOpaque(false);
         addMainPanel();
         grid.gridx = 1;
-        grid.weightx = .9;
+        grid.weightx = 1;
         grid.anchor = GridBagConstraints.FIRST_LINE_START;
         grid.fill = GridBagConstraints.BOTH;
         add(statspanel,grid);
+        add(equipmentPanel,grid);
         add(inventorypanel,grid);
         add(skillpanel,grid);
-        add(helppanel,grid);
         add(optionspanel,grid);
         command("");
     }
@@ -61,52 +54,45 @@ public class Menu extends JPanel {
         GridLayout gridlayout = new GridLayout(5,1,20,40);
         mainpanel.setOpaque(false);
         mainpanel.setLayout(gridlayout);
-        mainpanel.add(makeMenuButton("Stats", "stats"));
-        mainpanel.add(makeMenuButton("Inventory", "inventory"));
-        mainpanel.add(makeMenuButton("Spells", "spell"));
-        mainpanel.add(makeMenuButton("Help", "help"));
-        mainpanel.add(makeMenuButton("Options", "options"));
+        mainpanel.add(makeOption("Stats", "stats"));
+        mainpanel.add(makeOption("Equipment", "equip"));
+        mainpanel.add(makeOption("Inventory", "inventory"));
+        mainpanel.add(makeOption("Spells", "spell"));
+        mainpanel.add(makeOption("Options", "options"));
         grid.gridx = 0;
         add(mainpanel,grid);
     }
     @Override
-    public void paintComponent(Graphics g){
-        g.drawImage(image,0,0,null);
+    protected void setColor() {
+        setBackground(forecolor);
     }
-    public JButton makeOption(String p){
-        final JButton button = new JButton(p);
-        button.setFont(new Font("Ariel",Font.ITALIC,16));
-        button.setForeground(new Color(110,105,80));
+    public JButton makeOption(String p, final String cmd){
+        final JButton button = new JButton(" "+p+" ");
+        button.setFont(Panel.font);
+        button.setForeground(Panel.fontcolor);
         button.setBorder(null);
         button.setContentAreaFilled(false);
         button.setFocusable(false);
-        button.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-
-            }
+        button.setOpaque(true);
+        button.setBackground(Panel.forecolor);
+        button.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                button.setForeground(Color.blue);
+                button.setForeground(Color.CYAN);
             }
             @Override
             public void mouseReleased(MouseEvent e) {
-                button.setForeground(new Color(110,105,80));
+                button.setForeground(Panel.fontcolor);
             }
             @Override
             public void mouseEntered(MouseEvent e) {
-
+                button.setBackground(Panel.forecolor2);
             }
             @Override
             public void mouseExited(MouseEvent e) {
-
+                button.setBackground(Panel.forecolor);
             }
         });
-        return button;
-    }
-    private JButton makeMenuButton(String p, final String cmd){
-        JButton button = makeOption(p);
-        button.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -117,34 +103,31 @@ public class Menu extends JPanel {
     }
     private void command(String p){
         statspanel.setVisible(false);
+        equipmentPanel.setVisible(false);
         inventorypanel.setVisible(false);
         skillpanel.setVisible(false);
-        helppanel.setVisible(false);
         optionspanel.setVisible(false);
         if (p.equals("stats")) statspanel.setVisible(true);
+        else if (p.equals("equip")) equipmentPanel.setVisible(true);
         else if (p.equals("inventory")) inventorypanel.setVisible(true);
         else if (p.equals("spell")) skillpanel.setVisible(true);
-        else if (p.equals("help")) helppanel.setVisible(true);
         else if (p.equals("options")) optionspanel.setVisible(true);
     }
     public void toggle(){
         if (isVisible()) setVisible(false);
         else{
-            setVisible(true);
+            display();
         }
     }
-    public void resize(){
-        int x = (int) (Settings.centerX-(size.x/2));
-        int y = (int) (Settings.centerY-(size.y/2));
-        setBounds(x,y, (int) size.x, (int) size.y);
-    }
-    public void setVisible(boolean visible){
-        super.setVisible(visible);
-        if (visible && Global.player != null){
+    public void display(){
+        super.setVisible(true);
+        if (Global.player != null){
+            super.display();
+            setBackground(new Color(120,120,120,180));
             statspanel.refresh();
             inventorypanel.refresh();
             skillpanel.refresh();
-            helppanel.refresh();
+            equipmentPanel.refresh();
         }
     }
 }
@@ -153,7 +136,7 @@ class StatPanel extends JPanel{
     private GridBagConstraints statgrid = new GridBagConstraints();
     public StatPanel(){
         setLayout(new GridBagLayout());
-        setOpaque(false);
+        setBackground(Panel.forecolor2);
         statgrid.anchor = GridBagConstraints.LINE_START;
         statgrid.fill = GridBagConstraints.BOTH;
         statgrid.ipadx = 120;
@@ -211,8 +194,8 @@ class StatPanel extends JPanel{
     }
     public JButton makeStatButton(String p, final String cmd){
         final JButton button = new JButton(p);
-        button.setFont(new Font("Ariel",Font.ITALIC,16));
-        button.setForeground(new Color(110,105,80));
+        button.setFont(Panel.font);
+        button.setForeground(Panel.fontcolor);
         button.setBorder(null);
         button.setContentAreaFilled(false);
         button.setFocusable(false);
@@ -252,17 +235,15 @@ class StatPanel extends JPanel{
     }
 }
 
-class InventoryPanel extends JPanel {
+class EquipmentPanel extends JTextArea{
     private GridBagConstraints grid = new GridBagConstraints();
     private JPanel panel;
     private JScrollPane scroll;
     private JLabel gold;
     private Border emptyborder = new EmptyBorder(5,8,5,8);
     private int[] selected;
-    public InventoryPanel(){
+    public EquipmentPanel(){
         setLayout(new BoxLayout(this,BoxLayout.PAGE_AXIS));
-        setOpaque(false);
-        setBorder(BorderFactory.createBevelBorder(1));
         gold = new JLabel();
         panel = new JPanel();
         panel.setOpaque(false);
@@ -270,11 +251,13 @@ class InventoryPanel extends JPanel {
         scroll = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scroll.getVerticalScrollBar().setUI(new ScrollBar());
         scroll.getVerticalScrollBar().setOpaque(false);
-        scroll.getVerticalScrollBar().setUnitIncrement(16);
-        scroll.setOpaque(false);
+        scroll.getVerticalScrollBar().setUnitIncrement(24);
         scroll.getViewport().setOpaque(false);
-        add(scroll, BorderLayout.CENTER);
+        scroll.setBorder(null);
+        scroll.setOpaque(false);
+        setBackground(Panel.forecolor2);
         add(gold, BorderLayout.LINE_START);
+        add(scroll, BorderLayout.LINE_START);
     }
     public void refresh(){
         gold.setText("Gold: "+Global.player.host.gold);
@@ -285,34 +268,30 @@ class InventoryPanel extends JPanel {
 
         grid.gridy = 0;
         Item wielded = Global.player.host.getWeapon();
-        makeSlot(1, wielded, 0);
-        TitledBorder b = BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder());
+        makeSlot(-1, wielded);
+        TitledBorder b = BorderFactory.createTitledBorder(BorderFactory.createMatteBorder(2,2,2,2,Panel.forecolor));
         b.setTitle("Wielded");
         ((JPanel) panel.getComponent(0)).setBorder(b);
 
-        for (int i=0;i<5;i++) {
-            grid.gridy = 1+i;
-            Item equipped = Global.player.host.armor.armor[i];
-            makeSlot(2, equipped, i);
-            b = BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder());
-            String title = "Equipped";
-            if (i == 0) title += " - Right Arm";
-            else if (i == 1) title += " - Left Leg";
-            else if (i == 2) title += " - Right Leg";
-            else if (i == 3) title += " - Body";
-            else if (i == 4) title += " - Left Arm";
-            else if (i == 5) title += " - Head";
-            b.setTitle(title);
-            ((JPanel) panel.getComponent(i+1)).setBorder(b);
-        }
-
-        for (int i = 0; i < itemsize; i++) {
-            Item item = inv.getItem(i);
-            grid.gridy = i+2;
-            makeSlot(3, item, i);
+        for (int i=0;i<6;i++) {
+            if (!Global.player.host.armor.isBare(i)) {
+                grid.gridy = 1+i;
+                Item equipped = Global.player.host.armor.armor[i];
+                JPanel panel = makeSlot(i, equipped);
+                b = BorderFactory.createTitledBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Panel.forecolor));
+                String title = "Equipped";
+                if (i == 0) title += " - Right Arm";
+                else if (i == 1) title += " - Left Leg";
+                else if (i == 2) title += " - Right Leg";
+                else if (i == 3) title += " - Body";
+                else if (i == 4) title += " - Left Arm";
+                else if (i == 5) title += " - Head";
+                b.setTitle(title);
+                panel.setBorder(b);
+            }
         }
     }
-    public void makeSlot(int type, final Item item, final int index){
+    public JPanel makeSlot(final int type, final Item item){
         JPanel panel = new JPanel();
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel,BoxLayout.PAGE_AXIS));
@@ -322,28 +301,20 @@ class InventoryPanel extends JPanel {
         result.setHorizontalTextPosition(JLabel.CENTER);
         result.setVerticalTextPosition(JLabel.TOP);
         result.setBorder(emptyborder);
-        if (type == 3) {
-            result.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    Global.player.input("I"+index,0,0);
-                    Display.menu.setVisible(false);
-                }
-            });
-        } else if (type == 2) { //armor
-            result.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    Global.player.input("I1"+index,0,0);
-                    Display.menu.setVisible(false);
-                }
-            });
-        } else if (type == 1){
+        if (type == -1){
             if (Global.player.host.wieldingNone()) panel.setVisible(false);
             result.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     Global.player.input("AWield",0,0);
+                    Display.menu.setVisible(false);
+                }
+            });
+        } else { //armor
+            result.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    Global.player.input("I1"+type,0,0);
                     Display.menu.setVisible(false);
                 }
             });
@@ -356,7 +327,82 @@ class InventoryPanel extends JPanel {
         describe.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                describe(item);
+                Display.dialog.show(item.getFullName(),item.getDescription());
+            }
+        });
+        final JLabel drop = new JLabel(item.getFullName()+"             ");
+        drop.setForeground(item.getRarityColor());
+        options.add(describe);
+        options.add(drop);
+        panel.add(options);
+        panel.add(result);
+        this.panel.add(panel);
+        return panel;
+    }
+}
+
+class InventoryPanel extends JPanel {
+    private GridBagConstraints grid = new GridBagConstraints();
+    private JPanel panel;
+    private JScrollPane scroll;
+    private JLabel gold;
+    private Border emptyborder = new EmptyBorder(5,8,5,8);
+    private int[] selected;
+    public InventoryPanel(){
+        setLayout(new BoxLayout(this,BoxLayout.PAGE_AXIS));
+        gold = new JLabel();
+        panel = new JPanel();
+        panel.setOpaque(false);
+        panel.setLayout(new BoxLayout(panel,BoxLayout.PAGE_AXIS));
+        scroll = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scroll.getVerticalScrollBar().setUI(new ScrollBar());
+        scroll.getVerticalScrollBar().setOpaque(false);
+        scroll.getVerticalScrollBar().setUnitIncrement(24);
+        scroll.getViewport().setOpaque(false);
+        scroll.setBorder(null);
+        scroll.setOpaque(false);
+        setBackground(Panel.forecolor2);
+        add(gold, BorderLayout.LINE_START);
+        add(scroll, BorderLayout.LINE_START);
+    }
+    public void refresh(){
+        gold.setText("Gold: "+Global.player.host.gold);
+        panel.removeAll();
+        Inventory inv = Global.player.host.inventory;
+        int itemsize = inv.getItemSize();
+        selected = new int[itemsize];
+        for (int i = 0; i < itemsize; i++) {
+            Item item = inv.getItem(i);
+            grid.gridy = i;
+            makeSlot(item, i);
+        }
+    }
+    public void makeSlot(final Item item, final int index){
+        JPanel panel = new JPanel();
+        panel.setOpaque(false);
+        panel.setLayout(new BoxLayout(panel,BoxLayout.PAGE_AXIS));
+        panel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
+        final JLabel result = new JLabel();
+        result.setIcon(new ImageIcon(item.image.getImage()));
+        result.setHorizontalTextPosition(JLabel.CENTER);
+        result.setVerticalTextPosition(JLabel.TOP);
+        result.setBorder(emptyborder);
+        result.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                Global.player.input("I"+index,0,0);
+                Display.menu.setVisible(false);
+            }
+        });
+        JPanel options = new JPanel();
+        options.setOpaque(false);
+        options.setLayout(new BoxLayout(options,BoxLayout.LINE_AXIS));
+        final JLabel describe = new JLabel();
+        describe.setIcon(new ImageIcon(Picture.load("Describe")));
+        describe.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                Display.dialog.show(item.getFullName(),item.getDescription());
             }
         });
         final JLabel drop = new JLabel(item.getFullName()+"             ");
@@ -367,9 +413,6 @@ class InventoryPanel extends JPanel {
         panel.add(result);
         this.panel.add(panel);
     }
-    private void describe(Item item){
-        Display.dialog.show(item.getFullName(),item.getDescription());
-    }
 }
 
 class SkillPanel extends JPanel{
@@ -378,8 +421,6 @@ class SkillPanel extends JPanel{
     private JLabel skillpoints;
     public SkillPanel(){
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-        setBorder(BorderFactory.createBevelBorder(1));
-        setOpaque(false);
         setVisible(false);
         panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
@@ -390,6 +431,8 @@ class SkillPanel extends JPanel{
         scroll.getVerticalScrollBar().setUnitIncrement(16);
         scroll.setOpaque(false);
         scroll.getViewport().setOpaque(false);
+        scroll.setBorder(null);
+        setBackground(Panel.forecolor2);
         add(scroll, BorderLayout.CENTER);
         skillpoints = new JLabel();
         add(skillpoints);
@@ -492,17 +535,6 @@ class SkillPanel extends JPanel{
         panel.add(equip);
         this.panel.add(panel);
         this.panel.add(Box.createRigidArea(new Dimension(0,4)));
-    }
-}
-
-class HelpPanel extends JTextArea{
-    public HelpPanel(){
-        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-        setOpaque(false);
-        setVisible(false);
-    }
-    protected void refresh(){
-        setText("This help section is not feeling helpful.");
     }
 }
 

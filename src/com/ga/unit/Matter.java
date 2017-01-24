@@ -3,6 +3,7 @@ package com.ga.unit;
 import com.ga.game.Settings;
 import com.ga.map.Global;
 import com.ga.map.Updatable;
+import com.ga.tool.Interactive;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 
@@ -19,7 +20,7 @@ public class Matter extends Thing implements Updatable {
     public P vel = new P(0, 0);
     public DamageType damageType = DamageType.Bash;
     public boolean tangible = true;
-    public boolean interactive = false;
+    public Interactive onInteract = null;
     public Matter(){
         super(null);
     }
@@ -45,7 +46,7 @@ public class Matter extends Thing implements Updatable {
     }
     public boolean checkHit(Matter p, int r){
         if (!hittable()) return false;
-        if (p.faction != faction) {
+        if (p.faction.canAttack(faction)) {
             if (checkHit(p.pos,p.sizeRadius+r)) {
                 return true;
             }
@@ -63,7 +64,7 @@ public class Matter extends Thing implements Updatable {
         Line pp;
         boolean collided = true;
         int timeout = 8;
-        float maxX = vel.x*1.15f;
+        float maxX = vel.x;
         while (collided) {
             collided = false;
             vp = pos.getAdd(vel);
@@ -73,14 +74,17 @@ public class Matter extends Thing implements Updatable {
                     if (i.opt != -1) {
                         onCollide(i);
                         float slope = i.getSlope();
-                        boolean cc = i.pt.x > i.ptd.x;
+                        boolean cc = !i.clockwise();
                         float tangent = (float) Math.atan(slope);
-                        if ((cc && i.pt.y + (slope * (pos.x - i.pt.x)) < pos.y) || Math.abs(slope) > 4) {
+                        if (!cc && Math.abs(slope) > 3){
+                            vel.set(0, 0);
+                            return;
+                        } else if (cc && i.pt.y + (slope * (pos.x - i.pt.x)) < pos.y) {
                             vel.set(0, 0);
                             return;
                         }
-                        vel.x = vel.x > 0 ? Math.min(vel.x + (Global.sin(tangent) * Math.abs(vel.x)), maxX)
-                                : Math.max(vel.x + (Global.sin(tangent) * Math.abs(vel.x)), maxX);
+                        vel.x = vel.x > 0 ? Global.clamp(vel.x + (Global.sin(tangent) * Math.abs(vel.x)), 1f, maxX)
+                                : Global.clamp(vel.x + (Global.sin(tangent) * Math.abs(vel.x)), maxX, -1f);
                         vel.y += (i.pt.y + (slope * (pos.x + vel.x - i.pt.x))) - (pos.y + vel.y) - 1;
                         collided = true;
                     }
@@ -120,9 +124,8 @@ public class Matter extends Thing implements Updatable {
         if (gravity) {
             vel.y += Settings.gravity;
             if (vel.y > Settings.gravityMax) vel.y = Settings.gravityMax;
+            if (pos.y+vel.y >= Global.map.getHeight()) remove();
         }
-    }
-    public void interact(Unit p){
     }
     @Override
     public String toString(){

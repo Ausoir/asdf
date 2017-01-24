@@ -1,10 +1,12 @@
 package com.ga.unit;
 
-import com.ga.game.Picture;
+import com.ga.map.Global;
+import com.ga.map.Picture;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.unit.item.FlyingOrgan;
+import com.ga.unit.item.Projectile;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -16,7 +18,7 @@ public class Organ extends Line {
     public int strokeSize = 10;
     protected Picture image;
     protected boolean amputated = false;
-    public Matter host;
+    public Unit host;
     protected Organ parent;
     protected ArrayList<Organ> children = new ArrayList<>();
     protected int sizeRadius;
@@ -49,20 +51,28 @@ public class Organ extends Line {
     }
     public void setSize(int size){
         this.strokeSize = size;
+        if (type != 0 && image != null) image.size.x = size;
     }
     public void draw(Graphics2D g){
-        P pos = host.pos.getAdd(pt);
-        if (type != 0){
-            image.draw(g, pos.x, pos.y, getAtan()-1.57f, host.dir, strokeSize, getLength()+3);
-        } else if (image != null && !amputated){
-            image.draw(g, pos.x, pos.y, getAtan()+1.57f, host.dir);
-        }
+        image.draw(g, host.pos.x+pt.x, host.pos.y+pt.y, getAtan()-1.57f, host.dir, strokeSize, getLength()+3);
     }
-    protected boolean hit(Line p, int damage, DamageType type){
+    protected void hit(Line p, int damage, DamageType type){
         health -= damage;
         if (health <= 0 && (type == DamageType.Cut || type == DamageType.Burn)) {
             if (type == DamageType.Cut){
-                host = new FlyingOrgan(this, p.ptd.getAdd(0, -15), 30);
+                if (image != null) {
+                    new Projectile(null, host.pos, p.ptd.getAdd(0, -15), 30) {
+                        public void update() {
+                            float length = getLength() * .45f;
+                            if (tangible) {
+                                Particle.explode("Blood", pos.getAdd(pt), new P(0, -15), 4, 5, 5, true, 5);
+                                pt.set(Global.cos(rotation) * -length, Global.sin(rotation) * -length);
+                                ptd.set(Global.cos(rotation) * length, Global.sin(rotation) * length);
+                            }
+                            super.update();
+                        }
+                    }.image = image;
+                }
                 Particle.explode("Blood", p.ptd, new P(), 5, 40, 0, true, 2);
             } else {
                 Particle.explode("Flame", p.ptd, new P(0, -5), 1, 12, 3, false, 3);
@@ -70,14 +80,13 @@ public class Organ extends Line {
             amputated = true;
             for (Organ i : children) i.hit(p, 999, type);
             onAmputate.perform();
-            return true;
+            host.clip.updateStatus();
         } else ptd.add(p.getAtan(16));
-        return false;
     }
     protected boolean checkHit(Line p){
         if (!amputated) {
             Line body = getAdd(host.pos);
-            if (type == 1 && image != null) {
+            if (type == 0 && image != null) {
                 P t = body.ptd;
                 if (Math.pow(sizeRadius, 2) - ((Math.pow(p.ptd.x - t.x, 2) + Math.pow(p.ptd.y - t.y, 2))) > 0) {
                     return true;

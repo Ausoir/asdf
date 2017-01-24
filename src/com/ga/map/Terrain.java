@@ -1,8 +1,6 @@
-package com.ga.game;
+package com.ga.map;
 
-import com.ga.map.Global;
 import com.ga.tool.P;
-import com.ga.tool.Performer;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -12,12 +10,12 @@ import java.awt.image.BufferedImage;
 /**
  * Created by Ga on 1/10/2017.
  */
-public class Form extends Texture {
+public class Terrain extends Texture {
     private Polygon polygon;
     private TexturePaint imageTexture;
     private ShaderType shader;
     public P pos;
-    public Form(String p, String shader){
+    public Terrain(String p, String shader){
         super(p);
         polygon = new Polygon();
         imageTexture = new TexturePaint(image, new Rectangle2D.Double(0,0,size.x,size.y));

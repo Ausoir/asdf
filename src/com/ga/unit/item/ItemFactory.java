@@ -1,6 +1,5 @@
 package com.ga.unit.item;
 
-import com.ga.map.Global;
 import com.ga.tool.Performer;
 import com.ga.unit.*;
 import com.ga.unit.skill.Actions;
@@ -15,7 +14,8 @@ public class ItemFactory {
         Mace(3,-1,2,8,0, Item.Tag.Mace), Broadsword(3,600,2,6,0,Item.Tag.Sword), Stick(0,10,1,4,2, Item.Tag.Mace), Wooden_Sword(2,100,1,8,1, Item.Tag.Mace),
         Katana(3,100,1,12,1, Item.Tag.Sword), Spear(3,160,1,12,-3,Item.Tag.Spear), Axe(3,100,1,12,-2, Item.Tag.Sword), Dagger(1,80,1,8,3, Item.Tag.Dagger), Pick(4,100,1,12,-2,Item.Tag.Sword),
         Cleaver(4,600,2,8,0, Item.Tag.Sword), Lancesword(1,100,1,6,0,Item.Tag.Spear), Cutlass(1,100,1,6,0,Item.Tag.Sword), Claymore(1,100,1,6,-1,Item.Tag.Sword),
-        Halberd(6,100,1,36,-5, Item.Tag.Spear), Greatsword(7,400,2,12,-3, Item.Tag.Sword), Warhammer(7,-1,3,8,-3,Item.Tag.Mace), Claw(1,200,3,4,4,Item.Tag.Claw),
+        Halberd(6,100,1,36,-5, Item.Tag.Sword), Greatsword(7,400,2,12,-3, Item.Tag.Sword), Warhammer(7,-1,3,8,-3,Item.Tag.Mace), Claw(1,200,3,4,4,Item.Tag.Claw),
+        Bamboo_Spear(1,24,1,6,0, Item.Tag.Spear),
         Rifle(4,200,1,6,-3, Item.Tag.Snipe), Pistol(2,30,1,2,5, Item.Tag.Shoot), Revolver(3,7,1,2,0, Item.Tag.Shoot);
         private int damageNum, damageSides, weight, uses, speed;
         private Item.Tag type;
@@ -40,9 +40,9 @@ public class ItemFactory {
         }
     }
     public enum FactoryArmor{ //Body armor by default
-        Underwear(0, -1, 0, 0),
         Cotton_Clothing(0, 50, 1, 1),
         Suit(0, 50, 1f, 2),
+        Robe(0, 50, 1f, 2),
         Fabric_Clothing(1, 100, 1, 2),
         Adventurewear(1, 100, 2, 0),
         Leather_Armor(2, 500, 3f, 3),
@@ -50,11 +50,11 @@ public class ItemFactory {
         Chainmail(3, 200, 6f, 5),
         Platemail(4, 200, 8, 8),
         Shadowrobe(1, -1, 1, 0),
-        Head(0,-1,0,0),
-        Lace_Helm(1,-1,2,0),
-        Full_Helm(2,1000,5,1),
-        Legion_Helm(2,1000,8,1);
+        Lace_Helm(1,-1,2,0,true),
+        Full_Helm(2,1000,5,1,true),
+        Legion_Helm(2,1000,8,1,true);
         private int weight, uses;
+        private boolean helmet;
         private float armor;
         private int encumberance;
         FactoryArmor(int weight, int uses, float armor, int encumberance){
@@ -63,12 +63,26 @@ public class ItemFactory {
             this.weight = weight;
             this.encumberance = encumberance;
         }
+        FactoryArmor(int weight, int uses, float armor, int encumberance, boolean helmet){
+            this(weight, uses, armor, encumberance);
+            this.helmet = helmet;
+        }
         public static Armor produce(String p, int seed, int piece){
             String t = p;
             Armor r = null;
+            if (t.equals("Underwear") || t.equals("Head")) return ArmorSet.bare[piece];
             for (FactoryArmor w : FactoryArmor.values()){
                 if (w.name().equals(t)){
-                    r = new Armor(w.toString(), seed, w.weight, w.uses, w.armor, w.encumberance, piece);
+                    r = new Armor(w.toString(), seed, w.weight, w.uses, w.armor, w.encumberance, w.helmet?5:piece);
+                    switch (w){
+                        case Steel_Armor:
+                        case Shadowrobe:
+                            r.damage = 3;
+                            break;
+                        case Adventurewear:
+                            r.damage = 2;
+                            break;
+                    }
                 }
             }
             return r;
@@ -104,27 +118,6 @@ public class ItemFactory {
                     @Override
                     public boolean use(final Man host){
                         host.setState(Actions.Interact);
-                        return false;
-                    }
-                };
-                break;
-            case "Potion":
-                item = new Item(p, seed, 1, 1, 30, 1){
-                    @Override
-                    public boolean use(final Man host){
-                        host.setState(Actions.Consume);
-                        host.delay.performer = new Performer(){
-                            public boolean perform(){
-                                if (canUse()) {
-                                    Global.cooldown(lastused, cooldown);
-                                    if (uses.get() != -1) uses.add(-1);
-                                    emod.getEvent().start(host, ademod.level);
-                                    emod.getEvent().perform();
-                                }
-                                return true;
-                            }
-                        };
-                        host.delay.set(15);
                         return false;
                     }
                 };
@@ -165,8 +158,8 @@ public class ItemFactory {
                 item.setType(Item.Tag.Enchant);
                 item.delay = 45;
                 break;
-            case "Scroll":
-                item = new Item(p, seed, 1, 1, 100, 1){
+            case "Potion":
+                item = new Item(p, seed, 1, 1, 1, 1){
                     @Override
                     public boolean use(Man host){
                         if (super.use(host)) {
@@ -175,8 +168,25 @@ public class ItemFactory {
                         return false;
                     }
                 };
+                item.probability = 1;
                 item.setType(Item.Tag.Scroll);
                 item.delay = 45;
+                break;
+            case "Scroll":
+                item = new Item(p, seed, 0, 1, 1, 1){
+                    @Override
+                    public boolean use(Man host){
+                        if (super.use(host)) {
+                            host.clip.setState(Skills.Guard);
+                            if (uses.get() == 0) remove();
+                            return true;
+                        }
+                        return false;
+                    }
+                };
+                item.probability = 1;
+                item.setType(Item.Tag.Scroll);
+                item.delay = 30;
                 break;
             case "Fireball":
                 item = new Item(p, seed, 1, 3, 1, 0) {
@@ -201,10 +211,8 @@ public class ItemFactory {
                             p.gravity = true;
                             p.delay.set(50);
                             p.delay.performer = new Performer(){
-                                @Override
-                                public boolean perform(){
+                                public void perform(){
                                     p.stuck();
-                                    return true;
                                 }
                             };
                             return true;
@@ -221,7 +229,7 @@ public class ItemFactory {
                     public boolean use(final Man host){
                         if (super.use(host)) {
                             host.delay.performer = new Performer(){
-                                public boolean perform(){
+                                public void perform(){
                                     final Projectile p = new Projectile("Tanto",host.pos.getAdd(host.clip.organs[BodyHumanoid.OFIST].ptd),host.pos.getAdd(host.target),50){
                                         @Override
                                         public void stuck(){
@@ -235,12 +243,10 @@ public class ItemFactory {
                                     p.gravity = false;
                                     p.delay.performer = new Performer(){
                                         @Override
-                                        public boolean perform(){
+                                        public void perform(){
                                             p.stuck();
-                                            return true;
                                         }
                                     };
-                                    return true;
                                 }
                             };
                             return true;

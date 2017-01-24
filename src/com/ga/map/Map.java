@@ -1,15 +1,14 @@
 package com.ga.map;
 
 import com.ga.game.FileManager;
-import com.ga.game.Form;
 import com.ga.game.Settings;
 import com.ga.tool.Line;
 import com.ga.tool.P;
+import com.ga.unit.Matter;
 import com.ga.unit.Thing;
 import com.ga.unit.Updater;
 
 import java.awt.*;
-import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -22,8 +21,8 @@ public class Map {
     public static Thing map;
     public static Thing fmap;
     public ArrayList<Line> land = new ArrayList<>();
-    public ArrayList<Form> landform = new ArrayList<>();
-    private HashMap<Form, ArrayList<Line>> formLines = new HashMap<>();
+    public ArrayList<Terrain> landform = new ArrayList<>();
+    private HashMap<Terrain, ArrayList<Line>> formLines = new HashMap<>();
     public HashMap<Integer, String> formTextures = new HashMap<>();
     public String[] maps;
     private MapEvent event;
@@ -53,8 +52,7 @@ public class Map {
         } else panorama.image.visible = false;
         map = new Thing(null, pt, 2){
             public void draw(Graphics2D g){
-                g.setTransform(AffineTransform.getTranslateInstance(Global.getRelX(),Global.getRelY()));
-                g.drawImage(image.getImage(),(int)pos.x,(int)pos.y,(int)image.size.x,(int)image.size.y,null);
+                g.drawImage(image.getImage(),(int)(Global.getRelX()+pos.x),(int)(Global.getRelY()+pos.y),(int)image.size.x,(int)image.size.y,null);
             }
         };
         if (maps[2].startsWith("None")){
@@ -72,11 +70,10 @@ public class Map {
         }
         fmap = new Thing(maps[3], pt, 30) {
             public void draw(Graphics2D g) {
-                for (Form i : landform){
+                for (Terrain i : landform){
                     i.draw(g);
                 }
-                g.setTransform(AffineTransform.getTranslateInstance(Global.getRelX(),Global.getRelY()));
-                g.drawImage(image.getImage(),(int)pos.x,(int)pos.y,(int)image.size.x,(int)image.size.y,null);
+                g.drawImage(image.getImage(),(int)(Global.getRelX()+pos.x),(int)(Global.getRelY()+pos.y),(int)image.size.x,(int)image.size.y,null);
             }
         };
         if (maps[3].equals("None")) fmap.image.visible = false;
@@ -134,7 +131,7 @@ public class Map {
     }
 
     public void setShader() {
-        for (Form i : landform){
+        for (Terrain i : landform){
             ArrayList<Line> t = formLines.get(i);
             for (Line ii : t){
                 int origX = (int) (ii.pt.x-i.pos.x);
@@ -146,45 +143,93 @@ public class Map {
     }
 
     public void setTexture(){
-        HashMap<Integer, Form> hashmap = new HashMap<>();
+        HashMap<Integer, Terrain> hashmap = new HashMap<>();
         for (Line i : land){
             if (i.next >= 0){
-                Form form = hashmap.get(i.next);
-                if (form == null){
+                Terrain terrain = hashmap.get(i.next);
+                if (terrain == null){
                     String formTexture = formTextures.get(i.next);
-                    if (formTexture == null) form = new Form("Dirt", null);
+                    if (formTexture == null) terrain = new Terrain("Dirt", null);
                     else {
                         String[] formName = formTextures.get(i.next).split("&");
-                        form = new Form(formName[0], formName.length > 1 ? formName[1] : null);
+                        terrain = new Terrain(formName[0], formName.length > 1 ? formName[1] : null);
                     }
-                    hashmap.put(i.next, form);
+                    hashmap.put(i.next, terrain);
                 }
-                if (formLines.get(form) == null) formLines.put(form, new ArrayList<Line>());
-                formLines.get(form).add(i);
-                form.addPoint(i.pt.x, i.pt.y);
+                if (formLines.get(terrain) == null) formLines.put(terrain, new ArrayList<Line>());
+                formLines.get(terrain).add(i);
+                terrain.addPoint(i.pt.x, i.pt.y);
             }
         }
         Iterator it = hashmap.entrySet().iterator();
         while (it.hasNext()) {
             java.util.Map.Entry pair = (java.util.Map.Entry) it.next();
-            Form form = (Form) pair.getValue();
-            form.render();
-            landform.add(form);
+            Terrain terrain = (Terrain) pair.getValue();
+            terrain.render();
+            landform.add(terrain);
+        }
+    }
+
+    public void generateProps(){
+        Line l;
+        if (land.size() > 0) {
+            for (int i = 0; i < 50; i++) {
+                int tx, ty, timeout = 0;
+                do {
+                    l = land.get((int) (Global.r.nextFloat() * land.size()));
+                    tx = (int) (Global.r.nextFloat() * (l.ptd.x - l.pt.x));
+                    ty = (int) (l.pt.y + (int) (tx * l.getSlope()));
+                    if (timeout++ > 8){
+                        Global.p("Error generating prop");
+                        return;
+                    }
+                } while (!l.clockwise());
+                String texture = formTextures.get(l.next);
+                if (texture != null) {
+                    String[] formProps = formTextures.get(l.next).split("&");
+                    if (formProps.length > 2) {
+                        String prop = null;
+                        String[] props = formProps[2].split(",");
+                        if (props.length > 1) {
+                            float rand = (float) Math.random();
+                            for (String ii : props) {
+                                if (rand < Float.parseFloat(ii.split("=")[1])) {
+                                    prop = ii.split("=")[0];
+                                    break;
+                                }
+                            }
+                        } else {
+                            prop = formProps[2];
+                        }
+                        if (prop != null) {
+                            int xSize = Texture.load(prop).getWidth() / 2;
+                            if (l.pt.x + tx + xSize < l.ptd.x && l.pt.x + tx - xSize > l.pt.x) {
+                                Matter t = new Matter(prop, 0, new P(l.pt.x + tx, ty), 11) {
+                                    public String toString() {
+                                        return "";
+                                    }
+                                };
+                                t.image.size.x *= Math.random() + .5f;
+                                t.image.size.y *= Math.random() + .5f;
+                                if (Math.random() < .5f) t.dir = -1;
+                                t.pos.y -= t.image.size.y / 3;
+                                t.rotation = (float) Math.atan(l.getSlope());
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
     public P randomSurface(){
-        Line i = land.get((int) (Global.r.nextFloat()*land.size()));
-        int origX = (int) (i.pt.x);
-        int origY = (int) (i.pt.y);
-        int x = origX;
-        int x2 = (int) (i.ptd.x);
-        if (origX > x2){
-         x = x2;
-         x2 = origX;
-        }
-        int tx = (int) (Global.r.nextFloat()*(x2-x));
-        int ty = origY+(int)(tx*i.getSlope());
-        return new P(origX+tx,ty);
+        Line i;
+        int tx, ty;
+        do {
+            i = land.get((int) (Global.r.nextFloat() * land.size()));
+            tx = (int) (Global.r.nextFloat() * (i.ptd.x-i.pt.x));
+            ty = (int) (i.pt.y + (int) (tx * i.getSlope()));
+        } while (!i.clockwise());
+        return new P(i.pt.x+tx,ty);
     }
 }

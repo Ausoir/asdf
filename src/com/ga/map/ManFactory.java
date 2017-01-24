@@ -19,37 +19,35 @@ import java.util.HashMap;
 public class ManFactory {
     private static String[] manHeads = new String[]{"Man0","Man1","Man2","Man3","Man4","Man5","Man6"};
     enum ManType{
-        Player(null, Faction.Player, new String[]{"Head"},
-                new String[]{"Fist"}, new String[]{"Cotton_Clothing"}, 0,0,0,0,
-                "0/Idle"),
         Merchant(new String[]{"Merchant"}, Faction.Merchant, new String[]{"Head"},
-                new String[]{"Fist"}, new String[]{"Cotton_Clothing"}, 10,20,0,0,
+                new String[]{"Fist"}, new String[]{"Cotton_Clothing"}, 1,10,20,0,0,
                 "0/Idle"),
         Peasant(manHeads, Faction.Neutral, new String[]{"Head"},
-                new String[]{"Stick","Axe","Pick","Fist"}, new String[]{"Cotton_Clothing","Fabric_Clothing"}, 60,40,8,0,
+                new String[]{"Stick","Axe","Pick","Fist"}, new String[]{"Cotton_Clothing","Fabric_Clothing"}, 1,60,40,8,0,
                 "-5/Swing"),
         Punk(manHeads, Faction.Punk, new String[]{"Head"},
-                new String[]{"Stick","Axe","Pick","Broadsword"}, new String[]{"Cotton_Clothing","Fabric_Clothing"}, 60,40,5,0,
+                new String[]{"Stick","Axe","Pick","Broadsword"}, new String[]{"Cotton_Clothing","Fabric_Clothing"}, 3,60,40,5,0,
                 "-5,50/Swing,Pierce&Dash"),
         Soldier(manHeads, Faction.Guard, new String[]{"Lace_Helm"},
-                new String[]{"Broadsword","Spear"}, new String[]{"Leather_Armor", "Chainmail"}, 120,50,8,2,
+                new String[]{"Broadsword","Spear"}, new String[]{"Leather_Armor", "Chainmail"}, 5,120,50,8,2,
                 "-5,50/Swing,Pierce&Dash"),
         Knight(manHeads, Faction.Evil, new String[]{"Full_Helm","Legion_Helm"},
-                new String[]{"Broadsword","Mace","Katana"}, new String[]{"Platemail"}, 300,50,5,5,
+                new String[]{"Broadsword","Mace","Katana"}, new String[]{"Platemail"}, 9,300,50,5,5,
                 "0/Swing,Pierce,Slash,Whirlwind"),
         Phantom(new String[]{"Phantom"}, Faction.Evil, new String[]{"Head"},
-                new String[]{"Greatsword","Halberd","Katana"}, new String[]{"Shadowrobe"}, 5,70,15,15,
+                new String[]{"Greatsword","Halberd","Katana"}, new String[]{"Shadowrobe"}, 4,5,70,15,15,
                 "-5/Swing");
         String[] face, weapon, armor, helmet;
-        int health,speed,stamina,proficiency;
+        int level,health,speed,stamina,proficiency;
         String rangeMove;
         Faction faction;
-        ManType(String[] face, Faction faction, String[] helmet, String[] weapons, String[] armors, int hp, int spd, int arm, int prof, String rangeMove){
+        ManType(String[] face, Faction faction, String[] helmet, String[] weapons, String[] armors, int lvl, int hp, int spd, int arm, int prof, String rangeMove){
             this.face = face;
             this.faction = faction;
             this.weapon = weapons;
             this.armor = armors;
             this.helmet = helmet;
+            this.level = lvl;
             this.health = hp;
             this.speed = spd;
             this.stamina = arm;
@@ -71,9 +69,9 @@ public class ManFactory {
         }
         Man get(int seed, P p){
             String face = getFace();
-            String stat = "Stamina:"+stamina+"&Speed:"+speed+"&Proficiency:"+proficiency+"&Health:"+health+"&Strength:1";
+            String stat = "Stamina:"+stamina+"&Speed:"+speed+"&Proficiency:"+proficiency+"&Health:"+health+"&Level:1";
             String t = face+"@"+seed+"@"+p+"@"+ Updater.getId()+"@"+stat+"@"+faction.name()+"@"+rangeMove;
-            t += "@"+ItemFactory.FactoryWeapon.produce(getWeapon(),-1).toItemString()+"@";
+            t += "@"+ItemFactory.produce(getWeapon(),-1,0).toItemString()+"@";
             Armor armor = ItemFactory.FactoryArmor.produce(getArmor(),-1,0);
             for (int i=0;i<5;i++){
                 armor.piece = i;

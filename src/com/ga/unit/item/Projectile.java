@@ -19,7 +19,6 @@ public class Projectile extends Matter {
         rotation = (float) Math.atan2(dest.y-pt.y,dest.x-pt.x);
         gravity = true;
     }
-    @Override
     public int getDamage(){
         return damage;
     }

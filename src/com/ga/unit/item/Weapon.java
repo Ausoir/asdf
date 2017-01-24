@@ -18,7 +18,7 @@ public class Weapon extends Item {
             return (Global.r.nextInt(sides)+1) * num;
         }
     }
-    private Die damage = new Die(0,1);
+    private Die damageSide = new Die(0,1);
     private float damageMod = 1;
     public Weapon(String name, int seed, int weight, int uses, int num, int sides, Tag type) {
         super(name, seed, weight, uses, 100, 0.03f);
@@ -33,8 +33,14 @@ public class Weapon extends Item {
         if (mod == PrefixMod.Broken) damageMod = .5f;
         else if (mod == PrefixMod.Old) damageMod = .8f;
         else if (mod == PrefixMod.Fine) damageMod = 1.2f;
-        else if (mod == PrefixMod.Mastercraft) damageMod = 1.5f;
-        else if (mod == PrefixMod.Legendary) damageMod = 2;
+        else if (mod == PrefixMod.Mastercraft){
+            damageMod = 1.5f;
+            uses.setTotal(-1);
+        }
+        else if (mod == PrefixMod.Legendary){
+            damageMod = 2;
+            uses.setTotal(-1);
+        }
     }
     protected void setModifier(SpecialtyMod mod){
         if (mod == SpecialtyMod.Feather){
@@ -46,17 +52,16 @@ public class Weapon extends Item {
         else super.setModifier(mod);
     }
     public int getDamage() {
-        return (int) (damage.getDamage()*damageMod)+super.getDamage();
+        int r = 0;
+        if (canUse()) r = (int) (damageSide.getDamage()*damageMod)+super.getDamage();
+        return r;
     }
     public void setDamage(int num, int sides){
-        damage = new Die(num, sides);
+        damageSide = new Die(num, sides);
     }
     public boolean use(Man host){
         if (canUse()) {
-            if (host.setState(action) == 0) {
-                super.use(host);
-                return true;
-            }
+            return super.use(host);
         }
         return false;
     }
@@ -64,8 +69,8 @@ public class Weapon extends Item {
         String r = super.getDescription();
         r = r.replace(" uses "," durability ");
         if (emod != null){
-            r += " This weapon has "+getProbability()*100+"% chance of activating its enchantment every hit.";
+            r += " This weapon has "+probability*100+"% chance of activating its enchantment every hit.";
         }
-        return r + " This weapon deals "+damage.num+"d"+damage.sides+" * "+damageMod+" damage.";
+        return r + " This weapon deals "+damageSide.num+"d"+damageSide.sides+" * "+damageMod+" damage.";
     }
 }

@@ -1,24 +1,18 @@
-package com.ga.game;
+package com.ga.map;
 
-import com.ga.map.Global;
 import com.ga.tool.P;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
 
 /**
  * Created by Ga on 5/6/2016.
  */
 public class Picture extends Texture {
     private BufferedImage shade;
-    public int sizeRadius;
+    public int sizeRadius = 10;
     public Picture(){
         super();
     }
@@ -41,19 +35,20 @@ public class Picture extends Texture {
     public BufferedImage getImage(){
         return image;
     }
-    public void draw(Graphics2D g, float x, float y, float rot, int dir, float posX, float posY){
+    public void draw(Graphics2D g, float x, float y, float rot, int dir, float sizeX, float sizeY){
         if (visible) {
             float xMid = size.x*dir/2;
             float yMid = size.y/2;
-            P t = new P((x - xMid), (y - yMid));
-            P r = t.getAdd(xMid, yMid);
-            g.setTransform(AffineTransform.getTranslateInstance(Global.getRelX(),Global.getRelY()));
-            g.rotate(rot, r.x, r.y);
-            g.drawImage(image, (int) t.x, (int) t.y, (int) posX * dir, (int) posY, null);
+            float rx = x + Global.getRelX();
+            float ry = y + Global.getRelY();
+            x = rx - xMid;
+            y = ry - yMid;
+            g.rotate(rot, rx, ry);
+            g.drawImage(image, (int) x, (int) y, (int) sizeX * dir, (int) sizeY, null);
             if (shade != null){
-                g.drawImage(shade, (int) t.x, (int) t.y, (int) posX * dir, (int) posY, null);
+                g.drawImage(shade, (int) x, (int) y, (int) sizeX * dir, (int) sizeY, null);
             }
-            g.rotate(-rot, r.x, r.y);
+            g.rotate(-rot, rx, ry);
         }
     }
     public void draw(Graphics2D g, float x, float y, float rot, int dir){

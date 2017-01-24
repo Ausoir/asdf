@@ -2,6 +2,7 @@ package com.ga.game;
 
 import com.ga.connection.Server;
 import com.ga.map.Global;
+import com.ga.map.Picture;
 import com.ga.tool.Clips;
 import com.ga.unit.Updater;
 
@@ -33,5 +34,6 @@ public class Game extends JFrame {
         setExtendedState( getExtendedState()|JFrame.MAXIMIZED_BOTH );
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         new Process();
+        new ControllerProcess();
     }
 }

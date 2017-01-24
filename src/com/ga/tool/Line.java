@@ -33,6 +33,9 @@ public class Line {
     public Line getAdd(P p){
         return new Line(pt.getAdd(p), ptd.getAdd(p));
     }
+    public boolean clockwise(){
+        return pt.x < ptd.x;
+    }
     public float getAtan(){
         float r = (float) Math.atan2(ptd.y-pt.y,ptd.x-pt.x);
         return r;

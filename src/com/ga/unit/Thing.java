@@ -1,8 +1,8 @@
 package com.ga.unit;
 
 import com.ga.game.Observer;
-import com.ga.game.Picture;
 import com.ga.map.Drawable;
+import com.ga.map.Picture;
 import com.ga.tool.P;
 
 import java.awt.*;
@@ -42,9 +42,6 @@ public class Thing implements Drawable, Observer {
     }
     public boolean isFacing(P p){
         return (pos.x > p.x && dir == -1) || (pos.x < p.x && dir == 1);
-    }
-    public void draw(Graphics2D g, P offset){
-        image.draw(g, pos.x+offset.x, pos.y+offset.y, rotation, dir);
     }
     public void draw(Graphics2D g){
         image.draw(g, pos.x, pos.y, rotation, dir);

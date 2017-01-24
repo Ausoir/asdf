@@ -82,7 +82,7 @@ public class FileManager {
         pi.host.load(read("map/"+dir));
         pi.host.id = -Integer.parseInt(dir)-1;
         pi.load(line[2]);
-//        Global.setTime(Integer.parseInt(line[1].split(";")[0]));
+        Global.setTime(Integer.parseInt(line[1].split(";")[2]));
         return pi;
     }
     public static P readMap(String dir, int player) {
@@ -93,38 +93,40 @@ public class FileManager {
         String[] names = line[0].split(",");
         Global.map = new Map(names, mapPos);
 
-        String[] sections = line[1].split(";");
-        for (int section = 0; section < sections.length; section++) {
-            String values[] = sections[section].split(":");
-            Global.map.formTextures.put(Integer.parseInt(values[0]),values[1]);
-        }
-        if (line.length > 2) {
-            sections = line[2].split(";");
+        if (line.length > 1) {
+            String[] sections = line[1].split(";");
             for (int section = 0; section < sections.length; section++) {
-                String values[] = sections[section].split(",");
-                int[] v = new int[values.length];
-                for (int i = 0; i < values.length; i++) {
-                    v[i] = Integer.parseInt(values[i]);
-                }
-                Global.map.land.add(new Line(v[0], v[1], v[2], v[3], v[4], v[5]));
+                String values[] = sections[section].split(":");
+                Global.map.formTextures.put(Integer.parseInt(values[0]), values[1]);
             }
-            if (line.length > 3) {
-                sections = line[3].split(";");
-                if (sections.length > 0) {
-                    for (int section = 0; section < sections.length; section++) {
-                        String[] unit = sections[section].split("]");
-                        if (unit.length == 1) { //object
-                            String[] type = unit[0].split("@");
-                            if (type[0].equals("PlayerSpawn")){
-                                if (player == 0) r = new P(type[2]);
-                                else if (player > -1) player--;
+            if (line.length > 2) {
+                sections = line[2].split(";");
+                for (int section = 0; section < sections.length; section++) {
+                    String values[] = sections[section].split(",");
+                    int[] v = new int[values.length];
+                    for (int i = 0; i < values.length; i++) {
+                        v[i] = Integer.parseInt(values[i]);
+                    }
+                    Global.map.land.add(new Line(v[0], v[1], v[2], v[3], v[4], v[5]));
+                }
+                if (line.length > 3) {
+                    sections = line[3].split(";");
+                    if (sections.length > 0) {
+                        for (int section = 0; section < sections.length; section++) {
+                            String[] unit = sections[section].split("]");
+                            if (unit.length == 1) { //object
+                                String[] type = unit[0].split("@");
+                                if (type[0].equals("PlayerSpawn")) {
+                                    if (player == 0) r = new P(type[2]);
+                                    else if (player > -1) player--;
+                                }
+                                ObjectFactory.produce(type[0], new P(type[2]), Integer.parseInt(type[1]));
+                            } else { //unit
+                                int id = Integer.parseInt(unit[1].split("@")[3]);
+                                if (id >= Updater.id) Updater.id = id + 1;
+                                if (unit[0].equals("Man")) new Man(unit[1]);
+                                else BeastFactory.produce(unit[1]);
                             }
-                            ObjectFactory.produce(type[0], new P(type[2]), Integer.parseInt(type[1]));
-                        } else { //unit
-                            int id = Integer.parseInt(unit[1].split("@")[3]);
-                            if (id >= Updater.id) Updater.id = id+1;
-                            if (unit[0].equals("Man")) new Man(unit[1]);
-                            else BeastFactory.produce(unit[1]);
                         }
                     }
                 }
@@ -132,6 +134,7 @@ public class FileManager {
         }
         Global.map.setTexture();
         Global.map.setShader();
+        Global.map.generateProps();
         if (r == null) System.out.println("Invalid Player Spawn Location");
         return r;
     }

@@ -42,12 +42,15 @@ public class Timer {
         max = Integer.parseInt(t[1]);
         repeat = t[2].equals("*");
     }
-    public boolean update(){
+    public boolean update(int p){
         if (over()){
             if (repeat) time = max;
             return true;
         }
-        else if (time > 0) time--;
+        else if (time > 0) time = Math.max(0,time-p);
         return false;
+    }
+    public boolean update(){
+        return update(1);
     }
 }

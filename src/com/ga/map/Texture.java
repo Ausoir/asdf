@@ -1,4 +1,4 @@
-package com.ga.game;
+package com.ga.map;
 
 import com.ga.tool.P;
 
@@ -32,7 +32,7 @@ public abstract class Texture {
         this.image = image;
         size = new P(image.getWidth(), image.getHeight());
     }
-    protected static BufferedImage load(String dir){
+    public static BufferedImage load(String dir){
         BufferedImage image = cache.get(dir);
         if (image != null) return image;
         try {

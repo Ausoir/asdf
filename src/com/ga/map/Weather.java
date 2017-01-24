@@ -1,6 +1,5 @@
 package com.ga.map;
 
-import com.ga.game.Settings;
 import com.ga.unit.Updater;
 
 import java.awt.*;

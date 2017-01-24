@@ -11,7 +11,6 @@ import com.ga.unit.Updater;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -47,7 +46,6 @@ public class Speech extends JTextArea implements Drawable, Updatable{
     }
     public void draw(Graphics2D g){
         if (isVisible()) {
-            g.setTransform(AffineTransform.getTranslateInstance(Global.getRelX(),Global.getRelY()));
             P t = host.pos.getAdd(0,-150);
             int width = Math.min(g.getFontMetrics(font).stringWidth(getText()) + 30, 240);
             int height = (int) getPreferredSize().getHeight();
@@ -62,7 +60,6 @@ public class Speech extends JTextArea implements Drawable, Updatable{
             g.fillPolygon(xp, yp, xp.length);
         }
     }
-
     @Override
     public int getDepth() {
         return 99;

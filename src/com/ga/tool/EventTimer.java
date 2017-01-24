@@ -12,7 +12,8 @@ public class EventTimer extends Timer {
     public boolean update(){
         boolean result = super.update();
         if (result && performer != null){
-            if (performer.perform()) performer = null;
+            performer.perform();
+            performer = null;
         }
         return result;
     }

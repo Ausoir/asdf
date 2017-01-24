@@ -8,6 +8,7 @@ import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Moveset;
 import com.ga.unit.skill.Skills;
 
+import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,52 +32,43 @@ public class Body {
     protected int BODY, FOOT;
     protected int legNum = 0, legCurrent = 0;
     protected float appendageSize = 1;
-    public P size;
 
     Body(Unit host, String current) {
         this.host = host;
         this.clip = Clips.clip.get(current);
-        reset(current, clip);
+        reset(clip);
         appendageSize = (float) Math.abs(host.rand.nextGaussian()*.3f)+.7f;
         randomize();
         organs[BODY].pt.y = -getHeight();
-        setSkin(current+"_skin");
-    }
-
-    public void setSkin(String p){
-        for (int i=0;i<organs.length;i++){
-            if (organs[i].type != 0) organs[i].setImage(p,organs[i].type-1);
-        }
     }
 
     protected void setProperties(int[][] p){
         int hpPool = 0;
         for (int i=0;i<organs.length;i++){
-            organs[i].setSize(p[1][i]);
-            if (p[2][i] == 1) organs[i].vital = true;
-            else if (p[2][i] == 2){
+            organs[i].setSize(p[0][i]);
+            if (p[1][i] == 1) organs[i].vital = true;
+            else if (p[1][i] == 2){
                 organs[i].leg = true;
                 FOOT = i;
                 legNum++;
                 legCurrent++;
             }
-            organs[i].health = p[3][i];
-            hpPool += p[3][i];
+            organs[i].health = p[2][i];
+            hpPool += p[2][i];
         }
         for (int i=0;i<organs.length;i++){
             organs[i].health = (int)(((float) organs[i].health / hpPool)*host.get("Health").get());
         }
-        size = new P(p[0][0], p[0][1]);
     }
 
-    private void reset(String name, Clip p) {
+    private void reset(Clip p) {
         organs = new Organ[p.model.length];
         localAnimation = Clips.clone(p.clip);
         localFrames = Clips.clone(p.frames);
         frame = new Timer(0);
         nextClip = localAnimation[nextAnimation[current]];
         for (int i = 0; i < organs.length; i++) {
-            initializeOrgan(name, p.model,i);
+            initializeOrgan(p.model,i);
         }
         setProperties(p.property);
         for (Map.Entry<String, int[]> i : p.moveset.entrySet()){
@@ -86,24 +78,43 @@ public class Body {
         }
     }
 
-    private void initializeOrgan(String name, String[][] model, int p) {
+    private void initializeOrgan(String[][] model, int p) {
         if (organs[p] == null) {
             int clip = Integer.parseInt(model[p][0]);
+            Organ parent = null;
+            boolean tip = true;
             if (clip-1 == p){
-                organs[p] = new Organ( null, true);
                 BODY = p;
             } else {
                 if (organs[Math.abs(clip)-1] == null){
-                    initializeOrgan(name, model, Math.abs(clip)-1);
+                    initializeOrgan(model, Math.abs(clip)-1);
                 }
-                organs[p] = new Organ(organs[Math.abs(clip)-1], clip<0);
+                parent = organs[Math.abs(clip)-1];
+                tip = clip < 0;
+            }
+            if (model[p].length > 1){
+                int type = Integer.parseInt(model[p][1]);
+                if (type < 0) organs[p] = new Organ(parent, tip) {
+                                    public void draw(Graphics2D g) {
+                                        image.draw(g, host.pos.x + ptd.x, host.pos.y + ptd.y, (float) Math.atan2(pt.y - ptd.y, pt.x - ptd.x) - 1.57f, host.dir, strokeSize, getLength() + 6);
+                                    }
+                                };
+                else if (type == 0) organs[p] = new Organ(parent, tip) {
+                                        public void draw(Graphics2D g) {
+                                            if (!amputated) image.draw(g, host.pos.x+pt.x, host.pos.y+pt.y, getAtan()+1.57f, host.dir);
+                                        }
+                                    };
+                else organs[p] = new Organ(parent, tip);
+                organs[p].type = Math.abs(type);
+                if (model[p].length > 2){
+                    if (type == 0) organs[p].setImage(model[p][2]);
+                    else organs[p].setImage(model[p][2],organs[p].type-1);
+                }
+            } else {
+                organs[p] = new Organ(parent, tip);
             }
             organs[p].ptd = new P(nextClip[p][0],nextClip[p][1]);
             organs[p].host = host;
-            if (model[p].length > 1){
-                organs[p].type = Integer.parseInt(model[p][1]);
-                if (model[p].length > 2) organs[p].setImage(model[p][2]);
-            }
         }
     }
 
@@ -131,7 +142,8 @@ public class Body {
 
     public void setState(Moveset state) {
         if (state == Actions.Dead) organs[BODY].pt.y = 0;
-        else if (state == Actions.Hit) organs[BODY].pt.y = 0;
+        else if (state == Actions.Down) organs[BODY].pt.y = 0;
+        else if (state == Actions.Hit) organs[BODY].pt.y /= 2;
         else setHeight();
         this.state = state;
         current = 0;
@@ -213,6 +225,7 @@ public class Body {
     }
 
     protected float getLegStatus(){
+        if (legNum == 0) return 1;
         return (float)legCurrent/legNum;
     }
 

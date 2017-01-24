@@ -1,5 +1,6 @@
 package com.ga.unit.intelligence;
 
+import com.ga.game.Observer;
 import com.ga.map.Global;
 import com.ga.tool.Line;
 import com.ga.tool.P;
@@ -16,9 +17,8 @@ import java.util.ArrayList;
 /**
  * Created by Ga on 8/26/2016.
  */
-public abstract class Intelligence {
+public abstract class Intelligence implements Observer {
     protected Unit host;
-    protected Timer think = new Timer(3, true);
     protected Timer forget = new Timer(500, true);
     private ArrayList<Matter> seen;
     public Unit target;
@@ -26,6 +26,7 @@ public abstract class Intelligence {
     protected Communication comm;
     private int[] base;
     private int alertness = 0;
+    public int range = 150;
     public Intelligence(Unit man){
         host = man;
         base = new int[]{host.rand.nextInt(Global.map.getWidth()),
@@ -33,14 +34,19 @@ public abstract class Intelligence {
             host.rand.nextInt(Global.map.getWidth())};
         task = new Idle(host);
         forget.time = 1;
+        Updater.add(this);
     }
     protected void defaultTask(){
         setTaskEcho(new Wander(host, base));
     }
     public void update(){
-        if (think.update()){
-            think();
+        if (forget.update()){
+            target = null;
+            defaultTask();
+        } else {
+            task.update();
         }
+        if (alertness < 1) perceive();
     }
     protected void setTaskEcho(Task p){
         task = p;
@@ -74,10 +80,10 @@ public abstract class Intelligence {
         if (target != null) {
             P p = target.pos.getSubtract(host.pos);
             host.target = p;
-            host.rotateWeapon(p.getMult(host.dir,host.dir));
+            if (host instanceof Man) ((Man)host).rotateWeapon(p.getMult(host.dir,host.dir));
         }
         if (state == Actions.Dead){
-            think.set(-1);
+            Updater.remove(this);
             task = new Idle(host);
         } else if ((state == Actions.WalkL || state == Actions.WalkR) && blocked(host.dir)){
             host.setState(Actions.Idle);
@@ -110,7 +116,7 @@ public abstract class Intelligence {
         }
     }
     protected void perceive(){
-        seen = Updater.perceive(host, host.pos.getAdd(host.dir<0?-150:150,0), 300);
+        seen = Updater.perceive(host, host.pos.getAdd(host.dir<0?-range:range,0), range*2);
         for (Matter t : seen) {
             if (target != t) {
                 perceived(t);
@@ -121,15 +127,6 @@ public abstract class Intelligence {
         host.face(dir);
     }
     protected void perceived(Matter p){
-    }
-    protected void think(){
-        if (forget.update()){
-            target = null;
-            defaultTask();
-        } else {
-            task.update();
-        }
-        if (alertness < 1) perceive();
     }
     public void setComm(Communication comm) {
         this.comm = comm;

@@ -59,12 +59,14 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
         add(chatbox);
         dialog = new Dialog();
         add(dialog);
+        Updater.add(dialog);
         menu = new Menu();
         add(menu);
+        Updater.add(menu);
         shop = new Shop();
         add(shop);
+        Updater.add(shop);
         Global.weather = new Weather();
-
         new Timer(25, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {

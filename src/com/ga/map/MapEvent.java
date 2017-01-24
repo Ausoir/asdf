@@ -11,18 +11,15 @@ import com.ga.unit.Updater;
 public class MapEvent implements Updatable {
     private enum Map{
         None(new Performer(){
-            public boolean perform(){
-                return true;
+            public void perform(){
             }
         }),
         Town(new Performer(){
-            public boolean perform(){
-                return true;
+            public void perform(){
             }
         }),
         City(new Performer(){
-            public boolean perform(){
-                return true;
+            public void perform(){
             }
         });
         private Performer event;

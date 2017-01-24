@@ -42,9 +42,8 @@ public class UnitIntelligence extends Intelligence {
             setTaskEcho(new Follow(host, target));
         }
     }
-    @Override
-    protected void think(){
-        super.think();
+    public void update(){
+        super.update();
         if (host.get("Health").getPercentage() < .15f){
             host.say("@flee");
             setTaskEcho(new Flee(host, target));

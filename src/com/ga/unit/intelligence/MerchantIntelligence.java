@@ -1,10 +1,12 @@
 package com.ga.unit.intelligence;
 
 import com.ga.map.Global;
+import com.ga.tool.Interactive;
 import com.ga.tool.Performer;
 import com.ga.tool.Timer;
 import com.ga.unit.Man;
 import com.ga.unit.Matter;
+import com.ga.unit.Unit;
 import com.ga.unit.item.Item;
 import com.ga.unit.item.ItemFactory;
 
@@ -22,14 +24,6 @@ public class MerchantIntelligence extends Intelligence {
             this.items = items;
         }
     }
-    class Product{
-        Item item;
-        int value;
-        public Product(Item item, int value){
-            this.item = item;
-            this.value = value;
-        }
-    }
     private MerchantType type;
     private Item[] product;
     private int[] price;
@@ -40,6 +34,13 @@ public class MerchantIntelligence extends Intelligence {
     private String ad;
     public MerchantIntelligence(Man man) {
         super(man);
+        man.onInteract = new Interactive(80){
+            public void interact(Unit p){
+                if (p == Global.player.host) {
+                    shop.show("Trader's Wares - \""+host.getConversation()+"\"", product, price, action);
+                }
+            }
+        };
         comm = new Communication();
         type = MerchantType.SUBURBAN;//MerchantType.values()[man.rand.nextInt(MerchantType.values().length)];
         String r = "I'm selling ";
@@ -60,11 +61,10 @@ public class MerchantIntelligence extends Intelligence {
             final int ii = i;
             action[i] = new Performer() {
                 final int index = ii;
-                public boolean perform() {
+                public void perform() {
                     product[index] = null;
                     host.say("@sold");
                     shop.setVisible(false);
-                    return true;
                 }
             };
             String desc = "This is " + item.getDescription();

@@ -26,7 +26,6 @@ public class MainPlayer extends Player {
     public int setState(Moveset state) {
         if (state != Actions.Idle && state != Actions.Wait) {
             Display.shop.setVisible(false);
-            Display.dialog.setVisible(false);
             if (state == Actions.Recall) say(memorized);
             else if (!(state instanceof Actions) || !((Actions)state).isLooker()) Global.cameraTo = pos;
         }
@@ -53,6 +52,5 @@ public class MainPlayer extends Player {
         else if (state == Actions.LookLeft) Global.cameraTo = Global.cameraTo.getAdd(-50,0);
         else if (state == Actions.LookDown) Global.cameraTo = Global.cameraTo.getAdd(0,50);
         else if (state == Actions.LookRight) Global.cameraTo = Global.cameraTo.getAdd(50,0);
-        Global.mapEdgeCenter(Global.camera);
     }
 }

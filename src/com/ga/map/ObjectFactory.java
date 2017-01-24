@@ -1,5 +1,6 @@
 package com.ga.map;
 
+import com.ga.tool.Interactive;
 import com.ga.tool.P;
 import com.ga.unit.Matter;
 import com.ga.unit.Unit;
@@ -37,7 +38,8 @@ public class ObjectFactory {
             result = new Matter(name, seed, pt, Updater.editor?10:0);
             result.name = "PlayerSpawn";
         } else if (name.equals("Phone_Booth")) {
-            result = new Matter(name, seed, pt, depth){
+            result = new Matter(name, seed, pt, depth);
+            result.onInteract = new Interactive(80){
                 public void interact(Unit p){
                     String t = p.getConversation();
                     if (t.equals("")){
@@ -50,7 +52,6 @@ public class ObjectFactory {
                     p.setState(Actions.Wait);
                 }
             };
-            result.interactive = true;
         } else {
             result = new Matter(name, seed, pt, depth);
         }

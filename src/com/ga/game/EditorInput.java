@@ -11,30 +11,27 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
-/**
- * Created by Ga on 7/31/2016.
- */
 public class EditorInput implements Input, Updatable {
-    enum Tool {
+    private enum Tool {
         NONE, CREATE, DELETE, REMOVE, MAN, UNIT, OBJECT
     }
-    String cunit = "Player";
-    String texture = "Dirt";
-    boolean control = false;
-    boolean shift = false;
-    boolean lmb = false;
-    P lmbP = new P();
-    ArrayList<Line> history = new ArrayList<>();
-    HashMap<Line, Integer> lineConnection = new HashMap<>();
-    Line current = new Line(0, 0, 0, 0);
-    Thing currentU = new Thing(null);
-    boolean connected = false;
-    Tool tool = Tool.NONE;
-    P v = new P();
-    int speed = 50;
-    String map = "Map";
-    boolean placingTp = false;
-    int nextPolygon = 0;
+    private String cunit = "Player";
+    private String texture = "Dirt";
+    private boolean control = false;
+    private boolean shift = false;
+    private boolean lmb = false;
+    private P lmbP = new P();
+    private ArrayList<Line> history = new ArrayList<>();
+    private HashMap<Line, Integer> lineConnection = new HashMap<>();
+    private Line current = new Line(0, 0, 0, 0);
+    private Thing currentU = new Thing(null);
+    private boolean connected = false;
+    private Tool tool = Tool.NONE;
+    private P v = new P();
+    private int speed = 50;
+    private String map = "Map";
+    private boolean placingTp = false;
+    private int nextPolygon = 0;
 
     public EditorInput() {
         Display.input = this;
@@ -42,6 +39,7 @@ public class EditorInput implements Input, Updatable {
         if (Global.camera == null) Global.camera = new P();
         else Global.camera = new P(Global.camera);
         scanPolygon();
+        Global.margin = -36;
     }
 
     private void scanPolygon(){

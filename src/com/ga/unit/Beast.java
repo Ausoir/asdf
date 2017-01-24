@@ -1,10 +1,6 @@
 package com.ga.unit;
 
-import com.ga.map.Global;
 import com.ga.unit.intelligence.UnitIntelligence;
-import com.ga.unit.skill.Actions;
-import com.ga.unit.skill.Moveset;
-import com.ga.unit.skill.Skills;
 
 /**
  * Created by Ga on 9/5/2016.

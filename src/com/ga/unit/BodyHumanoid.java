@@ -16,12 +16,6 @@ public class BodyHumanoid extends Body {
     }
 
     @Override
-    public void setSkin(String p){
-        if (p.equals("Man_skin")) super.setSkin("Underwear");
-        else super.setSkin(p);
-    }
-
-    @Override
     public void setState(Moveset state) {
         if (state instanceof Actions) {
             switch ((Actions) state) {
@@ -80,9 +74,9 @@ public class BodyHumanoid extends Body {
             switch ((Actions) state) {
                 case Buff:
                 case Cast:
-                    Particle.dripFire(host.pos.getAdd(organs[OFIST].ptd));
+                    Particle.dripHoly(host.pos.getAdd(organs[OFIST].ptd));
                 case Conjure:
-                    Particle.dripFire(host.pos.getAdd(organs[FIST].ptd));
+                    Particle.dripHoly(host.pos.getAdd(organs[FIST].ptd));
                     break;
             }
         }

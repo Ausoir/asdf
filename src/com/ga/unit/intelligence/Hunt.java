@@ -3,6 +3,7 @@ package com.ga.unit.intelligence;
 import com.ga.unit.Unit;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Skills;
+import com.ga.unit.skill.Spells;
 
 /**
  * Created by Ga on 7/30/2016.
@@ -36,9 +37,20 @@ public class Hunt implements Task {
         } else if (dist < 600) {
             int t = host.performMoveset((int) dist);
             host.target = target.pos.getSubtract(host.pos).add(0, -30);
+
+            if (host.state instanceof Spells){
+                host.delay.set(300);
+            }
             if (t == -1){
-                if (x > 0) host.setState(Actions.WalkR);
-                else if (x < 0) host.setState(Actions.WalkL);
+                if (y < -50){
+                    if (host.vel.x == 0) {
+                        if (x > 0) host.setState(Actions.WalkR);
+                        else if (x < 0) host.setState(Actions.WalkL);
+                    } else host.setState(Skills.Jump);
+                } else {
+                    if (x > 0) host.setState(Actions.WalkR);
+                    else if (x < 0) host.setState(Actions.WalkL);
+                }
             } else if (t == 2){
                 host.setState(Skills.Rest);
                 host.delay.time += 28;

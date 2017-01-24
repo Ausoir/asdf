@@ -21,7 +21,7 @@ public class Stats {
     private ArrayList<int[]> effectLevels = new ArrayList<>();
     private ArrayList<Spell> effectEffects = new ArrayList<>();
     private HashMap<String, Stat> stats = new HashMap<>();
-    private Timer timer = new Timer(25, true);
+    private Timer timer = new Timer(100, true);
     private Timer bloodTimer = new Timer(-1, true);
     private Unit host;
     public Stats(Unit host){
@@ -42,9 +42,9 @@ public class Stats {
                 else stats.get(p.stat).add((int) (p.buff*level), true);
             }
             if (p.effect != null) {
-                p.effect.start(host, level);
+                p.effect.perform(host, level);
             }
-            effectTimes.add(new Timer(p.time * level));
+            effectTimes.add(new Timer((int) (p.time + (level*p.time*.2f))));
             effectLevels.add(new int[]{level});
             effectEffects.add(p.effect);
             effects.add(p);
@@ -99,17 +99,16 @@ public class Stats {
         timer.reset();
     }
     public boolean rest(int mag){
-        if (timer.update()){
-            if (mag > 0) {
-                stats.get("Stamina").add(mag);
-                return stats.get("Stamina").isFull();
-            }
+        if (timer.update(mag)){
+            stats.get("Stamina").add(3);
+            return stats.get("Stamina").isFull();
         }
         return false;
     }
     public void update(){
         for (int i = 0; i < effects.size(); i++) {
-            if (effectEffects.get(i).perform() || effectTimes.get(i).update()){
+            effectEffects.get(i).perform(host, effectLevels.get(i)[0]);
+            if (effectTimes.get(i).update()){
                 endEffect(effects.get(i));
             }
         }

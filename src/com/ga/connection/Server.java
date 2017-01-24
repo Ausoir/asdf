@@ -111,7 +111,7 @@ public class Server implements Updatable {
                         Updater.changeMap = "Server";
                         Updater.changeMapPos = 0;
                         Updater.changeMapEvent = new Performer() {
-                            public boolean perform() {
+                            public void perform() {
                                 for (int i = 0; i < clientSize; i++) {
                                     PlayerInput pi = FileManager.loadPlayer(false, "" + i);
                                     clientControllers.put(i, pi);
@@ -119,7 +119,6 @@ public class Server implements Updatable {
                                 for (Unit i : Updater.colidee){
                                     i.brain = null;
                                 }
-                                return true;
                             }
                         };
                         Global.player.host.id = -clientSize - 1;

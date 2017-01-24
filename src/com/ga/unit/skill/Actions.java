@@ -1,11 +1,13 @@
 package com.ga.unit.skill;
 
+import com.ga.unit.Unit;
+
 /**
  * Created by Ga on 7/28/2016.
  */
 public enum Actions implements Moveset {
-    Idle, LookUp, LookLeft, LookDown, LookRight, WalkL, WalkR, Hit(45,null), Dead(99999,null), Wield(18, null), Recall,
-    Conjure, Wait(50,null), Cast, Consume, Exhausted, Interact(8,null), Down(50,null), Buff, Revive;
+    Idle, LookUp, LookLeft, LookDown, LookRight, WalkL, WalkR, Hit(15,null), Dead(99999,null), Wield(18, null), Recall,
+    Conjure, Wait(50,null), Cast, Consume(8,null), Exhausted, Interact(8,null), Down(80,null), Buff, Revive;
     private String description;
     private int del;
     Actions(){
@@ -49,5 +51,15 @@ public enum Actions implements Moveset {
             }
         }
         return null;
+    }
+
+    @Override
+    public void update(Unit p, int level){
+
+    }
+
+    @Override
+    public void done(Unit p){
+        p.setState(Idle);
     }
 }

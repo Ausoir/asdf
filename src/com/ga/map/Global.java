@@ -21,6 +21,7 @@ public class Global {
     public static P cameraTo = new P();
     public static Display display;
     public static Random r = new Random();
+    public static int margin = 0;
     private static float[] sinv = new float[360];
     private static float[] cosv = new float[360];
     private static int[] time = new int[]{0};
@@ -73,8 +74,8 @@ public class Global {
         return result;
     }
     public static void mapEdgeCenter(P p){
-        p.set(clamp(p.x, Settings.centerX, Global.map.getWidth()-Settings.centerX),
-                clamp(p.y, Settings.centerY, Global.map.getHeight()-Settings.centerY));
+        p.set(clamp(p.x, Settings.centerX+margin, Global.map.getWidth()-Settings.centerX-margin),
+                clamp(p.y, Settings.centerY+margin, Global.map.getHeight()-Settings.centerY-margin));
     }
     public static int checkCooldown(int[] p, int cd){
         return cd-(time[0]-p[0]);

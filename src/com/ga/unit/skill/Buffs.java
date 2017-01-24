@@ -12,43 +12,38 @@ import com.ga.unit.item.Projectile;
 public enum Buffs {
     Haste(hostEffect(), 50, "Speed",1,"Speed"), Rejuvenate(hostEffect(), 100, "Stamina",.5f,"Stamina"), Empower(weaponEffect(1), 80, "Proficiency",10), Cleave(weaponEffect(2), 300),
     Slow(new Spell(){
-        @Override
-        public boolean perform(){
+        public void perform(Unit host, int level){
             Particle.implode("Glare", host.pos.getAdd(0,-25), new P(), 1, 10, 1, false, 6);
-            return false;
         }
     }, 50, "Speed", -.5f, "Speed"),
     Evade(new Spell(){
         @Override
-        public boolean perform(){
+        public void perform(Unit host, int level){
             Particle.smoke(new P(host.pos));
-            return false;
         }
     }, 100),
     Freeze(new Spell(){
         @Override
-        public boolean perform(){
+        public void perform(Unit host, int level){
             Particle.frozen(host.pos);
-            return false;
         }
     }, 50, "Speed",-1,"Speed"),
     Poison(new Spell(){
         private int tick = 1;
         @Override
-        public boolean perform(){
+        public void perform(Unit host, int level){
             tick--;
             if (tick == 0) {
                 host.get("Health").add(-level-1);
                 tick = 30-level;
-                if (host.get("Health").get() == 1) return true;
+//                if (host.get("Health").get() == 1) return true;
             }
-            return false;
         }
     }, 100),
     Glacialwalk(new Spell(){
         private int tick = 1;
         @Override
-        public boolean perform(){
+        public void perform(Unit host, final int level){
             tick--;
             if (tick == 0) {
                 tick = 2;
@@ -73,20 +68,17 @@ public enum Buffs {
                 p.gravity = true;
                 p.delay.set(50+(level*150));
                 p.delay.performer = new Performer(){
-                    @Override
-                    public boolean perform(){
+                    public void perform(){
                         p.remove();
-                        return true;
                     }
                 };
             }
-            return false;
         }
-    },50),
+    },150),
     Flamestride(new Spell(){
         private int tick = 1;
         @Override
-        public boolean perform(){
+        public void perform(Unit host, int level){
             tick--;
             if (tick == 0) {
                 tick = 1;
@@ -111,26 +103,23 @@ public enum Buffs {
                 p.delay.set(level*20);
                 p.delay.performer = new Performer(){
                     @Override
-                    public boolean perform(){
-                    p.remove();
-                    return true;
+                    public void perform(){
+                        p.remove();
                     }
                 };
             }
-            return false;
         }
-    },80),
+    },500),
     Stun(new Spell(){
         @Override
-        public boolean perform(){
+        public void perform(Unit host, int level){
             host.delay.set(0);
             host.jump = true;
             host.setState(Actions.Hit);
             host.delay.set(5);
             Particle.implode("Glare", host.pos.getAdd(0,-25), new P(), 1, 10, 1, false, 6);
-            return false;
         }
-    }, 50);
+    }, 150);
     public int time;
     public float buff;
     public String stat;
@@ -139,23 +128,21 @@ public enum Buffs {
     private static Spell weaponEffect(final int type){
         return new Spell(){
             @Override
-            public boolean perform(){
+            public void perform(Unit host, int level){
                 Man t = (Man) host;
                 if (type == 1) Particle.dripFire(t.getWeapon().getPoint());
                 else if (type == 2) Particle.dripHoly(t.getWeapon().getPoint());
-                return false;
             }
         };
     }
     private static Spell hostEffect(){
         return new Spell(){
             @Override
-            public boolean perform(){
+            public void perform(Unit host, int level){
                 if (Global.r.nextInt(5) == 0) {
                     Man t = (Man) host;
                     Particle.cleanse(t.pos);
                 }
-                return false;
             }
         };
     }

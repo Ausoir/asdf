@@ -10,6 +10,7 @@ import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.tool.Timer;
+import com.ga.unit.intelligence.Intelligence;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ public class Updater {
     public static ArrayList<Updatable> updatee = new ArrayList<>();
     public static ArrayList<Matter> matter = new ArrayList<>();
     public static ArrayList<Unit> colidee = new ArrayList<>();
+    public static ArrayList<Intelligence> controllee = new ArrayList<>();
     public static HashMap<Integer, Unit> unitList = new HashMap<>();
     private static ArrayList<Observer> addQueue = new ArrayList<>();
     private static ArrayList<Observer> removeQueue = new ArrayList<>();
@@ -35,7 +37,7 @@ public class Updater {
     public static String changeMap = null;
     public static int changeMapPos = 0;
     public static Performer changeMapEvent = null;
-    private static Timer time = new Timer(10,true);
+    private static Timer time = new Timer(40,true);
     public static void clear(){
         drawee.clear();
         updatee.clear();
@@ -44,6 +46,7 @@ public class Updater {
         addQueue.clear();
         removeQueue.clear();
         unitList.clear();
+        controllee.clear();
         matter.clear();
     }
     public static int getId(){
@@ -65,31 +68,32 @@ public class Updater {
         }
         changeMap = null;
     }
+    public static void updateControl(){
+        for (Intelligence i : controllee) i.update();
+    }
     public static void update(){
-        if (addQueue.size() > 0){
-            for (int i=0;i<addQueue.size();i++){
-                Observer p = addQueue.remove(i);
-                if (p instanceof Matter) matter.add((Matter) p);
-                else if (p instanceof Updatable) updatee.add((Updatable) p);
-                if (p instanceof Effect) effects.add((Effect) p);
-                if (p instanceof Unit){
-                    Unit unit = (Unit) p;
-                    colidee.add(unit);
-                    unitList.put(unit.id, unit);
-                }
-                if (p instanceof Drawable) addDrawee((Drawable) p);
+        while (addQueue.size() > 0){
+            Observer p = addQueue.remove(0);
+            if (p instanceof Matter) matter.add((Matter) p);
+            else if (p instanceof Updatable) updatee.add((Updatable) p);
+            if (p instanceof Effect) effects.add((Effect) p);
+            if (p instanceof Intelligence) controllee.add((Intelligence) p);
+            if (p instanceof Unit){
+                Unit unit = (Unit) p;
+                colidee.add(unit);
+                unitList.put(unit.id, unit);
             }
+            if (p instanceof Drawable) addDrawee((Drawable) p);
         }
-        if (removeQueue.size() > 0){
-            for (int i=0;i<removeQueue.size();i++) {
-                Observer p = removeQueue.remove(i);
-                updatee.remove(p);
-                matter.remove(p);
-                colidee.remove(p);
-                effects.remove(p);
-                unitList.remove(p);
-                drawee.remove(p);
-            }
+        while (removeQueue.size() > 0){
+            Observer p = removeQueue.remove(0);
+            updatee.remove(p);
+            matter.remove(p);
+            colidee.remove(p);
+            effects.remove(p);
+            unitList.remove(p);
+            controllee.remove(p);
+            drawee.remove(p);
         }
         Global.camera.add(Global.cameraTo.getSubtract(Global.camera.getAdd(0,40)).getMult(.2f,.2f));
         for (Updatable i : updatee) i.update();
@@ -106,6 +110,7 @@ public class Updater {
         if (changeMap != null) changeMap(false);
     }
     public static void draw(Graphics2D g2){
+        Global.mapEdgeCenter(Global.camera);
         for (Drawable i : drawee) i.draw(g2);
         if (editor || showTerrain){
             g2.setColor(landColor);
@@ -154,6 +159,15 @@ public class Updater {
                 }
             }
         }
+    }
+    public static ArrayList<Matter> collideInteractive(P p){
+        ArrayList<Matter> result = new ArrayList<>();
+        for (Matter i : matter){
+            if (i.onInteract != null) {
+                if (i.pos.getMinus().getAdd(p).getDist() <= i.onInteract.range) result.add(i);
+            }
+        }
+        return result;
     }
     public static ArrayList<Matter> collide(P p, int r){
         ArrayList<Matter> result = new ArrayList<>();

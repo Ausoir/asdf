@@ -1,6 +1,7 @@
 package com.ga.unit.item;
 
 import com.ga.map.Global;
+import com.ga.tool.Interactive;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.unit.*;
@@ -15,7 +16,7 @@ import java.util.Random;
 public class Item extends Matter {
     public enum Tag{
         Sword(Skills.Swing, DamageType.Cut), Spear(Skills.Pierce, DamageType.Cut), Mace(Skills.Swing, DamageType.Bash),
-        Dagger(Skills.Stab, DamageType.Cut), Armor(Skills.Rest, DamageType.Push), Scroll(Actions.Cast, DamageType.Push),
+        Dagger(Skills.Stab, DamageType.Cut), Armor(Skills.Rest, DamageType.Push), Scroll(Skills.Guard, DamageType.Push),
         Shoot(Skills.Shoot, DamageType.Cut), Snipe(Skills.Snipe, DamageType.Cut), Throwing(Skills.Throw, DamageType.Cut),
         Darting(Skills.Dart, DamageType.Cut), Consumable(Actions.Consume, DamageType.Push), Claw(Skills.Swing, DamageType.Cut),
         Enchant(Actions.Buff, DamageType.Push);
@@ -33,7 +34,7 @@ public class Item extends Matter {
         }
     }
     enum SpecialtyMod{
-        None, Light, Heavy, Feather, Sharp, Dull, Hasty, Lazy, Durable, Tough, Runic, Instant, Comfortable, Cursed, Quick, Slow;
+        None, Light, Heavy, Feather, Sharp, Dull, Hasty, Lazy, Durable, Tough, Runic, Instant, Comfortable, Cursed, Quick, Slow, Recharging;
         static SpecialtyMod get(Random seed){
             if (seed.nextGaussian() > 1) return values()[seed.nextInt(values().length)];
             return None;
@@ -108,13 +109,13 @@ public class Item extends Matter {
     private Tag type = Tag.Consumable;
     private Organ organ = null;
     public int speed = 0;
+    public int damage = 1;
     public Item(String name, int seed, int weight, int uses, int cooldown, float enchantRatio) {
         super(name, seed, new P(), 8);
         this.name = name;
         this.weight = weight;
         this.uses.setTotal(uses);
         this.cooldown = cooldown;
-        interactive = true;
         pmod = PrefixMod.get(rand);
         smod = SpecialtyMod.get(rand);
         if (rand.nextFloat() < enchantRatio) {
@@ -124,12 +125,17 @@ public class Item extends Matter {
         }
         setModifier(pmod);
         setModifier(smod);
-        Updater.remove(this);
         gravity = true;
-        init();
-    }
-    protected void init(){
-
+        final Item me = this;
+        onInteract = new Interactive(image.sizeRadius+5){
+            public void interact(Unit p){
+                if (p instanceof Man) {
+                    Man t = ((Man)p);
+                    t.setWeapon(me);
+                }
+            }
+        };
+        Updater.remove(this);
     }
     public void setType(Tag p){
         this.type = p;
@@ -156,11 +162,9 @@ public class Item extends Matter {
             uses.addTotal(Math.max(1,uses.getMax()));
             probability += .1f;
         }else if (mod == PrefixMod.Mastercraft){
-            uses.setTotal(-1);
             speed += 4;
             probability += .2f;
         }else if (mod == PrefixMod.Legendary){
-            uses.setTotal(-1);
             speed += 7;
             probability += .3f;
         }
@@ -181,6 +185,10 @@ public class Item extends Matter {
         else if (mod == SpecialtyMod.Runic) probability += .2f;
         else if (mod == SpecialtyMod.Instant) delay = 1;
         else if (mod == SpecialtyMod.Comfortable) smod = SpecialtyMod.None;
+        else if (mod == SpecialtyMod.Recharging){
+            cooldown = ((cooldown+5) * 2)+40;
+            uses.setTotal(-1);
+        }
     }
     public int getRarity(){
         return pmod.ordinal()+(smod != SpecialtyMod.None?10:0)+(emod != null?100:0);
@@ -190,10 +198,10 @@ public class Item extends Matter {
         Color result = Color.black;
         switch (rarity){
             case 1:
-                result = Color.GRAY;
+                result = Color.LIGHT_GRAY;
                 break;
             case 2:
-                result = Color.DARK_GRAY;
+                result = Color.WHITE;
                 break;
             case 3:
                 result = Color.GREEN;
@@ -274,9 +282,6 @@ public class Item extends Matter {
             Curse.get(host, 5);
         }
     }
-    protected float getProbability(){
-        return probability+ademod.magnitude;
-    }
     protected boolean canUse(){
         if (uses.get() != 0 && Global.checkCooldown(lastused, cooldown)<= 0) {
             return true;
@@ -288,19 +293,26 @@ public class Item extends Matter {
             Global.cooldown(lastused, cooldown);
             if (uses.get() != -1) uses.add(-1);
             host.setState(action);
-            if (emod != null && rand.nextFloat() < getProbability()){
-                emod.getEvent().start(host, ademod.level*3);
-                emod.getEvent().perform();
+            if (emod != null && rand.nextFloat() < probability){
+                emod.getEvent().perform(host, ademod.level*3);
+                host.state = emod;
             }
             return true;
         }
         return false;
     }
     public void drop(Man host) {
+        host.setWeapon(null);
         pos = new P(host.pos);
         field();
         rotation = (float)Global.r.nextInt(628)/100;
-        host.get("Speed").add(weight);
+    }
+    public void remove(){
+        if (organ != null) {
+            ((Man) organ.host).setWeapon(null);
+            setOrgan(null);
+        }
+        super.remove();
     }
     public void field(){
         gravity = true;
@@ -329,17 +341,10 @@ public class Item extends Matter {
         return result;
     }
     public int getDamage() {
-        return weight;
+        return damage;
     }
     public Line getLine(){
         return new Line(pos.getAdd(organ.pt), getPoint());
-    }
-    @Override
-    public void interact(Unit p){
-        if (p instanceof Man) {
-            Man t = ((Man)p);
-            t.setWeapon(this);
-        }
     }
     @Override
     public void draw(Graphics2D g){

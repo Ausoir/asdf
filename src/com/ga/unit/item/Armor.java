@@ -1,6 +1,6 @@
 package com.ga.unit.item;
 
-import com.ga.game.Picture;
+import com.ga.map.Picture;
 import com.ga.tool.Clips;
 import com.ga.tool.Performer;
 import com.ga.unit.Man;
@@ -20,7 +20,7 @@ public class Armor extends Item {
         this.name = name;
         this.encumberance = encumberance;
         this.piece = piece;
-        if (piece != 5) image = new Picture(name, Integer.parseInt(Clips.clip.get("Man").model[piece][1])-1);
+        if (piece != 5) image = new Picture(name, Math.abs(Integer.parseInt(Clips.clip.get("Man").model[piece][1]))-1);
         delay = 80;
     }
     public float getArmor(){
@@ -31,8 +31,14 @@ public class Armor extends Item {
         if (mod == PrefixMod.Broken) armorMod = .5f;
         else if (mod == PrefixMod.Old) armorMod = .8f;
         else if (mod == PrefixMod.Fine) armorMod = 1.2f;
-        else if (mod == PrefixMod.Mastercraft) armorMod = 1.5f;
-        else if (mod == PrefixMod.Legendary) armorMod = 2;
+        else if (mod == PrefixMod.Mastercraft){
+            uses.setTotal(-1);
+            armorMod = 1.5f;
+        }
+        else if (mod == PrefixMod.Legendary){
+            uses.setTotal(-1);
+            armorMod = 2;
+        }
     }
     protected void setModifier(SpecialtyMod mod){
         if (mod == SpecialtyMod.Comfortable) encumberance = Math.max(0,encumberance-admod.magnitude);
@@ -47,11 +53,12 @@ public class Armor extends Item {
         host.setState(action);
         final Armor me = this;
         host.delay.performer = new Performer(){
-            public boolean perform(){
-                host.armor.set(me, piece);
-                host.setWeapon(null);
-                me.remove();
-                return true;
+            public void perform(){
+                if (host.armor.isBare(piece)) {
+                    host.armor.set(me, piece, true);
+                    host.setWeapon(null);
+                    me.remove();
+                }
             }
         };
         return false;
@@ -68,7 +75,7 @@ public class Armor extends Item {
         String r = super.getDescription();
         r = r.replace(" uses "," durability ");
         if (emod != null){
-            r += " This armor has "+getProbability()*100+"% chance of activating its enchantment on being hit.";
+            r += " This armor has "+probability*100+"% chance of activating its enchantment on being hit.";
         }
         return r + " This armor decreases damage by "+getArmor()+" points.";
     }

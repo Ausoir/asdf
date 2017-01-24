@@ -41,7 +41,7 @@ public class Communication {
         if (topic.contains(t)) current = t;
         Performer reaction = react.get(t);
         if (reaction != null){
-            if (reaction.perform()) return "";
+            reaction.perform();
         }
         t = reply.get(t);
         if (t != null){

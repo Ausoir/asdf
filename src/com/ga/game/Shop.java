@@ -1,6 +1,7 @@
 package com.ga.game;
 
 import com.ga.map.Global;
+import com.ga.map.Picture;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.unit.Player;
@@ -15,8 +16,7 @@ import java.awt.event.*;
 /**
  * Created by Ga on 11/15/2016.
  */
-public class Shop extends JPanel {
-    public P size;
+public class Shop extends Panel {
     private GridBagConstraints grid = new GridBagConstraints();
     private JPanel panel;
     private JScrollPane scroll;
@@ -31,11 +31,8 @@ public class Shop extends JPanel {
     private Performer[] actions;
 
     public Shop(){
+        super();
         setLayout(new BoxLayout(this,BoxLayout.PAGE_AXIS));
-        image = Picture.load("Shop");
-        size = new P(image.getWidth(null), image.getHeight(null));
-        resize();
-        setBorder(BorderFactory.createTitledBorder(BorderFactory.createRaisedBevelBorder()));
         addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
@@ -80,19 +77,20 @@ public class Shop extends JPanel {
         add(titleLabel, BorderLayout.CENTER);
         add(scroll, BorderLayout.CENTER);
         add(gold, BorderLayout.LINE_START);
-        setVisible(false);
     }
-    @Override
-    public void paintComponent(Graphics g){
-        g.drawImage(image,0,0,null);
+    protected void setColor() {
+        setBackground(new Color(68, 95, 120, 180));
+        scroll.setBackground(new Color(120, 86, 47, 180));
     }
     public void show(String title, Item[] wares, int[] prices, Performer[] actions){
         if (!isVisible()) {
+            super.display();
+            setBackground(new Color(120,120,120,180));
+            scroll.setBackground(new Color(120,120,120,180));
             this.title = title;
             this.wares = wares;
             this.prices = prices;
             this.actions = actions;
-            setVisible(true);
 
             titleLabel.setText(title);
             gold.setText("Gold: " + Global.player.host.gold);
@@ -105,11 +103,6 @@ public class Shop extends JPanel {
                 }
             }
         }
-    }
-    public void resize(){
-        int x = (int) (Settings.centerX-(size.x/2));
-        int y = (int) (Settings.centerY-(size.y/2));
-        setBounds(x,y, (int) size.x, (int) size.y);
     }
     public void makeSlot(final Item item, final int price, final Performer action){
         JPanel panel = new JPanel();
@@ -147,17 +140,19 @@ public class Shop extends JPanel {
     private void describe(final Item item, final int price, final Performer action){
         Display.dialog.show(item.getFullName(),"This is "+item.getDescription()+". It is being sold for "+price+" gold.",
                 new String[]{"Buy"}, new Performer[]{new Performer(){
-                    public boolean perform(){
+                    public void perform(){
                         Player player = Global.player.host;
                         if (player.gold >= price) {
                             if (player.inventory.vacant()) {
                                 player.gold -= price;
-                                item.field();
-                                item.pos = player.pos.getAdd(0, 0);
+                                if (player.wieldingNone()) player.setWeapon(item);
+                                else {
+                                    item.field();
+                                    item.pos = player.pos.getAdd(0, 0);
+                                }
                                 action.perform();
                             }
                         }
-                        return true;
                     }
                 }});
     }

@@ -8,6 +8,7 @@ import com.ga.unit.item.Item;
 import com.ga.unit.skill.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static com.ga.unit.BodyHumanoid.FIST;
 
@@ -15,6 +16,7 @@ import static com.ga.unit.BodyHumanoid.FIST;
  * Created by Ga on 7/30/2016.
  */
 public class Player extends Man {
+    private HashMap<Moveset, int[]> cooldown = new HashMap<>();
     protected String memorized = "";
     public int gold;
     public Inventory inventory = new Inventory();
@@ -59,65 +61,92 @@ public class Player extends Man {
         } else return;
         say("Dropping " + p.getFullName());
     }
-    @Override
     protected int[] getCooldown(Moveset state){
         int level = skillTree.getSkillCdLevel(state);
-        if (level == 0) return super.getCooldown(state);
-        float cd = state.getCooldown() * (float)(1f/(Math.pow(2,level)));
-        int reduction = (int) ((state.getCooldown()-cd))-level;
-        return new int[]{super.getCooldown(state)[0]-reduction};
+        int reduction;
+        if (level == 0) reduction = 0;
+        else {
+            float cd = state.getCooldown() * (float) (1f / (Math.pow(2, level)));
+            reduction = (int) ((state.getCooldown() - cd)) - level;
+        }
+        int[] r = cooldown.get(state);
+        if (r == null) r = new int[]{0};
+        return new int[]{r[0]-reduction};
     }
     @Override
-    protected void startSkill(Moveset move, Spell p){
-        p.start(this, skillTree.getSkillLevel(move));
+    public int setState(Moveset state){
+        int[] cdinput = getCooldown(state);
+        int prevCd = cdinput[0];
+        int r;
+        if (Global.cooldown(cdinput, state.getCooldown())) {
+            cooldown.put(state, cdinput);
+            r = super.setState(state);
+            if (r != 0){
+                cooldown.put(state, new int[]{prevCd});
+                if (r == 2) {
+                    int req = (int) state.getCost();
+                    req += getStatPenalty();
+                    if (req > get("Stamina").getMax()) say("This skill is beyond my abilities!");
+                    else say("Need " + (req - get("Stamina").get()) + " more stamina!");
+                }
+            }
+            return r;
+        } else {
+            say(state.getName() + " is available in " + Global.checkCooldown(cdinput, state.getCooldown()) + " seconds!");
+            return 3;
+        }
     }
     @Override
-    protected void actionSet(Moveset state, int level){
-        super.actionSet(state, skillTree.getSkillLevel(state));
+    protected void stateSet(Moveset state){
+        super.stateSet(state);
+        stateLevel = skillTree.getSkillLevel(state);
+        if (weapon.getType() == Item.Tag.Claw) weapon.rotation = (weapon.getOrgan().getAtan()+(dir<0?3.14f:0));
         if (state instanceof Actions) {
             switch ((Actions) state) {
+                case Idle:
+                    if (!get("Stamina").isFull()) clip.setState(Actions.Exhausted);
+                    break;
+                case Interact:
+                    ArrayList<Matter> obj = Updater.collideInteractive(pos.getAdd(clip.organs[FIST].ptd));
+                    for (Matter i : obj) {
+                        if (i.onInteract != null) {
+                            i.onInteract.interact(this);
+                            break;
+                        }
+                    }
+                    break;
                 case Wield:
                     delay.performer = new Performer() {
-                        public boolean perform() {
+                        public void perform() {
                             if (selectingItem == -1) {
                                 sheathe();
-                                return false;
                             } else if (selectingItem < inventory.getItemSize()) {
                                 Item item = inventory.getItem(selectingItem);
                                 setWeapon(item);
                                 inventory.remove(item);
                                 selectingItem = -1;
                             } else if (selectingItem >= 10 && selectingItem <= 16){
-                                if (sheathe()) {
-                                    setWeapon(armor.armor[selectingItem-10]);
-                                    armor.set(null,selectingItem-10);
+                                int piece = selectingItem-10;
+                                if (sheathe() && !armor.isBare(piece)) {
+                                    setWeapon(armor.armor[piece]);
+                                    armor.set(null, piece, true);
                                 }
                             }
-                            return true;
                         }
                     };
                     break;
             }
-        }
-    }
-    public int setState(Moveset state){
-        if (state instanceof Actions) {
-            switch ((Actions) state) {
-                case Idle:
-                    if (!get("Stamina").isFull()) state = Actions.Exhausted;
+        } else if (state instanceof Skills){
+            switch ((Skills) state){
+                case Use:
+                    if (weapon.uses.get() == 0) say("This item is no longer usable...");
                     break;
-                case Interact:
-                    ArrayList<Matter> obj = Updater.collide(pos.getAdd(clip.organs[FIST].ptd), 12);
-                    for (Matter i : obj) {
-                        if (i.interactive) {
-                            i.interact(this);
-                            break;
-                        }
-                    }
+                case Duck:
+                    cooldown.put(state,new int[]{Global.getTime()[0]+((armor.armor[1].encumberance+armor.armor[2].encumberance)*4)});
                     break;
-            }
-        } else if (state instanceof Skills) {
-            switch ((Skills) state) {
+                case Guard:
+                    cooldown.put(state,new int[]{Global.getTime()[0]+((armor.armor[FIST].encumberance+armor.armor[0].encumberance)*4)});
+                    break;
                 case Snipe:
                 case Shoot:
                     weapon.rotate(target.getMult(dir,dir));
@@ -133,26 +162,12 @@ public class Player extends Man {
                 }
             }
         }
-        if (weapon.getType() == Item.Tag.Claw) weapon.rotation = (weapon.getOrgan().getAtan()+(dir<0?3.14f:0));
-        int r = super.setState(state);
-        if (r == 2){
-            int req = (int) state.getCost();
-            req += getStatPenalty();
-            if (req > get("Stamina").getMax()) say("This skill is beyond my abilities!");
-            else say("Need " + (req - get("Stamina").get()) + " more stamina!");
-        } else if (r == 3){
-            int[] cdinput = getCooldown(state);
-            say(state.getName() + " is available in "+Global.checkCooldown(cdinput, state.getCooldown())+" seconds!");
-        } else if (r == 4){
-            say("Item broke!");
-        }
-        return r;
     }
     @Override
     public int getStatPenalty() {
         return (armor.getWeight()+weapon.weight)/get("Strength").get();
     }
-    protected float getSpeed() {
+    public float getSpeed() {
         float t = Math.max(0,super.getSpeed()-(inventory.weight/get("Strength").get())-getStatPenalty());
         clip.setMoveSpeed((int) Global.clamp(t-1,-20,4));
         return t;
