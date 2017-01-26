@@ -33,7 +33,7 @@ public class Body {
     protected int legNum = 0, legCurrent = 0;
     protected float appendageSize = 1;
 
-    Body(Unit host, String current) {
+    public Body(Unit host, String current) {
         this.host = host;
         this.clip = Clips.clip.get(current);
         reset(clip);
@@ -159,7 +159,7 @@ public class Body {
         frame.set(Math.max(1, frame.time-p));
     }
     public void setMoveSpeed(int p){
-        int[] t = animation.get(Actions.WalkL);
+        int[] t = animation.get(Actions.Walk);
         for (int i : t) localFrames[i] = Math.max(1, clip.frames[i]-p);
     }
 
@@ -181,15 +181,19 @@ public class Body {
         localAnimation[frame][organ][1] = (int) (length*atanDir.y);
     }
 
-    public void update() {
+    public int update() {
+        int r = -1;
+        float high = 50;
         if (!frame.update()) {
             for (int i = 0; i < nextClip.length; i++) {
                 if (!organs[i].amputated) {
                     float x = (((nextClip[i][0] * host.dir) + organs[i].pt.x) - organs[i].ptd.x) / (frame.max);
                     float y = ((nextClip[i][1] + organs[i].pt.y) - organs[i].ptd.y) / (frame.max);
                     organs[i].ptd.add(x, y);
-                    if ((x * x) + (y * y) > 50) {
-                        host.moveTriggered(i);
+                    float t = (x * x) + (y * y);
+                    if (t > high) {
+                        high = t;
+                        r = i;
                     }
                 }
             }
@@ -197,6 +201,7 @@ public class Body {
             current++;
             setClip();
         }
+        return r;
     }
 
     protected void updateStatus(){

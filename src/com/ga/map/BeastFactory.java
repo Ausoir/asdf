@@ -3,9 +3,8 @@ package com.ga.map;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Word;
-import com.ga.unit.Beast;
-import com.ga.unit.Faction;
-import com.ga.unit.Updater;
+import com.ga.unit.*;
+import com.ga.unit.intelligence.UnitIntelligence;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Moveset;
 import com.ga.unit.skill.Skills;
@@ -19,7 +18,7 @@ public class BeastFactory {
         Dog(Faction.Evil, 1,10,30,10,3,"-5,50/Kick&Pierce"),
         Floater(Faction.Evil, 3,10,1,60,3,"200,800/Flamestride,Flameroll&Flameroll,Fireball"),
         Fire_Spitter(Faction.Evil, 3,10,1,60,3,"300/Fireblast,Idle,Idle,Idle"),
-        Slime(Faction.Evil, 1,10,6,10,1,"5/Kick"),
+        Slime(Faction.Evil, 1,10,12,10,1,"5/Kick"),
         Spider(Faction.Evil, 1,10,30,10,3,"-5/Kick"),
         Mantis(Faction.Evil, 10,100,40,10,3,"-5/Kick");
         private int level,health,speed,stamina,proficiency;
@@ -34,12 +33,12 @@ public class BeastFactory {
             this.proficiency = prof;
             this.rangeMove = rangeMove;
         }
-        Beast get(String p){
-            Beast r;
+        Unit get(String p){
+            Unit r;
             switch (this){
                 case Dog:
-                    r = new Beast(p){
-                        protected void stateSet(Moveset state){
+                    r = new Unit(p){
+                        public void stateSet(Moveset state){
                             super.stateSet(state);
                             if (state == Skills.Pierce){
                                 delay.time = 30;
@@ -50,8 +49,8 @@ public class BeastFactory {
                     };
                     break;
                 case Slime:
-                    r = new Beast(p) {
-                        protected void stateSet(Moveset state) {
+                    r = new Unit(p) {
+                        public void stateSet(Moveset state) {
                             super.stateSet(state);
                             if (state == Skills.Kick) {
                                 moveTriggered(0);
@@ -61,12 +60,12 @@ public class BeastFactory {
                     };
                     break;
                 case Mantis:
-                    r = new Beast(p);
+                    r = new Unit(p);
                     r.clip.organs[1].pt.y -= r.clip.organs[0].ptd.y;
                     break;
                 case Floater:
                 case Fire_Spitter:
-                    r = new Beast(p){
+                    r = new Unit(p){
                         public void collide(){
                             super.collide();
                             jump = true;
@@ -92,25 +91,26 @@ public class BeastFactory {
                             }
                         }
                     };
-                    r.brain.range = 400;
                     r.gravity = false;
                     break;
                 default:
-                    r = new Beast(p);
+                    r = new Unit(p);
             }
+            r.brain = new UnitIntelligence(r);
+            r.clip = new Body(r, r.name);
             return r;
         }
-        Beast get(int seed, P p){
+        Unit get(int seed, P p){
             String stat = "Level:"+level+"&Stamina:"+stamina+"&Speed:"+speed+"&Proficiency:"+proficiency+"&Health:"+health;
             String t = name()+"@"+seed+"@"+p+"@"+Updater.getId()+"@"+stat+"@"+faction.name()+"@"+rangeMove;
             return get(t);
         }
     }
-    public static Beast produce(String p){
+    public static Unit produce(String p){
         return Type.valueOf(p.split("@")[0]).get(p);
     }
-    public static Beast produce(String name, P pt, int seed){
-        Beast result;
+    public static Unit produce(String name, P pt, int seed){
+        Unit result;
         String t = Word.wordify(name);
         try {
             result = Type.valueOf(t).get(seed, pt);

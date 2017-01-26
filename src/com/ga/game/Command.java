@@ -48,7 +48,8 @@ public class Command {
                 else if (cmd[0].equals("actAction")) host.setState(Actions.valueOf(cmd[1]));
                 else if (cmd[0].equals("learnSkill")) host.learnSkill(Skills.valueOf(cmd[1]));
                 else if (cmd[0].equals("learnSpell")) host.learnSkill(Spells.valueOf(cmd[1]));
-                else if (cmd[0].equals("atkspd")) host.getWeapon().speed = Integer.parseInt(cmd[1]);
+                else if (cmd[0].equals("atkspd")) host.weapon.speed = Integer.parseInt(cmd[1]);
+                else if (cmd[0].equals("sound")) Sound.play(cmd[1]);
                 else if (p.equals("revive")) host.revive();
                 else if (p.equals("terrain")) Updater.showTerrain = true;
                 else if (cmd[0].equals("randomObj")){

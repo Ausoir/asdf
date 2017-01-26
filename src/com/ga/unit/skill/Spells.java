@@ -1,5 +1,6 @@
 package com.ga.unit.skill;
 
+import com.ga.game.Sound;
 import com.ga.map.Global;
 import com.ga.tool.Line;
 import com.ga.tool.P;
@@ -14,12 +15,16 @@ import com.ga.unit.item.Projectile;
  */
 public enum Spells implements Moveset {
     Focus(Actions.Conjure, 15, -1, 240, false, "Focus grants you free Stamina. [2+Level^2 Stamina]", new Spell(){
+        private boolean first = true;
         public void perform(Unit host, int level){
+            if (first) Sound.play("heal");
             host.get("Stamina").add(2 + level * level);
         }
     }),
     Heal(Actions.Buff, 40, 10, 240, true, "Heal channels you small streams of Health. [2*Level Health per Stamina] [Upkeep:10/20]", new Spell(){
+        private boolean first = true;
         public void perform(Unit host, int level){
+            if (first) Sound.play("heal");
             host.get("Health").add(level*2);
         }
     }),
@@ -69,6 +74,7 @@ public enum Spells implements Moveset {
     Shadowtwin(Actions.Buff, 40,3,100,false,"Summon a mirror of yourself to aid you in battle. [Level*1 Shadows] [Duration:50+Level*10] [3 Stamina Reserve/Shadow]",new Spell() {
         @Override
         public void perform(final Unit host, int level){
+            Sound.play("shadowstep");
             for (int i=0;i<level;i++) {
                 Man p = new Man(host.toString().split("]")[1]) {
                     @Override
@@ -103,23 +109,32 @@ public enum Spells implements Moveset {
             }
         }
     }),
-    Shadowstep(Actions.Conjure, 20,0,40,false,"Blink to the target location.",new Spell() {
+    Shadowstep(Actions.Conjure, 20,1,40,true,"Blink to the target location.",new Spell() {
+        private int turn = 0;
         public void perform(Unit host, int level){
+            if (turn++%4==0) Sound.play("shadow");
             Particle.smoke(host.pos);
             P target = host.target.getAdd(host.pos);
             Line pp = new Line(target, target.getAdd(0,1200));
             for (Line i : Global.map.land){
                 if (i.lineCross(pp)){
-                    host.pos.set(target);
                     Particle.smoke(host.pos);
+                    if (!Global.map.isInside((int) target.x, (int) target.y)) {
+                        Sound.play("shadowstep");
+                        host.pos.set(target);
+                        host.setState(Actions.Idle);
+                        return;
+                    }
                     return;
                 }
             }
         }
     }),
     Fireworks(Actions.Cast, 40,0,10,true,"Fire streams of cackling sparks. [Range:100] [No Damage] [Upkeep:1 Stamina, No Weight Penalty]",new Spell(){
+        private int turn = 0;
         @Override
         public void perform(final Unit host, int level){
+            if (turn++%8==0) Sound.play("fire");
             for (int i=0;i<2;i++) {
                 final Projectile p = new Projectile("Fire", host.getHand(), host.target.getAdd(host.pos).getAdd(Global.r.nextInt(50)-25, Global.r.nextInt(50)-25), Global.r.nextInt(12)+3) {
                     @Override
@@ -146,8 +161,10 @@ public enum Spells implements Moveset {
         }
     }),
     Fireblast(Actions.Cast, 40,4,60,true,"Fire streams of blazing flame. [Range:10*Level+100] [Damage:10] [Damage Scale:.3 per Proficiency] [Upkeep:4/20]",new Spell(){
+        private int turn = 0;
         @Override
         public void perform(final Unit host, int level){
+            if (turn++%8==0) Sound.play("fire");
             for (int i=0;i<3;i++) {
                 final Projectile p = new Projectile("Flame", host.getHand(), host.target.getAdd(host.pos).getAdd(Global.r.nextInt(50)-25, Global.r.nextInt(50)-25), Global.r.nextInt(10+level)+6+level) {
                     @Override
@@ -175,8 +192,10 @@ public enum Spells implements Moveset {
         }
     }),
     Freeze(Actions.Cast, 40,2,24,true,"Fire a stream of freezing blast. [Range:Low] [Damage:0 Constant] [Upkeep:2/20]",new Spell(){
+        private int turn = 0;
         @Override
         public void perform(final Unit host, final int level){
+            if (turn++%6==0) Sound.play("ice");
             for (int i=0;i<3;i++) {
                 final Projectile p = new Projectile("Ice", host.getHand(), host.target.getAdd(host.pos).getAdd(Global.r.nextInt(150)-75, Global.r.nextInt(150)-75), 20) {
                     private int tick = 200;
@@ -216,6 +235,7 @@ public enum Spells implements Moveset {
                 }
                 @Override
                 public void stuck(){
+                    attackHitSound();
                     host.setVisible(true);
                     Particle.explode("Fire", pos, new P(), 100+(level*15), 10+(level*2), 0, false, 4);
                     Particle.smoke(pos);
@@ -226,6 +246,9 @@ public enum Spells implements Moveset {
                 public void update(){
                     super.update();
                     Particle.explode("Fire", pos, new P(), 15, 10, 0, true, 4);
+                }
+                public void attackHitSound(){
+                    Sound.play("explosion_small");
                 }
             };
             host.setVisible(false);
@@ -249,6 +272,7 @@ public enum Spells implements Moveset {
                 }
                 @Override
                 public void stuck(){
+                    attackHitSound();
                     Particle.explode("Fire", pos, new P(), 100+(level*15), 10+(level*2), 0, false, 4);
                     Particle.smoke(pos);
                     Updater.collide(this,40+(level*5));
@@ -258,6 +282,9 @@ public enum Spells implements Moveset {
                 public void update(){
                     super.update();
                     Particle.explode("Fire", pos, new P(), 15, 10, 0, true, 4);
+                }
+                public void attackHitSound(){
+                    Sound.play("explosion_small");
                 }
             };
             p.faction = host.faction;
@@ -274,6 +301,7 @@ public enum Spells implements Moveset {
         @Override
         public void perform(final Unit host, final int level){
             if (Global.r.nextInt(40) > (level*8)-4) return;
+            if (Math.random() < .2f) Sound.play("ice");
             final Projectile p = new Projectile("Ice", host.pos.getAdd(Global.nextGaussian(500),-500), host.pos.getAdd(Global.nextGaussian(500),0), 8+Global.r.nextInt(6*level)){
                 @Override
                 protected void onAttack(Matter p){
@@ -308,6 +336,7 @@ public enum Spells implements Moveset {
     Meteor(Actions.Cast, 40,6,240,true,"Conjure down a meteor to devastate anything in its target range. [Range:0~500] [Radius:50] [Damage:15 per Meteor] [Upkeep:6/20]",new Spell(){
         public void perform(Unit host, int level){
             if (Global.r.nextInt(60) > level*2) return;
+            Sound.play("meteor");
             final Projectile p = new Projectile("Fireball", host.pos.getAdd(Global.nextGaussian(50),-500), host.pos.getAdd((host.target.x)+Global.nextGaussian(50),0), 12+Global.r.nextInt(6)){
                 @Override
                 public void stuck(){

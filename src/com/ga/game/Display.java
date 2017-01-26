@@ -89,7 +89,7 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
     }
 
     private void input(int mode){
-        if (this.mode != mode || mode < 0 || Updater.editor) {
+        if (this.mode != mode || mode <= 0 || Updater.editor) {
             this.mode = mode;
             if (input != null)
                 input.input(mode, (int) (mX-Settings.centerX+Global.camera.x), (int) (mY-Settings.centerY+Global.camera.y));
@@ -156,6 +156,6 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
     public void mouseMoved(MouseEvent e) {
         mX = e.getX();
         mY = e.getY();
-        if (Updater.editor) input(0);
+        input(0);
     }
 }

@@ -1,5 +1,6 @@
 package com.ga.unit;
 
+import com.ga.game.Sound;
 import com.ga.map.Global;
 import com.ga.tool.Performer;
 import com.ga.unit.intelligence.PlayerInput;
@@ -19,13 +20,20 @@ public class Player extends Man {
     private HashMap<Moveset, int[]> cooldown = new HashMap<>();
     protected String memorized = "";
     public int gold;
-    public Inventory inventory = new Inventory();
+    public Inventory inventory;
     public SkillTree skillTree = new SkillTree();
     public int selectingItem = -1;
     public PlayerInput input;
     public Player(String p) {
         super(p);
         speechType = "p";
+        inventory = new Inventory(this);
+        armor.onChange = new Performer(){
+            public void perform(){
+                inventory.setMaxSize(armor.getPockets());
+            }
+        };
+        inventory.setMaxSize(armor.getPockets());
     }
     public void learnSkill(Moveset p){
         say("Learned spell "+p.getName()+"!");
@@ -36,6 +44,7 @@ public class Player extends Man {
            skillTree.advanceSkill(p, cd);
     }
     public void setWeapon(Item p){
+        Sound.play("wield");
         if (p == null || sheathe()) super.setWeapon(p);
         else{
             dropItem(weapon);
@@ -97,7 +106,7 @@ public class Player extends Man {
         }
     }
     @Override
-    protected void stateSet(Moveset state){
+    public void stateSet(Moveset state){
         super.stateSet(state);
         stateLevel = skillTree.getSkillLevel(state);
         if (weapon.getType() == Item.Tag.Claw) weapon.rotation = (weapon.getOrgan().getAtan()+(dir<0?3.14f:0));
@@ -115,6 +124,9 @@ public class Player extends Man {
                         }
                     }
                     break;
+                case Walk:
+                    if (input.moving != dir) clip.setState(Actions.WalkL);
+                    break;
                 case Wield:
                     delay.performer = new Performer() {
                         public void perform() {
@@ -126,6 +138,7 @@ public class Player extends Man {
                                 inventory.remove(item);
                                 selectingItem = -1;
                             } else if (selectingItem >= 10 && selectingItem <= 16){
+                                Sound.play("unwear");
                                 int piece = selectingItem-10;
                                 if (sheathe() && !armor.isBare(piece)) {
                                     setWeapon(armor.armor[piece]);
@@ -173,16 +186,21 @@ public class Player extends Man {
         return t;
     }
     protected void stateDone(){
-        if (input.moving == 0) super.stateDone();
-        else if (input.moving == -1) setState(Actions.WalkL);
-        else if (input.moving == 1) setState(Actions.WalkR);
+        super.stateDone();
+        if (input.moving != 0){
+            delay.performer = new Performer(){
+                public void perform(){
+                    setState(Actions.Walk);
+                }
+            };
+        }
     }
     @Override
     public void stateUpdate(){
         super.stateUpdate();
-        if (input.moving == 0 && (state == Actions.WalkL || state == Actions.WalkR)){
+        if (input.moving == 0 && state == Actions.Walk){
             setState(Actions.Idle);
-        }
+        } else if (state == Actions.Walk) vel.x = getSpeed()*input.moving;
     }
     public String toCharacterString(){
         String r = super.toString()+"\n";

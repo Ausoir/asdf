@@ -1,7 +1,10 @@
 package com.ga.unit.item;
 
+import com.ga.game.Sound;
+import com.ga.tool.Performer;
 import com.ga.unit.Man;
 import com.ga.unit.Organ;
+import com.ga.unit.Player;
 
 /**
  * Created by Ga on 1/15/2017.
@@ -18,6 +21,7 @@ public class ArmorSet {
     };
     public Armor[] armor;
     private Organ[] organs;
+    public Performer onChange;
     public ArmorSet(Man host, String p){
         this.host = host;
         organs = host.clip.organs;
@@ -35,6 +39,7 @@ public class ArmorSet {
             if (piece == 5) organs[piece].setImage(p.name);
             else organs[piece].setImage(p.name, organs[piece].type-1);
         }
+        if (onChange != null) onChange.perform();
         if (loop) {
             if (piece == 1) set(p, 2, false);
             else if (piece == 2) set(p, 1, false);
@@ -63,6 +68,11 @@ public class ArmorSet {
     }
     public float getArmor(int p){
         return armor[p].getArmor();
+    }
+    public int getPockets(){
+        int r = 0;
+        for (int i=0;i<armor.length;i++) r += armor[i].pocket;
+        return r;
     }
     public float getTotalArmor(){
         float r = 0;

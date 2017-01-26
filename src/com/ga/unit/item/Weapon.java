@@ -59,6 +59,9 @@ public class Weapon extends Item {
     public void setDamage(int num, int sides){
         damageSide = new Die(num, sides);
     }
+    @Override
+    protected void playSound(){
+    }
     public boolean use(Man host){
         if (canUse()) {
             return super.use(host);

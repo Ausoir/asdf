@@ -29,7 +29,7 @@ public class ManFactory {
                 new String[]{"Stick","Axe","Pick","Broadsword"}, new String[]{"Cotton_Clothing","Fabric_Clothing"}, 3,60,40,5,0,
                 "-5,50/Swing,Pierce&Dash"),
         Soldier(manHeads, Faction.Guard, new String[]{"Lace_Helm"},
-                new String[]{"Broadsword","Spear"}, new String[]{"Leather_Armor", "Chainmail"}, 5,120,50,8,2,
+                new String[]{"Broadsword","Spear"}, new String[]{"Leather_Armor", "Chainmail"}, 5,120,50,18,2,
                 "-5,50/Swing,Pierce&Dash"),
         Knight(manHeads, Faction.Evil, new String[]{"Full_Helm","Legion_Helm"},
                 new String[]{"Broadsword","Mace","Katana"}, new String[]{"Platemail"}, 9,300,50,5,5,

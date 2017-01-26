@@ -26,6 +26,7 @@ public class Game extends JFrame {
         JPanel display = new Display();
         Clips.init();
         Picture.init();
+        Sound.init();
         Global.server = new Server();
         Global.server.start();
         FileManager.loadFirst(editor);

@@ -27,8 +27,7 @@ public class Follow implements Task {
         host.face(target.pos);
         int absX = Math.abs(x);
         if (absX > 160) {
-            if (x > 0) host.setState(Actions.WalkR);
-            else if (x < 0) host.setState(Actions.WalkL);
+            host.setState(Actions.Walk);
         } else if (absX < 40) host.setState(Actions.Idle);
     }
 

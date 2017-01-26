@@ -267,7 +267,7 @@ class EquipmentPanel extends JTextArea{
         selected = new int[itemsize];
 
         grid.gridy = 0;
-        Item wielded = Global.player.host.getWeapon();
+        Item wielded = Global.player.host.weapon;
         makeSlot(-1, wielded);
         TitledBorder b = BorderFactory.createTitledBorder(BorderFactory.createMatteBorder(2,2,2,2,Panel.forecolor));
         b.setTitle("Wielded");

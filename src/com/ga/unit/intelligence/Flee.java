@@ -27,8 +27,7 @@ public class Flee implements Task {
         if (target == null) return;
         int x = (int) (target.pos.x - host.pos.x);
         host.face(x < 0 ? -1 : 1);
-        if (x > 0) host.setState(Actions.WalkL);
-        else host.setState(Actions.WalkR);
+        host.setState(Actions.Walk);
     }
 
     @Override

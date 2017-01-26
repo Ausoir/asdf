@@ -25,7 +25,7 @@ public class PlayerInput implements Input {
         put(KeyEvent.VK_W, Actions.Interact);
         put(KeyEvent.VK_A, Actions.WalkL);
         put(KeyEvent.VK_S, Actions.Down);
-        put(KeyEvent.VK_D, Actions.WalkR);
+        put(KeyEvent.VK_D, Actions.Walk);
         put(KeyEvent.VK_R, Actions.Wield);
         put(1, Skills.Use);
         put(KeyEvent.VK_UP, Actions.LookUp);
@@ -79,6 +79,7 @@ public class PlayerInput implements Input {
     public void input(int mode, int x, int y){
         if (mode == KeyEvent.VK_ENTER) Display.chatbox.requestFocus();
         else if (mode == KeyEvent.VK_TAB) Display.menu.toggle();
+        else if (mode == 0) input("X",x,y);
         else if (keyMap.containsKey(mode)){
             input(keyMap.get(mode).getCodeName(),x,y);
         } else if (mode >= 49 && mode < 55) {
@@ -96,8 +97,11 @@ public class PlayerInput implements Input {
         host.target.set(x,y);
         if (p.startsWith("A")){
             if (t.equals("Idle")) moving = 0;
-            else if (t.equals("WalkL")) moving = -1;
-            else if (t.equals("WalkR")) moving = 1;
+            else if (t.equals("WalkL")){
+                moving = -1;
+                t = "Walk";
+            }
+            else if (t.equals("Walk")) moving = 1;
             host.selectingItem = -1;
             host.setState(Actions.getByName(t));
         }

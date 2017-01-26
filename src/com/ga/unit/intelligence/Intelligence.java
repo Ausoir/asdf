@@ -85,7 +85,7 @@ public abstract class Intelligence implements Observer {
         if (state == Actions.Dead){
             Updater.remove(this);
             task = new Idle(host);
-        } else if ((state == Actions.WalkL || state == Actions.WalkR) && blocked(host.dir)){
+        } else if (state == Actions.Walk && blocked(host.dir)){
             host.setState(Actions.Idle);
             task.blocked();
         }

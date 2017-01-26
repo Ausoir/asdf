@@ -1,6 +1,7 @@
 package com.ga.unit;
 
 import com.ga.game.Settings;
+import com.ga.game.Sound;
 import com.ga.map.Global;
 import com.ga.tool.EventTimer;
 import com.ga.tool.Line;
@@ -15,13 +16,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import static com.ga.unit.skill.Actions.WalkL;
-import static com.ga.unit.skill.Actions.WalkR;
-
 /**
  * Created by Ga on 5/7/2016.
  */
-public abstract class Unit extends Matter {
+public class Unit extends Matter {
     public int[] rangeZone = new int[]{-5};
     public HashMap<Integer, Moveset[]> moveset = new HashMap<>();
     public int id;
@@ -32,10 +30,10 @@ public abstract class Unit extends Matter {
     public EventTimer delay = new EventTimer(5, false, null);
     public P target = new P(); //For appendage rotation
     public Stats stats = new Stats(this);
-    protected float damageMod = 1;
+    public float damageMod = 1;
     public String speechType;
     protected Speech speech = new Speech(this);
-    protected int stateLevel = 1;
+    public int stateLevel = 1;
 
     public Unit(String p) {
         super(null,Integer.parseInt(p.split("@")[1]),new P(p.split("@")[2]),10);
@@ -135,7 +133,10 @@ public abstract class Unit extends Matter {
     protected boolean castable(){
         return true;
     }
-    protected void stateSet(Moveset state){
+    public void attackSound(){
+        Sound.play("swing");
+    }
+    public void stateSet(Moveset state){
         stats.unrest();
         delay.set(state.getDel());
         this.state = state;
@@ -144,14 +145,10 @@ public abstract class Unit extends Matter {
             if (state instanceof Skills){
                 vel.x *= ((Skills)state).getVelX();
                 if (state == Skills.Jump || state == Skills.Airstrike){
+                    Sound.play("jump");
                     vel.y -= 40 + (stateLevel * 2);
                 }
             } else {
-                if (state == WalkL){
-                    face(-1);
-                } else if (state == WalkR){
-                    face(1);
-                }
                 vel.x = 0;
             }
             clip.setState(state);
@@ -164,6 +161,7 @@ public abstract class Unit extends Matter {
             final Moveset s = state;
             delay.performer = new Performer(){
                 public void perform(){
+                    Sound.play("spell");
                     me.state = s;
                 }
             };
@@ -194,24 +192,20 @@ public abstract class Unit extends Matter {
 
     public boolean hit(Matter hitter, int damage, DamageType type) {
         delay.performer = null;
-        delay.set(0);
         float ratio = (float) damage * 8 / get("Health").getMax();
         float knockback = Math.min(ratio, 30);
         jump = false;
         if (ratio > 50) setState(Actions.Down);
         else setState(Actions.Hit);
+        Sound.play("kick");
         if (type != DamageType.Push) {
+            stats.addEffect(Buffs.Slow, 2);
+            if (brain != null) brain.hit(hitter);
             get("Health").add(-damage);
-            if (state != Actions.Dead) {
-                stats.addEffect(Buffs.Slow, 2);
-                if (brain != null) brain.hit(hitter);
-            }
         }
-        if (hitter != null) {
-            int x = pos.x - hitter.pos.x > 0 ? 1 : -1;
-            vel.x = knockback * x;
-        }
-        vel.y = -knockback * 1.3f - 5;
+        if (hitter != null) vel.x = knockback * (pos.x - hitter.pos.x > 0 ? 1 : -1);
+        else vel.x = knockback * dir;
+        vel.y = -knockback * 1.2f - 5;
         return true;
     }
 
@@ -268,6 +262,7 @@ public abstract class Unit extends Matter {
         if (!jump) {
             jump = true;
             int mag = (int) (vel.y - Settings.gravityMax);
+            if (vel.y > Settings.gravity*2) Sound.play("land");
             if (mag >= 0){
                 setState(Actions.Down);
                 delay.time += getStatPenalty()*30;
@@ -278,16 +273,6 @@ public abstract class Unit extends Matter {
 
     protected void stateUpdate(){
         state.update(this, stateLevel);
-        if (state == Skills.Sprint){
-            vel.x = getSpeed() * 2 * dir;
-        } else if (state == Skills.Rest){
-            if (stats.rest(4)) setState(Actions.Idle);
-        } else if (state == Actions.Idle){
-            if (stats.rest(1)) stateSet(Actions.Idle);
-        } else if (delay.over()){
-            if (state == WalkL) vel.x = -getSpeed();
-            else if (state == WalkR) vel.x = getSpeed();
-        }
     }
 
     protected void stateDone(){
@@ -301,11 +286,17 @@ public abstract class Unit extends Matter {
         }
     }
 
+    public void attack(){
+        Updater.collide(this, (int)getReach());
+    }
+
     @Override
     public void update() {
         vel.x *= .96f;
-        clip.update();
+        if (Math.abs(vel.x) <= 1) vel.x = 0;
+        int m = clip.update();
         if (state != Actions.Dead) {
+            if (m != -1) moveTriggered(m);
             stats.update();
             delay.update();
             stateUpdate();

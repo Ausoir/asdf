@@ -1,5 +1,6 @@
 package com.ga.unit.item;
 
+import com.ga.game.Sound;
 import com.ga.map.Global;
 import com.ga.tool.Interactive;
 import com.ga.tool.Line;
@@ -15,22 +16,34 @@ import java.util.Random;
  */
 public class Item extends Matter {
     public enum Tag{
-        Sword(Skills.Swing, DamageType.Cut), Spear(Skills.Pierce, DamageType.Cut), Mace(Skills.Swing, DamageType.Bash),
-        Dagger(Skills.Stab, DamageType.Cut), Armor(Skills.Rest, DamageType.Push), Scroll(Skills.Guard, DamageType.Push),
-        Shoot(Skills.Shoot, DamageType.Cut), Snipe(Skills.Snipe, DamageType.Cut), Throwing(Skills.Throw, DamageType.Cut),
-        Darting(Skills.Dart, DamageType.Cut), Consumable(Actions.Consume, DamageType.Push), Claw(Skills.Swing, DamageType.Cut),
-        Enchant(Actions.Buff, DamageType.Push);
-        Moveset action;
-        DamageType type;
-        Tag(Moveset p, DamageType type){
+        Sword(Skills.Swing, DamageType.Cut, "swing_knife", "hit_cut"), Spear(Skills.Pierce, DamageType.Cut, "swing_silent", "hit_bloody"), Mace(Skills.Swing, DamageType.Bash, "swing_silent", "hit_bash"),
+        Dagger(Skills.Stab, DamageType.Cut, "swing_normal", "hit_bloody"), Armor(Skills.Rest, DamageType.Push, "swing_normal"), Scroll(Skills.Guard, DamageType.Push, "scroll"),
+        Rapier(Skills.Underhand, DamageType.Cut, "swing_silent", "hit_cut"), Shoot(Skills.Shoot, DamageType.Cut, "swing_normal"), Snipe(Skills.Snipe, DamageType.Cut, "swing_normal"), Throwing(Skills.Throw, DamageType.Cut, "swing_normal"),
+        Darting(Skills.Dart, DamageType.Cut, "swing_normal"), Consumable(Actions.Consume, DamageType.Push, "swing_normal"), Claw(Skills.Swing, DamageType.Cut, "swing_normal"),
+        Enchant(Actions.Buff, DamageType.Push, "swing_normal");
+        private Moveset action;
+        private DamageType type;
+        private String sound, soundHit = "hit_punch";
+        Tag(Moveset p, DamageType type, String sound){
             action = p;
             this.type = type;
+            this.sound = sound;
+        }
+        Tag(Moveset p, DamageType type, String sound, String soundHit){
+            this(p, type, sound);
+            this.soundHit = soundHit;
         }
         public Moveset getAction() {
             return action;
         }
         public DamageType getDamageType(){
             return type;
+        }
+        public String getSound(){
+            return sound;
+        }
+        public String getHitSound(){
+            return soundHit;
         }
     }
     enum SpecialtyMod{
@@ -288,8 +301,12 @@ public class Item extends Matter {
         }
         return false;
     }
+    protected void playSound(){
+        Sound.play(type.getSound());
+    }
     public boolean use(Man host){
         if (canUse()) {
+            playSound();
             Global.cooldown(lastused, cooldown);
             if (uses.get() != -1) uses.add(-1);
             host.setState(action);
@@ -302,7 +319,7 @@ public class Item extends Matter {
         return false;
     }
     public void drop(Man host) {
-        host.setWeapon(null);
+        if (host.weapon == this) host.setWeapon(null);
         pos = new P(host.pos);
         field();
         rotation = (float)Global.r.nextInt(628)/100;
@@ -318,6 +335,12 @@ public class Item extends Matter {
         gravity = true;
         Updater.add(this);
         setOrgan(null);
+    }
+    public String getSound(){
+        return type.getSound();
+    }
+    public String getHitSound(){
+        return type.getHitSound();
     }
     public String getDescription() {
         String r = "a "+getFullName()+".";

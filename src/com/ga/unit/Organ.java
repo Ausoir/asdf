@@ -87,7 +87,7 @@ public class Organ extends Line {
         if (!amputated) {
             Line body = getAdd(host.pos);
             if (type == 0 && image != null) {
-                P t = body.ptd;
+                P t = body.pt;
                 if (Math.pow(sizeRadius, 2) - ((Math.pow(p.ptd.x - t.x, 2) + Math.pow(p.ptd.y - t.y, 2))) > 0) {
                     return true;
                 }

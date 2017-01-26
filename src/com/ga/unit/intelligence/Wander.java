@@ -1,6 +1,7 @@
 package com.ga.unit.intelligence;
 
 import com.ga.map.Global;
+import com.ga.tool.P;
 import com.ga.tool.Timer;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.Unit;
@@ -31,10 +32,10 @@ public class Wander implements Task {
             int dir = Global.r.nextInt(3);
             if (host.rand.nextFloat() < .3f) current = dir;
             if (dir == 0) host.setState(Actions.Idle);
-            else if (dir == 1) host.setState(dir == 1 ? Actions.WalkR : Actions.WalkL);
+            else if (dir == 1) host.setState(Actions.Walk);
             else if (dir >= 2) {
-                if (host.pos.x > base[current]) host.setState(Actions.WalkL);
-                else host.setState(Actions.WalkR);
+                host.face(new P(base[current],0));
+                host.setState(Actions.Walk);
             }
             tick.set(Global.r.nextInt(25)+1);
         }

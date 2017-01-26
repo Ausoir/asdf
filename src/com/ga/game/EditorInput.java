@@ -70,6 +70,9 @@ public class EditorInput implements Input, Updatable {
         } else if (p.startsWith("tp")) { //100 = force, 200 = input required, #0 = mapnum, # = posnum
             current.opt = Integer.parseInt(p.substring(2));
             Global.p("Level Teleporter: "+current.opt);
+        } else if (p.startsWith("size")){
+            String[] size = p.substring(5).split("x");
+            Global.map.map.image.size.set(Integer.parseInt(size[0]), Integer.parseInt(size[1]));
         } else if (p.equals("green")){
             Updater.landColor = Color.green;
         } else if (p.equals("pink")){

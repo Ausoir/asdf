@@ -11,8 +11,7 @@
 0,-15/4
 
 Idle@0,-1
-WalkL@1,2
-WalkR@1,2
+Walk@1,2
 Hit@1,-1
 Dead@4,-1
 Kick@3,0,-1

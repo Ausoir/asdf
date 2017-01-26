@@ -11,9 +11,9 @@ import com.ga.unit.skill.Stat;
  */
 public class ItemFactory {
     public enum FactoryWeapon{
-        Mace(3,-1,2,8,0, Item.Tag.Mace), Broadsword(3,600,2,6,0,Item.Tag.Sword), Stick(0,10,1,4,2, Item.Tag.Mace), Wooden_Sword(2,100,1,8,1, Item.Tag.Mace),
-        Katana(3,100,1,12,1, Item.Tag.Sword), Spear(3,160,1,12,-3,Item.Tag.Spear), Axe(3,100,1,12,-2, Item.Tag.Sword), Dagger(1,80,1,8,3, Item.Tag.Dagger), Pick(4,100,1,12,-2,Item.Tag.Sword),
-        Cleaver(4,600,2,8,0, Item.Tag.Sword), Lancesword(1,100,1,6,0,Item.Tag.Spear), Cutlass(1,100,1,6,0,Item.Tag.Sword), Claymore(1,100,1,6,-1,Item.Tag.Sword),
+        Mace(5,-1,2,10,-2, Item.Tag.Mace), Broadsword(4,600,2,6,0,Item.Tag.Sword), Stick(0,10,1,4,2, Item.Tag.Mace), Wooden_Sword(2,100,1,8,1, Item.Tag.Mace),
+        Katana(3,100,1,12,1, Item.Tag.Sword), Spear(2,160,1,12,-4,Item.Tag.Spear), Axe(3,100,1,12,-2, Item.Tag.Sword), Dagger(1,80,1,8,3, Item.Tag.Dagger), Pick(4,100,1,12,-2,Item.Tag.Sword),
+        Cleaver(4,600,2,8,0, Item.Tag.Sword), Lancesword(1,100,1,6,0,Item.Tag.Rapier), Cutlass(1,100,1,6,0,Item.Tag.Sword), Claymore(1,100,1,6,-1,Item.Tag.Sword),
         Halberd(6,100,1,36,-5, Item.Tag.Sword), Greatsword(7,400,2,12,-3, Item.Tag.Sword), Warhammer(7,-1,3,8,-3,Item.Tag.Mace), Claw(1,200,3,4,4,Item.Tag.Claw),
         Bamboo_Spear(1,24,1,6,0, Item.Tag.Spear),
         Rifle(4,200,1,6,-3, Item.Tag.Snipe), Pistol(2,30,1,2,5, Item.Tag.Shoot), Revolver(3,7,1,2,0, Item.Tag.Shoot);
@@ -80,6 +80,8 @@ public class ItemFactory {
                             r.damage = 3;
                             break;
                         case Adventurewear:
+                            if (piece == 1) r.pocket = 1;
+                            else if (piece == 3) r.pocket = 1;
                             r.damage = 2;
                             break;
                     }

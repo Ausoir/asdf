@@ -1,7 +1,7 @@
 package com.ga.unit;
 
+import com.ga.game.Sound;
 import com.ga.map.Global;
-import com.ga.tool.EventTimer;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
@@ -11,31 +11,32 @@ import com.ga.unit.intelligence.UnitIntelligence;
 import com.ga.unit.item.ArmorSet;
 import com.ga.unit.item.Item;
 import com.ga.unit.item.ItemFactory;
-import com.ga.unit.item.Projectile;
 import com.ga.unit.skill.*;
 
 import java.awt.*;
 
 import static com.ga.unit.BodyHumanoid.FIST;
 import static com.ga.unit.BodyHumanoid.OFIST;
-import static com.ga.unit.skill.Skills.*;
+import static com.ga.unit.skill.Skills.Underhand;
 
 /**
  * Created by Ga on 5/7/2016.
  */
 public class Man extends Unit {
     private Item fist = ItemFactory.produce("Fist",0,0);
-    protected Item weapon;
+    public Item weapon;
     public ArmorSet armor;
+    public String ground = "dirt";
+
     public Man(String p){
         super(p);
         clip = new BodyHumanoid(this);
         final Man me = this;
         clip.organs[FIST].onAmputate = new Performer(){
             public void perform(){
-                if (me.weapon.getOrgan().amputated){
-                    me.weapon.drop(me);
-                    me.setWeapon(fist);
+                if (clip.organs[FIST].amputated){
+                    weapon.drop(me);
+                    setWeapon(fist);
                 }
             }
         };
@@ -68,6 +69,7 @@ public class Man extends Unit {
                 weapon.remove();
             }
             p = fist;
+            p.setOrgan(clip.organs[FIST]);
         }
         weapon = p;
         weapon.pos = pos;
@@ -76,10 +78,6 @@ public class Man extends Unit {
     }
 
     public boolean wieldingNone(){ return weapon == null || weapon == fist; }
-
-    public Item getWeapon(){
-        return weapon;
-    }
 
     @Override
     public void remove() {
@@ -95,6 +93,15 @@ public class Man extends Unit {
         return weapon.getPoint().getSubtract(pos).getDist();
     }
 
+    public void attackSound(){
+        Sound.play(weapon.getSound());
+    }
+
+    @Override
+    public void attackHitSound(){
+        Sound.play(weapon.getHitSound());
+    }
+
     @Override
     public P getHand(){
         if (!clip.organs[FIST].amputated) return pos.getAdd(clip.organs[FIST].ptd);
@@ -105,7 +112,7 @@ public class Man extends Unit {
     protected boolean castable(){
         return !clip.organs[FIST].amputated || !clip.organs[OFIST].amputated;
     }
-    protected void stateSet(Moveset state){
+    public void stateSet(Moveset state){
         super.stateSet(state);
         if (state instanceof Skills) {
             int speed = weapon.speed-armor.getEncumberance();
@@ -115,10 +122,13 @@ public class Man extends Unit {
                     if (!clip.organs[FIST].amputated) weapon.use(this);
                     return;
                 case Duck:
-                case Guard:
                 case Sprint:
                 case Jump:
                 case Airstrike:
+                    speed = 0;
+                    break;
+                case Guard:
+                    weapon.rotation = target.getAtan()+(dir<0?-3.14f:0);
                     speed = 0;
                     break;
                 case Sidekick:
@@ -135,6 +145,7 @@ public class Man extends Unit {
                     break;
                 case Slash:
                     damageMod = 1 + stateLevel;
+                    weapon.rotation = target.getAtan()+(dir<0?-3.14f:0);
                     speed = 0;
                     break;
                 case Backstep:
@@ -156,7 +167,7 @@ public class Man extends Unit {
                     damageMod = stateLevel * .5f;
                     break;
                 case Whirlwind:
-                    delay.time += 35+(8 * stateLevel);
+                    delay.time += 8 * stateLevel;
                     damageMod = .5f + ((float) stateLevel * .5f);
                     delay.performer = new Performer(){
                         public void perform(){
@@ -226,7 +237,7 @@ public class Man extends Unit {
         super.die();
     }
 
-    private void attack() {
+    public void attack() {
         Matter hit;
         boolean cleave = false;
         if (stats.triggerEffect(Buffs.Cleave)) cleave = true;
@@ -241,18 +252,6 @@ public class Man extends Unit {
                 Particle.explode("Blood",hitbox.ptd,new P(),12,20,0,true,3);
                 Particle.explode("Fire",hitbox.ptd,new P(),30,8,0,false,3);
             }
-        }
-    }
-
-    private void swingAttack(float rot1, float rot2){
-        if (rot1 > rot2){
-            float t = rot1;
-            rot1 = rot2;
-            rot2 = t;
-        }
-        for (float i=rot1;i<rot2;i+=.2f){
-            weapon.rotation = i;
-            attack();
         }
     }
 
@@ -278,91 +277,10 @@ public class Man extends Unit {
 
     @Override
     protected void moveTriggered(int organ){
-        if (organ == FIST) {
-            weapon.rotate(target.getMult(dir, dir));
-            weapon.rotation += .1 * dir;
-            if (state instanceof Skills) {
-                switch ((Skills) state) {
-                    case Slash:
-                        weapon.rotation = delay.time * -.3f * -weapon.dir;
-                        vel.set(dir * Global.cos(weapon.rotation)*15, -1);
-                    case Stab:
-                    case Pierce:
-                    case Lunge:
-                    case Whirlwind:
-                        attack();
-                        break;
-                    case Underhand:
-                        vel.set(5*dir,-1);
-                        attack();
-                        break;
-                    case Dash:
-                        vel.set(getSpeed() * 10 * dir * (damageMod / 2), -5);
-                        break;
-                    case Throw:
-                        if (weapon != fist) {
-                            Projectile p = new Projectile(null, pos.getAdd(clip.organs[OFIST].ptd), pos.getAdd(target), 50) {
-                                Item wpn = weapon;
-                                @Override
-                                public void stuck() {
-                                    if (tangible) Particle.groundSlam(pos);
-                                    wpn.field();
-                                    wpn.pos = new P(pos);
-                                    wpn.rotation = rotation;
-                                    remove();
-                                }
-                            };
-                            p.image = weapon.image;
-                            p.rotSpeed = .03f;
-                            p.faction = faction;
-                            p.damage = getDamage()+weapon.weight;
-                            weapon.remove();
-                            setWeapon(null);
-                        }
-                        break;
-                    case Leap:
-                        if (jump) {
-                            vel.y -= 80;
-                            vel.x = getSpeed() * 10 * dir;
-                            jump = false;
-                        }
-                        break;
-                    case Shoot:
-                    case Snipe:
-                        P tip = weapon.getPoint();
-                        final Projectile p = new Projectile("Bullet",tip,pos.getAdd(target), (int) (150+(rand.nextFloat()*50))){
-                            @Override
-                            public void onCollide(Line l){
-                                remove();
-                            }
-                        };
-                        p.delay = new EventTimer(4,false,new Performer(){
-                            public void perform(){
-                                p.remove();
-                            }
-                        });
-                        if (state == Shoot) p.delay.set(2);
-                        p.dir = dir;
-                        p.rotSpeed = 0;
-                        p.rotate(target.getSubtract(tip).add(pos));
-                        p.faction = faction;
-                        p.damage = (weapon.getDamage()*10)+4;
-                        p.gravity = false;
-                        Particle.explode("Spark", tip, p.vel, 5, 10, 15, false,3);
-                        float start = rand.nextFloat();
-                        p.pos.add(p.vel.getMult(start, start));
-                        getWeapon().rotation += dir * -.3f;
-                        break;
-                }
-            }
-        } else if ((organ == clip.FOOT && state == Sidekick) || (organ == clip.FOOT-1 && state == Kick)){
-            for (Matter i : Updater.collide(clip.organs[organ].ptd.getAdd(this.pos), 50)){
-                if (i instanceof Unit) {
-                    if (faction.canAttack(i.faction)) {
-                        if (i.hittable()) ((Unit)i).hit(this, (int) ((armor.armor[clip.FOOT].getDamage()+1)*damageMod), damageType);
-                    }
-                }
-            }
+        weapon.rotate(target.getMult(dir, dir));
+        weapon.rotation += .1f * dir;
+        if (state instanceof Skills) {
+            ((Skills)state).trigger(this, organ);
         }
     }
 
@@ -371,41 +289,10 @@ public class Man extends Unit {
         boolean wasJump = jump;
         super.onCollide(l);
         if (!wasJump){
+            ground = Global.map.getLand(l.next);
             if (state == Skills.Jump){
                 setState(Actions.Hit);
                 delay.set(4);
-            }
-        }
-    }
-
-    @Override
-    protected void stateUpdate(){
-        super.stateUpdate();
-        if (state instanceof Skills) {
-            switch ((Skills) state){
-                case Guard:
-                    weapon.rotation = target.getAtan()+(dir<0?-3.14f:0);
-                    break;
-                case Swing:
-                    if (delay.time <= 25 && delay.time > 12) {
-                        int t = 25 - delay.time;
-                        float rot = -((weapon.dir * 10) + t * t * .03f * -weapon.dir);
-                        if (Math.abs(rot) < 8) swingAttack(weapon.rotation, rot);
-                        weapon.rotation = rot;
-                    }
-                    break;
-                case Airstrike:
-                    if (jump){
-                        weapon.rotation = 1f*dir;
-                        attack();
-                        break;
-                    }
-                case Whirlwind:
-                    weapon.rotation = delay.time * -weapon.dir;
-                    break;
-                case Dash:
-                    if (!jump) attack();
-                    break;
             }
         }
     }

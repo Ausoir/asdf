@@ -44,6 +44,7 @@ public class Stats {
             if (p.effect != null) {
                 p.effect.perform(host, level);
             }
+            if (p.start != null) p.start.perform(host, level);
             effectTimes.add(new Timer((int) (p.time + (level*p.time*.2f))));
             effectLevels.add(new int[]{level});
             effectEffects.add(p.effect);

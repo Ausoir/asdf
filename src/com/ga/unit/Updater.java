@@ -194,6 +194,7 @@ public class Updater {
             Unit t = colidee.get(i);
             if (host.faction.canAttack(t.faction)) {
                 if (t.checkHit(host,p)){
+                    host.attackHitSound();
                     if (!cleave) return t;
                     else result = t;
                 }

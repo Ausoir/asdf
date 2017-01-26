@@ -6,7 +6,15 @@ import com.ga.unit.Unit;
  * Created by Ga on 7/28/2016.
  */
 public enum Actions implements Moveset {
-    Idle, LookUp, LookLeft, LookDown, LookRight, WalkL, WalkR, Hit(15,null), Dead(99999,null), Wield(18, null), Recall,
+    Idle{
+        public void update(Unit p, int level){
+            if (p.stats.rest(1)) p.stateSet(Actions.Idle);
+        }
+    }, Walk{
+        public void update(Unit p, int level){
+            p.vel.x = p.getSpeed()*p.dir;
+        }
+    }, LookUp, LookLeft, LookDown, LookRight, WalkL, Hit(15,null), Dead(-1,null), Wield(18, null), Recall,
     Conjure, Wait(50,null), Cast, Consume(8,null), Exhausted, Interact(8,null), Down(80,null), Buff, Revive;
     private String description;
     private int del;

@@ -1,5 +1,6 @@
 package com.ga.unit.skill;
 
+import com.ga.game.Sound;
 import com.ga.map.Global;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
@@ -10,25 +11,28 @@ import com.ga.unit.item.Projectile;
  * Created by Ga on 9/1/2016.
  */
 public enum Buffs {
-    Haste(hostEffect(), 50, "Speed",1,"Speed"), Rejuvenate(hostEffect(), 100, "Stamina",.5f,"Stamina"), Empower(weaponEffect(1), 80, "Proficiency",10), Cleave(weaponEffect(2), 300),
-    Slow(new Spell(){
+    Haste(null, hostEffect(), 50, "Speed",1,"Speed"),
+    Rejuvenate(null, hostEffect(), 100, "Stamina",.5f,"Stamina"),
+    Empower(null, weaponEffect(1), 80, "Proficiency",10),
+    Cleave(null, weaponEffect(2), 300),
+    Slow(null, new Spell(){
         public void perform(Unit host, int level){
             Particle.implode("Glare", host.pos.getAdd(0,-25), new P(), 1, 10, 1, false, 6);
         }
     }, 50, "Speed", -.5f, "Speed"),
-    Evade(new Spell(){
+    Evade(null, new Spell(){
         @Override
         public void perform(Unit host, int level){
             Particle.smoke(new P(host.pos));
         }
     }, 100),
-    Freeze(new Spell(){
+    Freeze(sound("freeze"), new Spell(){
         @Override
         public void perform(Unit host, int level){
             Particle.frozen(host.pos);
         }
     }, 50, "Speed",-1,"Speed"),
-    Poison(new Spell(){
+    Poison(null, new Spell(){
         private int tick = 1;
         @Override
         public void perform(Unit host, int level){
@@ -40,7 +44,7 @@ public enum Buffs {
             }
         }
     }, 100),
-    Glacialwalk(new Spell(){
+    Glacialwalk(null, new Spell(){
         private int tick = 1;
         @Override
         public void perform(Unit host, final int level){
@@ -75,13 +79,13 @@ public enum Buffs {
             }
         }
     },150),
-    Flamestride(new Spell(){
-        private int tick = 1;
+    Flamestride(null, new Spell(){
+        private int tick = 0;
         @Override
         public void perform(Unit host, int level){
-            tick--;
-            if (tick == 0) {
-                tick = 1;
+            tick++;
+            if (tick % 2 == 0) {
+                if (tick % 6 == 0) Sound.play("fire");
                 final Projectile p = new Projectile("Flamecluster", host.pos.getAdd(0, -5), new P(), 0) {
                     @Override
                     protected void onAttack(Matter p) {
@@ -110,7 +114,7 @@ public enum Buffs {
             }
         }
     },500),
-    Stun(new Spell(){
+    Stun(sound("stun"), new Spell(){
         @Override
         public void perform(Unit host, int level){
             host.delay.set(0);
@@ -124,14 +128,14 @@ public enum Buffs {
     public float buff;
     public String stat;
     public String buffRel;
-    public Spell effect;
+    public Spell start, effect;
     private static Spell weaponEffect(final int type){
         return new Spell(){
             @Override
             public void perform(Unit host, int level){
                 Man t = (Man) host;
-                if (type == 1) Particle.dripFire(t.getWeapon().getPoint());
-                else if (type == 2) Particle.dripHoly(t.getWeapon().getPoint());
+                if (type == 1) Particle.dripFire(t.weapon.getPoint());
+                else if (type == 2) Particle.dripHoly(t.weapon.getPoint());
             }
         };
     }
@@ -146,17 +150,26 @@ public enum Buffs {
             }
         };
     }
-    Buffs(Spell effect, int time){
+    private static Spell sound(final String p){
+        return new Spell(){
+            @Override
+            public void perform(Unit host, int level){
+                Sound.play(p);
+            }
+        };
+    }
+    Buffs(Spell start, Spell effect, int time){
+        this.start = start;
         this.effect = effect;
         this.time = time;
     }
-    Buffs(Spell effect, int time, String stat, float buff){
-        this(effect, time);
+    Buffs(Spell start, Spell effect, int time, String stat, float buff){
+        this(start, effect, time);
         this.stat = stat;
         this.buff = buff;
     }
-    Buffs(Spell effect, int time, String stat, float buff, String buffRel){
-        this(effect, time, stat, buff);
+    Buffs(Spell start, Spell effect, int time, String stat, float buff, String buffRel){
+        this(start, effect, time, stat, buff);
         this.buffRel = buffRel;
     }
     public static Buffs getByName(String p) {

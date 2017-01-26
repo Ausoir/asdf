@@ -1,5 +1,7 @@
 package com.ga.unit.item;
 
+import com.ga.unit.Player;
+
 import java.util.ArrayList;
 
 /**
@@ -8,8 +10,10 @@ import java.util.ArrayList;
 public class Inventory {
     private ArrayList<Item> items = new ArrayList<>();
     public int weight = 0;
-    public int maxSize = 2;
-    public Inventory(){
+    private int maxSize = 0;
+    private Player host;
+    public Inventory(Player host){
+        this.host = host;
     }
     public boolean addItem(Item p){
         if (items.size() >= maxSize) return false;
@@ -29,6 +33,13 @@ public class Inventory {
     }
     public int getItemSize(){
         return items.size();
+    }
+    public void setMaxSize(int p){
+        while (items.size() > p){
+            Item t = items.remove(0);
+            t.drop(host);
+        }
+        maxSize = p;
     }
     public Item remove(int p){
         Item r = items.get(p);

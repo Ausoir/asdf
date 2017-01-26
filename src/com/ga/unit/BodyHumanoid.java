@@ -1,5 +1,6 @@
 package com.ga.unit;
 
+import com.ga.game.Sound;
 import com.ga.map.Global;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Moveset;
@@ -69,7 +70,7 @@ public class BodyHumanoid extends Body {
         super.setState(state);
     }
 
-    public void update() {
+    public int update() {
         if (state instanceof Actions) {
             switch ((Actions) state) {
                 case Buff:
@@ -77,9 +78,20 @@ public class BodyHumanoid extends Body {
                     Particle.dripHoly(host.pos.getAdd(organs[OFIST].ptd));
                 case Conjure:
                     Particle.dripHoly(host.pos.getAdd(organs[FIST].ptd));
+                    Sound.play("cast");
+                    break;
+                case Walk:
+                case WalkL:
+                    if ((current == 0 || current == 2) && frame.over()) Sound.play("step_"+((Man)host).ground);
+                    break;
+            }
+        } else if (state instanceof Skills){
+            switch ((Skills) state) {
+                case Sprint:
+                    if ((current == 1 || current == 3) && frame.over()) Sound.play("step_"+((Man)host).ground);
                     break;
             }
         }
-        super.update();
+        return super.update();
     }
 }

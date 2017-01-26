@@ -36,6 +36,8 @@ public class Matter extends Thing implements Updatable {
     public boolean hittable(){
         return true;
     }
+    public void attackHitSound(){
+    }
     public boolean checkHit(P p, int r){
         if (!hittable()) return false;
         if (!tangible) return false;
@@ -76,15 +78,16 @@ public class Matter extends Thing implements Updatable {
                         float slope = i.getSlope();
                         boolean cc = !i.clockwise();
                         float tangent = (float) Math.atan(slope);
-                        if (!cc && Math.abs(slope) > 3){
+                        if (!cc && Math.abs(slope) > 3 && !(pos.x >= i.ptd.x) && !(pos.x <= i.pt.x)){
                             vel.set(0, 0);
                             return;
                         } else if (cc && i.pt.y + (slope * (pos.x - i.pt.x)) < pos.y) {
                             vel.set(0, 0);
                             return;
                         }
-                        vel.x = vel.x > 0 ? Global.clamp(vel.x + (Global.sin(tangent) * Math.abs(vel.x)), 1f, maxX)
-                                : Global.clamp(vel.x + (Global.sin(tangent) * Math.abs(vel.x)), maxX, -1f);
+                        if (vel.x != 0)
+                            vel.x = vel.x > 0 ? Global.clamp(vel.x + (Global.sin(tangent) * Math.abs(vel.x)), 1f, maxX)
+                                    : Global.clamp(vel.x + (Global.sin(tangent) * Math.abs(vel.x)), maxX, -1f);
                         vel.y += (i.pt.y + (slope * (pos.x + vel.x - i.pt.x))) - (pos.y + vel.y) - 1;
                         collided = true;
                     }
@@ -96,16 +99,6 @@ public class Matter extends Thing implements Updatable {
                 return;
             }
         }
-    }
-    private boolean isInside(float x, float y){
-        Line pp = new Line((int)x,(int)y,999999,(int)y);
-        int num = 0;
-        for (Line i : Global.map.land){
-            if (i.lineCross(pp)){
-                num++;
-            }
-        }
-        return num % 2 == 1;
     }
     public void onCollide(Line l){
     }

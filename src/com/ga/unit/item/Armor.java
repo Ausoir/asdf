@@ -1,5 +1,6 @@
 package com.ga.unit.item;
 
+import com.ga.game.Sound;
 import com.ga.map.Picture;
 import com.ga.tool.Clips;
 import com.ga.tool.Performer;
@@ -13,6 +14,7 @@ public class Armor extends Item {
     private float armor = 0;
     private float armorMod = 1;
     public int encumberance = 0;
+    protected int pocket = 0;
     public Armor(String name, int seed, int weight, int uses, float armor, int encumberance, int piece) {
         super(name, seed, weight, uses, 100, .04f);
         setType(Tag.Armor);
@@ -55,6 +57,7 @@ public class Armor extends Item {
         host.delay.performer = new Performer(){
             public void perform(){
                 if (host.armor.isBare(piece)) {
+                    Sound.play("wear");
                     host.armor.set(me, piece, true);
                     host.setWeapon(null);
                     me.remove();

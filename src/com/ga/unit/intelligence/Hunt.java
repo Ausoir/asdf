@@ -10,18 +10,18 @@ import com.ga.unit.skill.Spells;
  */
 public class Hunt implements Task {
     private Unit host;
-    private float range;
+    private float range = 0;
 
     public Hunt(Unit host) {
         this.host = host;
-        range = host.getReach()+(host.brain.target.image.sizeRadius/2);
+        if (host.brain.target != null) range = host.getReach()+(host.brain.target.image.sizeRadius/2);
     }
 
     @Override
     public void blocked() {
         host.say("Blocked!");
-        if (host.dir > 0) host.setState(Actions.WalkL);
-        else host.setState(Actions.WalkR);
+        host.face(-host.dir);
+        host.setState(Actions.Walk);
     }
 
     public void update() {
@@ -44,12 +44,12 @@ public class Hunt implements Task {
             if (t == -1){
                 if (y < -50){
                     if (host.vel.x == 0) {
-                        if (x > 0) host.setState(Actions.WalkR);
-                        else if (x < 0) host.setState(Actions.WalkL);
+                        host.face(x > 0 ? 1 : -1);
+                        host.setState(Actions.Walk);
                     } else host.setState(Skills.Jump);
                 } else {
-                    if (x > 0) host.setState(Actions.WalkR);
-                    else if (x < 0) host.setState(Actions.WalkL);
+                    host.face(x > 0 ? 1 : -1);
+                    host.setState(Actions.Walk);
                 }
             } else if (t == 2){
                 host.setState(Skills.Rest);

@@ -149,9 +149,9 @@ public class Map {
                 Terrain terrain = hashmap.get(i.next);
                 if (terrain == null){
                     String formTexture = formTextures.get(i.next);
-                    if (formTexture == null) terrain = new Terrain("Dirt", null);
+                    if (formTexture == null) terrain = new Terrain("dirt", null);
                     else {
-                        String[] formName = formTextures.get(i.next).split("&");
+                        String[] formName = formTexture.split("&");
                         terrain = new Terrain(formName[0], formName.length > 1 ? formName[1] : null);
                     }
                     hashmap.put(i.next, terrain);
@@ -168,6 +168,12 @@ public class Map {
             terrain.render();
             landform.add(terrain);
         }
+    }
+
+    public String getLand(int p){
+        String t[] = formTextures.get(p).split("&");
+        if (t.length > 1) return t[1];
+        else return t[0];
     }
 
     public void generateProps(){
@@ -231,5 +237,16 @@ public class Map {
             ty = (int) (i.pt.y + (int) (tx * i.getSlope()));
         } while (!i.clockwise());
         return new P(i.pt.x+tx,ty);
+    }
+
+    public static boolean isInside(int x, int y){
+        Line pp = new Line(x,y,999999,y);
+        int num = 0;
+        for (Line i : Global.map.land){
+            if (i.lineCross(pp)){
+                num++;
+            }
+        }
+        return num % 2 == 1;
     }
 }
