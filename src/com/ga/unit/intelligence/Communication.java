@@ -12,7 +12,7 @@ public class Communication {
     private HashMap<String, String> reply = new HashMap<String, String>(){{
         put("hi","@greet");
         put("where","I don't know.");
-        put("shop","The shop around here sells all kinds of stuff. You can find one in any town or city.");
+        put("menuShop","The menuShop around here sells all kinds of stuff. You can find one in any town or city.");
     }};
     private HashMap<String, String> is = new HashMap<String, String>(){{
         put("ok","yes");
@@ -20,8 +20,8 @@ public class Communication {
         put("yea","yes");
         put("hello","hi");
         put("fine day","hi");
-        put("market","shop");
-        put("buy","shop");
+        put("market","menuShop");
+        put("buy","menuShop");
     }};
     protected HashMap<String, Performer> react = new HashMap();
     private ArrayList<String> topic = new ArrayList<>();

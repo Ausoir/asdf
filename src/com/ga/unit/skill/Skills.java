@@ -1,5 +1,6 @@
 package com.ga.unit.skill;
 
+import com.ga.game.Dialog;
 import com.ga.game.Sound;
 import com.ga.map.Global;
 import com.ga.tool.EventTimer;
@@ -16,16 +17,16 @@ import static com.ga.unit.BodyHumanoid.OFIST;
  * Created by Ga on 7/28/2016.
  */
 public enum Skills implements Moveset {
-    Sprint(15,1,0,36,"Run faster using stamina.",new Spell(){
+    Sprint(15,1,0,36,Dialog.get("mvsDscSprint"),new Spell(){
         public void perform(Unit host, int lvl){
             host.vel.x = host.getSpeed() * 2 * host.dir;
         }
     }, null),
-    Duck(18,-1,0,6,"Duck down to dodge attacks.",null,null),
-    Guard(23,-1,0,0,"Deflect an oncoming blow.",null,null),
-    Lunge(0,-1,0,0,"Lunge at the target, dealing little damage but halting its advance.",null,basic()),
+    Duck(18,-1,0,6,Dialog.get("mvsDscDuck"),null,null),
+    Guard(23,-1,0,0,Dialog.get("mvsDscGuard"),null,null),
+    Lunge(0,-1,0,0,Dialog.get("mvsDscLunge"),null,basic()),
     Pierce(25,1,2.5f,0,"A piercing attack that attacks while keeping momentum. Velocity is added to the damage.",null,basic()),
-    Swing(25,1,0,0,"Swing your weapon from top to bottom.",new Spell(){
+    Swing(25,1,0,0,Dialog.get("mvsDscSwing"),new Spell(){
         public void perform(Unit host, int level){
             if (host.delay.time <= 25 && host.delay.time > 12) {
                 Item item = ((Man)host).weapon;
@@ -49,7 +50,7 @@ public enum Skills implements Moveset {
             }
         }
     }, null),
-    Kick(3,-1,1,1,"A quick close range attack to push away enemies at no stamina cost.",null,new Spell(){
+    Kick(3,-1,1,1, Dialog.get("mvsDscKick"),null,new Spell(){
         public void perform(Unit host, int lvl){
             boolean man = host instanceof Man;
             if (man) Sound.play("swing_normal");
@@ -68,10 +69,10 @@ public enum Skills implements Moveset {
             }
         }
     }),
-    Sidekick(18,-1,1,1,"A slow and damaging close range attack for when you run out of stamina.",null,new Spell(){
+    Sidekick(18,-1,1,1,Dialog.get("mvsDscSidekick"),null,new Spell(){
         public void perform(Unit host, int lvl){
             boolean man = host instanceof Man;
-            if (man) Sound.play("swing_normal");
+            if (man) Sound.play("swing_silent");
             else host.attackSound();
             for (Matter i : Updater.collide(host.clip.organs[lvl].ptd.getAdd(host.pos), 50)){
                 if (i instanceof Unit) {
@@ -101,9 +102,8 @@ public enum Skills implements Moveset {
             host.attack();
         }
     }),
-    Stab(40,2,0,24,"Stab with your weapon, dealing enormous damage. [Damage:(2+Level)*100%]",null,basic()),
-    Use(0,-1,1,0,"Use the current weapon's basic moveset.",null,null),
-    Dash(35,1,0,24,"Dash through enemies with a piercing attack. [10*Level Distance] [Damage:.5*Level]",new Spell(){
+    Stab(40,2,0,24,Dialog.get("mvsDscStab"),null,basic()),
+    Dash(35,1,0,24,Dialog.get("mvsDscDash"),new Spell(){
         public void perform(Unit host, int level){
             if (host.vel.x > host.getSpeed()) host.attack();
         }
@@ -113,19 +113,19 @@ public enum Skills implements Moveset {
             host.vel.set(host.getSpeed() * 10 * host.dir * (host.damageMod / 2), -5);
         }
     }),
-    Rest(0,-1,0,0,"Resting restores stamina.",new Spell(){
+    Rest(0,-1,0,0,Dialog.get("mvsDscRest"),new Spell(){
         public void perform(Unit host, int lvl){
             if (host.stats.rest(4+lvl)) host.setState(Actions.Idle);
         }
     },null),
-    Underhand(32,0,0,0,"A careful lunge from the waist. Successful stab refunds stamina.",null,new Spell(){
+    Underhand(32,0,0,0,Dialog.get("mvsDscUnderhand"),null,new Spell(){
         public void perform(Unit host, int lvl){
             host.attackSound();
             host.vel.set(5*host.dir,-1);
             host.attack();
         }
     }),
-    Throw(12,-1,0,1,"Throw your weapon to deal damage from afar.",null,new Spell(){
+    Throw(12,-1,0,1,Dialog.get("mvsDscThrow"),null,new Spell(){
         public void perform(Unit host, int lvl){
             Sound.play("swing_normal");
             final Man t = (Man)host;
@@ -150,8 +150,8 @@ public enum Skills implements Moveset {
             }
         }
     }),
-    Dart(12,0,0,1,"Dart your weapon to deal damage from afar.",null,null),
-    Shoot(27,-1,0,0,"Fire your weapon.",null,new Spell(){
+    Dart(12,0,0,1,Dialog.get("mvsDscDart"),null,null),
+    Shoot(27,-1,0,0,Dialog.get("mvsDscShoot"),null,new Spell(){
         public void perform(Unit host, int lvl){
             Man t = (Man)host;
             P tip = t.weapon.getPoint();
@@ -206,7 +206,7 @@ public enum Skills implements Moveset {
             t.weapon.rotation += t.dir * -.3f;
         }
     }),
-    Slash(60,2,0,40,"Slash forward twice, dealing massive damage. [Damage: (1+Level)*100%]",null,new Spell(){
+    Slash(60,2,0,40,Dialog.get("mvsDscSlash"),null,new Spell(){
         public void perform(Unit host, int lvl){
             Man t = (Man)host;
             t.attackSound();
@@ -228,7 +228,7 @@ public enum Skills implements Moveset {
             }
         }
     },null),
-    Leap(40,2,3,60,"Perform a leap over great distances.",null,new Spell(){
+    Leap(40,2,3,60,Dialog.get("mvsDscLeap"),null,new Spell(){
         public void perform(Unit host, int lvl){
             if (host.jump) {
                 Sound.play("jump");

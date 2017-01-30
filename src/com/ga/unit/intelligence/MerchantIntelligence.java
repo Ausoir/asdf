@@ -10,7 +10,7 @@ import com.ga.unit.Unit;
 import com.ga.unit.item.Item;
 import com.ga.unit.item.ItemFactory;
 
-import static com.ga.game.Display.shop;
+import static com.ga.game.Display.menuShop;
 
 /**
  * Created by Ga on 7/31/2016.
@@ -37,7 +37,7 @@ public class MerchantIntelligence extends Intelligence {
         man.onInteract = new Interactive(80){
             public void interact(Unit p){
                 if (p == Global.player.host) {
-                    shop.show("Trader's Wares - \""+host.getConversation()+"\"", product, price, action);
+                    menuShop.show("Trader's Wares - \""+host.getConversation()+"\"", product, price, action);
                 }
             }
         };
@@ -64,7 +64,7 @@ public class MerchantIntelligence extends Intelligence {
                 public void perform() {
                     product[index] = null;
                     host.say("@sold");
-                    shop.setVisible(false);
+                    menuShop.setVisible(false);
                 }
             };
             String desc = "This is " + item.getDescription();
@@ -76,7 +76,7 @@ public class MerchantIntelligence extends Intelligence {
             else r += item.getFullName() + ", ";
         }
         ad = r;
-        comm.addReply("shop","@shop");
+        comm.addReply("menuShop","@menuShop");
     }
     private int fluctuate(int value){
         float fluc = (host.rand.nextFloat()*(high-low))+low;
@@ -86,8 +86,8 @@ public class MerchantIntelligence extends Intelligence {
     public void hear(Matter u, String p){
         super.hear(u, p);
         if (u == Global.player.host) {
-            if (p.equals("shop")) {
-                shop.show("Trader's Wares - \""+host.getConversation()+"\"", product, price, action);
+            if (p.equals("menuShop")) {
+                menuShop.show("Trader's Wares - \""+host.getConversation()+"\"", product, price, action);
             }
         }
     }

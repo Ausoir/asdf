@@ -25,9 +25,8 @@ public class MainPlayer extends Player {
     @Override
     public int setState(Moveset state) {
         if (state != Actions.Idle && state != Actions.Wait) {
-            Display.shop.setVisible(false);
+            Display.menuShop.setVisible(false);
             if (state == Actions.Recall) say(memorized);
-            else if (!(state instanceof Actions) || !((Actions)state).isLooker()) Global.cameraTo = pos;
         }
         return super.setState(state);
     }
@@ -35,22 +34,27 @@ public class MainPlayer extends Player {
         super.onCollide(r);
         if (state != Actions.Dead) {
             if (r.opt == 2) {
-                if (state == Actions.Wait){
+                if (state == Actions.Interact){
+                    clip.setState(Actions.Wait);
                     vel.set(0, 0);
                     Global.map.teleport(pos, r);
                 }
             } else if (r.opt >= 100) {
                 if (r.opt >= 200){
-                    if (state == Actions.Wait) Global.map.loadMap(r.opt - 200);
+                    if (state == Actions.Interact){
+                        clip.setState(Actions.Wait);
+                        Global.map.loadMap(r.opt - 200);
+                    }
                 } else Global.map.loadMap(r.opt - 100);
             }
         }
     }
     public void update(){
         super.update();
-        if (state == Actions.LookUp) Global.cameraTo = Global.cameraTo.getAdd(0,-50);
-        else if (state == Actions.LookLeft) Global.cameraTo = Global.cameraTo.getAdd(-50,0);
-        else if (state == Actions.LookDown) Global.cameraTo = Global.cameraTo.getAdd(0,50);
-        else if (state == Actions.LookRight) Global.cameraTo = Global.cameraTo.getAdd(50,0);
+        if (state == Actions.LookUp) Global.mapEdgeCenter(Global.cameraTo = Global.cameraTo.getAdd(0,-50));
+        else if (state == Actions.LookLeft) Global.mapEdgeCenter(Global.cameraTo = Global.cameraTo.getAdd(-50,0));
+        else if (state == Actions.LookDown) Global.mapEdgeCenter(Global.cameraTo = Global.cameraTo.getAdd(0,50));
+        else if (state == Actions.LookRight) Global.mapEdgeCenter(Global.cameraTo = Global.cameraTo.getAdd(50,0));
+        else if (state != Actions.Idle) Global.mapEdgeCenter(Global.cameraTo = pos.getAdd(0,0));
     }
 }

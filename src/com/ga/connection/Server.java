@@ -77,7 +77,6 @@ public class Server implements Updatable {
                         clientControllers.put(0, pi);
                         Global.display.input = pi;
                         Global.player = pi;
-                        Global.cameraTo = pi.host.pos;
                         Command.host = pi.host;
                         clientShortcuts.add(UDPClient.getAckPacket(t, Settings.receiverPort));
                         break;

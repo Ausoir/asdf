@@ -22,7 +22,6 @@ import java.util.HashMap;
 public class Updater {
     public static boolean pause = false;
     public static boolean editor = false;
-    public static boolean showTerrain = false;
     public static int id = 1;
     private static ArrayList<Drawable> drawee = new ArrayList<>();
     public static ArrayList<Effect> effects = new ArrayList<>();
@@ -33,7 +32,6 @@ public class Updater {
     public static HashMap<Integer, Unit> unitList = new HashMap<>();
     private static ArrayList<Observer> addQueue = new ArrayList<>();
     private static ArrayList<Observer> removeQueue = new ArrayList<>();
-    public static Color landColor = Color.pink;
     public static String changeMap = null;
     public static int changeMapPos = 0;
     public static Performer changeMapEvent = null;
@@ -48,6 +46,7 @@ public class Updater {
         unitList.clear();
         controllee.clear();
         matter.clear();
+        Global.map.clear();
     }
     public static int getId(){
         return id++;
@@ -57,6 +56,7 @@ public class Updater {
         if (!editor) {
             addQueue.add(Global.player.host);
             Global.player.host.pos.set(FileManager.readMap(changeMap, changeMapPos));
+            Global.mapEdgeCenter(Global.cameraTo = Global.player.host.pos.getAdd(0,0));
             Global.player.host.reset();
             Display.input = Global.player;
             if (changeMapEvent != null){
@@ -110,12 +110,9 @@ public class Updater {
         if (changeMap != null) changeMap(false);
     }
     public static void draw(Graphics2D g2){
-        Global.mapEdgeCenter(Global.camera);
-        for (Drawable i : drawee) i.draw(g2);
-        if (editor || showTerrain){
-            g2.setColor(landColor);
-            g2.setStroke(new BasicStroke(10));
-            for (Line i : Global.map.land) i.draw(g2,new P());
+        Global.setRel();
+        for (Drawable i : drawee){
+            i.draw(g2);
         }
     }
     public static void add(Observer p){

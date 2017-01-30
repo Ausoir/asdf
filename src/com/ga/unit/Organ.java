@@ -15,20 +15,20 @@ import java.util.ArrayList;
  * Created by Ga on 7/29/2016.
  */
 public class Organ extends Line {
-    public int strokeSize = 10;
+    int strokeSize = 10;
     protected Picture image;
-    protected boolean amputated = false;
+    boolean amputated = false;
     public Unit host;
-    protected Organ parent;
-    protected ArrayList<Organ> children = new ArrayList<>();
-    protected int sizeRadius;
+    private Organ parent;
+    private ArrayList<Organ> children = new ArrayList<>();
+    private int sizeRadius;
     public int type;
     public int health = 1;
-    protected boolean vital = false;
-    protected boolean leg = false;
-    public Performer onAmputate = new Performer();
+    boolean vital = false;
+    boolean leg = false;
+    Performer onAmputate = new Performer();
 
-    public Organ(Organ p, boolean tip){
+    Organ(Organ p, boolean tip){
         parent = p;
         if (parent != null) parent.children.add(this);
         if (p != null) {
@@ -44,6 +44,9 @@ public class Organ extends Line {
         image = new Picture(p, index);
         image.size.x = strokeSize;
         image.size.y = 0;
+        setShader();
+    }
+    protected void setShader(){
         image.setShader(Picture.Shader.XYLinearGradient);
     }
     public Picture getImage(){
@@ -83,7 +86,7 @@ public class Organ extends Line {
             host.clip.updateStatus();
         } else ptd.add(p.getAtan(16));
     }
-    protected boolean checkHit(Line p){
+    boolean checkHit(Line p){
         if (!amputated) {
             Line body = getAdd(host.pos);
             if (type == 0 && image != null) {

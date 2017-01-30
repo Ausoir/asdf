@@ -2,6 +2,8 @@ package com.ga.unit;
 
 import com.ga.game.Sound;
 import com.ga.map.Global;
+import com.ga.tool.Line;
+import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.unit.intelligence.PlayerInput;
 import com.ga.unit.item.Inventory;
@@ -23,6 +25,7 @@ public class Player extends Man {
     public Inventory inventory;
     public SkillTree skillTree = new SkillTree();
     public int selectingItem = -1;
+    public Line rope;
     public PlayerInput input;
     public Player(String p) {
         super(p);
@@ -96,7 +99,7 @@ public class Player extends Man {
                     int req = (int) state.getCost();
                     req += getStatPenalty();
                     if (req > get("Stamina").getMax()) say("This skill is beyond my abilities!");
-                    else say("Need " + (req - get("Stamina").get()) + " more stamina!");
+                    else say("I'm too exhausted!");
                 }
             }
             return r;
@@ -107,6 +110,11 @@ public class Player extends Man {
     }
     @Override
     public void stateSet(Moveset state){
+        if (state == Skills.Sprint){
+            int t = input.moving;
+            if (t == 0) t = dir;
+            face(t);
+        }
         super.stateSet(state);
         stateLevel = skillTree.getSkillLevel(state);
         if (weapon.getType() == Item.Tag.Claw) weapon.rotation = (weapon.getOrgan().getAtan()+(dir<0?3.14f:0));
@@ -115,12 +123,26 @@ public class Player extends Man {
                 case Idle:
                     if (!get("Stamina").isFull()) clip.setState(Actions.Exhausted);
                     break;
+                case Use:
+                    if (weapon.uses.get() == 0) say("This item is no longer usable...");
+                    break;
                 case Interact:
-                    ArrayList<Matter> obj = Updater.collideInteractive(pos.getAdd(clip.organs[FIST].ptd));
+                    P reach = pos.getAdd(clip.organs[FIST].ptd);
+                    ArrayList<Matter> obj = Updater.collideInteractive(reach);
                     for (Matter i : obj) {
                         if (i.onInteract != null) {
                             i.onInteract.interact(this);
                             break;
+                        }
+                    }
+                    for (Line i : Global.map.land) {
+                        if (i.opt == 1) {
+                            if (i.lineCross(new Line(reach.x, reach.y, reach.x + (24 * dir), reach.y))) {
+                                delay.set(0);
+                                pos.x = i.pt.x-(24*dir);
+                                setState(Actions.Climb);
+                                rope = i;
+                            }
                         }
                     }
                     break;
@@ -151,9 +173,6 @@ public class Player extends Man {
             }
         } else if (state instanceof Skills){
             switch ((Skills) state){
-                case Use:
-                    if (weapon.uses.get() == 0) say("This item is no longer usable...");
-                    break;
                 case Duck:
                     cooldown.put(state,new int[]{Global.getTime()[0]+((armor.armor[1].encumberance+armor.armor[2].encumberance)*4)});
                     break;
@@ -168,8 +187,6 @@ public class Player extends Man {
             if (this.state instanceof Skills) {
                 Moveset a = this.state;
                 Moveset b = state;
-                if (a == Skills.Use) a = weapon.action;
-                if (b == Skills.Use) b = weapon.action;
                 if (a != b) {
                     delay.set(0);
                 }
@@ -178,10 +195,11 @@ public class Player extends Man {
     }
     @Override
     public int getStatPenalty() {
-        return (armor.getWeight()+weapon.weight)/get("Strength").get();
+        return Math.max(0, armor.getWeight()+weapon.weight-get("Strength").get());
     }
     public float getSpeed() {
-        float t = Math.max(0,super.getSpeed()-(inventory.weight/get("Strength").get())-getStatPenalty());
+        float s = super.getSpeed();
+        float t = Global.clamp(s+get("Strength").get()-inventory.weight-getStatPenalty(),0,s);
         clip.setMoveSpeed((int) Global.clamp(t-1,-20,4));
         return t;
     }

@@ -24,7 +24,9 @@ public class Command {
             for (String i : cmds) {
                 String[] cmd = i.split("@");
                 if (cmd[0].equals("say")) host.say(cmd[1]);
+                else if (cmd[0].equals("menuDialog")) Display.menuDialog.show(cmd[1],cmd[2]);
                 else if (cmd[0].equals("heal")) host.get("Health").add(Integer.parseInt(cmd[1]));
+                else if (cmd[0].equals("seed")) host.weapon.seed = Integer.parseInt(cmd[1]);
                 else if (cmd[0].equals("time")) Global.setTime(Global.getTime()[0]+Integer.parseInt(cmd[1]));
                 else if (cmd[0].equals("slow")) host.stats.addEffect(Buffs.Slow, 3);
                 else if (cmd[0].equals("status")) host.say("Stamina:"+host.get("Stamina")+" Penalty:"+host.getStatPenalty()+" Health:"+host.get("Health"));
@@ -51,7 +53,6 @@ public class Command {
                 else if (cmd[0].equals("atkspd")) host.weapon.speed = Integer.parseInt(cmd[1]);
                 else if (cmd[0].equals("sound")) Sound.play(cmd[1]);
                 else if (p.equals("revive")) host.revive();
-                else if (p.equals("terrain")) Updater.showTerrain = true;
                 else if (cmd[0].equals("randomObj")){
                     new Matter(cmd[1],0,Global.map.randomSurface(),8);
                 } else if (cmd[0].equals("randomItem")){

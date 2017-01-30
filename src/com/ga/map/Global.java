@@ -22,6 +22,7 @@ public class Global {
     public static Display display;
     public static Random r = new Random();
     public static int margin = 0;
+    public static P rel = new P();
     private static float[] sinv = new float[360];
     private static float[] cosv = new float[360];
     private static int[] time = new int[]{0};
@@ -35,11 +36,8 @@ public class Global {
     public static int getSeed(){
         return r.nextInt(9999);
     }
-    public static float getRelX(){
-        return -camera.x+Settings.centerX;
-    }
-    public static float getRelY(){
-        return -camera.y+Settings.centerY;
+    public static void setRel(){
+        rel.set(-camera.x+Settings.centerX, -camera.y+Settings.centerY);
     }
     public static float sin(float p){
         return sin((int)Math.toDegrees(p));
@@ -69,13 +67,13 @@ public class Global {
     }
     public static int mapEdge(P p){
         int result = 1;
-        if (p.x != clamp(p.x, 0, Global.map.getWidth())) result += 2;
-        if (p.y != clamp(p.y, 0, Global.map.getHeight())) result *= 2;
+        if (p.x != clamp(p.x, 0, Global.map.size.x)) result += 2;
+        if (p.y != clamp(p.y, 0, Global.map.size.y)) result *= 2;
         return result;
     }
     public static void mapEdgeCenter(P p){
-        p.set(clamp(p.x, Settings.centerX+margin, Global.map.getWidth()-Settings.centerX-margin),
-                clamp(p.y, Settings.centerY+margin, Global.map.getHeight()-Settings.centerY-margin));
+        p.set(clamp(p.x, Settings.centerX+margin, Global.map.size.x-Settings.centerX-margin-margin),
+                clamp(p.y, Settings.centerY+margin, Global.map.size.y-Settings.centerY-margin-margin));
     }
     public static int checkCooldown(int[] p, int cd){
         return cd-(time[0]-p[0]);

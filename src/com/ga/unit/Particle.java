@@ -70,7 +70,7 @@ public class Particle extends Thing implements Effect {
         Line pp = new Line(pos,vp);
         for (Line i : Global.map.land){
             if (i.lineCross(pp)){
-                if (i.opt != -1) {
+                if (i.isLand()) {
                     float slope = i.getSlope();
                     vel.y = (slope * vel.x * 10000 - 5) / 10000f;
                     vel.x /= 2;

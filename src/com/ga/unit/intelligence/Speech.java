@@ -18,7 +18,7 @@ import java.util.HashMap;
  * Created by Ga on 7/31/2016.
  */
 public class Speech extends JTextArea implements Drawable, Updatable{
-    public static final HashMap<String,ArrayList<String>> dialogue = FileManager.readDialogue("Dialog.dlg");
+    public static final HashMap<String,ArrayList<String>> dialog = FileManager.readDialogue("dialog/Reaction.txt");
     private Unit host;
     private int[] xp, yp;
     public ArrayList<String> msg = new ArrayList<>();
@@ -49,13 +49,14 @@ public class Speech extends JTextArea implements Drawable, Updatable{
             P t = host.pos.getAdd(0,-150);
             int width = Math.min(g.getFontMetrics(font).stringWidth(getText()) + 30, 240);
             int height = (int) getPreferredSize().getHeight();
-            setBounds((int) (t.x - (width / 2) + Global.getRelX()), (int) (t.y - height + Global.getRelY()), width, height);
+            float rx = Global.rel.x, ry = Global.rel.y;
+            setBounds((int) (t.x - (width / 2) + rx), (int) (t.y - height + ry), width, height);
             g.setColor(color);
             xp = new int[]{
-                    (int) (-10 + t.x), (int) (10 + t.x), (int) (0 + t.x)
+                    (int) (-10 + t.x+rx), (int) (10 + t.x+rx), (int) (0 + t.x+rx)
             };
             yp = new int[]{
-                    (int) (t.y), (int) (t.y), (int) (t.y) + 40
+                    (int) (t.y+ry), (int) (t.y+ry), (int) (t.y+ry) + 40
             };
             g.fillPolygon(xp, yp, xp.length);
         }
@@ -81,9 +82,9 @@ public class Speech extends JTextArea implements Drawable, Updatable{
         }
     }
     public String getRandom(String p){
-        ArrayList<String> results = dialogue.get(host.speechType+":"+p);
+        ArrayList<String> results = dialog.get(host.speechType+":"+p);
         if (results == null){
-            results = dialogue.get(":"+p);
+            results = dialog.get(":"+p);
             if (results == null) return "";
         }
         return results.get(Global.r.nextInt(results.size()));

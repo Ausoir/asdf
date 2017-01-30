@@ -1,5 +1,6 @@
 package com.ga.unit.skill;
 
+import com.ga.unit.Player;
 import com.ga.unit.Unit;
 
 /**
@@ -14,16 +15,26 @@ public enum Actions implements Moveset {
         public void update(Unit p, int level){
             p.vel.x = p.getSpeed()*p.dir;
         }
-    }, LookUp, LookLeft, LookDown, LookRight, WalkL, Hit(15,null), Dead(-1,null), Wield(18, null), Recall,
-    Conjure, Wait(50,null), Cast, Consume(8,null), Exhausted, Interact(8,null), Down(80,null), Buff, Revive;
+    }, Climb{
+        public void update(Unit p, int level){
+            Player player = (Player)p;
+            if (player.clip.organs[0].ptd.y + p.pos.y > player.rope.pt.y) p.vel.y = -p.getSpeed();
+            else{
+                p.jump = true;
+                p.vel.x = p.getSpeed()*p.dir;
+                p.stateSet(Skills.Jump);
+            }
+        }
+    }, Use, LookUp, LookLeft, LookDown, LookRight, WalkL, Hit(15), Dead(-1), Wield(18), Recall,
+    Conjure, Wait(50), Cast, Consume(8), Exhausted, Interact(8), Down(80), Buff, Revive;
     private String description;
     private int del;
     Actions(){
         description = "";
     }
-    Actions(int del, String desc){
+    Actions(int del){
+        this();
         this.del = del;
-        this.description = desc;
     }
     public String getDescription(){
         return description;

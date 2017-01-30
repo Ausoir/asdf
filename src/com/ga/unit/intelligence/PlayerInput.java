@@ -27,7 +27,7 @@ public class PlayerInput implements Input {
         put(KeyEvent.VK_S, Actions.Down);
         put(KeyEvent.VK_D, Actions.Walk);
         put(KeyEvent.VK_R, Actions.Wield);
-        put(1, Skills.Use);
+        put(1, Actions.Use);
         put(KeyEvent.VK_UP, Actions.LookUp);
         put(KeyEvent.VK_LEFT, Actions.LookLeft);
         put(KeyEvent.VK_DOWN, Actions.LookDown);

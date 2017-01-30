@@ -39,8 +39,8 @@ public class Picture extends Texture {
         if (visible) {
             float xMid = size.x*dir/2;
             float yMid = size.y/2;
-            float rx = x + Global.getRelX();
-            float ry = y + Global.getRelY();
+            float rx = x + Global.rel.x;
+            float ry = y + Global.rel.y;
             x = rx - xMid;
             y = ry - yMid;
             g.rotate(rot, rx, ry);

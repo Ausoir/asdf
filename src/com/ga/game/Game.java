@@ -23,10 +23,11 @@ public class Game extends JFrame {
         }
         Settings.setScreenSize(x, y);
         setSize(Settings.screenX, Settings.screenY);
-        JPanel display = new Display();
+        Dialog.init();
         Clips.init();
         Picture.init();
         Sound.init();
+        JPanel display = new Display();
         Global.server = new Server();
         Global.server.start();
         FileManager.loadFirst(editor);

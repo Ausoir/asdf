@@ -26,16 +26,16 @@ public class ManFactory {
                 new String[]{"Stick","Axe","Pick","Fist"}, new String[]{"Cotton_Clothing","Fabric_Clothing"}, 1,60,40,8,0,
                 "-5/Swing"),
         Punk(manHeads, Faction.Punk, new String[]{"Head"},
-                new String[]{"Stick","Axe","Pick","Broadsword"}, new String[]{"Cotton_Clothing","Fabric_Clothing"}, 3,60,40,5,0,
-                "-5,50/Swing,Pierce&Dash"),
+                new String[]{"Stick","Axe","Pick","Broadsword"}, new String[]{"Cotton_Clothing","Fabric_Clothing"}, 3,60,40,10,0,
+                "-5,50/Kick&Swing,Pierce&Dash"),
         Soldier(manHeads, Faction.Guard, new String[]{"Lace_Helm"},
                 new String[]{"Broadsword","Spear"}, new String[]{"Leather_Armor", "Chainmail"}, 5,120,50,18,2,
-                "-5,50/Swing,Pierce&Dash"),
+                "-5,50/Kick&Swing,Pierce&Dash"),
         Knight(manHeads, Faction.Evil, new String[]{"Full_Helm","Legion_Helm"},
-                new String[]{"Broadsword","Mace","Katana"}, new String[]{"Platemail"}, 9,300,50,5,5,
+                new String[]{"Broadsword","Mace","Katana"}, new String[]{"Platemail"}, 9,300,50,24,5,
                 "0/Swing,Pierce,Slash,Whirlwind"),
         Phantom(new String[]{"Phantom"}, Faction.Evil, new String[]{"Head"},
-                new String[]{"Greatsword","Halberd","Katana"}, new String[]{"Shadowrobe"}, 4,5,70,15,15,
+                new String[]{"Greatsword","Halberd","Katana"}, new String[]{"Shadowrobe"}, 4,5,70,16,15,
                 "-5/Swing");
         String[] face, weapon, armor, helmet;
         int level,health,speed,stamina,proficiency;

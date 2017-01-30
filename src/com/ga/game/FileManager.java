@@ -8,6 +8,8 @@ import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.unit.*;
 import com.ga.unit.intelligence.PlayerInput;
+import com.ga.unit.item.Item;
+import com.ga.unit.item.ItemFactory;
 import com.ga.unit.skill.Actions;
 
 import java.io.BufferedReader;
@@ -27,7 +29,7 @@ public class FileManager {
             save("map/0", Global.player.host.toCharacterString());
         }
     }
-    public static void save(String dir, String input) {
+    private static void save(String dir, String input) {
         try {
             BufferedWriter writer = null;
             try {
@@ -40,7 +42,7 @@ public class FileManager {
             e.printStackTrace();
         }
     }
-    public static void saveMap(String name){
+    static void saveMap(String name){
         String result = "" + Global.map.toString();
         result += "\n";
         result += Updater.toMapString();
@@ -69,6 +71,7 @@ public class FileManager {
     }
     static void loadFirst(boolean editor){
         readMap("Map",0);
+        Global.mapEdgeCenter(Global.cameraTo = Global.player.host.pos.getAdd(0,0));
         if (editor){
             new EditorInput();
         }
@@ -118,14 +121,19 @@ public class FileManager {
                                 String[] type = unit[0].split("@");
                                 if (type[0].equals("PlayerSpawn")) {
                                     if (player == 0) r = new P(type[2]);
-                                    else if (player > -1) player--;
+                                    player--;
                                 }
                                 ObjectFactory.produce(type[0], new P(type[2]), Integer.parseInt(type[1]));
-                            } else { //unit
+                            } else if (unit.length == 2){ //unit
                                 int id = Integer.parseInt(unit[1].split("@")[3]);
                                 if (id >= Updater.id) Updater.id = id + 1;
                                 if (unit[0].equals("Man")) new Man(unit[1]);
                                 else BeastFactory.produce(unit[1]);
+                            } else { //item
+                                String[] t = unit[2].split("/");
+                                Item item = ItemFactory.load(t[0]);
+                                item.pos = new P(t[1]);
+                                item.field();
                             }
                         }
                     }
@@ -135,11 +143,14 @@ public class FileManager {
         Global.map.setTexture();
         Global.map.setShader();
         Global.map.generateProps();
-        if (r == null) System.out.println("Invalid Player Spawn Location");
+        if (r == null){
+            System.out.println("Invalid Player Spawn Location");
+            r = new P(Settings.centerX, Settings.centerY);
+        }
         return r;
     }
 
-    public static int[] readClipFrames(String dir) {
+    private static int[] readClipFrames(String dir) {
         String data = read(dir);
         int[] result;
         String[] lines = data.split("%%")[1].split("%");
@@ -150,7 +161,7 @@ public class FileManager {
         return result;
     }
 
-    public static int[][] readModelProperty(String dir) {
+    private static int[][] readModelProperty(String dir) {
         String data = read(dir);
         int[][] result;
         String line = data.split("%")[1];
@@ -167,7 +178,7 @@ public class FileManager {
         return result;
     }
 
-    public static String[][] readModel(String dir) {
+    private static String[][] readModel(String dir) {
         String data = read(dir);
         String[][] result;
         String line = data.split("%")[0];
@@ -183,7 +194,7 @@ public class FileManager {
         return result;
     }
 
-    public static int[][][] readAnimation(String dir) {
+    private static int[][][] readAnimation(String dir) {
         String data = read(dir);
         int[][][] result;
         String[] lines = data.split("%%")[1].split("%");
@@ -204,7 +215,7 @@ public class FileManager {
         return result;
     }
 
-    public static HashMap<String, int[]> readMoveset(String dir) {
+    private static HashMap<String, int[]> readMoveset(String dir) {
         String data = read(dir);
         HashMap<String, int[]> result;
         String[] lines = data.split("%%")[2].split("%");
@@ -237,5 +248,10 @@ public class FileManager {
             result.put(type[0],values);
         }
         return result;
+    }
+
+    public static String[] readText(String dir){
+        String data = read(dir+".txt");
+        return data.split("%");
     }
 }

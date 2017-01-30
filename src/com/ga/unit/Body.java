@@ -25,8 +25,8 @@ public class Body {
     public Organ[] organs;
     protected Timer frame;
     protected int[][] nextClip;
-    int[][][] localAnimation;
-    int[] localFrames;
+    protected int[][][] localAnimation;
+    protected int[] localFrames;
     protected int current = 0;
     protected Moveset state = Actions.Idle;
     protected int BODY, FOOT;
@@ -98,6 +98,8 @@ public class Body {
                                     public void draw(Graphics2D g) {
                                         image.draw(g, host.pos.x + ptd.x, host.pos.y + ptd.y, (float) Math.atan2(pt.y - ptd.y, pt.x - ptd.x) - 1.57f, host.dir, strokeSize, getLength() + 6);
                                     }
+                                    protected void setShader(){
+                                    }
                                 };
                 else if (type == 0) organs[p] = new Organ(parent, tip) {
                                         public void draw(Graphics2D g) {
@@ -138,6 +140,10 @@ public class Body {
 
     public int getHeight(){
         return localAnimation[0][FOOT][1];
+    }
+
+    public P randomPoint(){
+        return organs[(int) (Math.random()*organs.length)].ptd;
     }
 
     public void setState(Moveset state) {

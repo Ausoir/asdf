@@ -3,7 +3,10 @@ package com.ga.map;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Word;
-import com.ga.unit.*;
+import com.ga.unit.Body;
+import com.ga.unit.Faction;
+import com.ga.unit.Unit;
+import com.ga.unit.Updater;
 import com.ga.unit.intelligence.UnitIntelligence;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Moveset;
@@ -82,10 +85,14 @@ public class BeastFactory {
                             super.update();
                             vel.y += .1f;
                             if (state != Actions.Dead) {
-                                for (Line i : Global.map.land) {
-                                    if (i.lineCross(new Line(pos, pos.getAdd(0, 200)))) {
-                                        vel.y += ((i.pt.y + (i.getSlope() * (pos.x + vel.x - i.pt.x))) - (pos.y + 200)) * .01f;
-                                        break;
+                                if (pos.y+vel.y+200 >= Global.map.size.y){
+                                    vel.y += (Global.map.size.y - (pos.y + 200)) * .01f;
+                                } else {
+                                    for (Line i : Global.map.land) {
+                                        if (i.lineCross(new Line(pos, pos.getAdd(0, 200)))) {
+                                            vel.y += ((i.pt.y + (i.getSlope() * (pos.x + vel.x - i.pt.x))) - (pos.y + 200)) * .01f;
+                                            break;
+                                        }
                                     }
                                 }
                             }

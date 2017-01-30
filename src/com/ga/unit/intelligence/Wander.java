@@ -9,12 +9,12 @@ import com.ga.unit.Unit;
 /**
  * Created by Ga on 7/30/2016.
  */
-public class Wander implements Task {
+class Wander implements Task {
     private Unit host;
     private Timer tick;
     private int[] base;
     private int current;
-    public Wander(Unit host, int[] base){
+    protected Wander(Unit host, int[] base){
         this.host = host;
         tick = new Timer(2, true);
         this.base = base;
@@ -24,7 +24,10 @@ public class Wander implements Task {
     @Override
     public void blocked() {
         if (host.dir == 1) base[current] = host.rand.nextInt((int) host.pos.x);
-        if (host.dir == -1) base[current] = host.rand.nextInt((int) (Global.map.getWidth()-host.pos.x))+(int) host.pos.x;
+        if (host.dir == -1) base[current] = host.rand.nextInt((int) (Global.map.size.x-host.pos.x))+(int) host.pos.x;
+        host.face(-host.dir);
+        host.setState(Actions.Walk);
+        tick.set(30);
     }
 
     public void update(){

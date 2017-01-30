@@ -8,20 +8,20 @@ import com.ga.unit.skill.Spells;
 /**
  * Created by Ga on 7/30/2016.
  */
-public class Hunt implements Task {
+class Hunt implements Task {
     private Unit host;
     private float range = 0;
 
-    public Hunt(Unit host) {
+    protected Hunt(Unit host) {
         this.host = host;
         if (host.brain.target != null) range = host.getReach()+(host.brain.target.image.sizeRadius/2);
     }
 
     @Override
     public void blocked() {
-        host.say("Blocked!");
-        host.face(-host.dir);
-        host.setState(Actions.Walk);
+        host.brain.forget.time = 5;
+        host.vel.x = host.getSpeed()*host.dir;
+        host.setState(Skills.Jump);
     }
 
     public void update() {
@@ -36,7 +36,7 @@ public class Hunt implements Task {
             host.setState(Skills.Rest);
         } else if (dist < 600) {
             int t = host.performMoveset((int) dist);
-            host.target = target.pos.getSubtract(host.pos).add(0, -30);
+            host.target = target.pos.getSubtract(host.pos).add(0, -15);
 
             if (host.state instanceof Spells){
                 host.delay.set(300);

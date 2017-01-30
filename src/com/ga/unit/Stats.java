@@ -85,15 +85,14 @@ public class Stats {
     public void delevel(String stat){
         if (stats.get("Reset Points").get() > 0 && stats.get(stat).get() > 0) {
             stats.get("Level Points").addTotal(1);
-            stats.get(stat).addMax(-1);
+            stats.get(stat).addTotal(-1);
             stats.get("Reset Points").addTotal(-1);
         }
     }
     public void level(String stat){
         if (stats.get("Level Points").get() > 0) {
             stats.get("Level Points").addTotal(-1);
-            stats.get(stat).addMax(1);
-            stats.get(stat).add(1);
+            stats.get(stat).addTotal(1);
         }
     }
     public void unrest(){
@@ -113,7 +112,7 @@ public class Stats {
                 endEffect(effects.get(i));
             }
         }
-        if (bloodTimer.update()) Particle.explode("Blood",host.pos.getAdd(0,-host.clip.getHeight()),new P(),Global.r.nextInt(4),5,0,true,24);
+        if (bloodTimer.update()) Particle.explode("Blood",host.pos.getAdd(host.clip.randomPoint()),new P(),Global.r.nextInt(4),5,0,true,24);
     }
     public void load(String p){
         String[] statOrBuff = p.split("/");

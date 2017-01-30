@@ -114,7 +114,7 @@ public class Unit extends Matter {
         return false;
     }
     public int setState(Moveset state) {
-        if ((delay.over() && jump && this.state != state) || state == Actions.Hit) {
+        if (delay.over() && jump && this.state != state) {
             face(target.x > 0 ? 1 : -1);
             float req = state.getCost();
             if (req != -1) req += getStatPenalty();
@@ -195,8 +195,8 @@ public class Unit extends Matter {
         float ratio = (float) damage * 8 / get("Health").getMax();
         float knockback = Math.min(ratio, 30);
         jump = false;
-        if (ratio > 50) setState(Actions.Down);
-        else setState(Actions.Hit);
+        if (ratio > 50) stateSet(Actions.Down);
+        else stateSet(Actions.Hit);
         Sound.play("kick");
         if (type != DamageType.Push) {
             stats.addEffect(Buffs.Slow, 2);
@@ -262,9 +262,9 @@ public class Unit extends Matter {
         if (!jump) {
             jump = true;
             int mag = (int) (vel.y - Settings.gravityMax);
-            if (vel.y > Settings.gravity*2) Sound.play("land");
+            if (vel.y > Settings.gravity*3) Sound.play("land");
             if (mag >= 0){
-                setState(Actions.Down);
+                stateSet(Actions.Down);
                 delay.time += getStatPenalty()*30;
                 get("Health").add(-(getStatPenalty()+1+mag));
             }

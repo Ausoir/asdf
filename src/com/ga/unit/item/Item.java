@@ -1,6 +1,7 @@
 package com.ga.unit.item;
 
-import com.ga.game.Sound;
+import com.ga.game.*;
+import com.ga.game.Dialog;
 import com.ga.map.Global;
 import com.ga.tool.Interactive;
 import com.ga.tool.Line;
@@ -263,12 +264,12 @@ public class Item extends Matter {
         return r;
     }
     public String getRarityDescription(){
-        String r = "common";
+        String r = Dialog.get("item1");
         int rare = getRarity();
-        if (rare >= 10) r = "fine";
-        if (rare >= 100) r = "rare";
-        if (rare % 5 == 4) r = "ludicrous";
-        else if (rare % 5 == 5) r = "legendary";
+        if (rare >= 10) r = Dialog.get("item2");
+        if (rare >= 100) r = Dialog.get("item3");
+        if (rare % 5 == 4) r = Dialog.get("item4");
+        else if (rare % 5 == 5) r = Dialog.get("item5");
         return r;
     }
     public String getDisplayName(){
@@ -343,17 +344,16 @@ public class Item extends Matter {
         return type.getHitSound();
     }
     public String getDescription() {
-        String r = "a "+getFullName()+".";
+        String r = "";
         int uses = this.uses.get();
-        r+= " Weighs "+weight+" and has "+(uses==-1?"unlimited":uses)+" uses left.";
+        r += com.ga.game.Dialog.get("itemDsc",new String[]{getFullName(),weight+"",(uses==-1?"unlimited":uses+"")});
         if (emod != null){
             String ade = "";
             if (ademod != AdenchantMod.None) ade = "Level "+ademod.level+" ";
-            r += " This "+getRarityDescription()+" item is magically enchanted with "+ade+emod.name();
-            r += ". The item's cooldown is "+cooldown+" seconds.";
+            r += com.ga.game.Dialog.get("itemEncDsc",new String[]{getRarityDescription(), ade+emod.name(), cooldown+""});
             int cd = Global.checkCooldown(lastused, cooldown);
-            if (cd <= 0) r += " Currently the item is ready to use.";
-            else r += " Currently the item needs "+cd+" more seconds to recharge.";
+            if (cd <= 0) r += Dialog.get("itemEncRdy");
+            else r += Dialog.get("itemEncNRdy", new String[]{cd+""});
         }
         return r;
     }
@@ -376,7 +376,8 @@ public class Item extends Matter {
     }
     @Override
     public String toString(){
-        return "";
+        if (organ == null) return "]]"+toItemString()+"/"+pos;
+        else return "";
     }
     public String toItemString(){
         return name + "," + seed + "," + uses + "," + admod;

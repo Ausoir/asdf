@@ -1,5 +1,9 @@
 package com.ga.unit.item;
 
+import com.ga.game.Dialog;
+import com.ga.game.Display;
+import com.ga.map.Global;
+import com.ga.map.MapEvent;
 import com.ga.tool.Performer;
 import com.ga.unit.*;
 import com.ga.unit.skill.Actions;
@@ -116,13 +120,33 @@ public class ItemFactory {
                 };
                 break;
             case "Fist":
-                item = new Item(p, seed, 0, -1, 1, 0){
+                item = new Item(p, 0, 0, -1, 1, 0){
                     @Override
                     public boolean use(final Man host){
                         host.setState(Actions.Interact);
                         return false;
                     }
+                    @Override
+                    public String toString(){
+                        return "";
+                    }
                 };
+                break;
+            case "Guidebook":
+                item = new Item(p, seed, 1, -1, 0, 0){
+                    @Override
+                    public boolean use(Man host){
+                        if (super.use(host)) {
+                            String stage = "4";
+                            if (Global.map.event == MapEvent.Tutorial) stage = Global.map.event.cookie;
+                            Display.menuDialog.show("Guidebook by Whu", Dialog.get("tutorial"+stage));
+                            return true;
+                        }
+                        return false;
+                    }
+                };
+                item.setType(Item.Tag.Scroll);
+                item.delay = 25;
                 break;
             case "Spellbook":
                 item = new Item(p, seed, 1, 1, 0, 1){
@@ -260,6 +284,24 @@ public class ItemFactory {
                 item.setType(Item.Tag.Darting);
                 break;
             default:
+                if (p.startsWith("Book")){
+                    final String bookTitle = p.substring(6,p.length()-1);
+                    item = new Item("Book", seed, 1, -1, 0, 0){
+                        private Book book = new Book(bookTitle);
+                        @Override
+                        public boolean use(Man host){
+                            if (super.use(host)) {
+                                Display.menuDialog.show(book.title, book.content);
+                                return true;
+                            }
+                            return false;
+                        }
+                    };
+                    item.name = p;
+                    item.setType(Item.Tag.Scroll);
+                    item.delay = 45;
+                    break;
+                }
                 item = null;
                 break;
         }

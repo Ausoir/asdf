@@ -26,7 +26,7 @@ public class Man extends Unit {
     private Item fist = ItemFactory.produce("Fist",0,0);
     public Item weapon;
     public ArmorSet armor;
-    public String ground = "dirt";
+    private String ground = "dirt";
 
     public Man(String p){
         super(p);
@@ -93,6 +93,11 @@ public class Man extends Unit {
         return weapon.getPoint().getSubtract(pos).getDist();
     }
 
+    void stepSound(){
+        if (Sound.has("step_"+ground)) Sound.play("step_"+ground);
+        else Sound.play("step_dirt");
+    }
+
     public void attackSound(){
         Sound.play(weapon.getSound());
     }
@@ -114,13 +119,13 @@ public class Man extends Unit {
     }
     public void stateSet(Moveset state){
         super.stateSet(state);
-        if (state instanceof Skills) {
+        if (state == Actions.Use){
+            if (!clip.organs[FIST].amputated) weapon.use(this);
+            return;
+        } else if (state instanceof Skills) {
             int speed = weapon.speed-armor.getEncumberance();
             damageType = weapon.damageType;
             switch ((Skills) state) {
-                case Use:
-                    if (!clip.organs[FIST].amputated) weapon.use(this);
-                    return;
                 case Duck:
                 case Sprint:
                 case Jump:
@@ -218,8 +223,7 @@ public class Man extends Unit {
     public boolean hit(Matter hitter, int damage, DamageType type) {
         target = hitter.pos.getAdd(0,0);
         armor.onHit();
-        boolean r = super.hit(hitter, damage, type);
-        return r;
+        return super.hit(hitter, damage, type);
     }
 
     @Override
@@ -289,9 +293,9 @@ public class Man extends Unit {
         boolean wasJump = jump;
         super.onCollide(l);
         if (!wasJump){
-            ground = Global.map.getLand(l.next);
+            if (l.next != -1) ground = Global.map.getLand(l.next);
             if (state == Skills.Jump){
-                setState(Actions.Hit);
+                stateSet(Actions.Hit);
                 delay.set(4);
             }
         }

@@ -2,7 +2,6 @@ package com.ga.game;
 
 import com.ga.map.Global;
 import com.ga.map.Picture;
-import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.unit.Player;
 import com.ga.unit.item.Item;
@@ -16,7 +15,7 @@ import java.awt.event.*;
 /**
  * Created by Ga on 11/15/2016.
  */
-public class Shop extends Panel {
+public class MenuShop extends Panel {
     private GridBagConstraints grid = new GridBagConstraints();
     private JPanel panel;
     private JScrollPane scroll;
@@ -30,7 +29,7 @@ public class Shop extends Panel {
     private String title;
     private Performer[] actions;
 
-    public Shop(){
+    public MenuShop(){
         super();
         setLayout(new BoxLayout(this,BoxLayout.PAGE_AXIS));
         addMouseMotionListener(new MouseMotionAdapter() {
@@ -138,7 +137,7 @@ public class Shop extends Panel {
         this.panel.add(panel);
     }
     private void describe(final Item item, final int price, final Performer action){
-        Display.dialog.show(item.getFullName(),"This is "+item.getDescription()+". It is being sold for "+price+" gold.",
+        Display.menuDialog.show(item.getFullName(),"This is "+item.getDescription()+". It is being sold for "+price+" gold.",
                 new String[]{"Buy"}, new Performer[]{new Performer(){
                     public void perform(){
                         Player player = Global.player.host;

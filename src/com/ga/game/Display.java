@@ -7,7 +7,6 @@ import com.ga.unit.Updater;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.Rectangle2D;
 
 /**
  * Created by Ga on 5/6/2016.
@@ -15,9 +14,9 @@ import java.awt.geom.Rectangle2D;
 public class Display extends JPanel implements KeyListener, MouseListener, MouseMotionListener {
     public static JTextField chatbox;
     public static Input input;
-    public static Dialog dialog;
+    public static MenuDialog menuDialog;
     public static Menu menu;
-    public static Shop shop;
+    public static MenuShop menuShop;
     private int mode = 0;
     private int mX = 0;
     private int mY = 0;
@@ -31,9 +30,9 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
             @Override
             public void componentResized(ComponentEvent e) {
                 Settings.setScreenSize(getWidth(), getHeight());
-                dialog.resize();
+                menuDialog.resize();
                 menu.resize();
-                shop.resize();
+                menuShop.resize();
                 chatbox.setBounds(0,Settings.screenY-40,500,40);
             }
         });
@@ -57,15 +56,15 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
             }
         });
         add(chatbox);
-        dialog = new Dialog();
-        add(dialog);
-        Updater.add(dialog);
+        menuDialog = new MenuDialog();
+        add(menuDialog);
+        Updater.add(menuDialog);
         menu = new Menu();
         add(menu);
         Updater.add(menu);
-        shop = new Shop();
-        add(shop);
-        Updater.add(shop);
+        menuShop = new MenuShop();
+        add(menuShop);
+        Updater.add(menuShop);
         Global.weather = new Weather();
         new Timer(25, new ActionListener() {
             @Override

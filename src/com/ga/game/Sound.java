@@ -12,9 +12,12 @@ import java.util.HashMap;
  * Created by Ga on 1/25/2017.
  */
 public class Sound {
-    protected static HashMap<String,Clip> cache = new HashMap<>();
+    private static HashMap<String,Clip> cache = new HashMap<>();
     public static void init(){
         search("Data/");
+    }
+    public static boolean has(String p){
+        return cache.get(p) != null;
     }
     public static void play(String p){
         try {

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
-public class EditorInput implements Input, Updatable {
+class EditorInput implements Input, Updatable, Drawable {
     private enum Tool {
         NONE, CREATE, DELETE, REMOVE, MAN, UNIT, OBJECT
     }
@@ -32,14 +32,16 @@ public class EditorInput implements Input, Updatable {
     private String map = "Map";
     private boolean placingTp = false;
     private int nextPolygon = 0;
+    private Color landColor = Color.pink;
 
-    public EditorInput() {
+    protected EditorInput() {
         Display.input = this;
         Updater.add(this);
         if (Global.camera == null) Global.camera = new P();
         else Global.camera = new P(Global.camera);
         scanPolygon();
         Global.margin = -36;
+        new Line(0,36,Global.map.size.x,36);
     }
 
     private void scanPolygon(){
@@ -59,9 +61,20 @@ public class EditorInput implements Input, Updatable {
     }
 
     @Override
+    public void draw(Graphics2D g) {
+        g.setColor(landColor);
+        g.setStroke(new BasicStroke(10));
+        for (Line i : Global.map.land) i.draw(g,new P());
+    }
+
+    @Override
+    public int getDepth() {
+        return 99;
+    }
+
+    @Override
     public void chat(String p, int x, int y){
-        if (p.equals("c")) {
-            Global.p("Ceiling");
+        if (p.equals("rope")) {
             current.opt = 1;
         } else if (p.equals("tp")) {
             Global.p("Teleporter");
@@ -74,15 +87,18 @@ public class EditorInput implements Input, Updatable {
             String[] size = p.substring(5).split("x");
             Global.map.map.image.size.set(Integer.parseInt(size[0]), Integer.parseInt(size[1]));
         } else if (p.equals("green")){
-            Updater.landColor = Color.green;
+            landColor = Color.green;
         } else if (p.equals("pink")){
-            Updater.landColor = Color.pink;
+            landColor = Color.pink;
         } else if (p.equals("white")){
-            Updater.landColor = Color.white;
+            landColor = Color.white;
         } else if (p.equals("black")) {
-            Updater.landColor = Color.black;
+            landColor = Color.black;
         } else if (p.equals("invisible")) {
-            Updater.landColor = new Color(0,0,0,0);
+            landColor = new Color(0,0,0,0);
+        } else if (p.equals("margin")) {
+            if (Global.margin == 0) Global.margin = -36;
+            else Global.margin = 0;
         } else if (p.startsWith("tx")) {
             texture = p.substring(2);
         } else if (p.equals("render")){
@@ -129,29 +145,36 @@ public class EditorInput implements Input, Updatable {
     @Override
     public void input(int mode, int x, int y) {
         if (mode < 0) v.set(0, 0);
-        if (shift && current != null){
-            boolean snap = false;
-            for (int i=0;i<Global.map.land.size();i++){
-                Line l = Global.map.land.get(i);
-                if (l != current) {
-                    final int snapThreshold = 24;
-                    if (Math.abs(l.pt.x - x) < snapThreshold && Math.abs(l.pt.y - y) < snapThreshold) {
-                        x = (int) l.pt.x;
-                        y = (int) l.pt.y;
-                        lineConnection.put(current, i);
-                        snap = true;
-                        if (connected) makePolygon(current);
-                        break;
-                    } else if (Math.abs(l.ptd.x - x) < snapThreshold && Math.abs(l.ptd.y - y) < snapThreshold) {
-                        x = (int) l.ptd.x;
-                        y = (int) l.ptd.y;
-                        lineConnection.put(current, i);
-                        snap = true;
-                        break;
+        if (current != null){
+            if (shift) {
+                boolean snap = false;
+                for (int i = 0; i < Global.map.land.size(); i++) {
+                    Line l = Global.map.land.get(i);
+                    if (l != current) {
+                        final int snapThreshold = 24;
+                        if (Math.abs(l.pt.x - x) < snapThreshold && Math.abs(l.pt.y - y) < snapThreshold) {
+                            x = (int) l.pt.x;
+                            y = (int) l.pt.y;
+                            lineConnection.put(current, i);
+                            snap = true;
+                            if (connected) makePolygon(current);
+                            break;
+                        } else if (Math.abs(l.ptd.x - x) < snapThreshold && Math.abs(l.ptd.y - y) < snapThreshold) {
+                            x = (int) l.ptd.x;
+                            y = (int) l.ptd.y;
+                            lineConnection.put(current, i);
+                            snap = true;
+                            break;
+                        }
                     }
                 }
+                if (!snap){
+                    if (Math.abs(current.getSlope()) <= 1.5f) y = (int) current.pt.y;
+                    else x = (int) current.pt.x;
+                }
+            } else if (current.opt == 1){
+                x = (int) current.pt.x;
             }
-            if (!snap) y = (int) current.pt.y;
         }
         switch (mode) {
             case 0:
@@ -209,7 +232,7 @@ public class EditorInput implements Input, Updatable {
                     while (it.hasNext()){
                         i = (Line) it.next();
                         if (i.lineCross(new Line(new P(x,y),lmbP))){
-                            Global.p(i.toString());
+                            Global.p(i.toString()+" slope:"+i.getSlope()+" "+(i.clockwise()?"clockwise":"counterclockwise"));
                             if (!texture.equals("") && i.next != -1) Global.map.formTextures.put(i.next, texture);
                         }
                     }

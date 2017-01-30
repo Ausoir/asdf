@@ -29,9 +29,9 @@ public abstract class Intelligence implements Observer {
     public int range = 150;
     public Intelligence(Unit man){
         host = man;
-        base = new int[]{host.rand.nextInt(Global.map.getWidth()),
-            host.rand.nextInt(Global.map.getWidth()),
-            host.rand.nextInt(Global.map.getWidth())};
+        base = new int[]{host.rand.nextInt((int) Global.map.size.x),
+            host.rand.nextInt((int) Global.map.size.x),
+            host.rand.nextInt((int) Global.map.size.x)};
         task = new Idle(host);
         forget.time = 1;
         Updater.add(this);
@@ -44,7 +44,8 @@ public abstract class Intelligence implements Observer {
             target = null;
             defaultTask();
         } else {
-            task.update();
+            if (host.state == Actions.Walk && blocked(host.dir)) task.blocked();
+            else task.update();
         }
         if (alertness < 1) perceive();
     }
@@ -77,27 +78,33 @@ public abstract class Intelligence implements Observer {
         }
     }
     public void setState(Moveset state){
-        if (target != null) {
-            P p = target.pos.getSubtract(host.pos);
-            host.target = p;
-            if (host instanceof Man) ((Man)host).rotateWeapon(p.getMult(host.dir,host.dir));
-        }
         if (state == Actions.Dead){
             Updater.remove(this);
             task = new Idle(host);
-        } else if (state == Actions.Walk && blocked(host.dir)){
-            host.setState(Actions.Idle);
-            task.blocked();
+        } else {
+            if (target != null) {
+                P p = target.pos.getSubtract(host.pos);
+                host.target = p;
+                if (host instanceof Man) ((Man)host).rotateWeapon(p.getMult(host.dir,host.dir));
+            }
         }
     }
     protected boolean blocked(int dir){
-        Line pp = new Line(host.pos,host.pos.getAdd(120*dir,0));
+        P front = host.pos.getAdd((host.getSpeed()*3+24)*dir,0);
+        Line pp = new Line(host.pos,front);
+        Line pp2 = new Line(front.getAdd(0,-40),front.getAdd(0,40));
+        boolean fall = true;
         for (Line i : Global.map.land){
-            if (i.lineCross(pp) && Math.abs(i.getSlope()) > 5){
-                return true;
+            if (i.isLand()) {
+                if (i.lineCross(pp) && Math.abs(i.getSlope()) > 2) {
+                    return true;
+                }
+                if (i.lineCross(pp2)) {
+                    fall = false;
+                }
             }
         }
-        return false;
+        return fall;
     }
     public void hear(Matter u, String p){
         if (alertness < 1) {

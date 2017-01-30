@@ -49,16 +49,25 @@ public class Menu extends Panel {
         add(skillpanel,grid);
         add(optionspanel,grid);
         command("");
+
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {}
+            @Override
+            public void mousePressed(MouseEvent e) {}
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+        });
     }
     private void addMainPanel(){
         GridLayout gridlayout = new GridLayout(5,1,20,40);
         mainpanel.setOpaque(false);
         mainpanel.setLayout(gridlayout);
-        mainpanel.add(makeOption("Stats", "stats"));
-        mainpanel.add(makeOption("Equipment", "equip"));
-        mainpanel.add(makeOption("Inventory", "inventory"));
-        mainpanel.add(makeOption("Spells", "spell"));
-        mainpanel.add(makeOption("Options", "options"));
+        mainpanel.add(makeOption(Dialog.get("stats"), "stats"));
+        mainpanel.add(makeOption(Dialog.get("equip"), "equip"));
+        mainpanel.add(makeOption(Dialog.get("inv"), "inventory"));
+        mainpanel.add(makeOption(Dialog.get("mvs"), "spell"));
+        mainpanel.add(makeOption(Dialog.get("opt"), "options"));
         grid.gridx = 0;
         add(mainpanel,grid);
     }
@@ -134,6 +143,18 @@ public class Menu extends Panel {
 
 class StatPanel extends JPanel{
     private GridBagConstraints statgrid = new GridBagConstraints();
+    private String[][] stats = new String[][]{
+        new String[]{Dialog.get("prf"),Dialog.get("prfDsc")},
+        new String[]{Dialog.get("str"),Dialog.get("strDsc")},
+        new String[]{Dialog.get("sta"),Dialog.get("staDsc")},
+        new String[]{Dialog.get("end"),Dialog.get("endDsc")},
+        new String[]{Dialog.get("mem"),Dialog.get("memDsc")},
+        new String[]{Dialog.get("lvlPts"),Dialog.get("lvlPtsDsc")},
+        new String[]{Dialog.get("rstPts"),Dialog.get("rstPtsDsc")}
+    };
+    private JButton[] statButtons = new JButton[stats.length];
+    private JButton[] incButtons = new JButton[stats.length];
+    private JButton[] decButtons = new JButton[stats.length];
     public StatPanel(){
         setLayout(new GridBagLayout());
         setBackground(Panel.forecolor2);
@@ -143,54 +164,29 @@ class StatPanel extends JPanel{
         statgrid.ipady = 20;
         statgrid.gridx = 0;
         statgrid.gridy = 0;
-        makeStatButton("Proficiency - ", null);
-        makeStatButton("Stamina - ", null);
-        makeStatButton("Endurance - ", null);
-        makeStatButton("Memory - ", null);
-        makeStatButton("Reset Points - ", null);
-        makeStatButton("Level Points - ", null);
+        for (int i=0;i<stats.length;i++) statButtons[i] = makeStatButton(stats[i][0],null);
         statgrid.ipadx = 5;
         statgrid.gridx = 1;
         statgrid.gridy = 0;
-        makeStatButton("[+]", "level@Proficiency");
-        makeStatButton("[+]", "level@Stamina");
-        makeStatButton("[+]", "level@Endurance");
-        makeStatButton("[+]", "level@Memory");
+        for (int i=0;i<stats.length;i++) incButtons[i] = makeStatButton("[+]", "level@"+stats[i][0]);
         statgrid.gridx = 2;
         statgrid.gridy = 0;
-        makeStatButton("[-]", "delevel@Proficiency");
-        makeStatButton("[-]", "delevel@Stamina");
-        makeStatButton("[-]", "delevel@Endurance");
-        makeStatButton("[-]", "delevel@Memory");
+        for (int i=0;i<stats.length;i++) decButtons[i] = makeStatButton("[-]", "delevel@"+stats[i][0]);
         statgrid.gridx = 3;
         statgrid.gridy = 0;
-//        statgrid.insets = new Insets(0,0,0,240);
-        makeStatButton("[?]", "say@increases minimum/maximum damage by 1.");
-        makeStatButton("[?]", "say@increases Stamina by 1. Stamina recovers by 4 when resting.");
-        makeStatButton("[?]", "say@increases Endurance by 100. Endurance recovers by sleeping.");
-        makeStatButton("[?]", "say@increases Memory by 1. Each point can be used to learn with a Manual or a Spellbook. They can also be used to level up a Spell or Spell at the Spells menu.");
+        for (int i=0;i<stats.length;i++) makeStatButton("", "menuDialog@"+stats[i][0]+"@"+stats[i][1]).setIcon(new ImageIcon(Picture.load("Describe")));
     }
     protected void refresh(){
         Player player = Global.player.host;
-        ((JButton)getComponent(0)).setText("Proficiency - "+player.get("Proficiency").getMax());
-        ((JButton)getComponent(1)).setText("Stamina - "+player.get("Stamina").getMax());
-        ((JButton)getComponent(2)).setText("Endurance - "+player.get("Endurance").getMax());
-        ((JButton)getComponent(3)).setText("Memory - "+player.get("Memory").getMax());
-        ((JButton)getComponent(4)).setText("Reset Points - "+player.get("Reset Points").get());
-        ((JButton)getComponent(5)).setText("Level Points - "+player.get("Level Points").get());
-        if (player.get("Level Points").get() > 0)
-            for (int i=6;i<10;i++)
-                getComponent(i).setVisible(true);
-        else
-            for (int i=6;i<10;i++)
-                getComponent(i).setVisible(false);
-
-        if (player.get("Reset Points").get() > 0)
-            for (int i=10;i<14;i++)
-                getComponent(i).setVisible(true);
-        else
-            for (int i=10;i<14;i++)
-                getComponent(i).setVisible(false);
+        for (int i=0;i<stats.length;i++) statButtons[i].setText(stats[i][0]+" - "+player.get(stats[i][0]).getMax());
+        if (player.get("Level Points").get() > 0) for (JButton i : incButtons) i.setVisible(true);
+        else for (JButton i : incButtons) i.setVisible(false);
+        if (player.get("Reset Points").get() > 0) for (JButton i : decButtons) i.setVisible(true);
+        else for (JButton i : decButtons) i.setVisible(false);
+        incButtons[5].setVisible(false);
+        incButtons[6].setVisible(false);
+        decButtons[5].setVisible(false);
+        decButtons[6].setVisible(false);
     }
     public JButton makeStatButton(String p, final String cmd){
         final JButton button = new JButton(p);
@@ -199,26 +195,14 @@ class StatPanel extends JPanel{
         button.setBorder(null);
         button.setContentAreaFilled(false);
         button.setFocusable(false);
-        button.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-
-            }
+        button.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                button.setForeground(Color.blue);
+                button.setForeground(Color.CYAN);
             }
             @Override
             public void mouseReleased(MouseEvent e) {
-                button.setForeground(new Color(110,105,80));
-            }
-            @Override
-            public void mouseEntered(MouseEvent e) {
-
-            }
-            @Override
-            public void mouseExited(MouseEvent e) {
-
+                button.setForeground(Panel.fontcolor);
             }
         });
         if (cmd == null) button.removeMouseListener(button.getMouseListeners()[0]);
@@ -270,7 +254,7 @@ class EquipmentPanel extends JTextArea{
         Item wielded = Global.player.host.weapon;
         makeSlot(-1, wielded);
         TitledBorder b = BorderFactory.createTitledBorder(BorderFactory.createMatteBorder(2,2,2,2,Panel.forecolor));
-        b.setTitle("Wielded");
+        b.setTitle(Dialog.get("wielded"));
         ((JPanel) panel.getComponent(0)).setBorder(b);
 
         for (int i=0;i<6;i++) {
@@ -279,13 +263,13 @@ class EquipmentPanel extends JTextArea{
                 Item equipped = Global.player.host.armor.armor[i];
                 JPanel panel = makeSlot(i, equipped);
                 b = BorderFactory.createTitledBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Panel.forecolor));
-                String title = "Equipped";
-                if (i == 0) title += " - Right Arm";
-                else if (i == 1) title += " - Left Leg";
-                else if (i == 2) title += " - Right Leg";
-                else if (i == 3) title += " - Body";
-                else if (i == 4) title += " - Left Arm";
-                else if (i == 5) title += " - Head";
+                String title = Dialog.get("equipped");
+                if (i == 0) title += " - "+Dialog.get("brarm");
+                else if (i == 1) title += " - "+Dialog.get("blleg");
+                else if (i == 2) title += " - "+Dialog.get("brleg");
+                else if (i == 3) title += " - "+Dialog.get("bbody");
+                else if (i == 4) title += " - "+Dialog.get("blarm");
+                else if (i == 5) title += " - "+Dialog.get("bhead");
                 b.setTitle(title);
                 panel.setBorder(b);
             }
@@ -327,7 +311,7 @@ class EquipmentPanel extends JTextArea{
         describe.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                Display.dialog.show(item.getFullName(),item.getDescription());
+                Display.menuDialog.show(item.getFullName(),item.getDescription());
             }
         });
         final JLabel drop = new JLabel(item.getFullName()+"             ");
@@ -402,7 +386,7 @@ class InventoryPanel extends JPanel {
         describe.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                Display.dialog.show(item.getFullName(),item.getDescription());
+                Display.menuDialog.show(item.getFullName(),item.getDescription());
             }
         });
         final JLabel drop = new JLabel(item.getFullName()+"             ");
@@ -439,20 +423,19 @@ class SkillPanel extends JPanel{
     }
     protected void refresh(){
         panel.removeAll();
-        panel.add(new JLabel("Select a spell to re-map its keybinding."));
+        panel.add(new JLabel(Dialog.get("mvsRemap")));
         panel.add(Box.createRigidArea(new Dimension(0,12)));
-        makeSlot(Actions.Wait, false);
-        makeSlot(Skills.Use, false);
+        makeSlot(Actions.Use, false);
         makeSlot(Skills.Kick, false);
-        makeSlot(Actions.Interact, false);
         makeSlot(Skills.Rest, false);
         for (Moveset i : Global.player.host.skillTree.getSkills()){
             makeSlot(i, true);
         }
         int points = Global.player.host.get("Memory").get();
-        skillpoints.setText("Memory Points: "+points);
+        skillpoints.setText(Dialog.get("mem")+": "+points);
     }
     protected void makeSlot(final Moveset move, boolean skill){
+        final String displayName = Dialog.get("mvs"+move.getName());
         String key = Global.player.getMapping(move);
         if (key == null) key = "";
         else key = "["+key+"]";
@@ -473,21 +456,21 @@ class SkillPanel extends JPanel{
             advance.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Global.player.host.say("Leveled up " + move.getName() + "!");
+                    Global.player.host.say("Leveled up " + displayName + "!");
                     Global.player.host.advanceSkill(move, false);
                 }
             });
             advanceCd.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Global.player.host.say("Decreased the cooldown of " + move.getName() + " by half!");
+                    Global.player.host.say("Decreased the cooldown of " + displayName + " by half!");
                     Global.player.host.advanceSkill(move, true);
                 }
             });
             panel.add(advance);
             panel.add(advanceCd);
         }
-        final JLabel describe = new JLabel(" [?]");
+        final JLabel describe = new JLabel(new ImageIcon(Picture.load("Describe")));
         describe.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -496,14 +479,16 @@ class SkillPanel extends JPanel{
         });
         int level = Global.player.host.skillTree.getSkillLevel(move);
         int cdlevel = Global.player.host.skillTree.getSkillCdLevel(move);
-        final JLabel equip = new JLabel(" "+key+" "+Word.wordify(move.getName())+" Level "+level+"/"+cdlevel);
+        final JLabel equip = new JLabel(displayName+" "+Dialog.get("lvl")+" "+level+"/"+cdlevel);
+        final JLabel keyLabel = new JLabel(" "+key+" ");
+        keyLabel.setForeground(Color.RED);
         equip.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
                 describe.setVisible(false);
                 advance.setVisible(false);
                 advanceCd.setVisible(false);
-                equip.setText(" Press a Key");
+                equip.setText(" "+Dialog.get("reqInput"));
                 equip.requestFocus();
             }
         });
@@ -531,7 +516,8 @@ class SkillPanel extends JPanel{
                 refresh();
             }
         });
-        panel.add(describe);
+        if (!move.getDescription().equals("")) panel.add(describe);
+        panel.add(keyLabel);
         panel.add(equip);
         this.panel.add(panel);
         this.panel.add(Box.createRigidArea(new Dimension(0,4)));

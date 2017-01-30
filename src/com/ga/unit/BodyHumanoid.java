@@ -82,13 +82,13 @@ public class BodyHumanoid extends Body {
                     break;
                 case Walk:
                 case WalkL:
-                    if ((current == 0 || current == 2) && frame.over()) Sound.play("step_"+((Man)host).ground);
+                    if ((current == 0 || current == 2) && frame.over()) ((Man)host).stepSound();
                     break;
             }
         } else if (state instanceof Skills){
             switch ((Skills) state) {
                 case Sprint:
-                    if ((current == 1 || current == 3) && frame.over()) Sound.play("step_"+((Man)host).ground);
+                    if ((current == 1 || current == 3) && frame.over()) ((Man)host).stepSound();
                     break;
             }
         }

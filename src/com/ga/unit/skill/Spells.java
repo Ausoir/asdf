@@ -1,11 +1,11 @@
 package com.ga.unit.skill;
 
+import com.ga.game.Dialog;
 import com.ga.game.Sound;
 import com.ga.map.Global;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
-import com.ga.tool.Word;
 import com.ga.unit.*;
 import com.ga.unit.intelligence.UnitIntelligence;
 import com.ga.unit.item.Projectile;
@@ -34,14 +34,14 @@ public enum Spells implements Moveset {
             host.get("Stamina").add(20*level,true);
         }
     }),
-    Haste(Actions.Conjure, 25,2,100,false,"Haste doubles movement speed for 5 seconds. [Duration:10*Level]",produceBuff(Buffs.Haste)),
-    Adrenaline(Actions.Conjure, 25,3,100,false,"Haste grants the user a burst of Stamina for a short time. [Duration:10*Level]",produceBuff(Buffs.Rejuvenate)),
-    Cleave(Actions.Conjure, 25,1,100,false,"Cleave grants the user a cleaving property. [Level*1 Uses] [Duration:10*Level]",produceBuff(Buffs.Cleave)),
-    Empower(Actions.Conjure, 25,1,100,false,"Empower grants the next attack 10 bonus damage. [Level*1 Uses] [Duration:10*Level]",produceBuff(Buffs.Empower)),
-    Evade(Actions.Conjure, 25,2,100,false,"Evade grants you invulnerability to physical attacks for 10 seconds. [Level*1 Uses] [Duration:10*Level]",produceBuff(Buffs.Evade)),
-    Flamestride(Actions.Buff, 10,4,100,false,"Flamestride leaves damaging flames in the trails of the caster. [Level*1 Uses] [Duration:8*Level] [Damage:10] [Damage Scale:2 per Proficiency]",produceBuff(Buffs.Flamestride)),
-    Glacialwalk(Actions.Buff, 10,4,100,false,"Glacialwalk leaves freezing trails behind the caster. [Level*1 Uses] [Duration:8*Level] [Trail Duration:15*Level] [Freeze Duration:5*Level] [Damage:0]",produceBuff(Buffs.Glacialwalk)),
-    Stun(Actions.Cast, 40,4,50,false,"Stun a single enemy. [Duration:5*Level]",new Spell(){
+    Haste(Actions.Conjure, 25,2,100,false, Dialog.get("mvsDscHaste"),produceBuff(Buffs.Haste)),
+    Adrenaline(Actions.Conjure, 25,3,100,false,Dialog.get("mvsDscAdrenaline"),produceBuff(Buffs.Rejuvenate)),
+    Cleave(Actions.Conjure, 25,1,100,false,Dialog.get("mvsDscCleave"),produceBuff(Buffs.Cleave)),
+    Empower(Actions.Conjure, 25,1,100,false,Dialog.get("mvsDscEmpower"),produceBuff(Buffs.Empower)),
+    Evade(Actions.Conjure, 25,2,100,false,Dialog.get("mvsDscEvade"),produceBuff(Buffs.Evade)),
+    Flamestride(Actions.Buff, 10,4,100,false,Dialog.get("mvsDscFlamestride"),produceBuff(Buffs.Flamestride)),
+    Glacialwalk(Actions.Buff, 10,4,100,false,Dialog.get("mvsDscGlacialwalk"),produceBuff(Buffs.Glacialwalk)),
+    Stun(Actions.Cast, 40,4,50,false,Dialog.get("mvsDscStun"),new Spell(){
         @Override
         public void perform(Unit host, int level){
             Matter t = new Matter();
@@ -51,7 +51,7 @@ public enum Spells implements Moveset {
             if (target!= null) target.stats.addEffect(Buffs.Stun,level);
         }
     }),
-    Slow(Actions.Cast, 30,1,3,false,"Slow a single enemy. [Duration:5*Level]",new Spell(){
+    Slow(Actions.Cast, 30,1,3,false,Dialog.get("mvsDscSlow"),new Spell(){
         @Override
         public void perform(Unit host, int level){
             Matter t = new Matter();
@@ -61,7 +61,7 @@ public enum Spells implements Moveset {
             if (target!= null) target.stats.addEffect(Buffs.Slow,level);
         }
     }),
-    Poison(Actions.Cast, 40,4,50,false,"Poison a single enemy. [Duration:5*Level]",new Spell(){
+    Poison(Actions.Cast, 40,4,50,false,Dialog.get("mvsDscPoison"),new Spell(){
         @Override
         public void perform(Unit host, int level){
             Matter t = new Matter();
@@ -71,7 +71,7 @@ public enum Spells implements Moveset {
             if (target != null) target.stats.addEffect(Buffs.Poison,level);
         }
     }),
-    Shadowtwin(Actions.Buff, 40,3,100,false,"Summon a mirror of yourself to aid you in battle. [Level*1 Shadows] [Duration:50+Level*10] [3 Stamina Reserve/Shadow]",new Spell() {
+    Shadowtwin(Actions.Buff, 40,3,100,false,Dialog.get("mvsDscShadowtwin"),new Spell() {
         @Override
         public void perform(final Unit host, int level){
             Sound.play("shadowstep");
@@ -98,7 +98,7 @@ public enum Spells implements Moveset {
                     }
                 };
                 p.rangeZone = new int[]{-5};
-                p.moveset.put(0,new Moveset[]{Skills.Use, Skills.Sidekick});
+                p.moveset.put(0,new Moveset[]{Actions.Use, Skills.Sidekick});
                 p.stats.setStat("expire",new Stat(500+(level*100)));
                 host.get("Stamina").reserve += 3;
                 host.get("Stamina").add(0);
@@ -109,7 +109,7 @@ public enum Spells implements Moveset {
             }
         }
     }),
-    Shadowstep(Actions.Conjure, 20,1,40,true,"Blink to the target location.",new Spell() {
+    Shadowstep(Actions.Conjure, 20,1,40,true,Dialog.get("mvsDscShadowstep"),new Spell() {
         private int turn = 0;
         public void perform(Unit host, int level){
             if (turn++%4==0) Sound.play("shadow");
@@ -130,7 +130,7 @@ public enum Spells implements Moveset {
             }
         }
     }),
-    Fireworks(Actions.Cast, 40,0,10,true,"Fire streams of cackling sparks. [Range:100] [No Damage] [Upkeep:1 Stamina, No Weight Penalty]",new Spell(){
+    Fireworks(Actions.Cast, 40,0,10,true,Dialog.get("mvsDscFireworks"),new Spell(){
         private int turn = 0;
         @Override
         public void perform(final Unit host, int level){
@@ -160,7 +160,7 @@ public enum Spells implements Moveset {
             }
         }
     }),
-    Fireblast(Actions.Cast, 40,4,60,true,"Fire streams of blazing flame. [Range:10*Level+100] [Damage:10] [Damage Scale:.3 per Proficiency] [Upkeep:4/20]",new Spell(){
+    Fireblast(Actions.Cast, 40,4,60,true,Dialog.get("mvsDscFireblast"),new Spell(){
         private int turn = 0;
         @Override
         public void perform(final Unit host, int level){
@@ -191,7 +191,7 @@ public enum Spells implements Moveset {
             }
         }
     }),
-    Freeze(Actions.Cast, 40,2,24,true,"Fire a stream of freezing blast. [Range:Low] [Damage:0 Constant] [Upkeep:2/20]",new Spell(){
+    Freeze(Actions.Cast, 40,2,24,true,Dialog.get("mvsDscFreeze"),new Spell(){
         private int turn = 0;
         @Override
         public void perform(final Unit host, final int level){
@@ -225,7 +225,7 @@ public enum Spells implements Moveset {
             }
         }
     }),
-    Flameroll(Actions.Cast, 40,5,120,false,"Turn into a fireball and bash into target. [Range:Long] [Damage:15] [Radius:20+10*Level]",new Spell(){
+    Flameroll(Actions.Cast, 40,5,120,false,Dialog.get("mvsDscFlameroll"),new Spell(){
         @Override
         public void perform(final Unit host, final int level){
             final Projectile p = new Projectile("Fireball", host.pos, host.target.getAdd(host.pos), 80){
@@ -262,7 +262,7 @@ public enum Spells implements Moveset {
             };
         }
     }),
-    Fireball(Actions.Cast, 40,5,50,false,"Shoot a fireball. [Range:Long] [Damage:15] [Radius:20+10*Level]",new Spell(){
+    Fireball(Actions.Cast, 40,5,50,false,Dialog.get("mvsDscFireball"),new Spell(){
         @Override
         public void perform(final Unit host, final int level){
             final Projectile p = new Projectile("Fireball", host.getHand(), host.target.getAdd(host.pos), 50){
@@ -297,7 +297,7 @@ public enum Spells implements Moveset {
             };
         }
     }),
-    Blizzard(Actions.Buff, 30,3,240,true,"Conjure an ice storm to slow and slaughter your enemies. [Radius:800] [Damage:7 per Icebolt] [Freeze] [3*Level Icebolts/second] [Upkeep:3/20]",new Spell(){
+    Blizzard(Actions.Buff, 30,3,240,true,Dialog.get("mvsDscBlizzard"),new Spell(){
         @Override
         public void perform(final Unit host, final int level){
             if (Global.r.nextInt(40) > (level*8)-4) return;
@@ -333,7 +333,7 @@ public enum Spells implements Moveset {
             };
         }
     }),
-    Meteor(Actions.Cast, 40,6,240,true,"Conjure down a meteor to devastate anything in its target range. [Range:0~500] [Radius:50] [Damage:15 per Meteor] [Upkeep:6/20]",new Spell(){
+    Meteor(Actions.Cast, 40,6,240,true,Dialog.get("mvsDscMeteor"),new Spell(){
         public void perform(Unit host, int level){
             if (Global.r.nextInt(60) > level*2) return;
             Sound.play("meteor");

@@ -1,14 +1,12 @@
 package com.ga.map;
 
-import com.ga.unit.Updater;
-
 import java.awt.*;
 
 /**
  * Created by Ga on 9/2/2016.
  */
 public class Weather implements Drawable{
-    static int[][] colors = new int[][]{
+    private static int[][] colors = new int[][]{
             new int[]{120,40,220,50},
             new int[]{150,0,150,100},
             new int[]{255,255,255,70},
@@ -26,7 +24,7 @@ public class Weather implements Drawable{
     private static final int hourLength = 100;
     private int[] time = Global.getTime();
     public Weather(){
-        Updater.add(this);
+//        Updater.add(this);
     }
     private Color addition(int[] a, int[] b, float rate){
         return new Color((int) Global.clamp(a[0]+((b[0]-a[0])*rate),0,255),

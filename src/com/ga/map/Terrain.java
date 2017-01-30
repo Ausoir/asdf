@@ -3,37 +3,36 @@ package com.ga.map;
 import com.ga.tool.P;
 
 import java.awt.*;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
 /**
  * Created by Ga on 1/10/2017.
  */
-public class Terrain extends Texture {
+class Terrain extends Picture {
     private Polygon polygon;
     private TexturePaint imageTexture;
     private ShaderType shader;
-    public P pos;
+    protected P pos;
     public Terrain(String p, String shader){
         super(p);
         polygon = new Polygon();
         imageTexture = new TexturePaint(image, new Rectangle2D.Double(0,0,size.x,size.y));
         setShader(shader);
     }
-    public void setShader(String p){
+    private void setShader(String p){
         shader = ShaderType.getByName(p);
     }
-    public void shade(int x1, int x2, int y1, float slope){
+    protected void shade(int x1, int x2, int y1, float slope){
         shader.render(image, x1, x2, y1, slope);
     }
-    public void addPoint(float x, float y){
+    protected void addPoint(float x, float y){
         addPoint((int)x, (int)y);
     }
-    public void addPoint(int x, int y){
+    private void addPoint(int x, int y){
         polygon.addPoint(x, y);
     }
-    public void render(){
+    protected void render(){
         int lowX = polygon.xpoints[0], lowY = polygon.ypoints[0], highX = polygon.xpoints[0], highY = polygon.ypoints[0];
         for (int i=0;i<polygon.xpoints.length;i++){
             if (polygon.xpoints[i] < lowX) lowX = polygon.xpoints[i];
@@ -55,8 +54,8 @@ public class Terrain extends Texture {
     }
     public void draw(Graphics2D g){
         if (visible) {
-            g.setTransform(AffineTransform.getTranslateInstance(Global.getRelX(),Global.getRelY()));
-            g.drawImage(image,(int)pos.x,(int)pos.y,(int)size.x,(int)size.y,null);
+            P t = new P(Global.rel.x+pos.x, Global.rel.y+pos.y);
+            g.drawImage(image,(int)t.x,(int)t.y,(int)size.x,(int)size.y,null);
         }
     }
 }
