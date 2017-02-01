@@ -25,7 +25,7 @@ import java.util.HashMap;
 public class FileManager {
     public static void saveCharacter(){
         if (Global.player.host.state != Actions.Dead) {
-            saveMap("map/Map");
+            saveMap("map/"+Global.player.host.cmap);
             save("map/0", Global.player.host.toCharacterString());
         }
     }
@@ -42,7 +42,7 @@ public class FileManager {
             e.printStackTrace();
         }
     }
-    static void saveMap(String name){
+    public static void saveMap(String name){
         String result = "" + Global.map.toString();
         result += "\n";
         result += Updater.toMapString();
@@ -70,7 +70,7 @@ public class FileManager {
         return result;
     }
     static void loadFirst(boolean editor){
-        readMap("Map",0);
+        readMap(Global.player.host.cmap,0);
         Global.mapEdgeCenter(Global.cameraTo = Global.player.host.pos.getAdd(0,0));
         if (editor){
             new EditorInput();
@@ -82,10 +82,11 @@ public class FileManager {
         PlayerInput pi;
         String playerString = line[0].split("]")[1];
         pi = new PlayerInput(main ? new MainPlayer(playerString) : new Player(playerString));
-        pi.host.load(read("map/"+dir));
+        pi.host.load(data);
         pi.host.id = -Integer.parseInt(dir)-1;
         pi.load(line[2]);
-        Global.setTime(Integer.parseInt(line[1].split(";")[2]));
+        Global.setTime(Integer.parseInt(line[1].split(";")[3]));
+        Global.gameHour = Integer.parseInt(line[1].split(";")[4]);
         return pi;
     }
     public static P readMap(String dir, int player) {
@@ -129,10 +130,11 @@ public class FileManager {
                                 if (id >= Updater.id) Updater.id = id + 1;
                                 if (unit[0].equals("Man")) new Man(unit[1]);
                                 else BeastFactory.produce(unit[1]);
-                            } else { //item
+                            } else if (!Global.map.event.regrowth){ //item
                                 String[] t = unit[2].split("/");
                                 Item item = ItemFactory.load(t[0]);
                                 item.pos = new P(t[1]);
+                                item.rotation = Float.parseFloat(t[2]);
                                 item.field();
                             }
                         }
@@ -142,7 +144,10 @@ public class FileManager {
         }
         Global.map.setTexture();
         Global.map.setShader();
-        Global.map.generateProps();
+        if (Global.map.event.regrowth){
+            Global.map.event.regrowth = false;
+            Global.map.generateProps();
+        }
         if (r == null){
             System.out.println("Invalid Player Spawn Location");
             r = new P(Settings.centerX, Settings.centerY);

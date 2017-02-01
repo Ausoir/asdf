@@ -32,7 +32,9 @@ public enum MapEvent implements Updatable{
             } else if (cookie.equals("2")){
                 if (!p.armor.isBare(1)) setStage(3);
             } else if (cookie.equals("3")){
-                if (p.pos.x > 5500 && p.pos.y < 400) setStage(4);
+                if (p.pos.x > 5100 && p.pos.y < 680) setStage(4);
+            } else if (cookie.equals("4")){
+                if (p.pos.x > 5500 && p.pos.y < 400) setStage(5);
             }
         }
         private void setStage(int p){
@@ -43,6 +45,7 @@ public enum MapEvent implements Updatable{
     });
     private Performer event;
     public static String cookie;
+    public boolean regrowth = false;
     MapEvent (Performer p){
         event = p;
     }
@@ -51,12 +54,13 @@ public enum MapEvent implements Updatable{
     }
     @Override
     public String toString(){
-        return name()+(cookie!=null?":"+cookie:"");
+        return name()+(cookie==null?"":"@"+cookie);
     }
     public static MapEvent getByName(String p){
-        String[] t = p.split(":");
+        String[] t = p.split("@");
         MapEvent r = valueOf(t[0]);
-        if (t.length>1) cookie = t[1];
+        if (Global.gameHour % 3 == 0) r.regrowth = true;
+        if (t.length > 1) cookie = t[1];
         Updater.add(r);
         return r;
     }

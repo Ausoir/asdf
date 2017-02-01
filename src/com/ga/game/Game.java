@@ -36,6 +36,6 @@ public class Game extends JFrame {
         setExtendedState( getExtendedState()|JFrame.MAXIMIZED_BOTH );
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         new Process();
-        new ControllerProcess();
+        Global.cprocess = new ControllerProcess();
     }
 }

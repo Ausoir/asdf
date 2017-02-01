@@ -79,7 +79,7 @@ public class Matter extends Thing implements Updatable {
                             vel.set(0, 0);
                             return;
                         } else if (!cc && lineY >= pos.y) {
-                            if (Math.abs(slope) > 2) {
+                            if (Math.abs(slope) > Line.MAXSLOPE) {
                                 vel.set(0, 0);
                                 return;
                             }
@@ -125,6 +125,7 @@ public class Matter extends Thing implements Updatable {
     }
     @Override
     public String toString(){
+        if (!save) return "";
         return name + "@" + seed + "@" + pos;
     }
 }

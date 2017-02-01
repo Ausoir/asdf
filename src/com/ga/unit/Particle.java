@@ -15,6 +15,7 @@ public class Particle extends Thing implements Effect {
     private boolean gravity;
     public Particle(String name, P pt, P vel, float rotation, float speed, boolean gravity, int lifetime) {
         super(name, pt, 13);
+        save = false;
         this.vel = new P(vel);
         this.vel.add(Global.cos(rotation)*speed,Global.sin(rotation)*speed);
         this.gravity = gravity;
@@ -84,10 +85,5 @@ public class Particle extends Thing implements Effect {
         collide();
         pos.add(vel);
         return timer.update();
-    }
-
-    @Override
-    public String toString(){
-        return "";
     }
 }

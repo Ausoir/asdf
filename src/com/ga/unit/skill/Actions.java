@@ -18,12 +18,11 @@ public enum Actions implements Moveset {
     }, Climb{
         public void update(Unit p, int level){
             Player player = (Player)p;
-            if (player.clip.organs[0].ptd.y + p.pos.y > player.rope.pt.y) p.vel.y = -p.getSpeed();
-            else{
+            if (player.input.moving != 0 || player.clip.organs[0].ptd.y + p.pos.y < player.rope.pt.y){
                 p.jump = true;
-                p.vel.x = p.getSpeed()*p.dir;
+                p.vel.x = p.getSpeed()*(player.input.moving == 0?player.dir:player.input.moving);
                 p.stateSet(Skills.Jump);
-            }
+            } else p.vel.y = -p.getSpeed();
         }
     }, Use, LookUp, LookLeft, LookDown, LookRight, WalkL, Hit(15), Dead(-1), Wield(18), Recall,
     Conjure, Wait(50), Cast, Consume(8), Exhausted, Interact(8), Down(80), Buff, Revive;

@@ -92,11 +92,8 @@ public enum Spells implements Moveset {
                         if (expire.get() == 0) die();
                         Particle.smoke(pos.getAdd(clip.organs[4].ptd));
                     }
-                    @Override
-                    public String toString(){
-                        return "";
-                    }
                 };
+                p.save = false;
                 p.rangeZone = new int[]{-5};
                 p.moveset.put(0,new Moveset[]{Actions.Use, Skills.Sidekick});
                 p.stats.setStat("expire",new Stat(500+(level*100)));

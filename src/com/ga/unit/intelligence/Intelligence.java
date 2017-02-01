@@ -96,7 +96,7 @@ public abstract class Intelligence implements Observer {
         boolean fall = true;
         for (Line i : Global.map.land){
             if (i.isLand()) {
-                if (i.lineCross(pp) && Math.abs(i.getSlope()) > 2) {
+                if (i.lineCross(pp) && Math.abs(i.getSlope()) > Line.MAXSLOPE) {
                     return true;
                 }
                 if (i.lineCross(pp2)) {

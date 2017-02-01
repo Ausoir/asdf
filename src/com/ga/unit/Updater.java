@@ -24,11 +24,11 @@ public class Updater {
     public static boolean editor = false;
     public static int id = 1;
     private static ArrayList<Drawable> drawee = new ArrayList<>();
-    public static ArrayList<Effect> effects = new ArrayList<>();
-    public static ArrayList<Updatable> updatee = new ArrayList<>();
-    public static ArrayList<Matter> matter = new ArrayList<>();
-    public static ArrayList<Unit> colidee = new ArrayList<>();
-    public static ArrayList<Intelligence> controllee = new ArrayList<>();
+    private static ArrayList<Effect> effects = new ArrayList<>();
+    private static ArrayList<Updatable> updatee = new ArrayList<>();
+    private static ArrayList<Matter> matter = new ArrayList<>();
+    private static ArrayList<Unit> colidee = new ArrayList<>();
+    private static ArrayList<Intelligence> controllee = new ArrayList<>();
     public static HashMap<Integer, Unit> unitList = new HashMap<>();
     private static ArrayList<Observer> addQueue = new ArrayList<>();
     private static ArrayList<Observer> removeQueue = new ArrayList<>();
@@ -36,7 +36,7 @@ public class Updater {
     public static int changeMapPos = 0;
     public static Performer changeMapEvent = null;
     private static Timer time = new Timer(40,true);
-    public static void clear(){
+    private static void clear(){
         drawee.clear();
         updatee.clear();
         colidee.clear();
@@ -47,6 +47,7 @@ public class Updater {
         controllee.clear();
         matter.clear();
         Global.map.clear();
+        Display.addMenus();
     }
     public static int getId(){
         return id++;
@@ -54,7 +55,9 @@ public class Updater {
     public static void changeMap(boolean editor){
         clear();
         if (!editor) {
+            Global.gameHour++;
             addQueue.add(Global.player.host);
+            Global.player.host.cmap = changeMap;
             Global.player.host.pos.set(FileManager.readMap(changeMap, changeMapPos));
             Global.mapEdgeCenter(Global.cameraTo = Global.player.host.pos.getAdd(0,0));
             Global.player.host.reset();
@@ -106,8 +109,8 @@ public class Updater {
                 Global.update();
                 FileManager.saveCharacter();
             }
+            if (changeMap != null) changeMap(false);
         }
-        if (changeMap != null) changeMap(false);
     }
     public static void draw(Graphics2D g2){
         Global.setRel();
@@ -117,6 +120,9 @@ public class Updater {
     }
     public static void add(Observer p){
         addQueue.add(p);
+    }
+    public static void cancelAdd(Observer p){
+        addQueue.remove(p);
     }
     public static void remove(Observer p){
         removeQueue.add(p);

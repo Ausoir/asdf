@@ -1,6 +1,7 @@
 package com.ga.map;
 
 import com.ga.connection.Server;
+import com.ga.game.ControllerProcess;
 import com.ga.game.Display;
 import com.ga.game.Settings;
 import com.ga.tool.P;
@@ -17,12 +18,14 @@ public class Global {
     public static Weather weather;
     public static PlayerInput player;
     public static Server server;
+    public static ControllerProcess cprocess;
     public static P camera = new P();
     public static P cameraTo = new P();
     public static Display display;
     public static Random r = new Random();
     public static int margin = 0;
     public static P rel = new P();
+    public static int gameHour = 0;
     private static float[] sinv = new float[360];
     private static float[] cosv = new float[360];
     private static int[] time = new int[]{0};

@@ -319,7 +319,7 @@ public class Unit extends Matter {
 
     @Override
     public String toString(){
-        if (state == Actions.Dead) return "";
+        if (state == Actions.Dead || !save) return "";
         String r = getClass().getSimpleName()+"]"+super.toString()+"@"+id;
         r += "@"+stats.toString()+"@"+faction.name()+"@";
         for (int i:rangeZone) r += i+",";

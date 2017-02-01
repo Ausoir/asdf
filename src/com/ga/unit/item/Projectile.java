@@ -15,6 +15,7 @@ public class Projectile extends Matter {
     public EventTimer delay = new EventTimer(-1, false, null);
     public Projectile(String name, P pt, P dest, int speed) {
         super(name, 0, pt, 10);
+        save = false;
         vel.set(dest.getAtan(pt, speed));
         rotation = (float) Math.atan2(dest.y-pt.y,dest.x-pt.x);
         gravity = true;
@@ -41,8 +42,5 @@ public class Projectile extends Matter {
         }
         super.update();
         delay.update();
-    }
-    public String toString(){
-        return "";
     }
 }

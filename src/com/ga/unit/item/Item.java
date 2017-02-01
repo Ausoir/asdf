@@ -117,7 +117,7 @@ public class Item extends Matter {
     protected int cooldown = 100;
     public int delay = 0;
     protected float probability;
-    public Moveset action = Actions.Consume;
+    public Moveset action = Skills.Swing;
     public int[] lastused = new int[]{0};
     public Stat uses = new Stat(1);
     private Tag type = Tag.Consumable;
@@ -149,7 +149,7 @@ public class Item extends Matter {
                 }
             }
         };
-        Updater.remove(this);
+        Updater.cancelAdd(this);
     }
     public void setType(Tag p){
         this.type = p;
@@ -160,6 +160,8 @@ public class Item extends Matter {
         return type;
     }
     public void setOrgan(Organ p){
+        if (p == null) save = true;
+        else save = false;
         this.organ = p;
     }
     public Organ getOrgan() {
@@ -333,7 +335,6 @@ public class Item extends Matter {
         super.remove();
     }
     public void field(){
-        gravity = true;
         Updater.add(this);
         setOrgan(null);
     }
@@ -376,8 +377,8 @@ public class Item extends Matter {
     }
     @Override
     public String toString(){
-        if (organ == null) return "]]"+toItemString()+"/"+pos;
-        else return "";
+        if (save) return "]]"+toItemString()+"/"+pos+"/"+String.format(java.util.Locale.US,"%.2f", rotation);;
+        return "";
     }
     public String toItemString(){
         return name + "," + seed + "," + uses + "," + admod;

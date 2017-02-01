@@ -103,9 +103,10 @@ public class ItemFactory {
         return result;
     }
     public static Item produce(String p, int seed, int opt){
-        Item r = produceItem(p, seed);
-        if (r == null) r = FactoryWeapon.produce(p, seed);
+        Item r;
+        r = FactoryWeapon.produce(p, seed);
         if (r == null) r = FactoryArmor.produce(p, seed, opt);
+        if (r == null) r = produceItem(p, seed);
         return r;
     }
     protected static Item produceItem(String p, int seed) {
@@ -126,11 +127,8 @@ public class ItemFactory {
                         host.setState(Actions.Interact);
                         return false;
                     }
-                    @Override
-                    public String toString(){
-                        return "";
-                    }
                 };
+                item.save = false;
                 break;
             case "Guidebook":
                 item = new Item(p, seed, 1, -1, 0, 0){
@@ -301,8 +299,13 @@ public class ItemFactory {
                     item.setType(Item.Tag.Scroll);
                     item.delay = 45;
                     break;
+                } else if (seed == -2) {
+                    item = new Item(p, seed, 1, -1, 0, 0){
+                        public void update(){}
+                    };
+                } else {
+                    item = new Item(p, seed, 1, -1, 0, 0);
                 }
-                item = null;
                 break;
         }
         return item;

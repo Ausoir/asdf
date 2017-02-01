@@ -18,6 +18,7 @@ public class Thing implements Drawable, Observer {
     int depth; //5:Object, 8:Corpse, 9:Shadow, 10:Unit
     public int dir = 1;
     public float rotation = 0;
+    public boolean save = true;
     public Thing(String name){
         this.name = name;
         if (name != null) {
@@ -60,6 +61,7 @@ public class Thing implements Drawable, Observer {
         Updater.remove(this);
     }
     public String toString(){
+        if (!save) return "";
         return name + "@" + pos;
     }
 }

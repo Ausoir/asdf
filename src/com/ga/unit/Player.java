@@ -27,6 +27,7 @@ public class Player extends Man {
     public int selectingItem = -1;
     public Line rope;
     public PlayerInput input;
+    public String cmap;
     public Player(String p) {
         super(p);
         speechType = "p";
@@ -141,6 +142,7 @@ public class Player extends Man {
                                 delay.set(0);
                                 pos.x = i.pt.x-(24*dir);
                                 setState(Actions.Climb);
+                                input.moving = 0;
                                 rope = i;
                             }
                         }
@@ -222,7 +224,7 @@ public class Player extends Man {
     }
     public String toCharacterString(){
         String r = super.toString()+"\n";
-        r += gold+";"+memorized+";"+Global.getTime()[0]+"\n";
+        r += cmap+";"+gold+";"+memorized+";"+Global.getTime()[0]+";"+Global.gameHour+"\n";
         r += input.toString()+"\n";
         r += inventory.toString()+"\n";
         r += skillTree.toString();
@@ -230,8 +232,10 @@ public class Player extends Man {
     }
     public void load(String p){
         String[] line = p.split("%");
-        gold = Integer.parseInt(line[1].split(";")[0]);
-        memorized = line[1].split(";")[1];
+        String[] other = line[1].split(";");
+        cmap = other[0];
+        gold = Integer.parseInt(other[1]);
+        memorized = other[2];
         inventory.load(line[3]);
         skillTree.load(line[4]);
     }

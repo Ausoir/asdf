@@ -23,8 +23,8 @@ class Wander implements Task {
 
     @Override
     public void blocked() {
-        if (host.dir == 1) base[current] = host.rand.nextInt((int) host.pos.x);
-        if (host.dir == -1) base[current] = host.rand.nextInt((int) (Global.map.size.x-host.pos.x))+(int) host.pos.x;
+//        if (host.dir == 1) base[current] = host.rand.nextInt((int) host.pos.x);
+//        else if (host.dir == -1) base[current] = host.rand.nextInt((int) (Global.map.size.x-host.pos.x))+(int) host.pos.x;
         host.face(-host.dir);
         host.setState(Actions.Walk);
         tick.set(30);

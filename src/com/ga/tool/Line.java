@@ -8,6 +8,7 @@ import java.awt.*;
  * Created by Ga on 7/26/2016.
  */
 public class Line {
+    public static int MAXSLOPE = 2;
     public P pt;
     public P ptd;
     public int next = -1;

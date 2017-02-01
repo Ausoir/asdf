@@ -115,9 +115,7 @@ public class Server implements Updatable {
                                     PlayerInput pi = FileManager.loadPlayer(false, "" + i);
                                     clientControllers.put(i, pi);
                                 }
-                                for (Unit i : Updater.colidee){
-                                    i.brain = null;
-                                }
+                                Global.cprocess.stop();
                             }
                         };
                         Global.player.host.id = -clientSize - 1;

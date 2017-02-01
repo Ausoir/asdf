@@ -9,13 +9,18 @@ import java.awt.event.ActionListener;
 /**
  * Created by Ga on 1/20/2017.
  */
-class ControllerProcess {
+public class ControllerProcess {
+    private Timer timer;
     protected ControllerProcess(){
-        new Timer(120, new ActionListener() {
+        timer = new Timer(120, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 Updater.updateControl();
             }
-        }).start();
+        });
+        timer.start();
+    }
+    public void stop(){
+        timer.stop();
     }
 }

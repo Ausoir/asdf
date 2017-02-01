@@ -58,13 +58,10 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
         add(chatbox);
         menuDialog = new MenuDialog();
         add(menuDialog);
-        Updater.add(menuDialog);
         menu = new Menu();
         add(menu);
-        Updater.add(menu);
         menuShop = new MenuShop();
         add(menuShop);
-        Updater.add(menuShop);
         Global.weather = new Weather();
         new Timer(25, new ActionListener() {
             @Override
@@ -72,6 +69,13 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
                 repaint();
             }
         }).start();
+        addMenus();
+    }
+
+    public static void addMenus(){
+        Updater.add(menuDialog);
+        Updater.add(menu);
+        Updater.add(menuShop);
     }
 
     private void chat(){
