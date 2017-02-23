@@ -1,13 +1,12 @@
 package com.ga.game;
 
-import com.ga.map.BeastFactory;
+import com.ga.map.EditorInput;
 import com.ga.map.Global;
-import com.ga.map.ManFactory;
 import com.ga.unit.Matter;
 import com.ga.unit.Player;
 import com.ga.unit.Updater;
+import com.ga.unit.factory.Stock;
 import com.ga.unit.item.Item;
-import com.ga.unit.item.ItemFactory;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Buffs;
 import com.ga.unit.skill.Skills;
@@ -37,11 +36,10 @@ public class Command {
                 else if (cmd[0].equals("advSkillCd")) for (int num=0;num<Integer.parseInt(cmd[1].split(":")[1]);num++) host.skillTree.advanceSkill(Skills.valueOf(cmd[1].split(":")[0]),true);
                 else if (cmd[0].equals("advSpell")) for (int num=0;num<Integer.parseInt(cmd[1].split(":")[1]);num++) host.skillTree.advanceSkill(Spells.valueOf(cmd[1].split(":")[0]),false);
                 else if (cmd[0].equals("advSpellCd")) for (int num=0;num<Integer.parseInt(cmd[1].split(":")[1]);num++) host.skillTree.advanceSkill(Spells.valueOf(cmd[1].split(":")[0]),true);
-                else if (cmd[0].equals("man")) ManFactory.produce(cmd[1], host.pos.getAdd(host.target), -1);
-                else if (cmd[0].equals("mob")) for (int num=0;num<Integer.parseInt(cmd[1].split(":")[1]);num++) ManFactory.produce(cmd[1].split(":")[0], host.pos.getAdd(host.target), -1);
-                else if (cmd[0].equals("dog")) BeastFactory.produce(cmd[1], host.pos.getAdd(host.target), -1);
-                else if (cmd[0].equals("dummy")) ManFactory.produce(cmd[1], host.pos.getAdd(host.target), -1).brain = null;
-                else if (cmd[0].equals("item")) host.setWeapon(ItemFactory.produce(cmd[1] ,-1,cmd.length>2?Integer.parseInt(cmd[2]):3));
+                else if (cmd[0].equals("man")) Stock.getByName(cmd[1], -1).pos = host.pos.getAdd(host.target);
+                else if (cmd[0].equals("mob")) for (int num=0;num<Integer.parseInt(cmd[1].split(":")[1]);num++) Stock.getByName(cmd[1], -1).pos = host.pos.getAdd(host.target);
+                else if (cmd[0].equals("item")) host.setWeapon((Item) Stock.getByName(cmd[1], -1));
+                else if (cmd[0].equals("itemN")) host.setWeapon((Item) Stock.get(new String[]{cmd[1],cmd[2]}));
                 else if (cmd[0].equals("tp")) host.pos.add(Integer.parseInt(cmd[1].split(",")[0]),Integer.parseInt(cmd[1].split(",")[1]));
                 else if (cmd[0].equals("to")) host.pos.add(host.target);
 //                else if (cmd[0].equals("inside")) host.say(Matter.isInside(host.pos.getAdd(host.target).x, host.pos.getAdd(host.target).y)+"");
@@ -53,13 +51,7 @@ public class Command {
                 else if (cmd[0].equals("atkspd")) host.weapon.speed = Integer.parseInt(cmd[1]);
                 else if (cmd[0].equals("sound")) Sound.play(cmd[1]);
                 else if (p.equals("revive")) host.revive();
-                else if (cmd[0].equals("randomObj")){
-                    new Matter(cmd[1],0,Global.map.randomSurface(),8);
-                } else if (cmd[0].equals("randomItem")){
-                    Item t = ItemFactory.produce(cmd[1],0,0);
-                    t.field();
-                    t.pos = Global.map.randomSurface();
-                }
+                else if (cmd[0].equals("randomObj")) new Matter(cmd[1],0,8).pos = Global.map.randomSurface();
                 else if (p.startsWith("cast")){
                     host.setState(Spells.valueOf(p.substring(5)));
                 } else if (p.equals("editor")){

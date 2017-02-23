@@ -17,23 +17,22 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * Created by Ga on 7/25/2016.
+ * Created by Ga on 7/25/2016. asd
  */
 public class PlayerInput implements Input {
-    private HashMap<Integer, Moveset> keyMap = new HashMap<Integer, Moveset>(){{
-        put(-1, Actions.Idle);
-        put(KeyEvent.VK_W, Actions.Interact);
-        put(KeyEvent.VK_A, Actions.WalkL);
-        put(KeyEvent.VK_S, Actions.Down);
-        put(KeyEvent.VK_D, Actions.Walk);
-        put(KeyEvent.VK_R, Actions.Wield);
-        put(1, Actions.Use);
-        put(KeyEvent.VK_UP, Actions.LookUp);
-        put(KeyEvent.VK_LEFT, Actions.LookLeft);
-        put(KeyEvent.VK_DOWN, Actions.LookDown);
-        put(KeyEvent.VK_RIGHT, Actions.LookRight);
-        put(KeyEvent.VK_SHIFT, Skills.Rest);
-        put(KeyEvent.VK_BACK_QUOTE, Actions.Recall);
+    private HashMap<Integer, String> keyMap = new HashMap<Integer, String>(){{
+        put(-1, Actions.Idle.getCodeName());
+        put(KeyEvent.VK_W, Skills.Jump.getCodeName());
+        put(KeyEvent.VK_A, Actions.WalkL.getCodeName());
+        put(KeyEvent.VK_S, Skills.Rest.getCodeName());
+        put(KeyEvent.VK_D, Actions.Walk.getCodeName());
+        put(KeyEvent.VK_R, Actions.Wield.getCodeName());
+        put(1, Actions.Use.getCodeName());
+        put(KeyEvent.VK_UP, Actions.LookUp.getCodeName());
+        put(KeyEvent.VK_LEFT, Actions.LookLeft.getCodeName());
+        put(KeyEvent.VK_DOWN, Actions.LookDown.getCodeName());
+        put(KeyEvent.VK_RIGHT, Actions.LookRight.getCodeName());
+        put(KeyEvent.VK_BACK_QUOTE, Actions.Recall.getCodeName());
     }};
     public Player host;
     public int moving = 0;
@@ -64,51 +63,55 @@ public class PlayerInput implements Input {
                 Map.Entry e = (Map.Entry) i.next();
                 if (e.getValue() == event) i.remove();
             }
-            keyMap.put(key, event);
+            keyMap.put(key, event.getCodeName());
         }
     }
     public String getMapping(Moveset move){
         String r = null;
-        for (Map.Entry<Integer, Moveset> i : keyMap.entrySet()) {
-            if (i.getValue() == move){
+        for (Map.Entry<Integer, String> i : keyMap.entrySet()) {
+            if (i.getValue().equals(move.getCodeName())){
                 r = Word.getKeyName(i.getKey());
             }
         }
         return r;
     }
     public void input(int mode, int x, int y){
+        x = (int) (x-host.pos.x);
+        y = (int) (y-host.pos.y);
         if (mode == KeyEvent.VK_ENTER) Display.chatbox.requestFocus();
         else if (mode == KeyEvent.VK_TAB) Display.menu.toggle();
-        else if (mode == 0) input("X",x,y);
+        else if (mode == 0) inputDirect(null,x,y);
         else if (keyMap.containsKey(mode)){
-            input(keyMap.get(mode).getCodeName(),x,y);
+            inputDirect(keyMap.get(mode),x,y);
         } else if (mode >= 49 && mode < 55) {
-            input("I"+(mode-49),x,y);
-        }
-    }
-    public void input(String p, int x, int y){
-        int tx = (int) (x-host.pos.x);
-        int ty = (int) (y-host.pos.y);
-        Global.server.sendFromLocal("IN>"+p + "@" + tx + "@" + ty);
-        inputDirect(p, tx, ty);
+            inputDirect("I"+(mode-49),x,y);
+        } else inputDirect("O"+mode+"", x, y);
+        //Global.server.sendFromLocal("IN>"+p + "@" + tx + "@" + ty);
     }
     public void inputDirect(String p, int x, int y){
-        String t = p.substring(1);
         host.target.set(x,y);
-        if (p.startsWith("A")){
-            if (t.equals("Idle")) moving = 0;
-            else if (t.equals("WalkL")){
-                moving = -1;
-                t = "Walk";
+        if (p != null) {
+            String t = p.substring(1);
+            if (p.startsWith("O")) {
+                if (t.equals(KeyEvent.VK_SPACE + "")) host.setState(Skills.Guard);
+            } else if (p.startsWith("I")) {
+                host.selectingItem = Integer.parseInt(t);
+                host.setState(Actions.Wield);
+            } else {
+                if (t.equals("Idle")) moving = 0;
+                else if (t.equals("WalkL")) {
+                    moving = -1;
+                    p = "AWalk";
+                } else if (t.equals("Walk")) moving = 1;
+                if (t.equals("Use")) {
+                    if (host.state == Skills.Rest) host.setState(Skills.Slash);
+                    else if (host.state == Actions.Walk) host.setState(Skills.Pierce);
+                    else if (host.state == Skills.Jump && host.delay.time > 32) host.stateSet(Skills.Airstrike);
+                } else if (t.equals("Jump") && host.state == Skills.Rest) host.setState(Skills.Leap);
+                else if (t.equals("Rest") && host.state == Actions.Walk) host.setState(Skills.Sprint);
+                Moveset move = SkillTree.getByCodeName(p);
+                if (move != null) host.setState(move);
             }
-            else if (t.equals("Walk")) moving = 1;
-            host.selectingItem = -1;
-            host.setState(Actions.getByName(t));
-        }
-        else if (p.startsWith("K")) host.setState(Skills.getByName(t));
-        else if (p.startsWith("I")){
-            host.selectingItem = Integer.parseInt(t);
-            host.setState(Actions.Wield);
         }
     }
     public void load(String p){
@@ -116,16 +119,16 @@ public class PlayerInput implements Input {
             String[] data = p.substring(1).split(";");
             for (String i : data) {
                 String[] pair = i.split(":");
-                Moveset move = SkillTree.getByName(pair[1]);
+                Moveset move = SkillTree.getByCodeName(pair[1]);
                 if (host.skillTree.hasSkill(move))
-                    keyMap.put(Integer.parseInt(pair[0]), move);
+                    keyMap.put(Integer.parseInt(pair[0]), move.getCodeName());
             }
         }
     }
     @Override
     public String toString(){
         String r = ";";
-        for (Map.Entry<Integer, Moveset> i : keyMap.entrySet()){
+        for (Map.Entry<Integer, String> i : keyMap.entrySet()){
             r += i.getKey()+":"+i.getValue()+";";
         }
         return r;

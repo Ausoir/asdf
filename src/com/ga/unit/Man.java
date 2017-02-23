@@ -5,12 +5,12 @@ import com.ga.map.Global;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
+import com.ga.unit.factory.Stock;
 import com.ga.unit.intelligence.Communication;
 import com.ga.unit.intelligence.MerchantIntelligence;
 import com.ga.unit.intelligence.UnitIntelligence;
 import com.ga.unit.item.ArmorSet;
 import com.ga.unit.item.Item;
-import com.ga.unit.item.ItemFactory;
 import com.ga.unit.skill.*;
 
 import java.awt.*;
@@ -23,13 +23,14 @@ import static com.ga.unit.skill.Skills.Underhand;
  * Created by Ga on 5/7/2016.
  */
 public class Man extends Unit {
-    private Item fist = ItemFactory.produce("Fist",0,0);
-    public Item weapon;
+    private Item fist = ((Item) Stock.getByName("Fist",0)).cancelAdd();
+    public Item weapon = fist;
     public ArmorSet armor;
     private String ground = "dirt";
+    public Line rope;
 
     public Man(String p){
-        super(p);
+        super(p.split("#")[0]);
         clip = new BodyHumanoid(this);
         final Man me = this;
         clip.organs[FIST].onAmputate = new Performer(){
@@ -41,10 +42,11 @@ public class Man extends Unit {
             }
         };
         speechType = faction.name().toLowerCase();
-        String[] t = p.split("@");
-        if (t[7].startsWith("Fist,")) setWeapon(fist);
-        else setWeapon(ItemFactory.load(t[7]));
-        armor = new ArmorSet(this, t[8]);
+        String[] t = p.split("#");
+        if (t[1].equals("")) setWeapon(fist);
+        else setWeapon((Item) Stock.get(t[1].split("@")));
+        Updater.cancelAdd(weapon);
+        armor = new ArmorSet(this, t[2]);
         if (faction == Faction.Merchant){
             brain = new MerchantIntelligence(this);
         } else if (faction != Faction.Player && faction != Faction.Player2) {
@@ -56,21 +58,13 @@ public class Man extends Unit {
     @Override
     public String toString(){
         String r = super.toString();
-        if (!r.equals("")){
-            r += "@"+weapon.toItemString()+"@"+armor.toItemString();
-        }
+        if (!r.equals("")) r += "#"+weapon.forceToString()+"#"+armor.toString();
         return r;
     }
 
     public void setWeapon(Item p){
-        if (p == null){
-            if (weapon != null) {
-                weapon.field();
-                weapon.remove();
-            }
-            p = fist;
-            p.setOrgan(clip.organs[FIST]);
-        }
+        if (p == null) p = fist;
+        if (weapon != fist) weapon.field();
         weapon = p;
         weapon.pos = pos;
         weapon.setOrgan(clip.organs[FIST]);
@@ -129,8 +123,11 @@ public class Man extends Unit {
                 case Duck:
                 case Sprint:
                 case Jump:
+                    speed = 0;
+                    break;
                 case Airstrike:
                     speed = 0;
+                    vel.y -= 20;
                     break;
                 case Guard:
                     weapon.rotation = target.getAtan()+(dir<0?-3.14f:0);
@@ -248,9 +245,8 @@ public class Man extends Unit {
         Line hitbox = weapon.getLine();
         hit = Updater.collide(this, hitbox, cleave);
         if (hit != null){
-            if (state == Underhand){
-                get("Stamina").add(4);
-            }
+            weapon.use(1);
+            if (state == Underhand) get("Stamina").add(4);
             if (brain != null) brain.attacked();
             if (stats.triggerEffect(Buffs.Empower)){
                 Particle.explode("Blood",hitbox.ptd,new P(),12,20,0,true,3);

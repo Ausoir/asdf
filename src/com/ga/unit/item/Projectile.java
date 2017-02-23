@@ -14,11 +14,11 @@ public class Projectile extends Matter {
     public int damage = 0;
     public EventTimer delay = new EventTimer(-1, false, null);
     public Projectile(String name, P pt, P dest, int speed) {
-        super(name, 0, pt, 10);
+        super(name, 0, 10);
+        pos = pt;
         save = false;
         vel.set(dest.getAtan(pt, speed));
         rotation = (float) Math.atan2(dest.y-pt.y,dest.x-pt.x);
-        gravity = true;
     }
     public int getDamage(){
         return damage;

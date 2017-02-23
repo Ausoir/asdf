@@ -12,19 +12,13 @@ import com.ga.unit.Unit;
 class Wander implements Task {
     private Unit host;
     private Timer tick;
-    private int[] base;
-    private int current;
-    protected Wander(Unit host, int[] base){
+    protected Wander(Unit host){
         this.host = host;
         tick = new Timer(2, true);
-        this.base = base;
-        current = Global.r.nextInt(3);
     }
 
     @Override
-    public void blocked() {
-//        if (host.dir == 1) base[current] = host.rand.nextInt((int) host.pos.x);
-//        else if (host.dir == -1) base[current] = host.rand.nextInt((int) (Global.map.size.x-host.pos.x))+(int) host.pos.x;
+    public void blocked(boolean fall) {
         host.face(-host.dir);
         host.setState(Actions.Walk);
         tick.set(30);
@@ -33,12 +27,10 @@ class Wander implements Task {
     public void update(){
         if (tick.update()) {
             int dir = Global.r.nextInt(3);
-            if (host.rand.nextFloat() < .3f) current = dir;
-            if (dir == 0) host.setState(Actions.Idle);
-            else if (dir == 1) host.setState(Actions.Walk);
-            else if (dir >= 2) {
-                host.face(new P(base[current],0));
-                host.setState(Actions.Walk);
+            if (dir == 1) host.setState(Actions.Walk);
+            else {
+                host.face(dir-1);
+                host.setState(Actions.Idle);
             }
             tick.set(Global.r.nextInt(25)+1);
         }

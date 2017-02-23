@@ -1,5 +1,8 @@
 package com.ga.unit.intelligence;
 
+import com.ga.map.Global;
+import com.ga.tool.Line;
+import com.ga.unit.Man;
 import com.ga.unit.Matter;
 import com.ga.unit.Unit;
 import com.ga.unit.skill.Actions;
@@ -8,12 +11,13 @@ import com.ga.unit.skill.Actions;
  * Created by Ga on 7/30/2016.
  */
 public class UnitIntelligence extends Intelligence {
-    private Unit leader;
+    protected Unit leader;
     private int charisma;
+    private int travel = -1; //top left:1, top right:2, bottom left:3, bottom right:4
     public UnitIntelligence(Unit man){
         super(man);
         charisma = host.rand.nextInt(7);
-        leader = host;
+        leader = null;
     }
     protected void perceived(Matter p){
         if (p instanceof Unit) {
@@ -24,22 +28,24 @@ public class UnitIntelligence extends Intelligence {
                     host.say("@c tgt");
                     setTaskEcho(new Hunt(host));
                 }
-            } else if (host.faction == p.faction && host.name.equals(unit.name)){
+            } else if (host.faction == p.faction){
                 if (leader == null && ((UnitIntelligence)unit.brain).charisma > charisma) {
                     ((UnitIntelligence)unit.brain).charisma--;
                     leader = unit;
+                    setTaskEcho(new Follow(host, leader));
                 }
             }
         }
     }
     @Override
     protected void defaultTask(){
-        if (leader == null || leader == host) super.defaultTask();
-        else if (leader.state == Actions.Dead){
+        if (leader == null || leader == host){
+            if (travel == -1) super.defaultTask();
+            else setTaskEcho(new Travel(host, travel));
+        } else if (leader.state == Actions.Dead){
             leader = null;
         } else {
-            target = leader;
-            setTaskEcho(new Follow(host, target));
+            setTaskEcho(new Follow(host, leader));
         }
     }
     public void update(){

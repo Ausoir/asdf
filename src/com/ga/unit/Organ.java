@@ -5,7 +5,6 @@ import com.ga.map.Picture;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
-import com.ga.unit.item.FlyingOrgan;
 import com.ga.unit.item.Projectile;
 
 import java.awt.*;
@@ -42,8 +41,7 @@ public class Organ extends Line {
     }
     public void setImage(String p, int index){
         image = new Picture(p, index);
-        image.size.x = strokeSize;
-        image.size.y = 0;
+        image.setSize(strokeSize, 0);
         setShader();
     }
     protected void setShader(){
@@ -54,7 +52,7 @@ public class Organ extends Line {
     }
     public void setSize(int size){
         this.strokeSize = size;
-        if (type != 0 && image != null) image.size.x = size;
+        if (type != 0 && image != null) image.getSize().x = size;
     }
     public void draw(Graphics2D g){
         image.draw(g, host.pos.x+pt.x, host.pos.y+pt.y, getAtan()-1.57f, host.dir, strokeSize, getLength()+3);
@@ -64,7 +62,7 @@ public class Organ extends Line {
         if (health <= 0 && (type == DamageType.Cut || type == DamageType.Burn)) {
             if (type == DamageType.Cut){
                 if (image != null) {
-                    new Projectile(null, host.pos, p.ptd.getAdd(0, -15), 30) {
+                    new Projectile(null, host.pos, p.getAtan(10).add(p.ptd), 20) {
                         public void update() {
                             float length = getLength() * .45f;
                             if (tangible) {

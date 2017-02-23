@@ -1,52 +1,69 @@
-package com.ga.game;
+package com.ga.map;
 
-import com.ga.map.*;
+import com.ga.game.Display;
+import com.ga.game.FileManager;
+import com.ga.game.Input;
 import com.ga.tool.Line;
 import com.ga.tool.P;
-import com.ga.unit.*;
+import com.ga.unit.Matter;
+import com.ga.unit.Player;
+import com.ga.unit.Thing;
+import com.ga.unit.Updater;
+import com.ga.unit.factory.Stock;
+import com.ga.unit.item.Item;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 
-class EditorInput implements Input, Updatable, Drawable {
+public class EditorInput implements Input, Updatable, Drawable {
     private enum Tool {
-        NONE, CREATE, DELETE, REMOVE, MAN, UNIT, OBJECT
+        NONE, CREATE, DELETE, REMOVE, OBJECT
+    }
+    private enum CreateTool {
+        LINE, RECTANGLE
     }
     private String cunit = "Player";
-    private String texture = "Dirt";
+    private String texture = null;
+    private String auxTexture = null;
     private boolean control = false;
     private boolean shift = false;
     private boolean lmb = false;
     private P lmbP = new P();
     private ArrayList<Line> history = new ArrayList<>();
-    private HashMap<Line, Integer> lineConnection = new HashMap<>();
+    private ArrayList<Line> lineConnection = new ArrayList<>();
     private Line current = new Line(0, 0, 0, 0);
     private Thing currentU = new Thing(null);
     private boolean connected = false;
     private Tool tool = Tool.NONE;
+    private CreateTool subtool = CreateTool.LINE;
     private P v = new P();
     private int speed = 50;
-    private String map = "Map";
+    private String map;
     private boolean placingTp = false;
+    private boolean reverse = false;
     private int nextPolygon = 0;
     private Color landColor = Color.pink;
+    private boolean polygonReady = false;
 
-    protected EditorInput() {
+    public EditorInput() {
         Display.input = this;
         Updater.add(this);
         if (Global.camera == null) Global.camera = new P();
         else Global.camera = new P(Global.camera);
         scanPolygon();
         Global.margin = -36;
-        new Line(0,36,Global.map.size.x,36);
+        map = Global.player.host.cmap;
     }
 
     private void scanPolygon(){
+        int high = -1;
         for (Line i : Global.map.land){
-            if (i.next != -1) nextPolygon = i.next+1;
+            if (i.next > high){
+                high = i.next;
+                nextPolygon = i.next+1;
+            }
         }
     }
 
@@ -57,6 +74,7 @@ class EditorInput implements Input, Updatable, Drawable {
 
     private void remove(Line p) {
         Global.map.land.remove(p);
+        Global.map.formTextures.put(p.next, null);
         history.remove(p);
     }
 
@@ -85,10 +103,15 @@ class EditorInput implements Input, Updatable, Drawable {
             Global.p("Level Teleporter: "+current.opt);
         } else if (p.startsWith("size")){
             String[] size = p.substring(5).split("x");
-            Global.map.map.image.size.set(Integer.parseInt(size[0]), Integer.parseInt(size[1]));
+            Global.map.map.image.setSize(Integer.parseInt(size[0]), Integer.parseInt(size[1]));
+        } else if (p.equals("reverse")){
+            reverse = true;
+        } else if (p.equals("unreverse")){
+            reverse = false;
         } else if (p.equals("green")){
             landColor = Color.green;
         } else if (p.equals("pink")){
+            map = Updater.changeMap;
             landColor = Color.pink;
         } else if (p.equals("white")){
             landColor = Color.white;
@@ -99,6 +122,8 @@ class EditorInput implements Input, Updatable, Drawable {
         } else if (p.equals("margin")) {
             if (Global.margin == 0) Global.margin = -36;
             else Global.margin = 0;
+        } else if (p.startsWith("pp")) {
+            auxTexture = p.substring(2);
         } else if (p.startsWith("tx")) {
             texture = p.substring(2);
         } else if (p.equals("render")){
@@ -109,11 +134,12 @@ class EditorInput implements Input, Updatable, Drawable {
             save("map/"+p.substring(5));
         } else if (p.startsWith("load")){
             Updater.changeMap = p.substring(5);
-            map = Updater.changeMap;
             Updater.changeMap(true);
             Display.input = this;
             Updater.add(this);
             Global.camera = new P(Global.camera);
+            map = p.substring(5);
+            scanPolygon();
         } else {
             try {
                 cunit = p;
@@ -125,25 +151,39 @@ class EditorInput implements Input, Updatable, Drawable {
         }
     }
 
-    private void makePolygon(Line p){
-        Line i = p;
-        ArrayList<Line> result = new ArrayList<>();
-        while (lineConnection.get(i) != null){
-            result.add(i);
-            i = Global.map.land.get(lineConnection.get(i));
-            if (i == p) {
-                for (Line ii : result){
-                    ii.next = nextPolygon;
-                    lineConnection.remove(ii);
-                }
-                nextPolygon++;
-                return;
+    private void reverse(int p){
+        for (int i = 0; i < Global.map.land.size(); i++) {
+            Line l = Global.map.land.get(i);
+            if (l.next == p){
+                P t = l.pt;
+                l.pt = l.ptd;
+                l.ptd = t;
             }
         }
     }
 
+    private void makePolygon(P orig, Line p){
+        for (int i = 0; i < Global.map.land.size(); i++) {
+            Line l = Global.map.land.get(i);
+            if (p.ptd.x == l.pt.x && p.ptd.y == l.pt.y){
+                lineConnection.add(p);
+                Global.map.formTextures.remove(l.next);
+                p.next = nextPolygon;
+                Global.map.land.remove(i);
+                if (l.pt != orig) makePolygon(orig, l);
+                else{
+                    Global.map.land.addAll(lineConnection);
+                    lineConnection.clear();
+                }
+                break;
+            }
+        }
+        scanPolygon();
+    }
+
     @Override
     public void input(int mode, int x, int y) {
+        polygonReady = false;
         if (mode < 0) v.set(0, 0);
         if (current != null){
             if (shift) {
@@ -155,14 +195,12 @@ class EditorInput implements Input, Updatable, Drawable {
                         if (Math.abs(l.pt.x - x) < snapThreshold && Math.abs(l.pt.y - y) < snapThreshold) {
                             x = (int) l.pt.x;
                             y = (int) l.pt.y;
-                            lineConnection.put(current, i);
                             snap = true;
-                            if (connected) makePolygon(current);
+                            polygonReady = true;
                             break;
                         } else if (Math.abs(l.ptd.x - x) < snapThreshold && Math.abs(l.ptd.y - y) < snapThreshold) {
                             x = (int) l.ptd.x;
                             y = (int) l.ptd.y;
-                            lineConnection.put(current, i);
                             snap = true;
                             break;
                         }
@@ -182,7 +220,7 @@ class EditorInput implements Input, Updatable, Drawable {
                     if (connected) {
                         current.ptd.set(x, y);
                     }
-                } else if (tool == Tool.MAN || tool == Tool.UNIT || tool == Tool.OBJECT) {
+                } else if (tool == Tool.OBJECT) {
                     currentU.pos.set(x, y);
                 } else if (tool == Tool.REMOVE && lmb){
                     ArrayList<Matter> matters = Updater.collide(new P(x,y),100);
@@ -198,8 +236,23 @@ class EditorInput implements Input, Updatable, Drawable {
                 lmbP = new P(x,y);
                 if (tool == Tool.CREATE) {
                     if (connected) {
-                        current.ptd = new P(x, y);
-                        lineConnection.put(Global.map.land.get(Global.map.land.size()-1), Global.map.land.size());
+                        if (subtool == CreateTool.LINE) {
+                            current.ptd = new P(x, y);
+                            if (polygonReady) {
+                                polygonReady = false;
+                                makePolygon(current.pt, current);
+                            }
+                        } else if (subtool == CreateTool.RECTANGLE){
+                            subtool = CreateTool.LINE;
+                            Line t = new Line(current.pt.x, current.pt.y, x, current.pt.y);
+                            Global.map.land.add(t);
+                            Global.map.land.add(new Line(x, current.pt.y, x, y));
+                            Global.map.land.add(new Line(x, y, current.pt.x, y));
+                            Global.map.land.add(new Line(current.pt.x, y, current.pt.x, current.pt.y));
+                            Global.map.land.remove(current);
+                            makePolygon(t.pt, t);
+                            break;
+                        }
                     }
                     current = new Line(x, y, x, y);
                     if (placingTp){
@@ -208,12 +261,8 @@ class EditorInput implements Input, Updatable, Drawable {
                     }
                     add(current);
                     connected = true;
-                } else if (tool == Tool.MAN) {
-                    currentU = makeMan(cunit, new P(x, y));
-                } else if (tool == Tool.UNIT) {
-                    currentU = makeUnit(cunit, new P(x, y));
                 } else if (tool == Tool.OBJECT) {
-                    currentU = makeObject(cunit, new P(x, y));
+                    currentU = make(cunit, new P(x, y));
                 }
                 break;
             case -1:
@@ -223,6 +272,7 @@ class EditorInput implements Input, Updatable, Drawable {
                     while (it.hasNext()){
                         i = (Line) it.next();
                         if (i.lineCross(new Line(new P(x,y),lmbP))){
+                            Global.map.formTextures.remove(i.next);
                             it.remove();
                         }
                     }
@@ -232,12 +282,27 @@ class EditorInput implements Input, Updatable, Drawable {
                     while (it.hasNext()){
                         i = (Line) it.next();
                         if (i.lineCross(new Line(new P(x,y),lmbP))){
-                            Global.p(i.toString()+" slope:"+i.getSlope()+" "+(i.clockwise()?"clockwise":"counterclockwise"));
-                            if (!texture.equals("") && i.next != -1) Global.map.formTextures.put(i.next, texture);
+                            if (auxTexture != null){
+                                String[] aux = auxTexture.split("@");
+                                for (int ii=0;ii<Integer.parseInt(aux[0]);ii++) Global.map.placeProp(i, aux[1]);
+                                auxTexture = null;
+                            } else if (texture != null) {
+                                if (texture.equals("copy")) texture = Global.map.formTextures.get(i.next);
+                                else if (i.next != -1) Global.map.formTextures.put(i.next, texture);
+                                texture = null;
+                            }
+                            if (reverse){
+                                reverse(i.next);
+                                reverse = false;
+                            }
+                            Global.p(i.toString()+" slope:"+i.getSlope()+" "+(i.clockwise()?"cw":"cc")+" "+Global.map.formTextures.get(i.next));
                         }
                     }
                 }
                 lmb = false;
+                break;
+            case KeyEvent.VK_R:
+                subtool = CreateTool.RECTANGLE;
                 break;
             case KeyEvent.VK_Z:
                 Global.p("Undo");
@@ -266,19 +331,9 @@ class EditorInput implements Input, Updatable, Drawable {
                 if (!shift) selectTool(Tool.REMOVE);
                 break;
             case KeyEvent.VK_5:
-                if (!shift) selectTool(Tool.MAN);
-                currentU.remove();
-                currentU = makeMan(cunit, new P(x, y));
-                break;
-            case KeyEvent.VK_6:
-                if (!shift) selectTool(Tool.UNIT);
-                currentU.remove();
-                currentU = makeUnit(cunit, new P(x, y));
-                break;
-            case KeyEvent.VK_7:
                 if (!shift) selectTool(Tool.OBJECT);
                 currentU.remove();
-                currentU = makeObject(cunit, new P(x, y));
+                currentU = make(cunit, new P(x, y));
                 break;
             case KeyEvent.VK_W:
                 setSpeed(0,-1);
@@ -329,25 +384,18 @@ class EditorInput implements Input, Updatable, Drawable {
                 break;
         }
     }
-    private Matter makeObject(String name, P p){
-        Matter r;
-        int seed = 10*Global.map.magnify;
+    private Matter make(String name, P p){
+        int seed = -1;
         if (name.contains(":")){
             seed = Integer.parseInt(name.split(":")[1]);
             name = name.substring(0,name.indexOf(":"));
         }
-        r = ObjectFactory.produce(name, p, seed);
-        return r;
-    }
-    private Matter makeUnit(String name, P p){
-        Unit r;
-        r = BeastFactory.produce(name, p, -1);
-        return r;
-    }
-    private Matter makeMan(String name, P p){
-        Unit r;
-        r = ManFactory.produce(name, p, -1);
+        Matter r = Stock.getByName(name, seed);
+        if (r instanceof Item){
+            ((Item) r).field();
+        }
         if (name.equals("Player")) r = new Player(r.toString().substring(4));
+        r.pos = p;
         return r;
     }
     private void setSpeed(int x, int y){

@@ -17,8 +17,8 @@ public class Follow implements Task {
     }
 
     @Override
-    public void blocked() {
-        host.say("Follow blocked!");
+    public void blocked(boolean fall) {
+        ((UnitIntelligence)host.brain).leader = null;
     }
 
     public void update() {
@@ -27,6 +27,7 @@ public class Follow implements Task {
         host.face(target.pos);
         int absX = Math.abs(x);
         if (absX > 160) {
+            host.face(x>0?1:-1);
             host.setState(Actions.Walk);
         } else if (absX < 40) host.setState(Actions.Idle);
     }

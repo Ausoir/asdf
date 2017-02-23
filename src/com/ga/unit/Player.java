@@ -8,10 +8,11 @@ import com.ga.tool.Performer;
 import com.ga.unit.intelligence.PlayerInput;
 import com.ga.unit.item.Inventory;
 import com.ga.unit.item.Item;
-import com.ga.unit.skill.*;
+import com.ga.unit.skill.Actions;
+import com.ga.unit.skill.Moveset;
+import com.ga.unit.skill.Skills;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import static com.ga.unit.BodyHumanoid.FIST;
 
@@ -19,17 +20,15 @@ import static com.ga.unit.BodyHumanoid.FIST;
  * Created by Ga on 7/30/2016.
  */
 public class Player extends Man {
-    private HashMap<Moveset, int[]> cooldown = new HashMap<>();
     protected String memorized = "";
     public int gold;
     public Inventory inventory;
     public SkillTree skillTree = new SkillTree();
     public int selectingItem = -1;
-    public Line rope;
     public PlayerInput input;
     public String cmap;
     public Player(String p) {
-        super(p);
+        super(p.substring(1));
         speechType = "p";
         inventory = new Inventory(this);
         armor.onChange = new Performer(){
@@ -48,9 +47,12 @@ public class Player extends Man {
            skillTree.advanceSkill(p, cd);
     }
     public void setWeapon(Item p){
-        Sound.play("wield");
-        if (p == null || sheathe()) super.setWeapon(p);
-        else{
+        if (p == null){
+            super.setWeapon(p);
+        } else if (sheathe()){
+            Sound.play("wield");
+            super.setWeapon(p);
+        } else{
             dropItem(weapon);
             super.setWeapon(p);
         }
@@ -59,7 +61,6 @@ public class Player extends Man {
         if (wieldingNone()) return true;
         if (inventory.sheathe(weapon)){
             weapon.remove();
-            setWeapon(null);
             return true;
         }
         return false;
@@ -74,40 +75,34 @@ public class Player extends Man {
         } else return;
         say("Dropping " + p.getFullName());
     }
+    @Override
     protected int[] getCooldown(Moveset state){
         int level = skillTree.getSkillCdLevel(state);
         int reduction;
         if (level == 0) reduction = 0;
         else {
             float cd = state.getCooldown() * (float) (1f / (Math.pow(2, level)));
-            reduction = (int) ((state.getCooldown() - cd)) - level;
+            reduction = (int) (state.getCooldown() - cd) - level;
         }
-        int[] r = cooldown.get(state);
-        if (r == null) r = new int[]{0};
+        int[] r = super.getCooldown(state);
         return new int[]{r[0]-reduction};
     }
     @Override
     public int setState(Moveset state){
-        int[] cdinput = getCooldown(state);
-        int prevCd = cdinput[0];
-        int r;
-        if (Global.cooldown(cdinput, state.getCooldown())) {
-            cooldown.put(state, cdinput);
-            r = super.setState(state);
-            if (r != 0){
-                cooldown.put(state, new int[]{prevCd});
-                if (r == 2) {
-                    int req = (int) state.getCost();
-                    req += getStatPenalty();
-                    if (req > get("Stamina").getMax()) say("This skill is beyond my abilities!");
-                    else say("I'm too exhausted!");
-                }
+        int r = super.setState(state);
+        if (r != 0){
+            if (r == 2) {
+                int req = (int) state.getCost();
+                req += getStatPenalty();
+                if (req > get("Stamina").getMax()) say("This skill is beyond my abilities!");
+                else say("I'm too exhausted!");
+            } else if (r == 3){
+                say(state.getName() + " is available in " + Global.checkCooldown(getCooldown(state), state.getCooldown()) + " seconds!");
+            } else if (r == 4){
+                say("Cannot cast!");
             }
-            return r;
-        } else {
-            say(state.getName() + " is available in " + Global.checkCooldown(cdinput, state.getCooldown()) + " seconds!");
-            return 3;
         }
+        return r;
     }
     @Override
     public void stateSet(Moveset state){
@@ -125,7 +120,7 @@ public class Player extends Man {
                     if (!get("Stamina").isFull()) clip.setState(Actions.Exhausted);
                     break;
                 case Use:
-                    if (weapon.uses.get() == 0) say("This item is no longer usable...");
+                    if (weapon.uses.get() == 0) say("Can't use "+weapon.getDisplayName());
                     break;
                 case Interact:
                     P reach = pos.getAdd(clip.organs[FIST].ptd);
@@ -136,14 +131,21 @@ public class Player extends Man {
                             break;
                         }
                     }
-                    for (Line i : Global.map.land) {
+                    for (final Line i : Global.map.land) {
                         if (i.opt == 1) {
                             if (i.lineCross(new Line(reach.x, reach.y, reach.x + (24 * dir), reach.y))) {
-                                delay.set(0);
-                                pos.x = i.pt.x-(24*dir);
-                                setState(Actions.Climb);
-                                input.moving = 0;
-                                rope = i;
+                                clip.setState(Skills.Guard);
+                                delay.set(40);
+                                final int firstDir = dir;
+                                delay.performer = new Performer() {
+                                    public void perform() {
+                                        pos.x = i.pt.x - (24 * dir);
+                                        setState(Actions.Climb);
+                                        dir = firstDir;
+                                        input.moving = 0;
+                                        rope = i;
+                                    }
+                                };
                             }
                         }
                     }
@@ -221,6 +223,11 @@ public class Player extends Man {
         if (input.moving == 0 && state == Actions.Walk){
             setState(Actions.Idle);
         } else if (state == Actions.Walk) vel.x = getSpeed()*input.moving;
+        else if (input.moving != 0 && state == Actions.Climb) {
+            jump = true;
+            vel.x = getSpeed()*input.moving;
+            stateSet(Skills.Jump);
+        }
     }
     public String toCharacterString(){
         String r = super.toString()+"\n";

@@ -13,6 +13,7 @@ import java.util.Random;
  * Created by Ga on 8/12/2016.
  */
 public class Matter extends Thing implements Updatable {
+    public int factoryId = -1;
     public int seed = 0;
     public Random rand;
     public boolean gravity = false;
@@ -24,8 +25,8 @@ public class Matter extends Thing implements Updatable {
     public Matter(){
         super(null);
     }
-    public Matter(String name, int seed, P pt, int depth) {
-        super(name, pt, depth);
+    public Matter(String name, int seed, int depth) {
+        super(name, depth);
         if (seed == -1) this.seed = Global.getSeed();
         else this.seed = seed;
         rand = new Random(this.seed);
@@ -79,16 +80,10 @@ public class Matter extends Thing implements Updatable {
                             vel.set(0, 0);
                             return;
                         } else if (!cc && lineY >= pos.y) {
-                            if (Math.abs(slope) > Line.MAXSLOPE) {
-                                vel.set(0, 0);
-                                return;
-                            }
-                            if (vel.x != 0) {
-                                float slopeSpeed = vel.x + (Global.sin((float) Math.atan(slope)) * Math.abs(vel.x));
-                                vel.x = vel.x > 0 ? Global.clamp(slopeSpeed, 1f, maxX)
-                                        : Global.clamp(slopeSpeed, maxX, -1f);
-                            }
-                            vel.y += (i.pt.y + (slope * (pos.x + vel.x - i.pt.x))) - (pos.y + vel.y) - 1;
+                            float slopeSpeed = vel.x + (Global.sin((float) Math.atan(slope)) * Math.abs(vel.x));
+                            vel.x = vel.x > 0 ? Math.min(slopeSpeed, maxX)
+                                    : Math.max(slopeSpeed, maxX);
+                            if (!Double.isInfinite(slope)) vel.y += (i.pt.y + (slope * (pos.x + vel.x - i.pt.x))) - (pos.y + vel.y) - 1;
                             collided = true;
                         }
                     }
@@ -104,17 +99,16 @@ public class Matter extends Thing implements Updatable {
     public void onCollide(Line l){
     }
     public P getPoint(){
-        return pos.getAdd(image.size.x*.5f*Global.cos(rotation)*dir,(int) (image.size.x*.5f*Global.sin(rotation))*dir);
+        float x = image.getSize().x*.5f*dir;
+        return pos.getAdd(x*Global.cos(rotation),x*Global.sin(rotation));
     }
     @Override
     public void update(){
         int edge = Global.mapEdge(pos.getAdd(vel));
-        if (edge > 1) {
-            if (edge % 3 == 0) vel.x = 0;
-            if (edge % 2 == 0){
-                if (gravity && pos.y+vel.y >= Global.map.size.y) remove();
-                vel.y = 0;
-            }
+        if (edge % 2 == 0) vel.x = 0;
+        else if (edge % 3 == 0) {
+            if (gravity && pos.y + vel.y >= Global.map.size.y) remove();
+            vel.y = 0;
         }
         collide();
         pos.add(vel);
@@ -126,6 +120,6 @@ public class Matter extends Thing implements Updatable {
     @Override
     public String toString(){
         if (!save) return "";
-        return name + "@" + seed + "@" + pos;
+        return (factoryId==-1?"!"+name:""+factoryId) + "@" + seed + "@" + pos;
     }
 }

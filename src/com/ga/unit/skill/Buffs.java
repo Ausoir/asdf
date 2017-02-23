@@ -15,11 +15,6 @@ public enum Buffs {
     Rejuvenate(null, hostEffect(), 100, "Stamina",.5f,"Stamina"),
     Empower(null, weaponEffect(1), 80, "Proficiency",10),
     Cleave(null, weaponEffect(2), 300),
-    Slow(null, new Spell(){
-        public void perform(Unit host, int level){
-            Particle.implode("Glare", host.pos.getAdd(0,-25), new P(), 1, 10, 1, false, 6);
-        }
-    }, 50, "Speed", -.5f, "Speed"),
     Evade(null, new Spell(){
         @Override
         public void perform(Unit host, int level){
@@ -32,14 +27,25 @@ public enum Buffs {
             Particle.frozen(host.pos);
         }
     }, 50, "Speed",-1,"Speed"),
+    Slow(null, new Spell(){
+        public void perform(Unit host, int level){
+            Particle.implode("Glare", host.pos.getAdd(0,-25), new P(), 1, 10, 1, false, 6);
+        }
+    }, 50, "Speed", -.5f, "Speed"),
+    Exhaust(null, new Spell(){
+        @Override
+        public void perform(Unit host, int level){
+            host.get("Stamina").add(-level);
+        }
+    }, 100),
     Poison(null, new Spell(){
         private int tick = 1;
         @Override
         public void perform(Unit host, int level){
             tick--;
             if (tick == 0) {
-                host.get("Health").add(-level-1);
-                tick = 30-level;
+                host.get("Health").add(-level);
+                tick = Math.max(1,30-(level*2));
 //                if (host.get("Health").get() == 1) return true;
             }
         }
@@ -117,10 +123,8 @@ public enum Buffs {
     Stun(sound("stun"), new Spell(){
         @Override
         public void perform(Unit host, int level){
-            host.delay.set(0);
-            host.jump = true;
-            host.setState(Actions.Hit);
-            host.delay.set(5);
+            host.delay.set(150);
+            host.clip.setSpeed(999);
             Particle.implode("Glare", host.pos.getAdd(0,-25), new P(), 1, 10, 1, false, 6);
         }
     }, 150);

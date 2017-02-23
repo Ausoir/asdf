@@ -1,7 +1,7 @@
 package com.ga.unit.item;
 
-import com.ga.game.*;
 import com.ga.game.Dialog;
+import com.ga.game.Sound;
 import com.ga.map.Global;
 import com.ga.tool.Interactive;
 import com.ga.tool.Line;
@@ -18,10 +18,10 @@ import java.util.Random;
 public class Item extends Matter {
     public enum Tag{
         Sword(Skills.Swing, DamageType.Cut, "swing_knife", "hit_cut"), Spear(Skills.Pierce, DamageType.Cut, "swing_silent", "hit_bloody"), Mace(Skills.Swing, DamageType.Bash, "swing_silent", "hit_bash"),
-        Dagger(Skills.Stab, DamageType.Cut, "swing_normal", "hit_bloody"), Armor(Skills.Rest, DamageType.Push, "swing_normal"), Scroll(Skills.Guard, DamageType.Push, "scroll"),
-        Rapier(Skills.Underhand, DamageType.Cut, "swing_silent", "hit_cut"), Shoot(Skills.Shoot, DamageType.Cut, "swing_normal"), Snipe(Skills.Snipe, DamageType.Cut, "swing_normal"), Throwing(Skills.Throw, DamageType.Cut, "swing_normal"),
-        Darting(Skills.Dart, DamageType.Cut, "swing_normal"), Consumable(Actions.Consume, DamageType.Push, "swing_normal"), Claw(Skills.Swing, DamageType.Cut, "swing_normal"),
-        Enchant(Actions.Buff, DamageType.Push, "swing_normal");
+        Dagger(Skills.Pierce, DamageType.Cut, "swing_normal", "hit_bloody"), Armor(Skills.Rest, DamageType.Push, "swing_normal"), Scroll(Skills.Guard, DamageType.Push, "scroll"),
+        Rapier(Skills.Pierce, DamageType.Cut, "swing_silent", "hit_cut"), Shoot(Skills.Shoot, DamageType.Cut, "swing_normal"), Snipe(Skills.Snipe, DamageType.Cut, "swing_normal"), Throwing(Skills.Throw, DamageType.Cut, "swing_normal"),
+        Darting(Skills.Dart, DamageType.Cut, "swing_normal"), Consumable(Actions.Consume, DamageType.Push, "drink"), Claw(Skills.Swing, DamageType.Cut, "swing_normal"),
+        Enchant(Actions.Buff, DamageType.Push, "swing_normal"), Food(Actions.Consume, DamageType.Push, "eat");
         private Moveset action;
         private DamageType type;
         private String sound, soundHit = "hit_punch";
@@ -108,25 +108,26 @@ public class Item extends Matter {
             else return None;
         }
     }
-    AdverbMod admod = AdverbMod.None;
+    public AdverbMod admod = AdverbMod.None;
     AdenchantMod ademod;
     SpecialtyMod smod;
     PrefixMod pmod;
-    Spells emod = null;
+    public Spells emod = null;
     public int weight;
     protected int cooldown = 100;
     public int delay = 0;
-    protected float probability;
+    public float probability;
     public Moveset action = Skills.Swing;
     public int[] lastused = new int[]{0};
     public Stat uses = new Stat(1);
-    private Tag type = Tag.Consumable;
+    private Tag type = Tag.Sword;
     private Organ organ = null;
     public int speed = 0;
     public int damage = 1;
     public Item(String name, int seed, int weight, int uses, int cooldown, float enchantRatio) {
-        super(name, seed, new P(), 8);
+        super(name, seed, 8);
         this.name = name;
+        randomSize();
         this.weight = weight;
         this.uses.setTotal(uses);
         this.cooldown = cooldown;
@@ -149,7 +150,17 @@ public class Item extends Matter {
                 }
             }
         };
-        Updater.cancelAdd(this);
+    }
+    private void randomSize(){
+        P s = image.getSize();
+        image.setSize(s.x * (rand.nextFloat() * .6f + .7f), s.y * (rand.nextFloat() * .6f + .7f));
+    }
+    public void setImage(String p){
+        super.setImage(p);
+        if (rand != null) randomSize();
+    }
+    public void loadAdmod(String p){
+        admod = AdverbMod.load(p);
     }
     public void setType(Tag p){
         this.type = p;
@@ -160,8 +171,13 @@ public class Item extends Matter {
         return type;
     }
     public void setOrgan(Organ p){
-        if (p == null) save = true;
-        else save = false;
+        if (p == null){
+            save = true;
+            pos = pos.getAdd(0,0);
+        } else {
+            save = false;
+            Updater.remove(this);
+        }
         this.organ = p;
     }
     public Organ getOrgan() {
@@ -298,7 +314,7 @@ public class Item extends Matter {
             Curse.get(host, 5);
         }
     }
-    protected boolean canUse(){
+    public boolean canUse(){
         if (uses.get() != 0 && Global.checkCooldown(lastused, cooldown)<= 0) {
             return true;
         }
@@ -307,11 +323,17 @@ public class Item extends Matter {
     protected void playSound(){
         Sound.play(type.getSound());
     }
+    public boolean use(int p){
+        if (canUse()){
+            if (uses.get() != -1) uses.add(-p);
+            return true;
+        }
+        return false;
+    }
     public boolean use(Man host){
-        if (canUse()) {
+        if (use(1)) {
             playSound();
             Global.cooldown(lastused, cooldown);
-            if (uses.get() != -1) uses.add(-1);
             host.setState(action);
             if (emod != null && rand.nextFloat() < probability){
                 emod.getEvent().perform(host, ademod.level*3);
@@ -327,16 +349,23 @@ public class Item extends Matter {
         field();
         rotation = (float)Global.r.nextInt(628)/100;
     }
+    public Item cancelAdd(){
+        Updater.cancelAdd(this);
+        return this;
+    }
     public void remove(){
         if (organ != null) {
             ((Man) organ.host).setWeapon(null);
             setOrgan(null);
         }
+        Updater.cancelAdd(this);
         super.remove();
     }
     public void field(){
-        Updater.add(this);
-        setOrgan(null);
+        if (organ != null) {
+            Updater.add(this);
+            setOrgan(null);
+        }
     }
     public String getSound(){
         return type.getSound();
@@ -361,7 +390,8 @@ public class Item extends Matter {
     @Override
     public P getPoint(){
         P result = pos.getAdd(organ.ptd);
-        result.add(image.size.x*.5f*Global.cos(rotation)*dir,(int) (image.size.x*.5f*Global.sin(rotation))*dir);
+        float x = image.getSize().x*.5f*dir;
+        result.add(x*Global.cos(rotation),(int) (x*Global.sin(rotation)));
         return result;
     }
     public int getDamage() {
@@ -375,13 +405,21 @@ public class Item extends Matter {
         P t = pos.getAdd(organ==null?new P():organ.ptd);
         image.draw(g, t.x, t.y, rotation, dir);
     }
+    public String forceToString(){
+        boolean forced = false;
+        if (!save){
+            forced = true;
+            save = true;
+        }
+        String r = toString();
+        if (forced) save = false;
+        return r;
+    }
     @Override
     public String toString(){
-        if (save) return "]]"+toItemString()+"/"+pos+"/"+String.format(java.util.Locale.US,"%.2f", rotation);;
-        return "";
-    }
-    public String toItemString(){
-        return name + "," + seed + "," + uses + "," + admod;
+        String t = super.toString();
+        if (!t.equals("")) t += "@"+uses+"@"+admod+"@"+String.format(java.util.Locale.US,"%.2f", rotation);
+        return t;
     }
     public void update(){
         if (organ == null) super.update();

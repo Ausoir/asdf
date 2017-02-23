@@ -18,7 +18,7 @@ class Hunt implements Task {
     }
 
     @Override
-    public void blocked() {
+    public void blocked(boolean fall) {
         host.brain.forget.time = 5;
         host.vel.x = host.getSpeed()*host.dir;
         host.setState(Skills.Jump);
@@ -34,7 +34,7 @@ class Hunt implements Task {
         if (host.isExhausted()){
             if (host.rand.nextFloat() < .1f) host.get("Stamina").heal();
             host.setState(Skills.Rest);
-        } else if (dist < 600) {
+        } else if (dist < 1000) {
             int t = host.performMoveset((int) dist);
             host.target = target.pos.getSubtract(host.pos).add(0, -15);
 

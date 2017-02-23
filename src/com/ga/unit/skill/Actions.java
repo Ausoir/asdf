@@ -1,5 +1,6 @@
 package com.ga.unit.skill;
 
+import com.ga.unit.Man;
 import com.ga.unit.Player;
 import com.ga.unit.Unit;
 
@@ -17,10 +18,9 @@ public enum Actions implements Moveset {
         }
     }, Climb{
         public void update(Unit p, int level){
-            Player player = (Player)p;
-            if (player.input.moving != 0 || player.clip.organs[0].ptd.y + p.pos.y < player.rope.pt.y){
+            if (p.clip.organs[0].ptd.y + p.pos.y < ((Man)p).rope.pt.y){
                 p.jump = true;
-                p.vel.x = p.getSpeed()*(player.input.moving == 0?player.dir:player.input.moving);
+                p.vel.x = p.getSpeed()*p.dir;
                 p.stateSet(Skills.Jump);
             } else p.vel.y = -p.getSpeed();
         }
@@ -43,9 +43,6 @@ public enum Actions implements Moveset {
     }
     public String getCodeName(){
         return "A"+name();
-    }
-    public boolean isLooker(){
-        return this == LookUp || this == LookLeft || this == LookDown || this == LookRight;
     }
 
     public float getCost() {

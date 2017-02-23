@@ -21,8 +21,8 @@ public class Stats {
     private ArrayList<int[]> effectLevels = new ArrayList<>();
     private ArrayList<Spell> effectEffects = new ArrayList<>();
     private HashMap<String, Stat> stats = new HashMap<>();
-    private Timer timer = new Timer(100, true);
-    private Timer bloodTimer = new Timer(-1, true);
+    private Timer timer = new Timer(150, true);
+    Timer bloodTimer = new Timer(-1, true);
     private Unit host;
     public Stats(Unit host){
         this.host = host;
@@ -100,8 +100,8 @@ public class Stats {
     }
     public boolean rest(int mag){
         if (timer.update(mag)){
-            stats.get("Stamina").add(3);
-            return stats.get("Stamina").isFull();
+            stats.get("Stamina").heal();
+            return true;
         }
         return false;
     }
@@ -120,13 +120,6 @@ public class Stats {
         for (int i=0;i<data.length;i++){
             String[] pair = data[i].split(":");
             Stat newstat = new Stat(pair[1]);
-            if (pair[0].equals("Health")) newstat = new Stat(pair[1]){
-                public void onChange(){
-                    if (isFull()) bloodTimer.set(-1);
-                    else bloodTimer.set((int) (getPercentage()*getPercentage()*100)+1, true);
-                    if (current <= 0) host.die();
-                }
-            };
             newstat.add(0);
             stats.put(pair[0], newstat);
         }

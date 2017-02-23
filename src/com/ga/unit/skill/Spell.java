@@ -1,6 +1,5 @@
 package com.ga.unit.skill;
 
-import com.ga.map.Global;
 import com.ga.unit.Unit;
 
 /**

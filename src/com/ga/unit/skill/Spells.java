@@ -31,7 +31,8 @@ public enum Spells implements Moveset {
     Frenzy(Actions.Buff, 40, 5, 240, false, "Frenzy grants you a burst of immense power. [20*Level Stamina]", new Spell(){
         @Override
         public void perform(Unit host, int level){
-            host.get("Stamina").add(20*level,true);
+            host.get("Stamina").add(20+(20*level),true);
+            host.stats.addEffect(Buffs.Exhaust, 2);
         }
     }),
     Haste(Actions.Conjure, 25,2,100,false, Dialog.get("mvsDscHaste"),produceBuff(Buffs.Haste)),
@@ -249,6 +250,7 @@ public enum Spells implements Moveset {
                 }
             };
             host.setVisible(false);
+            p.gravity = true;
             p.faction = host.faction;
             p.damage = 15+host.get("Proficiency").get();
             p.delay.set(50);
@@ -284,6 +286,7 @@ public enum Spells implements Moveset {
                     Sound.play("explosion_small");
                 }
             };
+            p.gravity = true;
             p.faction = host.faction;
             p.damage = 15+host.get("Proficiency").get();
             p.delay.set(2);
@@ -428,6 +431,7 @@ public enum Spells implements Moveset {
 
     @Override
     public void update(Unit host, int level){
+        host.face(host.target.x > 0 ? 1 : -1);
         spell.perform(host, level);
         if (!channel || (Global.r.nextInt(Math.max(0,40-(cost*2))) == 0 && !host.get("Stamina").require(1+host.getStatPenalty()))) host.setState(Actions.Idle);
     }

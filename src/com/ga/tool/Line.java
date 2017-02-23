@@ -12,7 +12,7 @@ public class Line {
     public P pt;
     public P ptd;
     public int next = -1;
-    public int opt = 0; //0:normal,1:ceiling,2:tp,3:rope
+    public int opt = 0; //0:normal,1:rope,2:tp,100:ftp,200:manual tp
     public Line(){
         pt = new P();
         ptd = new P();

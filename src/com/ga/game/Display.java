@@ -17,9 +17,11 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
     public static MenuDialog menuDialog;
     public static Menu menu;
     public static MenuShop menuShop;
+    public static MenuMap menuMap;
     private int mode = 0;
     private int mX = 0;
     private int mY = 0;
+    public static boolean focus = true;
     public Display() {
         Global.display = this;
         setLayout(null);
@@ -33,6 +35,7 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
                 menuDialog.resize();
                 menu.resize();
                 menuShop.resize();
+                menuMap.resize();
                 chatbox.setBounds(0,Settings.screenY-40,500,40);
             }
         });
@@ -62,6 +65,8 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
         add(menu);
         menuShop = new MenuShop();
         add(menuShop);
+        menuMap = new MenuMap();
+        add(menuMap);
         Global.weather = new Weather();
         new Timer(25, new ActionListener() {
             @Override
@@ -73,9 +78,10 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
     }
 
     public static void addMenus(){
-        Updater.add(menuDialog);
         Updater.add(menu);
+        Updater.add(menuDialog);
         Updater.add(menuShop);
+        Updater.add(menuMap);
     }
 
     private void chat(){
@@ -92,10 +98,12 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
     }
 
     private void input(int mode){
-        if (this.mode != mode || mode <= 0 || Updater.editor) {
-            this.mode = mode;
-            if (input != null)
-                input.input(mode, (int) (mX-Settings.centerX+Global.camera.x), (int) (mY-Settings.centerY+Global.camera.y));
+        if (focus) {
+            if (this.mode != mode || mode <= 0 || Updater.editor) {
+                this.mode = mode;
+                if (input != null)
+                    input.input(mode, (int) (mX - Settings.centerX + Global.camera.x), (int) (mY - Settings.centerY + Global.camera.y));
+            }
         }
     }
 

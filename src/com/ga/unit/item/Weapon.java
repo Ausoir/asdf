@@ -60,13 +60,17 @@ public class Weapon extends Item {
         damageSide = new Die(num, sides);
     }
     @Override
-    protected void playSound(){
-    }
     public boolean use(Man host){
         if (canUse()) {
-            return super.use(host);
+            playSound();
+            Global.cooldown(lastused, cooldown);
+            host.setState(action);
+            return true;
         }
         return false;
+    }
+    @Override
+    protected void playSound(){
     }
     public String getDescription(){
         String r = super.getDescription();

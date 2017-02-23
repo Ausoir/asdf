@@ -14,7 +14,7 @@ public class Armor extends Item {
     private float armor = 0;
     private float armorMod = 1;
     public int encumberance = 0;
-    protected int pocket = 0;
+    public int pocket = 0;
     public Armor(String name, int seed, int weight, int uses, float armor, int encumberance, int piece) {
         super(name, seed, weight, uses, 100, .04f);
         setType(Tag.Armor);
@@ -83,7 +83,7 @@ public class Armor extends Item {
         return r + " This armor decreases damage by "+getArmor()+" points.";
     }
     @Override
-    public String toItemString(){
-        return super.toItemString()+","+piece;
+    public String toString(){
+        return super.toString()+"@"+piece;
     }
 }

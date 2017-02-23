@@ -1,6 +1,8 @@
 package com.ga.unit.item;
 
 import com.ga.unit.Player;
+import com.ga.unit.Updater;
+import com.ga.unit.factory.Stock;
 
 import java.util.ArrayList;
 
@@ -56,16 +58,23 @@ public class Inventory {
         if (p.equals(";")) return;
         String[] data = p.substring(1).split(";");
         for (int i=0;i<data.length;i++){
-            Item item = ItemFactory.load(data[i]);
+            Item item = (Item) Stock.get(data[i].split("@"));
             weight += item.weight;
+            Updater.cancelAdd(item);
             items.add(item);
+        }
+    }
+    public void onMapChange(){
+        for (int i=0;i<items.size();i++){
+            Item t = items.get(i);
+            if (t instanceof Food) ((Food) t).onMapChange();
         }
     }
     public String toString(){
         String r = ";";
         for (int i = 0; i < items.size(); i++) {
             Item item = items.get(i);
-            r += item.toItemString()+";";
+            r += item.toString()+";";
         }
         return r;
     }

@@ -1,5 +1,7 @@
 package com.ga.unit.skill;
 
+import com.ga.tool.Performer;
+
 /**
  * Created by Ga on 8/1/2016.
  */
@@ -7,6 +9,7 @@ public class Stat {
     private int max;
     protected int current;
     public int reserve = 0;
+    public Performer onChange;
     public Stat(String p){
         String[] t = p.split(",");
         if (t.length == 1){
@@ -73,6 +76,7 @@ public class Stat {
         return current;
     }
     public void onChange(){
+        if (onChange != null) onChange.perform();
     }
     public String toString(){
         return current+","+max;

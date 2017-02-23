@@ -70,13 +70,15 @@ public class Global {
     }
     public static int mapEdge(P p){
         int result = 1;
-        if (p.x != clamp(p.x, 0, Global.map.size.x)) result += 2;
-        if (p.y != clamp(p.y, 0, Global.map.size.y)) result *= 2;
+        if (p.x < 0) result = 2;
+        else if (p.x > Global.map.size.x) result = 4;
+        if (p.y < 0) result = 3;
+        else if (p.y > Global.map.size.y) result = 9;
         return result;
     }
     public static void mapEdgeCenter(P p){
-        p.set(clamp(p.x, Settings.centerX+margin, Global.map.size.x-Settings.centerX-margin-margin),
-                clamp(p.y, Settings.centerY+margin, Global.map.size.y-Settings.centerY-margin-margin));
+        p.set(clamp(p.x, Settings.centerX+margin, Global.map.size.x-Settings.centerX-margin),
+                clamp(p.y, Settings.centerY+40+margin, Global.map.size.y-Settings.centerY-margin-margin));
     }
     public static int checkCooldown(int[] p, int cd){
         return cd-(time[0]-p[0]);
@@ -96,5 +98,12 @@ public class Global {
     }
     public static int[] getTime(){
         return time;
+    }
+    public static void nextHour(){
+        setHour(gameHour+1);
+    }
+    public static void setHour(int p){
+        gameHour = p;
+        weather.setColor();
     }
 }

@@ -4,7 +4,7 @@ package com.ga.unit.intelligence;
  * Created by Ga on 7/30/2016.
  */
 public interface Task {
-    void blocked();
+    void blocked(boolean fall);
     void update();
     int getAlertness();
 }

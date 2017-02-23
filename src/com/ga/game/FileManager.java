@@ -1,15 +1,12 @@
 package com.ga.game;
 
-import com.ga.map.BeastFactory;
 import com.ga.map.Global;
 import com.ga.map.Map;
-import com.ga.map.ObjectFactory;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.unit.*;
+import com.ga.unit.factory.Stock;
 import com.ga.unit.intelligence.PlayerInput;
-import com.ga.unit.item.Item;
-import com.ga.unit.item.ItemFactory;
 import com.ga.unit.skill.Actions;
 
 import java.io.BufferedReader;
@@ -69,33 +66,28 @@ public class FileManager {
 //        System.out.println(result);
         return result;
     }
-    static void loadFirst(boolean editor){
+    static void loadFirst(){
         readMap(Global.player.host.cmap,0);
         Global.mapEdgeCenter(Global.cameraTo = Global.player.host.pos.getAdd(0,0));
-        if (editor){
-            new EditorInput();
-        }
     }
     public static PlayerInput loadPlayer(boolean main, String dir){
         String data = read("map/"+dir);
         String[] line = data.split("%");
         PlayerInput pi;
-        String playerString = line[0].split("]")[1];
+        String playerString = line[0];
         pi = new PlayerInput(main ? new MainPlayer(playerString) : new Player(playerString));
         pi.host.load(data);
         pi.host.id = -Integer.parseInt(dir)-1;
         pi.load(line[2]);
-        Global.setTime(Integer.parseInt(line[1].split(";")[3]));
-        Global.gameHour = Integer.parseInt(line[1].split(";")[4]);
         return pi;
     }
     public static P readMap(String dir, int player) {
         P r = null;
         String data = read("map/"+dir+".map");
         String[] line = data.split("%");
-        P mapPos = new P();
         String[] names = line[0].split(",");
-        Global.map = new Map(names, mapPos);
+        Map oldmap = Global.map;
+        Global.map = new Map(names);
 
         if (line.length > 1) {
             String[] sections = line[1].split(";");
@@ -117,25 +109,11 @@ public class FileManager {
                     sections = line[3].split(";");
                     if (sections.length > 0) {
                         for (int section = 0; section < sections.length; section++) {
-                            String[] unit = sections[section].split("]");
-                            if (unit.length == 1) { //object
-                                String[] type = unit[0].split("@");
-                                if (type[0].equals("PlayerSpawn")) {
-                                    if (player == 0) r = new P(type[2]);
-                                    player--;
-                                }
-                                ObjectFactory.produce(type[0], new P(type[2]), Integer.parseInt(type[1]));
-                            } else if (unit.length == 2){ //unit
-                                int id = Integer.parseInt(unit[1].split("@")[3]);
-                                if (id >= Updater.id) Updater.id = id + 1;
-                                if (unit[0].equals("Man")) new Man(unit[1]);
-                                else BeastFactory.produce(unit[1]);
-                            } else if (!Global.map.event.regrowth){ //item
-                                String[] t = unit[2].split("/");
-                                Item item = ItemFactory.load(t[0]);
-                                item.pos = new P(t[1]);
-                                item.rotation = Float.parseFloat(t[2]);
-                                item.field();
+                            String[] property = sections[section].split("@");
+                            Matter object = Stock.get(property);
+                            if (object instanceof Matter && object.name.equals("PlayerSpawn")){
+                                if (player == 0) r = new P(property[2]);
+                                player--;
                             }
                         }
                     }
@@ -144,10 +122,7 @@ public class FileManager {
         }
         Global.map.setTexture();
         Global.map.setShader();
-        if (Global.map.event.regrowth){
-            Global.map.event.regrowth = false;
-            Global.map.generateProps();
-        }
+        Global.map.event.onChange(oldmap);
         if (r == null){
             System.out.println("Invalid Player Spawn Location");
             r = new P(Settings.centerX, Settings.centerY);

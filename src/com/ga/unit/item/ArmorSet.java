@@ -1,10 +1,10 @@
 package com.ga.unit.item;
 
-import com.ga.game.Sound;
 import com.ga.tool.Performer;
 import com.ga.unit.Man;
 import com.ga.unit.Organ;
-import com.ga.unit.Player;
+import com.ga.unit.Updater;
+import com.ga.unit.factory.Stock;
 
 /**
  * Created by Ga on 1/15/2017.
@@ -12,12 +12,12 @@ import com.ga.unit.Player;
 public class ArmorSet {
     private Man host;
     protected static Armor[] bare = new Armor[]{
-        new Armor("Underwear", 0, 0, -1, 0, 0, 0),
-        new Armor("Underwear", 0, 0, -1, 0, 0, 1),
-        new Armor("Underwear", 0, 0, -1, 0, 0, 2),
-        new Armor("Underwear", 0, 0, -1, 0, 0, 3),
-        new Armor("Underwear", 0, 0, -1, 0, 0, 4),
-        new Armor("Head", 0, 0, -1, 0, 0, 5)
+            (Armor) new Armor("Underwear", 0, 0, -1, 0, 0, 0).cancelAdd(),
+            (Armor) new Armor("Underwear", 0, 0, -1, 0, 0, 1).cancelAdd(),
+            (Armor) new Armor("Underwear", 0, 0, -1, 0, 0, 2).cancelAdd(),
+            (Armor) new Armor("Underwear", 0, 0, -1, 0, 0, 3).cancelAdd(),
+            (Armor) new Armor("Underwear", 0, 0, -1, 0, 0, 4).cancelAdd(),
+            (Armor) new Armor("Head", 0, 0, -1, 0, 0, 5).cancelAdd()
     };
     public Armor[] armor;
     private Organ[] organs;
@@ -83,13 +83,14 @@ public class ArmorSet {
         String[] armors = p.split("&");
         for (int i=0;i<armor.length;i++){
             if (armors[i].equals("None")) armor[i] = bare[i];
-            else armor[i] = (Armor) ItemFactory.load(armors[i]);
+            else armor[i] = (Armor) ((Item) Stock.get(armors[i].split("@"))).cancelAdd();
         }
     }
-    public String toItemString(){
+    @Override
+    public String toString(){
         String r = "";
         for (int i=0;i<armor.length;i++){
-            if (armor[i] != bare[i]) r += armor[i].toItemString()+"&";
+            if (armor[i] != bare[i]) r += armor[i].toString()+"&";
             else r += "None&";
         }
         return r.substring(0,r.length()-1);

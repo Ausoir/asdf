@@ -18,7 +18,7 @@ public class Picture extends Texture {
     }
     private Picture(BufferedImage image){
         super(image);
-        sizeRadius = (int) size.getMult(.5f,.5f).getDist();
+        setSize(size.x,size.y);
     }
     public Picture(String name){
         this(load(name));
@@ -34,6 +34,10 @@ public class Picture extends Texture {
     }
     public BufferedImage getImage(){
         return image;
+    }
+    public void setSize(float x, float y){
+        size = new P(x,y);
+        sizeRadius = (int) size.getMult(.5f,.5f).getDist();
     }
     public void draw(Graphics2D g, float x, float y, float rot, int dir, float sizeX, float sizeY){
         if (visible) {

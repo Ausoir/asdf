@@ -13,7 +13,7 @@ public class Idle implements Task {
     }
 
     @Override
-    public void blocked() {
+    public void blocked(boolean fall) {
 
     }
 

@@ -1,6 +1,7 @@
 package com.ga.game;
 
 import com.ga.connection.Server;
+import com.ga.map.EditorInput;
 import com.ga.map.Global;
 import com.ga.map.Picture;
 import com.ga.tool.Clips;
@@ -30,7 +31,8 @@ public class Game extends JFrame {
         JPanel display = new Display();
         Global.server = new Server();
         Global.server.start();
-        FileManager.loadFirst(editor);
+        FileManager.loadFirst();
+        if (editor) new EditorInput();
         add(display);
         setVisible(true);
         setExtendedState( getExtendedState()|JFrame.MAXIMIZED_BOTH );

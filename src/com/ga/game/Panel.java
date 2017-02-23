@@ -37,6 +37,11 @@ public class Panel extends JPanel implements Updatable {
         int y = Settings.centerY-(size.height/2);
         setBounds(x,y, size.width, size.height);
     }
+    public void setVisible(boolean p){
+        if (!p) Display.focus = true;
+        else Display.focus = false;
+        super.setVisible(p);
+    }
     @Override
     public void update() {
         if (isVisible()) {

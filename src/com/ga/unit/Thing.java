@@ -26,6 +26,7 @@ public class Thing implements Drawable, Observer {
         } else {
             image = new Picture();
             image.visible = false;
+            image.setSize(0,0);
         }
         pos = new P();
     }
@@ -35,10 +36,9 @@ public class Thing implements Drawable, Observer {
     public void rotate(P p){
         rotation = ((float) Math.atan2(p.y,p.x));
     }
-    public Thing(String name, P pt, int depth){
+    public Thing(String name, int depth){
         this(name);
         this.depth = depth;
-        pos = pt;
         Updater.add(this);
     }
     public boolean isFacing(P p){

@@ -15,7 +15,7 @@ import java.util.HashMap;
 public abstract class Texture {
     public BufferedImage image;
     public boolean visible = true;
-    public P size;
+    protected P size;
     protected static int transparentColor = new Color(0,0,0,0).getRGB();
     protected static HashMap<String,BufferedImage> cache = new HashMap<>();
     protected static HashMap<String,String> directory = new HashMap<>();
@@ -31,6 +31,9 @@ public abstract class Texture {
     public void set(BufferedImage image){
         this.image = image;
         size = new P(image.getWidth(), image.getHeight());
+    }
+    public P getSize(){
+        return size;
     }
     public static BufferedImage load(String dir){
         BufferedImage image = cache.get(dir);
@@ -83,5 +86,6 @@ public abstract class Texture {
         cache.put("Drop",getTexture(load("Icon"),24,24,0,0));
         cache.put("Buy",getTexture(load("Icon"),24,24,1,0));
         cache.put("Describe",getTexture(load("Icon"),24,24,2,0));
+        cache.put("POI",getTexture(load("Icon"),24,24,3,0));
     }
 }

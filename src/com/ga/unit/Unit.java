@@ -22,6 +22,7 @@ import java.util.Map;
 public class Unit extends Matter {
     public int[] rangeZone = new int[]{-5};
     public HashMap<Integer, Moveset[]> moveset = new HashMap<>();
+    protected HashMap<Moveset, int[]> cooldown = new HashMap<>();
     public int id;
     public Body clip;
     public Moveset state = Actions.Idle;
@@ -36,13 +37,27 @@ public class Unit extends Matter {
     public int stateLevel = 1;
 
     public Unit(String p) {
-        super(null,Integer.parseInt(p.split("@")[1]),new P(p.split("@")[2]),10);
-        name = p.split("@")[0];
+        super(null,Integer.parseInt(p.split("@")[1]),10);
         String[] t = p.split("@");
+        name = t[0];
+        pos.load(t[2]);
         id = Integer.parseInt(t[3]);
         stats.load(t[4]);
+        final Stat health = get("Health");
+        health.onChange = new Performer(){
+            public void perform(){
+                if (health.isFull()) stats.bloodTimer.set(-1);
+                else stats.bloodTimer.set((int) (health.getPercentage()*health.getPercentage()*100)+1, true);
+                if (health.get() <= 0) die();
+            }
+        };
         faction = Faction.valueOf(t[5]);
-        String[] rangeMoves = t[6].split("/");
+        loadMoveset(t[6]);
+        gravity = true;
+    }
+
+    public void loadMoveset(String p){
+        String[] rangeMoves = p.split("/");
         String[] ranges = rangeMoves[0].split(",");
         String[] moveZones = rangeMoves[1].split("&");
         rangeZone = new int[ranges.length];
@@ -55,7 +70,6 @@ public class Unit extends Matter {
             }
             this.moveset.put(i, movesets);
         }
-        gravity = true;
     }
 
     private Moveset getMoveset(String p){
@@ -113,17 +127,30 @@ public class Unit extends Matter {
     public boolean isExhausted(){
         return false;
     }
+    protected int[] getCooldown(Moveset state) {
+        int[] r = cooldown.get(state);
+        if (r == null) r = new int[]{0};
+        return r;
+    }
     public int setState(Moveset state) {
         if (delay.over() && jump && this.state != state) {
             face(target.x > 0 ? 1 : -1);
             float req = state.getCost();
             if (req != -1) req += getStatPenalty();
-            if (get("Stamina").require((int) req)) {
-                if (state != Actions.Idle) delay.performer = null;
-                if (state instanceof Spells && !castable()) return 4;
-                stateSet(state);
-                return 0; //fine
-            } else return 2; //no stamina
+            int[] cdinput = getCooldown(state);
+            int prevCd = cdinput[0];
+            if (Global.cooldown(cdinput, state.getCooldown())) {
+                cooldown.put(state, cdinput);
+                if (get("Stamina").require((int) req)) {
+                    if (state != Actions.Idle) delay.performer = null;
+                    if (state instanceof Spells && !castable()) return 4;
+                    stateSet(state);
+                    return 0; //fine
+                } else {
+                    cooldown.put(state, new int[]{prevCd});
+                    return 2; //no stamina
+                }
+            } else return 3; //cooldown
         }
         return 1; //delay
     }
@@ -144,7 +171,7 @@ public class Unit extends Matter {
         if (state instanceof Actions || state instanceof Skills) {
             if (state instanceof Skills){
                 vel.x *= ((Skills)state).getVelX();
-                if (state == Skills.Jump || state == Skills.Airstrike){
+                if (state == Skills.Jump){
                     Sound.play("jump");
                     vel.y -= 40 + (stateLevel * 2);
                 }
@@ -320,7 +347,7 @@ public class Unit extends Matter {
     @Override
     public String toString(){
         if (state == Actions.Dead || !save) return "";
-        String r = getClass().getSimpleName()+"]"+super.toString()+"@"+id;
+        String r = super.toString()+"@"+id;
         r += "@"+stats.toString()+"@"+faction.name()+"@";
         for (int i:rangeZone) r += i+",";
         r = r.substring(0,r.length()-1)+"/";

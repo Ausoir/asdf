@@ -20,32 +20,27 @@ import java.util.ArrayList;
 public abstract class Intelligence implements Observer {
     protected Unit host;
     protected Timer forget = new Timer(500, true);
-    private ArrayList<Matter> seen;
+    private ArrayList<Unit> seen;
     public Unit target;
     private Task task;
     protected Communication comm;
-    private int[] base;
     private int alertness = 0;
     public int range = 150;
     public Intelligence(Unit man){
         host = man;
-        base = new int[]{host.rand.nextInt((int) Global.map.size.x),
-            host.rand.nextInt((int) Global.map.size.x),
-            host.rand.nextInt((int) Global.map.size.x)};
         task = new Idle(host);
         forget.time = 1;
         Updater.add(this);
     }
     protected void defaultTask(){
-        setTaskEcho(new Wander(host, base));
+        setTaskEcho(new Wander(host));
     }
     public void update(){
         if (forget.update()){
             target = null;
             defaultTask();
         } else {
-            if (host.state == Actions.Walk && blocked(host.dir)) task.blocked();
-            else task.update();
+            if (host.state != Actions.Walk || !blocked(host.dir)) task.update();
         }
         if (alertness < 1) perceive();
     }
@@ -89,22 +84,34 @@ public abstract class Intelligence implements Observer {
             }
         }
     }
-    protected boolean blocked(int dir){
-        P front = host.pos.getAdd((host.getSpeed()*3+24)*dir,0);
-        Line pp = new Line(host.pos,front);
-        Line pp2 = new Line(front.getAdd(0,-40),front.getAdd(0,40));
+    private boolean blocked(int dir){
+        boolean blocked = false;
         boolean fall = true;
-        for (Line i : Global.map.land){
-            if (i.isLand()) {
-                if (i.lineCross(pp) && Math.abs(i.getSlope()) > Line.MAXSLOPE) {
-                    return true;
-                }
-                if (i.lineCross(pp2)) {
-                    fall = false;
+        P front = host.pos.getAdd((host.getSpeed()*3+48)*dir,0);
+        int edge = Global.mapEdge(front);
+        if (edge > 1 && Global.mapEdge(front) % 3 == 0) blocked = true;
+        else {
+            Line pp = new Line(host.pos, front);
+            Line pp2 = new Line(front.getAdd(0, -40), front.getAdd(0, 40));
+            for (Line i : Global.map.land) {
+                if (i.isLand()) {
+                    if (i.lineCross(pp) && (Math.abs(i.getSlope()) > Line.MAXSLOPE || !i.clockwise())) {
+                        blocked = true;
+                    }
+                    if (i.lineCross(pp2)) {
+                        fall = false;
+                    }
                 }
             }
         }
-        return fall;
+        if (blocked){
+            task.blocked(false);
+            return true;
+        } else if (fall){
+            task.blocked(true);
+            return true;
+        }
+        return false;
     }
     public void hear(Matter u, String p){
         if (alertness < 1) {
@@ -124,7 +131,7 @@ public abstract class Intelligence implements Observer {
     }
     protected void perceive(){
         seen = Updater.perceive(host, host.pos.getAdd(host.dir<0?-range:range,0), range*2);
-        for (Matter t : seen) {
+        for (Unit t : seen) {
             if (target != t) {
                 perceived(t);
             } else if (target.state == Actions.Dead) forget.time = 0;

@@ -18,7 +18,7 @@ public class Flee implements Task {
     }
 
     @Override
-    public void blocked() {
+    public void blocked(boolean fall) {
         if (host.rand.nextFloat() < .5f) host.setState(Skills.Jump);
         else host.setState(Actions.Down);
     }

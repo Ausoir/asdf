@@ -1,10 +1,10 @@
 package com.ga.unit.skill;
 
 import com.ga.map.Global;
-import com.ga.map.ManFactory;
 import com.ga.tool.P;
 import com.ga.unit.Man;
 import com.ga.unit.Unit;
+import com.ga.unit.factory.Stock;
 
 /**
  * Created by Ga on 9/4/2016.
@@ -17,7 +17,8 @@ public enum Curse {
     }),
     Shadowcurse(new Spell(){
         public void perform(Unit host, int level) {
-            Man t = ManFactory.produce("Phantom",new P(host.pos.x, host.pos.y - 300),0);
+            Man t = (Man) Stock.getByName("Phantom",-1);
+            t.pos = new P(host.pos.x, host.pos.y - 300);
             Spells.Shadowtwin.getEvent().perform(t, level);
             t.remove();
         }

@@ -11,6 +11,7 @@ import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.tool.Timer;
 import com.ga.unit.intelligence.Intelligence;
+import com.ga.unit.item.Item;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -48,6 +49,8 @@ public class Updater {
         matter.clear();
         Global.map.clear();
         Display.addMenus();
+        add(Global.server);
+        add(Global.weather);
     }
     public static int getId(){
         return id++;
@@ -55,12 +58,11 @@ public class Updater {
     public static void changeMap(boolean editor){
         clear();
         if (!editor) {
-            Global.gameHour++;
             addQueue.add(Global.player.host);
             Global.player.host.cmap = changeMap;
             Global.player.host.pos.set(FileManager.readMap(changeMap, changeMapPos));
             Global.mapEdgeCenter(Global.cameraTo = Global.player.host.pos.getAdd(0,0));
-            Global.player.host.reset();
+            ((MainPlayer) Global.player.host).onMapChange();
             Display.input = Global.player;
             if (changeMapEvent != null){
                 changeMapEvent.perform();
@@ -143,6 +145,16 @@ public class Updater {
         }
         drawee.add(p);
     }
+    public static void regrowth(){
+        int size = addQueue.size();
+        for (int i=size-1;i>=0;i--){
+            Observer t = addQueue.get(i);
+            if (t instanceof Item || (t instanceof Unit && !(t instanceof Player))){
+                addQueue.remove(t);
+                drawee.remove(t); //drawee already added through thread gap
+            }
+        }
+    }
     public static String toMapString(){
         String result = "";
         for (Matter i : matter){
@@ -205,10 +217,10 @@ public class Updater {
         }
         return result;
     }
-    public static ArrayList<Matter> perceive(Unit host, P vision, int r){
-        ArrayList<Matter> seen = new ArrayList<>();
+    public static ArrayList<Unit> perceive(Unit host, P vision, int r){
+        ArrayList<Unit> seen = new ArrayList<>();
         int max = r;
-        for (Matter i : matter){
+        for (Unit i : colidee){
             if (host != i) {
                 float x = Math.abs(i.pos.x-vision.x), y = Math.abs(i.pos.y - vision.y);
                 if (x < r && y < r/3) {

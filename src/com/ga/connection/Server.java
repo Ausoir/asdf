@@ -107,6 +107,7 @@ public class Server implements Updatable {
                         }
                         entry[0] = "Data/map/Server.map";
                         tcp.download(t, entry);
+                        Global.cprocess.stop();
                         Updater.changeMap = "Server";
                         Updater.changeMapPos = 0;
                         Updater.changeMapEvent = new Performer() {
@@ -115,7 +116,6 @@ public class Server implements Updatable {
                                     PlayerInput pi = FileManager.loadPlayer(false, "" + i);
                                     clientControllers.put(i, pi);
                                 }
-                                Global.cprocess.stop();
                             }
                         };
                         Global.player.host.id = -clientSize - 1;

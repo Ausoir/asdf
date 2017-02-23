@@ -6,13 +6,13 @@ import com.ga.unit.skill.*;
 import java.util.ArrayList;
 
 /**
- * Created by Ga on 8/30/2016.
+ * Created by Ga on 8/30/2016. qweqwe
  */
 public class SkillTree {
     private ArrayList<Moveset> skills = new ArrayList<>();
     private ArrayList<Stat> skillCdLevels = new ArrayList<>();
     private ArrayList<Stat> skillLevels = new ArrayList<>();
-    public SkillTree(){}
+    SkillTree(){}
     public void load(String p){
         if (p.equals(";")) return;
         String[] data = p.substring(1).split(";");
@@ -70,6 +70,15 @@ public class SkillTree {
         if (move == null) move = Actions.getByName(p);
         if (move == null) move = Skills.getByName(p);
         if (move == null) System.out.println("Can't find spell "+p);
+        return move;
+    }
+    public static Moveset getByCodeName(String p){
+        Moveset move = null;
+        String t = p.substring(1);
+        if (p.startsWith("A")) move = Actions.getByName(t);
+        if (p.startsWith("K")) move = Skills.getByName(t);
+        if (p.startsWith("M")) move = Spells.getByName(t);
+        if (move == null) System.out.println("Can't find spell "+p+" by code name "+p);
         return move;
     }
     @Override

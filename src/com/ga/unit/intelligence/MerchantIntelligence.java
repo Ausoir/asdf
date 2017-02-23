@@ -7,8 +7,8 @@ import com.ga.tool.Timer;
 import com.ga.unit.Man;
 import com.ga.unit.Matter;
 import com.ga.unit.Unit;
+import com.ga.unit.factory.Stock;
 import com.ga.unit.item.Item;
-import com.ga.unit.item.ItemFactory;
 
 import static com.ga.game.Display.menuShop;
 
@@ -54,7 +54,7 @@ public class MerchantIntelligence extends Intelligence {
         price = new int[length];
         action = new Performer[length];
         for (int i = 0; i < length; i++) {
-            Item item = ItemFactory.produce(items[i], -1, 0);
+            Item item = (Item) Stock.get(new String[]{items[i]+"", "-1"});
             int value = fluctuate(item.getValue());
             product[i] = item;
             price[i] = value;

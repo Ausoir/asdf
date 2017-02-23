@@ -23,9 +23,9 @@ public enum Skills implements Moveset {
         }
     }, null),
     Duck(18,-1,0,6,Dialog.get("mvsDscDuck"),null,null),
-    Guard(23,-1,0,0,Dialog.get("mvsDscGuard"),null,null),
+    Guard(8,-1,0,0,Dialog.get("mvsDscGuard"),null,null),
     Lunge(0,-1,0,0,Dialog.get("mvsDscLunge"),null,basic()),
-    Pierce(25,1,2.5f,0,"A piercing attack that attacks while keeping momentum. Velocity is added to the damage.",null,basic()),
+    Pierce(25,1,1.5f,0,"A piercing attack that attacks while keeping momentum. Velocity is added to the damage.",null,basic()),
     Swing(25,1,0,0,Dialog.get("mvsDscSwing"),new Spell(){
         public void perform(Unit host, int level){
             if (host.delay.time <= 25 && host.delay.time > 12) {
@@ -50,7 +50,7 @@ public enum Skills implements Moveset {
             }
         }
     }, null),
-    Kick(3,-1,1,1, Dialog.get("mvsDscKick"),null,new Spell(){
+    Kick(3,-1,1,2, Dialog.get("mvsDscKick"),null,new Spell(){
         public void perform(Unit host, int lvl){
             boolean man = host instanceof Man;
             if (man) Sound.play("swing_normal");
@@ -69,7 +69,7 @@ public enum Skills implements Moveset {
             }
         }
     }),
-    Sidekick(18,-1,1,1,Dialog.get("mvsDscSidekick"),null,new Spell(){
+    Sidekick(18,0,1,2,Dialog.get("mvsDscSidekick"),null,new Spell(){
         public void perform(Unit host, int lvl){
             boolean man = host instanceof Man;
             if (man) Sound.play("swing_silent");
@@ -93,13 +93,13 @@ public enum Skills implements Moveset {
             if (host.delay.time < 36) {
                 Man t = (Man) host;
                 t.weapon.rotation = host.delay.time * -t.weapon.dir;
+                host.attack();
             }
         }
     }, new Spell() {
         @Override
         public void perform(Unit host, int level) {
             if (host.delay.time % 4 == 0) host.attackSound();
-            host.attack();
         }
     }),
     Stab(40,2,0,24,Dialog.get("mvsDscStab"),null,basic()),
@@ -125,28 +125,31 @@ public enum Skills implements Moveset {
             host.attack();
         }
     }),
-    Throw(12,-1,0,1,Dialog.get("mvsDscThrow"),null,new Spell(){
+    Throw(12,-1,0,0,Dialog.get("mvsDscThrow"),null,new Spell(){
         public void perform(Unit host, int lvl){
-            Sound.play("swing_normal");
             final Man t = (Man)host;
             if (!t.wieldingNone()) {
+                Sound.play("swing_normal");
                 Projectile p = new Projectile(null, t.pos.getAdd(t.clip.organs[OFIST].ptd), t.pos.getAdd(t.target), 50) {
-                    Item wpn = t.weapon;
+                    private Item wpn = t.weapon;
                     @Override
                     public void stuck() {
                         if (tangible) Particle.groundSlam(pos);
-                        wpn.field();
-                        wpn.pos = new P(pos);
-                        wpn.rotation = rotation;
                         remove();
                     }
+                    public void update(){
+                        super.update();
+                        wpn.rotation = rotation;
+                    }
                 };
-                p.image = t.weapon.image;
+                p.gravity = true;
                 p.rotSpeed = .03f;
                 p.faction = t.faction;
                 p.damage = t.getDamage()+t.weapon.weight;
-                t.weapon.remove();
+                Item item = t.weapon;
                 t.setWeapon(null);
+                item.pos = p.pos;
+                item.gravity = false;
             }
         }
     }),
@@ -172,7 +175,6 @@ public enum Skills implements Moveset {
             p.rotate(t.target.getSubtract(tip).add(t.pos));
             p.faction = t.faction;
             p.damage = (t.weapon.getDamage()*10)+4;
-            p.gravity = false;
             Particle.explode("Spark", tip, p.vel, 5, 10, 15, false,3);
             float start = t.rand.nextFloat();
             p.pos.add(p.vel.getMult(start, start));
@@ -199,7 +201,6 @@ public enum Skills implements Moveset {
             p.rotate(t.target.getSubtract(tip).add(t.pos));
             p.faction = t.faction;
             p.damage = (t.weapon.getDamage()*10)+4;
-            p.gravity = false;
             Particle.explode("Spark", tip, p.vel, 5, 10, 15, false,3);
             float start = t.rand.nextFloat();
             p.pos.add(p.vel.getMult(start, start));
@@ -216,15 +217,16 @@ public enum Skills implements Moveset {
         }
     }),
     Jump(47,1,4f,0,"Jump into the air.",null,null),
-    Airstrike(27,1,4f,4,"Jump into the air while attacking.",new Spell(){
+    Airstrike(27,1,1.5f,4,"Jump into the air while attacking.",new Spell(){
         public void perform(Unit host, int level){
             if (host.jump){
                 ((Man)host).weapon.rotation = 1f*host.dir;
-                host.attack();
+                host.delay.time = Math.min(host.delay.time, 4);
             } else {
                 Man t = (Man)host;
                 t.weapon.rotation = t.delay.time * -t.weapon.dir;
                 if (host.delay.time % 4 == 0) host.attackSound();
+                host.attack();
             }
         }
     },null),
