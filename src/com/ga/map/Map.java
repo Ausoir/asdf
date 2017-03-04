@@ -24,7 +24,6 @@ public class Map {
     public Thing fmap;
     public ArrayList<Line> land = new ArrayList<>();
     public ArrayList<Terrain> landform = new ArrayList<>();
-    private HashMap<Terrain, ArrayList<Line>> formLines = new HashMap<>();
     public HashMap<Integer, String> formTextures = new HashMap<>();
     private static HashMap<String, String> defaultProps = new HashMap<String, String>(){{
         put("grass","Rock=.1,Bush=.2,Weed=1");
@@ -42,7 +41,7 @@ public class Map {
     private Terrain blocker = null;
     public static String[] maps;
     public MapEvent event;
-    public static P size;
+    public P size;
     public static final int magnify = 2;
     public Map(final String[] maps) {
         this.maps = maps;
@@ -160,8 +159,8 @@ public class Map {
     }
     public void loadMap(int opt){
         int mapnum = opt / 10, posnum = opt % 10;
-        Global.player.host.stats.end();
         FileManager.saveCharacter();
+        Global.player.host.cmap = maps[mapnum + 5];
         Updater.changeMap = maps[mapnum + 5].split("@")[0];
         Updater.changeMapPos = posnum;
 //        Global.server.sendFromLocal("DC@"+maps[mapnum+5]+"@"+posnum);
@@ -178,22 +177,7 @@ public class Map {
     public void clear(){
         land.clear();
         landform.clear();
-        formLines.clear();
         formTextures.clear();
-    }
-
-    public void setShader() {
-        for (Terrain i : landform){
-            ArrayList<Line> t = formLines.get(i);
-            if (t != null) {
-                for (Line ii : t) {
-                    int origX = (int) (ii.pt.x - i.pos.x);
-                    int origY = (int) (ii.pt.y - i.pos.y);
-                    int x2 = (int) (ii.ptd.x - i.pos.x);
-                    i.shade(origX, x2, origY, ii.getSlope());
-                }
-            }
-        }
     }
 
     public void setTexture(){
@@ -234,12 +218,11 @@ public class Map {
                     if (formTexture == null) continue;
                     else {
                         String[] formName = formTexture.split("&");
-                        terrain = new Terrain(formName[0], formName.length > 1 ? formName[1] : null);
+                        terrain = new Terrain(formName[0], formName.length > 1 ? Shader.getByName(formName[1]) : null);
                     }
                     hashmap.put(i.next, terrain);
                 }
-                if (formLines.get(terrain) == null) formLines.put(terrain, new ArrayList<Line>());
-                formLines.get(terrain).add(i);
+                terrain.lines.add(i);
                 terrain.addPoint(i.pt.x, i.pt.y);
                 if (inside && (blockerTerrain == -1 || blockerTerrain == i.next)){
                     blocker.addPoint(i.pt.x, i.pt.y);

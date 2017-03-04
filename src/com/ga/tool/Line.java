@@ -30,6 +30,11 @@ public class Line {
         pt = p1;
         ptd = p2;
     }
+    public Line(P p1, P p2, int next, int opt){
+        this(p1, p2);
+        this.next = next;
+        this.opt = opt;
+    }
     public boolean isLand(){
         return opt != -1 && opt != 1;
     }
@@ -49,6 +54,9 @@ public class Line {
     }
     public float getLength(){
         return ptd.getSubtract(pt).getDist();
+    }
+    public P getMidPoint(){
+        return new P((ptd.x-pt.x)/2+pt.x, (ptd.y-pt.y)/2+pt.y);
     }
     public boolean lineCross(Line i2){
         boolean a = i2.pt.x-pt.x >= 0, b = i2.pt.x-ptd.x > 0, c = i2.ptd.x-pt.x >= 0, d = i2.ptd.x-ptd.x > 0,

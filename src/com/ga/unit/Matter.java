@@ -34,30 +34,8 @@ public class Matter extends Thing implements Updatable {
     public int getDamage(){
         return 0;
     }
-    public boolean hittable(){
-        return true;
-    }
-    public void attackHitSound(){
-    }
-    private boolean checkHit(P p, int r){
-        if (!hittable()) return false;
-        else if (!tangible) return false;
-        return Math.pow(sizeRadius+r,2) - ((Math.pow(p.x-pos.x,2) + Math.pow(p.y-pos.y,2))) > 0;
-    }
-    protected boolean checkHit(Matter p, int r){
-        if (!hittable()) return false;
-        if (p.faction.canAttack(faction)) {
-            if (checkHit(p.pos,p.sizeRadius+r)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    public boolean checkHit(Matter hitter, Line p){
-        return checkHit(hitter,0);
-    }
-    public void attackDenied(){
-
+    public boolean hittable(Faction faction){
+        return tangible && faction.canAttack(this.faction);
     }
     public void collide(){
         P vp;
@@ -96,6 +74,14 @@ public class Matter extends Thing implements Updatable {
             }
         }
     }
+    public void explode(int r){
+        for (Unit i : Updater.collideUnit(pos, getCollisionSize()+r, faction)){
+            i.checkHit(new Line(pos, pos),getDamage(),damageType);
+        }
+    }
+    public int getCollisionSize(){
+        return image.sizeRadius;
+    }
     public void onCollide(Line l){
     }
     public P getPoint(){
@@ -107,8 +93,8 @@ public class Matter extends Thing implements Updatable {
         int edge = Global.mapEdge(pos.getAdd(vel));
         if (edge % 2 == 0) vel.x = 0;
         else if (edge % 3 == 0) {
-            if (gravity && pos.y + vel.y >= Global.map.size.y) remove();
-            vel.y = 0;
+            if (edge == 9) remove();
+            else vel.y = 0;
         }
         collide();
         pos.add(vel);

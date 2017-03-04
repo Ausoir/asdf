@@ -50,44 +50,8 @@ public enum Skills implements Moveset {
             }
         }
     }, null),
-    Kick(3,-1,1,2, Dialog.get("mvsDscKick"),null,new Spell(){
-        public void perform(Unit host, int lvl){
-            boolean man = host instanceof Man;
-            if (man) Sound.play("swing_normal");
-            else host.attackSound();
-            for (Matter i : Updater.collide(host.clip.organs[lvl].ptd.getAdd(host.pos), 50)){
-                if (i instanceof Unit) {
-                    if (host.faction.canAttack(i.faction)) {
-                        int dam;
-                        if (man){
-                            dam = (int) ((((Man)host).armor.armor[lvl].getDamage()+1)*host.damageMod);
-                        } else dam = host.getDamage();
-                        if (i.hittable()) ((Unit)i).hit(host, dam, host.damageType);
-                        Sound.play("hit_whip");
-                    }
-                }
-            }
-        }
-    }),
-    Sidekick(18,0,1,2,Dialog.get("mvsDscSidekick"),null,new Spell(){
-        public void perform(Unit host, int lvl){
-            boolean man = host instanceof Man;
-            if (man) Sound.play("swing_silent");
-            else host.attackSound();
-            for (Matter i : Updater.collide(host.clip.organs[lvl].ptd.getAdd(host.pos), 50)){
-                if (i instanceof Unit) {
-                    if (host.faction.canAttack(i.faction)) {
-                        int dam;
-                        if (man){
-                            dam = (int) ((((Man)host).armor.armor[lvl].getDamage()+1)*host.damageMod);
-                        } else dam = host.getDamage();
-                        if (i.hittable()) ((Unit)i).hit(host, dam, host.damageType);
-                        Sound.play("hit_whip");
-                    }
-                }
-            }
-        }
-    }),
+    Kick(3,-1,1,2, Dialog.get("mvsDscKick"),null,basic()),
+    Sidekick(18,0,1,2,Dialog.get("mvsDscSidekick"),null,basic()),
     Whirlwind(35, 5, 0, 60, "Swing your weapon back and forth. Costly, but quick and effective even to multiple enemies. Hits multiple times. [Level*3 seconds duration]", new Spell() {
         public void perform(Unit host, int level) {
             if (host.delay.time < 36) {
@@ -135,6 +99,7 @@ public enum Skills implements Moveset {
                     @Override
                     public void stuck() {
                         if (tangible) Particle.groundSlam(pos);
+                        wpn.gravity = true;
                         remove();
                     }
                     public void update(){

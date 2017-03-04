@@ -10,7 +10,7 @@ import com.ga.unit.skill.Skills;
  * Created by Ga on 8/1/2016.
  */
 public class BodyHumanoid extends Body {
-    public static final int FIST = 0, OFIST = 4;
+    public static final int FIST = 0, LLEG = 1, RLEG = 2, BODY = 3, OFIST = 4, HEAD = 5;
     BodyHumanoid(Unit host) {
         super(host, "Man");
         organs[5].setImage(host.name);

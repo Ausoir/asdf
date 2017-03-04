@@ -1,9 +1,11 @@
 package com.ga.unit.item;
 
+import com.ga.map.Global;
 import com.ga.tool.EventTimer;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.unit.Matter;
+import com.ga.unit.Unit;
 import com.ga.unit.Updater;
 
 /**
@@ -26,7 +28,8 @@ public class Projectile extends Matter {
     public void onCollide(Line l){
         stuck();
     }
-    protected void onAttack(Matter p){
+    protected void onAttack(Unit p){
+        p.checkHit(new Line(pos,pos.getAdd(vel)),damage,damageType);
         stuck();
     }
     public void stuck(){
@@ -34,12 +37,17 @@ public class Projectile extends Matter {
         gravity = true;
         tangible = false;
     }
+    public int getCollisionSize(){
+        return (int) vel.getDist()*2;
+    }
     public void update(){
         rotation+=rotSpeed*vel.x;
         if (tangible) {
-            Matter u = Updater.collide(this, new Line(pos, pos.getAdd(vel)), false);
-            if (u != null) onAttack(u);
+            for (Unit i : Updater.collideUnit(pos, getCollisionSize(), faction)){
+                onAttack(i);
+            }
         }
+        if (Global.mapEdge(pos.getAdd(vel)) != 1) stuck();
         super.update();
         delay.update();
     }

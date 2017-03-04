@@ -13,7 +13,6 @@ import java.awt.*;
 public class Thing implements Drawable, Observer {
     public Picture image;
     public P pos;
-    protected int sizeRadius;
     public String name;
     int depth; //5:Object, 8:Corpse, 9:Shadow, 10:Unit
     public int dir = 1;

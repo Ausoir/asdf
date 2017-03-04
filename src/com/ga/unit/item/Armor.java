@@ -22,7 +22,7 @@ public class Armor extends Item {
         this.name = name;
         this.encumberance = encumberance;
         this.piece = piece;
-        if (piece != 5) image = new Picture(name, Math.abs(Integer.parseInt(Clips.clip.get("Man").model[piece][1]))-1);
+        if (piece != 0) image = new Picture(name, piece);
         delay = 80;
     }
     public float getArmor(){
@@ -58,7 +58,7 @@ public class Armor extends Item {
             public void perform(){
                 if (host.armor.isBare(piece)) {
                     Sound.play("wear");
-                    host.armor.set(me, piece, true);
+                    host.armor.set(me, piece);
                     host.setWeapon(null);
                     me.remove();
                 }
@@ -81,9 +81,5 @@ public class Armor extends Item {
             r += " This armor has "+probability*100+"% chance of activating its enchantment on being hit.";
         }
         return r + " This armor decreases damage by "+getArmor()+" points.";
-    }
-    @Override
-    public String toString(){
-        return super.toString()+"@"+piece;
     }
 }

@@ -55,7 +55,7 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
             }
             @Override
             public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) chat();
+                if (e.getKeyCode() == Keybinding.get("ENTER")) chat();
             }
         });
         add(chatbox);
@@ -119,8 +119,8 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
     @Override
     public void keyReleased(KeyEvent e) {
         int t = e.getKeyCode();
-        if (t == KeyEvent.VK_UP || t == KeyEvent.VK_LEFT || t == KeyEvent.VK_DOWN || t == KeyEvent.VK_RIGHT ||
-            t == KeyEvent.VK_A || t == KeyEvent.VK_D)
+        if (t == Keybinding.get("UP") || t == Keybinding.get("LEFT") || t == Keybinding.get("DOWN") || t == Keybinding.get("RIGHT") ||
+            t == Keybinding.get("A") || t == Keybinding.get("D"))
             input(-1);
         else if (Updater.editor) input(-t);
         if (t == mode) mode = -1;

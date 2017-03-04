@@ -168,7 +168,7 @@ public class Player extends Man {
                                 int piece = selectingItem-10;
                                 if (sheathe() && !armor.isBare(piece)) {
                                     setWeapon(armor.armor[piece]);
-                                    armor.set(null, piece, true);
+                                    armor.set(null, piece);
                                 }
                             }
                         }

@@ -1,36 +1,42 @@
 package com.ga.map;
 
+import com.ga.tool.Line;
 import com.ga.tool.P;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 /**
  * Created by Ga on 1/10/2017.
  */
-class Terrain extends Picture {
+class Terrain extends ShadedPicture {
     private Polygon polygon;
     private TexturePaint imageTexture;
-    private ShaderType shader;
+    protected ArrayList<Line> lines = new ArrayList<>();
     protected P pos;
-    public Terrain(String p, String shader){
-        super(p);
+    public Terrain(String p, Shader shader){
+        super(p, shader);
         polygon = new Polygon();
         imageTexture = new TexturePaint(image, new Rectangle2D.Double(0,0,size.x,size.y));
-        setShader(shader);
-    }
-    private void setShader(String p){
-        shader = ShaderType.getByName(p);
-    }
-    protected void shade(int x1, int x2, int y1, float slope){
-        shader.render(image, x1, x2, y1, slope);
     }
     protected void addPoint(float x, float y){
         addPoint((int)x, (int)y);
     }
     private void addPoint(int x, int y){
         polygon.addPoint(x, y);
+    }
+    @Override
+    public void shade(){
+        if (shader != null) {
+            for (Line i : lines) {
+                int origX = (int) (i.pt.x - pos.x);
+                int origY = (int) (i.pt.y - pos.y);
+                int x2 = (int) (i.ptd.x - pos.x);
+                shader.render(image, origX, x2, origY, i.getSlope());
+            }
+        }
     }
     protected void render(){
         int lowX = polygon.xpoints[0], lowY = polygon.ypoints[0], highX = polygon.xpoints[0], highY = polygon.ypoints[0];
@@ -51,6 +57,7 @@ class Terrain extends Picture {
         Graphics2D g = image.createGraphics();
         g.setPaint(imageTexture);
         g.fill(polygon);
+        shade();
     }
     public void draw(Graphics2D g){
         if (visible) {

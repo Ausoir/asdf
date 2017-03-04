@@ -41,11 +41,8 @@ public class Stats {
                 if (p.buffRel != null) stats.get(p.stat).add(Math.round(p.buff * stats.get(p.buffRel).getMax()), true);
                 else stats.get(p.stat).add((int) (p.buff*level), true);
             }
-            if (p.effect != null) {
-                p.effect.perform(host, level);
-            }
             if (p.start != null) p.start.perform(host, level);
-            effectTimes.add(new Timer((int) (p.time + (level*p.time*.2f))));
+            effectTimes.add(new Timer((int) (p.time + (level*p.time*.2f)), false));
             effectLevels.add(new int[]{level});
             effectEffects.add(p.effect);
             effects.add(p);
@@ -112,7 +109,7 @@ public class Stats {
                 endEffect(effects.get(i));
             }
         }
-        if (bloodTimer.update()) Particle.explode("Blood",host.pos.getAdd(host.clip.randomPoint()),new P(),Global.r.nextInt(4),5,0,true,24);
+        if (bloodTimer.update()) Particle.explode("Blood",host.getRandomPoint(),new P(),Global.r.nextInt(4),5,0,true,24);
     }
     public void load(String p){
         String[] statOrBuff = p.split("/");
@@ -136,6 +133,24 @@ public class Stats {
                 }
             }
         }
+    }
+    public void healStats(){
+        Iterator it = stats.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            if (!pair.getKey().equals("Health") && !pair.getKey().equals("Endurance")) ((Stat)pair.getValue()).heal();
+        }
+    }
+    public int getEffectsSize(){
+        return effects.size();
+    }
+    public String getEffectsList(){
+        String r = "";
+        for (int i=0;i<effects.size();i++){
+            r += effects.get(i).name() + " (Level " + effectLevels.get(i)[0] + ") - " + effectTimes.get(i).time + "s";
+            if (i != effects.size()-1) r += "\n";
+        }
+        return r;
     }
     public String toString(){
         String result = "";

@@ -114,6 +114,7 @@ public class Item extends Matter {
     PrefixMod pmod;
     public Spells emod = null;
     public int weight;
+    public int volume = 1;
     protected int cooldown = 100;
     public int delay = 0;
     public float probability;
@@ -124,10 +125,10 @@ public class Item extends Matter {
     private Organ organ = null;
     public int speed = 0;
     public int damage = 1;
+    protected float sizeMod;
     public Item(String name, int seed, int weight, int uses, int cooldown, float enchantRatio) {
         super(name, seed, 8);
         this.name = name;
-        randomSize();
         this.weight = weight;
         this.uses.setTotal(uses);
         this.cooldown = cooldown;
@@ -142,7 +143,7 @@ public class Item extends Matter {
         setModifier(smod);
         gravity = true;
         final Item me = this;
-        onInteract = new Interactive(image.sizeRadius+5){
+        onInteract = new Interactive(5){
             public void interact(Unit p){
                 if (p instanceof Man) {
                     Man t = ((Man)p);
@@ -151,9 +152,12 @@ public class Item extends Matter {
             }
         };
     }
-    private void randomSize(){
+    public void randomSize(){
         P s = image.getSize();
-        image.setSize(s.x * (rand.nextFloat() * .6f + .7f), s.y * (rand.nextFloat() * .6f + .7f));
+        float rx = rand.nextFloat();
+        float ry = rand.nextFloat();
+        image.setSize(s.x * (rx * .6f + .7f), s.y * (ry * .6f + .7f));
+        sizeMod = (rx + ry)/2;
     }
     public void setImage(String p){
         super.setImage(p);
@@ -357,7 +361,7 @@ public class Item extends Matter {
         if (organ != null) {
             ((Man) organ.host).setWeapon(null);
             setOrgan(null);
-        }
+        } else Global.player.host.inventory.remove(this);
         Updater.cancelAdd(this);
         super.remove();
     }

@@ -32,6 +32,7 @@ public class Body {
     protected int BODY, FOOT;
     protected int legNum = 0, legCurrent = 0;
     protected float appendageSize = 1;
+    protected int size = 0;
 
     public Body(Unit host, String current) {
         this.host = host;
@@ -115,6 +116,8 @@ public class Body {
             } else {
                 organs[p] = new Organ(parent, tip);
             }
+            if (Math.abs(nextClip[p][0]) > size) size = Math.abs(nextClip[p][0]);
+            if (Math.abs(nextClip[p][1]) > size) size = Math.abs(nextClip[p][1]);
             organs[p].ptd = new P(nextClip[p][0],nextClip[p][1]);
             organs[p].host = host;
         }
@@ -189,7 +192,7 @@ public class Body {
 
     public int update() {
         int r = -1;
-        float high = 50;
+        float high = 40;
         if (!frame.update()) {
             for (int i = 0; i < nextClip.length; i++) {
                 if (!organs[i].amputated) {

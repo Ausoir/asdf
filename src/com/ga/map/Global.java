@@ -5,6 +5,7 @@ import com.ga.game.ControllerProcess;
 import com.ga.game.Display;
 import com.ga.game.Settings;
 import com.ga.tool.P;
+import com.ga.unit.MainPlayer;
 import com.ga.unit.Updater;
 import com.ga.unit.intelligence.PlayerInput;
 
@@ -101,6 +102,7 @@ public class Global {
     }
     public static void nextHour(){
         setHour(gameHour+1);
+        ((MainPlayer) Global.player.host).onTimeChange(1);
     }
     public static void setHour(int p){
         gameHour = p;

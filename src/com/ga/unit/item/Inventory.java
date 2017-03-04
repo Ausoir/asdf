@@ -12,20 +12,31 @@ import java.util.ArrayList;
 public class Inventory {
     private ArrayList<Item> items = new ArrayList<>();
     public int weight = 0;
+    private int volume = 0;
     private int maxSize = 0;
     private Player host;
     public Inventory(Player host){
         this.host = host;
     }
     public boolean addItem(Item p){
-        if (items.size() >= maxSize) return false;
+        if (volume+p.volume > maxSize) return false;
         items.add(p);
         weight += p.weight;
+        volume += p.volume;
         return true;
     }
     public boolean sheathe(Item p){
         boolean r = addItem(p);
         return r;
+    }
+    public boolean eat(int p){
+        for (Item i : items){
+            if (i instanceof Food){
+                i.use(host);
+                return true;
+            }
+        }
+        return false;
     }
     public boolean vacant(){
         return items.size() < maxSize;
@@ -46,6 +57,7 @@ public class Inventory {
     public Item remove(int p){
         Item r = items.get(p);
         weight -= r.weight;
+        volume -= r.volume;
         items.remove(p);
         return r;
     }
@@ -64,11 +76,12 @@ public class Inventory {
             items.add(item);
         }
     }
-    public void onMapChange(){
+    public void onTimeChange(int p){
         for (int i=0;i<items.size();i++){
             Item t = items.get(i);
-            if (t instanceof Food) ((Food) t).onMapChange();
+            if (t instanceof Food) ((Food) t).onTimeChange(p);
         }
+        if (host.weapon instanceof Food) ((Food)host.weapon).onTimeChange(p);
     }
     public String toString(){
         String r = ";";

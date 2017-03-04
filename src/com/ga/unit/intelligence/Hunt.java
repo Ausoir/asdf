@@ -14,7 +14,7 @@ class Hunt implements Task {
 
     protected Hunt(Unit host) {
         this.host = host;
-        if (host.brain.target != null) range = host.getReach()+(host.brain.target.image.sizeRadius/2);
+        if (host.brain.target != null) range = host.getReach();
     }
 
     @Override
@@ -31,13 +31,8 @@ class Hunt implements Task {
         int y = (int) (target.pos.y - host.pos.y);
         host.face(target.pos);
         float dist = (float) (Math.sqrt((x*x)+(y*y))-range);
-        if (host.isExhausted()){
-            if (host.rand.nextFloat() < .1f) host.get("Stamina").heal();
-            host.setState(Skills.Rest);
-        } else if (dist < 1000) {
+        if (dist < 1000) {
             int t = host.performMoveset((int) dist);
-            host.target = target.pos.getSubtract(host.pos).add(0, -15);
-
             if (host.state instanceof Spells){
                 host.delay.set(300);
             }
@@ -53,7 +48,7 @@ class Hunt implements Task {
                 }
             } else if (t == 2){
                 host.setState(Skills.Rest);
-                host.delay.time += 28;
+                host.delay.time += 40;
             }
         }
     }

@@ -128,12 +128,11 @@ public class EditorInput implements Input, Updatable, Drawable {
             texture = p.substring(2);
         } else if (p.equals("render")){
             Global.map.setTexture();
-        } else if (p.equals("shader")){
-            Global.map.setShader();
         } else if (p.startsWith("save")){
             save("map/"+p.substring(5));
         } else if (p.startsWith("load")){
             Updater.changeMap = p.substring(5);
+            Updater.changeMapPos = -2;
             Updater.changeMap(true);
             Display.input = this;
             Updater.add(this);
@@ -223,7 +222,7 @@ public class EditorInput implements Input, Updatable, Drawable {
                 } else if (tool == Tool.OBJECT) {
                     currentU.pos.set(x, y);
                 } else if (tool == Tool.REMOVE && lmb){
-                    ArrayList<Matter> matters = Updater.collide(new P(x,y),100);
+                    ArrayList<Matter> matters = Updater.collideMatter(new P(x,y),100);
                     for (Matter i : matters) {
                         String name = i.name;
                         try{i.remove();}catch(Exception e){Global.p("Error deleting "+name);}

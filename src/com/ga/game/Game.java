@@ -15,6 +15,7 @@ import java.awt.*;
  */
 public class Game extends JFrame {
     public Game(boolean editor, int x, int y){
+        Keybinding.init();
         Global.init();
         Updater.editor = editor;
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();

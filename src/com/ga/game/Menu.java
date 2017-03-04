@@ -4,6 +4,7 @@ import com.ga.map.Global;
 import com.ga.map.Picture;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
+import com.ga.unit.MainPlayer;
 import com.ga.unit.Player;
 import com.ga.unit.Updater;
 import com.ga.unit.item.Inventory;
@@ -136,19 +137,16 @@ public class Menu extends Panel {
             b.setTitle(Dialog.get("wielded"));
             ((JPanel) panel.getComponent(0)).setBorder(b);
 
-            for (int i=0;i<6;i++) {
+            for (int i=0;i<3;i++) {
                 if (!Global.player.host.armor.isBare(i)) {
                     grid.gridy = 1+i;
                     Item equipped = Global.player.host.armor.armor[i];
                     JPanel panel = makeSlot(i, equipped);
                     b = BorderFactory.createTitledBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Panel.forecolor));
                     String title = Dialog.get("equipped");
-                    if (i == 0) title += " - "+Dialog.get("brarm");
-                    else if (i == 1) title += " - "+Dialog.get("blleg");
-                    else if (i == 2) title += " - "+Dialog.get("brleg");
-                    else if (i == 3) title += " - "+Dialog.get("bbody");
-                    else if (i == 4) title += " - "+Dialog.get("blarm");
-                    else if (i == 5) title += " - "+Dialog.get("bhead");
+                    if (i == 0) title += " - "+Dialog.get("bhead");
+                    else if (i == 1) title += " - "+Dialog.get("btorso");
+                    else if (i == 2) title += " - "+Dialog.get("bleg");
                     b.setTitle(title);
                     panel.setBorder(b);
                 }
@@ -412,7 +410,7 @@ public class Menu extends Panel {
             panel = new JPanel();
             panel.setOpaque(false);
             panel.add(makeOption("Check Status","stat","Check current status."));
-            panel.add(makeOption("Rest","h","Rest for an hour, healing lost health and consuming available food."));
+            panel.add(makeOption("Rest","h","Rest for an hour, healing lost health (if treated) and consuming available food."));
             panel.add(makeOption("Sleep","zzz","Sleep for six hours."));
             panel.add(makeOption("Fast Travel","ft","Fast travel to any connected map if current map holds no threats."));
             TitledBorder b = BorderFactory.createTitledBorder(BorderFactory.createMatteBorder(2,2,2,2,Panel.forecolor));
@@ -469,19 +467,17 @@ public class Menu extends Panel {
         }
         private void command(String p){
             if (p.equals("h")){
-                final P t = Global.player.host.pos.getAdd(0,0);
                 FileManager.saveCharacter();
-                Updater.changeMap = Global.player.host.cmap;
-                Updater.changeMapPos = 0;
-                Updater.changeMapEvent = new Performer(){
-                    public void perform(){
-                        Global.player.host.pos.set(t);
-                        Global.mapEdgeCenter(Global.cameraTo = Global.player.host.pos.getAdd(0,0));
-                    }
-                };
+                Global.map.event.onChange(Global.map.maps, false);
+                ((MainPlayer) Global.player.host).onMapChange();
+                if (Global.player.host.stats.getEffectsSize() == 0){
+                    Global.player.host.stats.healStats();
+                }
             } else if (p.equals("stat")){
                 Player player = Global.player.host;
-                Display.menuDialog.show("Current Status","Stamina:"+player.get("Stamina")+"\nEncumberance:"+player.getStatPenalty()+"\nHealth:"+player.get("Health"));
+                String statusDsc = "Stamina:"+player.get("Stamina")+"\nEncumberance:"+player.getStatPenalty()+"\nHealth:"+player.get("Health")+"\n";
+                statusDsc += "\nCurrent Status Effects:\n"+player.stats.getEffectsList();
+                Display.menuDialog.show("Current Status",statusDsc);
             } else if (p.equals("qq")){
                 FileManager.saveCharacter();
                 System.exit(0);

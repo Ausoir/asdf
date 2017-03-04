@@ -62,15 +62,9 @@ public abstract class Intelligence implements Observer {
             }
         }
     }
-    public void hit(Matter hitter){
-        if (hitter != null) {
-            if (target != hitter) host.say("@agro");
-            if (hitter instanceof Unit) target = (Unit) hitter;
-            else {
-                provoked(hitter.pos.x - host.pos.x > 0 ? 1 : -1);
-                host.say("@hit");
-            }
-        }
+    public void hit(){
+        if (target == null) host.say("@agro");
+        else host.say("@hit");
     }
     public void setState(Moveset state){
         if (state == Actions.Dead){
@@ -125,7 +119,7 @@ public abstract class Intelligence implements Observer {
                     }
                 }
             } else {
-                provoked(dir);
+                host.face(dir);
             }
         }
     }
@@ -136,9 +130,6 @@ public abstract class Intelligence implements Observer {
                 perceived(t);
             } else if (target.state == Actions.Dead) forget.time = 0;
         }
-    }
-    protected void provoked(int dir){
-        host.face(dir);
     }
     protected void perceived(Matter p){
     }

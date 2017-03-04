@@ -2,6 +2,7 @@ package com.ga.game;
 
 import com.ga.map.Global;
 import com.ga.map.Map;
+import com.ga.map.MapGenerator;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.unit.*;
@@ -67,7 +68,7 @@ public class FileManager {
         return result;
     }
     static void loadFirst(){
-        readMap(Global.player.host.cmap,0);
+        loadMap(Global.player.host.cmap,0);
         Global.mapEdgeCenter(Global.cameraTo = Global.player.host.pos.getAdd(0,0));
     }
     public static PlayerInput loadPlayer(boolean main, String dir){
@@ -81,12 +82,54 @@ public class FileManager {
         pi.load(line[2]);
         return pi;
     }
-    public static P readMap(String dir, int player) {
+    public static P loadMap(String dir, int player) {
+        P r;
+        String[] oldmap = null;
+        if (Global.map != null) oldmap = Global.map.maps;
+        if (oldmap != null && dir.startsWith("Instance")){
+            String instanceData[] = dir.split(":")[1].split("/");
+            String[] param = instanceData[0].split("&");
+            String[] returnAddr;
+            int returnPos = player;
+            int toPos = player;
+            if (instanceData.length > 1){
+                returnAddr = instanceData[1].split("&");
+                returnPos = Integer.parseInt(returnAddr[2]);
+                toPos = Integer.parseInt(param[3]);
+            } else {
+                String[] t = oldmap[5].split(":")[1].split("@")[0].split("&");
+                returnAddr = new String[]{t[1],t[2]};
+            }
+            int maxDist = Math.max(1,Integer.parseInt(param[1]));
+            int returndist = Math.min(Math.max(0,(Global.player.host.get("Hunger").get()+Global.player.host.get("Health").get())/2), Global.r.nextInt(maxDist)+1);
+            int distance = maxDist - returndist;
+            if (distance == 0)
+                r = readMap(param[2], toPos);
+            else if (returndist == 0)
+                r = readMap(returnAddr[1], returnPos);
+            else {
+                r = MapGenerator.generate(param[0], distance, param[2], toPos,
+                        returndist, returnAddr[1], returnPos);
+            }
+            for (int i = 0; i < returndist; i++){
+                Global.map.event.onChange(oldmap, i == returndist-1);
+            }
+        } else {
+            r = readMap(dir, player);
+            if (player != -2) Global.map.event.onChange(oldmap, true);
+        }
+        Global.map.setTexture();
+        if (r == null) {
+            System.out.println("Invalid Player Spawn Location");
+            r = new P(Settings.centerX, Settings.centerY);
+        }
+        return r;
+    }
+    private static P readMap(String dir, int player){
         P r = null;
-        String data = read("map/"+dir+".map");
+        String data = read("map/" + dir + ".map");
         String[] line = data.split("%");
         String[] names = line[0].split(",");
-        Map oldmap = Global.map;
         Global.map = new Map(names);
 
         if (line.length > 1) {
@@ -111,7 +154,7 @@ public class FileManager {
                         for (int section = 0; section < sections.length; section++) {
                             String[] property = sections[section].split("@");
                             Matter object = Stock.get(property);
-                            if (object instanceof Matter && object.name.equals("PlayerSpawn")){
+                            if (object instanceof Matter && object.name.equals("PlayerSpawn")) {
                                 if (player == 0) r = new P(property[2]);
                                 player--;
                             }
@@ -119,13 +162,6 @@ public class FileManager {
                     }
                 }
             }
-        }
-        Global.map.setTexture();
-        Global.map.setShader();
-        Global.map.event.onChange(oldmap);
-        if (r == null){
-            System.out.println("Invalid Player Spawn Location");
-            r = new P(Settings.centerX, Settings.centerY);
         }
         return r;
     }

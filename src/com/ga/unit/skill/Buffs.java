@@ -7,6 +7,8 @@ import com.ga.tool.Performer;
 import com.ga.unit.*;
 import com.ga.unit.item.Projectile;
 
+import java.util.ArrayList;
+
 /**
  * Created by Ga on 9/1/2016.
  */
@@ -46,7 +48,7 @@ public enum Buffs {
             if (tick == 0) {
                 host.get("Health").add(-level);
                 tick = Math.max(1,30-(level*2));
-//                if (host.get("Health").get() == 1) return true;
+                Particle.explode("Poison", host.getRandomPoint(), new P(host.dir*15,-15), 10, 3, 10, true, 16);
             }
         }
     }, 100),
@@ -59,19 +61,23 @@ public enum Buffs {
                 tick = 2;
                 final Projectile p = new Projectile("Ice", host.pos.getAdd(0, -5), new P(), 0) {
                     @Override
-                    protected void onAttack(Matter p) {
-                        if (p instanceof Unit){
-                            ((Unit) p).stats.addEffect(Buffs.Freeze,level);
-                        }
+                    protected void onAttack(Unit p) {
+                        p.stats.addEffect(Buffs.Freeze,level);
                         Particle.explode("Ice", pos, new P(0,-20), 30, 10, 5, true, 10);
                         remove();
+                    }
+                    @Override
+                    public void stuck() {
+                        vel.set(0, 0);
                     }
                     @Override
                     public void update() {
                         super.update();
                         Particle.explode("Ice", pos, new P(0, -5), 1, 3, 2, false, 6);
-                        Matter t = Updater.collide(this, 20);
-                        if (t!=null) onAttack(t);
+                    }
+                    @Override
+                    public int getCollisionSize(){
+                        return 30;
                     }
                 };
                 p.faction = host.faction;
@@ -94,16 +100,23 @@ public enum Buffs {
                 if (tick % 6 == 0) Sound.play("fire");
                 final Projectile p = new Projectile("Flamecluster", host.pos.getAdd(0, -5), new P(), 0) {
                     @Override
-                    protected void onAttack(Matter p) {
+                    protected void onAttack(Unit p) {
+                        super.onAttack(p);
                         Particle.explode("Flame", pos, new P(), 30, 20, 0, false, 2);
                         remove();
+                    }
+                    @Override
+                    public void stuck() {
+                        vel.set(0, 0);
                     }
                     @Override
                     public void update() {
                         super.update();
                         Particle.explode("Flame", pos, new P(0, -5), 1, 12, 3, false, 3);
-                        Matter t = Updater.collide(this, 30);
-                        if (t!=null) onAttack(t);
+                    }
+                    @Override
+                    public int getCollisionSize(){
+                        return 30;
                     }
                 };
                 p.faction = host.faction;

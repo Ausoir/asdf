@@ -71,25 +71,28 @@ public enum MapEvent implements Updatable{
         Updater.add(r);
         return r;
     }
-    public void onChange(Map oldmap){
-        if (oldmap != null) { //not init
-            if (!Global.map.inside && !oldmap.inside) Global.nextHour();
-            if (!Global.map.inside) { //regrowth
-                Updater.regrowth();
-                Global.map.generateProps();
-                if (mobs != null) { //encounter
-                    String[] moblist = mobs.split(",");
-                    for (int times = 0; times < 24; times++) {
-                        float random = Global.r.nextFloat();
-                        for (String i : moblist) {
-                            String[] mobp = i.split("=");
-                            if (random < Float.parseFloat(mobp[1])) {
-                                Stock.getByName(mobp[0], -1).pos.set(Global.map.randomSurface());
-                                break;
-                            }
-                        }
+    private void regrowth(){
+        Updater.regrowth();
+        Global.map.generateProps();
+        if (mobs != null) { //encounter
+            String[] moblist = mobs.split(",");
+            for (int times = 0; times < 24; times++) {
+                float random = Global.r.nextFloat();
+                for (String i : moblist) {
+                    String[] mobp = i.split("=");
+                    if (random < Float.parseFloat(mobp[1])) {
+                        Stock.getByName(mobp[0], -1).pos.set(Global.map.randomSurface());
+                        break;
                     }
                 }
+            }
+        }
+    }
+    public void onChange(String[] oldmap, boolean regrow){
+        if (oldmap != null) { //not init
+            if (!Global.map.inside && !oldmap[0].equals("1")) Global.nextHour();
+            if (!Global.map.inside && regrow) { //regrowth
+                regrowth();
             }
         }
     }

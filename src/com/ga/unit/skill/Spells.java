@@ -10,6 +10,8 @@ import com.ga.unit.*;
 import com.ga.unit.intelligence.UnitIntelligence;
 import com.ga.unit.item.Projectile;
 
+import java.util.ArrayList;
+
 /**
  * Created by Ga on 8/1/2016.
  */
@@ -45,31 +47,22 @@ public enum Spells implements Moveset {
     Stun(Actions.Cast, 40,4,50,false,Dialog.get("mvsDscStun"),new Spell(){
         @Override
         public void perform(Unit host, int level){
-            Matter t = new Matter();
-            t.faction = host.faction;
-            t.pos = host.target.getAdd(host.pos);
-            Unit target = Updater.collide(t,50);
-            if (target!= null) target.stats.addEffect(Buffs.Stun,level);
+            ArrayList<Unit> t = Updater.collideUnit(host.target.getAdd(host.pos),40,Faction.Destructive);
+            if (t.size() > 0) t.get(0).stats.addEffect(Buffs.Stun,level);
         }
     }),
     Slow(Actions.Cast, 30,1,3,false,Dialog.get("mvsDscSlow"),new Spell(){
         @Override
         public void perform(Unit host, int level){
-            Matter t = new Matter();
-            t.faction = host.faction;
-            t.pos = host.target.getAdd(host.pos);
-            Unit target = Updater.collide(t,40);
-            if (target!= null) target.stats.addEffect(Buffs.Slow,level);
+            ArrayList<Unit> t = Updater.collideUnit(host.target.getAdd(host.pos),40,Faction.Destructive);
+            if (t.size() > 0) t.get(0).stats.addEffect(Buffs.Slow,level);
         }
     }),
     Poison(Actions.Cast, 40,4,50,false,Dialog.get("mvsDscPoison"),new Spell(){
         @Override
         public void perform(Unit host, int level){
-            Matter t = new Matter();
-            t.faction = host.faction;
-            t.pos = host.target.getAdd(host.pos);
-            Unit target = Updater.collide(t,40);
-            if (target != null) target.stats.addEffect(Buffs.Poison,level);
+            ArrayList<Unit> t = Updater.collideUnit(host.target.getAdd(host.pos),40,Faction.Destructive);
+            if (t.size() > 0) t.get(0).stats.addEffect(Buffs.Poison,level);
         }
     }),
     Shadowtwin(Actions.Buff, 40,3,100,false,Dialog.get("mvsDscShadowtwin"),new Spell() {
@@ -136,11 +129,6 @@ public enum Spells implements Moveset {
             for (int i=0;i<2;i++) {
                 final Projectile p = new Projectile("Fire", host.getHand(), host.target.getAdd(host.pos).getAdd(Global.r.nextInt(50)-25, Global.r.nextInt(50)-25), Global.r.nextInt(12)+3) {
                     @Override
-                    protected void onAttack(Matter p) {
-                        if (!host.stats.hasEffect(Buffs.Cleave)) super.onAttack(p);
-                    }
-
-                    @Override
                     public void stuck() {
                         Particle.explode("Fire", pos, new P(), 10, 10, 0, false, 4);
                         remove();
@@ -165,11 +153,6 @@ public enum Spells implements Moveset {
             if (turn++%8==0) Sound.play("fire");
             for (int i=0;i<3;i++) {
                 final Projectile p = new Projectile("Flame", host.getHand(), host.target.getAdd(host.pos).getAdd(Global.r.nextInt(50)-25, Global.r.nextInt(50)-25), Global.r.nextInt(10+level)+6+level) {
-                    @Override
-                    protected void onAttack(Matter p) {
-                        if (!host.stats.hasEffect(Buffs.Cleave)) super.onAttack(p);
-                    }
-
                     @Override
                     public void stuck() {
                         Particle.explode("Flame", pos, new P(), 10, 10, 0, false, 4);
@@ -198,11 +181,9 @@ public enum Spells implements Moveset {
                 final Projectile p = new Projectile("Ice", host.getHand(), host.target.getAdd(host.pos).getAdd(Global.r.nextInt(150)-75, Global.r.nextInt(150)-75), 20) {
                     private int tick = 200;
                     @Override
-                    protected void onAttack(Matter p) {
-                        if (p instanceof Unit){
-                            ((Unit)p).stats.addEffect(Buffs.Freeze, level+1);
-                        }
-                        if (!host.stats.hasEffect(Buffs.Cleave)) super.onAttack(p);
+                    protected void onAttack(Unit p) {
+                        p.stats.addEffect(Buffs.Freeze, level+1);
+                        super.onAttack(p);
                     }
                     @Override
                     public void update(){
@@ -228,16 +209,12 @@ public enum Spells implements Moveset {
         public void perform(final Unit host, final int level){
             final Projectile p = new Projectile("Fireball", host.pos, host.target.getAdd(host.pos), 80){
                 @Override
-                protected void onAttack(Matter p){
-                    if (!host.stats.hasEffect(Buffs.Cleave)) super.onAttack(p);
-                }
-                @Override
                 public void stuck(){
                     attackHitSound();
                     host.setVisible(true);
                     Particle.explode("Fire", pos, new P(), 100+(level*15), 10+(level*2), 0, false, 4);
                     Particle.smoke(pos);
-                    Updater.collide(this,40+(level*5));
+                    explode(40+(level*5));
                     remove();
                 }
                 @Override
@@ -266,15 +243,11 @@ public enum Spells implements Moveset {
         public void perform(final Unit host, final int level){
             final Projectile p = new Projectile("Fireball", host.getHand(), host.target.getAdd(host.pos), 50){
                 @Override
-                protected void onAttack(Matter p){
-                    if (!host.stats.hasEffect(Buffs.Cleave)) super.onAttack(p);
-                }
-                @Override
                 public void stuck(){
                     attackHitSound();
                     Particle.explode("Fire", pos, new P(), 100+(level*15), 10+(level*2), 0, false, 4);
                     Particle.smoke(pos);
-                    Updater.collide(this,40+(level*5));
+                    explode(40+(level*5));
                     remove();
                 }
                 @Override
@@ -304,11 +277,9 @@ public enum Spells implements Moveset {
             if (Math.random() < .2f) Sound.play("ice");
             final Projectile p = new Projectile("Ice", host.pos.getAdd(Global.nextGaussian(500),-500), host.pos.getAdd(Global.nextGaussian(500),0), 8+Global.r.nextInt(6*level)){
                 @Override
-                protected void onAttack(Matter p){
-                    if (p instanceof Unit){
-                        ((Unit)p).stats.addEffect(Buffs.Freeze, level+1);
-                    }
-                    if (!host.stats.hasEffect(Buffs.Cleave)) super.onAttack(p);
+                protected void onAttack(Unit p){
+                    p.stats.addEffect(Buffs.Freeze, level+1);
+                    super.onAttack(p);
                 }
                 @Override
                 public void stuck(){
@@ -342,7 +313,7 @@ public enum Spells implements Moveset {
                 public void stuck(){
                     Particle.explode("Fire", pos, new P(), 30, 25, 0, false, 4);
                     Particle.smoke(pos);
-                    Updater.collide(this,50);
+                    explode(50);
                     remove();
                 }
                 @Override

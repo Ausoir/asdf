@@ -101,8 +101,16 @@ public class Unit extends Matter {
     }
 
     public void reset(){
-        state = Actions.Idle;
         Updater.add(speech);
+    }
+
+    public P getRandomPoint(){
+        return pos.getAdd(clip.randomPoint());
+    }
+
+    @Override
+    public int getCollisionSize(){
+        return clip.size;
     }
 
     public void say(String p) {
@@ -122,10 +130,7 @@ public class Unit extends Matter {
         return pos.getAdd(0,0);
     }
     public float getReach(){
-        return image.sizeRadius+4;
-    }
-    public boolean isExhausted(){
-        return false;
+        return 24;
     }
     protected int[] getCooldown(Moveset state) {
         int[] r = cooldown.get(state);
@@ -217,28 +222,29 @@ public class Unit extends Matter {
         return 0;
     }
 
-    public boolean hit(Matter hitter, int damage, DamageType type) {
+    public boolean hit(Line hitbox, int damage, DamageType type) {
         delay.performer = null;
         float ratio = (float) damage * 8 / get("Health").getMax();
-        float knockback = Math.min(ratio, 30);
+        float knockback = Math.min(ratio, 20);
         jump = false;
-        if (ratio > 50) stateSet(Actions.Down);
+        if (ratio > 30) stateSet(Actions.Down);
         else stateSet(Actions.Hit);
         Sound.play("kick");
+        int dir = hitbox.pt.x < pos.x ? 1 : -1;
         if (type != DamageType.Push) {
             stats.addEffect(Buffs.Slow, 2);
-            if (brain != null) brain.hit(hitter);
+            if (brain != null) brain.hit();
+            face(dir);
             get("Health").add(-damage);
         }
-        if (hitter != null) vel.x = knockback * (pos.x - hitter.pos.x > 0 ? 1 : -1);
-        else vel.x = knockback * dir;
-        vel.y = -knockback * 1.2f - 5;
+        vel.x = knockback * dir;
+        vel.y = -knockback-5;
         return true;
     }
 
     @Override
-    public boolean hittable(){
-        if (state != Actions.Down && state != Actions.Hit && state != Actions.Dead && state != Skills.Duck) {
+    public boolean hittable(Faction faction){
+        if (super.hittable(faction) && state != Actions.Down && state != Actions.Hit && state != Actions.Dead && state != Skills.Duck) {
             if (!stats.hasEffect(Buffs.Evade)) {
                 return true;
             }
@@ -246,21 +252,20 @@ public class Unit extends Matter {
         return false;
     }
 
-    @Override
-    public boolean checkHit(Matter hitter, Line p){
-        if (faction.canAttack(hitter.faction)) {
-            if (hittable()) {
-                for (int i = 0; i < clip.organs.length; i++) {
-                    int dam = hitter.getDamage() - getDamageReduction(i);
-                    if (clip.organs[i].checkHit(p)) {
-                        P t = new P(pos.x, p.ptd.y);
-                        Particle.explode("Blood", t, t.getSubtract(hitter.pos), 3, 3, 12, true, 5);
-                        hit(hitter, dam, hitter.damageType);
-                        clip.organs[i].hit(p, dam, hitter.damageType);
-                        return true;
-                    }
+    public boolean checkHit(Line hitBox, int damage, DamageType type){
+        float r = hitBox.getLength();
+        P midpoint = hitBox.getMidPoint();
+        if (Math.pow(getCollisionSize() + r, 2) - ((Math.pow(midpoint.x - pos.x, 2) + Math.pow(midpoint.y - pos.y, 2))) > 0) {
+            hit(hitBox, damage, damageType);
+            for (int i = 0; i < clip.organs.length; i++) {
+                int dam = damage - getDamageReduction(i);
+                if (clip.organs[i].checkHit(hitBox)) {
+                    P t = new P(pos.x, hitBox.ptd.y);
+                    Particle.explode("Blood", t, t.getSubtract(hitBox.pt), 3, 3, 12, true, 5);
+                    clip.organs[i].hit(hitBox, dam, type);
                 }
             }
+            return true;
         }
         return false;
     }
@@ -292,7 +297,7 @@ public class Unit extends Matter {
             if (vel.y > Settings.gravity*3) Sound.play("land");
             if (mag >= 0){
                 stateSet(Actions.Down);
-                delay.time += getStatPenalty()*30;
+                delay.time += getStatPenalty()*20;
                 get("Health").add(-(getStatPenalty()+1+mag));
             }
         }
@@ -309,18 +314,21 @@ public class Unit extends Matter {
 
     protected void moveTriggered(int p){
         if (state instanceof Skills) {
-            Updater.collide(this, clip.organs[p].getAdd(pos), false);
+            for (Unit i : Updater.collideUnit(pos, (int) getReach(), faction)){
+                if (i.checkHit(clip.organs[p].getAdd(pos),getDamage(),damageType)) break;
+            }
         }
     }
 
     public void attack(){
-        Updater.collide(this, (int)getReach());
+        for (Unit i : Updater.collideUnit(pos, (int) getReach(), faction)){
+            if (i.checkHit(new Line(pos, pos.getAdd(vel)),getDamage(),damageType)) break;
+        }
     }
 
     @Override
     public void update() {
-        vel.x *= .96f;
-        if (Math.abs(vel.x) <= 1) vel.x = 0;
+        vel.x *= .97f;
         int m = clip.update();
         if (state != Actions.Dead) {
             if (m != -1) moveTriggered(m);

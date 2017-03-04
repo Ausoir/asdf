@@ -2,6 +2,7 @@ package com.ga.unit.intelligence;
 
 import com.ga.game.Display;
 import com.ga.game.Input;
+import com.ga.game.Keybinding;
 import com.ga.map.Global;
 import com.ga.tool.Word;
 import com.ga.unit.Player;
@@ -11,7 +12,6 @@ import com.ga.unit.skill.Moveset;
 import com.ga.unit.skill.Skills;
 import com.ga.unit.skill.Spells;
 
-import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -22,17 +22,20 @@ import java.util.Map;
 public class PlayerInput implements Input {
     private HashMap<Integer, String> keyMap = new HashMap<Integer, String>(){{
         put(-1, Actions.Idle.getCodeName());
-        put(KeyEvent.VK_W, Skills.Jump.getCodeName());
-        put(KeyEvent.VK_A, Actions.WalkL.getCodeName());
-        put(KeyEvent.VK_S, Skills.Rest.getCodeName());
-        put(KeyEvent.VK_D, Actions.Walk.getCodeName());
-        put(KeyEvent.VK_R, Actions.Wield.getCodeName());
-        put(1, Actions.Use.getCodeName());
-        put(KeyEvent.VK_UP, Actions.LookUp.getCodeName());
-        put(KeyEvent.VK_LEFT, Actions.LookLeft.getCodeName());
-        put(KeyEvent.VK_DOWN, Actions.LookDown.getCodeName());
-        put(KeyEvent.VK_RIGHT, Actions.LookRight.getCodeName());
-        put(KeyEvent.VK_BACK_QUOTE, Actions.Recall.getCodeName());
+        put(Keybinding.get("W"), Skills.Jump.getCodeName());
+        put(Keybinding.get("A"), Actions.WalkL.getCodeName());
+        put(Keybinding.get("S"), Skills.Rest.getCodeName());
+        put(Keybinding.get("D"), Actions.Walk.getCodeName());
+        put(Keybinding.get("SPACE"), Skills.Kick.getCodeName());
+        put(Keybinding.get("R"), Actions.Wield.getCodeName());
+        put(Keybinding.get("M1"), Actions.Use.getCodeName());
+        put(Keybinding.get("M2"), Skills.Throw.getCodeName());
+        put(Keybinding.get("Q"), Skills.Throw.getCodeName());
+        put(Keybinding.get("UP"), Actions.LookUp.getCodeName());
+        put(Keybinding.get("LEFT"), Actions.LookLeft.getCodeName());
+        put(Keybinding.get("DOWN"), Actions.LookDown.getCodeName());
+        put(Keybinding.get("RIGHT"), Actions.LookRight.getCodeName());
+        put(Keybinding.get("GRAVE"), Actions.Recall.getCodeName());
     }};
     public Player host;
     public int moving = 0;
@@ -78,8 +81,8 @@ public class PlayerInput implements Input {
     public void input(int mode, int x, int y){
         x = (int) (x-host.pos.x);
         y = (int) (y-host.pos.y);
-        if (mode == KeyEvent.VK_ENTER) Display.chatbox.requestFocus();
-        else if (mode == KeyEvent.VK_TAB) Display.menu.toggle();
+        if (mode == Keybinding.get("ENTER")) Display.chatbox.requestFocus();
+        else if (mode == Keybinding.get("TAB")) Display.menu.toggle();
         else if (mode == 0) inputDirect(null,x,y);
         else if (keyMap.containsKey(mode)){
             inputDirect(keyMap.get(mode),x,y);
@@ -93,7 +96,7 @@ public class PlayerInput implements Input {
         if (p != null) {
             String t = p.substring(1);
             if (p.startsWith("O")) {
-                if (t.equals(KeyEvent.VK_SPACE + "")) host.setState(Skills.Guard);
+                if (t.equals(Keybinding.get("SPACE") + "")) host.setState(Skills.Guard);
             } else if (p.startsWith("I")) {
                 host.selectingItem = Integer.parseInt(t);
                 host.setState(Actions.Wield);
@@ -106,9 +109,13 @@ public class PlayerInput implements Input {
                 if (t.equals("Use")) {
                     if (host.state == Skills.Rest) host.setState(Skills.Slash);
                     else if (host.state == Actions.Walk) host.setState(Skills.Pierce);
+                    else if (host.state == Skills.Backstep) host.setState(Skills.Dash);
                     else if (host.state == Skills.Jump && host.delay.time > 32) host.stateSet(Skills.Airstrike);
                 } else if (t.equals("Jump") && host.state == Skills.Rest) host.setState(Skills.Leap);
                 else if (t.equals("Rest") && host.state == Actions.Walk) host.setState(Skills.Sprint);
+                else if (t.equals("Kick") && host.state == Skills.Rest) host.setState(Skills.Sidekick);
+                else if (t.equals("Backstep") && host.state == Skills.Rest) host.setState(Skills.Duck);
+                else if (t.equals("Rest") && host.state == Skills.Backstep) host.setState(Skills.Duck);
                 Moveset move = SkillTree.getByCodeName(p);
                 if (move != null) host.setState(move);
             }

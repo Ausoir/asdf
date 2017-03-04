@@ -59,8 +59,8 @@ public class Updater {
         clear();
         if (!editor) {
             addQueue.add(Global.player.host);
-            Global.player.host.cmap = changeMap;
-            Global.player.host.pos.set(FileManager.readMap(changeMap, changeMapPos));
+            Global.player.host.pos.set(FileManager.loadMap(changeMap, changeMapPos));
+            Global.player.host.cmap = changeMap.split(":")[0];
             Global.mapEdgeCenter(Global.cameraTo = Global.player.host.pos.getAdd(0,0));
             ((MainPlayer) Global.player.host).onMapChange();
             Display.input = Global.player;
@@ -69,7 +69,7 @@ public class Updater {
                 changeMapEvent = null;
             }
         } else {
-            FileManager.readMap(changeMap, -2);
+            FileManager.loadMap(changeMap, -2);
         }
         changeMap = null;
     }
@@ -179,41 +179,22 @@ public class Updater {
         ArrayList<Matter> result = new ArrayList<>();
         for (Matter i : matter){
             if (i.onInteract != null) {
-                if (i.pos.getMinus().getAdd(p).getDist() <= i.onInteract.range) result.add(i);
+                if (i.pos.getMinus().getAdd(p).getDist() <= i.onInteract.range+i.image.sizeRadius) result.add(i);
             }
         }
         return result;
     }
-    public static ArrayList<Matter> collide(P p, int r){
+    public static ArrayList<Matter> collideMatter(P p, int r){
         ArrayList<Matter> result = new ArrayList<>();
         for (Matter i : matter){
-            if (i.pos.getMinus().getAdd(p).getDist() <= r) result.add(i);
+            if (i.hittable(Faction.Destructive) && p.getSubtract(i.pos).getDist() <= r) result.add(i);
         }
         return result;
     }
-    public static Unit collide(Matter p, int r){
-        Unit result = null;
-        for (int i = 0; i < colidee.size(); i++) {
-            Unit t = colidee.get(i);
-            if (p.faction.canAttack(t.faction)) {
-                if (t.checkHit(p,r)) {
-                    result = t;
-                }
-            }
-        }
-        return result;
-    }
-    public static Unit collide(Matter host, Line p, boolean cleave){
-        Unit result = null;
-        for (int i = 0; i < colidee.size(); i++) {
-            Unit t = colidee.get(i);
-            if (host.faction.canAttack(t.faction)) {
-                if (t.checkHit(host,p)){
-                    host.attackHitSound();
-                    if (!cleave) return t;
-                    else result = t;
-                }
-            }
+    public static ArrayList<Unit> collideUnit(P p, int r, Faction faction){
+        ArrayList<Unit> result = new ArrayList<>();
+        for (Unit i : colidee){
+            if (i.hittable(faction) && p.getSubtract(i.pos).getDist() <= r) result.add(i);
         }
         return result;
     }

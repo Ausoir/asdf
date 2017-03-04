@@ -2,6 +2,8 @@ package com.ga.unit;
 
 import com.ga.map.Global;
 import com.ga.map.Picture;
+import com.ga.map.ShadedPicture;
+import com.ga.map.Shader;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
@@ -15,12 +17,11 @@ import java.util.ArrayList;
  */
 public class Organ extends Line {
     int strokeSize = 10;
-    protected Picture image;
+    protected ShadedPicture image;
     boolean amputated = false;
     public Unit host;
     private Organ parent;
     private ArrayList<Organ> children = new ArrayList<>();
-    private int sizeRadius;
     public int type;
     public int health = 1;
     boolean vital = false;
@@ -37,15 +38,12 @@ public class Organ extends Line {
         ptd = new P();
     }
     public void setImage(String p){
-        image = new Picture(p);
+        image = new ShadedPicture(p, null);
     }
     public void setImage(String p, int index){
-        image = new Picture(p, index);
+        image = new ShadedPicture(p, index, Shader.XYLinearGradient);
         image.setSize(strokeSize, 0);
-        setShader();
-    }
-    protected void setShader(){
-        image.setShader(Picture.Shader.XYLinearGradient);
+        image.shade();
     }
     public Picture getImage(){
         return image;
@@ -89,7 +87,8 @@ public class Organ extends Line {
             Line body = getAdd(host.pos);
             if (type == 0 && image != null) {
                 P t = body.pt;
-                if (Math.pow(sizeRadius, 2) - ((Math.pow(p.ptd.x - t.x, 2) + Math.pow(p.ptd.y - t.y, 2))) > 0) {
+                P m = p.getMidPoint();
+                if (Math.pow(image.sizeRadius, 2) - ((Math.pow(m.x - t.x, 2) + Math.pow(m.y - t.y, 2))) > 0) {
                     return true;
                 }
             } else if (p.lineCross(body)) {

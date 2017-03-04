@@ -20,7 +20,9 @@ public class MainPlayer extends Player {
                 if (hung < 0){
                     get("Health").add(hung);
                     say("I'm starving!");
-                } else if (hung < 10) say("I'm hungry!");
+                } else if (hung < 10){
+                    say("I'm hungry!");
+                }
             }
         };
     }
@@ -39,34 +41,50 @@ public class MainPlayer extends Player {
         }
         return super.setState(state);
     }
-    public void onCollide(Line r){
+    public void onCollide(final Line r){
         super.onCollide(r);
         if (r.opt >= 2) {
             if (state != Actions.Dead) {
                 if (r.opt >= 200){
                     if (state == Actions.Interact){
-                        clip.setState(Actions.Wait);
-                        Global.map.loadMap(r.opt - 200);
+                        stateSet(Actions.Wait);
+                        delay.set(30);
+                        delay.performer = new Performer(){
+                            public void perform(){
+                                Global.map.loadMap(r.opt - 200);
+                            }
+                        };
                     }
                 } else if (r.opt >= 100) Global.map.loadMap(r.opt - 100);
                 else if (r.opt == 2){
                     if (state == Actions.Interact){
-                        clip.setState(Actions.Wait);
-                        vel.set(0, 0);
-                        Global.map.teleport(pos, r);
+                        stateSet(Actions.Wait);
+                        delay.set(30);
+                        delay.performer = new Performer(){
+                            public void perform(){
+                                Global.map.teleport(pos, r);
+                                vel.set(0, 0);
+                            }
+                        };
                     }
                 }
             }
         }
     }
+    public void onTimeChange(int p){
+        Stat hunger = get("Hunger");
+        hunger.add(-2*p, true);
+        if (hunger.get() < 10) inventory.eat(hunger.getMax()-hunger.get());
+        inventory.onTimeChange(p);
+    }
     public void onMapChange(){
         reset();
-        get("Hunger").add(-2, true);
-        inventory.onMapChange();
+        stateSet(Actions.Wait);
+        delay.set(5);
     }
     public void update(){
         int edge = Global.mapEdge(pos.getAdd(vel));
-        if (edge % 2 == 0) Global.map.loadMap(edge, pos.y);
+        if (edge % 2 == 0 && Global.player.host.get("Hunger").get()+Global.player.host.get("Health").get() >= 2) Global.map.loadMap(edge, pos.y);
         super.update();
         if (state == Actions.LookUp) Global.mapEdgeCenter(Global.cameraTo = Global.cameraTo.getAdd(0,-80));
         else if (state == Actions.LookLeft) Global.mapEdgeCenter(Global.cameraTo = Global.cameraTo.getAdd(-80,0));

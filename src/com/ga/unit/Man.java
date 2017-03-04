@@ -97,11 +97,6 @@ public class Man extends Unit {
     }
 
     @Override
-    public void attackHitSound(){
-        Sound.play(weapon.getHitSound());
-    }
-
-    @Override
     public P getHand(){
         if (!clip.organs[FIST].amputated) return pos.getAdd(clip.organs[FIST].ptd);
         else if (!clip.organs[OFIST].amputated) return pos.getAdd(clip.organs[OFIST].ptd);
@@ -139,7 +134,6 @@ public class Man extends Unit {
                     break;
                 case Kick:
                     speed = 0;
-                    damageMod = 3;
                     damageType = DamageType.Push;
                     break;
                 case Lunge:
@@ -217,15 +211,10 @@ public class Man extends Unit {
     }
 
     @Override
-    public boolean hit(Matter hitter, int damage, DamageType type) {
-        target = hitter.pos.getAdd(0,0);
+    public boolean hit(Line hitbox, int damage, DamageType type) {
+        target = hitbox.pt.getAdd(0,0);
         armor.onHit();
-        return super.hit(hitter, damage, type);
-    }
-
-    @Override
-    public boolean isExhausted(){
-        return get("Stamina").get() < weapon.weight+armor.getWeight();
+        return super.hit(hitbox, damage, type);
     }
 
     public Stat get(String p){
@@ -239,13 +228,19 @@ public class Man extends Unit {
     }
 
     public void attack() {
-        Matter hit;
         boolean cleave = false;
         if (stats.triggerEffect(Buffs.Cleave)) cleave = true;
         Line hitbox = weapon.getLine();
-        hit = Updater.collide(this, hitbox, cleave);
-        if (hit != null){
+        boolean hit = false;
+        for (Unit i : Updater.collideUnit(pos, (int) hitbox.getLength(), faction)){
+            if (i.checkHit(hitbox,getDamage(),damageType)){
+                hit = true;
+                if (!cleave) break;
+            }
+        }
+        if (hit){
             weapon.use(1);
+            Sound.play(weapon.getHitSound());
             if (state == Underhand) get("Stamina").add(4);
             if (brain != null) brain.attacked();
             if (stats.triggerEffect(Buffs.Empower)){
@@ -256,31 +251,16 @@ public class Man extends Unit {
     }
 
     @Override
-    public void attackDenied(){
-        weapon.dir *= -1;
-    }
-
-    @Override
-    public boolean checkHit(Matter hitter, Line p){
-        if (state == Skills.Guard) {
-            if (faction.canAttack(hitter.faction)) {
-                if (hittable()) {
-                    if (p.lineCross(weapon.getLine())) {
-                        hitter.attackDenied();
-                        return false;
-                    }
-                }
-            }
-        }
-        return super.checkHit(hitter, p);
-    }
-
-    @Override
     protected void moveTriggered(int organ){
         weapon.rotate(target.getMult(dir, dir));
         weapon.rotation += .1f * dir;
         if (state instanceof Skills) {
-            ((Skills)state).trigger(this, organ);
+            if (state == Skills.Kick || state == Skills.Sidekick){
+                Line hitbox = clip.organs[organ].getAdd(pos);
+                int damage = armor.armor[stateLevel].getDamage()+1;
+                for (Unit i : Updater.collideUnit(pos, (int) hitbox.getLength(), faction))
+                    i.checkHit(hitbox,damage,damageType);
+            } else ((Skills)state).trigger(this, organ);
         }
     }
 

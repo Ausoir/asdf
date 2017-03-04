@@ -23,6 +23,7 @@ public class Weapon extends Item {
     public Weapon(String name, int seed, int weight, int uses, int num, int sides, Tag type) {
         super(name, seed, weight, uses, 100, 0.03f);
         setType(type);
+        randomSize();
         cooldown = 0;
         setDamage(num, sides);
         rotation = 35;
