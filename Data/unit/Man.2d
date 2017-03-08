@@ -90,6 +90,7 @@ Whirlwind@30,31
 Wait@53,-1
 Cast@36,36,11,-1
 Duck@20,20,20,-1
+Sneak@20,20,20,-1
 Consume@25,-1
 Exhausted@26,27
 Throw@6,7,8,-1

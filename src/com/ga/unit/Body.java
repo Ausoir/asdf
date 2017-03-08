@@ -1,6 +1,7 @@
 package com.ga.unit;
 
 import com.ga.map.Global;
+import com.ga.map.Shader;
 import com.ga.tool.Clips;
 import com.ga.tool.P;
 import com.ga.tool.Timer;
@@ -120,6 +121,13 @@ public class Body {
             if (Math.abs(nextClip[p][1]) > size) size = Math.abs(nextClip[p][1]);
             organs[p].ptd = new P(nextClip[p][0],nextClip[p][1]);
             organs[p].host = host;
+        }
+    }
+
+    public void setShade(Shader p){
+        for (int i=0;i<organs.length;i++){
+            organs[i].image.setShader(p);
+            organs[i].image.shade();
         }
     }
 

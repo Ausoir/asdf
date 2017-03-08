@@ -169,6 +169,7 @@ public class Unit extends Matter {
         Sound.play("swing");
     }
     public void stateSet(Moveset state){
+        if (state != Actions.Idle) this.state.onInterrupt(this);
         stats.unrest();
         delay.set(state.getDel());
         this.state = state;
@@ -198,6 +199,7 @@ public class Unit extends Matter {
                 }
             };
         }
+        this.state.onSet(this);
     }
     public boolean face(int dir) {
         if (!delay.over() || !jump || this.dir == dir) return false;
@@ -295,7 +297,7 @@ public class Unit extends Matter {
             jump = true;
             int mag = (int) (vel.y - Settings.gravityMax);
             if (vel.y > Settings.gravity*3) Sound.play("land");
-            if (mag >= 0){
+            if (mag >= 0 && state != Actions.Dead){
                 stateSet(Actions.Down);
                 delay.time += getStatPenalty()*20;
                 get("Health").add(-(getStatPenalty()+1+mag));
@@ -308,7 +310,7 @@ public class Unit extends Matter {
     }
 
     protected void stateDone(){
-        state.done(this);
+        state.onFinish(this);
         clip.setSpeed(8);
     }
 

@@ -28,7 +28,7 @@ public class ArmorSet {
     public void set(Armor p, int piece){
         if (p == null || p == bare[piece]){
             armor[piece] = bare[piece];
-            if (piece == 0) organs[piece].setImage(host.name);
+            if (piece == 0) organs[5].setImage(host.name);
             else if (piece == 1) {
                 organs[BodyHumanoid.LLEG].setImage("Underwear", 1);
                 organs[BodyHumanoid.RLEG].setImage("Underwear", 1);
@@ -39,7 +39,7 @@ public class ArmorSet {
             }
         } else {
             armor[piece] = p;
-            if (piece == 0) organs[piece].setImage(p.name);
+            if (piece == 0) organs[5].setImage(p.name);
             else if (piece == 1) {
                 organs[BodyHumanoid.LLEG].setImage(p.name, 1);
                 organs[BodyHumanoid.RLEG].setImage(p.name, 1);

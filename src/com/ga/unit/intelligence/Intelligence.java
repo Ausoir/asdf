@@ -19,11 +19,10 @@ import java.util.ArrayList;
  */
 public abstract class Intelligence implements Observer {
     protected Unit host;
-    protected Timer forget = new Timer(500, true);
+    protected Timer forget = new Timer(30, true);
     private ArrayList<Unit> seen;
     public Unit target;
     private Task task;
-    protected Communication comm;
     private int alertness = 0;
     public int range = 150;
     public Intelligence(Unit man){
@@ -111,11 +110,10 @@ public abstract class Intelligence implements Observer {
         if (alertness < 1) {
             int dir = u.pos.x - host.pos.x > 0 ? 1 : -1;
             if (!host.faction.canAttack(u.faction)) {
-                if (comm != null && u instanceof Man) {
+                if (u instanceof Man) {
                     if (u.isFacing(host.pos) && Math.abs(u.pos.x - host.pos.x) < 240) {
                         host.face(dir);
                         setTaskEcho(new Idle(host));
-                        host.say(comm.hear(p));
                     }
                 }
             } else {
@@ -132,8 +130,5 @@ public abstract class Intelligence implements Observer {
         }
     }
     protected void perceived(Matter p){
-    }
-    public void setComm(Communication comm) {
-        this.comm = comm;
     }
 }

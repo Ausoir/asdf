@@ -15,9 +15,11 @@ public class MainPlayer extends Player {
         super(p);
         final Stat hunger = get("Hunger");
         hunger.onChange = new Performer(){
-            public void perform(){
+            public void perform() {
                 int hung = hunger.get();
-                if (hung < 0){
+                if (hung < -50) {
+                    die();
+                } else if (hung < 0){
                     get("Health").add(hung);
                     say("I'm starving!");
                 } else if (hung < 10){
@@ -71,11 +73,15 @@ public class MainPlayer extends Player {
             }
         }
     }
-    public void onTimeChange(int p){
+    public void onTimeChange(int p) {
         Stat hunger = get("Hunger");
-        hunger.add(-2*p, true);
-        if (hunger.get() < 10) inventory.eat(hunger.getMax()-hunger.get());
+        hunger.add(-2 * p, true);
+        if (hunger.get() < 10) inventory.eat(hunger.getMax() - hunger.get());
         inventory.onTimeChange(p);
+        if (stats.getEffectsSize() == 0) {
+            get("Speed").heal();
+            get("Strength").heal();
+        }
     }
     public void onMapChange(){
         reset();

@@ -21,7 +21,7 @@ public class Stats {
     private ArrayList<int[]> effectLevels = new ArrayList<>();
     private ArrayList<Spell> effectEffects = new ArrayList<>();
     private HashMap<String, Stat> stats = new HashMap<>();
-    private Timer timer = new Timer(150, true);
+    private Timer timer = new Timer(100, true);
     Timer bloodTimer = new Timer(-1, true);
     private Unit host;
     public Stats(Unit host){
@@ -132,13 +132,6 @@ public class Stats {
                     else stats.get(buff.stat).add(-(int) buff.buff);
                 }
             }
-        }
-    }
-    public void healStats(){
-        Iterator it = stats.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
-            if (!pair.getKey().equals("Health") && !pair.getKey().equals("Endurance")) ((Stat)pair.getValue()).heal();
         }
     }
     public int getEffectsSize(){

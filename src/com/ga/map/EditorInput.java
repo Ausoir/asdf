@@ -24,6 +24,7 @@ public class EditorInput implements Input, Updatable, Drawable {
     private enum CreateTool {
         LINE, RECTANGLE
     }
+    private final int SNAP = 48;
     private String cunit = "Player";
     private String texture = null;
     private String auxTexture = null;
@@ -180,37 +181,53 @@ public class EditorInput implements Input, Updatable, Drawable {
         scanPolygon();
     }
 
+    private void removeTerrain(int next) {
+        Iterator it = Global.map.land.iterator();
+        Line i;
+        while (it.hasNext()) {
+            i = (Line) it.next();
+            if (i.next == next) {
+                it.remove();
+            }
+        }
+        Global.map.formTextures.remove(next);
+    }
+
     @Override
     public void input(int mode, int x, int y) {
         polygonReady = false;
         if (mode < 0) v.set(0, 0);
-        if (current != null){
-            if (shift) {
-                boolean snap = false;
-                for (int i = 0; i < Global.map.land.size(); i++) {
-                    Line l = Global.map.land.get(i);
-                    if (l != current) {
-                        final int snapThreshold = 24;
-                        if (Math.abs(l.pt.x - x) < snapThreshold && Math.abs(l.pt.y - y) < snapThreshold) {
-                            x = (int) l.pt.x;
-                            y = (int) l.pt.y;
-                            snap = true;
-                            polygonReady = true;
-                            break;
-                        } else if (Math.abs(l.ptd.x - x) < snapThreshold && Math.abs(l.ptd.y - y) < snapThreshold) {
-                            x = (int) l.ptd.x;
-                            y = (int) l.ptd.y;
-                            snap = true;
-                            break;
+        if (tool == Tool.CREATE) {
+            x = ((x + SNAP / 2) / SNAP) * SNAP;
+            y = ((y + SNAP / 2) / SNAP) * SNAP;
+            if (current != null) {
+                if (shift) {
+                    boolean snap = false;
+                    for (int i = 0; i < Global.map.land.size(); i++) {
+                        Line l = Global.map.land.get(i);
+                        if (l != current) {
+                            final int snapThreshold = 24;
+                            if (Math.abs(l.pt.x - x) < snapThreshold && Math.abs(l.pt.y - y) < snapThreshold) {
+                                x = (int) l.pt.x;
+                                y = (int) l.pt.y;
+                                snap = true;
+                                polygonReady = true;
+                                break;
+                            } else if (Math.abs(l.ptd.x - x) < snapThreshold && Math.abs(l.ptd.y - y) < snapThreshold) {
+                                x = (int) l.ptd.x;
+                                y = (int) l.ptd.y;
+                                snap = true;
+                                break;
+                            }
                         }
                     }
+                    if (!snap) {
+                        if (Math.abs(current.getSlope()) <= 1.5f) y = (int) current.pt.y;
+                        else x = (int) current.pt.x;
+                    }
+                } else if (current.opt == 1) {
+                    x = (int) current.pt.x;
                 }
-                if (!snap){
-                    if (Math.abs(current.getSlope()) <= 1.5f) y = (int) current.pt.y;
-                    else x = (int) current.pt.x;
-                }
-            } else if (current.opt == 1){
-                x = (int) current.pt.x;
             }
         }
         switch (mode) {
@@ -266,13 +283,26 @@ public class EditorInput implements Input, Updatable, Drawable {
                 break;
             case -1:
                 if (tool == Tool.DELETE && lmb){
-                    Iterator it = Global.map.land.iterator();
-                    Line i;
-                    while (it.hasNext()){
-                        i = (Line) it.next();
-                        if (i.lineCross(new Line(new P(x,y),lmbP))){
-                            Global.map.formTextures.remove(i.next);
-                            it.remove();
+                    if (shift){
+                        Iterator it = Global.map.land.iterator();
+                        Line i;
+                        int n = -1;
+                        while (it.hasNext()) {
+                            i = (Line) it.next();
+                            if (i.lineCross(new Line(new P(x, y), lmbP))) {
+                                n = i.next;
+                            }
+                        }
+                        if (n != -1) removeTerrain(n);
+                    } else {
+                        Iterator it = Global.map.land.iterator();
+                        Line i;
+                        while (it.hasNext()) {
+                            i = (Line) it.next();
+                            if (i.lineCross(new Line(new P(x, y), lmbP))) {
+                                Global.map.formTextures.remove(i.next);
+                                it.remove();
+                            }
                         }
                     }
                 } else if (tool == Tool.NONE && lmb){

@@ -9,7 +9,9 @@ import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.unit.*;
-import com.ga.unit.intelligence.UnitIntelligence;
+import com.ga.unit.intelligence.IntelligenceSocial;
+import com.ga.unit.intelligence.MerchantIntelligence;
+import com.ga.unit.intelligence.ResidentIntelligence;
 import com.ga.unit.item.*;
 import com.ga.unit.skill.*;
 
@@ -83,7 +85,10 @@ public class Stock {
             new Factory("Cleaver"){ public Matter make(int seed){
                 return new Weapon(name,seed,1,10,1,6,Item.Tag.Sword); //name,seed,weight,uses,dmgNum,dmgSide,type
             }},
-            new Factory("Lancesword"){ public Matter make(int seed){ //15
+            new Factory("Lancesword"){ public Matter make(int seed){
+                return new Weapon(name,seed,1,10,1,6,Item.Tag.Spear); //name,seed,weight,uses,dmgNum,dmgSide,type
+            }},
+            new Factory("Lanceblade"){ public Matter make(int seed){
                 return new Weapon(name,seed,1,10,1,6,Item.Tag.Sword); //name,seed,weight,uses,dmgNum,dmgSide,type
             }},
             new Factory("Cutlass"){ public Matter make(int seed){
@@ -152,27 +157,36 @@ public class Stock {
             }},
             new Factory("Steel Armor Legging"){ public Matter make(int seed){
                 Armor r = new Armor("Steel Armor",seed,1,10,1,1,1); //name,seed,weight,uses,armor,encumberance,piece
+                r.breakable = false;
                 r.pocket = 1;
                 return r;
             }},
             new Factory("Steel Armor Torso"){ public Matter make(int seed){
-                return new Armor("Steel Armor",seed,1,10,1,1,2); //name,seed,weight,uses,armor,encumberance,piece
+                Armor r = new Armor("Steel Armor",seed,1,10,1,1,2); //name,seed,weight,uses,armor,encumberance,piece
+                r.breakable = false;
+                return r;
             }},
             new Factory("Chainmail Legging"){ public Matter make(int seed){
                 Armor r = new Armor("Chainmail",seed,1,10,1,1,1); //name,seed,weight,uses,armor,encumberance,piece
+                r.breakable = false;
                 r.pocket = 1;
                 return r;
             }},
             new Factory("Chainmail Torso"){ public Matter make(int seed){
-                return new Armor("Chainmail",seed,1,10,1,1,2); //name,seed,weight,uses,armor,encumberance,piece
+                Armor r = new Armor("Chainmail",seed,1,10,1,1,2); //name,seed,weight,uses,armor,encumberance,piece
+                r.breakable = false;
+                return r;
             }},
             new Factory("Platemail Legging"){ public Matter make(int seed){
                 Armor r = new Armor("Platemail",seed,1,10,1,1,1); //name,seed,weight,uses,armor,encumberance,piece
+                r.breakable = false;
                 r.pocket = 1;
                 return r;
             }},
             new Factory("Platemail Torso"){ public Matter make(int seed){
-                return new Armor("Platemail",seed,1,10,1,1,2); //name,seed,weight,uses,armor,encumberance,piece
+                Armor r = new Armor("Platemail",seed,1,10,1,1,2); //name,seed,weight,uses,armor,encumberance,piece
+                r.breakable = false;
+                return r;
             }},
             new Factory("Shadowrobe Legging"){ public Matter make(int seed){
                 Armor r = new Armor("Shadowrobe",seed,1,10,1,1,1); //name,seed,weight,uses,armor,encumberance,piece
@@ -183,7 +197,9 @@ public class Stock {
                 return new Armor("Shadowrobe",seed,1,10,1,1,2); //name,seed,weight,uses,armor,encumberance,piece
             }},
             new Factory("Lace Helm"){ public Matter make(int seed){
-                return new Armor(name,seed,1,10,1,1,0); //name,seed,weight,uses,armor,encumberance,piece
+                Armor r = new Armor(name,seed,1,10,1,1,0); //name,seed,weight,uses,armor,encumberance,piece
+                r.breakable = false;
+                return r;
             }},
             new Factory("Full Helm"){ public Matter make(int seed){ //70
                 return new Armor(name,seed,1,10,1,1,0); //name,seed,weight,uses,armor,encumberance,piece
@@ -273,7 +289,41 @@ public class Stock {
                 item.onInteract = null;
                 return item;
             }},
-            new Factory("Bridge1"){ public Matter make(int seed){ //80
+            new Factory("HouseB"){ public Matter make(int seed){
+                Matter item = new Matter(null, seed, 5){
+                    public void update(){}
+                    public void randomSize(){
+                        P s = image.getSize();
+                        float r = rand.nextFloat()*.2f+.9f;
+                        image.setSize(s.x * r, s.y * r);
+                        sizeMod = r;
+                    }
+                };
+                item.randomSize();
+                item.name = "SteamHouse"+((item.seed % 4)+1);
+                item.setImage(item.name);
+                item.onInteract = null;
+                return item;
+            }},
+            new Factory("Clockwork"){ public Matter make(int seed){
+                Matter item = new Matter(null, seed, 31){
+                    public void update(){
+                        rotation += .1f;
+                    }
+                    public void randomSize(){
+                        P s = image.getSize();
+                        float r = rand.nextFloat()+.5f;
+                        image.setSize(s.x * r, s.y * r);
+                        sizeMod = r;
+                    }
+                };
+                item.randomSize();
+                item.name = "Clockwork"+((item.seed % 6)+1);
+                item.setImage(item.name);
+                item.onInteract = null;
+                return item;
+            }},
+            new Factory("Bridge1"){ public Matter make(int seed){
                 Matter r = new Matter(name, seed, 15){
                     public void update(){}
                 };
@@ -323,6 +373,7 @@ public class Stock {
                         return false;
                     }
                 };
+                item.value = 128;
                 item.setType(Item.Tag.Enchant);
                 item.delay = 45;
                 return item;
@@ -338,6 +389,7 @@ public class Stock {
                         return false;
                     }
                 };
+                item.value = 128;
                 item.setType(Item.Tag.Enchant);
                 item.delay = 45;
                 return item;
@@ -361,6 +413,7 @@ public class Stock {
                         return false;
                     }
                 };
+                item.value = 16;
                 item.probability = 1;
                 item.setType(Item.Tag.Scroll);
                 item.delay = 30;
@@ -369,28 +422,33 @@ public class Stock {
             new Factory("Fireball"){ public Matter make(int seed){
                 Item item = new Item(name, seed, 1, 3, 1, 0) {
                     @Override
-                    public boolean use(Man host) {
+                    public boolean use(final Man host) {
                         if (super.use(host)) {
-                            final Projectile p = new Projectile("Fireball", host.pos.getAdd(host.clip.organs[BodyHumanoid.FIST].ptd), host.pos.getAdd(host.target), 20+host.get("Stamina").get()){
-                                @Override
-                                public void stuck(){
-                                    Particle.explosion(pos);
-                                    explode(60);
-                                    remove();
-                                }
-                                @Override
-                                public void update(){
-                                    super.update();
-                                    Particle.dripFire(pos);
-                                }
-                            };
-                            p.faction = host.faction;
-                            p.damage = 30;
-                            p.gravity = true;
-                            p.delay.set(50);
-                            p.delay.performer = new Performer(){
-                                public void perform(){
-                                    p.stuck();
+                            host.delay.performer = new Performer() {
+                                public void perform() {
+                                    final Projectile p = new Projectile("Fireball", host.pos.getAdd(host.clip.organs[BodyHumanoid.FIST].ptd), host.pos.getAdd(host.target), 20 + host.get("Stamina").get()) {
+                                        @Override
+                                        public void stuck() {
+                                            Particle.explosion(pos);
+                                            explode(60);
+                                            remove();
+                                        }
+
+                                        @Override
+                                        public void update() {
+                                            super.update();
+                                            Particle.dripFire(pos);
+                                        }
+                                    };
+                                    p.faction = host.faction;
+                                    p.damage = 50;
+                                    p.gravity = true;
+                                    p.delay.set(50);
+                                    p.delay.performer = new Performer() {
+                                        public void perform() {
+                                            p.stuck();
+                                        }
+                                    };
                                 }
                             };
                             return true;
@@ -398,8 +456,9 @@ public class Stock {
                         return false;
                     }
                 };
+                item.value = 16;
                 item.delay = 10;
-                item.setType(Item.Tag.Throwing);
+                item.setType(Item.Tag.Darting);
                 return item;
             }},
             new Factory("Tanto"){ public Matter make(int seed){
@@ -418,7 +477,7 @@ public class Stock {
                                     };
                                     p.rotSpeed = 0;
                                     p.faction = host.faction;
-                                    p.damage = 10;
+                                    p.damage = 15;
                                     p.gravity = false;
                                     p.delay.performer = new Performer(){
                                         @Override
@@ -433,6 +492,7 @@ public class Stock {
                         return false;
                     }
                 };
+                item.value = 16;
                 item.delay = 10;
                 item.setType(Item.Tag.Darting);
                 return item;
@@ -472,6 +532,7 @@ public class Stock {
                 item.randomSize();
                 item.setImage(item.name);
                 item.setType(Item.Tag.Food);
+                item.value = 4;
                 return item;
             }},
             new Factory("Meal"){ public Matter make(int seed){
@@ -482,6 +543,7 @@ public class Stock {
                 else item.name = "Meal";
                 item.setImage(item.name);
                 item.setType(Item.Tag.Food);
+                item.value = 12;
                 return item;
             }},
             new Factory("Ration"){ public Matter make(int seed){
@@ -492,18 +554,48 @@ public class Stock {
                 item.randomSize();
                 item.setImage(item.name);
                 item.setType(Item.Tag.Food);
+                item.value = 16;
                 return item;
             }},
-            new ManFactory("Punk"){ public Matter make(int seed){
-                Man r = getMan(seed,getStat(12,40,40,10,0),Faction.Punk,"-5,50/Kick&Swing,Pierce&Dash",
-                        new String[]{"Stick","Axe","Pick","Broadsword"},
+            new ManFactory("Resident"){ public Matter make(int seed){
+                Man r = getMan(seed,getStat(4,30,0,20,0),Faction.Helpless,"200/Sprint",
+                        null,
                         new String[]{"Cotton Clothing","Fabric Clothing"});
+                r.speechType = "resident";
+                r.brain = new ResidentIntelligence(r);
+                return r;
+            }},
+            new ManFactory("Merchant"){ public Matter make(int seed){
+                Man r = getMan(seed,getStat(4,30,0,20,0),Faction.Neutral,"200/Sprint",
+                        null,
+                        new String[]{"Suit"});
+                r.speechType = "merchant";
+                r.brain = new MerchantIntelligence(r);
+                return r;
+            }},
+            new ManFactory("Guard"){ public Matter make(int seed){
+                Man r = getMan(seed,getStat(12,40,5,40,0),Faction.Neutral,"-5,50/Swing,Pierce&Dash",
+                        new String[]{"Broadsword"},
+                        new String[]{"Leather Armor","Fabric Clothing"});
+                r.armor.set((Armor) getByName("Lace Helm",-1),0);
+                r.speechType = "soldier";
+                r.brain = new IntelligenceSocial(r);
+                return r;
+            }},
+            new ManFactory("Punk"){ public Matter make(int seed){
+                Man r = getMan(seed,getStat(12,40,0,40,0),Faction.Punk,"-5,5/Swing,Pierce&Dash",
+                        new String[]{"Stick","Axe","Pick"},
+                        new String[]{"Cotton Clothing","Fabric Clothing"});
+                r.speechType = "punk";
+                r.brain = new IntelligenceSocial(r);
                 return r;
             }},
             new ManFactory("Phantom"){ public Matter make(int seed){
-                Man r = getMan(seed,getStat(12,40,40,10,0),Faction.Punk,"-5,50/Kick&Swing,Pierce&Dash",
+                Man r = getMan(seed,getStat(12,40,10,50,0),Faction.Punk,"-5,50/Swing,Pierce&Dash",
                         new String[]{"Stick","Axe","Pick","Broadsword"},
-                        new String[]{"Cotton Clothing","Fabric Clothing"});
+                        new String[]{"Shadowrobe"});
+                r.clip.organs[5].setImage("Phantom");
+                r.brain = new IntelligenceSocial(r);
                 return r;
             }},
             new UnitFactory("Dog") { Matter make(int seed) {
@@ -664,7 +756,7 @@ abstract class UnitFactory extends Factory{
         return name+"@"+seed+"@0,0@"+Updater.getId()+"@"+stat+"@"+faction.name()+"@"+moves;
     }
     Unit process(Unit p){
-        p.brain = new UnitIntelligence(p);
+        p.brain = new IntelligenceSocial(p);
         p.clip = new Body(p, p.name);
         return p;
     }
@@ -674,9 +766,6 @@ abstract class ManFactory extends UnitFactory{
     ManFactory(String name) {
         super(name);
     }
-    private String getFace(){
-        return manHeads[Global.r.nextInt(manHeads.length)];
-    }
     private Armor getArmor(String p, int piece){
         String pieceName = "";
         if (piece == 1) pieceName = "Legging";
@@ -684,11 +773,12 @@ abstract class ManFactory extends UnitFactory{
         return (Armor) Stock.getByName(p+" "+pieceName,-1);
     }
     Man getMan(int seed, String stat, Faction faction, String moves, String[] weapon, String[] armor){
-        String r = getUnit(getFace(),seed,stat,faction,moves);
+        String r = getUnit("Man",seed,stat,faction,moves);
         r += "##None&None&None";
         String arm = armor[Global.r.nextInt(armor.length)];
         Man m = new Man(r);
-        m.setWeapon((Item) Stock.getByName(weapon[Global.r.nextInt(weapon.length)],-1));
+        m.clip.organs[5].setImage(manHeads[m.rand.nextInt(manHeads.length)]);
+        if (weapon != null) m.setWeapon((Item) Stock.getByName(weapon[Global.r.nextInt(weapon.length)],-1));
         m.armor.set(getArmor(arm,1),1);
         m.armor.set(getArmor(arm,2),2);
         return m;

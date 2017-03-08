@@ -19,9 +19,9 @@ public class Item extends Matter {
     public enum Tag{
         Sword(Skills.Swing, DamageType.Cut, "swing_knife", "hit_cut"), Spear(Skills.Pierce, DamageType.Cut, "swing_silent", "hit_bloody"), Mace(Skills.Swing, DamageType.Bash, "swing_silent", "hit_bash"),
         Dagger(Skills.Pierce, DamageType.Cut, "swing_normal", "hit_bloody"), Armor(Skills.Rest, DamageType.Push, "swing_normal"), Scroll(Skills.Guard, DamageType.Push, "scroll"),
-        Rapier(Skills.Pierce, DamageType.Cut, "swing_silent", "hit_cut"), Shoot(Skills.Shoot, DamageType.Cut, "swing_normal"), Snipe(Skills.Snipe, DamageType.Cut, "swing_normal"), Throwing(Skills.Throw, DamageType.Cut, "swing_normal"),
-        Darting(Skills.Dart, DamageType.Cut, "swing_normal"), Consumable(Actions.Consume, DamageType.Push, "drink"), Claw(Skills.Swing, DamageType.Cut, "swing_normal"),
-        Enchant(Actions.Buff, DamageType.Push, "swing_normal"), Food(Actions.Consume, DamageType.Push, "eat");
+        Rapier(Skills.Pierce, DamageType.Cut, "swing_silent", "hit_cut"), Shoot(Skills.Shoot, DamageType.Cut, "swing_normal"), Snipe(Skills.Snipe, DamageType.Cut, "swing_normal"),
+        Throwing(Skills.Throw, DamageType.Cut, "swing_normal"), Darting(Skills.Dart, DamageType.Cut, "swing_normal"), Consumable(Actions.Consume, DamageType.Push, "drink"),
+        Claw(Skills.Swing, DamageType.Cut, "swing_normal"), Enchant(Actions.Buff, DamageType.Push, "swing_normal"), Food(Actions.Consume, DamageType.Push, "eat");
         private Moveset action;
         private DamageType type;
         private String sound, soundHit = "hit_punch";
@@ -125,7 +125,8 @@ public class Item extends Matter {
     private Organ organ = null;
     public int speed = 0;
     public int damage = 1;
-    protected float sizeMod;
+    public int value = 8;
+    public boolean breakable = true;
     public Item(String name, int seed, int weight, int uses, int cooldown, float enchantRatio) {
         super(name, seed, 8);
         this.name = name;
@@ -151,13 +152,6 @@ public class Item extends Matter {
                 }
             }
         };
-    }
-    public void randomSize(){
-        P s = image.getSize();
-        float rx = rand.nextFloat();
-        float ry = rand.nextFloat();
-        image.setSize(s.x * (rx * .6f + .7f), s.y * (ry * .6f + .7f));
-        sizeMod = (rx + ry)/2;
     }
     public void setImage(String p){
         super.setImage(p);
@@ -253,37 +247,37 @@ public class Item extends Matter {
         return result;
     }
     public int getValue(){
-        int r;
+        float r = value;
         int adverb = admod.ordinal()+1;
         boolean special = smod != SpecialtyMod.None;
         switch (pmod.ordinal()){
             case 0:
-                r = 100;
+                r *= 1;
                 break;
             case 1:
-                r = 20;
+                r *= .8f;
                 break;
             case 2:
-                r = 50;
+                r *= .9f;
                 break;
             case 3:
-                r = 1000;
+                r *= 5;
                 break;
             case 4:
-                r = 5000;
+                r *= 15;
                 break;
             default:
-                r = 50000;
+                r *= 100;
                 break;
         }
         if (smod == SpecialtyMod.Cursed){
-            r = 1;
+            r *= .1f;
         } else if (special) r += (r*adverb);
         if (emod != null){
             r += 500;
             r *= 2;
         }
-        return r;
+        return (int) r;
     }
     public String getRarityDescription(){
         String r = Dialog.get("item1");
@@ -330,6 +324,7 @@ public class Item extends Matter {
     public boolean use(int p){
         if (canUse()){
             if (uses.get() != -1) uses.add(-p);
+            if (breakable && uses.get() == 0) remove();
             return true;
         }
         return false;

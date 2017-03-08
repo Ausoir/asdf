@@ -163,6 +163,7 @@ public class FileManager {
                 }
             }
         }
+        Global.player.host.cmap = dir;
         return r;
     }
 

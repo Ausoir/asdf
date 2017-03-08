@@ -74,7 +74,15 @@ public enum Actions implements Moveset {
     }
 
     @Override
-    public void done(Unit p){
+    public void onSet(Unit p){
+    }
+
+    @Override
+    public void onFinish(Unit p){
         p.setState(Idle);
+    }
+
+    @Override
+    public void onInterrupt(Unit p){
     }
 }

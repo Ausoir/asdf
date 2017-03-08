@@ -22,6 +22,8 @@ public class Weapon extends Item {
     private float damageMod = 1;
     public Weapon(String name, int seed, int weight, int uses, int num, int sides, Tag type) {
         super(name, seed, weight, uses, 100, 0.03f);
+        value = 36;
+        breakable = false;
         setType(type);
         randomSize();
         cooldown = 0;

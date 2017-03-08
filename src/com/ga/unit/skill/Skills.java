@@ -3,6 +3,7 @@ package com.ga.unit.skill;
 import com.ga.game.Dialog;
 import com.ga.game.Sound;
 import com.ga.map.Global;
+import com.ga.map.Shader;
 import com.ga.tool.EventTimer;
 import com.ga.tool.Line;
 import com.ga.tool.P;
@@ -82,6 +83,22 @@ public enum Skills implements Moveset {
             if (host.stats.rest(4+lvl)) host.setState(Actions.Idle);
         }
     },null),
+    Sneak(3,-1,0,0,Dialog.get("mvsDscSneak"),new Spell(){
+        public void perform(Unit host, int lvl){
+            host.stats.rest(2+lvl);
+        }
+    },null){
+        public void onSet(Unit p){
+            p.clip.setShade(Shader.Gray);
+            p.setDepth(3);
+        }
+        public void onFinish(Unit p){
+        }
+        public void onInterrupt(Unit p){
+            p.clip.setShade(Shader.XYLinearGradient);
+            p.setDepth(10);
+        }
+    },
     Underhand(32,0,0,0,Dialog.get("mvsDscUnderhand"),null,new Spell(){
         public void perform(Unit host, int lvl){
             host.attackSound();
@@ -262,12 +279,19 @@ public enum Skills implements Moveset {
     }
 
     @Override
-    public void done(Unit p){
+    public void onSet(Unit p){
+    }
+
+    @Override
+    public void onFinish(Unit p){
         p.setState(Actions.Idle);
     }
 
     public void trigger(Unit p, int p2){
         if (trigger != null) trigger.perform(p, p2);
+    }
+
+    public void onInterrupt(Unit p){
     }
 
     public static Moveset getByName(String p) {

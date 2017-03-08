@@ -39,9 +39,12 @@ public class Picture extends Texture {
             x = rx - xMid;
             y = ry - yMid;
             g.rotate(rot, rx, ry);
-            g.drawImage(image, (int) x, (int) y, (int) sizeX * dir, (int) sizeY, null);
+            drawImage(g, (int) x, (int) y, (int) sizeX*dir, (int) sizeY);
             g.rotate(-rot, rx, ry);
         }
+    }
+    protected void drawImage(Graphics2D g, int x, int y, int sizeX, int sizeY){
+        g.drawImage(image, x, y, sizeX, sizeY, null);
     }
     public void draw(Graphics2D g, float x, float y, float rot, int dir){
         draw(g,x,y,rot,dir,size.x,size.y);

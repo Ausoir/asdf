@@ -1,8 +1,5 @@
 package com.ga.unit.intelligence;
 
-import com.ga.map.Global;
-import com.ga.tool.Line;
-import com.ga.unit.Man;
 import com.ga.unit.Matter;
 import com.ga.unit.Unit;
 import com.ga.unit.skill.Actions;
@@ -10,11 +7,11 @@ import com.ga.unit.skill.Actions;
 /**
  * Created by Ga on 7/30/2016.
  */
-public class UnitIntelligence extends Intelligence {
+public class IntelligenceSocial extends Intelligence {
     protected Unit leader;
     private int charisma;
     private int travel = -1; //top left:1, top right:2, bottom left:3, bottom right:4
-    public UnitIntelligence(Unit man){
+    public IntelligenceSocial(Unit man){
         super(man);
         charisma = host.rand.nextInt(7);
         leader = null;
@@ -29,8 +26,8 @@ public class UnitIntelligence extends Intelligence {
                     setTaskEcho(new Hunt(host));
                 }
             } else if (host.faction == p.faction){
-                if (leader == null && ((UnitIntelligence)unit.brain).charisma > charisma) {
-                    ((UnitIntelligence)unit.brain).charisma--;
+                if (leader == null && ((IntelligenceSocial)unit.brain).charisma > charisma) {
+                    ((IntelligenceSocial)unit.brain).charisma--;
                     leader = unit;
                     setTaskEcho(new Follow(host, leader));
                 }

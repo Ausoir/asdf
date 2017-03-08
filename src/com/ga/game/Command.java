@@ -37,7 +37,7 @@ public class Command {
                 else if (cmd[0].equals("advSpell")) for (int num=0;num<Integer.parseInt(cmd[1].split(":")[1]);num++) host.skillTree.advanceSkill(Spells.valueOf(cmd[1].split(":")[0]),false);
                 else if (cmd[0].equals("advSpellCd")) for (int num=0;num<Integer.parseInt(cmd[1].split(":")[1]);num++) host.skillTree.advanceSkill(Spells.valueOf(cmd[1].split(":")[0]),true);
                 else if (cmd[0].equals("man")) Stock.getByName(cmd[1], -1).pos.set(host.pos.getAdd(host.target));
-                else if (cmd[0].equals("mob")) for (int num=0;num<Integer.parseInt(cmd[1].split(":")[1]);num++) Stock.getByName(cmd[1], -1).pos = host.pos.getAdd(host.target);
+                else if (cmd[0].equals("mob")) for (int num=0;num<Integer.parseInt(cmd[2]);num++) Stock.getByName(cmd[1], -1).pos.set(host.pos.getAdd(host.target));
                 else if (cmd[0].equals("item")) host.setWeapon((Item) Stock.getByName(cmd[1], -1));
                 else if (cmd[0].equals("itemN")) host.setWeapon((Item) Stock.get(new String[]{cmd[1],cmd[2]}));
                 else if (cmd[0].equals("tp")) host.pos.add(Integer.parseInt(cmd[1].split(",")[0]),Integer.parseInt(cmd[1].split(",")[1]));

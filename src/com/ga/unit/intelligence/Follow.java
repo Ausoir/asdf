@@ -3,7 +3,6 @@ package com.ga.unit.intelligence;
 import com.ga.unit.Matter;
 import com.ga.unit.Unit;
 import com.ga.unit.skill.Actions;
-import com.ga.unit.skill.Skills;
 
 /**
  * Created by Ga on 7/30/2016.
@@ -18,7 +17,7 @@ public class Follow implements Task {
 
     @Override
     public void blocked(boolean fall) {
-        ((UnitIntelligence)host.brain).leader = null;
+        ((IntelligenceSocial)host.brain).leader = null;
     }
 
     public void update() {

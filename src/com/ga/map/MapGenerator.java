@@ -10,6 +10,7 @@ public class MapGenerator {
     public static P generate(String map, int repeat, String to, int toPos, int returnDist, String returnAddr, int returnPos){
         P r = null;
         if (map.equals("Plains")) r = generatePlains(repeat, to, toPos, returnDist, returnAddr, returnPos);
+        Global.player.host.cmap = "Instance";
         return r;
     }
     private static P generatePlains(int toDist, String to, int toPos, int returnDist, String returnAddr, int returnPos){

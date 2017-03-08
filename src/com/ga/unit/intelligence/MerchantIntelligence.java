@@ -15,10 +15,10 @@ import static com.ga.game.Display.menuShop;
 /**
  * Created by Ga on 7/31/2016.
  */
-public class MerchantIntelligence extends Intelligence {
+public class MerchantIntelligence extends ResidentIntelligence {
     enum MerchantType{
         SUBURBAN(new String[]{"Pistol","Revolver","Rifle"}),
-        FOREST(new String[]{"Axe","Fireball","Potion"});
+        FOREST(new String[]{"Axe","Fireball","Potion","Scroll"});
         String[] items;
         MerchantType(String[] items){
             this.items = items;
@@ -41,8 +41,7 @@ public class MerchantIntelligence extends Intelligence {
                 }
             }
         };
-        comm = new Communication();
-        type = MerchantType.SUBURBAN;//MerchantType.values()[man.rand.nextInt(MerchantType.values().length)];
+        type = MerchantType.values()[man.rand.nextInt(MerchantType.values().length)];
         String r = "I'm selling ";
         int length = host.rand.nextInt(12)+2;
         String[] items = new String[length];
@@ -54,7 +53,7 @@ public class MerchantIntelligence extends Intelligence {
         price = new int[length];
         action = new Performer[length];
         for (int i = 0; i < length; i++) {
-            Item item = (Item) Stock.get(new String[]{items[i]+"", "-1"});
+            Item item = (Item) Stock.getByName(items[i],-1);
             int value = fluctuate(item.getValue());
             product[i] = item;
             price[i] = value;
@@ -67,16 +66,10 @@ public class MerchantIntelligence extends Intelligence {
                     menuShop.setVisible(false);
                 }
             };
-            String desc = "This is " + item.getDescription();
-            desc += " This is a " + item.getRarityDescription() + " item.";
-            desc += " I'll sell it for " + value + " gold!";
-            comm.addReply(items[i].toLowerCase(), desc);
-            comm.addTopic(items[i]);
             if (i == length - 1) r += "and " + item.getFullName() + "!";
             else r += item.getFullName() + ", ";
         }
         ad = r;
-        comm.addReply("menuShop","@menuShop");
     }
     private int fluctuate(int value){
         float fluc = (host.rand.nextFloat()*(high-low))+low;
@@ -86,7 +79,7 @@ public class MerchantIntelligence extends Intelligence {
     public void hear(Matter u, String p){
         super.hear(u, p);
         if (u == Global.player.host) {
-            if (p.equals("menuShop")) {
+            if (p.equals("shop")) {
                 menuShop.show("Trader's Wares - \""+host.getConversation()+"\"", product, price, action);
             }
         }

@@ -7,7 +7,7 @@ import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.unit.*;
-import com.ga.unit.intelligence.UnitIntelligence;
+import com.ga.unit.intelligence.IntelligenceSocial;
 import com.ga.unit.item.Projectile;
 
 import java.util.ArrayList;
@@ -93,7 +93,7 @@ public enum Spells implements Moveset {
                 p.stats.setStat("expire",new Stat(500+(level*100)));
                 host.get("Stamina").reserve += 3;
                 host.get("Stamina").add(0);
-                p.brain = new UnitIntelligence(p);
+                p.brain = new IntelligenceSocial(p);
                 p.dir = -host.dir;
                 p.faction = host.faction;
                 p.clip.setState(Actions.Buff);
@@ -408,6 +408,14 @@ public enum Spells implements Moveset {
     }
 
     @Override
-    public void done(Unit p){
+    public void onSet(Unit p){
+    }
+
+    @Override
+    public void onFinish(Unit p){
+    }
+
+    @Override
+    public void onInterrupt(Unit p){
     }
 }

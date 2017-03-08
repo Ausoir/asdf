@@ -12,6 +12,7 @@ import com.ga.tool.Performer;
 import com.ga.tool.Timer;
 import com.ga.unit.intelligence.Intelligence;
 import com.ga.unit.item.Item;
+import com.ga.unit.skill.Skills;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -60,7 +61,6 @@ public class Updater {
         if (!editor) {
             addQueue.add(Global.player.host);
             Global.player.host.pos.set(FileManager.loadMap(changeMap, changeMapPos));
-            Global.player.host.cmap = changeMap.split(":")[0];
             Global.mapEdgeCenter(Global.cameraTo = Global.player.host.pos.getAdd(0,0));
             ((MainPlayer) Global.player.host).onMapChange();
             Display.input = Global.player;
@@ -202,7 +202,7 @@ public class Updater {
         ArrayList<Unit> seen = new ArrayList<>();
         int max = r;
         for (Unit i : colidee){
-            if (host != i) {
+            if (host != i && i.state != Skills.Sneak) {
                 float x = Math.abs(i.pos.x-vision.x), y = Math.abs(i.pos.y - vision.y);
                 if (x < r && y < r/3) {
                     if (x+y < max){

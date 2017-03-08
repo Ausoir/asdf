@@ -31,7 +31,6 @@ public class Food extends Item {
             } else {
                 p.get("Hunger").add(hunger);
             }
-            if (uses.get() == 0) remove();
         }
         return r;
     }

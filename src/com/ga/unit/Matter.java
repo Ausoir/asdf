@@ -22,6 +22,7 @@ public class Matter extends Thing implements Updatable {
     public DamageType damageType = DamageType.Bash;
     protected boolean tangible = true;
     public Interactive onInteract = null;
+    protected float sizeMod;
     public Matter(){
         super(null);
     }
@@ -30,6 +31,13 @@ public class Matter extends Thing implements Updatable {
         if (seed == -1) this.seed = Global.getSeed();
         else this.seed = seed;
         rand = new Random(this.seed);
+    }
+    public void randomSize(){
+        P s = image.getSize();
+        float rx = rand.nextFloat();
+        float ry = rand.nextFloat();
+        image.setSize(s.x * (rx * .6f + .7f), s.y * (ry * .6f + .7f));
+        sizeMod = (rx + ry)/2;
     }
     public int getDamage(){
         return 0;

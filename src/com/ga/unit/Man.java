@@ -6,9 +6,6 @@ import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.unit.factory.Stock;
-import com.ga.unit.intelligence.Communication;
-import com.ga.unit.intelligence.MerchantIntelligence;
-import com.ga.unit.intelligence.UnitIntelligence;
 import com.ga.unit.item.ArmorSet;
 import com.ga.unit.item.Item;
 import com.ga.unit.skill.*;
@@ -41,18 +38,11 @@ public class Man extends Unit {
                 }
             }
         };
-        speechType = faction.name().toLowerCase();
         String[] t = p.split("#");
         if (t[1].equals("")) setWeapon(fist);
         else setWeapon((Item) Stock.get(t[1].split("@")));
         Updater.cancelAdd(weapon);
         armor = new ArmorSet(this, t[2]);
-        if (faction == Faction.Merchant){
-            brain = new MerchantIntelligence(this);
-        } else if (faction != Faction.Player && faction != Faction.Player2) {
-            brain = new UnitIntelligence(this);
-            brain.setComm(new Communication());
-        }
     }
 
     @Override

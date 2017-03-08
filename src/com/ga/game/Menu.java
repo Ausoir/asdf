@@ -467,12 +467,9 @@ public class Menu extends Panel {
         }
         private void command(String p){
             if (p.equals("h")){
+                Global.nextHour();
                 FileManager.saveCharacter();
-                Global.map.event.onChange(Global.map.maps, false);
                 ((MainPlayer) Global.player.host).onMapChange();
-                if (Global.player.host.stats.getEffectsSize() == 0){
-                    Global.player.host.stats.healStats();
-                }
             } else if (p.equals("stat")){
                 Player player = Global.player.host;
                 String statusDsc = "Stamina:"+player.get("Stamina")+"\nEncumberance:"+player.getStatPenalty()+"\nHealth:"+player.get("Health")+"\n";

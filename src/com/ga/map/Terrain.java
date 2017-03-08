@@ -34,7 +34,8 @@ class Terrain extends ShadedPicture {
                 int origX = (int) (i.pt.x - pos.x);
                 int origY = (int) (i.pt.y - pos.y);
                 int x2 = (int) (i.ptd.x - pos.x);
-                shader.render(image, origX, x2, origY, i.getSlope());
+                int y2 = (int) (i.ptd.y - pos.x);
+                shader.render(image, origX, x2, origY, y2, i.getSlope());
             }
         }
     }

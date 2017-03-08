@@ -10,7 +10,8 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 /**
  * Created by Ga on 11/15/2016.
@@ -21,51 +22,21 @@ public class MenuShop extends Panel {
     private JScrollPane scroll;
     private JLabel gold, titleLabel;
     private Border emptyborder = new EmptyBorder(5,8,5,8);
-    private boolean mRelease = true;
-    private int prevY = 0;
-    private Image image;
-    private Item[] wares;
-    private int[] prices;
-    private String title;
-    private Performer[] actions;
 
     public MenuShop(){
         super();
         setLayout(new BoxLayout(this,BoxLayout.PAGE_AXIS));
-        addMouseMotionListener(new MouseMotionAdapter() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                int y = e.getY();
-                if (mRelease) mRelease = false;
-                else panel.setLocation(0, Math.min(panel.getY() + (y - prevY),0));
-                prevY = y;
-            }
-        });
-        addMouseWheelListener(new MouseWheelListener() {
-            @Override
-            public void mouseWheelMoved(MouseWheelEvent e) {
-                int notches = e.getWheelRotation();
-                if (notches < 0) panel.setLocation(0, Math.min(panel.getY() - 30,0));
-                else if (notches > 0) panel.setLocation(0, Math.min(panel.getY() + 30,0));
-            }
-        });
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                if (e.getButton() == 2){
-                    panel.setLocation(0, 0);
-                }
-            }
-            @Override
-            public void mouseReleased(MouseEvent e){
-                mRelease = true;
-            }
-        });
         titleLabel = new JLabel();
         gold = new JLabel();
         panel = new JPanel();
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel,BoxLayout.PAGE_AXIS));
+        panel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                setVisible(false);
+            }
+        });
         scroll = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scroll.getVerticalScrollBar().setUI(new ScrollBar());
         scroll.getVerticalScrollBar().setOpaque(false);
@@ -86,11 +57,6 @@ public class MenuShop extends Panel {
             super.display();
             setBackground(new Color(120,120,120,180));
             scroll.setBackground(new Color(120,120,120,180));
-            this.title = title;
-            this.wares = wares;
-            this.prices = prices;
-            this.actions = actions;
-
             titleLabel.setText(title);
             gold.setText("Gold: " + Global.player.host.gold);
             panel.removeAll();
@@ -142,7 +108,7 @@ public class MenuShop extends Panel {
                     public void perform(){
                         Player player = Global.player.host;
                         if (player.gold >= price) {
-                            if (player.inventory.vacant()) {
+                            if (player.inventory.vacant() || player.wieldingNone()) {
                                 player.gold -= price;
                                 if (player.wieldingNone()) player.setWeapon(item);
                                 else {
@@ -150,7 +116,13 @@ public class MenuShop extends Panel {
                                     item.pos = player.pos.getAdd(0, 0);
                                 }
                                 action.perform();
+                            } else {
+                                Global.player.host.say("Not enough inventory space..");
+                                setVisible(false);
                             }
+                        } else {
+                            Global.player.host.say("Not enough Gold..");
+                            setVisible(false);
                         }
                     }
                 }});

@@ -2,6 +2,7 @@ package com.ga.unit;
 
 import com.ga.game.Sound;
 import com.ga.map.Global;
+import com.ga.map.Shader;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
@@ -177,6 +178,11 @@ public class Player extends Man {
             }
         } else if (state instanceof Skills){
             switch ((Skills) state){
+                case Rest:
+                    for (Matter i : Updater.collideMatter(pos,20)){
+                        if (i.image.sizeRadius > 40) stateSet(Skills.Sneak);
+                    }
+                    break;
                 case Duck:
                     cooldown.put(state,new int[]{Global.getTime()[0]+((armor.armor[1].encumberance+armor.armor[2].encumberance)*4)});
                     break;

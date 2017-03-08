@@ -16,6 +16,9 @@ public interface Moveset {
 
     int getCooldown();
 
-    void done(Unit p);
+    void onSet(Unit p);
+    void onFinish(Unit p);
+    void onInterrupt(Unit p);
+
     void update(Unit p, int level);
 }
