@@ -5,11 +5,10 @@ import com.ga.game.FileManager;
 import com.ga.game.Input;
 import com.ga.tool.Line;
 import com.ga.tool.P;
-import com.ga.unit.Matter;
 import com.ga.unit.Player;
-import com.ga.unit.Thing;
+import com.ga.unit.Prop;
+import com.ga.unit.Stock;
 import com.ga.unit.Updater;
-import com.ga.unit.factory.Stock;
 import com.ga.unit.item.Item;
 
 import java.awt.*;
@@ -35,7 +34,7 @@ public class EditorInput implements Input, Updatable, Drawable {
     private ArrayList<Line> history = new ArrayList<>();
     private ArrayList<Line> lineConnection = new ArrayList<>();
     private Line current = new Line(0, 0, 0, 0);
-    private Thing currentU = new Thing(null);
+    private Prop currentU = new Prop();
     private boolean connected = false;
     private Tool tool = Tool.NONE;
     private CreateTool subtool = CreateTool.LINE;
@@ -50,12 +49,13 @@ public class EditorInput implements Input, Updatable, Drawable {
 
     public EditorInput() {
         Display.input = this;
+        Updater.addUpdatee(this);
         Updater.add(this);
         if (Global.camera == null) Global.camera = new P();
         else Global.camera = new P(Global.camera);
         scanPolygon();
         Global.margin = -36;
-        map = Global.player.host.cmap;
+        map = Global.player.cmap;
     }
 
     private void scanPolygon(){
@@ -88,7 +88,7 @@ public class EditorInput implements Input, Updatable, Drawable {
 
     @Override
     public int getDepth() {
-        return 99;
+        return 999;
     }
 
     @Override
@@ -104,7 +104,7 @@ public class EditorInput implements Input, Updatable, Drawable {
             Global.p("Level Teleporter: "+current.opt);
         } else if (p.startsWith("size")){
             String[] size = p.substring(5).split("x");
-            Global.map.map.image.setSize(Integer.parseInt(size[0]), Integer.parseInt(size[1]));
+            Global.map.size.set(Integer.parseInt(size[0]), Integer.parseInt(size[1]));
         } else if (p.equals("reverse")){
             reverse = true;
         } else if (p.equals("unreverse")){
@@ -128,12 +128,12 @@ public class EditorInput implements Input, Updatable, Drawable {
         } else if (p.startsWith("tx")) {
             texture = p.substring(2);
         } else if (p.equals("render")){
+            Updater.unrender();
             Global.map.setTexture();
         } else if (p.startsWith("save")){
             save("map/"+p.substring(5));
         } else if (p.startsWith("load")){
-            Updater.changeMap = p.substring(5);
-            Updater.changeMapPos = -2;
+            Updater.changeMap = p.substring(5)+"@0";
             Updater.changeMap(true);
             Display.input = this;
             Updater.add(this);
@@ -239,8 +239,8 @@ public class EditorInput implements Input, Updatable, Drawable {
                 } else if (tool == Tool.OBJECT) {
                     currentU.pos.set(x, y);
                 } else if (tool == Tool.REMOVE && lmb){
-                    ArrayList<Matter> matters = Updater.collideMatter(new P(x,y),100);
-                    for (Matter i : matters) {
+                    ArrayList<Prop> Props = Updater.collideProp(new P(x,y),100);
+                    for (Prop i : Props) {
                         String name = i.name;
                         try{i.remove();}catch(Exception e){Global.p("Error deleting "+name);}
                         Global.p("Deleted "+name);
@@ -317,8 +317,10 @@ public class EditorInput implements Input, Updatable, Drawable {
                                 auxTexture = null;
                             } else if (texture != null) {
                                 if (texture.equals("copy")) texture = Global.map.formTextures.get(i.next);
-                                else if (i.next != -1) Global.map.formTextures.put(i.next, texture);
-                                texture = null;
+                                else if (i.next != -1){
+                                    Global.map.formTextures.put(i.next, texture);
+                                    texture = null;
+                                }
                             }
                             if (reverse){
                                 reverse(i.next);
@@ -407,19 +409,19 @@ public class EditorInput implements Input, Updatable, Drawable {
                 if (Updater.editor) {
                     Updater.editor = false;
                     FileManager.loadPlayer(true, "0");
-                    Display.input = Global.player;
-                    Global.player.host.pos.set(Global.camera);
+                    Display.input = Global.player.input;
+                    Global.player.pos.set(Global.camera);
                 }
                 break;
         }
     }
-    private Matter make(String name, P p){
+    private Prop make(String name, P p){
         int seed = -1;
         if (name.contains(":")){
             seed = Integer.parseInt(name.split(":")[1]);
             name = name.substring(0,name.indexOf(":"));
         }
-        Matter r = Stock.getByName(name, seed);
+        Prop r = Stock.getByName(name, seed);
         if (r instanceof Item){
             ((Item) r).field();
         }

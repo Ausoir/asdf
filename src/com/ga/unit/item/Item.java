@@ -13,15 +13,15 @@ import java.awt.*;
 import java.util.Random;
 
 /**
- * Created by Ga on 8/5/2016.
+ * Created by Ga on 8/5/2016. asd
  */
-public class Item extends Matter {
+public class Item extends Prop {
     public enum Tag{
-        Sword(Skills.Swing, DamageType.Cut, "swing_knife", "hit_cut"), Spear(Skills.Pierce, DamageType.Cut, "swing_silent", "hit_bloody"), Mace(Skills.Swing, DamageType.Bash, "swing_silent", "hit_bash"),
-        Dagger(Skills.Pierce, DamageType.Cut, "swing_normal", "hit_bloody"), Armor(Skills.Rest, DamageType.Push, "swing_normal"), Scroll(Skills.Guard, DamageType.Push, "scroll"),
-        Rapier(Skills.Pierce, DamageType.Cut, "swing_silent", "hit_cut"), Shoot(Skills.Shoot, DamageType.Cut, "swing_normal"), Snipe(Skills.Snipe, DamageType.Cut, "swing_normal"),
-        Throwing(Skills.Throw, DamageType.Cut, "swing_normal"), Darting(Skills.Dart, DamageType.Cut, "swing_normal"), Consumable(Actions.Consume, DamageType.Push, "drink"),
-        Claw(Skills.Swing, DamageType.Cut, "swing_normal"), Enchant(Actions.Buff, DamageType.Push, "swing_normal"), Food(Actions.Consume, DamageType.Push, "eat");
+        Sword(Actions.Slash, DamageType.Cut, "swing_knife", "hit_cut"), Spear(Actions.Thrust, DamageType.Cut, "swing_silent", "hit_bloody"), Mace(Actions.Slash, DamageType.Bash, "swing_silent", "hit_bash"),
+        Dagger(Actions.Thrust, DamageType.Cut, "swing_normal", "hit_bloody"), Armor(Actions.Rest, DamageType.Push, "swing_normal"), Scroll(Actions.Guard, DamageType.Push, "scroll"),
+        Shoot(Actions.Shoot, DamageType.Cut, "swing_normal"), Snipe(Actions.Snipe, DamageType.Cut, "swing_normal"),
+        Throwing(Actions.Throw, DamageType.Cut, "swing_silent"), Darting(Actions.Dart, DamageType.Cut, "swing_normal"), Consumable(Actions.Consume, DamageType.Push, "drink"),
+        Claw(Actions.Slash, DamageType.Cut, "swing_normal"), Enchant(Actions.Buff, DamageType.Push, "swing_silent"), Food(Actions.Consume, DamageType.Push, "eat");
         private Moveset action;
         private DamageType type;
         private String sound, soundHit = "hit_punch";
@@ -53,6 +53,15 @@ public class Item extends Matter {
             if (seed.nextGaussian() > 1) return values()[seed.nextInt(values().length)];
             return None;
         }
+        static SpecialtyMod load(String p){
+            for (SpecialtyMod i : values()){
+                if ((""+i.ordinal()).equals(p)) return i;
+            }
+            return None;
+        }
+        public String toString() {
+            return ""+ordinal();
+        }
     }
     enum PrefixMod{
         None(125), Broken(20), Old(20), Fine(15), Mastercraft(4), Legendary(1);
@@ -74,8 +83,17 @@ public class Item extends Matter {
             }
             return None;
         }
+        static PrefixMod load(String p){
+            for (PrefixMod i : values()){
+                if ((""+i.weight).equals(p)) return i;
+            }
+            return None;
+        }
+        public String toString() {
+            return ""+weight;
+        }
     }
-    enum AdverbMod{
+    protected enum AdverbMod{
         None(1), Very(2), Super(3), Ultra(4);
         int magnitude;
         AdverbMod(int mag){
@@ -87,19 +105,26 @@ public class Item extends Matter {
             }
             return None;
         }
+        static AdverbMod get(Random seed){
+            int r = seed.nextInt(100);
+            if (r < 1) return Ultra;
+            else if (r < 3) return Super;
+            else if (r < 8) return Very;
+            return None;
+        }
         public String toString(){
             return ""+magnitude;
         }
     }
-    enum AdenchantMod{
+    public enum AdenchantMod{
         None(2,.15f), Minor(1,.1f), Major(3,.25f), Greater(4,.35f), Ultimate(5,.4f);
         int level;
-        float magnitude;
+        public float magnitude;
         AdenchantMod(int level, float mag){
             this.level = level;
             this.magnitude = mag;
         }
-        static AdenchantMod get(Random seed){
+        public static AdenchantMod get(Random seed){
             float t = (float) seed.nextGaussian();
             if (t > 2.5) return Ultimate;
             else if (t > 2) return Greater;
@@ -107,58 +132,72 @@ public class Item extends Matter {
             else if (t < -1) return Minor;
             else return None;
         }
+        static AdenchantMod load(String p){
+            for (AdenchantMod i : values()){
+                if ((""+i.level).equals(p)) return i;
+            }
+            return None;
+        }
+        public String toString(){
+            return ""+level;
+        }
     }
-    public AdverbMod admod = AdverbMod.None;
-    AdenchantMod ademod;
-    SpecialtyMod smod;
-    PrefixMod pmod;
-    public Spells emod = null;
+    AdverbMod admod = AdverbMod.None;
+    public AdenchantMod ademod = AdenchantMod.None;
+    private SpecialtyMod smod = SpecialtyMod.None;
+    PrefixMod pmod = PrefixMod.None;
+    public Buffs emod = null;
     public int weight;
     public int volume = 1;
-    protected int cooldown = 100;
+    protected int cooldown = 0;
     public int delay = 0;
     public float probability;
-    public Moveset action = Skills.Swing;
-    public int[] lastused = new int[]{0};
-    public Stat uses = new Stat(1);
-    private Tag type = Tag.Sword;
+    Moveset action = Actions.Slash;
+    private int[] lastused = new int[]{0};
+    public Stat uses = new Stat(-1);
+    private Tag type = Tag.Throwing;
     private Organ organ = null;
-    public int speed = 0;
-    public int damage = 1;
+    public int speed = -4;
+    public int damage = 0;
     public int value = 8;
     public boolean breakable = true;
-    public Item(String name, int seed, int weight, int uses, int cooldown, float enchantRatio) {
-        super(name, seed, 8);
+    public Item(String name, int seed, int weight, int uses) {
+        super(name, seed, 100);
+        dynamic = true;
         this.name = name;
         this.weight = weight;
         this.uses.setTotal(uses);
-        this.cooldown = cooldown;
+        gravity = true;
+        final Item me = this;
+        onInteract = new Interactive(){
+            public void interact(Man p){
+                p.setWeapon(me);
+            }
+        };
+        randomSize(new P(.2f,.2f));
+    }
+    public void imbueMeta(boolean canSmod, boolean canAdmod, float emodProb, boolean canAdemod){
         pmod = PrefixMod.get(rand);
-        smod = SpecialtyMod.get(rand);
-        if (rand.nextFloat() < enchantRatio) {
-            ademod = AdenchantMod.get(rand);
-            emod = Spells.values()[rand.nextInt(Spells.values().length)];
+        if (canSmod) smod = SpecialtyMod.get(rand);
+        if (canAdmod) admod = AdverbMod.get(rand);
+        if (rand.nextFloat() < emodProb) {
+            emod = Buffs.values()[rand.nextInt(Buffs.values().length)];
+            if (canAdemod) ademod = Item.AdenchantMod.get(rand);
             probability = ademod.magnitude;
         }
         setModifier(pmod);
         setModifier(smod);
-        gravity = true;
-        final Item me = this;
-        onInteract = new Interactive(5){
-            public void interact(Unit p){
-                if (p instanceof Man) {
-                    Man t = ((Man)p);
-                    t.setWeapon(me);
-                }
-            }
-        };
     }
-    public void setImage(String p){
-        super.setImage(p);
-        if (rand != null) randomSize();
-    }
-    public void loadAdmod(String p){
-        admod = AdverbMod.load(p);
+    public void loadMeta(String p){
+        String[] metadata = p.split("_");
+        pmod = PrefixMod.load(metadata[0]);
+        smod = SpecialtyMod.load(metadata[1]);
+        admod = AdverbMod.load(metadata[2]);
+        if (!metadata[3].equals("")){
+            emod = Buffs.getByName(metadata[3]);
+            ademod = AdenchantMod.load(metadata[4]);
+            probability = ademod.magnitude;
+        }
     }
     public void setType(Tag p){
         this.type = p;
@@ -204,7 +243,7 @@ public class Item extends Matter {
         else if (mod == SpecialtyMod.Sharp) smod = SpecialtyMod.None;
         else if (mod == SpecialtyMod.Dull) smod = SpecialtyMod.None;
         else if (mod == SpecialtyMod.Tough) smod = SpecialtyMod.None;
-        else if (mod == SpecialtyMod.Heavy) this.weight += 1*admod.magnitude;
+        else if (mod == SpecialtyMod.Heavy) this.weight += admod.magnitude;
         else if (mod == SpecialtyMod.Light) this.weight = Math.max(0, this.weight + (-1 * admod.magnitude));
         else if (mod == SpecialtyMod.Feather) this.weight /= 2*admod.magnitude;
         else if (mod == SpecialtyMod.Quick) speed = admod.magnitude;
@@ -220,7 +259,7 @@ public class Item extends Matter {
             uses.setTotal(-1);
         }
     }
-    public int getRarity(){
+    private int getRarity(){
         return pmod.ordinal()+(smod != SpecialtyMod.None?10:0)+(emod != null?100:0);
     }
     public Color getRarityColor(){
@@ -279,7 +318,7 @@ public class Item extends Matter {
         }
         return (int) r;
     }
-    public String getRarityDescription(){
+    private String getRarityDescription(){
         String r = Dialog.get("item1");
         int rare = getRarity();
         if (rare >= 10) r = Dialog.get("item2");
@@ -288,7 +327,7 @@ public class Item extends Matter {
         else if (rare % 5 == 5) r = Dialog.get("item5");
         return r;
     }
-    public String getDisplayName(){
+    public String getName(){
         return name;
     }
     public String getFullName(){
@@ -296,27 +335,24 @@ public class Item extends Matter {
         if (admod != AdverbMod.None) r+=admod.name()+" ";
         if (smod != SpecialtyMod.None) r+=smod.name()+" ";
         if (pmod != PrefixMod.None) r+=pmod.name()+" ";
-        r += getDisplayName();
+        r += getName();
         if (emod != null){
             r+=" of ";
             if (ademod != AdenchantMod.None){
                 r += ademod.name()+" ";
             }
-            r+=emod.getName();
+            r+=emod.name();
         }
         r = r.replace("_"," ");
         return r;
     }
-    public void unequip(Man host){
+    public void onUnequip(Man host){
         if (smod == SpecialtyMod.Cursed){
             Curse.get(host, 5);
         }
     }
-    public boolean canUse(){
-        if (uses.get() != 0 && Global.checkCooldown(lastused, cooldown)<= 0) {
-            return true;
-        }
-        return false;
+    boolean canUse(){
+        return uses.get() != 0 && Global.checkCooldown(lastused, cooldown) <= 0;
     }
     protected void playSound(){
         Sound.play(type.getSound());
@@ -329,18 +365,16 @@ public class Item extends Matter {
         }
         return false;
     }
-    public boolean use(Man host){
-        if (use(1)) {
-            playSound();
-            Global.cooldown(lastused, cooldown);
-            host.setState(action);
-            if (emod != null && rand.nextFloat() < probability){
-                emod.getEvent().perform(host, ademod.level*3);
-                host.state = emod;
-            }
-            return true;
+    public void trigger(Unit target){
+        if (emod != null && rand.nextFloat() < probability){
+            target.stats.addEffect(emod, ademod.level);
         }
-        return false;
+    }
+    public boolean use(Man host){
+        playSound();
+        Global.cooldown(lastused, cooldown);
+        host.setState(action);
+        return true;
     }
     public void drop(Man host) {
         if (host.weapon == this) host.setWeapon(null);
@@ -356,7 +390,7 @@ public class Item extends Matter {
         if (organ != null) {
             ((Man) organ.host).setWeapon(null);
             setOrgan(null);
-        } else Global.player.host.inventory.remove(this);
+        } else Global.player.inventory.remove(this);
         Updater.cancelAdd(this);
         super.remove();
     }
@@ -375,14 +409,16 @@ public class Item extends Matter {
     public String getDescription() {
         String r = "";
         int uses = this.uses.get();
-        r += com.ga.game.Dialog.get("itemDsc",new String[]{getFullName(),weight+"",(uses==-1?"unlimited":uses+"")});
+        r += Dialog.get("itemDsc",new String[]{getFullName(),weight+"",(uses==-1?"unlimited":uses+"")});
         if (emod != null){
             String ade = "";
             if (ademod != AdenchantMod.None) ade = "Level "+ademod.level+" ";
-            r += com.ga.game.Dialog.get("itemEncDsc",new String[]{getRarityDescription(), ade+emod.name(), cooldown+""});
-            int cd = Global.checkCooldown(lastused, cooldown);
-            if (cd <= 0) r += Dialog.get("itemEncRdy");
-            else r += Dialog.get("itemEncNRdy", new String[]{cd+""});
+            if (cooldown > 0){
+                r += " "+Dialog.get("itemEncDsc",new String[]{getRarityDescription(), ade+emod.name(), cooldown+""});
+                int cd = Global.checkCooldown(lastused, cooldown);
+                if (cd <= 0) r += " "+Dialog.get("itemEncRdy");
+                else r += " "+Dialog.get("itemEncNRdy", new String[]{cd+""});
+            }
         }
         return r;
     }
@@ -417,7 +453,8 @@ public class Item extends Matter {
     @Override
     public String toString(){
         String t = super.toString();
-        if (!t.equals("")) t += "@"+uses+"@"+admod+"@"+String.format(java.util.Locale.US,"%.2f", rotation);
+        String meta = pmod+"_"+smod+"_"+admod+"_"+(emod==null?"":emod)+"_"+ademod;
+        if (!t.equals("")) t += "@"+uses+"@"+meta+"@"+String.format(java.util.Locale.US,"%.2f", rotation);
         return t;
     }
     public void update(){

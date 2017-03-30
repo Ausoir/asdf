@@ -58,7 +58,7 @@ public class MenuShop extends Panel {
             setBackground(new Color(120,120,120,180));
             scroll.setBackground(new Color(120,120,120,180));
             titleLabel.setText(title);
-            gold.setText("Gold: " + Global.player.host.gold);
+            gold.setText("Gold: " + Global.player.gold);
             panel.removeAll();
             int itemsize = wares.length;
             for (int i = 0; i < itemsize; i++) {
@@ -106,7 +106,7 @@ public class MenuShop extends Panel {
         Display.menuDialog.show(item.getFullName(),"This is "+item.getDescription()+". It is being sold for "+price+" gold.",
                 new String[]{"Buy"}, new Performer[]{new Performer(){
                     public void perform(){
-                        Player player = Global.player.host;
+                        Player player = Global.player;
                         if (player.gold >= price) {
                             if (player.inventory.vacant() || player.wieldingNone()) {
                                 player.gold -= price;
@@ -117,11 +117,11 @@ public class MenuShop extends Panel {
                                 }
                                 action.perform();
                             } else {
-                                Global.player.host.say("Not enough inventory space..");
+                                Global.player.say("Not enough inventory space..");
                                 setVisible(false);
                             }
                         } else {
-                            Global.player.host.say("Not enough Gold..");
+                            Global.player.say("Not enough Gold..");
                             setVisible(false);
                         }
                     }

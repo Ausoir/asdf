@@ -5,9 +5,8 @@ import com.ga.tool.Interactive;
 import com.ga.tool.Performer;
 import com.ga.tool.Timer;
 import com.ga.unit.Man;
-import com.ga.unit.Matter;
-import com.ga.unit.Unit;
-import com.ga.unit.factory.Stock;
+import com.ga.unit.Prop;
+import com.ga.unit.Stock;
 import com.ga.unit.item.Item;
 
 import static com.ga.game.Display.menuShop;
@@ -18,6 +17,7 @@ import static com.ga.game.Display.menuShop;
 public class MerchantIntelligence extends ResidentIntelligence {
     enum MerchantType{
         SUBURBAN(new String[]{"Pistol","Revolver","Rifle"}),
+        DESERT(new String[]{"Katana","Broadsword","Lancesword"}),
         FOREST(new String[]{"Axe","Fireball","Potion","Scroll"});
         String[] items;
         MerchantType(String[] items){
@@ -34,16 +34,16 @@ public class MerchantIntelligence extends ResidentIntelligence {
     private String ad;
     public MerchantIntelligence(Man man) {
         super(man);
-        man.onInteract = new Interactive(80){
-            public void interact(Unit p){
-                if (p == Global.player.host) {
+        man.onInteract = new Interactive(){
+            public void interact(Man p){
+                if (p == Global.player) {
                     menuShop.show("Trader's Wares - \""+host.getConversation()+"\"", product, price, action);
                 }
             }
         };
         type = MerchantType.values()[man.rand.nextInt(MerchantType.values().length)];
         String r = "I'm selling ";
-        int length = host.rand.nextInt(12)+2;
+        int length = host.rand.nextInt(12)+52;
         String[] items = new String[length];
         for (int i = 0; i < length; i++){
             int l = type.items.length;
@@ -76,16 +76,16 @@ public class MerchantIntelligence extends ResidentIntelligence {
         return (int) (value * fluc);
     }
     @Override
-    public void hear(Matter u, String p){
+    public void hear(Prop u, String p){
         super.hear(u, p);
-        if (u == Global.player.host) {
+        if (u == Global.player) {
             if (p.equals("shop")) {
                 menuShop.show("Trader's Wares - \""+host.getConversation()+"\"", product, price, action);
             }
         }
     }
     @Override
-    public void perceived(Matter p){
+    public void perceived(Prop p){
         if (p instanceof Man) {
             if (target != p) {
                 target = (Man) p;

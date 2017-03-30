@@ -3,11 +3,16 @@ package com.ga.unit.skill;
 import com.ga.game.Dialog;
 import com.ga.game.Sound;
 import com.ga.map.Global;
+import com.ga.map.Shader;
+import com.ga.map.Terrain;
+import com.ga.tool.EventTimer;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.unit.*;
+import com.ga.unit.Stock;
 import com.ga.unit.intelligence.IntelligenceSocial;
+import com.ga.unit.item.Item;
 import com.ga.unit.item.Projectile;
 
 import java.util.ArrayList;
@@ -16,6 +21,57 @@ import java.util.ArrayList;
  * Created by Ga on 8/1/2016.
  */
 public enum Spells implements Moveset {
+    Innersword(Actions.Cast, 6,3,14,false,Dialog.get("mvsDscInnersword"),new Spell(){
+        public void perform(final Unit host, int level){
+            Man man = (Man)host;
+            if (man.wieldingNone()) {
+                Sound.play("shadowstep");
+                final Item t = (Item) Stock.getByName("Ethersword", -1);
+                man.setWeapon(t);
+                int duration = 1;
+                if (level == 2) duration = 4;
+                if (level == 3) duration = 16;
+                if (level > 3) duration = 256;
+                t.uses.setTotal(duration);
+                Global.timers.add(new EventTimer(duration,false,new Performer(){
+                    public void perform(){
+                        t.remove();
+                    }
+                }));
+            }
+        }
+    }),
+    Materialize(Actions.Cast, 40,4,4,false,Dialog.get("mvsDscMaterialize"),new Spell(){
+        public void perform(final Unit host, int level){
+            Sound.play("shadowstep");
+            final Terrain r = new Terrain("water", Shader.None, 0);
+            P[] points = new P[3];
+            int power = 15+(50*level);
+            final P target = host.target.getAdd(host.pos);
+            for (int i=0;i<3;i++){
+                points[i] = target.getAdd(Global.r.nextInt(power)-(power/2),Global.r.nextInt(power)-(power/2));
+                r.addPoint(points[i].x, points[i].y);
+            }
+            final Line[] lines = new Line[3];
+            for (int i=0;i<3;i++) {
+                Global.map.land.add(lines[i] = new Line(points[i], points[i+1<3?i+1:0]) {
+                    public String toString() {
+                        return "";
+                    }
+                });
+            }
+            r.render();
+            Global.timers.add(new EventTimer(level*2,false,new Performer(){
+                public void perform(){
+                    Particle.holyExplosion(target);
+                    for (int i = 0;i<3;i++) {
+                        Global.map.land.remove(lines[i]);
+                        Updater.remove(r);
+                    }
+                }
+            }));
+        }
+    }),
     Focus(Actions.Conjure, 15, -1, 240, false, "Focus grants you free Stamina. [2+Level^2 Stamina]", new Spell(){
         private boolean first = true;
         public void perform(Unit host, int level){
@@ -89,7 +145,7 @@ public enum Spells implements Moveset {
                 };
                 p.save = false;
                 p.rangeZone = new int[]{-5};
-                p.moveset.put(0,new Moveset[]{Actions.Use, Skills.Sidekick});
+                p.moveset.put(0,new Moveset[]{Actions.Use, Actions.Sidekick});
                 p.stats.setStat("expire",new Stat(500+(level*100)));
                 host.get("Stamina").reserve += 3;
                 host.get("Stamina").add(0);
@@ -110,10 +166,11 @@ public enum Spells implements Moveset {
             for (Line i : Global.map.land){
                 if (i.lineCross(pp)){
                     Particle.smoke(host.pos);
-                    if (!Global.map.isInside((int) target.x, (int) target.y)) {
+                    if (!Global.map.isInside(target)) {
                         Sound.play("shadowstep");
                         host.pos.set(target);
                         host.setState(Actions.Idle);
+                        host.lastLand = new Line();
                         return;
                     }
                     return;
@@ -402,7 +459,7 @@ public enum Spells implements Moveset {
 
     @Override
     public void update(Unit host, int level){
-        host.face(host.target.x > 0 ? 1 : -1);
+        host.face(host.target.x > 0 ? 1 : -1, true);
         spell.perform(host, level);
         if (!channel || (Global.r.nextInt(Math.max(0,40-(cost*2))) == 0 && !host.get("Stamina").require(1+host.getStatPenalty()))) host.setState(Actions.Idle);
     }

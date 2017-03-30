@@ -1,7 +1,7 @@
 package com.ga.unit.intelligence;
 
 import com.ga.map.Global;
-import com.ga.unit.Matter;
+import com.ga.unit.Prop;
 import com.ga.unit.Unit;
 
 /**
@@ -12,9 +12,9 @@ public class ResidentIntelligence extends Intelligence {
         super(man);
     }
     @Override
-    public void hear(Matter u, String p){
+    public void hear(Prop u, String p){
         super.hear(u, p);
-        if (u == Global.player.host){
+        if (u == Global.player){
             host.say("@talk");
         }
     }

@@ -1,10 +1,11 @@
 package com.ga.unit.item;
 
+import com.ga.map.Shader;
 import com.ga.tool.Performer;
 import com.ga.unit.BodyHumanoid;
 import com.ga.unit.Man;
 import com.ga.unit.Organ;
-import com.ga.unit.factory.Stock;
+import com.ga.unit.Stock;
 
 /**
  * Created by Ga on 1/15/2017.
@@ -35,7 +36,7 @@ public class ArmorSet {
             } else if (piece == 2){
                 organs[BodyHumanoid.FIST].setImage("Underwear", 2);
                 organs[BodyHumanoid.OFIST].setImage("Underwear", 2);
-                organs[BodyHumanoid.BODY].setImage("Underwear", 0);
+                organs[BodyHumanoid.BODY].setImage("Underwear", 0, Shader.None);
             }
         } else {
             armor[piece] = p;

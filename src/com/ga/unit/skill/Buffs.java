@@ -13,7 +13,7 @@ import java.util.ArrayList;
  * Created by Ga on 9/1/2016.
  */
 public enum Buffs {
-    Haste(null, hostEffect(), 50, "Speed",1,"Speed"),
+    Haste(null, hostEffect(), 100, "Speed",1,"Speed"),
     Rejuvenate(null, hostEffect(), 100, "Stamina",.5f,"Stamina"),
     Empower(null, weaponEffect(1), 80, "Proficiency",10),
     Cleave(null, weaponEffect(2), 300),

@@ -1,6 +1,6 @@
 package com.ga.unit.intelligence;
 
-import com.ga.unit.Matter;
+import com.ga.unit.Prop;
 import com.ga.unit.Unit;
 import com.ga.unit.skill.Actions;
 
@@ -9,8 +9,8 @@ import com.ga.unit.skill.Actions;
  */
 public class Follow implements Task {
     private Unit host;
-    private Matter target;
-    public Follow(Unit host, Matter target) {
+    private Prop target;
+    public Follow(Unit host, Prop target) {
         this.host = host;
         this.target = target;
     }
@@ -23,10 +23,10 @@ public class Follow implements Task {
     public void update() {
         if (target == null) return;
         int x = (int) ((target.pos.x+target.vel.x) - (host.pos.x+host.vel.x));
-        host.face(target.pos);
+        host.face(target.pos.x > host.pos.x?1:-1, false);
         int absX = Math.abs(x);
         if (absX > 160) {
-            host.face(x>0?1:-1);
+            host.face(x>0?1:-1, false);
             host.setState(Actions.Walk);
         } else if (absX < 40) host.setState(Actions.Idle);
     }

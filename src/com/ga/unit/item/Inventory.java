@@ -2,7 +2,7 @@ package com.ga.unit.item;
 
 import com.ga.unit.Player;
 import com.ga.unit.Updater;
-import com.ga.unit.factory.Stock;
+import com.ga.unit.Stock;
 
 import java.util.ArrayList;
 
@@ -44,6 +44,9 @@ public class Inventory {
     public Item getItem(int p){
         return items.get(p);
     }
+    public ArrayList<Item> getItems(){
+        return items;
+    }
     public int getItemSize(){
         return items.size();
     }
@@ -75,13 +78,6 @@ public class Inventory {
             Updater.cancelAdd(item);
             items.add(item);
         }
-    }
-    public void onTimeChange(int p){
-        for (int i=0;i<items.size();i++){
-            Item t = items.get(i);
-            if (t instanceof Food) ((Food) t).onTimeChange(p);
-        }
-        if (host.weapon instanceof Food) ((Food)host.weapon).onTimeChange(p);
     }
     public String toString(){
         String r = ";";

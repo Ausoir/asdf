@@ -3,6 +3,7 @@ package com.ga.game;
 import com.ga.map.Global;
 import com.ga.map.Weather;
 import com.ga.unit.Updater;
+import com.ga.unit.intelligence.Speech;
 
 import javax.swing.*;
 import java.awt.*;
@@ -67,21 +68,22 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
         add(menuShop);
         menuMap = new MenuMap();
         add(menuMap);
-        Global.weather = new Weather();
         new Timer(25, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 repaint();
             }
         }).start();
-        addMenus();
+        Updater.addUpdatee(menu);
+        Updater.addUpdatee(menuDialog);
+        Updater.addUpdatee(menuShop);
+        Updater.addUpdatee(menuMap);
     }
 
-    public static void addMenus(){
-        Updater.add(menu);
-        Updater.add(menuDialog);
-        Updater.add(menuShop);
-        Updater.add(menuMap);
+    public void removeSpeech(){
+        for (Component i : getComponents()){
+            if (i instanceof Speech) remove(i);
+        }
     }
 
     private void chat(){

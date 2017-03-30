@@ -7,7 +7,6 @@ import com.ga.tool.P;
 import com.ga.tool.Timer;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Moveset;
-import com.ga.unit.skill.Skills;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -75,7 +74,7 @@ public class Body {
         setProperties(p.property);
         for (Map.Entry<String, int[]> i : p.moveset.entrySet()){
             Moveset move = Actions.getByName(i.getKey());
-            if (move == null) move = Skills.getByName(i.getKey());
+            if (move == null) move = Actions.getByName(i.getKey());
             animation.put(move, i.getValue());
         }
     }
@@ -99,8 +98,6 @@ public class Body {
                 if (type < 0) organs[p] = new Organ(parent, tip) {
                                     public void draw(Graphics2D g) {
                                         image.draw(g, host.pos.x + ptd.x, host.pos.y + ptd.y, (float) Math.atan2(pt.y - ptd.y, pt.x - ptd.x) - 1.57f, host.dir, strokeSize, getLength() + 6);
-                                    }
-                                    protected void setShader(){
                                     }
                                 };
                 else if (type == 0) organs[p] = new Organ(parent, tip) {
@@ -160,13 +157,13 @@ public class Body {
     public void setState(Moveset state) {
         if (state == Actions.Dead) organs[BODY].pt.y = 0;
         else if (state == Actions.Down) organs[BODY].pt.y = 0;
-        else if (state == Actions.Hit) organs[BODY].pt.y /= 2;
+        else if (state == Actions.Hit) organs[BODY].pt.y += 14;
         else setHeight();
         this.state = state;
         current = 0;
         if (animation.containsKey(state)) nextAnimation = animation.get(state);
         else{
-//            Global.p("Can't find current state "+state.getName());
+            Global.p("Can't find current state "+state.getName());
             nextAnimation = animation.get(Actions.Idle);
         }
         setClip();

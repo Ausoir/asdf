@@ -2,7 +2,6 @@ package com.ga.unit.intelligence;
 
 import com.ga.unit.Unit;
 import com.ga.unit.skill.Actions;
-import com.ga.unit.skill.Skills;
 import com.ga.unit.skill.Spells;
 
 /**
@@ -21,7 +20,7 @@ class Hunt implements Task {
     public void blocked(boolean fall) {
         host.brain.forget.time = 5;
         host.vel.x = host.getSpeed()*host.dir;
-        host.setState(Skills.Jump);
+        host.setState(Actions.Jump);
     }
 
     public void update() {
@@ -29,26 +28,23 @@ class Hunt implements Task {
         if (target == null || !host.delay.over()) return;
         int x = (int) ((target.pos.x+target.vel.x) - (host.pos.x+host.vel.x));
         int y = (int) (target.pos.y - host.pos.y);
-        host.face(target.pos);
-        float dist = (float) (Math.sqrt((x*x)+(y*y))-range);
+        host.face(target.pos.x>host.pos.x?1:-1, false);
+        float dist = Math.abs(x)-range;
         if (dist < 1000) {
-            int t = host.performMoveset((int) dist);
-            if (host.state instanceof Spells){
-                host.delay.set(300);
-            }
-            if (t == -1){
-                if (y < -50){
-                    if (host.vel.x == 0) {
-                        host.face(x > 0 ? 1 : -1);
-                        host.setState(Actions.Walk);
-                    } else host.setState(Skills.Jump);
-                } else {
-                    host.face(x > 0 ? 1 : -1);
-                    host.setState(Actions.Walk);
+            if (y < -64) {
+                Actions.Walk.update(host,1);
+                host.setState(Actions.Jump);
+            } else if (y > 64){
+                if (Math.abs(x) < 160 && host.lastLand != target.lastLand) host.setState(Actions.Drop);
+            } else {
+                int t = host.performMoveset((int) dist);
+                if (host.state instanceof Spells) {
+                    host.delay.set(300);
                 }
-            } else if (t == 2){
-                host.setState(Skills.Rest);
-                host.delay.time += 40;
+                if (t == 2) { //no stamina
+                    host.setState(Actions.Rest);
+                    host.delay.time += 40;
+                }
             }
         }
     }

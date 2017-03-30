@@ -5,7 +5,6 @@ import com.ga.map.Global;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
-import com.ga.unit.factory.Stock;
 import com.ga.unit.item.ArmorSet;
 import com.ga.unit.item.Item;
 import com.ga.unit.skill.*;
@@ -14,7 +13,7 @@ import java.awt.*;
 
 import static com.ga.unit.BodyHumanoid.FIST;
 import static com.ga.unit.BodyHumanoid.OFIST;
-import static com.ga.unit.skill.Skills.Underhand;
+import static com.ga.unit.skill.Actions.Underhand;
 
 /**
  * Created by Ga on 5/7/2016.
@@ -23,7 +22,6 @@ public class Man extends Unit {
     private Item fist = ((Item) Stock.getByName("Fist",0)).cancelAdd();
     public Item weapon = fist;
     public ArmorSet armor;
-    private String ground = "dirt";
     public Line rope;
 
     public Man(String p){
@@ -54,7 +52,10 @@ public class Man extends Unit {
 
     public void setWeapon(Item p){
         if (p == null) p = fist;
-        if (weapon != fist) weapon.field();
+        if (weapon != fist){
+            weapon.onUnequip(this);
+            weapon.field();
+        }
         weapon = p;
         weapon.pos = pos;
         weapon.setOrgan(clip.organs[FIST]);
@@ -70,7 +71,7 @@ public class Man extends Unit {
     }
 
     public void rotateWeapon(P p){
-        weapon.rotate(p);
+        weapon.rotateTo(p);
     }
 
     public float getReach(){
@@ -78,8 +79,11 @@ public class Man extends Unit {
     }
 
     void stepSound(){
-        if (Sound.has("step_"+ground)) Sound.play("step_"+ground);
-        else Sound.play("step_dirt");
+        if (Global.camera.getSubtract(pos).getSum() < 1000) {
+            String ground = Global.map.getLand(lastLand.next);
+            if (Sound.has("step_" + ground)) Sound.play("step_" + ground);
+            else Sound.play("step_dirt");
+        }
     }
 
     public void attackSound(){
@@ -98,13 +102,13 @@ public class Man extends Unit {
     }
     public void stateSet(Moveset state){
         super.stateSet(state);
-        if (state == Actions.Use){
-            if (!clip.organs[FIST].amputated) weapon.use(this);
-            return;
-        } else if (state instanceof Skills) {
-            int speed = weapon.speed-armor.getEncumberance();
+        if (state instanceof Actions) {
+            int speed = weapon.speed-armor.getEncumberance()-weapon.weight;
             damageType = weapon.damageType;
-            switch ((Skills) state) {
+            switch ((Actions) state) {
+                case Use:
+                    if (!clip.organs[FIST].amputated) weapon.use(this);
+                    break;
                 case Duck:
                 case Sprint:
                 case Jump:
@@ -129,7 +133,7 @@ public class Man extends Unit {
                 case Lunge:
                     damageMod = -1;
                     break;
-                case Slash:
+                case Triple:
                     damageMod = 1 + stateLevel;
                     weapon.rotation = target.getAtan()+(dir<0?-3.14f:0);
                     speed = 0;
@@ -143,11 +147,11 @@ public class Man extends Unit {
                 case Stab:
                     damageMod = 2 + stateLevel;
                     break;
-                case Pierce:
+                case Thrust:
                     damageMod = .5f + (Math.abs(vel.x) / 20) + (stateLevel*.5f);
                     break;
                 case Dash:
-                    vel.x -= getSpeed() * 2 * dir;
+                    vel.x -= getSpeed() * dir;
                     delay.time += 2 * stateLevel;
                     delay.max += 2 * stateLevel;
                     damageMod = stateLevel * .5f;
@@ -157,21 +161,21 @@ public class Man extends Unit {
                     damageMod = .5f + ((float) stateLevel * .5f);
                     delay.performer = new Performer(){
                         public void perform(){
-                            setState(Skills.Rest);
+                            setState(Actions.Rest);
                         }
                     };
                     break;
                 case Throw:
                     damageMod = stateLevel;
                     break;
-                case Swing:
+                case Slash:
                     damageMod = 1+(stateLevel*.5f);
                     speed = Math.min(10,speed);
                     break;
                 default:
                     damageMod = .5f + (stateLevel * .5f);
             }
-            delay.set(Math.max(3, delay.time - speed));
+            if (delay.max != 0) delay.set(Math.max(3, delay.time - speed));
             clip.setSpeed(speed);
         } else if (state instanceof Spells){
             weapon.rotation = target.getAtan()+(dir<0?-3.14f:0);
@@ -180,10 +184,13 @@ public class Man extends Unit {
         }
     }
 
-    public boolean face(int dir) {
-        if (super.face(dir)) {
-            weapon.dir = dir;
-            weapon.rotation *= -1;
+    @Override
+    public boolean face(int dir, boolean force) {
+        if (super.face(dir, force)) {
+            if (weapon.dir != dir) {
+                weapon.dir = dir;
+                weapon.rotation *= -1;
+            }
             clip.setClip();
             return true;
         }
@@ -217,19 +224,19 @@ public class Man extends Unit {
         super.die();
     }
 
-    public void attack() {
+    public boolean attack() {
         boolean cleave = false;
         if (stats.triggerEffect(Buffs.Cleave)) cleave = true;
         Line hitbox = weapon.getLine();
-        boolean hit = false;
+        Unit target = null;
         for (Unit i : Updater.collideUnit(pos, (int) hitbox.getLength(), faction)){
             if (i.checkHit(hitbox,getDamage(),damageType)){
-                hit = true;
+                target = i;
                 if (!cleave) break;
             }
         }
-        if (hit){
-            weapon.use(1);
+        if (target != null){
+            if (weapon.use(1)) weapon.trigger(target);
             Sound.play(weapon.getHitSound());
             if (state == Underhand) get("Stamina").add(4);
             if (brain != null) brain.attacked();
@@ -237,33 +244,20 @@ public class Man extends Unit {
                 Particle.explode("Blood",hitbox.ptd,new P(),12,20,0,true,3);
                 Particle.explode("Fire",hitbox.ptd,new P(),30,8,0,false,3);
             }
+            return true;
         }
+        return false;
     }
 
     @Override
     protected void moveTriggered(int organ){
-        weapon.rotate(target.getMult(dir, dir));
-        weapon.rotation += .1f * dir;
-        if (state instanceof Skills) {
-            if (state == Skills.Kick || state == Skills.Sidekick){
+        if (state instanceof Actions) {
+            if (state == Actions.Kick || state == Actions.Sidekick){
                 Line hitbox = clip.organs[organ].getAdd(pos);
                 int damage = armor.armor[stateLevel].getDamage()+1;
                 for (Unit i : Updater.collideUnit(pos, (int) hitbox.getLength(), faction))
                     i.checkHit(hitbox,damage,damageType);
-            } else ((Skills)state).trigger(this, organ);
-        }
-    }
-
-    @Override
-    public void onCollide(Line l){
-        boolean wasJump = jump;
-        super.onCollide(l);
-        if (!wasJump){
-            if (l.next != -1) ground = Global.map.getLand(l.next);
-            if (state == Skills.Jump){
-                stateSet(Actions.Hit);
-                delay.set(4);
-            }
+            } else ((Actions)state).trigger(this, organ);
         }
     }
 

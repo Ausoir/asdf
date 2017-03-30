@@ -2,21 +2,20 @@ package com.ga.unit.item;
 
 import com.ga.game.Sound;
 import com.ga.map.Picture;
-import com.ga.tool.Clips;
 import com.ga.tool.Performer;
 import com.ga.unit.Man;
 
 /**
- * Created by Ga on 8/9/2016.
+ * Created by Ga on 8/9/2016. asd
  */
 public class Armor extends Item {
-    public int piece = 0;
+    private int piece = 0;
     private float armor = 0;
     private float armorMod = 1;
     public int encumberance = 0;
     public int pocket = 0;
     public Armor(String name, int seed, int weight, int uses, float armor, int encumberance, int piece) {
-        super(name, seed, weight, uses, 100, .04f);
+        super(name, seed, weight, uses);
         value = 24;
         setType(Tag.Armor);
         this.armor = armor;
@@ -26,7 +25,10 @@ public class Armor extends Item {
         if (piece != 0) image = new Picture(name, piece);
         delay = 80;
     }
-    public float getArmor(){
+    public void onCreate(){
+        imbueMeta(true, true, .1f, true);
+    }
+    float getArmor(){
         return armor * armorMod;
     }
     protected void setModifier(PrefixMod mod){
@@ -48,7 +50,7 @@ public class Armor extends Item {
         else if (mod == SpecialtyMod.Tough) armorMod += .5f;
         else super.setModifier(mod);
     }
-    protected void onHit(Man host){
+    void onHit(Man host){
         super.use(host);
     }
     @Override
@@ -68,11 +70,10 @@ public class Armor extends Item {
         return false;
     }
     @Override
-    public String getDisplayName(){
-        String r = super.getDisplayName();
-        if (piece == 0 || piece == 4) r+=" Arm";
-        else if (piece == 1 || piece == 2) r+=" Leggings";
-        else if (piece == 3) r+=" Armor";
+    public String getName(){
+        String r = super.getName();
+        if (piece == 1) r+=" Leggings";
+        else if (piece == 2) r+=" Armor";
         return r;
     }
     public String getDescription(){
@@ -81,6 +82,6 @@ public class Armor extends Item {
         if (emod != null){
             r += " This armor has "+probability*100+"% chance of activating its enchantment on being hit.";
         }
-        return r + " This armor decreases damage by "+getArmor()+" points.";
+        return r + " This armor decreases damage by "+getArmor()+" points. It has "+pocket+" pockets.";
     }
 }

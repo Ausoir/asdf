@@ -19,7 +19,7 @@ class Wander implements Task {
 
     @Override
     public void blocked(boolean fall) {
-        host.face(-host.dir);
+        host.face(-host.dir, true);
         host.setState(Actions.Walk);
         tick.set(30);
     }
@@ -29,7 +29,7 @@ class Wander implements Task {
             int dir = Global.r.nextInt(3);
             if (dir == 1) host.setState(Actions.Walk);
             else {
-                host.face(dir-1);
+                host.face(dir-1, false);
                 host.setState(Actions.Idle);
             }
             tick.set(Global.r.nextInt(25)+1);

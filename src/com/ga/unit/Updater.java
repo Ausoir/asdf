@@ -5,14 +5,13 @@ import com.ga.game.FileManager;
 import com.ga.game.Observer;
 import com.ga.map.Drawable;
 import com.ga.map.Global;
+import com.ga.map.Terrain;
 import com.ga.map.Updatable;
-import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.tool.Timer;
 import com.ga.unit.intelligence.Intelligence;
-import com.ga.unit.item.Item;
-import com.ga.unit.skill.Skills;
+import com.ga.unit.skill.Actions;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -24,94 +23,100 @@ import java.util.HashMap;
 public class Updater {
     public static boolean pause = false;
     public static boolean editor = false;
-    public static int id = 1;
     private static ArrayList<Drawable> drawee = new ArrayList<>();
     private static ArrayList<Effect> effects = new ArrayList<>();
     private static ArrayList<Updatable> updatee = new ArrayList<>();
-    private static ArrayList<Matter> matter = new ArrayList<>();
+    private static ArrayList<Prop> props = new ArrayList<>();
     private static ArrayList<Unit> colidee = new ArrayList<>();
     private static ArrayList<Intelligence> controllee = new ArrayList<>();
     public static HashMap<Integer, Unit> unitList = new HashMap<>();
     private static ArrayList<Observer> addQueue = new ArrayList<>();
     private static ArrayList<Observer> removeQueue = new ArrayList<>();
     public static String changeMap = null;
-    public static int changeMapPos = 0;
     public static Performer changeMapEvent = null;
     private static Timer time = new Timer(40,true);
     private static void clear(){
         drawee.clear();
-        updatee.clear();
         colidee.clear();
         effects.clear();
         addQueue.clear();
         removeQueue.clear();
         unitList.clear();
         controllee.clear();
-        matter.clear();
+        props.clear();
         Global.map.clear();
-        Display.addMenus();
-        add(Global.server);
-        add(Global.weather);
-    }
-    public static int getId(){
-        return id++;
+        Global.display.removeSpeech();
     }
     public static void changeMap(boolean editor){
         clear();
         if (!editor) {
-            addQueue.add(Global.player.host);
-            Global.player.host.pos.set(FileManager.loadMap(changeMap, changeMapPos));
-            Global.mapEdgeCenter(Global.cameraTo = Global.player.host.pos.getAdd(0,0));
-            ((MainPlayer) Global.player.host).onMapChange();
-            Display.input = Global.player;
+            addQueue.add(Global.player);
+            int pos = FileManager.loadMap(changeMap);
+            for (Observer i : addQueue){
+                if (i instanceof Prop && ((Prop)i).name.equals("Spawn") && ((Prop)i).seed == pos){
+                    Global.player.pos.set(((Prop)i).pos);
+                }
+            }
+            Global.player.onMapChange();
+            Display.input = Global.player.input;
+            Global.mapEdgeCenter(Global.cameraTo = Global.player.pos.getAdd(0,0));
+            Global.mapEdgeCenter(Global.camera = Global.cameraTo.getAdd(0,0));
             if (changeMapEvent != null){
                 changeMapEvent.perform();
                 changeMapEvent = null;
             }
         } else {
-            FileManager.loadMap(changeMap, -2);
+            FileManager.loadMap(changeMap);
         }
         changeMap = null;
     }
     public static void updateControl(){
         for (Intelligence i : controllee) i.update();
     }
+    public static void addUpdatee(Updatable p){
+        updatee.add(p);
+    }
     public static void update(){
         while (addQueue.size() > 0){
             Observer p = addQueue.remove(0);
-            if (p instanceof Matter) matter.add((Matter) p);
-            else if (p instanceof Updatable) updatee.add((Updatable) p);
+            if (p instanceof Prop){
+                props.add((Prop) p);
+                ((Prop)p).onField();
+            }
             if (p instanceof Effect) effects.add((Effect) p);
             if (p instanceof Intelligence) controllee.add((Intelligence) p);
             if (p instanceof Unit){
                 Unit unit = (Unit) p;
                 colidee.add(unit);
-                unitList.put(unit.id, unit);
+                unitList.put(unit.controlId, unit);
             }
             if (p instanceof Drawable) addDrawee((Drawable) p);
         }
         while (removeQueue.size() > 0){
             Observer p = removeQueue.remove(0);
-            updatee.remove(p);
-            matter.remove(p);
+            drawee.remove(p);
+            props.remove(p);
             colidee.remove(p);
-            effects.remove(p);
             unitList.remove(p);
             controllee.remove(p);
-            drawee.remove(p);
         }
         Global.camera.add(Global.cameraTo.getSubtract(Global.camera.getAdd(0,40)).getMult(.2f,.2f));
         for (Updatable i : updatee) i.update();
         if (!editor && !pause) {
-            for (Matter i : matter) i.update();
+            for (Prop i : props) i.update();
             for (int i = 0; i < effects.size(); i++) {
-                if (effects.get(i).over()) remove((Thing) effects.get(i));
+                Effect t = effects.get(i);
+                if (t.over()){
+                    drawee.remove(t);
+                    effects.remove(t);
+                }
             }
-            if (time.update()){
+            if (changeMap != null) changeMap(false);
+            else if (time.update()){
+                Global.map.event.update();
                 Global.update();
                 FileManager.saveCharacter();
             }
-            if (changeMap != null) changeMap(false);
         }
     }
     public static void draw(Graphics2D g2){
@@ -119,6 +124,7 @@ public class Updater {
         for (Drawable i : drawee){
             i.draw(g2);
         }
+        Global.map.weather.draw(g2);
     }
     public static void add(Observer p){
         addQueue.add(p);
@@ -149,45 +155,51 @@ public class Updater {
         int size = addQueue.size();
         for (int i=size-1;i>=0;i--){
             Observer t = addQueue.get(i);
-            if (t instanceof Item || (t instanceof Unit && !(t instanceof Player))){
-                addQueue.remove(t);
-                drawee.remove(t); //drawee already added through thread gap
+            if (t instanceof Prop && !(t instanceof Player)){
+                if (((Prop)t).dynamic) {
+                    addQueue.remove(t);
+                    drawee.remove(t); //drawee already added through thread gap
+                }
             }
         }
     }
     public static String toMapString(){
         String result = "";
-        for (Matter i : matter){
+        for (Prop i : props){
             if (!i.toString().equals("") && !(i instanceof Player)) result += i.toString()+";";
         }
         if (result.length() == 0) return "";
         result = result.substring(0,result.length()-1);
         return result;
     }
-    public static void sound(Matter p, String msg){
-        for (Matter i : colidee){
+    public static void sound(Unit p, String msg){
+        for (Unit i : colidee){
             if (i != p && i.faction != p.faction) {
                 if (Math.abs(i.pos.x - p.pos.x) < 600 && Math.abs(i.pos.y - p.pos.y) < 200) {
                     if (i instanceof Man) {
-                        ((Man) i).hear(p, msg);
+                        i.hear(p, msg);
                     }
                 }
             }
         }
     }
-    public static ArrayList<Matter> collideInteractive(P p){
-        ArrayList<Matter> result = new ArrayList<>();
-        for (Matter i : matter){
+    public static ArrayList<Prop> collideInteractive(P p){
+        ArrayList<Prop> result = new ArrayList<>();
+        for (Prop i : props){
             if (i.onInteract != null) {
-                if (i.pos.getMinus().getAdd(p).getDist() <= i.onInteract.range+i.image.sizeRadius) result.add(i);
+                if (i instanceof Man){
+                    if (((Man) i).getHand().getSubtract(p).getDist() <= 64) result.add(i);
+                } else {
+                    if (i.pos.getSubtract(p).getDist() <= i.getSize()) result.add(i);
+                }
             }
         }
         return result;
     }
-    public static ArrayList<Matter> collideMatter(P p, int r){
-        ArrayList<Matter> result = new ArrayList<>();
-        for (Matter i : matter){
-            if (i.hittable(Faction.Destructive) && p.getSubtract(i.pos).getDist() <= r) result.add(i);
+    public static ArrayList<Prop> collideProp(P p, int r){
+        ArrayList<Prop> result = new ArrayList<>();
+        for (Prop i : props){
+            if (i.hittable(Faction.Destructive) && p.getSubtract(i.pos).getDist() <= r+i.getSize()) result.add(i);
         }
         return result;
     }
@@ -202,9 +214,9 @@ public class Updater {
         ArrayList<Unit> seen = new ArrayList<>();
         int max = r;
         for (Unit i : colidee){
-            if (host != i && i.state != Skills.Sneak) {
+            if (host != i && i.state != Actions.Sneak) {
                 float x = Math.abs(i.pos.x-vision.x), y = Math.abs(i.pos.y - vision.y);
-                if (x < r && y < r/3) {
+                if (x < r && y < r) {
                     if (x+y < max){
                         max = (int) (x+y);
                         seen.add(0,i);
@@ -216,12 +228,22 @@ public class Updater {
     }
     public static P getEntrancePos(int p){
         int index = 0;
-        for (Matter i : matter){
+        for (Prop i : props){
             if (i.name.equals("PlayerSpawn")){
                 if (index == p) return i.pos;
                 else index++;
             }
         }
         return new P();
+    }
+
+    public static void removeUpdatee(Updatable p) {
+        updatee.remove(p);
+    }
+
+    public static void unrender() {
+        for (Observer i : drawee){
+            if (i instanceof Terrain) remove(i);
+        }
     }
 }

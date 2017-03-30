@@ -14,7 +14,7 @@ public class Particle extends Thing implements Effect {
     private P vel;
     private boolean gravity;
     public Particle(String name, P pt, P vel, float rotation, float speed, boolean gravity, int lifetime) {
-        super(name, 13);
+        super(name, 800);
         pos = pt;
         save = false;
         this.vel = new P(vel);
@@ -33,7 +33,7 @@ public class Particle extends Thing implements Effect {
         explode("Glare",pt,new P(),1,4,0,true,4);
     }
     public static void groundSlam(P pt){
-        explode("Dust",pt,new P(0,-16),1,4,0,true,4);
+        explode("Dust",pt,new P(0,-16),1,12,8,true,4);
     }
     public static void explosion(P pt){
         explode("Smoke",pt,new P(0,-16),50,15,15,false,7);
@@ -74,7 +74,7 @@ public class Particle extends Thing implements Effect {
             if (i.lineCross(pp)){
                 if (i.isLand()) {
                     float slope = i.getSlope();
-                    vel.y = (slope * vel.x * 10000 - 5) / 10000f;
+                    if (!Double.isInfinite(slope)) vel.y = slope * vel.x;
                     vel.x /= 2;
                 }
             }

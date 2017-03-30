@@ -13,6 +13,19 @@ public class Line {
     public P ptd;
     public int next = -1;
     public int opt = 0; //0:normal,1:rope,2:tp,100:ftp,200:manual tp
+    public int depth = 0;
+    public Line(String p){
+        load(p);
+    }
+    public void load(String p){
+        String[] data = p.split(",");
+        float[] intdata = new float[data.length];
+        for (int i=0;i<data.length;i++) intdata[i] = Float.parseFloat(data[i]);
+        pt = new P(new P(intdata[0], intdata[1]));
+        ptd = new P(new P(intdata[2], intdata[3]));
+        next = (int) intdata[4];
+        opt = (int) intdata[5];
+    }
     public Line(){
         pt = new P();
         ptd = new P();
@@ -26,6 +39,10 @@ public class Line {
         this.next = next;
         this.opt = opt;
     }
+    public Line(float x, float y, float x1, float y1, int next, int opt, int depth){
+        this(x,y,x1,y1,next,opt);
+        this.depth = depth;
+    }
     public Line(P p1, P p2){
         pt = p1;
         ptd = p2;
@@ -36,7 +53,10 @@ public class Line {
         this.opt = opt;
     }
     public boolean isLand(){
-        return opt != -1 && opt != 1;
+        return opt != -1;
+    }
+    public boolean isLandable(){
+        return isLand() && clockwise();
     }
     public Line getAdd(P p){
         return new Line(pt.getAdd(p), ptd.getAdd(p));
@@ -57,6 +77,9 @@ public class Line {
     }
     public P getMidPoint(){
         return new P((ptd.x-pt.x)/2+pt.x, (ptd.y-pt.y)/2+pt.y);
+    }
+    public float getCrossPointY(float x){
+        return ((x-pt.x)*getSlope())+pt.y;
     }
     public boolean lineCross(Line i2){
         boolean a = i2.pt.x-pt.x >= 0, b = i2.pt.x-ptd.x > 0, c = i2.ptd.x-pt.x >= 0, d = i2.ptd.x-ptd.x > 0,

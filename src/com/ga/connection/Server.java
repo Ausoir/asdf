@@ -58,7 +58,7 @@ public class Server implements Updatable {
             e.printStackTrace();
             System.exit(1);
         }
-        Updater.add(this);
+        Updater.addUpdatee(this);
     }
 
     private void translate(String p) throws Exception {
@@ -75,9 +75,6 @@ public class Server implements Updatable {
                         PlayerInput pi = FileManager.loadPlayer(true, "0");
                         clientIPs.add(t);
                         clientControllers.put(0, pi);
-                        Global.display.input = pi;
-                        Global.player = pi;
-                        Command.host = pi.host;
                         clientShortcuts.add(UDPClient.getAckPacket(t, Settings.receiverPort));
                         break;
                     case "HI":
@@ -95,11 +92,11 @@ public class Server implements Updatable {
                     case "OK": //client
                         System.out.println("Acknowledgement received (" + cmd[0] + ")");
                         server = false;
-                        Updater.remove(this);
+                        Updater.removeUpdatee(this);
                         t = udp.getClientIP(); //server ip
                         clientIPs.add(0, t);
                         clientControllers.remove(0);
-                        clientControllers.put(Integer.parseInt(cmd[0]), Global.player); //callname = local
+                        clientControllers.put(Integer.parseInt(cmd[0]), Global.player.input); //callname = local
                         final int clientSize = Integer.parseInt(cmd[0]);
                         entry = new String[clientSize + 1];
                         for (int i = 0; i < clientSize; i++) {
@@ -108,8 +105,7 @@ public class Server implements Updatable {
                         entry[0] = "Data/map/Server.map";
                         tcp.download(t, entry);
                         Global.cprocess.stop();
-                        Updater.changeMap = "Server";
-                        Updater.changeMapPos = 0;
+                        Updater.changeMap = "Server@0";
                         Updater.changeMapEvent = new Performer() {
                             public void perform() {
                                 for (int i = 0; i < clientSize; i++) {
@@ -118,7 +114,7 @@ public class Server implements Updatable {
                                 }
                             }
                         };
-                        Global.player.host.id = -clientSize - 1;
+                        Global.player.controlId = -clientSize - 1;
                         udp.send("KK>1", t, Settings.senderPort);
                         tcp.send(new String[]{"Data/map/0"});
                         break;
@@ -141,7 +137,7 @@ public class Server implements Updatable {
                         try {
                             Unit unit = Updater.unitList.get(Integer.parseInt(cmd[0]));
                             unit.target = new P(Integer.parseInt(cmd[1]), Integer.parseInt(cmd[2]));
-                            unit.face(unit.target.x > 0 ? 1 : -1);
+                            unit.face(unit.target.x > 0 ? 1 : -1, false);
     //                        unit.setStateEcho(cmd[2]);
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -247,7 +243,7 @@ public class Server implements Updatable {
             while (it.hasNext()) {
                 Map.Entry<Integer, Unit> entry = (Map.Entry<Integer, Unit>) it.next();
                 Unit unit = entry.getValue();
-                if (entry.getKey() != 0) t += unit.id+"@"+unit.pos+";";
+                if (entry.getKey() != 0) t += unit.controlId +"@"+unit.pos+";";
             }
             sendFromLocal(t.substring(0,t.length()-1));
         }

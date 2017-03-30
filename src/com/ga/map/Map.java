@@ -4,10 +4,10 @@ import com.ga.game.FileManager;
 import com.ga.game.Settings;
 import com.ga.tool.Line;
 import com.ga.tool.P;
-import com.ga.unit.Matter;
+import com.ga.unit.Prop;
 import com.ga.unit.Thing;
 import com.ga.unit.Updater;
-import com.ga.unit.factory.Stock;
+import com.ga.unit.Stock;
 import com.ga.unit.item.Item;
 
 import java.awt.*;
@@ -16,17 +16,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 /**
- * Created by Ga on 5/7/2016.
+ * Created by Ga on 5/7/2016. asd
  */
-public class Map {
-    public Thing panorama;
-    public Thing map;
-    public Thing fmap;
+public class Map extends Thing {
+    public Weather weather = new Weather();
     public ArrayList<Line> land = new ArrayList<>();
-    public ArrayList<Terrain> landform = new ArrayList<>();
     public HashMap<Integer, String> formTextures = new HashMap<>();
     private static HashMap<String, String> defaultProps = new HashMap<String, String>(){{
-        put("grass","Rock=.1,Bush=.2,Weed=1");
+        put("grass","Rock=.1,Bush=.2,Stone=.1,Weed=1");
         put("dirt","Rock=.2");
         put("rock","Rock=.2");
         put("road","Rock=.1");
@@ -37,83 +34,23 @@ public class Map {
         put("dirt","Root=.15");
         put("grass","Vine=.8");
     }};
-    protected static boolean inside = false;
     private Terrain blocker = null;
-    public static String[] maps;
+    public String[] maps;
     public MapEvent event;
     public P size;
-    public static final int magnify = 2;
+    private static final int magnify = 2;
     public Map(final String[] maps) {
+        super(null,1);
         this.maps = maps;
-        inside = maps[0].equals("1");
+        if (maps[2].equals("None")) image.visible = false;
+        else{
+            setImage(maps[2]);
+            image.size.mult(magnify);
+        }
         event = MapEvent.getByName(maps[1]);
-        final boolean noPanorama = maps[2].equals("None");
-        panorama = new Thing(maps[2]+(!noPanorama && Global.weather.isNight()?"_Night":""), 1) {
-            private boolean none = noPanorama;
-            @Override
-            public void draw(Graphics2D g) {
-                if (none) {
-                    g.setColor(Color.black);
-                    g.fillRect(0,0, Settings.screenX, Settings.screenY);
-                } else {
-                    P t = new P(Global.rel.x+pos.x, Global.rel.y+pos.y).mult(.1f);
-                    t.x = Global.clamp(t.x, -image.size.x + Settings.screenX, 0);
-                    t.y = Global.clamp(t.y, -image.size.y + Settings.screenY, 0);
-                    g.drawImage(image.getImage(), (int) (t.x), (int) (t.y), (int) image.size.x, (int) image.size.y, null);
-                }
-            }
-        };
-        if (!noPanorama) {
-            panorama.image.size.mult(magnify, magnify);
-            panorama.pos = panorama.pos.getAdd(500, 0);
-        } else panorama.image.visible = false;
-        if (!inside) {
-            map = new Thing(null, 2) {
-                public void draw(Graphics2D g) {
-                    g.drawImage(image.getImage(), (int) (Global.rel.x + pos.x), (int) (Global.rel.y + pos.y), (int) image.size.x, (int) image.size.y, null);
-                }
-            };
-        } else {
-            map = new Thing(null, 2) {
-                public void draw(Graphics2D g) {
-                    g.drawImage(image.getImage(), (int) (Global.rel.x + pos.x), (int) (Global.rel.y + pos.y), (int) image.size.x, (int) image.size.y, null);
-                    for (Terrain i : landform) i.draw(g);
-                }
-            };
-        }
-        int manualSize = maps[3].indexOf(":");
-        String mapName = maps[3];
-        if (manualSize != -1){
-            String[] size = mapName.substring(manualSize+1).split("x");
-            mapName = mapName.substring(0,manualSize);
-            map.setImage(mapName);
-            this.size = new P(Integer.parseInt(size[0]), Integer.parseInt(size[1]));
-        }
-        if (mapName.startsWith("None")){
-            map.image.visible = false;
-            if (this.size == null) this.size = new P(Settings.screenX, Settings.screenY);
-        } else {
-            map.setImage(mapName);
-            map.image.size.mult(magnify,magnify);
-            if (this.size == null) this.size = new P(map.image.size);
-        }
-        if (!inside) {
-            fmap = new Thing(maps[4], 30) {
-                public void draw(Graphics2D g) {
-                    for (Terrain i : landform) i.draw(g);
-                    g.drawImage(image.getImage(), (int) (Global.rel.x + pos.x), (int) (Global.rel.y + pos.y), (int) image.size.x, (int) image.size.y, null);
-                }
-            };
-        } else {
-            fmap = new Thing(maps[4], 30) {
-                public void draw(Graphics2D g) {
-                    blocker.draw(g);
-                    g.drawImage(image.getImage(), (int) (Global.rel.x + pos.x), (int) (Global.rel.y + pos.y), (int) image.size.x, (int) image.size.y, null);
-                }
-            };
-        }
-        if (maps[4].equals("None")) fmap.image.visible = false;
-        else fmap.image.size.mult(magnify, magnify);
+        String[] size = maps[3].split("x");
+        this.size = new P(Integer.parseInt(size[0]), Integer.parseInt(size[1]));
+        onTimeChange();
     }
     public String toString(){
         String result = maps[0]+","+event.toString()+",";
@@ -130,7 +67,7 @@ public class Map {
         result += "\n";
         if (land.size() == 0) return result;
         for (Line i : land){
-            if (!i.equals("")){
+            if (!i.toString().equals("")){
                 result += i+";";
             }
         }
@@ -144,48 +81,32 @@ public class Map {
             }
         }
     }
-    public void loadMap(int side, float py){
-        for (int i=5;i<maps.length;i++){
-            String[] t = maps[i].split("@");
-            if (t.length > 1){
-                if ((side == 2 && t[1].equals("L")) || (side == 4 && t[1].equals("R"))){
-                    if (py > Integer.parseInt(t[2])){
-                        loadMap(((i-5)*10)+Integer.parseInt(t[3]));
-                        return;
-                    }
-                }
-            }
+    public void loadMap(int side){
+        String targetMap = "None";
+        if (side == 2) targetMap = maps[4];
+        if (side == 4) targetMap = maps[5];
+        if (!targetMap.equals("None")) {
+            loadMap(targetMap);
+            return;
         }
     }
-    public void loadMap(int opt){
-        int mapnum = opt / 10, posnum = opt % 10;
+    public void loadMap(String p){
         FileManager.saveCharacter();
-        Global.player.host.cmap = maps[mapnum + 5];
-        Updater.changeMap = maps[mapnum + 5].split("@")[0];
-        Updater.changeMapPos = posnum;
+        Updater.changeMap = p;
 //        Global.server.sendFromLocal("DC@"+maps[mapnum+5]+"@"+posnum);
-    }
-
-    public boolean fallSafe(P pos){
-        Line line = new Line(pos.getAdd(0,100), pos.getAdd(0,9999));
-        for (Line i : land){
-            if (i.lineCross(line)) return true;
-        }
-        return false;
     }
 
     public void clear(){
         land.clear();
-        landform.clear();
         formTextures.clear();
     }
 
     public void setTexture(){
-        HashMap<Integer, Terrain> hashmap = new HashMap<>();
         float highX = 0;
         Line high = null;
+        boolean inside = isIndoors();
         if (inside) {
-            blocker = new Terrain("black", null);
+            blocker = new Terrain("black", null, 0);
             for (final Line i : land) {
                 if (i.next >= 0) {
                     if (i.pt.x > highX) {
@@ -195,36 +116,34 @@ public class Map {
                 }
             }
         }
-        ArrayList<Terrain> ropes = new ArrayList<>();
-        int blockerTerrain = -1;
+        int blockerTerrain = inside ? -2 : -1;
+        HashMap<Integer, Terrain> terrains = new HashMap<>();
         for (final Line i : land){
             if (i.opt == 1){
-                Terrain t = new Terrain("rope", null);
+                Terrain t = new Terrain("rope", null, -1);
                 t.addPoint(i.pt.x-8, i.pt.y);
                 t.addPoint(i.pt.x+8, i.pt.y);
                 t.addPoint(i.ptd.x+8, i.ptd.y);
                 t.addPoint(i.ptd.x-8, i.ptd.y);
                 t.render();
-                if (!inside) landform.add(t);
-                else ropes.add(t);
-                Thing top = new Thing("Ropetop",31);
+                Thing top = new Thing("Ropetop",20);
                 top.save = false;
                 top.pos = i.pt;
             }
             if (i.next >= 0){
-                Terrain terrain = hashmap.get(i.next);
+                Terrain terrain = terrains.get(i.next);
                 if (terrain == null){
                     String formTexture = formTextures.get(i.next);
                     if (formTexture == null) continue;
                     else {
                         String[] formName = formTexture.split("&");
-                        terrain = new Terrain(formName[0], formName.length > 1 ? Shader.getByName(formName[1]) : null);
+                        terrain = new Terrain(formName[1], Shader.getByName(formName[2]), Integer.parseInt(formName[0]));
                     }
-                    hashmap.put(i.next, terrain);
+                    terrains.put(i.next, terrain);
                 }
-                terrain.lines.add(i);
+                terrain.addLine(i);
                 terrain.addPoint(i.pt.x, i.pt.y);
-                if (inside && (blockerTerrain == -1 || blockerTerrain == i.next)){
+                if (blockerTerrain == -2 || blockerTerrain == i.next) {
                     blocker.addPoint(i.pt.x, i.pt.y);
                     blockerTerrain = i.next;
                     if (i == high){
@@ -240,45 +159,42 @@ public class Map {
             }
         }
         if (inside) blocker.render();
-        Iterator it = hashmap.entrySet().iterator();
-        while (it.hasNext()) {
-            java.util.Map.Entry pair = (java.util.Map.Entry) it.next();
+        for (Object o : terrains.entrySet()) {
+            java.util.Map.Entry pair = (java.util.Map.Entry) o;
             Terrain terrain = (Terrain) pair.getValue();
             terrain.render();
-            landform.add(terrain);
         }
-        landform.addAll(ropes);
     }
 
-    public void generateProps(){
-        Line l;
-        for (int i = 0; i < land.size(); i++) {
-            l = land.get(i);
-            if (l.isLand() && Math.abs(l.getSlope()) < Line.MAXSLOPE-1) {
-                String texture = formTextures.get(l.next);
-                if (texture != null) {
-                    String[] formProps = formTextures.get(l.next).split("&");
-                    boolean cw = l.clockwise();
-                    int size = (int) (Math.abs(l.ptd.x-l.pt.x) * .02f);
-                    for (int ii = 0; ii < size; ii++) {
-                        String prop = null;
-                        if (cw) {
-                            if (formProps.length > 2) {
-                                prop = formProps[2];
-                            } else if (formProps.length > 1) {
-                                prop = defaultProps.get(formProps[1]);
+    void generateProps(){
+        for (Line l : land) {
+            if (l.isLand() && Math.abs(l.getSlope()) < Line.MAXSLOPE - 1) {
+                if (Math.abs(l.getSlope()) < .5f) {
+                    String texture = formTextures.get(l.next);
+                    if (texture != null) {
+                        String[] formProps = formTextures.get(l.next).split("&");
+                        boolean cw = l.clockwise();
+                        int size = (int) (Math.abs(l.ptd.x - l.pt.x) * .02f);
+                        for (int ii = 0; ii < size; ii++) {
+                            String prop = null;
+                            if (cw) {
+                                if (formProps.length > 3) {
+                                    prop = formProps[3];
+                                } else if (formProps.length > 2) {
+                                    prop = defaultProps.get(formProps[2]);
+                                }
+                            } else {
+                                prop = defaultPropsCC.get(formProps[0]);
                             }
-                        } else {
-                            prop = defaultPropsCC.get(formProps[0]);
+                            if (prop != null) placeProp(l, prop);
                         }
-                        if (prop != null) placeProp(l, prop);
                     }
                 }
             }
         }
     }
 
-    protected void placeProp(Line l, String p){
+    void placeProp(Line l, String p){
         String prop = null;
         String[] props = p.split(",");
         float rand = (float) Math.random();
@@ -296,20 +212,15 @@ public class Map {
             float landSize = Math.abs(l.ptd.x-l.pt.x);
             if (landSize > 72) {
                 int tx = (int) (Global.r.nextFloat() * (l.ptd.x - l.pt.x));
-                Matter t = Stock.getByName(prop, -1);
-                if (landSize < t.image.size.x){
-                    t.image.size.x = landSize;
-                }
+                Prop t = Stock.getByName(prop, -1);
+                if (landSize < t.image.size.x) t.image.size.x = landSize;
                 int xSize = (int) Math.abs(t.image.size.x/2);
                 if (l.clockwise()) tx = (int) Global.clamp(tx, xSize, (l.ptd.x - l.pt.x) - xSize);
                 else tx = (int) Global.clamp(tx, l.ptd.x - l.pt.x + xSize, -xSize);
                 int ty = (int) (l.pt.y + (tx * l.getSlope()));
                 t.pos = new P(l.pt.x + tx, ty);
                 if (t instanceof Item) ((Item) t).field();
-                if (Math.random() < .5f) t.dir = -1;
-                t.rotation = (float) Math.atan(l.getSlope());
-                if (l.clockwise()) t.pos.y -= (t.image.size.y / 2)-4;
-                else {
+                if (!l.clockwise()){
                     t.pos.y += (t.image.size.y / 2)-4;
                     t.rotation = 3.14f;
                 }
@@ -338,14 +249,49 @@ public class Map {
         return new P(i.pt.x+tx,ty);
     }
 
-    public static boolean isInside(int x, int y){
-        Line pp = new Line(x,y,999999,y);
+    public boolean fallSafe(Line from, P pos){
+        Line pp = new Line(pos.x,pos.y,pos.x,99999);
+        for (Line i : Global.map.land){
+            if (i.isLandable() && i.lineCross(pp) && i.depth >= from.depth){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isIndoors(){
+        return maps[0].equals("1");
+    }
+
+    public boolean isInside(P pos){
+        Line pp = new Line(pos.x,pos.y,pos.x,99999);
         int num = 0;
         for (Line i : Global.map.land){
-            if (i.isLand() && i.opt/100 != 1 && i.lineCross(pp)){
+            if (i.isLand() && i.next != -1 && i.lineCross(pp)){
                 num++;
             }
         }
-        return num % 2 == (inside?0:1);
+        return num % 2 == (isIndoors()?0:1);
+    }
+
+    void onTimeChange() {
+        if (!maps[2].equals("None")){
+            setImage(maps[2]+(weather.isNight()?"_Night":""));
+            image.size.mult(magnify, magnify);
+        }
+        weather.setColor();
+    }
+
+    @Override
+    public void draw(Graphics2D g) {
+        if (image.visible) {
+            P t = new P(Global.rel.x + pos.x, Global.rel.y + pos.y).mult(.1f);
+            t.x = Global.clamp(t.x, -image.size.x + Settings.screenX, 0);
+            t.y = Global.clamp(t.y, -image.size.y + Settings.screenY, 0);
+            g.drawImage(image.getImage(), (int) (t.x), (int) (t.y), (int) image.size.x, (int) image.size.y, null);
+        } else {
+            g.setColor(Color.black);
+            g.fillRect(0,0, Settings.screenX, Settings.screenY);
+        }
     }
 }

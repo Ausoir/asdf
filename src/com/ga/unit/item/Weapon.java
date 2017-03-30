@@ -21,15 +21,17 @@ public class Weapon extends Item {
     private Die damageSide = new Die(0,1);
     private float damageMod = 1;
     public Weapon(String name, int seed, int weight, int uses, int num, int sides, Tag type) {
-        super(name, seed, weight, uses, 100, 0.03f);
+        super(name, seed, weight, uses);
         value = 36;
         breakable = false;
         setType(type);
-        randomSize();
         cooldown = 0;
         setDamage(num, sides);
         rotation = 35;
         delay = 0;
+    }
+    public void onCreate(){
+        imbueMeta(true, true, .1f, true);
     }
     protected void setModifier(PrefixMod mod){
         super.setModifier(mod);
@@ -61,16 +63,6 @@ public class Weapon extends Item {
     }
     public void setDamage(int num, int sides){
         damageSide = new Die(num, sides);
-    }
-    @Override
-    public boolean use(Man host){
-        if (canUse()) {
-            playSound();
-            Global.cooldown(lastused, cooldown);
-            host.setState(action);
-            return true;
-        }
-        return false;
     }
     @Override
     protected void playSound(){

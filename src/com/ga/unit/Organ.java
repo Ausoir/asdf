@@ -45,6 +45,11 @@ public class Organ extends Line {
         image.setSize(strokeSize, 0);
         image.shade();
     }
+    public void setImage(String p, int index, Shader shader){
+        image = new ShadedPicture(p, index, shader);
+        image.setSize(strokeSize, 0);
+        image.shade();
+    }
     public Picture getImage(){
         return image;
     }

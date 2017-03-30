@@ -6,14 +6,11 @@ import com.ga.map.MapGenerator;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.unit.*;
-import com.ga.unit.factory.Stock;
+import com.ga.unit.Stock;
 import com.ga.unit.intelligence.PlayerInput;
 import com.ga.unit.skill.Actions;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -22,9 +19,9 @@ import java.util.HashMap;
  */
 public class FileManager {
     public static void saveCharacter(){
-        if (Global.player.host.state != Actions.Dead) {
-            saveMap("map/"+Global.player.host.cmap);
-            save("map/0", Global.player.host.toCharacterString());
+        if (Global.player.state != Actions.Dead) {
+            saveMap("map/"+Global.player.cmap);
+            save("map/0", Global.player.toCharacterString());
         }
     }
     private static void save(String dir, String input) {
@@ -43,7 +40,7 @@ public class FileManager {
     public static void saveMap(String name){
         String result = "" + Global.map.toString();
         result += "\n";
-        result += Updater.toMapString();
+        result += ";"+Updater.toMapString();
         save(name+".map", result);
     }
     private static String read(String dir) {
@@ -67,10 +64,6 @@ public class FileManager {
 //        System.out.println(result);
         return result;
     }
-    static void loadFirst(){
-        loadMap(Global.player.host.cmap,0);
-        Global.mapEdgeCenter(Global.cameraTo = Global.player.host.pos.getAdd(0,0));
-    }
     public static PlayerInput loadPlayer(boolean main, String dir){
         String data = read("map/"+dir);
         String[] line = data.split("%");
@@ -78,60 +71,77 @@ public class FileManager {
         String playerString = line[0];
         pi = new PlayerInput(main ? new MainPlayer(playerString) : new Player(playerString));
         pi.host.load(data);
-        pi.host.id = -Integer.parseInt(dir)-1;
+        pi.host.controlId = -Integer.parseInt(dir)-1;
         pi.load(line[2]);
+        if (!Updater.editor) Global.display.input = pi;
+        Command.host = pi.host;
+        loadMap(Global.player.cmap);
+        Global.setHour(Global.gameHour);
+        Global.mapEdgeCenter(Global.camera = Global.map.size.getMult(.5f,.5f));
         return pi;
     }
-    public static P loadMap(String dir, int player) {
-        P r;
+    public static void delete(String dir){
+        File file = new File("Data/"+dir);
+        if (file.exists()){
+            if (!file.delete()) System.out.println("Instance Map File Deletion Failed! ("+dir+")");
+        }
+    }
+    public static int loadMap(String map) {
+        Global.thouseId = -1;
+        Global.player.lastLand = new Line();
         String[] oldmap = null;
+        String[] mapProperties = map.split("@");
+        String dir = mapProperties[0];
+        int regrowths;
+        int player = -999;
+        if (mapProperties.length > 1) player = Integer.parseInt(mapProperties[1]);
         if (Global.map != null) oldmap = Global.map.maps;
-        if (oldmap != null && dir.startsWith("Instance")){
+        if (oldmap != null && dir.startsWith("House")){
+            String[] houseInfo = dir.split("/");
+            if (houseInfo.length > 1) dir = houseInfo[0];
+            else houseInfo = new String[]{houseInfo[0], "1200,800"};
+            if (new File("Data/map/" + dir + ".map").isFile()) readMap(dir);
+            else MapGenerator.generateHouse(Global.player.cmap, Integer.parseInt(dir.split("_")[1]), houseInfo[1]);
+            Global.player.cmap = dir;
+            regrowths = 0;
+        } else if (oldmap != null && dir.startsWith("Instance:")){
             String instanceData[] = dir.split(":")[1].split("/");
             String[] param = instanceData[0].split("&");
-            String[] returnAddr;
-            int returnPos = player;
-            int toPos = player;
+            String returnAddr;
             if (instanceData.length > 1){
-                returnAddr = instanceData[1].split("&");
-                returnPos = Integer.parseInt(returnAddr[2]);
-                toPos = Integer.parseInt(param[3]);
+                returnAddr = instanceData[1].split("&")[1];
             } else {
-                String[] t = oldmap[5].split(":")[1].split("@")[0].split("&");
-                returnAddr = new String[]{t[1],t[2]};
+                String[] t = oldmap[4].split(":")[1].split("@")[0].split("&");
+                returnAddr = t[1];
             }
             int maxDist = Math.max(1,Integer.parseInt(param[1]));
-            int returndist = Math.min(Math.max(0,(Global.player.host.get("Hunger").get()+Global.player.host.get("Health").get())/2), Global.r.nextInt(maxDist)+1);
+            int returndist = Global.player.fastTravel ? Global.r.nextInt(maxDist) + 1 : 1;
+            if (Global.player.get("Hunger").get() < 0)
+                returndist = Math.max(1,Math.min(Global.player.get("Health").get()/(Global.player.get("Hunger").get()*-2), returndist));
             int distance = maxDist - returndist;
-            if (distance == 0)
-                r = readMap(param[2], toPos);
-            else if (returndist == 0)
-                r = readMap(returnAddr[1], returnPos);
+            if (distance == 0) readMap(param[2]);
+            else if (returndist == 0) readMap(returnAddr);
             else {
-                r = MapGenerator.generate(param[0], distance, param[2], toPos,
-                        returndist, returnAddr[1], returnPos);
+                boolean rightSide = Global.player.pos.x > Global.map.size.x/2;
+                String destination = "Instance:"+param[0]+"&"+distance+"&"+param[2]+"@0";
+                String prevmap = "Instance:"+param[0]+"&"+returndist+"&"+returnAddr+"@0";
+                Global.player.cmap = "Instance";
+                MapGenerator.generateMap(param[0], rightSide, prevmap, destination);
             }
-            for (int i = 0; i < returndist; i++){
-                Global.map.event.onChange(oldmap, i == returndist-1);
-            }
+            regrowths = distance;
         } else {
-            r = readMap(dir, player);
-            if (player != -2) Global.map.event.onChange(oldmap, true);
+            readMap(dir);
+            regrowths = oldmap != null && !oldmap[0].equals("1") && !Global.map.isIndoors() ? 1 : 0;
         }
         Global.map.setTexture();
-        if (r == null) {
-            System.out.println("Invalid Player Spawn Location");
-            r = new P(Settings.centerX, Settings.centerY);
-        }
-        return r;
+        Global.map.event.onChange(regrowths);
+        return player;
     }
-    private static P readMap(String dir, int player){
-        P r = null;
+    private static void readMap(String dir){
         String data = read("map/" + dir + ".map");
         String[] line = data.split("%");
         String[] names = line[0].split(",");
         Global.map = new Map(names);
-
         if (line.length > 1) {
             String[] sections = line[1].split(";");
             for (int section = 0; section < sections.length; section++) {
@@ -141,30 +151,21 @@ public class FileManager {
             if (line.length > 2) {
                 sections = line[2].split(";");
                 for (int section = 0; section < sections.length; section++) {
-                    String values[] = sections[section].split(",");
-                    int[] v = new int[values.length];
-                    for (int i = 0; i < values.length; i++) {
-                        v[i] = Integer.parseInt(values[i]);
-                    }
-                    Global.map.land.add(new Line(v[0], v[1], v[2], v[3], v[4], v[5]));
+                    Line surface = new Line(sections[section]);
+                    Global.map.land.add(surface);
                 }
-                if (line.length > 3) {
-                    sections = line[3].split(";");
+                if (line.length > 3 && !line[3].equals(";")) {
+                    sections = line[3].substring(1).split(";");
                     if (sections.length > 0) {
                         for (int section = 0; section < sections.length; section++) {
                             String[] property = sections[section].split("@");
-                            Matter object = Stock.get(property);
-                            if (object instanceof Matter && object.name.equals("PlayerSpawn")) {
-                                if (player == 0) r = new P(property[2]);
-                                player--;
-                            }
+                            Stock.get(property);
                         }
                     }
                 }
             }
         }
-        Global.player.host.cmap = dir;
-        return r;
+        Global.player.cmap = dir;
     }
 
     private static int[] readClipFrames(String dir) {

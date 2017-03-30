@@ -4,7 +4,6 @@ import com.ga.game.Sound;
 import com.ga.map.Global;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Moveset;
-import com.ga.unit.skill.Skills;
 
 /**
  * Created by Ga on 8/1/2016.
@@ -23,7 +22,7 @@ public class BodyHumanoid extends Body {
                     rotateAppendage(FIST, 15);
                     rotateAppendage(BODY, 15);
                     localAnimation[15][BODY][0] = (int) Global.clamp(localAnimation[15][BODY][0],-15,15);
-                    localAnimation[15][BODY][1] = Math.min(0,localAnimation[15][BODY][1]);
+                    localAnimation[15][BODY][1] = Math.min(5,localAnimation[15][BODY][1]);
                     break;
                 case Cast:
                     rotateAppendage(OFIST, 11);
@@ -32,9 +31,6 @@ public class BodyHumanoid extends Body {
                 case Conjure:
                     rotateAppendage(FIST, 20);
                     break;
-            }
-        } else if (state instanceof Skills) {
-            switch ((Skills) state) {
                 case Shoot:
                     rotateAppendage(FIST, 39);
                     break;
@@ -50,8 +46,8 @@ public class BodyHumanoid extends Body {
                     break;
                 case Throw:
                 case Lunge:
-                case Pierce:
-                case Swing:
+                case Thrust:
+                case Slash:
                     rotateAppendage(FIST, 7);
                     break;
                 case Kick:
@@ -83,9 +79,6 @@ public class BodyHumanoid extends Body {
                 case WalkL:
                     if ((current == 0 || current == 2) && frame.over()) ((Man)host).stepSound();
                     break;
-            }
-        } else if (state instanceof Skills){
-            switch ((Skills) state) {
                 case Sprint:
                     if ((current == 1 || current == 3) && frame.over()) ((Man)host).stepSound();
                     break;

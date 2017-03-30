@@ -2,6 +2,7 @@ package com.ga.map;
 
 import com.ga.tool.Line;
 import com.ga.tool.P;
+import com.ga.unit.Updater;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
@@ -11,17 +12,23 @@ import java.util.ArrayList;
 /**
  * Created by Ga on 1/10/2017.
  */
-class Terrain extends ShadedPicture {
+public class Terrain extends ShadedPicture implements Drawable{
+    int depth; //7,10,13
     private Polygon polygon;
     private TexturePaint imageTexture;
-    protected ArrayList<Line> lines = new ArrayList<>();
+    private ArrayList<Line> lines = new ArrayList<>();
     protected P pos;
-    public Terrain(String p, Shader shader){
-        super(p, shader);
+    public Terrain(String texture, Shader shader, int depth){
+        super(texture, shader);
+        setDepth(10+(depth*3));
         polygon = new Polygon();
         imageTexture = new TexturePaint(image, new Rectangle2D.Double(0,0,size.x,size.y));
     }
-    protected void addPoint(float x, float y){
+    public void addLine(Line p){
+        lines.add(p);
+        p.depth = depth;
+    }
+    public void addPoint(float x, float y){
         addPoint((int)x, (int)y);
     }
     private void addPoint(int x, int y){
@@ -39,7 +46,7 @@ class Terrain extends ShadedPicture {
             }
         }
     }
-    protected void render(){
+    public void render(){
         int lowX = polygon.xpoints[0], lowY = polygon.ypoints[0], highX = polygon.xpoints[0], highY = polygon.ypoints[0];
         for (int i=0;i<polygon.xpoints.length;i++){
             if (polygon.xpoints[i] < lowX) lowX = polygon.xpoints[i];
@@ -65,5 +72,16 @@ class Terrain extends ShadedPicture {
             P t = new P(Global.rel.x+pos.x, Global.rel.y+pos.y);
             g.drawImage(image,(int)t.x,(int)t.y,(int)size.x,(int)size.y,null);
         }
+    }
+
+    @Override
+    public int getDepth() {
+        return Global.map.isIndoors()?10:depth;
+    }
+
+    public void setDepth(int depth) {
+        this.depth = depth;
+        Updater.resetDepth(this);
+        for (Line i : lines) i.depth = depth;
     }
 }

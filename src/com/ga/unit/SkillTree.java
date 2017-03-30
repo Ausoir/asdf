@@ -18,9 +18,12 @@ public class SkillTree {
         String[] data = p.substring(1).split(";");
         for (String i : data) {
             String[] skill = i.split("@");
-            skills.add(getByName(skill[0]));
-            skillLevels.add(new Stat(Integer.parseInt(skill[1]),99));
-            skillCdLevels.add(new Stat(Integer.parseInt(skill[2]),99));
+            Moveset move = getByName(skill[0]);
+            if (move != null) {
+                skills.add(move);
+                skillLevels.add(new Stat(Integer.parseInt(skill[1]), 99));
+                skillCdLevels.add(new Stat(Integer.parseInt(skill[2]), 99));
+            }
         }
     }
     public ArrayList<Moveset> getSkills(){
@@ -34,11 +37,11 @@ public class SkillTree {
         }
     }
     public boolean advanceAble(Moveset p, boolean cd){
-        int level = Global.player.host.get("Level").get();
+        int level = Global.player.get("Level").get();
         int index = skills.indexOf(p);
         if (cd){
-            if (p instanceof Skills) {
-                switch ((Skills) p) {
+            if (p instanceof Actions) {
+                switch ((Actions) p) {
                     case Underhand:
                     case Lunge:
                     case Throw:
@@ -66,9 +69,8 @@ public class SkillTree {
         return false;
     }
     public static Moveset getByName(String p){
-        Moveset move = Spells.getByName(p);
-        if (move == null) move = Actions.getByName(p);
-        if (move == null) move = Skills.getByName(p);
+        Moveset move = Actions.getByName(p);
+        if (move == null) move = Spells.getByName(p);
         if (move == null) System.out.println("Can't find spell "+p);
         return move;
     }
@@ -76,7 +78,6 @@ public class SkillTree {
         Moveset move = null;
         String t = p.substring(1);
         if (p.startsWith("A")) move = Actions.getByName(t);
-        if (p.startsWith("K")) move = Skills.getByName(t);
         if (p.startsWith("M")) move = Spells.getByName(t);
         if (move == null) System.out.println("Can't find spell "+p+" by code name "+p);
         return move;

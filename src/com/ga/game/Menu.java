@@ -2,16 +2,13 @@ package com.ga.game;
 
 import com.ga.map.Global;
 import com.ga.map.Picture;
-import com.ga.tool.P;
-import com.ga.tool.Performer;
-import com.ga.unit.MainPlayer;
 import com.ga.unit.Player;
-import com.ga.unit.Updater;
+import com.ga.unit.Prop;
+import com.ga.unit.item.Crafts;
 import com.ga.unit.item.Inventory;
 import com.ga.unit.item.Item;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Moveset;
-import com.ga.unit.skill.Skills;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -20,6 +17,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.plaf.basic.BasicScrollBarUI;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 
 /**
  * Created by Ga on 8/6/2016. asd
@@ -61,7 +59,7 @@ public class Menu extends Panel {
             for (String[] i : stats) makeStatButton("", "menuDialog@"+i[0]+"@"+i[1]).setIcon(iconDescribe);
         }
         void refresh(){
-            Player player = Global.player.host;
+            Player player = Global.player;
             for (int i=0;i<stats.length;i++) statButtons[i].setText(stats[i][0]+" - "+player.get(stats[i][0]).getMax());
             if (player.get("Level Points").get() > 0) for (JButton i : incButtons) i.setVisible(true);
             else for (JButton i : incButtons) i.setVisible(false);
@@ -127,20 +125,20 @@ public class Menu extends Panel {
             add(scroll, BorderLayout.LINE_START);
         }
         void refresh(){
-            gold.setText("Gold: "+Global.player.host.gold);
+            gold.setText("Gold: "+Global.player.gold);
             panel.removeAll();
 
             grid.gridy = 0;
-            Item wielded = Global.player.host.weapon;
+            Item wielded = Global.player.weapon;
             makeSlot(-1, wielded);
             TitledBorder b = BorderFactory.createTitledBorder(BorderFactory.createMatteBorder(2,2,2,2,Panel.forecolor));
             b.setTitle(Dialog.get("wielded"));
             ((JPanel) panel.getComponent(0)).setBorder(b);
 
             for (int i=0;i<3;i++) {
-                if (!Global.player.host.armor.isBare(i)) {
+                if (!Global.player.armor.isBare(i)) {
                     grid.gridy = 1+i;
-                    Item equipped = Global.player.host.armor.armor[i];
+                    Item equipped = Global.player.armor.armor[i];
                     JPanel panel = makeSlot(i, equipped);
                     b = BorderFactory.createTitledBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Panel.forecolor));
                     String title = Dialog.get("equipped");
@@ -163,11 +161,11 @@ public class Menu extends Panel {
             result.setVerticalTextPosition(JLabel.TOP);
             result.setBorder(emptyborder);
             if (type == -1){
-                if (Global.player.host.wieldingNone()) panel.setVisible(false);
+                if (Global.player.wieldingNone()) panel.setVisible(false);
                 result.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        Global.player.inputDirect("AWield",0,0);
+                        Global.player.input.inputDirect("AWield",0,0);
                         Display.menu.setVisible(false);
                     }
                 });
@@ -175,7 +173,7 @@ public class Menu extends Panel {
                 result.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        Global.player.inputDirect("I1"+type,0,0);
+                        Global.player.input.inputDirect("I1"+type,0,0);
                         Display.menu.setVisible(false);
                     }
                 });
@@ -226,9 +224,9 @@ public class Menu extends Panel {
             add(scroll, BorderLayout.LINE_START);
         }
         void refresh(){
-            gold.setText("Gold: "+Global.player.host.gold);
+            gold.setText("Gold: "+Global.player.gold);
             panel.removeAll();
-            Inventory inv = Global.player.host.inventory;
+            Inventory inv = Global.player.inventory;
             int itemsize = inv.getItemSize();
             for (int i = 0; i < itemsize; i++) {
                 Item item = inv.getItem(i);
@@ -249,7 +247,7 @@ public class Menu extends Panel {
             result.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Global.player.inputDirect("I"+index,0,0);
+                    Global.player.input.inputDirect("I"+index,0,0);
                     Display.menu.setVisible(false);
                 }
             });
@@ -301,17 +299,17 @@ public class Menu extends Panel {
             panel.add(new JLabel(Dialog.get("mvsRemap")));
             panel.add(Box.createRigidArea(new Dimension(0,12)));
             makeSlot(Actions.Use, false);
-            makeSlot(Skills.Kick, false);
-            makeSlot(Skills.Rest, false);
-            for (Moveset i : Global.player.host.skillTree.getSkills()){
+            makeSlot(Actions.Kick, false);
+            makeSlot(Actions.Rest, false);
+            for (Moveset i : Global.player.skillTree.getSkills()){
                 makeSlot(i, true);
             }
-            int points = Global.player.host.get("Memory").get();
+            int points = Global.player.get("Memory").get();
             skillpoints.setText(Dialog.get("mem")+": "+points);
         }
         void makeSlot(final Moveset move, boolean skill){
             final String displayName = Dialog.get("mvs"+move.getName());
-            String key = Global.player.getMapping(move);
+            String key = Global.player.input.getMapping(move);
             if (key == null) key = "";
             else key = "["+key+"]";
             JPanel panel = new JPanel();
@@ -319,11 +317,11 @@ public class Menu extends Panel {
             panel.setLayout(new BoxLayout(panel,BoxLayout.LINE_AXIS));
             panel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
             final JLabel advance = new JLabel(" [+ Proficiency]");
-            if (!Global.player.host.skillTree.advanceAble(move, false)) advance.setVisible(false);
+            if (!Global.player.skillTree.advanceAble(move, false)) advance.setVisible(false);
             final JLabel advanceCd = new JLabel(" [+ Cooldown]");
-            if (!Global.player.host.skillTree.advanceAble(move, true)) advanceCd.setVisible(false);
+            if (!Global.player.skillTree.advanceAble(move, true)) advanceCd.setVisible(false);
             if (skill) {
-                int points = Global.player.host.get("Memory").get();
+                int points = Global.player.get("Memory").get();
                 if (points <= 0) {
                     advance.setVisible(false);
                     advanceCd.setVisible(false);
@@ -331,15 +329,15 @@ public class Menu extends Panel {
                 advance.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        Global.player.host.say("Leveled up " + displayName + "!");
-                        Global.player.host.advanceSkill(move, false);
+                        Global.player.say("Leveled up " + displayName + "!");
+                        Global.player.advanceSkill(move, false);
                     }
                 });
                 advanceCd.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        Global.player.host.say("Decreased the cooldown of " + displayName + " by half!");
-                        Global.player.host.advanceSkill(move, true);
+                        Global.player.say("Decreased the cooldown of " + displayName + " by half!");
+                        Global.player.advanceSkill(move, true);
                     }
                 });
                 panel.add(advance);
@@ -349,11 +347,11 @@ public class Menu extends Panel {
             describe.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Global.player.host.say(move.getDescription());
+                    Global.player.say(move.getDescription());
                 }
             });
-            int level = Global.player.host.skillTree.getSkillLevel(move);
-            int cdlevel = Global.player.host.skillTree.getSkillCdLevel(move);
+            int level = Global.player.skillTree.getSkillLevel(move);
+            int cdlevel = Global.player.skillTree.getSkillCdLevel(move);
             final JLabel equip = new JLabel(displayName+" "+Dialog.get("lvl")+" "+level+"/"+cdlevel);
             final JLabel keyLabel = new JLabel(" "+key+" ");
             keyLabel.setForeground(Color.RED);
@@ -371,7 +369,7 @@ public class Menu extends Panel {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     if (equip.hasFocus()) {
-                        Global.player.changeMapping(e.getButton(), move);
+                        Global.player.input.changeMapping(e.getButton(), move);
                         Global.display.requestFocus();
                         describe.setVisible(true);
                         advance.setVisible(true);
@@ -383,7 +381,7 @@ public class Menu extends Panel {
             equip.addKeyListener(new KeyAdapter() {
                 @Override
                 public void keyReleased(KeyEvent e) {
-                    Global.player.changeMapping(e.getKeyCode(), move);
+                    Global.player.input.changeMapping(e.getKeyCode(), move);
                     Global.display.requestFocus();
                     describe.setVisible(true);
                     advance.setVisible(true);
@@ -406,32 +404,36 @@ public class Menu extends Panel {
             setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
             setVisible(false);
             setBackground(Panel.forecolor2);
-
             panel = new JPanel();
             panel.setOpaque(false);
+            other = new JPanel();
+            other.setOpaque(false);
+        }
+        void refresh() {
+            panel.removeAll();
             panel.add(makeOption("Check Status","stat","Check current status."));
-            panel.add(makeOption("Rest","h","Rest for an hour, healing lost health (if treated) and consuming available food."));
+            panel.add(makeOption("Rest","h","Rest for an hour, healing lost health (if treated) and consuming available food. Shortcut is ',' key."));
             panel.add(makeOption("Sleep","zzz","Sleep for six hours."));
-            panel.add(makeOption("Fast Travel","ft","Fast travel to any connected map if current map holds no threats."));
+            String fastTravel = Global.player.fastTravel ? "ON" : "OFF";
+            panel.add(makeOption("Fast Travel ["+fastTravel+"]","ft","Choose to skip instanced maps until you reach a point of interest, if possible. Shortcut is ']' key."));
             TitledBorder b = BorderFactory.createTitledBorder(BorderFactory.createMatteBorder(2,2,2,2,Panel.forecolor));
             b.setTitle("Default");
             panel.setBorder(b);
             add(panel, BorderLayout.CENTER);
 
-            other = new JPanel();
-            other.setOpaque(false);
-            other.add(makeOption("Stuff","etc","Do stuff."));
-            other.add(makeOption("Quit","qq","Quit game."));
+            other.removeAll();
+            other.add(makeOption("Other","opt","Do stuff."));
+            other.add(makeOption("Help","?","Noob"));
             b = BorderFactory.createTitledBorder(BorderFactory.createMatteBorder(2,2,2,2,Panel.forecolor));
             b.setTitle("Other");
             other.setBorder(b);
             add(other, BorderLayout.CENTER);
         }
-        JLabel makeOption(final String p, final String cmd, final String description){
+        JPanel makeOption(final String p, final String cmd, final String description){
+            JPanel subpanel = new JPanel();
             final JLabel button = new JLabel(" "+p+" ");
             button.setFont(Panel.font);
             button.setForeground(Panel.fontcolor);
-            button.setBorder(BorderFactory.createMatteBorder(1,1,1,1,Panel.forecolor));
             button.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
@@ -462,33 +464,142 @@ public class Menu extends Panel {
                     Display.menuDialog.show(p,description);
                 }
             });
-            button.add(desc);
-            return button;
+            subpanel.setOpaque(false);
+            subpanel.setBorder(BorderFactory.createMatteBorder(1,1,1,1,Panel.forecolor));
+            subpanel.add(button);
+            subpanel.add(desc);
+            return subpanel;
         }
         private void command(String p){
+            Display.menu.setVisible(false);
             if (p.equals("h")){
-                Global.nextHour();
-                FileManager.saveCharacter();
-                ((MainPlayer) Global.player.host).onMapChange();
+                Command.order("rest");
+            } else if (p.equals("ft")){
+                Command.order("ft");
             } else if (p.equals("stat")){
-                Player player = Global.player.host;
-                String statusDsc = "Stamina:"+player.get("Stamina")+"\nEncumberance:"+player.getStatPenalty()+"\nHealth:"+player.get("Health")+"\n";
+                Player player = Global.player;
+                String statusDsc = "Stamina:"+player.get("Stamina")+"\nEncumberance:"+player.getStatPenalty()+
+                        "\nHealth:"+player.get("Health")+"\nHunger:"+player.get("Hunger")+"\n";
                 statusDsc += "\nCurrent Status Effects:\n"+player.stats.getEffectsList();
                 Display.menuDialog.show("Current Status",statusDsc);
-            } else if (p.equals("qq")){
-                FileManager.saveCharacter();
-                System.exit(0);
+            } else if (p.equals("etc")){
+                Display.menuDialog.show("Options","apparently none.");
+            } else if (p.equals("?")){
+                String desc = "Saving is automatic and does not need to be triggered. Just hit the X or Alt+F4.";
+                Display.menuDialog.show("Current Status",desc);
             }
         }
     }
+
+    private class CraftPanel extends JPanel{
+        private ArrayList<String> items;
+        private JPanel panel;
+        private JPanel other;
+        CraftPanel(){
+            setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+            setVisible(false);
+            setBackground(Panel.forecolor2);
+            panel = new JPanel();
+            panel.setOpaque(false);
+            other = new JPanel();
+            other.setOpaque(false);
+        }
+        void refresh() {
+            ArrayList<String> craftables = new ArrayList<>();
+            items = new ArrayList<>();
+            for (Prop i : Global.player.getAvailableItems()) items.add(i.name);
+            panel.removeAll();
+            panel.add(makeOption("[Available Items]","?","Show all items available for crafting."));
+            for (String i : Global.player.crafting.knowledge){
+                ArrayList<String> recipe = Crafts.recipes.get(i);
+                if (items.containsAll(recipe)) {
+                    String t = "";
+                    for (String ii : recipe) t += ii+", ";
+                    craftables.add(i);
+                    panel.add(makeOption(i, i, "Craft a " + i + " using ["+t.substring(0,t.length()-2)+"]"));
+                }
+            }
+            TitledBorder b = BorderFactory.createTitledBorder(BorderFactory.createMatteBorder(2,2,2,2,Panel.forecolor));
+            b.setTitle("Craftable");
+            panel.setBorder(b);
+            add(panel, BorderLayout.CENTER);
+
+            other.removeAll();
+            for (String i : Global.player.crafting.knowledge){
+                if (!craftables.contains(i)) {
+                    String t = "";
+                    for (String ii : Crafts.recipes.get(i)) t += ii + ", ";
+                    other.add(makeOption(i, i, "Crafting "+i+" requires ["+t.substring(0, t.length() - 2)+"]"));
+                }
+            }
+            b = BorderFactory.createTitledBorder(BorderFactory.createMatteBorder(2,2,2,2,Panel.forecolor));
+            b.setTitle("Known");
+            other.setBorder(b);
+            add(other, BorderLayout.CENTER);
+        }
+        JPanel makeOption(final String p, final String cmd, final String description){
+            JPanel subpanel = new JPanel();
+            final JLabel button = new JLabel(" "+p+" ");
+            button.setFont(Panel.font);
+            button.setForeground(Panel.fontcolor);
+            button.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    button.setForeground(Color.CYAN);
+                }
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    button.setForeground(Panel.fontcolor);
+                }
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    button.setBackground(Panel.forecolor2);
+                }
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    button.setBackground(Panel.forecolor);
+                }
+                @Override
+                public void mouseClicked(MouseEvent e){
+                    command(cmd);
+                }
+            });
+            JLabel desc = new JLabel("");
+            desc.setIcon(iconDescribe);
+            desc.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    Display.menuDialog.show(p,description);
+                }
+            });
+            subpanel.setOpaque(false);
+            subpanel.setBorder(BorderFactory.createMatteBorder(1,1,1,1,Panel.forecolor));
+            subpanel.add(button);
+            subpanel.add(desc);
+            return subpanel;
+        }
+        private void command(String p){
+            Display.menu.setVisible(false);
+            if (p.equals("?")){
+                String t = "";
+                for (String i : items) t += i + ", ";
+                String result = t.equals("")?"None":t.substring(0,t.length()-2);
+                Display.menuDialog.show("Available Items",result);
+            } else {
+                Command.order("crft@"+p);
+            }
+        }
+    }
+
     private ImageIcon iconDescribe = new ImageIcon(Picture.load("Describe"));
     private GridBagConstraints grid = new GridBagConstraints();
     private JPanel mainpanel = new JPanel();
+    private ActionPanel actionpanel = new ActionPanel();
     private StatPanel statspanel = new StatPanel();
     private EquipmentPanel equipmentPanel = new EquipmentPanel();
     private InventoryPanel inventorypanel = new InventoryPanel();
     private SkillPanel skillpanel = new SkillPanel();
-    private ActionPanel actionpanel = new ActionPanel();
+    private CraftPanel craftpanel = new CraftPanel();
     Menu() {
         targetSizeX = 764;
         setLayout(new GridBagLayout());
@@ -507,6 +618,7 @@ public class Menu extends Panel {
         add(equipmentPanel,grid);
         add(inventorypanel,grid);
         add(skillpanel,grid);
+        add(craftpanel,grid);
         command("");
 
         addMouseListener(new MouseAdapter() {
@@ -519,7 +631,7 @@ public class Menu extends Panel {
         });
     }
     private void addMainPanel(){
-        GridLayout gridlayout = new GridLayout(5,1,20,40);
+        GridLayout gridlayout = new GridLayout(6,1,20,40);
         mainpanel.setOpaque(false);
         mainpanel.setLayout(gridlayout);
         mainpanel.add(makeOption(Dialog.get("act"), "act"));
@@ -527,6 +639,7 @@ public class Menu extends Panel {
         mainpanel.add(makeOption(Dialog.get("equip"), "equip"));
         mainpanel.add(makeOption(Dialog.get("inv"), "inventory"));
         mainpanel.add(makeOption(Dialog.get("mvs"), "spell"));
+        mainpanel.add(makeOption(Dialog.get("crft"), "craft"));
         grid.gridx = 0;
         add(mainpanel,grid);
     }
@@ -575,11 +688,13 @@ public class Menu extends Panel {
         inventorypanel.setVisible(false);
         skillpanel.setVisible(false);
         actionpanel.setVisible(false);
+        craftpanel.setVisible(false);
         if (p.equals("act")) actionpanel.setVisible(true);
         else if (p.equals("stats")) statspanel.setVisible(true);
         else if (p.equals("equip")) equipmentPanel.setVisible(true);
         else if (p.equals("inventory")) inventorypanel.setVisible(true);
         else if (p.equals("spell")) skillpanel.setVisible(true);
+        else if (p.equals("craft")) craftpanel.setVisible(true);
     }
     @Override
     public void setVisible(boolean p){
@@ -597,10 +712,12 @@ public class Menu extends Panel {
         if (Global.player != null){
             super.display();
             setBackground(new Color(120,120,120,180));
+            actionpanel.refresh();
             statspanel.refresh();
             inventorypanel.refresh();
             skillpanel.refresh();
             equipmentPanel.refresh();
+            craftpanel.refresh();
         }
     }
 }

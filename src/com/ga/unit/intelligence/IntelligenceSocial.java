@@ -1,6 +1,6 @@
 package com.ga.unit.intelligence;
 
-import com.ga.unit.Matter;
+import com.ga.unit.Prop;
 import com.ga.unit.Unit;
 import com.ga.unit.skill.Actions;
 
@@ -16,7 +16,7 @@ public class IntelligenceSocial extends Intelligence {
         charisma = host.rand.nextInt(7);
         leader = null;
     }
-    protected void perceived(Matter p){
+    protected void perceived(Prop p){
         if (p instanceof Unit) {
             Unit unit = (Unit) p;
             if (host.faction.canAttack(p.faction)) {
@@ -25,7 +25,7 @@ public class IntelligenceSocial extends Intelligence {
                     host.say("@c tgt");
                     setTaskEcho(new Hunt(host));
                 }
-            } else if (host.faction == p.faction){
+            } else if (host.faction == p.faction && unit.brain instanceof IntelligenceSocial){
                 if (leader == null && ((IntelligenceSocial)unit.brain).charisma > charisma) {
                     ((IntelligenceSocial)unit.brain).charisma--;
                     leader = unit;

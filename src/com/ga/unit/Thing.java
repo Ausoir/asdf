@@ -14,7 +14,7 @@ public class Thing implements Drawable, Observer {
     public Picture image;
     public P pos;
     public String name;
-    int depth; //5:Object, 8:Corpse, 9:Shadow, 10:Unit
+    int depth; //5:Object, 8:Corpse, 10:Unit
     public int dir = 1;
     public float rotation = 0;
     public boolean save = true;
@@ -32,7 +32,7 @@ public class Thing implements Drawable, Observer {
     public void setImage(String p){
         image = new Picture(p);
     }
-    public void rotate(P p){
+    public void rotateTo(P p){
         rotation = ((float) Math.atan2(p.y,p.x));
     }
     public Thing(String name, int depth){
@@ -52,8 +52,10 @@ public class Thing implements Drawable, Observer {
         return depth;
     }
     public void setDepth(int depth) {
-        this.depth = depth;
-        Updater.resetDepth(this);
+        if (this.depth != depth) {
+            this.depth = depth;
+            Updater.resetDepth(this);
+        }
     }
 
     public void remove(){

@@ -17,7 +17,7 @@ import java.util.HashMap;
 /**
  * Created by Ga on 7/31/2016.
  */
-public class Speech extends JTextArea implements Drawable, Updatable{
+public class Speech extends JTextArea implements Drawable {
     public static final HashMap<String,ArrayList<String>> dialog = FileManager.readDialogue("dialog/Reaction.txt");
     private Unit host;
     private int[] xp, yp;
@@ -90,7 +90,6 @@ public class Speech extends JTextArea implements Drawable, Updatable{
         return results.get(Global.r.nextInt(results.size()));
     }
 
-    @Override
     public void update() {
         if (msg.size() > 0) {
             if (timer.update()) {

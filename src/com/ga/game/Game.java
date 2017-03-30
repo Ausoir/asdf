@@ -32,7 +32,6 @@ public class Game extends JFrame {
         JPanel display = new Display();
         Global.server = new Server();
         Global.server.start();
-        FileManager.loadFirst();
         if (editor) new EditorInput();
         add(display);
         setVisible(true);

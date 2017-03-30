@@ -6,7 +6,7 @@ import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Timer;
 import com.ga.unit.Man;
-import com.ga.unit.Matter;
+import com.ga.unit.Prop;
 import com.ga.unit.Unit;
 import com.ga.unit.Updater;
 import com.ga.unit.skill.Actions;
@@ -19,7 +19,7 @@ import java.util.ArrayList;
  */
 public abstract class Intelligence implements Observer {
     protected Unit host;
-    protected Timer forget = new Timer(30, true);
+    protected Timer forget = new Timer(80, true);
     private ArrayList<Unit> seen;
     public Unit target;
     private Task task;
@@ -106,18 +106,18 @@ public abstract class Intelligence implements Observer {
         }
         return false;
     }
-    public void hear(Matter u, String p){
+    public void hear(Prop u, String p){
         if (alertness < 1) {
             int dir = u.pos.x - host.pos.x > 0 ? 1 : -1;
             if (!host.faction.canAttack(u.faction)) {
                 if (u instanceof Man) {
                     if (u.isFacing(host.pos) && Math.abs(u.pos.x - host.pos.x) < 240) {
-                        host.face(dir);
+                        host.face(dir, false);
                         setTaskEcho(new Idle(host));
                     }
                 }
             } else {
-                host.face(dir);
+                host.face(dir, false);
             }
         }
     }
@@ -129,6 +129,7 @@ public abstract class Intelligence implements Observer {
             } else if (target.state == Actions.Dead) forget.time = 0;
         }
     }
-    protected void perceived(Matter p){
+    protected void perceived(Prop p){
     }
+    public void onRemove(){}
 }

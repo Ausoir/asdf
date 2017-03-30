@@ -2,29 +2,25 @@ package com.ga.unit;
 
 import com.ga.game.Sound;
 import com.ga.map.Global;
-import com.ga.map.Shader;
-import com.ga.tool.Line;
-import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.unit.intelligence.PlayerInput;
+import com.ga.unit.item.Crafts;
 import com.ga.unit.item.Inventory;
 import com.ga.unit.item.Item;
-import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Moveset;
-import com.ga.unit.skill.Skills;
 
 import java.util.ArrayList;
-
-import static com.ga.unit.BodyHumanoid.FIST;
+import java.util.Iterator;
 
 /**
  * Created by Ga on 7/30/2016.
  */
 public class Player extends Man {
-    protected String memorized = "";
+    public String memorized = "";
     public int gold;
     public Inventory inventory;
     public SkillTree skillTree = new SkillTree();
+    public Crafts crafting;
     public int selectingItem = -1;
     public PlayerInput input;
     public String cmap;
@@ -32,6 +28,7 @@ public class Player extends Man {
         super(p.substring(1));
         speechType = "p";
         inventory = new Inventory(this);
+        crafting = new Crafts(this);
         armor.onChange = new Performer(){
             public void perform(){
                 inventory.setMaxSize(armor.getPockets());
@@ -79,13 +76,14 @@ public class Player extends Man {
     @Override
     protected int[] getCooldown(Moveset state){
         int level = skillTree.getSkillCdLevel(state);
-        int reduction;
-        if (level == 0) reduction = 0;
-        else {
-            float cd = state.getCooldown() * (float) (1f / (Math.pow(2, level)));
-            reduction = (int) (state.getCooldown() - cd) - level;
+        int[] r = cooldown.get(state);
+        if (r == null) r = new int[]{0};
+        int reduction = 0;
+        float stateCd = state.getCooldown();
+        if (stateCd > 0) {
+            float cd = stateCd * (float) (1f / (Math.pow(2, level)));
+            reduction = (int) (stateCd - cd) - level;
         }
-        int[] r = super.getCooldown(state);
         return new int[]{r[0]-reduction};
     }
     @Override
@@ -106,141 +104,34 @@ public class Player extends Man {
         return r;
     }
     @Override
-    public void stateSet(Moveset state){
-        if (state == Skills.Sprint){
-            int t = input.moving;
-            if (t == 0) t = dir;
-            face(t);
-        }
-        super.stateSet(state);
-        stateLevel = skillTree.getSkillLevel(state);
-        if (weapon.getType() == Item.Tag.Claw) weapon.rotation = (weapon.getOrgan().getAtan()+(dir<0?3.14f:0));
-        if (state instanceof Actions) {
-            switch ((Actions) state) {
-                case Idle:
-                    if (!get("Stamina").isFull()) clip.setState(Actions.Exhausted);
-                    break;
-                case Use:
-                    if (weapon.uses.get() == 0) say("Can't use "+weapon.getDisplayName());
-                    break;
-                case Interact:
-                    P reach = pos.getAdd(clip.organs[FIST].ptd);
-                    ArrayList<Matter> obj = Updater.collideInteractive(reach);
-                    for (Matter i : obj) {
-                        if (i.onInteract != null) {
-                            i.onInteract.interact(this);
-                            break;
-                        }
-                    }
-                    for (final Line i : Global.map.land) {
-                        if (i.opt == 1) {
-                            if (i.lineCross(new Line(reach.x, reach.y, reach.x + (24 * dir), reach.y))) {
-                                clip.setState(Skills.Guard);
-                                delay.set(40);
-                                final int firstDir = dir;
-                                delay.performer = new Performer() {
-                                    public void perform() {
-                                        pos.x = i.pt.x - (24 * dir);
-                                        setState(Actions.Climb);
-                                        dir = firstDir;
-                                        input.moving = 0;
-                                        rope = i;
-                                    }
-                                };
-                            }
-                        }
-                    }
-                    break;
-                case Walk:
-                    if (input.moving != dir) clip.setState(Actions.WalkL);
-                    break;
-                case Wield:
-                    delay.performer = new Performer() {
-                        public void perform() {
-                            if (selectingItem == -1) {
-                                sheathe();
-                            } else if (selectingItem < inventory.getItemSize()) {
-                                Item item = inventory.getItem(selectingItem);
-                                setWeapon(item);
-                                inventory.remove(item);
-                                selectingItem = -1;
-                            } else if (selectingItem >= 10 && selectingItem <= 16){
-                                Sound.play("unwear");
-                                int piece = selectingItem-10;
-                                if (sheathe() && !armor.isBare(piece)) {
-                                    setWeapon(armor.armor[piece]);
-                                    armor.set(null, piece);
-                                }
-                            }
-                        }
-                    };
-                    break;
-            }
-        } else if (state instanceof Skills){
-            switch ((Skills) state){
-                case Rest:
-                    for (Matter i : Updater.collideMatter(pos,20)){
-                        if (i.image.sizeRadius > 40) stateSet(Skills.Sneak);
-                    }
-                    break;
-                case Duck:
-                    cooldown.put(state,new int[]{Global.getTime()[0]+((armor.armor[1].encumberance+armor.armor[2].encumberance)*4)});
-                    break;
-                case Guard:
-                    cooldown.put(state,new int[]{Global.getTime()[0]+((armor.armor[FIST].encumberance+armor.armor[0].encumberance)*4)});
-                    break;
-                case Snipe:
-                case Shoot:
-                    weapon.rotate(target.getMult(dir,dir));
-                    weapon.rotation += .1*dir;
-            }
-            if (this.state instanceof Skills) {
-                Moveset a = this.state;
-                Moveset b = state;
-                if (a != b) {
-                    delay.set(0);
-                }
-            }
-        }
+    public int getStateLevel(Moveset state){
+        return skillTree.getSkillLevel(state);
     }
     @Override
     public int getStatPenalty() {
         return Math.max(0, armor.getWeight()+weapon.weight-get("Strength").get());
     }
     public float getSpeed() {
-        float s = super.getSpeed();
-        float t = Global.clamp(s+get("Strength").get()-inventory.weight-getStatPenalty(),0,s);
-        clip.setMoveSpeed((int) Global.clamp(t-1,-20,4));
+        float t = Math.max(0,super.getSpeed()-Math.max(0,inventory.weight+armor.getWeight()+weapon.weight-get("Strength").get()));
         return t;
     }
-    protected void stateDone(){
-        super.stateDone();
-        if (input.moving != 0){
-            delay.performer = new Performer(){
-                public void perform(){
-                    setState(Actions.Walk);
-                }
-            };
+    public ArrayList<Prop> getAvailableItems(){
+        ArrayList<Prop> items = Updater.collideProp(pos,100);
+        Iterator it = items.iterator();
+        while (it.hasNext()){
+            if (!(it.next() instanceof Item)) it.remove();
         }
-    }
-    @Override
-    public void stateUpdate(){
-        super.stateUpdate();
-        if (input.moving == 0 && state == Actions.Walk){
-            setState(Actions.Idle);
-        } else if (state == Actions.Walk) vel.x = getSpeed()*input.moving;
-        else if (input.moving != 0 && state == Actions.Climb) {
-            jump = true;
-            vel.x = getSpeed()*input.moving;
-            stateSet(Skills.Jump);
-        }
+        if (!wieldingNone()) items.add(weapon);
+        items.addAll(inventory.getItems());
+        return items;
     }
     public String toCharacterString(){
         String r = super.toString()+"\n";
         r += cmap+";"+gold+";"+memorized+";"+Global.getTime()[0]+";"+Global.gameHour+"\n";
         r += input.toString()+"\n";
         r += inventory.toString()+"\n";
-        r += skillTree.toString();
+        r += skillTree.toString()+"\n";
+        r += crafting.toString();
         return r;
     }
     public void load(String p){
@@ -251,5 +142,6 @@ public class Player extends Man {
         memorized = other[2];
         inventory.load(line[3]);
         skillTree.load(line[4]);
+        crafting.load(line[5]);
     }
 }

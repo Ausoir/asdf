@@ -30,11 +30,11 @@ class Travel implements Task {
         switch (travel){
             case 1:
             case 3:
-                host.face(-1);
+                host.face(-1, true);
                 break;
             case 2:
             case 4:
-                host.face(1);
+                host.face(1, true);
                 break;
         }
         if (man && (travel == 1 || travel == 2)) {

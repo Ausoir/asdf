@@ -4,7 +4,7 @@ import com.ga.map.Global;
 import com.ga.tool.P;
 import com.ga.unit.Man;
 import com.ga.unit.Unit;
-import com.ga.unit.factory.Stock;
+import com.ga.unit.Stock;
 
 /**
  * Created by Ga on 9/4/2016.

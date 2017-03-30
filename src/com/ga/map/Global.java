@@ -4,11 +4,14 @@ import com.ga.connection.Server;
 import com.ga.game.ControllerProcess;
 import com.ga.game.Display;
 import com.ga.game.Settings;
+import com.ga.tool.EventTimer;
 import com.ga.tool.P;
 import com.ga.unit.MainPlayer;
 import com.ga.unit.Updater;
 import com.ga.unit.intelligence.PlayerInput;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Random;
 
 /**
@@ -16,8 +19,7 @@ import java.util.Random;
  */
 public class Global {
     public static Map map;
-    public static Weather weather;
-    public static PlayerInput player;
+    public static MainPlayer player;
     public static Server server;
     public static ControllerProcess cprocess;
     public static P camera = new P();
@@ -30,6 +32,10 @@ public class Global {
     private static float[] sinv = new float[360];
     private static float[] cosv = new float[360];
     private static int[] time = new int[]{0};
+    public static int objectId = 1;
+    public static int houseId = 0;
+    public static int thouseId = -1;
+    public static ArrayList<EventTimer> timers = new ArrayList<>();
     public static void init(){
         for (int i=0;i<360;i++){
             sinv[i] = (float)Math.sin(Math.toRadians(i));
@@ -38,7 +44,7 @@ public class Global {
         Updater.unitList.put(0,null);
     }
     public static int getSeed(){
-        return r.nextInt(9999);
+        return r.nextInt(9999)+1;
     }
     public static void setRel(){
         rel.set(-camera.x+Settings.centerX, -camera.y+Settings.centerY);
@@ -78,7 +84,8 @@ public class Global {
         return result;
     }
     public static void mapEdgeCenter(P p){
-        p.set(clamp(p.x, Settings.centerX+margin, Global.map.size.x-Settings.centerX-margin),
+        if (Global.map.size.x > Settings.screenX && Global.map.size.y > Settings.screenY)
+            p.set(clamp(p.x, Settings.centerX+margin, Global.map.size.x-Settings.centerX-margin),
                 clamp(p.y, Settings.centerY+40+margin, Global.map.size.y-Settings.centerY-margin-margin));
     }
     public static int checkCooldown(int[] p, int cd){
@@ -93,6 +100,11 @@ public class Global {
     }
     public static void update(){
         time[0]++;
+        Iterator it = timers.iterator();
+        while (it.hasNext()){
+            EventTimer timer = (EventTimer) it.next();
+            if (timer.update()) it.remove();
+        }
     }
     public static void setTime(int p){
         time[0] = p;
@@ -100,12 +112,18 @@ public class Global {
     public static int[] getTime(){
         return time;
     }
-    public static void nextHour(){
-        setHour(gameHour+1);
-        ((MainPlayer) Global.player.host).onTimeChange(1);
-    }
     public static void setHour(int p){
+        player.onTimeChange(p-gameHour);
+        map.onTimeChange();
         gameHour = p;
-        weather.setColor();
+    }
+    public static int getObjectId(){
+        return objectId++;
+    }
+    public static int getHouseId(){
+        return houseId++;
+    }
+    public static int getTempHouseId(){
+        return --thouseId;
     }
 }

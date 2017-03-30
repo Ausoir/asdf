@@ -4,19 +4,19 @@ import com.ga.map.Global;
 import com.ga.tool.EventTimer;
 import com.ga.tool.Line;
 import com.ga.tool.P;
-import com.ga.unit.Matter;
+import com.ga.unit.Prop;
 import com.ga.unit.Unit;
 import com.ga.unit.Updater;
 
 /**
  * Created by Ga on 8/12/2016.
  */
-public class Projectile extends Matter {
+public class Projectile extends Prop {
     public float rotSpeed = .03f;
     public int damage = 0;
     public EventTimer delay = new EventTimer(-1, false, null);
     public Projectile(String name, P pt, P dest, int speed) {
-        super(name, 0, 10);
+        super(name, 0, 60);
         pos = pt;
         save = false;
         vel.set(dest.getAtan(pt, speed));
@@ -32,6 +32,7 @@ public class Projectile extends Matter {
         p.checkHit(new Line(pos,pos.getAdd(vel)),damage,damageType);
         stuck();
     }
+    public void onField(){}
     public void stuck(){
         vel.set(0,0);
         gravity = true;
