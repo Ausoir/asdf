@@ -16,7 +16,7 @@ import static com.ga.unit.BodyHumanoid.OFIST;
 import static com.ga.unit.skill.Actions.Underhand;
 
 /**
- * Created by Ga on 5/7/2016.
+ * Created by Ga on 5/7/2016. asd
  */
 public class Man extends Unit {
     private Item fist = ((Item) Stock.getByName("Fist",0)).cancelAdd();
@@ -24,9 +24,12 @@ public class Man extends Unit {
     public ArmorSet armor;
     public Line rope;
 
-    public Man(String p){
-        super(p.split("#")[0]);
+    public Man(int seed) {
+        super(seed);
         clip = new BodyHumanoid(this);
+    }
+    public void load(String p){
+        super.load(p.split("#")[0]);
         final Man me = this;
         clip.organs[FIST].onAmputate = new Performer(){
             public void perform(){
@@ -38,28 +41,28 @@ public class Man extends Unit {
         };
         String[] t = p.split("#");
         if (t[1].equals("")) setWeapon(fist);
-        else setWeapon((Item) Stock.get(t[1].split("@")));
-        Updater.cancelAdd(weapon);
+        else setWeapon((Item) Stock.get(t[1]));
         armor = new ArmorSet(this, t[2]);
     }
 
-    @Override
-    public String toString(){
-        String r = super.toString();
-        if (!r.equals("")) r += "#"+weapon.forceToString()+"#"+armor.toString();
-        return r;
+    public void setHead(String p){
+        clip.organs[5].setImage(p);
     }
 
     public void setWeapon(Item p){
         if (p == null) p = fist;
         if (weapon != fist){
             weapon.onUnequip(this);
-            weapon.field();
         }
         weapon = p;
         weapon.pos = pos;
         weapon.setOrgan(clip.organs[FIST]);
         weapon.dir = dir;
+    }
+
+    public void setDepth(int depth){
+        super.setDepth(depth);
+        weapon.setDepth(depth-1);
     }
 
     public boolean wieldingNone(){ return weapon == null || weapon == fist; }
@@ -96,10 +99,7 @@ public class Man extends Unit {
         else if (!clip.organs[OFIST].amputated) return pos.getAdd(clip.organs[OFIST].ptd);
         else return super.getHand();
     }
-    @Override
-    protected boolean castable(){
-        return !clip.organs[FIST].amputated || !clip.organs[OFIST].amputated;
-    }
+
     public void stateSet(Moveset state){
         super.stateSet(state);
         if (state instanceof Actions) {
@@ -191,6 +191,7 @@ public class Man extends Unit {
                 weapon.dir = dir;
                 weapon.rotation *= -1;
             }
+            armor.armor[0].dir = dir;
             clip.setClip();
             return true;
         }
@@ -207,11 +208,19 @@ public class Man extends Unit {
         return (int) armor.getArmor(organ);
     }
 
+    void restorePoise(){
+        super.restorePoise();
+        poise += armor.getArmor(3)*8;
+    }
+
     @Override
     public boolean hit(Line hitbox, int damage, DamageType type) {
-        target = hitbox.pt.getAdd(0,0);
-        armor.onHit();
-        return super.hit(hitbox, damage, type);
+        boolean r = super.hit(hitbox, damage, type);
+        if (r){
+            target = hitbox.pt.getAdd(0,0);
+            armor.onHit();
+        }
+        return r;
     }
 
     public Stat get(String p){
@@ -249,15 +258,25 @@ public class Man extends Unit {
         return false;
     }
 
+    public boolean checkHit(Line hitBox, int damage, DamageType type) {
+        boolean r;
+        if (r = super.checkHit(hitBox, damage, type)) {
+            if (clip.organs[FIST].amputated && clip.organs[OFIST].amputated){
+                tags.remove(Tag.Arms);
+            }
+        }
+        return r;
+    }
+
     @Override
     protected void moveTriggered(int organ){
         if (state instanceof Actions) {
             if (state == Actions.Kick || state == Actions.Sidekick){
                 Line hitbox = clip.organs[organ].getAdd(pos);
-                int damage = armor.armor[stateLevel].getDamage()+1;
+                int damage = armor.armor[1].getDamage()+1;
                 for (Unit i : Updater.collideUnit(pos, (int) hitbox.getLength(), faction))
                     i.checkHit(hitbox,damage,damageType);
-            } else ((Actions)state).trigger(this, organ);
+            } else state.trigger(this, organ);
         }
     }
 
@@ -268,12 +287,23 @@ public class Man extends Unit {
 
     @Override
     public void draw(Graphics2D g) {
-        weapon.draw(g);
         super.draw(g);
+        armor.armor[0].pos.set(pos.getAdd(clip.organs[5].pt));
+        armor.armor[0].rotation = clip.organs[5].getAtan()+1.57f;
+        armor.armor[0].draw(g);
     }
 
-    public void revive() {
-        super.revive();
-        clip.setState(state);
+    public String getDescription(){
+        String r = super.getDescription()+"\n";
+        if (!wieldingNone()) r += "*Wielding - "+weapon.getFullName()+"\n";
+        r += "*Wearing - "+armor.getDescription()+"\n";
+        return r;
+    }
+
+    @Override
+    public String toString(){
+        String r = super.toString();
+        if (!r.equals("")) r += "#"+weapon.forceToString()+"#"+armor.toString();
+        return r;
     }
 }

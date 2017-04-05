@@ -103,7 +103,7 @@ public class MenuShop extends Panel {
         this.panel.add(panel);
     }
     private void describe(final Item item, final int price, final Performer action){
-        Display.menuDialog.show(item.getFullName(),"This is "+item.getDescription()+". It is being sold for "+price+" gold.",
+        Global.display.menuDialog.show(item.getFullName(),"This is "+item.getDescription()+". It is being sold for "+price+" gold.",
                 new String[]{"Buy"}, new Performer[]{new Performer(){
                     public void perform(){
                         Player player = Global.player;
@@ -112,7 +112,6 @@ public class MenuShop extends Panel {
                                 player.gold -= price;
                                 if (player.wieldingNone()) player.setWeapon(item);
                                 else {
-                                    item.field();
                                     item.pos = player.pos.getAdd(0, 0);
                                 }
                                 action.perform();

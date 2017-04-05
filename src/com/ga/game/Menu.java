@@ -166,7 +166,7 @@ public class Menu extends Panel {
                     @Override
                     public void mouseClicked(MouseEvent e) {
                         Global.player.input.inputDirect("AWield",0,0);
-                        Display.menu.setVisible(false);
+                        Global.display.menu.setVisible(false);
                     }
                 });
             } else { //armor
@@ -174,7 +174,7 @@ public class Menu extends Panel {
                     @Override
                     public void mouseClicked(MouseEvent e) {
                         Global.player.input.inputDirect("I1"+type,0,0);
-                        Display.menu.setVisible(false);
+                        Global.display.menu.setVisible(false);
                     }
                 });
             }
@@ -186,7 +186,7 @@ public class Menu extends Panel {
             describe.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Display.menuDialog.show(item.getFullName(),item.getDescription());
+                    Global.display.menuDialog.show(item.getFullName(),item.getDescription());
                 }
             });
             final JLabel drop = new JLabel(item.getFullName()+"             ");
@@ -248,7 +248,7 @@ public class Menu extends Panel {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     Global.player.input.inputDirect("I"+index,0,0);
-                    Display.menu.setVisible(false);
+                    Global.display.menu.setVisible(false);
                 }
             });
             JPanel options = new JPanel();
@@ -259,7 +259,7 @@ public class Menu extends Panel {
             describe.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Display.menuDialog.show(item.getFullName(),item.getDescription());
+                    Global.display.menuDialog.show(item.getFullName(),item.getDescription());
                 }
             });
             final JLabel drop = new JLabel(item.getFullName()+"             ");
@@ -461,7 +461,7 @@ public class Menu extends Panel {
             desc.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Display.menuDialog.show(p,description);
+                    Global.display.menuDialog.show(p,description);
                 }
             });
             subpanel.setOpaque(false);
@@ -471,22 +471,28 @@ public class Menu extends Panel {
             return subpanel;
         }
         private void command(String p){
-            Display.menu.setVisible(false);
-            if (p.equals("h")){
-                Command.order("rest");
-            } else if (p.equals("ft")){
-                Command.order("ft");
-            } else if (p.equals("stat")){
-                Player player = Global.player;
-                String statusDsc = "Stamina:"+player.get("Stamina")+"\nEncumberance:"+player.getStatPenalty()+
-                        "\nHealth:"+player.get("Health")+"\nHunger:"+player.get("Hunger")+"\n";
-                statusDsc += "\nCurrent Status Effects:\n"+player.stats.getEffectsList();
-                Display.menuDialog.show("Current Status",statusDsc);
-            } else if (p.equals("etc")){
-                Display.menuDialog.show("Options","apparently none.");
-            } else if (p.equals("?")){
-                String desc = "Saving is automatic and does not need to be triggered. Just hit the X or Alt+F4.";
-                Display.menuDialog.show("Current Status",desc);
+            Global.display.menu.setVisible(false);
+            switch (p) {
+                case "h":
+                    Command.order("rest");
+                    break;
+                case "ft":
+                    Command.order("ft");
+                    break;
+                case "stat":
+                    Player player = Global.player;
+                    String statusDsc = "Stamina:" + player.get("Stamina") + "\nEncumberance:" + player.getStatPenalty() +
+                            "\nHealth:" + player.get("Health") + "\nHunger:" + player.get("Hunger") + "\n";
+                    statusDsc += "\nCurrent Status Effects:\n" + player.stats.getEffectsList();
+                    Global.display.menuDialog.show("Current Status", statusDsc);
+                    break;
+                case "etc":
+                    Global.display.menuDialog.show("Options", "apparently none.");
+                    break;
+                case "?":
+                    String desc = "Saving is automatic and does not need to be triggered. Just hit the X or Alt+F4.";
+                    Global.display.menuDialog.show("Current Status", desc);
+                    break;
             }
         }
     }
@@ -569,7 +575,7 @@ public class Menu extends Panel {
             desc.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Display.menuDialog.show(p,description);
+                    Global.display.menuDialog.show(p,description);
                 }
             });
             subpanel.setOpaque(false);
@@ -579,12 +585,12 @@ public class Menu extends Panel {
             return subpanel;
         }
         private void command(String p){
-            Display.menu.setVisible(false);
+            Global.display.menu.setVisible(false);
             if (p.equals("?")){
                 String t = "";
                 for (String i : items) t += i + ", ";
                 String result = t.equals("")?"None":t.substring(0,t.length()-2);
-                Display.menuDialog.show("Available Items",result);
+                Global.display.menuDialog.show("Available Items",result);
             } else {
                 Command.order("crft@"+p);
             }
@@ -689,17 +695,31 @@ public class Menu extends Panel {
         skillpanel.setVisible(false);
         actionpanel.setVisible(false);
         craftpanel.setVisible(false);
-        if (p.equals("act")) actionpanel.setVisible(true);
-        else if (p.equals("stats")) statspanel.setVisible(true);
-        else if (p.equals("equip")) equipmentPanel.setVisible(true);
-        else if (p.equals("inventory")) inventorypanel.setVisible(true);
-        else if (p.equals("spell")) skillpanel.setVisible(true);
-        else if (p.equals("craft")) craftpanel.setVisible(true);
+        switch (p) {
+            case "act":
+                actionpanel.setVisible(true);
+                break;
+            case "stats":
+                statspanel.setVisible(true);
+                break;
+            case "equip":
+                equipmentPanel.setVisible(true);
+                break;
+            case "inventory":
+                inventorypanel.setVisible(true);
+                break;
+            case "spell":
+                skillpanel.setVisible(true);
+                break;
+            case "craft":
+                craftpanel.setVisible(true);
+                break;
+        }
     }
     @Override
     public void setVisible(boolean p){
         super.setVisible(p);
-        Display.focus = true;
+        Global.display.focus = true;
     }
     public void toggle(){
         if (isVisible()) setVisible(false);

@@ -6,10 +6,11 @@ import com.ga.unit.Prop;
 import com.ga.unit.Stock;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 /**
- * Created by Ga on 3/26/2017.
+ * Created by Ga on 3/26/2017. asd
  */
 public class Crafts {
     public static final HashMap<String,ArrayList<String>> recipes = FileManager.readDialogue("dialog/Recipe.txt");
@@ -35,15 +36,13 @@ public class Crafts {
     public void load(String p) {
         if (p.equals(";")) return;
         String[] data = p.substring(1).split(";");
-        for (String i : data) {
-            knowledge.add(i);
-        }
+        Collections.addAll(knowledge, data);
     }
 
     public String toString(){
         String r = ";";
-        for (int i=0;i<knowledge.size();i++){
-            r += knowledge.get(i)+";";
+        for (String aKnowledge : knowledge) {
+            r += aKnowledge + ";";
         }
         return r;
     }

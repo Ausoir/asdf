@@ -7,6 +7,7 @@ import com.ga.unit.intelligence.PlayerInput;
 import com.ga.unit.item.Crafts;
 import com.ga.unit.item.Inventory;
 import com.ga.unit.item.Item;
+import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Moveset;
 
 import java.util.ArrayList;
@@ -24,21 +25,17 @@ public class Player extends Man {
     public int selectingItem = -1;
     public PlayerInput input;
     public String cmap;
-    public Player(String p) {
-        super(p.substring(1));
+    public Player(int seed) {
+        super(seed);
+        loadMoveset("-5,100,1000/Use&Walk&Sprint");
         speechType = "p";
         inventory = new Inventory(this);
         crafting = new Crafts(this);
-        armor.onChange = new Performer(){
-            public void perform(){
-                inventory.setMaxSize(armor.getPockets());
-            }
-        };
-        inventory.setMaxSize(armor.getPockets());
     }
     public void learnSkill(Moveset p){
         say("Learned spell "+p.getName()+"!");
         skillTree.addSkill(p);
+        if (skillTree.hasSkill(Actions.Skill)) tags.add(Tag.Skill);
     }
     public void advanceSkill(Moveset p, boolean cd){
         if (get("Memory").require(1))
@@ -50,7 +47,7 @@ public class Player extends Man {
         } else if (sheathe()){
             Sound.play("wield");
             super.setWeapon(p);
-        } else{
+        } else {
             dropItem(weapon);
             super.setWeapon(p);
         }
@@ -85,6 +82,15 @@ public class Player extends Man {
             reduction = (int) (stateCd - cd) - level;
         }
         return new int[]{r[0]-reduction};
+    }
+    @Override
+    boolean tagCapable(Tags p){
+        if (!tags.has(p)) {
+            for (Tag i : p) {
+                if (!tags.contains(i) && !armor.tags.contains(i)) return false;
+            }
+        }
+        return true;
     }
     @Override
     public int setState(Moveset state){
@@ -136,6 +142,9 @@ public class Player extends Man {
     }
     public void load(String p){
         String[] line = p.split("%");
+        super.load(line[0]);
+        name = "Player";
+        setHead("Player");
         String[] other = line[1].split(";");
         cmap = other[0];
         gold = Integer.parseInt(other[1]);
@@ -143,5 +152,12 @@ public class Player extends Man {
         inventory.load(line[3]);
         skillTree.load(line[4]);
         crafting.load(line[5]);
+        armor.onChange = new Performer(){
+            public void perform(){
+                inventory.setMaxSize(armor.getPockets());
+            }
+        };
+        inventory.setMaxSize(armor.getPockets());
+        if (skillTree.hasSkill(Actions.Skill)) tags.add(Tag.Skill);
     }
 }

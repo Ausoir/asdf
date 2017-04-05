@@ -51,6 +51,9 @@ public class Particle extends Thing implements Effect {
     public static void smoke(P pt){
         explode("Smoke",pt,new P(),8,16,0,false,4);
     }
+    public static void burn(P pt){
+        Particle.explode("Flame", pt, new P(0, -5), 2, 7, 3, false, 4);
+    }
     public static void implode(String name, P pt, P vel, int num, int speed, int velSpeed, boolean gravity, int lifetime){
         P t;
         for (int i=0;i<num;i++){

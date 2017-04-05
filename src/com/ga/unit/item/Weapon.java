@@ -31,7 +31,7 @@ public class Weapon extends Item {
         delay = 0;
     }
     public void onCreate(){
-        imbueMeta(true, true, .1f, true);
+        imbueMeta(true, true, .03f, true);
     }
     protected void setModifier(PrefixMod mod){
         super.setModifier(mod);

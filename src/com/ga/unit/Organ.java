@@ -85,7 +85,9 @@ public class Organ extends Line {
             for (Organ i : children) i.hit(p, 999, type);
             onAmputate.perform();
             host.clip.updateStatus();
-        } else ptd.add(p.getAtan(16));
+        } else if (ptd.getDist() < 64){
+            ptd.add(p.getAtan(24));
+        }
     }
     boolean checkHit(Line p){
         if (!amputated) {

@@ -4,9 +4,7 @@ import com.ga.map.Global;
 import com.ga.map.Map;
 import com.ga.map.MapGenerator;
 import com.ga.tool.Line;
-import com.ga.tool.P;
 import com.ga.unit.*;
-import com.ga.unit.Stock;
 import com.ga.unit.intelligence.PlayerInput;
 import com.ga.unit.skill.Actions;
 
@@ -15,7 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * Created by Ga on 7/26/2016.
+ * Created by Ga on 7/26/2016. asd
  */
 public class FileManager {
     public static void saveCharacter(){
@@ -26,12 +24,8 @@ public class FileManager {
     }
     private static void save(String dir, String input) {
         try {
-            BufferedWriter writer = null;
-            try {
-                writer = new BufferedWriter(new FileWriter("Data/"+dir));
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter("Data/" + dir))) {
                 writer.write(input);
-            } finally {
-                writer.close();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -46,8 +40,7 @@ public class FileManager {
     private static String read(String dir) {
         String result = null;
         try {
-            BufferedReader br = new BufferedReader(new FileReader("Data/"+dir));
-            try {
+            try (BufferedReader br = new BufferedReader(new FileReader("Data/" + dir))) {
                 String line = br.readLine().split(" //")[0];
                 result = line + "%";
                 while (line != null) {
@@ -55,8 +48,6 @@ public class FileManager {
                     if (line != null) result += line.split(" //")[0] + "%";
                 }
                 result = result.substring(0, result.length() - 1);
-            } finally {
-                br.close();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -69,7 +60,7 @@ public class FileManager {
         String[] line = data.split("%");
         PlayerInput pi;
         String playerString = line[0];
-        pi = new PlayerInput(main ? new MainPlayer(playerString) : new Player(playerString));
+        pi = new PlayerInput(main ? new MainPlayer(0) : new Player(0));
         pi.host.load(data);
         pi.host.controlId = -Integer.parseInt(dir)-1;
         pi.load(line[2]);
@@ -90,12 +81,12 @@ public class FileManager {
         Global.thouseId = -1;
         Global.player.lastLand = new Line();
         String[] oldmap = null;
+        if (Global.map != null) oldmap = Global.map.maps;
         String[] mapProperties = map.split("@");
         String dir = mapProperties[0];
         int regrowths;
         int player = -999;
         if (mapProperties.length > 1) player = Integer.parseInt(mapProperties[1]);
-        if (Global.map != null) oldmap = Global.map.maps;
         if (oldmap != null && dir.startsWith("House")){
             String[] houseInfo = dir.split("/");
             if (houseInfo.length > 1) dir = houseInfo[0];
@@ -122,11 +113,10 @@ public class FileManager {
             if (distance == 0) readMap(param[2]);
             else if (returndist == 0) readMap(returnAddr);
             else {
-                boolean rightSide = Global.player.pos.x > Global.map.size.x/2;
                 String destination = "Instance:"+param[0]+"&"+distance+"&"+param[2]+"@0";
                 String prevmap = "Instance:"+param[0]+"&"+returndist+"&"+returnAddr+"@0";
                 Global.player.cmap = "Instance";
-                MapGenerator.generateMap(param[0], rightSide, prevmap, destination);
+                MapGenerator.generateMap(param[0], prevmap, destination);
             }
             regrowths = distance;
         } else {
@@ -144,22 +134,21 @@ public class FileManager {
         Global.map = new Map(names);
         if (line.length > 1) {
             String[] sections = line[1].split(";");
-            for (int section = 0; section < sections.length; section++) {
-                String values[] = sections[section].split(":");
+            for (String section1 : sections) {
+                String values[] = section1.split(":");
                 Global.map.formTextures.put(Integer.parseInt(values[0]), values[1]);
             }
             if (line.length > 2) {
                 sections = line[2].split(";");
-                for (int section = 0; section < sections.length; section++) {
-                    Line surface = new Line(sections[section]);
+                for (String section1 : sections) {
+                    Line surface = new Line(section1);
                     Global.map.land.add(surface);
                 }
                 if (line.length > 3 && !line[3].equals(";")) {
                     sections = line[3].substring(1).split(";");
                     if (sections.length > 0) {
-                        for (int section = 0; section < sections.length; section++) {
-                            String[] property = sections[section].split("@");
-                            Stock.get(property);
+                        for (String section1 : sections) {
+                            Stock.get(section1);
                         }
                     }
                 }

@@ -1,6 +1,5 @@
 package com.ga.map;
 
-import com.ga.game.Display;
 import com.ga.game.FileManager;
 import com.ga.game.Input;
 import com.ga.tool.Line;
@@ -9,7 +8,6 @@ import com.ga.unit.Player;
 import com.ga.unit.Prop;
 import com.ga.unit.Stock;
 import com.ga.unit.Updater;
-import com.ga.unit.item.Item;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -48,7 +46,7 @@ public class EditorInput implements Input, Updatable, Drawable {
     private boolean polygonReady = false;
 
     public EditorInput() {
-        Display.input = this;
+        Global.display.input = this;
         Updater.addUpdatee(this);
         Updater.add(this);
         if (Global.camera == null) Global.camera = new P();
@@ -135,7 +133,7 @@ public class EditorInput implements Input, Updatable, Drawable {
         } else if (p.startsWith("load")){
             Updater.changeMap = p.substring(5)+"@0";
             Updater.changeMap(true);
-            Display.input = this;
+            Global.display.input = this;
             Updater.add(this);
             Global.camera = new P(Global.camera);
             map = p.substring(5);
@@ -347,7 +345,7 @@ public class EditorInput implements Input, Updatable, Drawable {
                 }
                 break;
             case KeyEvent.VK_ENTER:
-                Display.chatbox.requestFocus();
+                Global.display.chatbox.requestFocus();
                 break;
             case KeyEvent.VK_1:
                 if (!shift) selectTool(Tool.NONE);
@@ -409,7 +407,7 @@ public class EditorInput implements Input, Updatable, Drawable {
                 if (Updater.editor) {
                     Updater.editor = false;
                     FileManager.loadPlayer(true, "0");
-                    Display.input = Global.player.input;
+                    Global.display.input = Global.player.input;
                     Global.player.pos.set(Global.camera);
                 }
                 break;
@@ -422,10 +420,7 @@ public class EditorInput implements Input, Updatable, Drawable {
             name = name.substring(0,name.indexOf(":"));
         }
         Prop r = Stock.getByName(name, seed);
-        if (r instanceof Item){
-            ((Item) r).field();
-        }
-        if (name.equals("Player")) r = new Player(r.toString().substring(4));
+        if (name.equals("Player")) r = new Player(0);
         r.pos = p;
         return r;
     }

@@ -20,23 +20,10 @@ import static com.ga.unit.BodyHumanoid.FIST;
  */
 public class MainPlayer extends Player {
     public boolean fastTravel = true;
-    public MainPlayer(String p) {
-        super(p);
+    public MainPlayer(int seed) {
+        super(seed);
         Global.player = this;
-        final Stat hunger = get("Hunger");
-        hunger.onChange = new Performer(){
-            public void perform() {
-                int hung = hunger.get();
-                if (hung < -50) {
-                    die();
-                } else if (hung < 0){
-                    get("Health").add(hung);
-                    say("I'm starving!");
-                } else if (hung < 10){
-                    say("I'm hungry!");
-                }
-            }
-        };
+        controlId = -1;
     }
     @Override
     public void say(String p){
@@ -190,7 +177,7 @@ public class MainPlayer extends Player {
         int edge = Global.mapEdge(pos.getAdd(vel));
         if (edge % 2 == 0){
             int hunger = get("Hunger").get();
-            if (hunger > 0 || get("Health").get()/(hunger*-2) > 0) Global.map.loadMap(edge);
+            if (hunger >= 0 || get("Health").get()/(hunger*-2) > 0) Global.map.loadMap(edge);
         }
         super.update();
         if (input.cameraMode) Global.mapEdgeCenter(Global.cameraTo = Global.cameraTo.getAdd(input.movement));
@@ -201,5 +188,19 @@ public class MainPlayer extends Player {
         String[] other = p.split("%")[1].split(";");
         Global.setTime(Integer.parseInt(other[3]));
         Global.gameHour = Integer.parseInt(other[4]);
+        final Stat hunger = get("Hunger");
+        hunger.onChange = new Performer(){
+            public void perform() {
+                int hung = hunger.get();
+                if (hung < -50) {
+                    die();
+                } else if (hung < 0){
+                    get("Health").add(hung);
+                    say("I'm starving!");
+                } else if (hung < 10){
+                    say("I'm hungry!");
+                }
+            }
+        };
     }
 }

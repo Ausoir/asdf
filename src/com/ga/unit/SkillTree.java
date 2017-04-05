@@ -79,7 +79,7 @@ public class SkillTree {
         String t = p.substring(1);
         if (p.startsWith("A")) move = Actions.getByName(t);
         if (p.startsWith("M")) move = Spells.getByName(t);
-        if (move == null) System.out.println("Can't find spell "+p+" by code name "+p);
+        if (move == null) System.out.println("Can't find spell "+p+" by code productName "+p);
         return move;
     }
     @Override

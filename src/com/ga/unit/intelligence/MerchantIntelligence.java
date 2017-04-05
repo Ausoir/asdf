@@ -9,13 +9,11 @@ import com.ga.unit.Prop;
 import com.ga.unit.Stock;
 import com.ga.unit.item.Item;
 
-import static com.ga.game.Display.menuShop;
-
 /**
- * Created by Ga on 7/31/2016.
+ * Created by Ga on 7/31/2016. asd
  */
 public class MerchantIntelligence extends ResidentIntelligence {
-    enum MerchantType{
+    private enum MerchantType{
         SUBURBAN(new String[]{"Pistol","Revolver","Rifle"}),
         DESERT(new String[]{"Katana","Broadsword","Lancesword"}),
         FOREST(new String[]{"Axe","Fireball","Potion","Scroll"});
@@ -37,7 +35,7 @@ public class MerchantIntelligence extends ResidentIntelligence {
         man.onInteract = new Interactive(){
             public void interact(Man p){
                 if (p == Global.player) {
-                    menuShop.show("Trader's Wares - \""+host.getConversation()+"\"", product, price, action);
+                    Global.display.menuShop.show("Trader's Wares - \""+host.getConversation()+"\"", product, price, action);
                 }
             }
         };
@@ -53,7 +51,7 @@ public class MerchantIntelligence extends ResidentIntelligence {
         price = new int[length];
         action = new Performer[length];
         for (int i = 0; i < length; i++) {
-            Item item = (Item) Stock.getByName(items[i],-1);
+            Item item = ((Item) Stock.getByName(items[i],-1)).cancelAdd();
             int value = fluctuate(item.getValue());
             product[i] = item;
             price[i] = value;
@@ -63,7 +61,7 @@ public class MerchantIntelligence extends ResidentIntelligence {
                 public void perform() {
                     product[index] = null;
                     host.say("@sold");
-                    menuShop.setVisible(false);
+                    Global.display.menuShop.setVisible(false);
                 }
             };
             if (i == length - 1) r += "and " + item.getFullName() + "!";
@@ -80,7 +78,7 @@ public class MerchantIntelligence extends ResidentIntelligence {
         super.hear(u, p);
         if (u == Global.player) {
             if (p.equals("shop")) {
-                menuShop.show("Trader's Wares - \""+host.getConversation()+"\"", product, price, action);
+                Global.display.menuShop.show("Trader's Wares - \""+host.getConversation()+"\"", product, price, action);
             }
         }
     }

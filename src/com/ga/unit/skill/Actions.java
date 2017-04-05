@@ -12,6 +12,8 @@ import com.ga.unit.*;
 import com.ga.unit.item.Item;
 import com.ga.unit.item.Projectile;
 
+import java.util.ArrayList;
+
 import static com.ga.unit.BodyHumanoid.OFIST;
 
 /**
@@ -35,42 +37,99 @@ public enum Actions implements Moveset {
             } else p.vel.y = -p.getSpeed();
         }
     }, Drop{
-        public void onSet(Unit p){
-            if (Global.map.fallSafe(p.lastLand, p.pos.getAdd(0,4))){
+        public void onSet(Unit p, int level){
+            if (Global.map.fallSafe(p.pos.getAdd(0,4), p.lastLand.depth) != null){
                 p.setDepth(100);
                 p.pos.y+=4;
             }
         }
-    }, Use, WalkL, Hit(15), Dead(-1), Wield(18),
-    Conjure, Wait(50), Cast, Consume(8), Exhausted, Interact(8), Down(80), Buff,
-    Sprint(15,1,0,24,Dialog.get("mvsDscSprint")){
+    }, Hit(15){
+        public void onSet(Unit p, int level){
+            p.clip.organs[p.clip.BODY].pt.y += 14;
+        }
+        public void onInterrupt(Unit p){
+            onFinish(p);
+        }
+        public void onFinish(Unit p){
+            p.clip.setHeight();
+            super.onFinish(p);
+        }
+    }, Dead(-1){
+        public void onSet(Unit p, int level){
+            p.clip.organs[p.clip.BODY].pt.y = 0;
+        }
+        public void onInterrupt(Unit p){
+            onFinish(p);
+        }
+        public void onFinish(Unit p){
+            p.clip.setHeight();
+        }
+    }, Down(80){
+        public void onSet(final Unit p, int level){
+            p.clip.organs[p.clip.BODY].pt.y = 0;
+            p.delay.performer = new Performer(){
+                public void perform(){
+                    p.clip.setHeight();
+                }
+            };
+        }
+        public void onInterrupt(Unit p){
+            onFinish(p);
+        }
+        public void onFinish(Unit p){
+            super.onFinish(p);
+        }
+    }, Wield(18), Skill,
+    Conjure, Use, WalkL, Wait(50), Cast, Consume(8), Exhausted, Interact(8), Buff,
+    Sprint(15,1,0,14,new Tags(){{
+        add(Tag.Legs);
+        add(Tag.Agile);
+    }}){
+        private int turn = 0;
         public void update(Unit p, int level){
-            p.vel.x = p.getSpeed() * 2 * p.dir;
+            turn++;
+            if (turn % 24 == 0 && !p.get("Stamina").require(1)) p.setState(Actions.Walk);
+            else p.vel.x = p.getSpeed() * 2 * p.dir;
         }
     },
-    Duck(18,-1,0,6,Dialog.get("mvsDscDuck")),
-    Guard(8,-1,0,0,Dialog.get("mvsDscGuard")),
-    Lunge(0,-1,0,0,Dialog.get("mvsDscLunge")){
+    Duck(24,-1,0,6,new Tags(){{
+        add(Tag.Agile);
+    }}),
+    Guard(8,-1,0,0,new Tags(){{
+        add(Tag.Arms);
+        add(Tag.Skill);
+    }}),
+    Lunge(40,-1,0,0,new Tags(){{
+        add(Tag.Arms);
+        add(Tag.Skill);
+        add(Tag.Agile);
+    }}){
+        public void onSet(Unit p, int level){
+            p.buff(Buffs.Evade, 1);
+        }
         public void trigger(Unit p, int level){
             p.attackSound();
             p.attack();
         }
     },
-    Thrust(25,2,1f,0,Dialog.get("mvsDscThrust")){
+    Thrust(25,2,1f,0,new Tags(){{
+        add(Tag.Arms);
+    }}){
         public void trigger(Unit p, int level){
             p.attackSound();
             p.attack();
             ((Man)p).weapon.rotateTo(p.target.getMult(p.dir, p.dir));
         }
-        public void onSet(Unit p){
+        public void onSet(Unit p, int level){
             if (p.vel.x < 0 != p.dir < 0) p.vel.x = 0;
         }
     },
-    Slash(25,2,0,0,Dialog.get("mvsDscSlash")){
-        public void onSet(Unit p){
+    Slash(25,2,0,0,new Tags(){{
+        add(Tag.Arms);
+    }}){
+        public void onSet(Unit p, int level){
             Item weapon = ((Man)p).weapon;
-            float rot = -(weapon.dir * 10);
-            weapon.rotation = rot;
+            weapon.rotation = -(weapon.dir * 10);
         }
         public void update(Unit p, int level){
             if (p.delay.time <= 25 && p.delay.time > 12) {
@@ -95,19 +154,28 @@ public enum Actions implements Moveset {
             }
         }
     },
-    Kick(3,-1,1,2, Dialog.get("mvsDscKick")){
+    Kick(3,-1,1,2,new Tags(){{
+        add(Tag.Legs);
+    }}){
         public void trigger(Unit p, int level){
             p.attackSound();
             p.attack();
         }
     },
-    Sidekick(18,0,1,2,Dialog.get("mvsDscSidekick")){
+    Sidekick(18,0,1,2,new Tags(){{
+        add(Tag.Arms);
+        add(Tag.Skill);
+    }}){
         public void trigger(Unit p, int level){
             p.attackSound();
             p.attack();
         }
     },
-    Whirlwind(35, 5, 0, 60,Dialog.get("mvsDscWhirlwind")){
+    Whirlwind(35, 5, 0, 60,new Tags(){{
+        add(Tag.Arms);
+        add(Tag.Skill);
+        add(Tag.Strong);
+    }}){
         public void update(Unit p, int level) {
             if (p.delay.time < 36) {
                 Man t = (Man) p;
@@ -119,13 +187,21 @@ public enum Actions implements Moveset {
             if (p.delay.time % 4 == 0) p.attackSound();
         }
     },
-    Stab(40,2,0,24,Dialog.get("mvsDscStab")){
+    Stab(40,2,0,24,new Tags(){{
+        add(Tag.Arms);
+        add(Tag.Skill);
+        add(Tag.Cunning);
+    }}){
         public void trigger(Unit p, int level){
             p.attackSound();
             p.attack();
         }
     },
-    Dash(35,1,0,24,Dialog.get("mvsDscDash")){
+    Dash(35,1,0,24,new Tags(){{
+        add(Tag.Arms);
+        add(Tag.Legs);
+        add(Tag.Skill);
+    }}){
         public void update(Unit p, int level) {
             if (Math.abs(p.vel.x) >= p.getSpeed()) p.attack();
         }
@@ -135,16 +211,19 @@ public enum Actions implements Moveset {
             ((Man)p).weapon.rotateTo(p.target.getMult(p.dir, p.dir));
         }
     },
-    Rest(0,-1,0,0,Dialog.get("mvsDscRest")){
+    Rest(0,-1,0,0,new Tags(){{
+    }}){
         public void update(Unit p, int level) {
             if (p.stats.rest(4+level)) p.setState(Idle);
         }
     },
-    Sneak(3,-1,0,0,Dialog.get("mvsDscSneak")){
+    Sneak(3,-1,0,0,new Tags(){{
+        add(Tag.Cunning);
+    }}){
         public void update(Unit p, int level) {
             p.stats.rest(2+level);
         }
-        public void onSet(Unit p){
+        public void onSet(Unit p, int level){
             p.clip.setShade(Shader.Gray);
         }
         public void onFinish(Unit p){
@@ -153,7 +232,14 @@ public enum Actions implements Moveset {
             p.clip.setShade(Shader.XYLinearGradient);
         }
     },
-    Underhand(32,0,0,0,Dialog.get("mvsDscUnderhand")){
+    Underhand(32,0,0,0,new Tags(){{
+        add(Tag.Arms);
+        add(Tag.Skill);
+        add(Tag.Agile);
+    }}){
+        public void onSet(Unit p, int level){
+            p.buff(Buffs.Evade, 1);
+        }
         public void trigger(Unit p, int level){
             p.attackSound();
             p.vel.set(5*p.dir,-1);
@@ -161,14 +247,38 @@ public enum Actions implements Moveset {
             ((Man)p).weapon.rotateTo(p.target.getMult(p.dir, p.dir));
         }
     },
-    Throw(12,-1,0,0,Dialog.get("mvsDscThrow")){
+    Mark(80,-1,0,17,new Tags(){{
+        add(Tag.Arms);
+        add(Tag.Skill);
+        add(Tag.Cunning);
+    }}){
+        public void onSet(Unit p, int level){
+            ArrayList<Unit> t = Updater.collideUnit(p.target.getAdd(p.pos),40,Faction.Destructive);
+            if (t.size() > 0) t.get(0).buff(Buffs.Mark,1);
+        }
+    },
+    Identify(1,-1,0,0,new Tags(){{
+    }}){
+        public void onSet(Unit p, int level){
+            if (p == Global.player) {
+                ArrayList<Unit> t = Updater.collideUnit(p.target.getAdd(p.pos), 40, Faction.Destructive);
+                if (t.size() > 0){
+                    Unit target = t.get(0);
+                    Global.display.menuDialog.show(target.name,target.getDescription());
+                }
+            }
+        }
+    },
+    Throw(12,-1,0,0,new Tags(){{
+        add(Tag.Arms);
+    }}){
         public void trigger(Unit p, int level){
             final Man t = (Man)p;
             if (!t.wieldingNone()) {
                 int speed = 5;
                 int damage = 0;
                 if (t.weapon.weight != 0 && t.get("Stamina").require((int) (t.weapon.weight*1.5f))){
-                    speed = 5+(15*t.get("Strength").get());
+                    speed = 20+(5*Math.max(1,t.get("Strength").get()-t.weapon.weight));
                     damage = t.getDamage()+t.weapon.weight;
                 }
                 Projectile pj = new Projectile(null, t.pos.getAdd(t.clip.organs[OFIST].ptd), t.pos.getAdd(t.target), speed) {
@@ -201,8 +311,12 @@ public enum Actions implements Moveset {
             }
         }
     },
-    Dart(12,0,0,1,Dialog.get("mvsDscDart")),
-    Shoot(27,-1,0,0,Dialog.get("mvsDscShoot")){
+    Dart(12,0,0,1,new Tags(){{
+        add(Tag.Arms);
+    }}),
+    Shoot(27,-1,0,0,new Tags(){{
+        add(Tag.Arms);
+    }}){
         public void trigger(Unit p, int level){
             Man t = (Man)p;
             P tip = t.weapon.getPoint();
@@ -229,7 +343,9 @@ public enum Actions implements Moveset {
             t.weapon.rotation += t.dir * -.3f;
         }
     },
-    Snipe(27,-1,.5f,0,"Fire your weapon."){
+    Snipe(27,-1,.5f,0,new Tags(){{
+        add(Tag.Arms);
+    }}){
         public void trigger(Unit p, int level){
             Man t = (Man)p;
             P tip = t.weapon.getPoint();
@@ -255,7 +371,10 @@ public enum Actions implements Moveset {
             t.weapon.rotation += t.dir * -.3f;
         }
     },
-    Triple(60,2,0,40,Dialog.get("mvsDscTriple")){
+    Triple(60,2,0,40,new Tags(){{
+        add(Tag.Arms);
+        add(Tag.Mastery);
+    }}){
         public void trigger(Unit p, int level){
             Man t = (Man)p;
             t.attackSound();
@@ -264,14 +383,54 @@ public enum Actions implements Moveset {
             t.attack();
         }
     },
-    Jump(47,1,3f,0,"Jump into the air."){
-        public void onSet(Unit p){
+    Jump(47,1,3f,0,new Tags(){{
+    }}){
+        public void onSet(Unit p, int level){
             Sound.play("jump");
             p.vel.y -= 40;
             p.lastLand = new Line();
         }
     },
-    Airstrike(27,1,1.5f,4,"Jump into the air while attacking."){
+    Warcry(60,-1,0,40,new Tags(){{
+        add(Tag.Strong);
+        add(Tag.Mastery);
+    }}){
+        public void onSet(Unit p, int level){
+            ArrayList<Unit> t = Updater.collideUnit(p.pos,240+(120*level),Faction.Destructive);
+            for (Unit i : t){
+                if (i != p) i.buff(Buffs.Stun,3+level);
+            }
+        }
+    },
+    Evade(40,-1,0,27,new Tags(){{
+        add(Tag.Shadow);
+        add(Tag.Agile);
+    }}){
+        public void onSet(Unit p, int level){
+            p.buff(Buffs.Evade,1+level);
+        }
+    },
+    Empower(40,-1,0,27,new Tags(){{
+        add(Tag.Buff);
+        add(Tag.Skill);
+    }}){
+        public void onSet(Unit p, int level){
+            p.buff(Buffs.Empower,level);
+        }
+    },
+    Cleave(40,-1,0,27,new Tags(){{
+        add(Tag.Buff);
+        add(Tag.Strong);
+    }}){
+        public void onSet(Unit p, int level){
+            p.buff(Buffs.Empower,level);
+        }
+    },
+    Airstrike(27,1,1.5f,4,new Tags(){{
+        add(Tag.Arms);
+        add(Tag.Legs);
+        add(Tag.Skill);
+    }}){
         public void update(Unit p, int level){
             if (p.jump){
                 ((Man)p).weapon.rotation = 1f*p.dir;
@@ -284,7 +443,10 @@ public enum Actions implements Moveset {
             }
         }
     },
-    Leap(40,2,3,60,Dialog.get("mvsDscLeap")){
+    Leap(40,2,3,60,new Tags(){{
+        add(Tag.Legs);
+        add(Tag.Strong);
+    }}){
         public void trigger(Unit p, int level){
             if (p.jump) {
                 Sound.play("jump");
@@ -294,22 +456,31 @@ public enum Actions implements Moveset {
             }
         }
     },
-    Backstep(20,0,-1f,7,"Take a step backwards.");
+    Backstep(20,1,0,12,new Tags(){{
+        add(Tag.Legs);
+        add(Tag.Agile);
+    }}){
+        public void onSet(Unit p, int level){
+            p.vel.x = -p.dir*24;
+        }
+    };
     private String description;
     private int del, cooldown;
     private float cost, velx;
+    private Tags tags;
     Actions(){
         this(0);
     }
     Actions(int del){
-        this(del,-1,0,0,"");
+        this(del,-1,0,0, new Tags());
     }
-    Actions(int del, float cost, float velx, int cooldown, String desc){
+    Actions(int del, float cost, float velx, int cooldown, Tags tags){
         this.del = del;
         this.cost = cost;
         this.velx = velx;
         this.cooldown = cooldown;
-        this.description = desc;
+        this.description = Dialog.get("mvsDsc"+name());
+        this.tags = tags;
     }
     public String getDescription(){
         String t = ""+((int)cost);
@@ -326,6 +497,7 @@ public enum Actions implements Moveset {
         return cost;
     }
 
+    @Override
     public float getVelX() {
         return velx;
     }
@@ -345,18 +517,24 @@ public enum Actions implements Moveset {
     }
 
     @Override
-    public void onSet(Unit p){
+    public void onSet(Unit p, int level){
     }
 
     @Override
     public void onFinish(Unit p){
         p.setState(Idle);
+        p.clip.setSpeed(8);
     }
 
-    public void trigger(Unit p, int p2){
+    @Override
+    public void trigger(Unit p, int organ){
     }
 
     public void onInterrupt(Unit p){
+    }
+
+    public Tags getTags(){
+        return tags;
     }
 
     public static Moveset getByName(String p) {

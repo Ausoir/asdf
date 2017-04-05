@@ -29,7 +29,8 @@ public class Body {
     protected int[] localFrames;
     protected int current = 0;
     protected Moveset state = Actions.Idle;
-    protected int BODY, FOOT;
+    public int BODY;
+    protected int FOOT;
     protected int legNum = 0, legCurrent = 0;
     protected float appendageSize = 1;
     protected int size = 0;
@@ -43,8 +44,15 @@ public class Body {
         organs[BODY].pt.y = -getHeight();
     }
 
-    protected void setProperties(int[][] p){
+    public void setOrganHealth(){
         int hpPool = 0;
+        for (Organ organ : organs) hpPool += organ.health;
+        for (Organ organ : organs) {
+            organ.health = (int) (((float) organ.health / hpPool) * host.get("Health").get());
+        }
+    }
+
+    protected void setProperties(int[][] p){
         for (int i=0;i<organs.length;i++){
             organs[i].setSize(p[0][i]);
             if (p[1][i] == 1) organs[i].vital = true;
@@ -55,10 +63,6 @@ public class Body {
                 legCurrent++;
             }
             organs[i].health = p[2][i];
-            hpPool += p[2][i];
-        }
-        for (int i=0;i<organs.length;i++){
-            organs[i].health = (int)(((float) organs[i].health / hpPool)*host.get("Health").get());
         }
     }
 
@@ -155,10 +159,6 @@ public class Body {
     }
 
     public void setState(Moveset state) {
-        if (state == Actions.Dead) organs[BODY].pt.y = 0;
-        else if (state == Actions.Down) organs[BODY].pt.y = 0;
-        else if (state == Actions.Hit) organs[BODY].pt.y += 14;
-        else setHeight();
         this.state = state;
         current = 0;
         if (animation.containsKey(state)) nextAnimation = animation.get(state);
@@ -238,8 +238,11 @@ public class Body {
         }
     }
 
-    private void setHeight(){
-        if (legCurrent == 0) organs[BODY].pt.y = 0;
+    public void setHeight(){
+        if (legCurrent == 0){
+            organs[BODY].pt.y = 0;
+            host.tags.remove(Tag.Legs);
+        }
         else organs[BODY].pt.y = -getHeight();
     }
 

@@ -2,6 +2,7 @@ package com.ga.game;
 
 import com.ga.map.EditorInput;
 import com.ga.map.Global;
+import com.ga.map.Mob;
 import com.ga.tool.Line;
 import com.ga.unit.Prop;
 import com.ga.unit.Player;
@@ -23,7 +24,7 @@ public class Command {
             for (String i : cmds) {
                 String[] cmd = i.split("@");
                 if (cmd[0].equals("say")) host.say(cmd[1]);
-                else if (cmd[0].equals("menuDialog")) Display.menuDialog.show(cmd[1],cmd[2]);
+                else if (cmd[0].equals("menuDialog")) Global.display.menuDialog.show(cmd[1],cmd[2]);
                 else if (cmd[0].equals("rest")) Global.setHour(Global.gameHour + 1);
                 else if (cmd[0].equals("crft")) Global.player.crafting.craft(cmd[1]);
                 else if (cmd[0].equals("ft")) Global.player.fastTravel = !Global.player.fastTravel;
@@ -39,10 +40,10 @@ public class Command {
                 else if (cmd[0].equals("advSkillCd")) for (int num=0;num<Integer.parseInt(cmd[1].split(":")[1]);num++) host.skillTree.advanceSkill(Actions.valueOf(cmd[1].split(":")[0]),true);
                 else if (cmd[0].equals("advSpell")) for (int num=0;num<Integer.parseInt(cmd[1].split(":")[1]);num++) host.skillTree.advanceSkill(Spells.valueOf(cmd[1].split(":")[0]),false);
                 else if (cmd[0].equals("advSpellCd")) for (int num=0;num<Integer.parseInt(cmd[1].split(":")[1]);num++) host.skillTree.advanceSkill(Spells.valueOf(cmd[1].split(":")[0]),true);
-                else if (cmd[0].equals("man")) Stock.getByName(cmd[1], -1).pos.set(host.pos.getAdd(host.target));
-                else if (cmd[0].equals("mob")) for (int num=0;num<Integer.parseInt(cmd[2]);num++) Stock.getByName(cmd[1], -1).pos.set(host.pos.getAdd(host.target));
+                else if (cmd[0].equals("unit")) Stock.getByName(cmd[1], -1).pos.set(host.pos.getAdd(host.target));
+                else if (cmd[0].equals("mob")) Mob.spawn(cmd[1],host.pos.getAdd(host.target));
                 else if (cmd[0].equals("item")) host.setWeapon((Item) Stock.getByName(cmd[1], -1));
-                else if (cmd[0].equals("itemN")) host.setWeapon((Item) Stock.get(new String[]{cmd[1],cmd[2]}));
+                else if (cmd[0].equals("itemN")) host.setWeapon((Item) Stock.get(cmd[1]+"@"+cmd[2]));
                 else if (cmd[0].equals("tp")) host.pos.add(Integer.parseInt(cmd[1].split(",")[0]),Integer.parseInt(cmd[1].split(",")[1]));
                 else if (cmd[0].equals("to")){
                     host.lastLand = new Line();
@@ -62,7 +63,7 @@ public class Command {
                     host.setState(Spells.valueOf(p.substring(5)));
                 } else if (p.equals("editor")){
                     Updater.editor = true;
-                    Display.input = new EditorInput();
+                    Global.display.input = new EditorInput();
                 } else if (p.equals("online")) {
                     Global.server.online();
                 } else if (p.startsWith("cellcall")) {

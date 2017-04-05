@@ -1,7 +1,6 @@
 package com.ga.game;
 
 import com.ga.map.Global;
-import com.ga.map.Weather;
 import com.ga.unit.Updater;
 import com.ga.unit.intelligence.Speech;
 
@@ -10,19 +9,19 @@ import java.awt.*;
 import java.awt.event.*;
 
 /**
- * Created by Ga on 5/6/2016.
+ * Created by Ga on 5/6/2016. asd
  */
 public class Display extends JPanel implements KeyListener, MouseListener, MouseMotionListener {
-    public static JTextField chatbox;
-    public static Input input;
-    public static MenuDialog menuDialog;
-    public static Menu menu;
-    public static MenuShop menuShop;
-    public static MenuMap menuMap;
+    public JTextField chatbox;
+    public Input input;
+    public MenuDialog menuDialog;
+    public Menu menu;
+    public MenuShop menuShop;
+    public MenuMap menuMap;
     private int mode = 0;
     private int mX = 0;
     private int mY = 0;
-    public static boolean focus = true;
+    boolean focus = true;
     public Display() {
         Global.display = this;
         setLayout(null);

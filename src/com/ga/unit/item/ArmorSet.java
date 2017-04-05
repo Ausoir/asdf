@@ -2,17 +2,14 @@ package com.ga.unit.item;
 
 import com.ga.map.Shader;
 import com.ga.tool.Performer;
-import com.ga.unit.BodyHumanoid;
-import com.ga.unit.Man;
-import com.ga.unit.Organ;
-import com.ga.unit.Stock;
+import com.ga.unit.*;
 
 /**
- * Created by Ga on 1/15/2017.
+ * Created by Ga on 1/15/2017. asd
  */
 public class ArmorSet {
     private Man host;
-    protected static Armor[] bare = new Armor[]{
+    private static Armor[] bare = new Armor[]{
             (Armor) new Armor("Head", 0, 0, -1, 0, 0, 0).cancelAdd(),
             (Armor) new Armor("Underwear", 0, 0, -1, 0, 0, 1).cancelAdd(),
             (Armor) new Armor("Underwear", 0, 0, -1, 0, 0, 2).cancelAdd()
@@ -20,6 +17,7 @@ public class ArmorSet {
     public Armor[] armor;
     private Organ[] organs;
     public Performer onChange;
+    public Tags tags = new Tags();
     public ArmorSet(Man host, String p){
         this.host = host;
         organs = host.clip.organs;
@@ -29,8 +27,7 @@ public class ArmorSet {
     public void set(Armor p, int piece){
         if (p == null || p == bare[piece]){
             armor[piece] = bare[piece];
-            if (piece == 0) organs[5].setImage(host.name);
-            else if (piece == 1) {
+            if (piece == 1) {
                 organs[BodyHumanoid.LLEG].setImage("Underwear", 1);
                 organs[BodyHumanoid.RLEG].setImage("Underwear", 1);
             } else if (piece == 2){
@@ -40,8 +37,7 @@ public class ArmorSet {
             }
         } else {
             armor[piece] = p;
-            if (piece == 0) organs[5].setImage(p.name);
-            else if (piece == 1) {
+            if (piece == 1) {
                 organs[BodyHumanoid.LLEG].setImage(p.name, 1);
                 organs[BodyHumanoid.RLEG].setImage(p.name, 1);
             } else if (piece == 2){
@@ -50,6 +46,12 @@ public class ArmorSet {
                 organs[BodyHumanoid.BODY].setImage(p.name, 0);
             }
         }
+        tags.clear();
+        for (Armor i : armor){
+            tags.addAll(i.tags);
+        }
+        if (getEncumberance() <= 4) tags.add(Tag.Agile);
+        if (host.get("Strength").get()-getWeight() >= 4) tags.add(Tag.Strong);
         if (onChange != null) onChange.perform();
     }
     private int organToPiece(int organ){
@@ -62,21 +64,21 @@ public class ArmorSet {
         return armor[piece] == bare[piece];
     }
     public void onHit(){
-        for (int i=0;i<armor.length;i++) armor[i].onHit(host);
+        for (Armor i : armor) i.onHit(host);
     }
     public int getEncumberance(){
         int r = 0;
-        for (int i=0;i<armor.length;i++) r += armor[i].encumberance;
+        for (Armor i : armor) r += i.encumberance;
         return r;
     }
     public int getSpeed(){
         int r = 0;
-        for (int i=0;i<armor.length;i++) r += armor[i].speed;
+        for (Armor i : armor) r += i.speed;
         return r;
     }
     public int getWeight(){
         int r = 0;
-        for (int i=0;i<armor.length;i++) r += armor[i].weight;
+        for (Armor i : armor) r += i.weight;
         return r;
     }
     public float getArmor(int p){
@@ -84,19 +86,22 @@ public class ArmorSet {
     }
     public int getPockets(){
         int r = 0;
-        for (int i=0;i<armor.length;i++) r += armor[i].pocket;
+        for (Armor i : armor) r += i.pocket;
         return r;
     }
-    public float getTotalArmor(){
-        float r = 0;
-        for (int i=0;i<armor.length;i++) r += armor[i].getArmor();
-        return r;
+    public String getDescription(){
+        if (isBare(0) && isBare(1) && isBare(2)) return "Nothing";
+        String r = "";
+        if (!isBare(0)) r += armor[0].getFullName()+", ";
+        if (!isBare(1)) r += armor[1].getFullName()+" Legging, ";
+        if (!isBare(2)) r += armor[2].getFullName()+" Torso, ";
+        return r.substring(0,r.length()-2);
     }
     private void load(String p){
         String[] armors = p.split("&");
         for (int i=0;i<armor.length;i++){
             if (armors[i].equals("None")) armor[i] = bare[i];
-            else armor[i] = (Armor) ((Item) Stock.get(armors[i].split("@"))).cancelAdd();
+            else armor[i] = (Armor) ((Item) Stock.get(armors[i])).cancelAdd();
         }
         for (int i=0;i<armor.length;i++) set(armor[i], i);
     }

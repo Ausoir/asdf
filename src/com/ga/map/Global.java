@@ -7,15 +7,13 @@ import com.ga.game.Settings;
 import com.ga.tool.EventTimer;
 import com.ga.tool.P;
 import com.ga.unit.MainPlayer;
-import com.ga.unit.Updater;
-import com.ga.unit.intelligence.PlayerInput;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
 
 /**
- * Created by Ga on 7/25/2016.
+ * Created by Ga on 7/25/2016. asd
  */
 public class Global {
     public static Map map;
@@ -26,22 +24,22 @@ public class Global {
     public static P cameraTo = new P();
     public static Display display;
     public static Random r = new Random();
-    public static int margin = 0;
+    static int margin = 0;
     public static P rel = new P();
     public static int gameHour = 0;
     private static float[] sinv = new float[360];
     private static float[] cosv = new float[360];
     private static int[] time = new int[]{0};
-    public static int objectId = 1;
-    public static int houseId = 0;
+    private static int controlId = 1;
+    private static int houseId = 1;
     public static int thouseId = -1;
     public static ArrayList<EventTimer> timers = new ArrayList<>();
+
     public static void init(){
         for (int i=0;i<360;i++){
             sinv[i] = (float)Math.sin(Math.toRadians(i));
             cosv[i] = (float)Math.cos(Math.toRadians(i));
         }
-        Updater.unitList.put(0,null);
     }
     public static int getSeed(){
         return r.nextInt(9999)+1;
@@ -117,13 +115,14 @@ public class Global {
         map.onTimeChange();
         gameHour = p;
     }
-    public static int getObjectId(){
-        return objectId++;
-    }
     public static int getHouseId(){
         return houseId++;
     }
     public static int getTempHouseId(){
         return --thouseId;
+    }
+
+    public static int getControlId() {
+        return controlId++;
     }
 }

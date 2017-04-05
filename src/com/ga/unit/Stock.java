@@ -1,7 +1,6 @@
 package com.ga.unit;
 
 import com.ga.game.Dialog;
-import com.ga.game.Display;
 import com.ga.map.Global;
 import com.ga.map.MapEvent;
 import com.ga.tool.Interactive;
@@ -22,7 +21,7 @@ import java.util.ArrayList;
 public class Stock {
     private static Factory[] factory = new Factory[]{
             new Factory("Spawn"){ protected Prop make(int seed){
-                Prop product = new Prop(name, seed, 999){
+                Prop product = new Prop(productName, seed, 999){
                     public void onField(){}
                 };
                 if (!Updater.editor) product.image.visible = false;
@@ -41,7 +40,7 @@ public class Stock {
                 return product;
             }},
             new Factory("Phone_Booth"){ Prop make(int seed){
-                Prop r = new Prop(name, seed, 5);
+                Prop r = new Prop(productName, seed, 5);
                 r.onInteract = new Interactive(){
                     public void interact(Man p){
                         String t = p.getConversation();
@@ -58,79 +57,99 @@ public class Stock {
                 return r;
             }},
             new Factory("Map"){ Prop make(int seed){
-                Prop r = new Prop(name, seed, 5);
+                Prop r = new Prop(productName, seed, 5);
                 r.onInteract = new Interactive(){
                     public void interact(Man p){
-                        Display.menuMap.display();
+                        Global.display.menuMap.display();
                     }
                 };
                 return r;
             }},
+            new Factory("Fist"){ Prop make(int seed){
+                return new Weapon(productName,0,0,-1,1,4,Item.Tag.Spear){
+                    @Override
+                    public boolean use(final Man host) {
+                        host.setState(Actions.Interact);
+                        return false;
+                    }
+                    public String forceToString() {
+                        return "";
+                    }
+                    public void drop(Man host) {}
+                };
+            }},
+            new Factory("Knuckle"){ Prop make(int seed){
+                return new Weapon("Fist",0,0,-1,1,4,Item.Tag.Spear){
+                    public void drop(Man host) {}
+                };
+            }},
             new Factory("Stick"){ Prop make(int seed){ //3
-                return new Weapon(name,seed,1,10,6,1,Item.Tag.Mace); //name,seed,weight,uses,dmgNum,dmgSide,type
+                return new Weapon(productName,seed,1,10,1,6,Item.Tag.Mace);
             }},
             new Factory("Wooden Sword"){ Prop make(int seed){
-                return new Weapon(name,seed,1,30,6,1,Item.Tag.Mace); //name,seed,weight,uses,dmgNum,dmgSide,type
+                return new Weapon(productName,seed,1,30,1,6,Item.Tag.Mace);
             }},
             new Factory("Broadsword"){ Prop make(int seed){
-                return new Weapon(name,seed,3,100,6,1,Item.Tag.Sword); //name,seed,weight,uses,dmgNum,dmgSide,type
+                return new Weapon(productName,seed,3,100,1,6,Item.Tag.Sword);
             }},
             new Factory("Bamboo Spear"){ Prop make(int seed){
-                return new Weapon(name,seed,1,12,6,1,Item.Tag.Spear); //name,seed,weight,uses,dmgNum,dmgSide,type
+                return new Weapon(productName,seed,1,12,1,6,Item.Tag.Spear);
             }},
             new Factory("Mace"){ Prop make(int seed){
-                return new Weapon(name,seed,4,-1,4,2,Item.Tag.Mace); //name,seed,weight,uses,dmgNum,dmgSide,type
+                return new Weapon(productName,seed,4,-1,2,6,Item.Tag.Mace){
+                    public void randomSize(P p){}
+                };
             }},
             new Factory("Katana"){ Prop make(int seed){
-                return new Weapon(name,seed,2,40,6,1,Item.Tag.Sword); //name,seed,weight,uses,dmgNum,dmgSide,type
+                return new Weapon(productName,seed,2,40,1,6,Item.Tag.Sword);
             }},
             new Factory("Claw"){ Prop make(int seed){
-                return new Weapon(name,seed,1,60,6,1,Item.Tag.Claw); //name,seed,weight,uses,dmgNum,dmgSide,type
+                return new Weapon(productName,seed,1,60,1,6,Item.Tag.Claw);
             }},
             new Factory("Spear"){ Prop make(int seed){ //10
-                return new Weapon(name,seed,2,100,6,1,Item.Tag.Spear); //name,seed,weight,uses,dmgNum,dmgSide,type
+                return new Weapon(productName,seed,2,100,1,6,Item.Tag.Spear);
             }},
             new Factory("Axe"){ Prop make(int seed){
-                return new Weapon(name,seed,4,100,6,1,Item.Tag.Sword); //name,seed,weight,uses,dmgNum,dmgSide,type
+                return new Weapon(productName,seed,4,100,1,6,Item.Tag.Sword);
             }},
             new Factory("Dagger"){ Prop make(int seed){
-                return new Weapon(name,seed,1,100,6,1,Item.Tag.Dagger); //name,seed,weight,uses,dmgNum,dmgSide,type
+                return new Weapon(productName,seed,1,100,1,6,Item.Tag.Dagger);
             }},
             new Factory("Pick"){ Prop make(int seed){
-                return new Weapon(name,seed,3,60,16,1,Item.Tag.Sword); //name,seed,weight,uses,dmgNum,dmgSide,type
+                return new Weapon(productName,seed,3,60,1,12,Item.Tag.Sword);
             }},
             new Factory("Cleaver"){ Prop make(int seed){
-                return new Weapon(name,seed,5,100,6,3,Item.Tag.Sword); //name,seed,weight,uses,dmgNum,dmgSide,type
+                return new Weapon(productName,seed,5,100,3,6,Item.Tag.Sword);
             }},
             new Factory("Lancesword"){ Prop make(int seed){
-                return new Weapon(name,seed,3,300,20,1,Item.Tag.Spear); //name,seed,weight,uses,dmgNum,dmgSide,type
+                return new Weapon(productName,seed,3,300,1,16,Item.Tag.Spear);
             }},
             new Factory("Cutlass"){ Prop make(int seed){
-                return new Weapon(name,seed,4,240,12,2,Item.Tag.Sword); //name,seed,weight,uses,dmgNum,dmgSide,type
+                return new Weapon(productName,seed,4,240,2,12,Item.Tag.Sword);
             }},
             new Factory("Claymore"){ Prop make(int seed){
-                return new Weapon(name,seed,6,200,12,3,Item.Tag.Sword); //name,seed,weight,uses,dmgNum,dmgSide,type
+                return new Weapon(productName,seed,6,200,3,12,Item.Tag.Sword);
             }},
             new Factory("Halberd"){ Prop make(int seed){
-                return new Weapon(name,seed,7,100,20,3,Item.Tag.Sword); //name,seed,weight,uses,dmgNum,dmgSide,type
+                return new Weapon(productName,seed,7,100,3,20,Item.Tag.Sword);
             }},
             new Factory("Greatsword"){ Prop make(int seed){
-                return new Weapon(name,seed,8,100,20,4,Item.Tag.Sword); //name,seed,weight,uses,dmgNum,dmgSide,type
+                return new Weapon(productName,seed,8,100,4,20,Item.Tag.Sword);
             }},
             new Factory("Warhammer"){ Prop make(int seed){ //20
-                return new Weapon(name,seed,10,-1,20,4,Item.Tag.Mace); //name,seed,weight,uses,dmgNum,dmgSide,type
+                return new Weapon(productName,seed,10,-1,4,20,Item.Tag.Mace);
             }},
             new Factory("Revolver"){ Prop make(int seed){
-                return new Weapon(name,seed,1,6,20,2,Item.Tag.Shoot); //name,seed,weight,uses,dmgNum,dmgSide,type
+                return new Weapon(productName,seed,1,6,1,48,Item.Tag.Shoot);
             }},
             new Factory("Pistol"){ Prop make(int seed){
-                return new Weapon(name,seed,1,12,20,2,Item.Tag.Shoot); //name,seed,weight,uses,dmgNum,dmgSide,type
+                return new Weapon(productName,seed,1,12,1,40,Item.Tag.Shoot);
             }},
             new Factory("Rifle"){ Prop make(int seed){
-                return new Weapon(name,seed,3,2,20,4,Item.Tag.Snipe); //name,seed,weight,uses,dmgNum,dmgSide,type
+                return new Weapon(productName,seed,3,2,1,60,Item.Tag.Snipe);
             }},
             new Factory("Ethersword"){ Prop make(int seed){
-                Weapon product = new Weapon(name,seed,0,1,6,2,Item.Tag.Sword){
+                Weapon product = new Weapon(productName,seed,0,1,6,2,Item.Tag.Sword){
                     public String toString(){
                         return "";
                     }
@@ -158,99 +177,115 @@ public class Stock {
                 return product;
             }},
             new Factory("Cotton Clothing Legging"){ Prop make(int seed){
-                Armor product = new Armor("Cotton Clothing",seed,1,10,1,1,1); //name,seed,weight,uses,armor,encumberance,piece
+                Armor product = new Armor("Cotton Clothing",seed,1,10,1,1,1);
                 product.pocket = 1;
                 return product;
             }},
             new Factory("Cotton Clothing Torso"){ Prop make(int seed){
-                return new Armor("Cotton Clothing",seed,1,10,1,1,2); //name,seed,weight,uses,armor,encumberance,piece
+                return new Armor("Cotton Clothing",seed,1,10,1,1,2);
             }},
             new Factory("Fabric Clothing Legging"){ Prop make(int seed){
-                Armor product = new Armor("Fabric Clothing",seed,1,10,1,1,1); //name,seed,weight,uses,armor,encumberance,piece
+                Armor product = new Armor("Fabric Clothing",seed,1,10,1,1,1);
                 product.pocket = 1;
                 return product;
             }},
             new Factory("Fabric Clothing Torso"){ Prop make(int seed){
-                return new Armor("Fabric Clothing",seed,1,10,1,1,2); //name,seed,weight,uses,armor,encumberance,piece
+                return new Armor("Fabric Clothing",seed,1,10,1,1,2);
             }},
             new Factory("Suit Legging"){ Prop make(int seed){
-                Armor product = new Armor("Suit",seed,1,10,1,1,1); //name,seed,weight,uses,armor,encumberance,piece
+                Armor product = new Armor("Suit",seed,1,10,1,1,1);
                 product.pocket = 1;
                 return product;
             }},
             new Factory("Suit Torso"){ Prop make(int seed){
-                return new Armor("Suit",seed,1,10,1,1,2); //name,seed,weight,uses,armor,encumberance,piece
+                return new Armor("Suit",seed,1,10,1,1,2);
             }},
             new Factory("Adventurewear Legging"){ Prop make(int seed){ //30
-                Armor product = new Armor("Adventurewear",seed,1,10,1,1,1); //name,seed,weight,uses,armor,encumberance,piece
+                Armor product = new Armor("Adventurewear",seed,1,10,1,1,1);
                 product.pocket = 1;
                 return product;
             }},
             new Factory("Adventurewear Torso"){ Prop make(int seed){
-                return new Armor("Adventurewear",seed,1,10,1,1,2); //name,seed,weight,uses,armor,encumberance,piece
+                return new Armor("Adventurewear",seed,1,10,1,1,2);
             }},
             new Factory("Leather Armor Legging"){ Prop make(int seed){
-                Armor product = new Armor("Leather Armor",seed,1,10,1,1,1); //name,seed,weight,uses,armor,encumberance,piece
+                Armor product = new Armor("Leather Armor",seed,1,10,1,1,1);
                 product.pocket = 1;
                 return product;
             }},
             new Factory("Leather Armor Torso"){ Prop make(int seed){
-                return new Armor("Leather Armor",seed,1,10,1,1,2); //name,seed,weight,uses,armor,encumberance,piece
+                return new Armor("Leather Armor",seed,1,10,1,1,2);
             }},
             new Factory("Steel Armor Legging"){ Prop make(int seed){
-                Armor product = new Armor("Steel Armor",seed,1,10,1,1,1); //name,seed,weight,uses,armor,encumberance,piece
+                Armor product = new Armor("Steel Armor",seed,1,10,1,1,1);
                 product.breakable = false;
                 product.pocket = 1;
                 return product;
             }},
             new Factory("Steel Armor Torso"){ Prop make(int seed){
-                Armor product = new Armor("Steel Armor",seed,1,10,1,1,2); //name,seed,weight,uses,armor,encumberance,piece
+                Armor product = new Armor("Steel Armor",seed,1,10,1,1,2);
                 product.breakable = false;
                 return product;
             }},
             new Factory("Chainmail Legging"){ Prop make(int seed){
-                Armor product = new Armor("Chainmail",seed,1,10,1,1,1); //name,seed,weight,uses,armor,encumberance,piece
+                Armor product = new Armor("Chainmail",seed,1,10,1,1,1);
                 product.breakable = false;
                 product.pocket = 1;
                 return product;
             }},
             new Factory("Chainmail Torso"){ Prop make(int seed){
-                Armor product = new Armor("Chainmail",seed,1,10,1,1,2); //name,seed,weight,uses,armor,encumberance,piece
+                Armor product = new Armor("Chainmail",seed,1,10,1,1,2);
                 product.breakable = false;
                 return product;
             }},
             new Factory("Platemail Legging"){ Prop make(int seed){
-                Armor product = new Armor("Platemail",seed,1,10,1,1,1); //name,seed,weight,uses,armor,encumberance,piece
+                Armor product = new Armor("Platemail",seed,1,10,1,1,1);
                 product.breakable = false;
                 product.pocket = 1;
                 return product;
             }},
             new Factory("Platemail Torso"){ Prop make(int seed){
-                Armor product = new Armor("Platemail",seed,1,10,1,1,2); //name,seed,weight,uses,armor,encumberance,piece
+                Armor product = new Armor("Platemail",seed,1,10,1,1,2);
                 product.breakable = false;
                 return product;
             }},
             new Factory("Shadowrobe Legging"){ Prop make(int seed){
-                Armor product = new Armor("Shadowrobe",seed,1,10,1,1,1); //name,seed,weight,uses,armor,encumberance,piece
+                Armor product = new Armor("Shadowrobe",seed,1,10,1,1,1);
                 product.pocket = 1;
                 return product;
             }},
             new Factory("Shadowrobe Torso"){ Prop make(int seed){
-                return new Armor("Shadowrobe",seed,1,10,1,1,2); //name,seed,weight,uses,armor,encumberance,piece
+                return new Armor("Shadowrobe",seed,1,10,1,1,2);
             }},
-            new Factory("Lace Helm"){ Prop make(int seed){
-                Armor product = new Armor(name,seed,1,10,1,1,0); //name,seed,weight,uses,armor,encumberance,piece
-                product.breakable = false;
+            new Factory("Bandana"){ Prop make(int seed){
+                Armor product = new Armor(productName,seed,0,3,0,0,0){
+                    public void onCreate(){
+                        imbueMeta(true,true,.2f,true);
+                    }
+                };
+                product.breakable = true;
                 return product;
             }},
+            new Factory("Mask"){ Prop make(int seed){
+                Armor product = new Armor(productName,seed,0,3,0,0,0){
+                    public void onCreate(){
+                        imbueMeta(true,true,.2f,true);
+                    }
+                };
+                product.breakable = true;
+                return product;
+            }},
+            new Factory("Lace Helm"){ Prop make(int seed){
+                return new Armor(productName,seed,1,10,1,1,0);
+            }},
             new Factory("Full Helm"){ Prop make(int seed){ //70
-                return new Armor(name,seed,1,10,1,1,0); //name,seed,weight,uses,armor,encumberance,piece
+                return new Armor(productName,seed,1,10,1,1,0);
             }},
             new Factory("Legion Helm"){ Prop make(int seed){
-                return new Armor(name,seed,1,10,1,1,0); //name,seed,weight,uses,armor,encumberance,piece
+                return new Armor(productName,seed,1,10,1,1,0);
             }},
             new Factory("Blood"){ Prop make(int seed){
-                return new Item(name, seed, 0, -1){
+                return new Item(productName, seed, 0, -1){
                     @Override
                     public boolean use(final Man host){
                         return false;
@@ -331,7 +366,7 @@ public class Stock {
                 entrance.onInteract = new Interactive(){
                     public void interact(Man p){
                         if (p == Global.player && p.lastLand.depth == product.getDepth()+2){
-                            Global.map.loadMap("House_"+entrance.seed+"/"+product.image.getSize().getAdd(64,64)+"@"+entrance.seed);
+                            Global.map.loadMap("House_"+entrance.seed+"/"+product.image.getSize().getAdd(64,64)+"&0@"+entrance.seed);
                         }
                     }
                 };
@@ -370,13 +405,32 @@ public class Stock {
                 P doorPos = new P(product.rand.nextInt(doorWidth)-(doorWidth)/2, baseSizeY/2-(door.image.getSize().y/2)-2);
                 door.pos = doorPos;
                 addons.add(door);
+                int houseType = product.rand.nextInt(16);
+                if (houseType == 1){
+                    Prop sign = makeAddon("Sign_Food");
+                    sign.pos.set(doorPos.x<0?doorPos.x+128:doorPos.x-128, doorPos.y);
+                    addons.add(sign);
+                } else if (houseType == 2){
+                    Prop sign = makeAddon("Sign_Training");
+                    sign.pos.set(doorPos.x<0?doorPos.x+128:doorPos.x-128, doorPos.y);
+                    addons.add(sign);
+                } else if (houseType == 3){
+                    Prop sign = makeAddon("Sign_Guild");
+                    sign.pos.set(doorPos.x<0?doorPos.x+128:doorPos.x-128, doorPos.y);
+                    addons.add(sign);
+                } else if (houseType == 4){
+                    Prop sign = makeAddon("Sign_Shop");
+                    sign.pos.set(doorPos.x<0?doorPos.x+128:doorPos.x-128, doorPos.y);
+                    addons.add(sign);
+                } else houseType = 0;
+                final int finalHouseType = houseType;
                 final Prop entrance = Stock.getByName("Spawn",Global.getTempHouseId());
                 entrance.save = false;
                 entrance.pos = doorPos.getAdd(0,0);
                 entrance.onInteract = new Interactive(){
                     public void interact(Man p){
                         if (p == Global.player && p.lastLand.depth == product.getDepth()+2){
-                            Global.map.loadMap("House_"+entrance.seed+"/"+product.image.getSize().getAdd(64,64)+"@"+entrance.seed);
+                            Global.map.loadMap("House_"+entrance.seed+"/"+product.image.getSize().getAdd(64,64)+"&"+finalHouseType+"@"+entrance.seed);
                         }
                     }
                 };
@@ -444,7 +498,7 @@ public class Stock {
                         image.setSize(s.x * rx, s.y * rx);
                     }
                 };
-                Prop product = new Prop(varies(name,seed,2), seed, 15){
+                Prop product = new Prop(varies(productName,seed,2), seed, 15){
                     public void setDepth(int depth){
                         super.setDepth(depth);
                         fan.setDepth(depth+(seed%2==0?1:-1));
@@ -462,10 +516,10 @@ public class Stock {
                 return product;
             }},
             new Factory("Bridge1"){ Prop make(int seed){
-                return new Prop(name, seed, 15);
+                return new Prop(productName, seed, 15);
             }},
             new Factory("Grass"){ Prop make(int seed){
-                Item product = new Item(name, -1, 0, 1){
+                Item product = new Item(productName, -1, 0, 1){
                     public boolean use(Man p){
                         return true;
                     }
@@ -473,28 +527,8 @@ public class Stock {
                 product.setType(Item.Tag.Consumable);
                 return product;
             }},
-            new Factory("Fist"){ Prop make(int seed){
-                Item product = new Item(name, 0, 0, -1) {
-                    @Override
-                    public boolean use(final Man host) {
-                        host.setState(Actions.Interact);
-                        return false;
-                    }
-
-                    @Override
-                    public String forceToString() {
-                        return "";
-                    }
-                    public void drop(Man host) {
-                    }
-                    public void field() {
-                    }
-                };
-                product.save = false;
-                return product;
-            }},
             new Factory("Battery"){ Prop make(int seed){
-                Item product = new Item(name, seed, 1, 10){
+                Item product = new Item(productName, seed, 1, 10){
                     public boolean use(Man host){
                         return true;
                     }
@@ -504,13 +538,13 @@ public class Stock {
                 return product;
             }},
             new Factory("Guidebook"){ Prop make(int seed){
-                Item product = new Item(name, seed, 0, -1){
+                Item product = new Item(productName, seed, 0, -1){
                     @Override
                     public boolean use(Man host){
                         super.use(host);
                         String stage = "0";
                         if (Global.map.event == MapEvent.Tutorial) stage = MapEvent.cookie;
-                        Display.menuDialog.show("Guidebook by Whu", Dialog.get("tutorial"+stage));
+                        Global.display.menuDialog.show("Guidebook by Whu", Dialog.get("tutorial"+stage));
                         if (stage.equals("4")) remove();
                         return true;
                     }
@@ -520,7 +554,7 @@ public class Stock {
                 return product;
             }},
             new Factory("Spellbook"){ Prop make(int seed){
-                Item product = new Item(name, seed, 1, 1){
+                Item product = new Item(productName, seed, 1, 1){
                     private Spells spell;
                     public void onLoad(){
                         spell = Spells.values()[rand.nextInt(Spells.values().length)];
@@ -546,7 +580,7 @@ public class Stock {
                 return product;
             }},
             new Factory("Manual"){ Prop make(int seed){
-                Item product = new Item(name, seed, 1, 1){
+                Item product = new Item(productName, seed, 1, 1){
                     @Override
                     public boolean use(Man host){
                         if (super.use(host)) {
@@ -562,14 +596,14 @@ public class Stock {
                 return product;
             }},
             new Factory("Potion"){ Prop make(int seed){
-                Item product = new Item(name, seed, 1, 1) {
+                Item product = new Item(productName, seed, 1, 1) {
                     public void onCreate() {
                         imbueMeta(false, false, 1, true);
                     }
                     public boolean use(Man host) {
                         if (use(1)){
                             super.use(host);
-                            host.stats.addEffect(emod, Integer.parseInt(ademod.toString()));
+                            host.stats.addEffect(emod, ademod.level);
                             return true;
                         }
                         return false;
@@ -580,7 +614,7 @@ public class Stock {
                 return product;
             }},
             new Factory("Scroll"){ Prop make(int seed){
-                Item product = new Item(name, seed, 0, 1){
+                Item product = new Item(productName, seed, 0, 1){
                     private Spells spell;
                     @Override
                     public boolean use(Man host){
@@ -611,7 +645,7 @@ public class Stock {
                 return product;
             }},
             new Factory("Fireball"){ Prop make(int seed){
-                Item product = new Item(name, seed, 1, 3) {
+                Item product = new Item(productName, seed, 1, 3) {
                     @Override
                     public boolean use(final Man host) {
                         if (super.use(host)) {
@@ -654,7 +688,7 @@ public class Stock {
                 return product;
             }},
             new Factory("Tanto"){ Prop make(int seed){
-                Item product = new Item(name, seed, 1, 10){
+                Item product = new Item(productName, seed, 1, 10){
                     @Override
                     public boolean use(final Man host){
                         if (super.use(host)) {
@@ -691,21 +725,21 @@ public class Stock {
                 return product;
             }},
             new Factory("Shell"){ Prop make(int seed){
-                Item product = new Item(name, seed, 0, 1);
+                Item product = new Item(productName, seed, 0, 1);
                 product.damage = 0;
                 return product;
             }},
             new Factory("Starfish"){ Prop make(int seed){ //90
-                Item product = new Item(name, seed, 0, 1);
+                Item product = new Item(productName, seed, 0, 1);
                 product.damage = 0;
                 return product;
             }},
             new Factory("Book"){ Prop make(int seed){
-                Item product = new Item(name, seed, 1, -1){
+                Item product = new Item(productName, seed, 1, -1){
                     @Override
                     public boolean use(Man host){
                         if (super.use(host)) {
-                            Display.menuDialog.show("Title","Content");
+                            Global.display.menuDialog.show("Title","Content");
                             return true;
                         }
                         return false;
@@ -750,7 +784,7 @@ public class Stock {
             new ManFactory("Resident"){ Prop make(int seed){
                 Man product = getMan(seed,getStat(4,30,0,20,1),Faction.Helpless,"200/Sprint",
                         null,
-                        new String[]{"Cotton Clothing","Fabric Clothing"});
+                        new String[]{"Cotton Clothing","Fabric Clothing"},null);
                 product.speechType = "resident";
                 product.brain = new ResidentIntelligence(product);
                 return product;
@@ -758,38 +792,45 @@ public class Stock {
             new ManFactory("Merchant"){ Prop make(int seed){
                 Man product = getMan(seed,getStat(4,30,0,20,1),Faction.Neutral,"200/Sprint",
                         null,
-                        new String[]{"Suit"});
+                        new String[]{"Suit"},null);
                 product.speechType = "merchant";
                 product.brain = new MerchantIntelligence(product);
                 return product;
             }},
             new ManFactory("Guard"){ Prop make(int seed){
                 Man product = getMan(seed,getStat(9,40,5,40,3),Faction.Neutral,"-5,20,800/Slash,Thrust&Dash&Sprint",
-                        new String[]{"Broadsword"},
-                        new String[]{"Leather Armor","Fabric Clothing"});
-                product.armor.set((Armor) getByName("Lace Helm",-1),0);
+                        new String[]{"Broadsword","Spear"},
+                        new String[]{"Leather Armor"},new String[]{"Lace Helm",null});
                 product.speechType = "soldier";
                 product.brain = new IntelligenceSocial(product);
                 return product;
             }},
             new ManFactory("Punk"){ Prop make(int seed){
                 Man product = getMan(seed,getStat(5,40,0,40,2),Faction.Punk,"-5,80,200,1200/Slash,Thrust&Dash,Walk&Walk&Sprint",
-                        new String[]{"Stick","Axe","Pick"},
-                        new String[]{"Cotton Clothing","Fabric Clothing"});
+                        new String[]{"Dagger","Axe","Pick"},
+                        new String[]{"Cotton Clothing", "Fabric Clothing"},null);
+                product.speechType = "punk";
+                product.brain = new IntelligenceSocial(product);
+                return product;
+            }},
+            new ManFactory("Yeller"){ Prop make(int seed){
+                Man product = getMan(seed,getStat(3,40,0,20,3),Faction.Punk,"-5,80,700,1200/Slash&Backstep&Calling&Sprint",
+                        new String[]{"Stick","Dagger",null},
+                        new String[]{"Cotton Clothing"},new String[]{"Bandana","Mask"});
                 product.speechType = "punk";
                 product.brain = new IntelligenceSocial(product);
                 return product;
             }},
             new ManFactory("Phantom"){ Prop make(int seed){
-                Man product = getMan(seed,getStat(12,40,10,50,6),Faction.Punk,"-5,20,120,800/Slash,Thrust&Dash,Flameroll&Fireblast,Stun&Shadowstep,Meteor",
-                        new String[]{"Stick","Axe","Pick","Broadsword"},
-                        new String[]{"Shadowrobe"});
-                product.clip.organs[5].setImage("Phantom");
+                Man product = getMan(seed,getStat(12,40,10,50,9),Faction.Evil,"-5,20,120,1200/Slash,Thrust&Dash,Flameroll&Fireblast,Stun&Shadowstep,Meteor,Blizzard",
+                        new String[]{"Greatsword","Halberd","Warhammer"},
+                        new String[]{"Shadowrobe"},null);
                 product.brain = new IntelligenceSocial(product);
+                product.clip.organs[5].setImage("Phantom");
                 return product;
             }},
             new UnitFactory("Dog") { Prop make(int seed) {
-                Unit product = new Unit(getUnit(name,seed,getStat(3,20,30,10,3),Faction.Evil,"5,140,1200/Kick&Thrust,Walk&Sprint")){
+                Unit product = new Unit(seed){
                     public void stateSet(Moveset state){
                         super.stateSet(state);
                         if (state == Actions.Thrust){
@@ -808,12 +849,15 @@ public class Stock {
                         if (state == Actions.Thrust) attack();
                         if (state == Actions.Sprint) vel.x *= 2;
                     }
+                    public void onCreate(){
+                        load(getUnit(name,seed,getStat(3,20,30,10,3),Faction.Evil,"5,140,1200/Kick&Thrust,Walk&Sprint"));
+                    }
                 };
                 process(product);
                 return product;
             }},
             new UnitFactory("Slime") { Prop make(int seed) {
-                Unit product = new Unit(getUnit(name,seed,getStat(1,10,12,10,1),Faction.Evil,"-5,800/Kick&Walk")){
+                Unit product = new Unit(seed){
                     public void stateSet(Moveset state) {
                         super.stateSet(state);
                         if (state == Actions.Kick) {
@@ -830,16 +874,24 @@ public class Stock {
                             explode(156);
                         }
                     }
+                    public void buff(Buffs buff, int level){
+                        if (buff.tags.has(Tag.Cold)) level *= 8;
+                        super.buff(buff, level);
+                    }
                     public void stateDone(){
                         super.stateDone();
                         get("Stamina").heal();
                     }
+                    public void onCreate(){
+                        load(getUnit(productName,seed,getStat(1,10,12,10,1),Faction.Evil,"-5,800/Kick&Walk"));
+                    }
                 };
+                product.tags.remove(Tag.Combustible);
                 process(product);
                 return product;
             }},
             new UnitFactory("Mantis") { Prop make(int seed) {
-                Unit product = new Unit(getUnit(name,seed,getStat(10,100,40,10,3),Faction.Evil,"-5/Kick")){
+                Unit product = new Unit(seed){
                     public void stateSet(Moveset state){
                         super.stateSet(state);
                         if (state == Actions.Thrust){
@@ -848,13 +900,16 @@ public class Stock {
                             vel.y -= 20;
                         }
                     }
+                    public void onCreate(){
+                        load(getUnit(productName,seed,getStat(10,100,40,10,3),Faction.Evil,"-5/Kick"));
+                    }
                 };
-                product.clip.organs[1].pt.y -= product.clip.organs[0].ptd.y;
                 process(product);
+                product.clip.organs[1].pt.y -= product.clip.organs[0].ptd.y;
                 return product;
             }},
             new UnitFactory("Beholder") { Prop make(int seed) {
-                Unit product = new Unit(getUnit(name,seed,getStat(30,10,1,60,3),Faction.Evil,"300/Fireblast,Idle,Idle,Idle")){
+                Unit product = new Unit(seed){
                     public void collide(){
                         super.collide();
                         jump = true;
@@ -883,6 +938,9 @@ public class Stock {
                             }
                         }
                     }
+                    public void onCreate(){
+                        load(getUnit(productName,seed,getStat(30,10,1,60,3),Faction.Evil,"300/Fireblast,Idle,Idle,Idle"));
+                    }
                 };
                 if (seed % 2 == 1) product.loadMoveset("200,800/Flamestride,Flameroll&Flameroll,Fireball");
                 product.gravity = false;
@@ -891,39 +949,42 @@ public class Stock {
             }},
             //Uniques
             new Factory("Stomach Full Helm"){ Prop make(int seed){
-                return new Armor("Full Helm",seed,0,10,1,0,0){
+                Armor product = new Armor("Full Helm",seed,0,10,1,0,0){
                     public String getDescription(){
                         return super.getDescription()+" Something is odd about this helmet.";
                     }
                 };
+                product.tags.add(Tag.Cunning);
+                return product;
             }},
     };
-    public static Prop get(String[] p){
+    public static Prop get(String p){
         Prop t;
-        int seed = Integer.parseInt(p[1]);
+        String[] sections = p.split("@");
+        int seed = Integer.parseInt(sections[1]);
         if (seed == -1) seed = Global.getSeed();
-        if (p[0].charAt(0) == '!'){
-            t = getInstant(p[0].substring(1), seed);
+        if (sections[0].charAt(0) == '!'){
+            t = getInstant(sections[0].substring(1), seed);
         } else {
-            int index = Integer.parseInt(p[0]);
+            int index = Integer.parseInt(sections[0]);
             t = factory[index].make(seed);
             t.factoryId = index;
             if (t instanceof Item){
                 Item item = (Item)t;
-                if (p.length > 3) item.uses = new Stat(p[3]);
-                if (p.length > 4) item.loadMeta(p[4]);
-                if (p.length > 5) item.rotation = Float.parseFloat(p[5]);
-                if (p.length > 6){
-                    if (t instanceof Food) ((Food) item).perish = Integer.parseInt(p[6]);
+                if (sections.length > 3) item.uses = new Stat(sections[3]);
+                if (sections.length > 4) item.loadMeta(sections[4]);
+                if (sections.length > 5) item.rotation = Float.parseFloat(sections[5]);
+                if (sections.length > 6){
+                    if (t instanceof Food) ((Food) item).perish = Integer.parseInt(sections[6]);
                 }
             } else if (t instanceof Unit) {
-                if (p.length > 3) {
-                    int id = Integer.parseInt(p[3]);
-                    if (id >= Global.objectId) Global.objectId = id + 1;
+                if (sections.length > 3) {
+                    ((Unit)t).load(p);
+                    t.name = factory[index].productName;
                 }
             }
         }
-        if (p.length > 2) t.pos.load(p[2]);
+        if (sections.length > 2) t.pos.load(sections[2]);
         return t;
     }
     private static Prop getInstant(String p, int seed){
@@ -933,8 +994,8 @@ public class Stock {
     }
     public static Prop getByName(String p, int seed){
         for (int i=0;i<factory.length;i++){
-            if (factory[i].name.equals(p)){
-                Prop r = get(new String[]{""+i,""+seed,"0,0"});
+            if (factory[i].productName.equals(p)){
+                Prop r = get(i+"@"+seed);
                 r.onCreate();
                 r.factoryId = i;
                 return r;
@@ -943,23 +1004,25 @@ public class Stock {
         return getInstant(p, seed);
     }
     static String getFactoryName(int id){
-        return id==-1?"":factory[id].name;
+        return id==-1?"":factory[id].productName;
     }
 }
 abstract class Factory{
-    protected String name;
-    Factory(String name){
-        this.name = name;
+    String productName;
+    Factory(String productName){
+        this.productName = productName;
     }
     abstract Prop make(int seed);
     void isNatural(Prop product){
         product.gravity = false;
         product.dynamic = true;
+        product.mobile = false;
         product.randomSize(new P(.3f,.3f));
         randomSide(product);
     }
     void isFurniture(Prop product){
         product.gravity = false;
+        product.mobile = false;
         randomSide(product);
     }
     Prop makeAddon(String name){
@@ -984,14 +1047,14 @@ abstract class UnitFactory extends Factory{
         super(name);
     }
     String getStat(int stamina, int speed, int proficiency, int health, int level){
-        return "Stamina:"+stamina+"&Speed:"+speed+"&Proficiency:"+proficiency+"&Health:"+health+"&Level:"+level;
+        return "Stamina:"+stamina+"&Speed:"+speed+"&Proficiency:"+proficiency+"&Health:"+health+"&Strength:"+level+"&Level:"+level;
     }
     String getUnit(String name, int seed, String stat, Faction faction, String moves){
-        return name+"@"+seed+"@0,0@"+Global.getObjectId()+"@"+stat+"@"+faction.name()+"@"+moves;
+        return name+"@"+seed+"@0,0@"+stat+"@"+faction.name()+"@"+moves;
     }
     Unit process(Unit p){
+        p.clip = new Body(p, productName);
         p.brain = new IntelligenceSocial(p);
-        p.clip = new Body(p, p.name);
         return p;
     }
 }
@@ -1000,23 +1063,30 @@ abstract class ManFactory extends UnitFactory{
     ManFactory(String name) {
         super(name);
     }
-    private Armor getArmor(String p, int piece){
+    private String getItem(String p, int piece){
+        if (p == null){
+            if (piece == 0) return "None";
+            else if (piece == -1) return "";
+        }
         String pieceName = "";
-        if (piece == 1) pieceName = "Legging";
-        else if (piece == 2) pieceName = "Torso";
-        Armor r = (Armor) Stock.getByName(p+" "+pieceName,-1);
+        if (piece == 1) pieceName = " Legging";
+        else if (piece == 2) pieceName = " Torso";
+        Item r = (Item) Stock.getByName(p+pieceName,-1);
         r.cancelAdd();
-        return r;
+        return r.toString();
     }
-    Man getMan(int seed, String stat, Faction faction, String moves, String[] weapon, String[] armor){
-        String r = getUnit("Man",seed,stat,faction,moves);
-        r += "##None&None&None";
-        String arm = armor[Global.r.nextInt(armor.length)];
-        Man m = new Man(r);
-        m.clip.organs[5].setImage(manHeads[m.rand.nextInt(manHeads.length)]);
-        if (weapon != null) m.setWeapon((Item) Stock.getByName(weapon[Global.r.nextInt(weapon.length)],-1));
-        m.armor.set(getArmor(arm,1),1);
-        m.armor.set(getArmor(arm,2),2);
+    Man getMan(int seed, final String stat, final Faction pfaction, final String moves, final String[] pweapon, final String[] parmor, final String[] pface){
+        Man m = new Man(seed){
+            public void onCreate(){
+                String str = getUnit(productName,seed,stat,pfaction,moves);
+                str += "#"+(pweapon==null?"None": getItem(pweapon[seed % pweapon.length],-1));
+                String helm = pface==null?"None": getItem(pface[seed % pface.length],0);
+                String arm = parmor==null?null:parmor[seed % parmor.length];
+                str += "#"+helm+"&"+ getItem(arm, 1)+"&"+ getItem(arm, 2);
+                load(str);
+            }
+        };
+        m.setHead(manHeads[seed % manHeads.length]);
         return m;
     }
 }

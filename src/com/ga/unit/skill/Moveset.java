@@ -1,5 +1,6 @@
 package com.ga.unit.skill;
 
+import com.ga.unit.Tags;
 import com.ga.unit.Unit;
 
 /**
@@ -15,10 +16,13 @@ public interface Moveset {
     int getDel();
 
     int getCooldown();
+    float getVelX();
 
-    void onSet(Unit p);
+    void trigger(Unit p, int organ);
+    void onSet(Unit p, int level);
     void onFinish(Unit p);
     void onInterrupt(Unit p);
+    Tags getTags();
 
     void update(Unit p, int level);
 }

@@ -23,8 +23,8 @@ import java.util.Map;
  */
 public class Server implements Updatable {
     private static final String local = "127.0.0.1";
-    protected UDPClient udp;
-    protected TCPClient tcp;
+    private UDPClient udp;
+    private TCPClient tcp;
     private HashMap<Integer, PlayerInput> clientControllers = new HashMap<>();
     private ArrayList<DatagramPacket> clientShortcuts = new ArrayList<>();
     private ArrayList<String> clientIPs = new ArrayList<>();

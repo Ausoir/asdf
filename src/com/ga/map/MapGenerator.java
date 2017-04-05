@@ -14,7 +14,7 @@ public class MapGenerator {
         float horizon = mapsize.y-600;
         P orig = new P(0, horizon), pt1 = orig, pt2 = new P();
         while (pt2.x < mapsize.x) {
-            int randX = (Global.r.nextInt(240) + 20) * Global.r.nextInt(randomness);
+            int randX = (Global.r.nextInt(240) + 20) * (Global.r.nextInt(randomness)+1);
             int randY = (Global.r.nextInt(varianceY) - (varianceY/2)) * Global.r.nextInt(randomness);
             pt2 = new P(pt1.x + randX, orig.y + randY);
             if (pt2.x+(200*randomness*.5f) > mapsize.x) pt2.x = mapsize.x;
@@ -73,8 +73,9 @@ public class MapGenerator {
         Global.map.land.add(new Line(pt4, pt1, id, -1));
         Global.map.formTextures.put(id, id+"&"+texture[Global.r.nextInt(texture.length)]);
     }
-    public static P generateHouse(final String returnAddr, int returnDoorSeed, String houseInfo){
-        P mapsize = new P(houseInfo).mult(1.5f);
+    public static void generateHouse(final String returnAddr, int returnDoorSeed, String houseInfo){
+        String[] houseInfos = houseInfo.split("&");
+        P mapsize = new P(houseInfos[0]).mult(1.5f);
         Global.map = new Map(new String[]{"1","None","None",((int)mapsize.x)+"x"+((int)mapsize.y),returnAddr});
         float bottom = mapsize.y - 64;
         P topleft = new P(64, 64), topright = new P(mapsize.x-64, 64),
@@ -88,13 +89,14 @@ public class MapGenerator {
         P result = new P(mapsize.x / 2, bottom - 50);
         Stock.getByName("Door",returnDoorSeed).pos.set(result);
         Stock.getByName("Exit",returnDoorSeed).pos.set(result);
-        return result;
+        if (houseInfos[1].equals("1")) Stock.getByName("Merchant",-1).pos.set(Global.r.nextInt((int) mapsize.x-30)+15,result.y-20);
     }
-    private static P generatePlains(boolean rightSide, String prevmap, String nextmap){
-        P mapsize = new P(3600, 1600);
+    private static void generatePlains(String prevmap, String nextmap){
+        P mapsize = new P(7200, 1600);
         Global.map = new Map(new String[]{"0","Rural",Global.map.maps[2],((int)mapsize.x)+"x"+((int)mapsize.y),prevmap,nextmap});
         String[] texture = new String[]{"dirt&grass","dirt&grass&Rock=.1,Bush=.2,Weed=.4,Tree=1"};
         generateFloor(9, mapsize, Global.r.nextInt(9) + 1, 40, texture);
+        Global.map.formTextures.put(-1, "9");
         for (int i=0;i<Global.r.nextInt(4);i++) generateMound(i+1, mapsize, texture, Global.r.nextInt(240)+80);
         for (int i=0;i<Global.map.land.size();i++){
             Line l = Global.map.land.get(i);
@@ -102,24 +104,23 @@ public class MapGenerator {
                 ObjectGenerator.generateSingleHouse(l);
             }
         }
-        return rightSide ? new P(24, mapsize.y - 650) : new P(mapsize.x - 24, mapsize.y - 650);
     }
-    private static P generateCity(boolean rightSide, String prevmap, String nextmap){
-        P mapsize = new P(8000, 6000);
+    private static void generateCity(String prevmap, String nextmap){
+        P mapsize = new P(10000, 6000);
         Global.map = new Map(new String[]{"0","Urban",Global.map.maps[2],((int)mapsize.x)+"x"+((int)mapsize.y),prevmap,nextmap});
-        Line[] lands = new Line[16];
-        int fragment = (int) (mapsize.x/16);
+        Line[] lands = new Line[14];
+        int fragment = (int) (mapsize.x/14);
         for (int i=0;i<lands.length;i++) Global.map.land.add(lands[i] = new Line(i*fragment,mapsize.y-600,(i+1)*fragment,mapsize.y-600,0,0));
         Global.map.land.add(new Line(mapsize.x,mapsize.y-600,mapsize.x,mapsize.y,0,0));
         Global.map.land.add(new Line(mapsize.x,mapsize.y,0,mapsize.y,0,0));
         Global.map.land.add(new Line(0,mapsize.y,0,mapsize.y-600,0,0));
         Global.map.formTextures.put(0, "9&steel&road");
+        Global.map.formTextures.put(-1, "9");
         for (int i=3;i<lands.length-3;i++){
             ObjectGenerator.generateSkyscraper(lands[i]);
         }
-        return rightSide ? new P(24, mapsize.y - 650) : new P(mapsize.x - 24, mapsize.y - 650);
     }
-    private static P generateTown(boolean rightSide, String prevmap, String nextmap){
+    private static void generateTown(String prevmap, String nextmap){
         P mapsize = new P(6000, 4000);
         Global.map = new Map(new String[]{"0","None",Global.map.maps[2],((int)mapsize.x)+"x"+((int)mapsize.y),prevmap,nextmap});
         String[] foundationTexture = new String[]{"brick&basic","marble&basic","concrete&basic","rock&basic","wood&basic"};
@@ -130,6 +131,7 @@ public class MapGenerator {
             generateFoundation(max-i, mapsize, pos, lastY, foundationTexture);
             lastY = pos.y;
         }
+        Global.map.formTextures.put(-1, ""+max+1);
         generateFloor(max+1, mapsize, Global.r.nextInt(4) + 7, 20, new String[]{"dirt&road","dirt&grass","rock&road","rock&grass"});
         for (int i=0;i<Global.map.land.size();i++){
             Line l = Global.map.land.get(i);
@@ -137,23 +139,19 @@ public class MapGenerator {
                 ObjectGenerator.generateSingleHouse(l);
             }
         }
-        return rightSide ? new P(24, mapsize.y - 650) : new P(mapsize.x - 24, mapsize.y - 650);
     }
-    public static void generateMap(String map, boolean rightSide, String prevmap, String nextmap){
-        P r = new P();
+    public static void generateMap(String map, String prevmap, String nextmap){
         switch (map) {
             case "Plains":
-                r = generatePlains(rightSide, prevmap, nextmap);
+                generatePlains(prevmap, nextmap);
                 break;
             case "City":
-                r = generateCity(rightSide, prevmap, nextmap);
+                generateCity(prevmap, nextmap);
                 break;
             case "Town":
-                r = generateTown(rightSide, prevmap, nextmap);
+                generateTown(prevmap, nextmap);
                 break;
         }
-        Prop entrance = Stock.getByName("Spawn",0);
-        entrance.pos = r;
     }
 }
 

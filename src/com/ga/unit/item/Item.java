@@ -3,6 +3,8 @@ package com.ga.unit.item;
 import com.ga.game.Dialog;
 import com.ga.game.Sound;
 import com.ga.map.Global;
+import com.ga.map.ShadedPicture;
+import com.ga.map.Shader;
 import com.ga.tool.Interactive;
 import com.ga.tool.Line;
 import com.ga.tool.P;
@@ -85,15 +87,15 @@ public class Item extends Prop {
         }
         static PrefixMod load(String p){
             for (PrefixMod i : values()){
-                if ((""+i.weight).equals(p)) return i;
+                if ((""+i.ordinal()).equals(p)) return i;
             }
             return None;
         }
         public String toString() {
-            return ""+weight;
+            return ""+ordinal();
         }
     }
-    protected enum AdverbMod{
+    enum AdverbMod{
         None(1), Very(2), Super(3), Ultra(4);
         int magnitude;
         AdverbMod(int mag){
@@ -101,7 +103,7 @@ public class Item extends Prop {
         }
         static AdverbMod load(String p){
             for (AdverbMod i : values()){
-                if ((""+i.magnitude).equals(p)) return i;
+                if ((""+i.ordinal()).equals(p)) return i;
             }
             return None;
         }
@@ -113,12 +115,12 @@ public class Item extends Prop {
             return None;
         }
         public String toString(){
-            return ""+magnitude;
+            return ""+ordinal();
         }
     }
     public enum AdenchantMod{
         None(2,.15f), Minor(1,.1f), Major(3,.25f), Greater(4,.35f), Ultimate(5,.4f);
-        int level;
+        public int level;
         public float magnitude;
         AdenchantMod(int level, float mag){
             this.level = level;
@@ -134,19 +136,19 @@ public class Item extends Prop {
         }
         static AdenchantMod load(String p){
             for (AdenchantMod i : values()){
-                if ((""+i.level).equals(p)) return i;
+                if ((""+i.ordinal()).equals(p)) return i;
             }
             return None;
         }
         public String toString(){
-            return ""+level;
+            return ""+ordinal();
         }
     }
     AdverbMod admod = AdverbMod.None;
-    public AdenchantMod ademod = AdenchantMod.None;
+    protected AdenchantMod ademod = AdenchantMod.None;
     private SpecialtyMod smod = SpecialtyMod.None;
-    PrefixMod pmod = PrefixMod.None;
-    public Buffs emod = null;
+    private PrefixMod pmod = PrefixMod.None;
+    protected Buffs emod = null;
     public int weight;
     public int volume = 1;
     protected int cooldown = 0;
@@ -176,7 +178,7 @@ public class Item extends Prop {
         };
         randomSize(new P(.2f,.2f));
     }
-    public void imbueMeta(boolean canSmod, boolean canAdmod, float emodProb, boolean canAdemod){
+    protected void imbueMeta(boolean canSmod, boolean canAdmod, float emodProb, boolean canAdemod){
         pmod = PrefixMod.get(rand);
         if (canSmod) smod = SpecialtyMod.get(rand);
         if (canAdmod) admod = AdverbMod.get(rand);
@@ -187,6 +189,7 @@ public class Item extends Prop {
         }
         setModifier(pmod);
         setModifier(smod);
+        shade();
     }
     public void loadMeta(String p){
         String[] metadata = p.split("_");
@@ -194,9 +197,20 @@ public class Item extends Prop {
         smod = SpecialtyMod.load(metadata[1]);
         admod = AdverbMod.load(metadata[2]);
         if (!metadata[3].equals("")){
-            emod = Buffs.getByName(metadata[3]);
+            emod = Buffs.values()[Integer.parseInt(metadata[3])];
             ademod = AdenchantMod.load(metadata[4]);
             probability = ademod.magnitude;
+        }
+        shade();
+    }
+    private void shade(){
+        int r = getRarity();
+        if (r % 10 > 3){
+            image = new ShadedPicture(name, Shader.Shine);
+            ((ShadedPicture) image).shade();
+        } else if (r >= 100){
+            image = new ShadedPicture(name, Shader.Glow);
+            ((ShadedPicture) image).shade();
         }
     }
     public void setType(Tag p){
@@ -207,13 +221,17 @@ public class Item extends Prop {
     public Tag getType(){
         return type;
     }
+    public void onField(){
+        if (organ == null) super.onField();
+    }
     public void setOrgan(Organ p){
         if (p == null){
             save = true;
             pos = pos.getAdd(0,0);
+            if (this.organ != null) lastLand = this.organ.host.lastLand;
         } else {
+            setDepth(p.host.getDepth()-1);
             save = false;
-            Updater.remove(this);
         }
         this.organ = p;
     }
@@ -347,6 +365,7 @@ public class Item extends Prop {
         return r;
     }
     public void onUnequip(Man host){
+        setOrgan(null);
         if (smod == SpecialtyMod.Cursed){
             Curse.get(host, 5);
         }
@@ -379,7 +398,7 @@ public class Item extends Prop {
     public void drop(Man host) {
         if (host.weapon == this) host.setWeapon(null);
         pos = new P(host.pos);
-        field();
+        setOrgan(null);
         rotation = (float)Global.r.nextInt(628)/100;
     }
     public Item cancelAdd(){
@@ -391,14 +410,8 @@ public class Item extends Prop {
             ((Man) organ.host).setWeapon(null);
             setOrgan(null);
         } else Global.player.inventory.remove(this);
-        Updater.cancelAdd(this);
+        cancelAdd();
         super.remove();
-    }
-    public void field(){
-        if (organ != null) {
-            Updater.add(this);
-            setOrgan(null);
-        }
     }
     public String getSound(){
         return type.getSound();
@@ -437,8 +450,10 @@ public class Item extends Prop {
     }
     @Override
     public void draw(Graphics2D g){
-        P t = pos.getAdd(organ==null?new P():organ.ptd);
-        image.draw(g, t.x, t.y, rotation, dir);
+        if (organ != null) {
+            P t = pos.getAdd(organ.ptd);
+            image.draw(g, t.x, t.y, rotation, dir);
+        } else image.draw(g, pos.x, pos.y, rotation, dir);
     }
     public String forceToString(){
         boolean forced = false;
@@ -453,7 +468,7 @@ public class Item extends Prop {
     @Override
     public String toString(){
         String t = super.toString();
-        String meta = pmod+"_"+smod+"_"+admod+"_"+(emod==null?"":emod)+"_"+ademod;
+        String meta = pmod+"_"+smod+"_"+admod+"_"+(emod==null?"":emod.ordinal())+"_"+ademod;
         if (!t.equals("")) t += "@"+uses+"@"+meta+"@"+String.format(java.util.Locale.US,"%.2f", rotation);
         return t;
     }

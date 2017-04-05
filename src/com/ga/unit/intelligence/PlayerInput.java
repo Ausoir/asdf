@@ -1,16 +1,12 @@
 package com.ga.unit.intelligence;
 
 import com.ga.game.Command;
-import com.ga.game.Display;
 import com.ga.game.Input;
 import com.ga.game.Keybinding;
 import com.ga.map.Global;
-import com.ga.map.Updatable;
 import com.ga.tool.P;
-import com.ga.tool.Word;
 import com.ga.unit.Player;
 import com.ga.unit.SkillTree;
-import com.ga.unit.Updater;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Moveset;
 import com.ga.unit.skill.Spells;
@@ -77,7 +73,13 @@ public class PlayerInput implements Input {
         String r = null;
         for (Map.Entry<Integer, String> i : keyMap.entrySet()) {
             if (i.getValue().equals(move.getCodeName())){
-                r = Word.getKeyName(i.getKey());
+                int key = i.getKey();
+                String keyname = ""+((char)key);
+                if (key == 1) keyname = "LMB";
+                else if (key == 3) keyname = "RMB";
+                else if (key == 32) keyname = "SPACE";
+                else if (key == 16) keyname = "SHIFT";
+                r = keyname;
             }
         }
         return r;
@@ -90,8 +92,8 @@ public class PlayerInput implements Input {
         x = (int) (x-host.pos.x);
         y = (int) (y-host.pos.y);
         if (mode == 0) inputDirect(null,x,y); //mousemove for better targetting
-        else if (mode == Keybinding.get("ENTER")) Display.chatbox.requestFocus();
-        else if (mode == Keybinding.get("TAB")) Display.menu.toggle();
+        else if (mode == Keybinding.get("ENTER")) Global.display.chatbox.requestFocus();
+        else if (mode == Keybinding.get("TAB")) Global.display.menu.toggle();
         else if (mode == Keybinding.get("UP")) moveCamera(0,-80);
         else if (mode == Keybinding.get("RIGHT")) moveCamera(80,0);
         else if (mode == Keybinding.get("LEFT")) moveCamera(-80,0);

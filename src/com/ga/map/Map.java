@@ -5,10 +5,9 @@ import com.ga.game.Settings;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.unit.Prop;
+import com.ga.unit.Stock;
 import com.ga.unit.Thing;
 import com.ga.unit.Updater;
-import com.ga.unit.Stock;
-import com.ga.unit.item.Item;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -87,7 +86,6 @@ public class Map extends Thing {
         if (side == 4) targetMap = maps[5];
         if (!targetMap.equals("None")) {
             loadMap(targetMap);
-            return;
         }
     }
     public void loadMap(String p){
@@ -156,6 +154,8 @@ public class Map extends Thing {
                         blocker.addPoint(i.pt.x, i.pt.y);
                     }
                 }
+            } else {
+                i.depth = Terrain.toTerrainDepth(Integer.parseInt(formTextures.get(i.next)));
             }
         }
         if (inside) blocker.render();
@@ -219,7 +219,6 @@ public class Map extends Thing {
                 else tx = (int) Global.clamp(tx, l.ptd.x - l.pt.x + xSize, -xSize);
                 int ty = (int) (l.pt.y + (tx * l.getSlope()));
                 t.pos = new P(l.pt.x + tx, ty);
-                if (t instanceof Item) ((Item) t).field();
                 if (!l.clockwise()){
                     t.pos.y += (t.image.size.y / 2)-4;
                     t.rotation = 3.14f;
@@ -249,29 +248,18 @@ public class Map extends Thing {
         return new P(i.pt.x+tx,ty);
     }
 
-    public boolean fallSafe(Line from, P pos){
+    public Line fallSafe(P pos, int depth){
         Line pp = new Line(pos.x,pos.y,pos.x,99999);
         for (Line i : Global.map.land){
-            if (i.isLandable() && i.lineCross(pp) && i.depth >= from.depth){
-                return true;
+            if (i.isLandable() && i.lineCross(pp) && i.depth >= depth){
+                return i;
             }
         }
-        return false;
+        return null;
     }
 
     public boolean isIndoors(){
         return maps[0].equals("1");
-    }
-
-    public boolean isInside(P pos){
-        Line pp = new Line(pos.x,pos.y,pos.x,99999);
-        int num = 0;
-        for (Line i : Global.map.land){
-            if (i.isLand() && i.next != -1 && i.lineCross(pp)){
-                num++;
-            }
-        }
-        return num % 2 == (isIndoors()?0:1);
     }
 
     void onTimeChange() {

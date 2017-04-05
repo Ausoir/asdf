@@ -1,12 +1,12 @@
 package com.ga.unit;
 
-import com.ga.game.Display;
 import com.ga.game.FileManager;
 import com.ga.game.Observer;
 import com.ga.map.Drawable;
 import com.ga.map.Global;
 import com.ga.map.Terrain;
 import com.ga.map.Updatable;
+import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.tool.Timer;
@@ -16,18 +16,18 @@ import com.ga.unit.skill.Actions;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Created by Ga on 5/6/2016.
+ * Created by Ga on 5/6/2016. asd
  */
+@SuppressWarnings("SuspiciousMethodCalls")
 public class Updater {
-    public static boolean pause = false;
     public static boolean editor = false;
     private static ArrayList<Drawable> drawee = new ArrayList<>();
     private static ArrayList<Effect> effects = new ArrayList<>();
     private static ArrayList<Updatable> updatee = new ArrayList<>();
     private static ArrayList<Prop> props = new ArrayList<>();
-    private static ArrayList<Unit> colidee = new ArrayList<>();
     private static ArrayList<Intelligence> controllee = new ArrayList<>();
     public static HashMap<Integer, Unit> unitList = new HashMap<>();
     private static ArrayList<Observer> addQueue = new ArrayList<>();
@@ -37,7 +37,6 @@ public class Updater {
     private static Timer time = new Timer(40,true);
     private static void clear(){
         drawee.clear();
-        colidee.clear();
         effects.clear();
         addQueue.clear();
         removeQueue.clear();
@@ -50,15 +49,28 @@ public class Updater {
     public static void changeMap(boolean editor){
         clear();
         if (!editor) {
-            addQueue.add(Global.player);
+            boolean rightSide = Global.player.pos.x > Global.map.size.x/2;
             int pos = FileManager.loadMap(changeMap);
+            boolean spawnFound = false;
             for (Observer i : addQueue){
                 if (i instanceof Prop && ((Prop)i).name.equals("Spawn") && ((Prop)i).seed == pos){
                     Global.player.pos.set(((Prop)i).pos);
+                    spawnFound = true;
+                    break;
                 }
             }
+            if (!spawnFound){
+                if (rightSide){
+                    Global.player.pos.set(24,Global.map.fallSafe(new P(24,0),0).getCrossPointY(24)-1);
+                } else {
+                    Line rightEdge = Global.map.fallSafe(new P(Global.map.size.x-24,0),0);
+                    Global.player.pos.set(Global.map.size.x-24,rightEdge.getCrossPointY(rightEdge.ptd.x-24)-1);
+                }
+            }
+            addQueue.add(Global.player);
+            addQueue.add(Global.player.weapon);
             Global.player.onMapChange();
-            Display.input = Global.player.input;
+            Global.display.input = Global.player.input;
             Global.mapEdgeCenter(Global.cameraTo = Global.player.pos.getAdd(0,0));
             Global.mapEdgeCenter(Global.camera = Global.cameraTo.getAdd(0,0));
             if (changeMapEvent != null){
@@ -87,7 +99,6 @@ public class Updater {
             if (p instanceof Intelligence) controllee.add((Intelligence) p);
             if (p instanceof Unit){
                 Unit unit = (Unit) p;
-                colidee.add(unit);
                 unitList.put(unit.controlId, unit);
             }
             if (p instanceof Drawable) addDrawee((Drawable) p);
@@ -96,13 +107,12 @@ public class Updater {
             Observer p = removeQueue.remove(0);
             drawee.remove(p);
             props.remove(p);
-            colidee.remove(p);
             unitList.remove(p);
             controllee.remove(p);
         }
-        Global.camera.add(Global.cameraTo.getSubtract(Global.camera.getAdd(0,40)).getMult(.2f,.2f));
+        Global.camera.add(Global.cameraTo.getSubtract(Global.camera.getAdd(0,40)).mult(.2f,.2f));
         for (Updatable i : updatee) i.update();
-        if (!editor && !pause) {
+        if (!editor) {
             for (Prop i : props) i.update();
             for (int i = 0; i < effects.size(); i++) {
                 Effect t = effects.get(i);
@@ -136,8 +146,7 @@ public class Updater {
         removeQueue.add(p);
     }
     public static void resetDepth(Drawable p){
-        drawee.remove(p);
-        addDrawee(p);
+        if (drawee.remove(p)) addDrawee(p);
     }
     private static void addDrawee(Drawable p){
         int size = drawee.size();
@@ -173,17 +182,18 @@ public class Updater {
         return result;
     }
     public static void sound(Unit p, String msg){
-        for (Unit i : colidee){
-            if (i != p && i.faction != p.faction) {
-                if (Math.abs(i.pos.x - p.pos.x) < 600 && Math.abs(i.pos.y - p.pos.y) < 200) {
+        for (Map.Entry i : unitList.entrySet()){
+            Unit unit = (Unit) i.getValue();
+            if (i != p && unit.faction != p.faction) {
+                if (Math.abs(unit.pos.x - p.pos.x) < 600 && Math.abs(unit.pos.y - p.pos.y) < 200) {
                     if (i instanceof Man) {
-                        i.hear(p, msg);
+                        unit.hear(p, msg);
                     }
                 }
             }
         }
     }
-    public static ArrayList<Prop> collideInteractive(P p){
+    static ArrayList<Prop> collideInteractive(P p){
         ArrayList<Prop> result = new ArrayList<>();
         for (Prop i : props){
             if (i.onInteract != null) {
@@ -205,22 +215,24 @@ public class Updater {
     }
     public static ArrayList<Unit> collideUnit(P p, int r, Faction faction){
         ArrayList<Unit> result = new ArrayList<>();
-        for (Unit i : colidee){
-            if (i.hittable(faction) && p.getSubtract(i.pos).getDist() <= r) result.add(i);
+        for (Map.Entry i : unitList.entrySet()){
+            Unit unit = (Unit) i.getValue();
+            if (unit.hittable(faction) && p.getSubtract(unit.pos).getDist() <= r) result.add(unit);
         }
         return result;
     }
     public static ArrayList<Unit> perceive(Unit host, P vision, int r){
         ArrayList<Unit> seen = new ArrayList<>();
         int max = r;
-        for (Unit i : colidee){
-            if (host != i && i.state != Actions.Sneak) {
-                float x = Math.abs(i.pos.x-vision.x), y = Math.abs(i.pos.y - vision.y);
+        for (Map.Entry i : unitList.entrySet()){
+            Unit unit = (Unit) i.getValue();
+            if (host != i && unit.state != Actions.Sneak) {
+                float x = Math.abs(unit.pos.x-vision.x), y = Math.abs(unit.pos.y - vision.y);
                 if (x < r && y < r) {
                     if (x+y < max){
                         max = (int) (x+y);
-                        seen.add(0,i);
-                    } else seen.add(i);
+                        seen.add(0,unit);
+                    } else seen.add(unit);
                 }
             }
         }

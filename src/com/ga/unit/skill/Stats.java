@@ -1,0 +1,140 @@
+package com.ga.unit.skill;
+
+import com.ga.map.Global;
+import com.ga.tool.P;
+import com.ga.tool.Performer;
+import com.ga.tool.Timer;
+import com.ga.unit.Particle;
+import com.ga.unit.Unit;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+/**
+ * Created by Ga on 8/1/2016. asd
+ */
+public class Stats {
+    private ArrayList<Buff> effects = new ArrayList<>();
+    private HashMap<String, Stat> stats = new HashMap<>();
+    private Timer timer = new Timer(100, true);
+    private Timer bloodTimer = new Timer(-1, true);
+    private Unit host;
+    public Stats(Unit host){
+        this.host = host;
+    }
+    public Stat getStat(String p) {
+        Stat stat = stats.get(p);
+        if (stat == null) Global.p("Can't find stat "+p);
+        return stat;
+    }
+    void setStat(String name, Stat p) {
+        stats.put(name,p);
+    }
+    public void addEffect(Buffs p, int level){
+        Buff origBuff = getEffect(p);
+        if (origBuff == null) {
+            Buff buff = p.make(host, level);
+            buff.onSet();
+            effects.add(buff);
+        } else {
+            origBuff.onStack();
+        }
+    }
+    private Buff getEffect(Buffs p){
+        for (Buff i : effects){
+            if (i.buff == p) return i;
+        }
+        return null;
+    }
+    public boolean triggerEffect(Buffs p){
+        Buff buff = getEffect(p);
+        return buff != null && buff.onTrigger();
+    }
+    public void delevel(String stat){
+        if (stats.get("Reset Points").get() > 0 && stats.get(stat).get() > 0) {
+            stats.get("Level Points").addTotal(1);
+            stats.get(stat).addTotal(-1);
+            stats.get("Reset Points").addTotal(-1);
+        }
+    }
+    public void level(String stat){
+        if (stats.get("Level Points").get() > 0) {
+            stats.get("Level Points").addTotal(-1);
+            stats.get(stat).addTotal(1);
+        }
+    }
+    public void unrest(){
+        timer.reset();
+    }
+    public boolean rest(int mag){
+        if (timer.update(mag)){
+            stats.get("Stamina").heal();
+            return true;
+        }
+        return false;
+    }
+    public void update(){
+        Iterator it = effects.iterator();
+        while (it.hasNext()){
+            Buff buff = (Buff) it.next();
+            if (buff.update()){
+                buff.onFinish();
+                it.remove();
+            }
+        }
+        if (bloodTimer.update()) Particle.explode("Blood",host.getRandomPoint(),new P(),Global.r.nextInt(4),5,0,true,24);
+    }
+    public void load(String p){
+        String[] statOrBuff = p.split("/");
+        String[] data = statOrBuff[0].split("&");
+        for (String i : data){
+            String[] pair = i.split(":");
+            Stat newstat = new Stat(pair[1]);
+            newstat.add(0);
+            stats.put(pair[0], newstat);
+        }
+        if (statOrBuff.length > 1) {
+            data = statOrBuff[1].split(";");
+            for (String i : data) {
+                String[] t = i.split("&");
+                Buffs buff = Buffs.values()[Integer.parseInt(t[0])];
+                addEffect(buff,Integer.parseInt(t[1]));
+                effects.get(effects.size()-1).time = Integer.parseInt(t[2]);
+                effects.get(effects.size()-1).var = Integer.parseInt(t[3]);
+            }
+        }
+        final Stat health = stats.get("Health");
+        health.onChange = new Performer(){
+            public void perform(){
+                if (health.isFull()) bloodTimer.set(-1);
+                else bloodTimer.set((int) (health.getPercentage()*health.getPercentage()*100)+1, true);
+                if (health.get() <= 0) host.die();
+            }
+        };
+    }
+    public int getEffectsSize(){
+        return effects.size();
+    }
+    public String getEffectsList(){
+        if (effects.size() == 0) return "None";
+        String r = "";
+        for (int i=0;i<effects.size();i++){
+            r += effects.get(i).getDescription();
+            if (i != effects.size()-1) r += "\n";
+        }
+        return r;
+    }
+    public String toString(){
+        String result = "";
+        for (Map.Entry pair : stats.entrySet()){
+            result += pair.getKey() + ":" + pair.getValue()+"&";
+        }
+        result = result.substring(0,result.length()-1)+"/";
+        for (Buff i : effects){
+            result += i.toString()+";";
+        }
+        return result.substring(0,result.length()-1);
+    }
+}

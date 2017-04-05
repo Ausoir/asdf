@@ -21,7 +21,7 @@ public class Food extends Item {
     @Override
     public boolean use(Man p){
         boolean r = super.use(p);
-        if (r) {
+        if (r && use(1)) {
             int perishTime = perish - Global.gameHour;
             if (perishTime <= 0 && rand.nextInt(100) < getPoisonChance()){
                 p.stats.addEffect(Buffs.Poison, punish);

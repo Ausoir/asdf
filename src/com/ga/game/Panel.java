@@ -1,5 +1,6 @@
 package com.ga.game;
 
+import com.ga.map.Global;
 import com.ga.map.Updatable;
 
 import javax.swing.*;
@@ -38,8 +39,8 @@ public class Panel extends JPanel implements Updatable {
         setBounds(x,y, size.width, size.height);
     }
     public void setVisible(boolean p){
-        if (!p) Display.focus = true;
-        else Display.focus = false;
+        if (!p) Global.display.focus = true;
+        else Global.display.focus = false;
         super.setVisible(p);
     }
     @Override

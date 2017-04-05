@@ -38,8 +38,8 @@ class Hunt implements Task {
                 if (Math.abs(x) < 160 && host.lastLand != target.lastLand) host.setState(Actions.Drop);
             } else {
                 int t = host.performMoveset((int) dist);
-                if (host.state instanceof Spells) {
-                    host.delay.set(300);
+                if (host.state instanceof Spells && ((Spells)host.state).channel) {
+                    host.delay.set(180);
                 }
                 if (t == 2) { //no stamina
                     host.setState(Actions.Rest);

@@ -26,7 +26,7 @@ public class Armor extends Item {
         delay = 80;
     }
     public void onCreate(){
-        imbueMeta(true, true, .1f, true);
+        imbueMeta(true, true, .03f, true);
     }
     float getArmor(){
         return armor * armorMod;

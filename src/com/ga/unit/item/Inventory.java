@@ -73,7 +73,7 @@ public class Inventory {
         if (p.equals(";")) return;
         String[] data = p.substring(1).split(";");
         for (int i=0;i<data.length;i++){
-            Item item = (Item) Stock.get(data[i].split("@"));
+            Item item = (Item) Stock.get(data[i]);
             weight += item.weight;
             Updater.cancelAdd(item);
             items.add(item);

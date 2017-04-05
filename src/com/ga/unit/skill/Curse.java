@@ -2,9 +2,7 @@ package com.ga.unit.skill;
 
 import com.ga.map.Global;
 import com.ga.tool.P;
-import com.ga.unit.Man;
-import com.ga.unit.Unit;
-import com.ga.unit.Stock;
+import com.ga.unit.*;
 
 /**
  * Created by Ga on 9/4/2016.
@@ -17,19 +15,25 @@ public enum Curse {
     }),
     Shadowcurse(new Spell(){
         public void perform(Unit host, int level) {
-            Man t = (Man) Stock.getByName("Phantom",-1);
-            t.pos = new P(host.pos.x, host.pos.y - 300);
-            Spells.Shadowtwin.getEvent().perform(t, level);
-            t.remove();
+            for (int i=0;i<level;i++) Stock.getByName("Phantom",-1).pos.set(host.pos.x, host.pos.y - 300);
         }
     }),
-    Elemental(new Spell(){
+    Ensnare(new Spell(){
         public void perform(Unit host, int level) {
-            Man d = new Man(host.toString());
-            d.target = new P();
-            for (int i=0;i<level*4;i++) Spells.Meteor.getEvent().perform(d, level);
-            for (int i=0;i<level*4;i++) Spells.Blizzard.getEvent().perform(d, level);
-            d.remove();
+            int r = Global.r.nextInt(3);
+            if (r == 0) host.stats.addEffect(Buffs.Slow, level);
+            else if (r == 1) host.stats.addEffect(Buffs.Stun, level);
+            else if (r == 2) host.stats.addEffect(Buffs.Freeze, level);
+        }
+    }),
+    Alert(new Spell(){
+        public void perform(Unit host, int level) {
+            for (Unit i : Updater.collideUnit(host.pos,2000*level, Faction.Destructive)){
+                if (i.brain != null) {
+                    i.brain.target = host;
+                    i.brain.attacked();
+                }
+            }
         }
     });
     private Spell effect;

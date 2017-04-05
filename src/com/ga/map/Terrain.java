@@ -13,18 +13,22 @@ import java.util.ArrayList;
  * Created by Ga on 1/10/2017.
  */
 public class Terrain extends ShadedPicture implements Drawable{
-    int depth; //7,10,13
+    private int depth; //7,10,13
     private Polygon polygon;
     private TexturePaint imageTexture;
     private ArrayList<Line> lines = new ArrayList<>();
     protected P pos;
     public Terrain(String texture, Shader shader, int depth){
         super(texture, shader);
-        setDepth(10+(depth*3));
+        setDepth(toTerrainDepth(depth));
         polygon = new Polygon();
         imageTexture = new TexturePaint(image, new Rectangle2D.Double(0,0,size.x,size.y));
+        Updater.add(this);
     }
-    public void addLine(Line p){
+    static int toTerrainDepth(int depth){
+        return 10+(depth*3);
+    }
+    void addLine(Line p){
         lines.add(p);
         p.depth = depth;
     }
