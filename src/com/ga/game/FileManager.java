@@ -1,15 +1,16 @@
 package com.ga.game;
 
-import com.ga.map.Global;
-import com.ga.map.Map;
-import com.ga.map.MapGenerator;
+import com.ga.map.*;
 import com.ga.tool.Line;
 import com.ga.unit.*;
 import com.ga.unit.intelligence.PlayerInput;
+import com.ga.unit.player.MainPlayer;
+import com.ga.unit.player.Player;
 import com.ga.unit.skill.Actions;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 /**
@@ -22,7 +23,7 @@ public class FileManager {
             save("map/0", Global.player.toCharacterString());
         }
     }
-    private static void save(String dir, String input) {
+    public static void save(String dir, String input) {
         try {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter("Data/" + dir))) {
                 writer.write(input);
@@ -52,14 +53,12 @@ public class FileManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
-//        System.out.println(result);
         return result;
     }
     public static PlayerInput loadPlayer(boolean main, String dir){
         String data = read("map/"+dir);
         String[] line = data.split("%");
         PlayerInput pi;
-        String playerString = line[0];
         pi = new PlayerInput(main ? new MainPlayer(0) : new Player(0));
         pi.host.load(data);
         pi.host.controlId = -Integer.parseInt(dir)-1;
@@ -67,7 +66,7 @@ public class FileManager {
         if (!Updater.editor) Global.display.input = pi;
         Command.host = pi.host;
         loadMap(Global.player.cmap);
-        Global.setHour(Global.gameHour);
+        Global.setHour(Global.getHour());
         Global.mapEdgeCenter(Global.camera = Global.map.size.getMult(.5f,.5f));
         return pi;
     }
@@ -78,53 +77,39 @@ public class FileManager {
         }
     }
     public static int loadMap(String map) {
-        Global.thouseId = -1;
         Global.player.lastLand = new Line();
         String[] oldmap = null;
         if (Global.map != null) oldmap = Global.map.maps;
         String[] mapProperties = map.split("@");
         String dir = mapProperties[0];
-        int regrowths;
+        boolean regrowths = false;
         int player = -999;
         if (mapProperties.length > 1) player = Integer.parseInt(mapProperties[1]);
-        if (oldmap != null && dir.startsWith("House")){
-            String[] houseInfo = dir.split("/");
-            if (houseInfo.length > 1) dir = houseInfo[0];
-            else houseInfo = new String[]{houseInfo[0], "1200,800"};
-            if (new File("Data/map/" + dir + ".map").isFile()) readMap(dir);
-            else MapGenerator.generateHouse(Global.player.cmap, Integer.parseInt(dir.split("_")[1]), houseInfo[1]);
-            Global.player.cmap = dir;
-            regrowths = 0;
-        } else if (oldmap != null && dir.startsWith("Instance:")){
-            String instanceData[] = dir.split(":")[1].split("/");
-            String[] param = instanceData[0].split("&");
-            String returnAddr;
-            if (instanceData.length > 1){
-                returnAddr = instanceData[1].split("&")[1];
-            } else {
-                String[] t = oldmap[4].split(":")[1].split("@")[0].split("&");
-                returnAddr = t[1];
-            }
-            int maxDist = Math.max(1,Integer.parseInt(param[1]));
-            int returndist = Global.player.fastTravel ? Global.r.nextInt(maxDist) + 1 : 1;
-            if (Global.player.get("Hunger").get() < 0)
-                returndist = Math.max(1,Math.min(Global.player.get("Health").get()/(Global.player.get("Hunger").get()*-2), returndist));
-            int distance = maxDist - returndist;
-            if (distance == 0) readMap(param[2]);
-            else if (returndist == 0) readMap(returnAddr);
-            else {
-                String destination = "Instance:"+param[0]+"&"+distance+"&"+param[2]+"@0";
-                String prevmap = "Instance:"+param[0]+"&"+returndist+"&"+returnAddr+"@0";
-                Global.player.cmap = "Instance";
-                MapGenerator.generateMap(param[0], prevmap, destination);
-            }
-            regrowths = distance;
-        } else {
-            readMap(dir);
-            regrowths = oldmap != null && !oldmap[0].equals("1") && !Global.map.isIndoors() ? 1 : 0;
+        int[] newmap = null;
+        if (map.length() == 1){
+            newmap = Creation.getWorld(Global.map.id, Integer.parseInt(map));
+            dir = Global.player.cworld+"_"+newmap[0];
         }
+        if (FileManager.isFile("Data/map/" + dir + ".map")){
+            readMap(dir);
+            regrowths = oldmap != null && !oldmap[0].equals("1") && !Global.map.isIndoors();
+        } else if (dir.startsWith("House")){
+            if (FileManager.isFile("Data/map/" + dir + ".map")) readMap(dir);
+            else{
+                String[] houseInfo = dir.split("/");
+                if (houseInfo.length > 1) dir = houseInfo[0];
+                else houseInfo = new String[]{houseInfo[0], "1200,800"};
+                MapGenerator.generateHouse(Global.player.cmap, Integer.parseInt(dir.split("_")[2]), houseInfo[1]);
+            }
+        } else { //can't find map
+            if (newmap != null){
+                MapGenerator.generateMap(newmap);
+                regrowths = true;
+            }
+        }
+        Global.player.cmap = dir;
         Global.map.setTexture();
-        Global.map.event.onChange(regrowths);
+        if (regrowths) Global.map.event.onChange();
         return player;
     }
     private static void readMap(String dir){
@@ -154,7 +139,6 @@ public class FileManager {
                 }
             }
         }
-        Global.player.cmap = dir;
     }
 
     private static int[] readClipFrames(String dir) {
@@ -194,9 +178,7 @@ public class FileManager {
         for (int section = 0; section < sections.length; section++) {
             String values[] = sections[section].split(",");
             result[section] = new String[values.length];
-            for (int i = 0; i < values.length; i++) {
-                result[section][i] = values[i];
-            }
+            System.arraycopy(values, 0, result[section], 0, values.length);
         }
         return result;
     }
@@ -227,14 +209,14 @@ public class FileManager {
         HashMap<String, int[]> result;
         String[] lines = data.split("%%")[2].split("%");
         result = new HashMap<>();
-        for (int line = 0; line < lines.length; line++) {
-            String[] sections = lines[line].split("@");
+        for (String line1 : lines) {
+            String[] sections = line1.split("@");
             String values[] = sections[1].split(",");
             int[] v = new int[values.length];
             for (int i = 0; i < values.length; i++) {
                 v[i] = Integer.parseInt(values[i]);
             }
-            result.put(sections[0],v);
+            result.put(sections[0], v);
         }
         return result;
     }
@@ -247,12 +229,12 @@ public class FileManager {
         String data = read(dir);
         String[] lines = data.split("%");
         HashMap<String,ArrayList<String>> result = new HashMap<>();
-        for (int line = 0; line < lines.length; line++) {
-            String[] type = lines[line].split("@");
+        for (String line1 : lines) {
+            String[] type = line1.split("@");
             String[] results = type[1].split("/");
             ArrayList<String> values = new ArrayList<>();
-            for (String i : results) values.add(i);
-            result.put(type[0],values);
+            Collections.addAll(values, results);
+            result.put(type[0], values);
         }
         return result;
     }
@@ -260,5 +242,46 @@ public class FileManager {
     public static String[] readText(String dir){
         String data = read(dir+".txt");
         return data.split("%");
+    }
+
+    public static boolean isFile(String p){
+        File file = new File(p);
+        return file.isFile() && file.length() > 0;
+    }
+
+    public static ArrayList<String> searchFiles(String p, String[] ext){
+        ArrayList<String> r = new ArrayList<>();
+        File[] files = new File(p).listFiles();
+        if (files != null) {
+            for (File file : files) {
+                String path = file.getPath();
+                if (file.isDirectory()) {
+                    r.addAll(searchFiles(path, ext));
+                } else if (file.isFile() && file.length() > 0){
+                    if (ext == null) r.add(path);
+                    else {
+                        String t = file.getName();
+                        for (String i : ext) {
+                            if (t.endsWith("." + i)) r.add(path);
+                        }
+                    }
+                }
+            }
+        }
+        return r;
+    }
+
+    public static int[][] readWorld(String dir){
+        int[][] world;
+        String data = read("map/"+dir+".map");
+        String[] lines = data.split("%");
+        world = new int[lines.length][lines[0].length()];
+        for (int y=0;y<lines.length;y++){
+            for (int x=0;x<lines[y].toCharArray().length;x++){
+                char node = lines[y].charAt(x);
+                world[y][x] = node=='*'?-1:Character.getNumericValue(node);
+            }
+        }
+        return world;
     }
 }

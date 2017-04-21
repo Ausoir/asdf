@@ -1,6 +1,6 @@
 package com.ga.game;
 
-import com.ga.unit.Updater;
+import com.ga.map.Updater;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

@@ -3,6 +3,7 @@ package com.ga.unit;
 import com.ga.game.Observer;
 import com.ga.map.Drawable;
 import com.ga.map.Picture;
+import com.ga.map.Updater;
 import com.ga.tool.P;
 
 import java.awt.*;
@@ -14,7 +15,7 @@ public class Thing implements Drawable, Observer {
     public Picture image;
     public P pos;
     public String name;
-    int depth; //5:Object, 8:Corpse, 10:Unit
+    protected int depth; //5:Object, 8:Corpse, 10:Unit
     public int dir = 1;
     public float rotation = 0;
     public boolean save = true;

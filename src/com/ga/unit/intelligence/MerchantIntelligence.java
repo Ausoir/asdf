@@ -14,12 +14,21 @@ import com.ga.unit.item.Item;
  */
 public class MerchantIntelligence extends ResidentIntelligence {
     private enum MerchantType{
-        SUBURBAN(new String[]{"Pistol","Revolver","Rifle"}),
-        DESERT(new String[]{"Katana","Broadsword","Lancesword"}),
-        FOREST(new String[]{"Axe","Fireball","Potion","Scroll"});
-        String[] items;
-        MerchantType(String[] items){
+        FOOD(new String[][]{new String[]{"Meat","Meal","Ration"}}),
+        SHOP(new String[][]{new String[]{"Katana","Broadsword","Lancesword"},
+                new String[]{"Tanto","Fireball","Potion","Scroll"},
+                new String[]{"Battery","Shell","Grass","Meat","Starfish","Rock"},
+                new String[]{"Cotton Clothing Legging","Cotton Clothing Torso","Fabric Clothing Legging","Fabric Clothing Torso",
+                        "Adventurewear Legging", "Adventurewear Torso","Leather Armor Torso","Leather Armor Legging",
+                        "Chainmail Torso","Chainmail Legging","Platemail Torso","Platemail Legging","Steel Armor Torso","Steel Armor Legging"}}),
+        GUILD(new String[][]{new String[]{"Manual","Spellbook","Scroll","Potion","Battery","Adventurewear Torso","Adventurewear Legging","Ration"}}),
+        TRAINING(new String[][]{new String[]{"Manual","Spellbook"}});
+        private String[][] items;
+        MerchantType(String[][] items){
             this.items = items;
+        }
+        String[] getItems(Man host){
+            return items[host.rand.nextInt(items.length)];
         }
     }
     private MerchantType type;
@@ -27,25 +36,28 @@ public class MerchantIntelligence extends ResidentIntelligence {
     private int[] price;
     private Performer[] action;
     private Timer advertise = new Timer(200, false);
-    private float low = .5f;
-    private float high = 4f;
+    private float low;
+    private float high;
     private String ad;
-    public MerchantIntelligence(Man man) {
+    public MerchantIntelligence(Man man, int merchanttype) {
         super(man);
+        low = man.rand.nextFloat()+.3f;
+        high = man.rand.nextInt(4)+2;
         man.onInteract = new Interactive(){
             public void interact(Man p){
                 if (p == Global.player) {
-                    Global.display.menuShop.show("Trader's Wares - \""+host.getConversation()+"\"", product, price, action);
+                    hear(p,"shop");
                 }
             }
         };
-        type = MerchantType.values()[man.rand.nextInt(MerchantType.values().length)];
+        type = MerchantType.values()[merchanttype-1];
         String r = "I'm selling ";
-        int length = host.rand.nextInt(12)+52;
+        int length = host.rand.nextInt(48)+1;
         String[] items = new String[length];
         for (int i = 0; i < length; i++){
-            int l = type.items.length;
-            items[i] = type.items[host.rand.nextInt(l)];
+            String[] typeItems = type.getItems(man);
+            int l = typeItems.length;
+            items[i] = typeItems[host.rand.nextInt(l)];
         }
         product = new Item[length];
         price = new int[length];
@@ -64,8 +76,10 @@ public class MerchantIntelligence extends ResidentIntelligence {
                     Global.display.menuShop.setVisible(false);
                 }
             };
-            if (i == length - 1) r += "and " + item.getFullName() + "!";
-            else r += item.getFullName() + ", ";
+            if (i < 8) {
+                if (i == Math.min(7,length - 1)) r += "and " + item.getFullName() + "!";
+                else r += item.getFullName() + ", ";
+            }
         }
         ad = r;
     }
@@ -78,6 +92,10 @@ public class MerchantIntelligence extends ResidentIntelligence {
         super.hear(u, p);
         if (u == Global.player) {
             if (p.equals("shop")) {
+                int[] newPrice = price;
+                for (int i=0;i<newPrice.length;i++){
+                    newPrice[i] *= Global.player.getShopPrice();
+                }
                 Global.display.menuShop.show("Trader's Wares - \""+host.getConversation()+"\"", product, price, action);
             }
         }

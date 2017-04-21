@@ -1,7 +1,7 @@
 package com.ga.unit.skill;
 
 import com.ga.map.Global;
-import com.ga.tool.P;
+import com.ga.map.Updater;
 import com.ga.unit.*;
 
 /**

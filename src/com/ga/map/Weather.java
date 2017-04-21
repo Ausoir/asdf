@@ -30,11 +30,11 @@ public class Weather implements Drawable{
 //                (int) Global.clamp(a[3]+((b[3]-a[3])*rate),0,255));
 //    }
     protected void setColor(){
-        int[] t = colors[Global.gameHour%colors.length];
+        int[] t = colors[Global.getHour()%colors.length];
         color = new Color(t[0],t[1],t[2],t[3]);
     }
     boolean isNight(){
-        return Global.gameHour % colors.length >= 8;
+        return Global.getHour() % colors.length >= 8;
     }
     @Override
     public void draw(Graphics2D g) {

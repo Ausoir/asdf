@@ -6,7 +6,7 @@ import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.unit.Prop;
 import com.ga.unit.Unit;
-import com.ga.unit.Updater;
+import com.ga.map.Updater;
 
 /**
  * Created by Ga on 8/12/2016.
@@ -48,7 +48,7 @@ public class Projectile extends Prop {
                 onAttack(i);
             }
         }
-        if (Global.mapEdge(pos.getAdd(vel)) != 1) stuck();
+        if (Global.mapEdge(pos.getAdd(vel)) != 0) stuck();
         super.update();
         delay.update();
     }

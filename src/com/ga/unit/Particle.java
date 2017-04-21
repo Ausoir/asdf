@@ -32,6 +32,13 @@ public class Particle extends Thing implements Effect {
     public static void dripHoly(P pt){
         explode("Glare",pt,new P(),1,4,0,true,4);
     }
+    public static void sparkle(P pt, float r){
+        for (int i=0;i<12;i++) {
+            float x = (float) (Math.random()*r-r/2);
+            float y = (float) (Math.random()*r-r/2);
+            new Particle("Glare", pt.getAdd(x,y), new P(), 0, 3, false, 1);
+        }
+    }
     public static void groundSlam(P pt){
         explode("Dust",pt,new P(0,-16),1,12,8,true,4);
     }

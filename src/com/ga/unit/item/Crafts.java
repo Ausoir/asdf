@@ -1,7 +1,7 @@
 package com.ga.unit.item;
 
 import com.ga.game.FileManager;
-import com.ga.unit.Player;
+import com.ga.unit.player.Player;
 import com.ga.unit.Prop;
 import com.ga.unit.Stock;
 

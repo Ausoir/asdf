@@ -2,11 +2,13 @@ package com.ga.game;
 
 import com.ga.map.Global;
 import com.ga.map.Picture;
-import com.ga.unit.Player;
 import com.ga.unit.Prop;
+import com.ga.unit.Tag;
+import com.ga.unit.Tags;
 import com.ga.unit.item.Crafts;
-import com.ga.unit.item.Inventory;
 import com.ga.unit.item.Item;
+import com.ga.unit.player.Inventory;
+import com.ga.unit.player.Player;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Moveset;
 
@@ -301,7 +303,7 @@ public class Menu extends Panel {
             makeSlot(Actions.Use, false);
             makeSlot(Actions.Kick, false);
             makeSlot(Actions.Rest, false);
-            for (Moveset i : Global.player.skillTree.getSkills()){
+            for (Moveset i : Global.player.skillTree.skills){
                 makeSlot(i, true);
             }
             int points = Global.player.get("Memory").get();
@@ -317,42 +319,30 @@ public class Menu extends Panel {
             panel.setLayout(new BoxLayout(panel,BoxLayout.LINE_AXIS));
             panel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
             final JLabel advance = new JLabel(" [+ Proficiency]");
-            if (!Global.player.skillTree.advanceAble(move, false)) advance.setVisible(false);
-            final JLabel advanceCd = new JLabel(" [+ Cooldown]");
-            if (!Global.player.skillTree.advanceAble(move, true)) advanceCd.setVisible(false);
+            if (!Global.player.skillTree.advanceAble(move)) advance.setVisible(false);
             if (skill) {
                 int points = Global.player.get("Memory").get();
                 if (points <= 0) {
                     advance.setVisible(false);
-                    advanceCd.setVisible(false);
                 }
                 advance.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
                         Global.player.say("Leveled up " + displayName + "!");
-                        Global.player.advanceSkill(move, false);
-                    }
-                });
-                advanceCd.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        Global.player.say("Decreased the cooldown of " + displayName + " by half!");
-                        Global.player.advanceSkill(move, true);
+                        Global.player.advanceSkill(move);
                     }
                 });
                 panel.add(advance);
-                panel.add(advanceCd);
             }
             final JLabel describe = new JLabel(iconDescribe);
             describe.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Global.player.say(move.getDescription());
+                    Command.order("menuDialog@"+move.getName()+"@"+move.getDescription());
                 }
             });
             int level = Global.player.skillTree.getSkillLevel(move);
-            int cdlevel = Global.player.skillTree.getSkillCdLevel(move);
-            final JLabel equip = new JLabel(displayName+" "+Dialog.get("lvl")+" "+level+"/"+cdlevel);
+            final JLabel equip = new JLabel(displayName+" "+Dialog.get("lvl")+" "+level);
             final JLabel keyLabel = new JLabel(" "+key+" ");
             keyLabel.setForeground(Color.RED);
             equip.addMouseListener(new MouseAdapter() {
@@ -360,7 +350,6 @@ public class Menu extends Panel {
                 public void mouseReleased(MouseEvent e) {
                     describe.setVisible(false);
                     advance.setVisible(false);
-                    advanceCd.setVisible(false);
                     equip.setText(" "+Dialog.get("reqInput"));
                     equip.requestFocus();
                 }
@@ -373,7 +362,6 @@ public class Menu extends Panel {
                         Global.display.requestFocus();
                         describe.setVisible(true);
                         advance.setVisible(true);
-                        advanceCd.setVisible(true);
                         refresh();
                     }
                 }
@@ -385,7 +373,6 @@ public class Menu extends Panel {
                     Global.display.requestFocus();
                     describe.setVisible(true);
                     advance.setVisible(true);
-                    advanceCd.setVisible(true);
                     refresh();
                 }
             });
@@ -411,11 +398,9 @@ public class Menu extends Panel {
         }
         void refresh() {
             panel.removeAll();
-            panel.add(makeOption("Check Status","stat","Check current status."));
-            panel.add(makeOption("Rest","h","Rest for an hour, healing lost health (if treated) and consuming available food. Shortcut is ',' key."));
+            panel.add(makeOption("Inspect Self","stat","Check current status, stats, and injuries."));
+            panel.add(makeOption("Rest","h","Rest for an hour, removing curable debuffs and consuming available food. Shortcut is ',' key."));
             panel.add(makeOption("Sleep","zzz","Sleep for six hours."));
-            String fastTravel = Global.player.fastTravel ? "ON" : "OFF";
-            panel.add(makeOption("Fast Travel ["+fastTravel+"]","ft","Choose to skip instanced maps until you reach a point of interest, if possible. Shortcut is ']' key."));
             TitledBorder b = BorderFactory.createTitledBorder(BorderFactory.createMatteBorder(2,2,2,2,Panel.forecolor));
             b.setTitle("Default");
             panel.setBorder(b);
@@ -476,24 +461,106 @@ public class Menu extends Panel {
                 case "h":
                     Command.order("rest");
                     break;
-                case "ft":
-                    Command.order("ft");
-                    break;
                 case "stat":
                     Player player = Global.player;
                     String statusDsc = "Stamina:" + player.get("Stamina") + "\nEncumberance:" + player.getStatPenalty() +
-                            "\nHealth:" + player.get("Health") + "\nHunger:" + player.get("Hunger") + "\n";
+                        "\nMetabolism:" + player.health.getStatusDescription() + "\nMotivation:" + player.get("Motivation")+"\n";
                     statusDsc += "\nCurrent Status Effects:\n" + player.stats.getEffectsList();
                     Global.display.menuDialog.show("Current Status", statusDsc);
                     break;
                 case "etc":
                     Global.display.menuDialog.show("Options", "apparently none.");
                     break;
-                case "?":
-                    String desc = "Saving is automatic and does not need to be triggered. Just hit the X or Alt+F4.";
-                    Global.display.menuDialog.show("Current Status", desc);
-                    break;
             }
+        }
+    }
+
+    private class TrainingPanel extends JPanel{
+        private GridBagConstraints statgrid = new GridBagConstraints();
+        private String[][] stats = new String[][]{
+                new String[]{Dialog.get("ath"),Dialog.get("athDsc")},
+                new String[]{Dialog.get("jmp"),Dialog.get("jmpDsc")},
+                new String[]{Dialog.get("swg"),Dialog.get("swgDsc")},
+                new String[]{Dialog.get("agl"),Dialog.get("aglDsc")},
+                new String[]{Dialog.get("mrt"),Dialog.get("mrtDsc")},
+                new String[]{Dialog.get("cst"),Dialog.get("cstDsc")},
+                new String[]{Dialog.get("chn"),Dialog.get("chnDsc")}
+        };
+        private JPanel learning;
+        private JButton learningButton;
+        private JProgressBar learningProgress;
+        private JButton[] statButtons = new JButton[stats.length];
+        TrainingPanel(){
+            setLayout(new GridBagLayout());
+            setBackground(Panel.forecolor2);
+            statgrid.anchor = GridBagConstraints.LINE_START;
+            statgrid.fill = GridBagConstraints.BOTH;
+            statgrid.ipadx = 120;
+            statgrid.ipady = 20;
+            statgrid.gridx = 0;
+            statgrid.gridy = 0;
+            statgrid.gridwidth = 2;
+            learning = new JPanel();
+            learning.setOpaque(false);
+            add(learning,statgrid);
+            statgrid.gridwidth = 1;
+            statgrid.gridy = 1;
+            for (int i=0;i<stats.length;i++) statButtons[i] = makeStatButton(this,stats[i][0],null);
+            statgrid.gridx = 1;
+            statgrid.gridy = 1;
+            for (String[] i : stats){
+                makeStatButton(this,"", "menuDialog@"+i[0]+"@"+i[1]).setIcon(iconDescribe);
+            }
+        }
+        void refresh(){
+            learning.removeAll();
+            if (Global.player.learning != null) {
+                TitledBorder b = BorderFactory.createTitledBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Panel.forecolor));
+                b.setTitle("Currently Learning");
+                learning.setBorder(b);
+                String title = Global.player.learning.toString();
+                learningButton = makeStatButton(learning, title, "menuDialog@"+title+"@"+Global.player.learning.getDescription());
+                learningButton.setIcon(iconDescribe);
+                learningProgress = new JProgressBar(0,Global.player.learning.getDifficulty()*100);
+                learningProgress.setBackground(Panel.fontcolor);
+                Tags fields = Global.player.learning.getTags().getTrainers();
+                int total = 0;
+                for (Tag i : fields){
+                    total += Global.player.get(i.name()).get();
+                }
+                learningProgress.setValue((total*100)+Global.player.get("Progress").get());
+                learningProgress.setStringPainted(true);
+                learning.add(learningProgress);
+            }
+            for (int i=0;i<stats.length;i++) statButtons[i].setText(stats[i][0]+" - "+Global.player.get(stats[i][0]).get());
+        }
+        JButton makeStatButton(JPanel panel, String p, final String cmd){
+            final JButton button = new JButton(p);
+            button.setFont(Panel.font);
+            button.setForeground(Panel.fontcolor);
+            button.setBorder(null);
+            button.setContentAreaFilled(false);
+            button.setFocusable(false);
+            button.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    button.setForeground(Color.CYAN);
+                }
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    button.setForeground(Panel.fontcolor);
+                }
+            });
+            button.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    Command.order(cmd);
+                    refresh();
+                }
+            });
+            panel.add(button, statgrid);
+            statgrid.gridy++;
+            return button;
         }
     }
 
@@ -605,6 +672,7 @@ public class Menu extends Panel {
     private EquipmentPanel equipmentPanel = new EquipmentPanel();
     private InventoryPanel inventorypanel = new InventoryPanel();
     private SkillPanel skillpanel = new SkillPanel();
+    private TrainingPanel trainpanel = new TrainingPanel();
     private CraftPanel craftpanel = new CraftPanel();
     Menu() {
         targetSizeX = 764;
@@ -624,6 +692,7 @@ public class Menu extends Panel {
         add(equipmentPanel,grid);
         add(inventorypanel,grid);
         add(skillpanel,grid);
+        add(trainpanel,grid);
         add(craftpanel,grid);
         command("");
 
@@ -637,7 +706,7 @@ public class Menu extends Panel {
         });
     }
     private void addMainPanel(){
-        GridLayout gridlayout = new GridLayout(6,1,20,40);
+        GridLayout gridlayout = new GridLayout(7,1,20,36);
         mainpanel.setOpaque(false);
         mainpanel.setLayout(gridlayout);
         mainpanel.add(makeOption(Dialog.get("act"), "act"));
@@ -645,6 +714,7 @@ public class Menu extends Panel {
         mainpanel.add(makeOption(Dialog.get("equip"), "equip"));
         mainpanel.add(makeOption(Dialog.get("inv"), "inventory"));
         mainpanel.add(makeOption(Dialog.get("mvs"), "spell"));
+        mainpanel.add(makeOption(Dialog.get("train"), "train"));
         mainpanel.add(makeOption(Dialog.get("crft"), "craft"));
         grid.gridx = 0;
         add(mainpanel,grid);
@@ -694,6 +764,7 @@ public class Menu extends Panel {
         inventorypanel.setVisible(false);
         skillpanel.setVisible(false);
         actionpanel.setVisible(false);
+        trainpanel.setVisible(false);
         craftpanel.setVisible(false);
         switch (p) {
             case "act":
@@ -710,6 +781,9 @@ public class Menu extends Panel {
                 break;
             case "spell":
                 skillpanel.setVisible(true);
+                break;
+            case "train":
+                trainpanel.setVisible(true);
                 break;
             case "craft":
                 craftpanel.setVisible(true);
@@ -737,6 +811,7 @@ public class Menu extends Panel {
             inventorypanel.refresh();
             skillpanel.refresh();
             equipmentPanel.refresh();
+            trainpanel.refresh();
             craftpanel.refresh();
         }
     }

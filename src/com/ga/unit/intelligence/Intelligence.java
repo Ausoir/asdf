@@ -8,7 +8,7 @@ import com.ga.tool.Timer;
 import com.ga.unit.Man;
 import com.ga.unit.Prop;
 import com.ga.unit.Unit;
-import com.ga.unit.Updater;
+import com.ga.map.Updater;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Moveset;
 
@@ -48,9 +48,6 @@ public abstract class Intelligence implements Observer {
         alertness = p.getAlertness();
         forget.reset();
     }
-    protected Task getTask(){
-        return task;
-    }
     public void attacked(){
         if (target != null) {
             if (target.state != Actions.Dead) {
@@ -60,10 +57,6 @@ public abstract class Intelligence implements Observer {
                 target = null;
             }
         }
-    }
-    public void hit(){
-        if (target == null) host.say("@agro");
-        else host.say("@hit");
     }
     public void setState(Moveset state){
         if (state == Actions.Dead){
@@ -81,8 +74,7 @@ public abstract class Intelligence implements Observer {
         boolean blocked = false;
         boolean fall = true;
         P front = host.pos.getAdd((host.getSpeed()*3+48)*dir,0);
-        int edge = Global.mapEdge(front);
-        if (edge > 1 && Global.mapEdge(front) % 3 == 0) blocked = true;
+        if (Math.abs(Global.mapEdge(front)-5) == 1) blocked = true;
         else {
             Line pp = new Line(host.pos, front);
             Line pp2 = new Line(front.getAdd(0, -40), front.getAdd(0, 40));

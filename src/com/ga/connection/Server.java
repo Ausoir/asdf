@@ -9,7 +9,7 @@ import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.tool.Timer;
 import com.ga.unit.Unit;
-import com.ga.unit.Updater;
+import com.ga.map.Updater;
 import com.ga.unit.intelligence.PlayerInput;
 
 import java.net.DatagramPacket;
@@ -19,7 +19,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * Created by Ga on 12/10/2016.
+ * Created by Ga on 12/10/2016. asd
  */
 public class Server implements Updatable {
     private static final String local = "127.0.0.1";
@@ -28,37 +28,44 @@ public class Server implements Updatable {
     private HashMap<Integer, PlayerInput> clientControllers = new HashMap<>();
     private ArrayList<DatagramPacket> clientShortcuts = new ArrayList<>();
     private ArrayList<String> clientIPs = new ArrayList<>();
-    private Thread serverThread;
     private static boolean online = false;
     private String syncommand = null;
     public boolean server = true;
     private Timer sync = new Timer(15,true);
+    private boolean stop = false;
 
     public void start(){
         udp = new ClientEmulator();
         tcp = new TCPClient();
-        serverThread = new Thread(new Runnable(){
+        Thread serverThread = new Thread(new Runnable() {
             @Override
-            public void run(){
-                while (true) {
-                    try{
+            public void run() {
+                while (!stop) {
+                    try {
                         String t = udp.receive();
                         translate(t);
                         Thread.sleep(10);
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
             }
         });
         serverThread.start();
+        reconnect();
+        Updater.addUpdatee(this);
+    }
+
+    public void reconnect(){ //can be called from updater thread
         try{
+            clientIPs.clear();
+            clientControllers.clear();
+            clientShortcuts.clear();
             translate("ME>1%");
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
         }
-        Updater.addUpdatee(this);
     }
 
     private void translate(String p) throws Exception {
@@ -72,9 +79,8 @@ public class Server implements Updatable {
                 switch (commands[0]) {
                     case "ME":
                         String t = local;
-                        PlayerInput pi = FileManager.loadPlayer(true, "0");
                         clientIPs.add(t);
-                        clientControllers.put(0, pi);
+                        clientControllers.put(0, Global.player.input);
                         clientShortcuts.add(UDPClient.getAckPacket(t, Settings.receiverPort));
                         break;
                     case "HI":
@@ -239,11 +245,9 @@ public class Server implements Updatable {
             syncommand = null;
         } else if (sync.update()){
             String t = "SY>";
-            Iterator it = Updater.unitList.entrySet().iterator();
-            while (it.hasNext()) {
-                Map.Entry<Integer, Unit> entry = (Map.Entry<Integer, Unit>) it.next();
+            for (Map.Entry<Integer, Unit> entry : Updater.unitList.entrySet()) {
                 Unit unit = entry.getValue();
-                if (entry.getKey() != 0) t += unit.controlId +"@"+unit.pos+";";
+                if (entry.getKey() != 0) t += unit.controlId + "@" + unit.pos + ";";
             }
             sendFromLocal(t.substring(0,t.length()-1));
         }

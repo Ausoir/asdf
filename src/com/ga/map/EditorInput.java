@@ -4,10 +4,9 @@ import com.ga.game.FileManager;
 import com.ga.game.Input;
 import com.ga.tool.Line;
 import com.ga.tool.P;
-import com.ga.unit.Player;
+import com.ga.unit.player.Player;
 import com.ga.unit.Prop;
 import com.ga.unit.Stock;
-import com.ga.unit.Updater;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;

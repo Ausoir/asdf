@@ -11,7 +11,7 @@ import com.ga.unit.Man;
 public class Armor extends Item {
     private int piece = 0;
     private float armor = 0;
-    private float armorMod = 1;
+    private int armorMod = 1;
     public int encumberance = 0;
     public int pocket = 0;
     public Armor(String name, int seed, int weight, int uses, float armor, int encumberance, int piece) {
@@ -29,32 +29,26 @@ public class Armor extends Item {
         imbueMeta(true, true, .03f, true);
     }
     float getArmor(){
-        return armor * armorMod;
+        return Math.max(0,armor + armorMod);
     }
     protected void setModifier(PrefixMod mod){
         super.setModifier(mod);
-        if (mod == PrefixMod.Broken) armorMod = .5f;
-        else if (mod == PrefixMod.Old) armorMod = .8f;
-        else if (mod == PrefixMod.Fine) armorMod = 1.2f;
-        else if (mod == PrefixMod.Mastercraft){
-            uses.setTotal(-1);
-            armorMod = 1.5f;
-        }
-        else if (mod == PrefixMod.Legendary){
-            uses.setTotal(-1);
-            armorMod = 2;
-        }
+        if (mod == PrefixMod.Broken) armorMod = -2;
+        else if (mod == PrefixMod.Old) armorMod = -1;
+        else if (mod == PrefixMod.Fine) armorMod = 1;
+        else if (mod == PrefixMod.Mastercraft) armorMod = 2;
+        else if (mod == PrefixMod.Legendary) armorMod = 3;
     }
     protected void setModifier(SpecialtyMod mod){
         if (mod == SpecialtyMod.Comfortable) encumberance = Math.max(0,encumberance-admod.magnitude);
-        else if (mod == SpecialtyMod.Tough) armorMod += .5f;
+        else if (mod == SpecialtyMod.Tough) armorMod += admod.magnitude;
         else super.setModifier(mod);
     }
     void onHit(Man host){
         super.use(host);
     }
     @Override
-    public boolean use(final Man host){
+    public void use(final Man host){
         host.setState(action);
         final Armor me = this;
         host.delay.performer = new Performer(){
@@ -67,7 +61,6 @@ public class Armor extends Item {
                 }
             }
         };
-        return false;
     }
     @Override
     public String getName(){

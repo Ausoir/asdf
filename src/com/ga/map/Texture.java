@@ -1,5 +1,6 @@
 package com.ga.map;
 
+import com.ga.game.FileManager;
 import com.ga.tool.P;
 
 import javax.imageio.ImageIO;
@@ -7,6 +8,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -64,24 +66,16 @@ public abstract class Texture {
             }
         }
     }
-    private static void search(String p){
-        File[] files = new File(p).listFiles();
-        for (File file : files) {
-            String path = file.getPath();
-            if (file.isDirectory()) {
-                search(path);
-            } else if (file.isFile()){
-                String t = file.getName();
-                if (t.endsWith(".png") || t.endsWith(".gif")) directory.put(t.substring(0,t.lastIndexOf(".")), path);
-            }
-        }
-    }
-    protected static BufferedImage getTexture(BufferedImage image, int sx, int sy, int px, int py) {
-        BufferedImage result = image.getSubimage(px * sx, py * sy, sx, sy);
-        return result;
+    static BufferedImage getTexture(BufferedImage image, int sx, int sy, int px, int py) {
+        return image.getSubimage(px * sx, py * sy, sx, sy);
     }
     public static void init(){
-        search("Data/");
+        ArrayList<String> pics = FileManager.searchFiles("Data/",new String[]{"png","gif"});
+        for (String i : pics) {
+            int pathEnd = i.lastIndexOf('\\');
+            String fileName = i.substring(pathEnd+1);
+            directory.put(fileName.substring(0,fileName.lastIndexOf(".")), i);
+        }
         directory.put("Mantis_skin","Data/unit/Spider_skin.png");
         cache.put("Drop",getTexture(load("Icon"),24,24,0,0));
         cache.put("Buy",getTexture(load("Icon"),24,24,1,0));

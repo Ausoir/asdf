@@ -50,7 +50,7 @@ public class ArmorSet {
         for (Armor i : armor){
             tags.addAll(i.tags);
         }
-        if (getEncumberance() <= 4) tags.add(Tag.Agile);
+        if (getEncumberance() <= 4) tags.add(Tag.Agility);
         if (host.get("Strength").get()-getWeight() >= 4) tags.add(Tag.Strong);
         if (onChange != null) onChange.perform();
     }

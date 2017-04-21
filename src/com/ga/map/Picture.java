@@ -10,6 +10,8 @@ import java.awt.image.BufferedImage;
  */
 public class Picture extends Texture {
     public int sizeRadius = 10;
+    private P halfSize;
+    private int type = 1; //1:center,2:bottom
     public Picture(){
         super();
     }
@@ -29,11 +31,21 @@ public class Picture extends Texture {
     public void setSize(float x, float y){
         size = new P(x,y);
         sizeRadius = (int) size.getMult(.5f,.5f).getDist();
+        if (type == 1) centerCenter();
+        else if (type == 2) centerBottom();
+    }
+    private void centerCenter(){
+        type = 1;
+        halfSize = new P(size.x/2, size.y/2);
+    }
+    public void centerBottom(){
+        type = 2;
+        halfSize = new P(size.x/2, size.y-4);
     }
     public void draw(Graphics2D g, float x, float y, float rot, int dir, float sizeX, float sizeY){
         if (visible) {
-            float xMid = size.x*dir/2;
-            float yMid = size.y/2;
+            float xMid = halfSize.x*dir;
+            float yMid = halfSize.y;
             float rx = x + Global.rel.x;
             float ry = y + Global.rel.y;
             x = rx - xMid;

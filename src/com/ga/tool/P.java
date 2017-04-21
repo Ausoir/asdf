@@ -71,6 +71,9 @@ public class P {
     public float getDist(){
         return (float) Math.sqrt((this.x*this.x)+(this.y*this.y));
     }
+    public boolean inOval(float x, float y){
+        return (Math.abs(this.x) < x && Math.abs(this.y) < y);
+    }
     public float getDist(P p){
         float x = p.x-this.x;
         float y = p.y-this.y;

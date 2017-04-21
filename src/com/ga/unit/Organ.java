@@ -13,7 +13,7 @@ import java.awt.*;
 import java.util.ArrayList;
 
 /**
- * Created by Ga on 7/29/2016.
+ * Created by Ga on 7/29/2016. asd
  */
 public class Organ extends Line {
     int strokeSize = 10;
@@ -24,6 +24,7 @@ public class Organ extends Line {
     private ArrayList<Organ> children = new ArrayList<>();
     public int type;
     public int health = 1;
+    private int maxLength = 80;
     boolean vital = false;
     boolean leg = false;
     Performer onAmputate = new Performer();
@@ -43,29 +44,34 @@ public class Organ extends Line {
     public void setImage(String p, int index){
         image = new ShadedPicture(p, index, Shader.XYLinearGradient);
         image.setSize(strokeSize, 0);
-        image.shade();
+        image.shade(0);
     }
     public void setImage(String p, int index, Shader shader){
         image = new ShadedPicture(p, index, shader);
         image.setSize(strokeSize, 0);
-        image.shade();
+        image.shade(0);
     }
     public Picture getImage(){
         return image;
     }
     public void setSize(int size){
         this.strokeSize = size;
-        if (type != 0 && image != null) image.getSize().x = size;
+        if (type != 0 && image != null){
+            image.setSize(size, image.getSize().y);
+        }
     }
     public void draw(Graphics2D g){
-        image.draw(g, host.pos.x+pt.x, host.pos.y+pt.y, getAtan()-1.57f, host.dir, strokeSize, getLength()+3);
+        if (!amputated) image.draw(g, host.pos.x+pt.x, host.pos.y+pt.y, getAtan()-1.57f, host.dir, strokeSize, getLength()+3);
+    }
+    void setMaxLength(int p){
+        maxLength = p;
     }
     protected void hit(Line p, int damage, DamageType type){
-        health -= damage;
-        if (health <= 0 && (type == DamageType.Cut || type == DamageType.Burn)) {
-            if (type == DamageType.Cut){
+        boolean pierce = Global.r.nextInt(health) < Global.r.nextInt(damage);
+        if (pierce && (type == DamageType.Cut || type == DamageType.Burn)) {
+            if (type == DamageType.Cut) {
                 if (image != null) {
-                    new Projectile(null, host.pos, p.getAtan(10).add(p.ptd), 20) {
+                    Projectile flyingOrgan = new Projectile(null, new P(host.pos), p.getAtan(10).add(p.ptd), 20) {
                         public void update() {
                             float length = getLength() * .45f;
                             if (tangible) {
@@ -75,7 +81,9 @@ public class Organ extends Line {
                             }
                             super.update();
                         }
-                    }.image = image;
+                    };
+                    flyingOrgan.gravity = true;
+                    flyingOrgan.image = image;
                 }
                 Particle.explode("Blood", p.ptd, new P(), 5, 40, 0, true, 2);
             } else {
@@ -85,8 +93,8 @@ public class Organ extends Line {
             for (Organ i : children) i.hit(p, 999, type);
             onAmputate.perform();
             host.clip.updateStatus();
-        } else if (ptd.getDist() < 64){
-            ptd.add(p.getAtan(24));
+        } else {
+            ptd.set(p.getAtan(maxLength));
         }
     }
     boolean checkHit(Line p){

@@ -2,7 +2,6 @@ package com.ga.map;
 
 import com.ga.tool.Line;
 import com.ga.tool.P;
-import com.ga.unit.Updater;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
@@ -13,7 +12,7 @@ import java.util.ArrayList;
  * Created by Ga on 1/10/2017.
  */
 public class Terrain extends ShadedPicture implements Drawable{
-    private int depth; //7,10,13
+    private int depth; //
     private Polygon polygon;
     private TexturePaint imageTexture;
     private ArrayList<Line> lines = new ArrayList<>();
@@ -39,7 +38,7 @@ public class Terrain extends ShadedPicture implements Drawable{
         polygon.addPoint(x, y);
     }
     @Override
-    public void shade(){
+    public void shade(int param){
         if (shader != null) {
             for (Line i : lines) {
                 int origX = (int) (i.pt.x - pos.x);
@@ -69,7 +68,7 @@ public class Terrain extends ShadedPicture implements Drawable{
         Graphics2D g = image.createGraphics();
         g.setPaint(imageTexture);
         g.fill(polygon);
-        shade();
+        shade(0);
     }
     public void draw(Graphics2D g){
         if (visible) {
@@ -80,7 +79,7 @@ public class Terrain extends ShadedPicture implements Drawable{
 
     @Override
     public int getDepth() {
-        return Global.map.isIndoors()?10:depth;
+        return depth;
     }
 
     public void setDepth(int depth) {

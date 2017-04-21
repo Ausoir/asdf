@@ -1,15 +1,10 @@
 package com.ga.map;
 
-import com.ga.game.Dialog;
-import com.ga.game.Sound;
 import com.ga.tool.Performer;
-import com.ga.unit.Particle;
-import com.ga.unit.Updater;
 import com.ga.unit.Stock;
-import com.ga.unit.item.Item;
 
 /**
- * Created by Ga on 10/31/2016.
+ * Created by Ga on 10/31/2016. asd
  */
 public enum MapEvent implements Updatable{
     None(null, new Performer(){
@@ -63,10 +58,8 @@ public enum MapEvent implements Updatable{
             }
         }
     }
-    public void onChange(int timeChange){
-        if (timeChange > 0){
-            Global.setHour(Global.gameHour+timeChange);
-            regrowth();
-        }
+    public void onChange(){
+        Global.setHour(Global.getHour()+1);
+        regrowth();
     }
 }

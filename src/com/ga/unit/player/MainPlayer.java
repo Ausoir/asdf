@@ -1,25 +1,28 @@
-package com.ga.unit;
+package com.ga.unit.player;
 
 import com.ga.game.Sound;
 import com.ga.map.Global;
+import com.ga.map.Updater;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
+import com.ga.unit.Prop;
+import com.ga.unit.Stock;
+import com.ga.unit.Tag;
 import com.ga.unit.item.Item;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Moveset;
 import com.ga.unit.skill.Spells;
-import com.ga.unit.skill.Stat;
 
 import java.util.ArrayList;
 
 import static com.ga.unit.BodyHumanoid.FIST;
+import static com.ga.unit.BodyHumanoid.OFIST;
 
 /**
  * Created by Ga on 12/29/2016. asd
  */
 public class MainPlayer extends Player {
-    public boolean fastTravel = true;
     public MainPlayer(int seed) {
         super(seed);
         Global.player = this;
@@ -81,7 +84,7 @@ public class MainPlayer extends Player {
                     face(input.moving, true);
                     break;
                 case Use:
-                    if (weapon.uses.get() == 0) say("Can't use " + weapon.getName());
+                    if (weapon.uses == 0) say("Can't use " + weapon.getName());
                     break;
                 case Interact:
                     final Player me = this;
@@ -150,20 +153,28 @@ public class MainPlayer extends Player {
             }
         }
     }
+    public float getShopPrice(){
+        float r = 1;
+        if (traits.contains(Trait.Dull)) r = 1.1f;
+        else if (traits.contains(Trait.Sharp)) r = .9f;
+        return r;
+    }
     public void onTimeChange(int p) {
-        Stat hunger = get("Hunger");
         if (Stock.getFactoryName(armor.armor[0].factoryId).equals("Stomach Full Helm")) p = 0;
-        hunger.add(-2 * p, true);
-        if (hunger.get() < 10) inventory.eat(hunger.getMax() - hunger.get());
+        health.starve(p);
+        int status = health.getStatus();
+        if (status == 1) {
+            say("Food...");
+            die();
+        } else if (status == 2) say("I'm starving!");
+        else if (status == 3) say("I don't feel so good...");
+        else if (status == 4) say("I'm hungry!");
         if (stats.getEffectsSize() == 0) {
             get("Speed").heal();
             get("Strength").heal();
         }
-    }
-    void onMapChange(){
-        reset();
-        stateSet(Actions.Wait);
-        delay.set(5);
+        if (traits.contains(Trait.Optimistic)) get("Motivation").add(1);
+        else if (traits.contains(Trait.Pessimistic)) get("Motivation").add(-1);
     }
     protected void stateDone(){
         super.stateDone();
@@ -172,13 +183,14 @@ public class MainPlayer extends Player {
     protected void stateUpdate(){
         super.stateUpdate();
         if (state == Actions.Walk && input.moving == 0) setState(Actions.Idle);
+        else if (state instanceof Spells){
+            clip.rotateAppendage(FIST,11);
+            clip.rotateAppendage(OFIST,11);
+        }
     }
     public void update(){
         int edge = Global.mapEdge(pos.getAdd(vel));
-        if (edge % 2 == 0){
-            int hunger = get("Hunger").get();
-            if (hunger >= 0 || get("Health").get()/(hunger*-2) > 0) Global.map.loadMap(edge);
-        }
+        if (edge != 0 && !Global.map.isIndoors()) Global.map.loadMap(edge+"");
         super.update();
         if (input.cameraMode) Global.mapEdgeCenter(Global.cameraTo = Global.cameraTo.getAdd(input.movement));
         else Global.mapEdgeCenter(Global.cameraTo = pos.getAdd(0,0));
@@ -186,21 +198,6 @@ public class MainPlayer extends Player {
     public void load(String p){
         super.load(p);
         String[] other = p.split("%")[1].split(";");
-        Global.setTime(Integer.parseInt(other[3]));
-        Global.gameHour = Integer.parseInt(other[4]);
-        final Stat hunger = get("Hunger");
-        hunger.onChange = new Performer(){
-            public void perform() {
-                int hung = hunger.get();
-                if (hung < -50) {
-                    die();
-                } else if (hung < 0){
-                    get("Health").add(hung);
-                    say("I'm starving!");
-                } else if (hung < 10){
-                    say("I'm hungry!");
-                }
-            }
-        };
+        Global.loadTime(Integer.parseInt(other[0]));
     }
 }

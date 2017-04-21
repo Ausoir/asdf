@@ -1,11 +1,8 @@
 package com.ga.game;
 
 import com.ga.connection.Server;
-import com.ga.map.EditorInput;
-import com.ga.map.Global;
-import com.ga.map.Picture;
+import com.ga.map.*;
 import com.ga.tool.Clips;
-import com.ga.unit.Updater;
 
 import javax.swing.*;
 import java.awt.*;
@@ -30,6 +27,7 @@ public class Game extends JFrame {
         Picture.init();
         Sound.init();
         JPanel display = new Display();
+        Creation.create();
         Global.server = new Server();
         Global.server.start();
         if (editor) new EditorInput();

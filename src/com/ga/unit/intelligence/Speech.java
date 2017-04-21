@@ -3,11 +3,10 @@ package com.ga.unit.intelligence;
 import com.ga.game.FileManager;
 import com.ga.map.Drawable;
 import com.ga.map.Global;
-import com.ga.map.Updatable;
 import com.ga.tool.P;
 import com.ga.tool.Timer;
 import com.ga.unit.Unit;
-import com.ga.unit.Updater;
+import com.ga.map.Updater;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,13 +14,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * Created by Ga on 7/31/2016.
+ * Created by Ga on 7/31/2016. asd
  */
 public class Speech extends JTextArea implements Drawable {
     public static final HashMap<String,ArrayList<String>> dialog = FileManager.readDialogue("dialog/Reaction.txt");
     private Unit host;
-    private int[] xp, yp;
-    public ArrayList<String> msg = new ArrayList<>();
+    private ArrayList<String> msg = new ArrayList<>();
     private Timer timer = new Timer(-1,false);
     private String recent = "";
     private Color color = new Color(255,255,255,150);
@@ -52,11 +50,11 @@ public class Speech extends JTextArea implements Drawable {
             float rx = Global.rel.x, ry = Global.rel.y;
             setBounds((int) (t.x - (width / 2) + rx), (int) (t.y - height + ry), width, height);
             g.setColor(color);
-            xp = new int[]{
-                    (int) (-10 + t.x+rx), (int) (10 + t.x+rx), (int) (0 + t.x+rx)
+            int[] xp = new int[]{
+                    (int) (-10 + t.x + rx), (int) (10 + t.x + rx), (int) (0 + t.x + rx)
             };
-            yp = new int[]{
-                    (int) (t.y+ry), (int) (t.y+ry), (int) (t.y+ry) + 40
+            int[] yp = new int[]{
+                    (int) (t.y + ry), (int) (t.y + ry), (int) (t.y + ry) + 40
             };
             g.fillPolygon(xp, yp, xp.length);
         }
@@ -81,7 +79,7 @@ public class Speech extends JTextArea implements Drawable {
             Updater.sound(host, p.toLowerCase());
         }
     }
-    public String getRandom(String p){
+    private String getRandom(String p){
         ArrayList<String> results = dialog.get(host.speechType+":"+p);
         if (results == null){
             results = dialog.get(":"+p);

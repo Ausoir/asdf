@@ -5,8 +5,8 @@ import com.ga.map.Global;
 import com.ga.map.Mob;
 import com.ga.tool.Line;
 import com.ga.unit.Prop;
-import com.ga.unit.Player;
-import com.ga.unit.Updater;
+import com.ga.unit.player.Player;
+import com.ga.map.Updater;
 import com.ga.unit.Stock;
 import com.ga.unit.item.Item;
 import com.ga.unit.skill.Actions;
@@ -14,7 +14,7 @@ import com.ga.unit.skill.Buffs;
 import com.ga.unit.skill.Spells;
 
 /**
- * Created by Ga on 8/7/2016.
+ * Created by Ga on 8/7/2016. asd
  */
 public class Command {
     public static Player host;
@@ -25,21 +25,19 @@ public class Command {
                 String[] cmd = i.split("@");
                 if (cmd[0].equals("say")) host.say(cmd[1]);
                 else if (cmd[0].equals("menuDialog")) Global.display.menuDialog.show(cmd[1],cmd[2]);
-                else if (cmd[0].equals("rest")) Global.setHour(Global.gameHour + 1);
+                else if (cmd[0].equals("rest")) {
+                    if (Updater.mapIsSafe(Global.player.faction)) Global.setHour(Global.getHour()+1);
+                }
                 else if (cmd[0].equals("crft")) Global.player.crafting.craft(cmd[1]);
-                else if (cmd[0].equals("ft")) Global.player.fastTravel = !Global.player.fastTravel;
-                else if (cmd[0].equals("heal")) host.get("Health").add(Integer.parseInt(cmd[1]));
+                else if (cmd[0].equals("buff")) Global.player.buff(Buffs.valueOf(cmd[1]),3);
                 else if (cmd[0].equals("seed")) host.weapon.seed = Integer.parseInt(cmd[1]);
-                else if (cmd[0].equals("time")) Global.setTime(Global.getTime()[0]+Integer.parseInt(cmd[1]));
+                else if (cmd[0].equals("time")) Global.loadTime(Global.getTime()[0]+Integer.parseInt(cmd[1]));
                 else if (cmd[0].equals("slow")) host.stats.addEffect(Buffs.Slow, 3);
-                else if (cmd[0].equals("status")) host.say("Stamina:"+host.get("Stamina")+" Penalty:"+host.getStatPenalty()+" Health:"+host.get("Health"));
                 else if (cmd[0].equals("delevel")) host.stats.delevel(cmd[1]);
                 else if (cmd[0].equals("level")) host.stats.level(cmd[1]);
                 else if (cmd[0].equals("stat")) host.get(cmd[1].split(":")[0]).addTotal(Integer.parseInt(cmd[1].split(":")[1]));
-                else if (cmd[0].equals("advSkill")) for (int num=0;num<Integer.parseInt(cmd[1].split(":")[1]);num++) host.skillTree.advanceSkill(Actions.valueOf(cmd[1].split(":")[0]),false);
-                else if (cmd[0].equals("advSkillCd")) for (int num=0;num<Integer.parseInt(cmd[1].split(":")[1]);num++) host.skillTree.advanceSkill(Actions.valueOf(cmd[1].split(":")[0]),true);
-                else if (cmd[0].equals("advSpell")) for (int num=0;num<Integer.parseInt(cmd[1].split(":")[1]);num++) host.skillTree.advanceSkill(Spells.valueOf(cmd[1].split(":")[0]),false);
-                else if (cmd[0].equals("advSpellCd")) for (int num=0;num<Integer.parseInt(cmd[1].split(":")[1]);num++) host.skillTree.advanceSkill(Spells.valueOf(cmd[1].split(":")[0]),true);
+                else if (cmd[0].equals("advSkill")) for (int num=0;num<Integer.parseInt(cmd[1].split(":")[1]);num++) host.skillTree.advanceSkill(Actions.valueOf(cmd[1].split(":")[0]));
+                else if (cmd[0].equals("advSpell")) for (int num=0;num<Integer.parseInt(cmd[1].split(":")[1]);num++) host.skillTree.advanceSkill(Spells.valueOf(cmd[1].split(":")[0]));
                 else if (cmd[0].equals("unit")) Stock.getByName(cmd[1], -1).pos.set(host.pos.getAdd(host.target));
                 else if (cmd[0].equals("mob")) Mob.spawn(cmd[1],host.pos.getAdd(host.target));
                 else if (cmd[0].equals("item")) host.setWeapon((Item) Stock.getByName(cmd[1], -1));

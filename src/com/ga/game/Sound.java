@@ -6,15 +6,25 @@ import javax.sound.sampled.Clip;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * Created by Ga on 1/25/2017.
+ * Created by Ga on 1/25/2017. asd
  */
 public class Sound {
     private static HashMap<String,Clip> cache = new HashMap<>();
-    public static void init(){
-        search("Data/");
+    static void init(){
+        ArrayList<String> sounds = FileManager.searchFiles("Data/sound",new String[]{"wav"});
+        for (String i : sounds) {
+            int pathEnd = i.lastIndexOf('\\');
+            String fileName = i.substring(pathEnd+1);
+            try {
+                cache.put(fileName.substring(0, fileName.lastIndexOf(".")), makeAudio(i));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
     public static boolean has(String p){
         return cache.get(p) != null;
@@ -51,23 +61,5 @@ public class Sound {
             e.printStackTrace();
         }
         return null;
-    }
-    private static void search(String p){
-        File[] files = new File(p).listFiles();
-        for (File file : files) {
-            String path = file.getPath();
-            if (file.isDirectory()) {
-                search(path);
-            } else if (file.isFile()){
-                String t = file.getName();
-                if (t.endsWith(".wav")){
-                    try {
-                        cache.put(t.substring(0,t.lastIndexOf(".")),makeAudio(path));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
     }
 }

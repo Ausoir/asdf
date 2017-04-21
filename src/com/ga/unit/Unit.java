@@ -3,6 +3,7 @@ package com.ga.unit;
 import com.ga.game.Settings;
 import com.ga.game.Sound;
 import com.ga.map.Global;
+import com.ga.map.Updater;
 import com.ga.tool.EventTimer;
 import com.ga.tool.Line;
 import com.ga.tool.P;
@@ -33,31 +34,33 @@ public class Unit extends Prop {
     public Stats stats = new Stats(this);
     public float damageMod = 1;
     public String speechType;
-    Speech speech = new Speech(this);
+    protected Speech speech = new Speech(this);
     int stateLevel = 1;
-    int poise = 1;
 
     public Unit(int seed) {
         super(null,seed,101);
         controlId = Global.getControlId();
         dynamic = true;
         gravity = true;
-        tags.add(Tag.Arms);
-        tags.add(Tag.Legs);
+        tags.add(Tag.Swinging);
+        tags.add(Tag.Athletics);
+        tags.add(Tag.Jumping);
         tags.add(Tag.Combustible);
         tags.add(Tag.Freezable);
     }
+
+    @Override
     public void load(String p){
-        String[] t = p.split("@");
-        name = t[0];
-        pos.load(t[2]);
-        stats.load(t[3]);
-        faction = Faction.valueOf(t[4]);
-        loadMoveset(t[5]);
+        String[] sections = p.split("@");
+        name = sections[0];
+        pos.load(sections[2]);
+        stats.load(sections[3]);
+        faction = Faction.valueOf(sections[4]);
+        loadMoveset(sections[5]);
         clip.setOrganHealth();
     }
 
-    void loadMoveset(String p){
+    protected void loadMoveset(String p){
         String[] rangeMoves = p.split("/");
         String[] ranges = rangeMoves[0].split(",");
         String[] moveZones = rangeMoves[1].split("&");
@@ -100,11 +103,6 @@ public class Unit extends Prop {
         return -1;
     }
 
-    public void reset(){
-        Updater.add(speech);
-        Global.display.add(speech);
-    }
-
     public P getRandomPoint(){
         return pos.getAdd(clip.randomPoint());
     }
@@ -123,7 +121,7 @@ public class Unit extends Prop {
     public String getConversation(){
         return speech.getText();
     }
-    void hear(Prop pos, String p){
+    public void hear(Prop pos, String p){
         if (brain != null) brain.hear(pos, p);
     }
     public P getHand(){
@@ -137,7 +135,7 @@ public class Unit extends Prop {
         if (r == null) r = new int[]{0};
         return r;
     }
-    boolean tagCapable(Tags p){
+    protected boolean tagCapable(Tags p){
         return true;
     }
     public int setState(Moveset state) {
@@ -145,15 +143,18 @@ public class Unit extends Prop {
             face(target.x > 0 ? 1 : -1, true);
             float req = state.getCost();
             if (req != -1) req += getStatPenalty();
+            else req = 0;
             int[] cdinput = getCooldown(state);
             int prevCd = cdinput[0];
             if (Global.cooldown(cdinput, state.getCooldown())) {
                 cooldown.put(state, cdinput);
                 if (get("Stamina").require((int) req)) {
                     if (state != Actions.Idle) delay.performer = null;
-                    if (state instanceof Spells) return 4;
-                    stateSet(state);
-                    return 0; //fine
+                    stateLevel = getStateLevel(state);
+                    if (stateLevel >= 1){
+                        stateSet(state);
+                        return 0; //fine
+                    } else return 5; //not enough power
                 } else {
                     cooldown.put(state, new int[]{prevCd});
                     return 2; //no stamina
@@ -173,24 +174,20 @@ public class Unit extends Prop {
     }
     public void stateSet(Moveset state){
         if (state != Actions.Idle) this.state.onInterrupt(this);
-        stats.unrest();
         delay.set(state.getDel());
         this.state = state;
-        stateLevel = getStateLevel(state);
         vel.x *= state.getVelX();
         if (state instanceof Actions) {
-            clip.setState(state);
+            clip.setState((Actions) state);
             if (brain != null) brain.setState(state);
         } else if (state instanceof Spells){
-            this.state = Actions.Cast;
             clip.setState(((Spells)state).getAction());
+            this.state = Actions.Cast;
             final Unit me = this;
-            final Moveset s = state;
+            final Moveset spell = state;
             delay.performer = new Performer(){
                 public void perform(){
-                    Sound.play("spell");
-                    me.state = s;
-                    me.state.trigger(me, stateLevel);
+                    spell.trigger(me, stateLevel);
                 }
             };
         }
@@ -206,7 +203,7 @@ public class Unit extends Prop {
 
     @Override
     public int getDamage(){
-        return (int) ((get("Proficiency").get())*damageMod);
+        return (int) ((get("Level").get())*damageMod);
     }
 
     protected int getDamageReduction(int organ){
@@ -217,57 +214,54 @@ public class Unit extends Prop {
         return 0;
     }
 
-    void restorePoise(){
-        poise = Global.r.nextInt((get("Strength").get()*4)+4);
-    }
-
     public void buff(Buffs buff, int level){
         stats.addEffect(buff, level);
     }
 
-    public boolean hit(Line hitbox, int damage, DamageType type) {
-        if (poise--<= 0 || type == DamageType.Push) {
-            if (stats.triggerEffect(Buffs.Evade)) return false;
-            delay.performer = null;
-            if (stats.triggerEffect(Buffs.Mark)) damage *= 4;
-            float knockback = (float) damage * 8 / get("Health").getMax();
-            if (knockback > 1) knockback *= 2;
-            jump = false;
-            if (knockback > 20) stateSet(Actions.Down);
-            else stateSet(Actions.Hit);
-            Sound.play("kick");
-            int dir = hitbox.pt.x < pos.x ? 1 : -1;
-            if (type != DamageType.Push) {
-                stats.addEffect(Buffs.Slow, 2);
-                if (brain != null) brain.hit();
-                face(dir, true);
-                get("Health").add(-damage);
-            }
-            vel.x = knockback * dir;
-            vel.y = -knockback - 5;
-            restorePoise();
+    public void hit(Line hitbox, float knockback, DamageType type) {
+        delay.performer = null;
+        jump = false;
+        stats.addEffect(Buffs.Slow, 2);
+        if (stats.triggerEffect(Buffs.Mark)) knockback += .5f;
+        if (state == Actions.Rest) knockback += .5f;
+        int dir = hitbox.pt.x < pos.x ? 1 : -1;
+        vel.x = knockback * 8 * dir;
+        vel.y = -knockback - 5;
+        if (state == Actions.Down) die();
+        else if (knockback > 0){
+            if (knockback > .4f && rand.nextBoolean()){
+                stateSet(Actions.Down);
+                if (knockback > rand.nextFloat()*2) die();
+            } else stateSet(Actions.Hit);
+            if (type == DamageType.Cut && rand.nextBoolean()) buff(Buffs.Bleed,1);
         }
-        return true;
     }
 
     @Override
     public boolean hittable(Faction faction){
-        return super.hittable(faction) && state != Actions.Down && state != Actions.Hit && state != Actions.Dead && state != Actions.Duck;
+        return super.hittable(faction) && state != Actions.Dead && state != Actions.Duck;
     }
 
     public boolean checkHit(Line hitBox, int damage, DamageType type){
         float r = hitBox.getLength();
         P midpoint = hitBox.getMidPoint();
         if (Math.pow(getSize() + r, 2) - ((Math.pow(midpoint.x - pos.x, 2) + Math.pow(midpoint.y - pos.y, 2))) > 0) {
+            if (stats.triggerEffect(Buffs.Evade)) return false;
+            Stat stamina = get("Stamina");
+            int tstamina = stamina.get();
+            stamina.add(-damage);
+            damage -= tstamina;
+            if (damage > 0) {
+                hit(hitBox, (float) (damage - getDamageReduction(3))/stamina.getMax(), type);
+            }
             for (int i = 0; i < clip.organs.length; i++) {
-                int dam = damage - getDamageReduction(i);
+                int dam = Math.max(1, damage - getDamageReduction(i));
                 if (clip.organs[i].checkHit(hitBox)) {
                     P t = new P(pos.x, hitBox.ptd.y);
                     Particle.explode("Blood", t, t.getSubtract(hitBox.pt), 3, 3, 12, true, 5);
                     clip.organs[i].hit(hitBox, dam, type);
                 }
             }
-            if (state != Actions.Dead) hit(hitBox, damage-getDamageReduction(3), type);
             return true;
         }
         return false;
@@ -279,9 +273,8 @@ public class Unit extends Prop {
 
     public void die() {
         Updater.remove(brain);
-        state = Actions.Dead;
-        clip.setState(Actions.Dead);
-        delay.set(-1);
+        stateSet(Actions.Dead);
+        Global.player.witnessDeath(this);
     }
 
     @Override
@@ -306,7 +299,6 @@ public class Unit extends Prop {
                     stateSet(Actions.Down);
                     int statpenalty = getStatPenalty();
                     delay.time += statpenalty * 20;
-                    get("Health").add(-(statpenalty + 1 + mag));
                 } else if (state == Actions.Jump && vel.y > 0) {
                     stateSet(Actions.Hit);
                     delay.set(4);
@@ -346,8 +338,9 @@ public class Unit extends Prop {
         if (state != Actions.Dead) {
             if (m != -1) moveTriggered(m);
             stats.update();
-            delay.update();
+            if (delay.update()) stateDone();
             stateUpdate();
+            stats.rest(1);
         }
         super.update();
     }
@@ -395,9 +388,6 @@ public class Unit extends Prop {
         stats.addEffect(Buffs.Evade,1);
         stateSet(Actions.Down);
         delay.set(50);
-        get("Health").heal();
-        reset();
-        clip.setState(state);
         clip.setOrganHealth();
         for (Organ i : clip.organs){
             i.amputated = false;

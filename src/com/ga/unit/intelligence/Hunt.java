@@ -1,17 +1,18 @@
 package com.ga.unit.intelligence;
 
+import com.ga.map.Global;
 import com.ga.unit.Unit;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Spells;
 
 /**
- * Created by Ga on 7/30/2016.
+ * Created by Ga on 7/30/2016. asd
  */
 class Hunt implements Task {
     private Unit host;
     private float range = 0;
 
-    protected Hunt(Unit host) {
+    Hunt(Unit host) {
         this.host = host;
         if (host.brain.target != null) range = host.getReach();
     }
@@ -38,10 +39,10 @@ class Hunt implements Task {
                 if (Math.abs(x) < 160 && host.lastLand != target.lastLand) host.setState(Actions.Drop);
             } else {
                 int t = host.performMoveset((int) dist);
-                if (host.state instanceof Spells && ((Spells)host.state).channel) {
-                    host.delay.set(180);
+                if (host.state instanceof Spells) {
+                    host.delay.set(60+ Global.r.nextInt(80));
                 }
-                if (t == 2) { //no stamina
+                if (t == 2 && target.vel.x > 0 != host.dir > 0) { //no stamina
                     host.setState(Actions.Rest);
                     host.delay.time += 40;
                 }

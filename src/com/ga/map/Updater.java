@@ -1,16 +1,15 @@
-package com.ga.unit;
+package com.ga.map;
 
 import com.ga.game.FileManager;
 import com.ga.game.Observer;
-import com.ga.map.Drawable;
-import com.ga.map.Global;
-import com.ga.map.Terrain;
-import com.ga.map.Updatable;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.tool.Timer;
+import com.ga.unit.*;
 import com.ga.unit.intelligence.Intelligence;
+import com.ga.unit.item.Item;
+import com.ga.unit.player.Player;
 import com.ga.unit.skill.Actions;
 
 import java.awt.*;
@@ -34,7 +33,7 @@ public class Updater {
     private static ArrayList<Observer> removeQueue = new ArrayList<>();
     public static String changeMap = null;
     public static Performer changeMapEvent = null;
-    private static Timer time = new Timer(40,true);
+    public static Timer time = new Timer(40,true);
     private static void clear(){
         drawee.clear();
         effects.clear();
@@ -46,14 +45,14 @@ public class Updater {
         Global.map.clear();
         Global.display.removeSpeech();
     }
-    public static void changeMap(boolean editor){
+    static void changeMap(boolean editor){
         clear();
         if (!editor) {
             boolean rightSide = Global.player.pos.x > Global.map.size.x/2;
             int pos = FileManager.loadMap(changeMap);
             boolean spawnFound = false;
             for (Observer i : addQueue){
-                if (i instanceof Prop && ((Prop)i).name.equals("Spawn") && ((Prop)i).seed == pos){
+                if (i instanceof Prop && ((Prop)i).factoryId == Stock.Spawn.ordinal() && ((Prop)i).seed == pos){
                     Global.player.pos.set(((Prop)i).pos);
                     spawnFound = true;
                     break;
@@ -69,7 +68,6 @@ public class Updater {
             }
             addQueue.add(Global.player);
             addQueue.add(Global.player.weapon);
-            Global.player.onMapChange();
             Global.display.input = Global.player.input;
             Global.mapEdgeCenter(Global.cameraTo = Global.player.pos.getAdd(0,0));
             Global.mapEdgeCenter(Global.camera = Global.cameraTo.getAdd(0,0));
@@ -160,7 +158,7 @@ public class Updater {
         }
         drawee.add(p);
     }
-    public static void regrowth(){
+    static void regrowth(){
         int size = addQueue.size();
         for (int i=size-1;i>=0;i--){
             Observer t = addQueue.get(i);
@@ -184,21 +182,23 @@ public class Updater {
     public static void sound(Unit p, String msg){
         for (Map.Entry i : unitList.entrySet()){
             Unit unit = (Unit) i.getValue();
-            if (i != p && unit.faction != p.faction) {
+            if (unit != p && unit.faction != p.faction) {
                 if (Math.abs(unit.pos.x - p.pos.x) < 600 && Math.abs(unit.pos.y - p.pos.y) < 200) {
-                    if (i instanceof Man) {
+                    if (unit instanceof Man) {
                         unit.hear(p, msg);
                     }
                 }
             }
         }
     }
-    static ArrayList<Prop> collideInteractive(P p){
+    public static ArrayList<Prop> collideInteractive(P p){
         ArrayList<Prop> result = new ArrayList<>();
         for (Prop i : props){
             if (i.onInteract != null) {
                 if (i instanceof Man){
                     if (((Man) i).getHand().getSubtract(p).getDist() <= 64) result.add(i);
+                } else if (i instanceof Item) {
+                    if (i.pos.getSubtract(p).getDist() <= 48) result.add(i);
                 } else {
                     if (i.pos.getSubtract(p).getDist() <= i.getSize()) result.add(i);
                 }
@@ -228,7 +228,7 @@ public class Updater {
             Unit unit = (Unit) i.getValue();
             if (host != i && unit.state != Actions.Sneak) {
                 float x = Math.abs(unit.pos.x-vision.x), y = Math.abs(unit.pos.y - vision.y);
-                if (x < r && y < r) {
+                if (x < r && y < r/2) {
                     if (x+y < max){
                         max = (int) (x+y);
                         seen.add(0,unit);
@@ -238,10 +238,17 @@ public class Updater {
         }
         return seen;
     }
+    public static boolean mapIsSafe(Faction faction){
+        for (Map.Entry i : unitList.entrySet()) {
+            Unit unit = (Unit) i.getValue();
+            if (unit.faction.canAttack(faction)) return false;
+        }
+        return true;
+    }
     public static P getEntrancePos(int p){
         int index = 0;
         for (Prop i : props){
-            if (i.name.equals("PlayerSpawn")){
+            if (i.factoryId == Stock.Spawn.ordinal()){
                 if (index == p) return i.pos;
                 else index++;
             }
@@ -253,7 +260,7 @@ public class Updater {
         updatee.remove(p);
     }
 
-    public static void unrender() {
+    static void unrender() {
         for (Observer i : drawee){
             if (i instanceof Terrain) remove(i);
         }

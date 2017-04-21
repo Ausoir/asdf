@@ -45,11 +45,4 @@ public class IntelligenceSocial extends Intelligence {
             setTaskEcho(new Follow(host, leader));
         }
     }
-    public void update(){
-        super.update();
-        if (host.get("Health").getPercentage() < .15f){
-            host.say("@flee");
-            setTaskEcho(new Flee(host, target));
-        } else if (getTask() instanceof Flee && target != null) setTaskEcho(new Hunt(host));
-    }
 }

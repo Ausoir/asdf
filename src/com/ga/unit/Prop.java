@@ -2,6 +2,7 @@ package com.ga.unit;
 
 import com.ga.game.Settings;
 import com.ga.map.Global;
+import com.ga.map.Updater;
 import com.ga.tool.Interactive;
 import com.ga.tool.Line;
 import com.ga.tool.P;
@@ -12,7 +13,7 @@ import java.util.Random;
  * Created by Ga on 3/13/2017. asd
  */
 public class Prop extends Thing {
-    protected int factoryId = -1;
+    public int factoryId = -1;
     public int seed = 0;
     public Random rand;
     public Interactive onInteract = null;
@@ -22,7 +23,7 @@ public class Prop extends Thing {
     public P vel = new P(0, 0);
     public DamageType damageType = DamageType.Bash;
     protected boolean tangible = true;
-    protected boolean dynamic = false; //regrowth sensitive
+    public boolean dynamic = false; //regrowth sensitive
     public Line lastLand = new Line();
     public Tags tags = new Tags();
     public Prop(){
@@ -32,7 +33,6 @@ public class Prop extends Thing {
         super(name, depth);
         this.seed = seed;
         rand = new Random(this.seed);
-        onLoad();
     }
     public int getDamage(){
         return 0;
@@ -44,7 +44,8 @@ public class Prop extends Thing {
         image.setSize(s.x * rx, s.y * ry);
     }
     public void onCreate(){}
-    public void onLoad(){}
+    public void load(String p) {
+    }
     public void onField(){
         adjustToLand();
     }
@@ -54,7 +55,7 @@ public class Prop extends Thing {
         Line line = new Line(pos, new P(pos.x, closestY));
         for (Line i : Global.map.land) {
             if (line.lineCross(i)) {
-                if (i.isLandable()) {
+                if (i.next != -1 && i.isLandable()) {
                     float y = i.getCrossPointY(pos.x);
                     if (y < closestY) {
                         closest = i;
@@ -64,7 +65,7 @@ public class Prop extends Thing {
             }
         }
         if (closest != null) {
-            rotation = (float) Math.atan(closest.getSlope());
+            if (gravity) rotation = (float) Math.atan(closest.getSlope());
             setDepth(closest.depth - 2);
         }
     }
@@ -127,13 +128,15 @@ public class Prop extends Thing {
     }
     public void update(){
         if (mobile) {
-            int edge = Global.mapEdge(pos.getAdd(vel));
-            if (edge % 2 == 0) vel.x = 0;
-            else if (edge % 3 == 0) {
-                if (edge == 9) remove();
-                else vel.y = 0;
-            }
             collide();
+            int edge = Global.mapEdge(pos.getAdd(vel));
+            if (edge > 0) {
+                if (Math.abs(edge-5) == 0) vel.x = 0;
+                else {
+                    if (edge == 9) remove();
+                    else vel.y = 0;
+                }
+            }
             pos.add(vel);
             if (gravity) {
                 vel.y += Settings.gravity;
@@ -145,7 +148,7 @@ public class Prop extends Thing {
     @Override
     public String toString(){
         if (!save) return "";
-        return (factoryId==-1?"!"+name:""+factoryId) + "@" + seed + "@" + pos;
+        return (factoryId==-1?name:""+factoryId) + "@" + seed + "@" + pos;
     }
 }
 

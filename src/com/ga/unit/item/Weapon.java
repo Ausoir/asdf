@@ -19,7 +19,7 @@ public class Weapon extends Item {
         }
     }
     private Die damageSide = new Die(0,1);
-    private float damageMod = 1;
+    private int damageMod = 0;
     public Weapon(String name, int seed, int weight, int uses, int num, int sides, Tag type) {
         super(name, seed, weight, uses);
         value = 36;
@@ -35,33 +35,30 @@ public class Weapon extends Item {
     }
     protected void setModifier(PrefixMod mod){
         super.setModifier(mod);
-        if (mod == PrefixMod.Broken) damageMod = .5f;
-        else if (mod == PrefixMod.Old) damageMod = .8f;
-        else if (mod == PrefixMod.Fine) damageMod = 1.2f;
-        else if (mod == PrefixMod.Mastercraft){
-            damageMod = 1.5f;
-            uses.setTotal(-1);
-        }
-        else if (mod == PrefixMod.Legendary){
+        if (mod == PrefixMod.Mastercraft){
+            damageMod = 1;
+        } else if (mod == PrefixMod.Legendary){
             damageMod = 2;
-            uses.setTotal(-1);
         }
     }
     protected void setModifier(SpecialtyMod mod){
         if (mod == SpecialtyMod.Feather){
-            damageMod = .33f;
-            this.weight /= 2*admod.magnitude;
+            damageMod = -1;
+            this.weight = Math.max(0,this.weight-(2*admod.magnitude));
         }
-        else if (mod == SpecialtyMod.Sharp) damageMod += .2f*admod.magnitude;
-        else if (mod == SpecialtyMod.Dull) damageMod += -.2f*admod.magnitude;
+        else if (mod == SpecialtyMod.Sharp) damageMod += (1*admod.magnitude)/2;
+        else if (mod == SpecialtyMod.Dull) damageMod += (-1*admod.magnitude)/2;
         else super.setModifier(mod);
     }
     public int getDamage() {
-        int r = 0;
-        if (canUse()) r = (int) (damageSide.getDamage()*damageMod)+super.getDamage();
-        return r;
+        return damageSide.getDamage()+super.getDamage()+damageMod;
     }
-    public void setDamage(int num, int sides){
+    @Override
+    public void use(Man host){
+        if (uses == 0) return;
+        super.use(host);
+    }
+    private void setDamage(int num, int sides){
         damageSide = new Die(num, sides);
     }
     @Override
@@ -73,6 +70,6 @@ public class Weapon extends Item {
         if (emod != null){
             r += " This weapon has "+probability*100+"% chance of activating its enchantment every hit.";
         }
-        return r + " This weapon deals "+damageSide.num+"d"+damageSide.sides+" * "+damageMod+" damage.";
+        return r + " This weapon deals "+damageSide.num+"d"+damageSide.sides+" + "+damageMod+" damage.";
     }
 }

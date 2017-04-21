@@ -6,36 +6,35 @@ import com.ga.tool.Clips;
 import com.ga.tool.P;
 import com.ga.tool.Timer;
 import com.ga.unit.skill.Actions;
-import com.ga.unit.skill.Moveset;
 
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by Ga on 8/1/2016.
+ * Created by Ga on 8/1/2016. asd
  */
 public class Body {
-    protected HashMap<Moveset, int[]> animation = new HashMap<Moveset, int[]>() {{
+    private HashMap<Actions, int[]> animation = new HashMap<Actions, int[]>() {{
         put(Actions.Idle, new int[]{0, -1});
     }};
     private Clip clip;
     public Unit host;
-    protected int[] nextAnimation = animation.get(Actions.Idle);
+    private int[] nextAnimation = animation.get(Actions.Idle);
     public Organ[] organs;
-    protected Timer frame;
-    protected int[][] nextClip;
-    protected int[][][] localAnimation;
-    protected int[] localFrames;
-    protected int current = 0;
-    protected Moveset state = Actions.Idle;
+    Timer frame;
+    private int[][] nextClip;
+    int[][][] localAnimation;
+    private int[] localFrames;
+    int current = 0;
+    protected Actions state = Actions.Idle;
     public int BODY;
-    protected int FOOT;
-    protected int legNum = 0, legCurrent = 0;
-    protected float appendageSize = 1;
+    int FOOT;
+    private int legNum = 0, legCurrent = 0;
+    private float appendageSize = 1;
     protected int size = 0;
 
-    public Body(Unit host, String current) {
+    Body(Unit host, String current) {
         this.host = host;
         this.clip = Clips.clip.get(current);
         reset(clip);
@@ -44,15 +43,16 @@ public class Body {
         organs[BODY].pt.y = -getHeight();
     }
 
-    public void setOrganHealth(){
+    void setOrganHealth(){
         int hpPool = 0;
         for (Organ organ : organs) hpPool += organ.health;
+        int mod = host.get("Stamina").getMax()*organs.length;
         for (Organ organ : organs) {
-            organ.health = (int) (((float) organ.health / hpPool) * host.get("Health").get());
+            organ.health = (int) (((float) organ.health / hpPool) * mod) + 1;
         }
     }
 
-    protected void setProperties(int[][] p){
+    private void setProperties(int[][] p){
         for (int i=0;i<organs.length;i++){
             organs[i].setSize(p[0][i]);
             if (p[1][i] == 1) organs[i].vital = true;
@@ -75,10 +75,10 @@ public class Body {
         for (int i = 0; i < organs.length; i++) {
             initializeOrgan(p.model,i);
         }
+        for (int i = 0; i < organs.length; i++) organs[i].setMaxLength((int) Math.sqrt((nextClip[i][0]*nextClip[i][0])+(nextClip[i][1]*nextClip[i][1])));
         setProperties(p.property);
         for (Map.Entry<String, int[]> i : p.moveset.entrySet()){
-            Moveset move = Actions.getByName(i.getKey());
-            if (move == null) move = Actions.getByName(i.getKey());
+            Actions move = (Actions) Actions.getByName(i.getKey());
             animation.put(move, i.getValue());
         }
     }
@@ -125,14 +125,14 @@ public class Body {
         }
     }
 
-    public void setShade(Shader p){
-        for (int i=0;i<organs.length;i++){
-            organs[i].image.setShader(p);
-            organs[i].image.shade();
+    public void setShade(Shader p, int param){
+        for (Organ organ : organs) {
+            organ.image.setShader(p);
+            organ.image.shade(param);
         }
     }
 
-    protected void randomize() {
+    private void randomize() {
         for (int i = 0; i < localAnimation.length; i++) {
             randomizeSection(i);
         }
@@ -142,7 +142,7 @@ public class Body {
         if (i != 0) randomizeSection(dead);
     }
 
-    protected void randomizeSection(int p) {
+    private void randomizeSection(int p) {
         for (int t = 0; t < localAnimation[p].length; t++) {
             int x = (int) (localAnimation[p][t][0]*appendageSize);
             int y = (int) (localAnimation[p][t][1]*appendageSize);
@@ -150,15 +150,15 @@ public class Body {
         }
     }
 
-    public int getHeight(){
-        return localAnimation[0][FOOT][1];
+    private int getHeight(){
+        return legNum==0?0:localAnimation[0][FOOT][1]-1;
     }
 
-    public P randomPoint(){
+    P randomPoint(){
         return organs[(int) (Math.random()*organs.length)].ptd;
     }
 
-    public void setState(Moveset state) {
+    public void setState(Actions state) {
         this.state = state;
         current = 0;
         if (animation.containsKey(state)) nextAnimation = animation.get(state);
@@ -181,14 +181,13 @@ public class Body {
         if (current >= nextAnimation.length) current = 0;
         if (nextAnimation[current] == -1) {
             current--;
-            host.stateDone();
             state = Actions.Idle;
         }
         nextClip = localAnimation[nextAnimation[current]];
         frame.set(localFrames[nextAnimation[current]]);
     }
 
-    protected void rotateAppendage(int organ, int frame){
+    public void rotateAppendage(int organ, int frame){
         int length = Math.abs(clip.clip[frame][organ][0])+Math.abs(clip.clip[frame][organ][1]);
         P atanDir = host.target.getAdd(localAnimation[frame][organ][0]*host.dir,localAnimation[frame][organ][1]).getAtan(1);
         localAnimation[frame][organ][0] = (int) (length*atanDir.x)*host.dir;
@@ -218,7 +217,7 @@ public class Body {
         return r;
     }
 
-    protected void updateStatus(){
+    void updateStatus(){
         int legs = legNum;
         for (Organ o : organs) {
             if (o.amputated) {
@@ -239,14 +238,14 @@ public class Body {
     }
 
     public void setHeight(){
-        if (legCurrent == 0){
+        if (legCurrent == 0) {
             organs[BODY].pt.y = 0;
-            host.tags.remove(Tag.Legs);
-        }
-        else organs[BODY].pt.y = -getHeight();
+            host.tags.remove(Tag.Jumping);
+            host.tags.remove(Tag.Athletics);
+        } else organs[BODY].pt.y = -getHeight();
     }
 
-    protected float getLegStatus(){
+    float getLegStatus(){
         if (legNum == 0) return 1;
         return (float)legCurrent/legNum;
     }

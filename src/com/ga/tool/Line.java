@@ -12,7 +12,7 @@ public class Line {
     public P pt;
     public P ptd;
     public int next = -1;
-    public int opt = 0; //0:normal,1:rope,2:tp,100:ftp,200:manual tp
+    public int opt = 0; //0:normal,1:rope,2:impenetrable
     public int depth = 0;
     public Line(String p){
         load(p);
@@ -53,7 +53,7 @@ public class Line {
         this.opt = opt;
     }
     public boolean isLand(){
-        return opt != -1;
+        return opt != -1 && opt != 1;
     }
     public boolean isLandable(){
         return isLand() && clockwise();
@@ -69,7 +69,7 @@ public class Line {
         return r;
     }
     public P getAtan(int mag){
-        float r = (float) Math.atan2(ptd.y-pt.y,ptd.x-pt.x);
+        float r = getAtan();
         return new P(Global.cos(r)*mag,Global.sin(r)*mag);
     }
     public float getLength(){

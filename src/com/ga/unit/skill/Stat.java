@@ -42,7 +42,6 @@ public class Stat {
     }
     public void setMax(int p){
         max = p;
-        if (max < 0) max = 0;
     }
     public void addTotal(int p){
         setTotal(max + p);
@@ -83,9 +82,5 @@ public class Stat {
     }
     public int getMax() {
         return max;
-    }
-
-    public void addMax(int i) {
-        setMax(max + i);
     }
 }

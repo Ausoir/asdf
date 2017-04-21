@@ -1,7 +1,7 @@
 package com.ga.game;
 
 import com.ga.map.Global;
-import com.ga.unit.Updater;
+import com.ga.map.Updater;
 import com.ga.unit.intelligence.Speech;
 
 import javax.swing.*;

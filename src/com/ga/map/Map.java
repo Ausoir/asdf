@@ -1,13 +1,11 @@
 package com.ga.map;
 
-import com.ga.game.FileManager;
 import com.ga.game.Settings;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.unit.Prop;
 import com.ga.unit.Stock;
 import com.ga.unit.Thing;
-import com.ga.unit.Updater;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -18,7 +16,7 @@ import java.util.Iterator;
  * Created by Ga on 5/7/2016. asd
  */
 public class Map extends Thing {
-    public Weather weather = new Weather();
+    Weather weather = new Weather();
     public ArrayList<Line> land = new ArrayList<>();
     public HashMap<Integer, String> formTextures = new HashMap<>();
     private static HashMap<String, String> defaultProps = new HashMap<String, String>(){{
@@ -37,10 +35,12 @@ public class Map extends Thing {
     public String[] maps;
     public MapEvent event;
     public P size;
+    public int id;
     private static final int magnify = 2;
     public Map(final String[] maps) {
         super(null,1);
         this.maps = maps;
+        id = Integer.parseInt(maps[0]);
         if (maps[2].equals("None")) image.visible = false;
         else{
             setImage(maps[2]);
@@ -80,21 +80,12 @@ public class Map extends Thing {
             }
         }
     }
-    public void loadMap(int side){
-        String targetMap = "None";
-        if (side == 2) targetMap = maps[4];
-        if (side == 4) targetMap = maps[5];
-        if (!targetMap.equals("None")) {
-            loadMap(targetMap);
-        }
-    }
+
     public void loadMap(String p){
-        FileManager.saveCharacter();
         Updater.changeMap = p;
-//        Global.server.sendFromLocal("DC@"+maps[mapnum+5]+"@"+posnum);
     }
 
-    public void clear(){
+    void clear(){
         land.clear();
         formTextures.clear();
     }
@@ -104,9 +95,13 @@ public class Map extends Thing {
         Line high = null;
         boolean inside = isIndoors();
         if (inside) {
-            blocker = new Terrain("black", null, 0);
+            blocker = new Terrain("black", Shader.Basic, 10){
+                public int getDepth() {
+                    return 150;
+                }
+            };
             for (final Line i : land) {
-                if (i.next >= 0) {
+                if (i.next == 0) {
                     if (i.pt.x > highX) {
                         highX = i.pt.x;
                         high = i;
@@ -114,43 +109,46 @@ public class Map extends Thing {
                 }
             }
         }
-        int blockerTerrain = inside ? -2 : -1;
+        int blockerTerrain = inside ? 0 : -1;
         HashMap<Integer, Terrain> terrains = new HashMap<>();
         for (final Line i : land){
             if (i.opt == 1){
-                Terrain t = new Terrain("rope", null, -1);
+                Terrain t = new Terrain("rope", null, 23);
                 t.addPoint(i.pt.x-8, i.pt.y);
                 t.addPoint(i.pt.x+8, i.pt.y);
                 t.addPoint(i.ptd.x+8, i.ptd.y);
                 t.addPoint(i.ptd.x-8, i.ptd.y);
                 t.render();
-                Thing top = new Thing("Ropetop",20);
+                Thing top = new Thing("Ropetop",80);
                 top.save = false;
                 top.pos = i.pt;
-            }
-            if (i.next >= 0){
+            } else if (i.next >= 0){
                 Terrain terrain = terrains.get(i.next);
                 if (terrain == null){
                     String formTexture = formTextures.get(i.next);
                     if (formTexture == null) continue;
                     else {
                         String[] formName = formTexture.split("&");
-                        terrain = new Terrain(formName[1], Shader.getByName(formName[2]), Integer.parseInt(formName[0]));
+                        if (inside) terrain = new Terrain(formName[1], Shader.getByName(formName[2]), Integer.parseInt(formName[0])){
+                            public int getDepth(){
+                                return 20-super.getDepth();
+                            }
+                        };
+                        else terrain = new Terrain(formName[1], Shader.getByName(formName[2]), Integer.parseInt(formName[0]));
                     }
                     terrains.put(i.next, terrain);
                 }
                 terrain.addLine(i);
                 terrain.addPoint(i.pt.x, i.pt.y);
-                if (blockerTerrain == -2 || blockerTerrain == i.next) {
+                if (blockerTerrain == i.next) {
                     blocker.addPoint(i.pt.x, i.pt.y);
-                    blockerTerrain = i.next;
                     if (i == high){
                         blocker.addPoint(i.pt.x, i.pt.y);
-                        blocker.addPoint(size.x, 0);
-                        blocker.addPoint(0, 0);
-                        blocker.addPoint(0, size.y);
-                        blocker.addPoint(size.x, size.y);
-                        blocker.addPoint(size.x, 0);
+                        blocker.addPoint(size.x+128, -128);
+                        blocker.addPoint(-128, -128);
+                        blocker.addPoint(-128, size.y+128);
+                        blocker.addPoint(size.x+128, size.y+128);
+                        blocker.addPoint(size.x+128, -128);
                         blocker.addPoint(i.pt.x, i.pt.y);
                     }
                 }
@@ -251,7 +249,7 @@ public class Map extends Thing {
     public Line fallSafe(P pos, int depth){
         Line pp = new Line(pos.x,pos.y,pos.x,99999);
         for (Line i : Global.map.land){
-            if (i.isLandable() && i.lineCross(pp) && i.depth >= depth){
+            if (i.isLandable() && i.depth >= depth && i.lineCross(pp)){
                 return i;
             }
         }
@@ -259,7 +257,7 @@ public class Map extends Thing {
     }
 
     public boolean isIndoors(){
-        return maps[0].equals("1");
+        return id == -1;
     }
 
     void onTimeChange() {

@@ -5,6 +5,7 @@ import com.ga.game.Sound;
 import com.ga.map.Global;
 import com.ga.map.Shader;
 import com.ga.map.Terrain;
+import com.ga.map.Updater;
 import com.ga.tool.EventTimer;
 import com.ga.tool.Line;
 import com.ga.tool.P;
@@ -21,8 +22,11 @@ import java.util.ArrayList;
  * Created by Ga on 8/1/2016. asd
  */
 public enum Spells implements Moveset {
-    Innersword(Actions.Cast, 6,3,14,false,new Spell(){
-        public void perform(final Unit host, int level){
+    Innersword(Actions.Cast, 6,3,14,new Tags(){{
+        add(Tag.Conjuration);
+        add(Tag.Buff);
+    }}){
+        public void trigger(Unit host, int level){
             Man man = (Man)host;
             if (man.wieldingNone()) {
                 Sound.play("shadowstep");
@@ -32,7 +36,7 @@ public enum Spells implements Moveset {
                 if (level == 2) duration = 4;
                 if (level == 3) duration = 16;
                 if (level > 3) duration = 256;
-                t.uses.setTotal(duration);
+                t.uses = duration;
                 Global.timers.add(new EventTimer(duration,false,new Performer(){
                     public void perform(){
                         t.remove();
@@ -40,12 +44,11 @@ public enum Spells implements Moveset {
                 }));
             }
         }
-    }, new Tags(){{
+    },
+    Materialize(Actions.Cast, 40,4,4,new Tags(){{
         add(Tag.Conjuration);
-        add(Tag.Buff);
-    }}),
-    Materialize(Actions.Cast, 40,4,4,false,new Spell(){
-        public void perform(final Unit host, int level){
+    }}){
+        public void trigger(Unit host, int level){
             Sound.play("shadowstep");
             final Terrain r = new Terrain("water", Shader.None, 0);
             P[] points = new P[3];
@@ -74,88 +77,80 @@ public enum Spells implements Moveset {
                 }
             }));
         }
-    }, new Tags(){{
-        add(Tag.Conjuration);
-    }}),
-    Focus(Actions.Conjure, 15, -1, 40, false, new Spell(){
-        private boolean first = true;
-        public void perform(Unit host, int level){
-            if (first) Sound.play("heal");
+    },
+    Focus(Actions.Conjure, 15, -1, 40,new Tags(){{
+        add(Tag.Buff);
+        add(Tag.Martial);
+    }}){
+        public void trigger(Unit host, int level){
+            Sound.play("heal");
             host.get("Stamina").add(2 + level * level);
         }
-    }, new Tags(){{
-        add(Tag.Buff);
-        add(Tag.Skill);
-    }}),
-    Heal(Actions.Buff, 40, 10, 40, true, new Spell(){
-        private boolean first = true;
-        public void perform(Unit host, int level){
-            if (first) Sound.play("heal");
-            host.get("Health").add(level*2);
-        }
-    }, new Tags(){{
+    },
+    Rejuvenate(Actions.Buff, 40, 1, 40, new Tags(){{
         add(Tag.Buff);
         add(Tag.Biology);
-    }}),
-    Frenzy(Actions.Buff, 40, 5, 40, false, new Spell(){
-        @Override
-        public void perform(Unit host, int level){
+    }}){
+        public void trigger(Unit host, int level){
+            host.buff(Buffs.Rejuvenate, level);
+        }
+    },
+    Frenzy(Actions.Buff, 40, 5, 40, new Tags(){{
+        add(Tag.Buff);
+        add(Tag.Biology);
+    }}){
+        public void trigger(Unit host, int level){
             host.get("Stamina").add(20+(20*level),true);
             host.buff(Buffs.Exhaust, 2);
         }
-    }, new Tags(){{
-        add(Tag.Buff);
-        add(Tag.Biology);
-    }}),
-    Haste(Actions.Conjure, 25,2,20,false,produceBuff(Buffs.Haste), new Tags(){{
+    },
+    Windwalk(Actions.Conjure, 25,2,20,new Tags(){{
         add(Tag.Buff);
         add(Tag.Air);
-    }}),
-    Adrenaline(Actions.Conjure, 25,3,20,false,produceBuff(Buffs.Rejuvenate), new Tags(){{
-        add(Tag.Buff);
-        add(Tag.Biology);
-    }}),
-    Flamestride(Actions.Buff, 10,4,20,false,produceBuff(Buffs.Flamestride), new Tags(){{
+    }}){
+        public void trigger(Unit host, int level){
+            host.buff(Buffs.Haste, level);
+        }
+    },
+    Flamestride(Actions.Buff, 10,4,20,new Tags(){{
         add(Tag.Buff);
         add(Tag.Fire);
-    }}),
-    Glacialwalk(Actions.Buff, 10,4,20,false,produceBuff(Buffs.Glacialwalk), new Tags(){{
+    }}){
+        public void trigger(Unit host, int level){
+            host.buff(Buffs.Flamestride, level);
+        }
+    },
+    Glacialwalk(Actions.Buff, 10,4,20,new Tags(){{
         add(Tag.Buff);
         add(Tag.Cold);
-    }}),
-    Stun(Actions.Cast, 40,4,40,false,new Spell(){
-        @Override
-        public void perform(Unit host, int level){
+    }}){
+        public void trigger(Unit host, int level){
+            host.buff(Buffs.Glacialwalk, level);
+        }
+    },
+    Stun(Actions.Cast, 40,4,40,new Tags(){{
+        add(Tag.Debuff);
+        add(Tag.Cunning);
+    }}){
+        public void trigger(Unit host, int level){
             ArrayList<Unit> t = Updater.collideUnit(host.target.getAdd(host.pos),40,Faction.Destructive);
             if (t.size() > 0) t.get(0).buff(Buffs.Stun,level);
         }
-    }, new Tags(){{
+    },
+    Slow(Actions.Cast, 40,4,40,new Tags(){{
         add(Tag.Debuff);
-        add(Tag.Cunning);
-    }}),
-    Slow(Actions.Cast, 30,1,3,false,new Spell(){
-        @Override
-        public void perform(Unit host, int level){
+        add(Tag.Agility);
+    }}){
+        public void trigger(Unit host, int level){
             ArrayList<Unit> t = Updater.collideUnit(host.target.getAdd(host.pos),40,Faction.Destructive);
             if (t.size() > 0) t.get(0).buff(Buffs.Slow,level);
         }
-    }, new Tags(){{
-        add(Tag.Debuff);
-        add(Tag.Agile);
-    }}),
-    Poison(Actions.Cast, 40,4,20,false,new Spell(){
-        @Override
-        public void perform(Unit host, int level){
-            ArrayList<Unit> t = Updater.collideUnit(host.target.getAdd(host.pos),40,Faction.Destructive);
-            if (t.size() > 0) t.get(0).buff(Buffs.Poison,level);
-        }
-    }, new Tags(){{
-        add(Tag.Debuff);
+    },
+    Calling(Actions.Buff, 40,2,4,new Tags(){{
+        add(Tag.Conjuration);
         add(Tag.Biology);
-    }}),
-    Calling(Actions.Buff, 40,2,4,false,new Spell() {
-        @Override
-        public void perform(final Unit host, int level){
+    }}){
+        public void trigger(Unit host, int level){
             Sound.play("shadowstep");
             for (int i=0;i<host.rand.nextInt(level+1);i++) {
                 Unit p = (Unit) Stock.getByName("Dog",-1);
@@ -172,13 +167,12 @@ public enum Spells implements Moveset {
                 p.faction = host.faction;
             }
         }
-    }, new Tags(){{
+    },
+    Shadowtwin(Actions.Buff, 40,3,60,new Tags(){{
+        add(Tag.Shadow);
         add(Tag.Conjuration);
-        add(Tag.Biology);
-    }}),
-    Shadowtwin(Actions.Buff, 40,3,60,false,new Spell() {
-        @Override
-        public void perform(final Unit host, int level){
+    }}){
+        public void trigger(final Unit host, int level){
             Sound.play("shadowstep");
             for (int i=0;i<host.rand.nextInt(level+1);i++) {
                 Man p = new Man(host.seed) {
@@ -210,14 +204,13 @@ public enum Spells implements Moveset {
                 p.clip.setState(Actions.Buff);
             }
         }
-    }, new Tags(){{
+    },
+    Shadowstep(Actions.Conjure, 20,1,40,new Tags(){{
         add(Tag.Shadow);
-        add(Tag.Conjuration);
-    }}),
-    Shadowstep(Actions.Conjure, 20,1,40,true,new Spell() {
-        private int turn = 0;
-        public void perform(Unit host, int level){
-            if (turn++%4==0) Sound.play("shadow");
+        add(Tag.Cunning);
+    }}){
+        public void trigger(Unit host, int level){
+            Sound.play("shadow");
             Particle.smoke(host.pos);
             P target = host.target.getAdd(host.pos);
             Line pp = new Line(target, target.getAdd(0,1200));
@@ -235,15 +228,12 @@ public enum Spells implements Moveset {
                 }
             }
         }
-    }, new Tags(){{
-        add(Tag.Shadow);
-        add(Tag.Cunning);
-    }}),
-    Fireworks(Actions.Cast, 40,0,10,true,new Spell(){
-        private int turn = 0;
-        @Override
-        public void perform(final Unit host, int level){
-            if (turn++%8==0) Sound.play("fire");
+    },
+    Fireworks(Actions.Cast, 40,0,10,new Tags(){{
+        add(Tag.Fire);
+    }}){
+        public void update(Unit host, int level){
+            Sound.play("fire");
             for (int i=0;i<2;i++) {
                 final Projectile p = new Projectile("Fire", host.getHand(), host.target.getAdd(host.pos).getAdd(Global.r.nextInt(50)-25, Global.r.nextInt(50)-25), Global.r.nextInt(12)+3) {
                     @Override
@@ -262,15 +252,15 @@ public enum Spells implements Moveset {
                     }
                 };
             }
+            super.update(host, level);
         }
-    }, new Tags(){{
+    },
+    Fireblast(Actions.Cast, 40,1,60,new Tags(){{
         add(Tag.Fire);
-    }}),
-    Fireblast(Actions.Cast, 40,4,60,true,new Spell(){
-        private int turn = 0;
-        @Override
-        public void perform(final Unit host, final int level){
-            if (turn++%8==0) Sound.play("fire");
+        add(Tag.Air);
+    }}){
+        public void update(Unit host, final int level){
+            Sound.play("fire");
             for (int i=0;i<3;i++) {
                 final Projectile p = new Projectile("Flame", host.getHand(), host.target.getAdd(host.pos).getAdd(Global.r.nextInt(50)-25, Global.r.nextInt(50)-25), Global.r.nextInt(10+level)+6+level) {
                     @Override
@@ -294,16 +284,15 @@ public enum Spells implements Moveset {
                     }
                 };
             }
+            super.update(host, level);
         }
-    }, new Tags(){{
-        add(Tag.Fire);
+    },
+    Freeze(Actions.Cast, 40,1,24,new Tags(){{
+        add(Tag.Cold);
         add(Tag.Air);
-    }}),
-    Freeze(Actions.Cast, 40,2,24,true,new Spell(){
-        private int turn = 0;
-        @Override
-        public void perform(final Unit host, final int level){
-            if (turn++%6==0) Sound.play("ice");
+    }}){
+        public void update(Unit host, final int level){
+            Sound.play("ice");
             for (int i=0;i<3;i++) {
                 final Projectile p = new Projectile("Ice", host.getHand(), host.target.getAdd(host.pos).getAdd(Global.r.nextInt(150)-75, Global.r.nextInt(150)-75), 20) {
                     private int tick = 200;
@@ -329,23 +318,24 @@ public enum Spells implements Moveset {
                     }
                 };
             }
+            super.update(host, level);
         }
-    }, new Tags(){{
-        add(Tag.Cold);
-        add(Tag.Air);
-    }}),
-    Flameroll(Actions.Cast, 40,5,120,false,new Spell(){
-        @Override
-        public void perform(final Unit host, final int level){
+    },
+    Flameroll(Actions.Cast, 40,5,120,new Tags(){{
+        add(Tag.Fire);
+        add(Tag.Biology);
+    }}){
+        public void trigger(final Unit host, final int level){
             final Projectile p = new Projectile("Fireball", host.pos, host.target.getAdd(host.pos), 80){
                 @Override
                 public void stuck(){
                     attackHitSound();
-                    host.setVisible(true);
-                    Particle.explode("Fire", pos, new P(), 100+(level*15), 10+(level*2), 0, false, 4);
+                    Particle.explode("Fire", pos, new P(), 85+(level*10), 10+(level*2), 0, false, 4);
                     Particle.smoke(pos);
-                    explode(40+(level*5));
+                    explode(80+(level*10));
                     remove();
+                    host.setVisible(true);
+                    host.stats.triggerEffect(Buffs.Invincible);
                 }
                 @Override
                 public void update(){
@@ -357,6 +347,7 @@ public enum Spells implements Moveset {
                 }
             };
             host.setVisible(false);
+            host.buff(Buffs.Invincible, 80);
             p.gravity = true;
             p.faction = host.faction;
             p.damage = 15+host.get("Proficiency").get();
@@ -367,13 +358,12 @@ public enum Spells implements Moveset {
                 }
             };
         }
-    }, new Tags(){{
+    },
+    Fireball(Actions.Cast, 40,5,50,new Tags(){{
         add(Tag.Fire);
-        add(Tag.Biology);
-    }}),
-    Fireball(Actions.Cast, 40,5,50,false,new Spell(){
-        @Override
-        public void perform(final Unit host, final int level){
+        add(Tag.Conjuration);
+    }}){
+        public void trigger(Unit host, final int level){
             final Projectile p = new Projectile("Fireball", host.getHand(), host.target.getAdd(host.pos), 50){
                 @Override
                 public void stuck(){
@@ -402,13 +392,13 @@ public enum Spells implements Moveset {
                 }
             };
         }
-    }, new Tags(){{
-        add(Tag.Fire);
-        add(Tag.Conjuration);
-    }}),
-    Blizzard(Actions.Buff, 30,3,240,true,new Spell(){
-        @Override
-        public void perform(final Unit host, final int level){
+    },
+    Blizzard(Actions.Buff, 30,2,240,new Tags(){{
+        add(Tag.Cold);
+        add(Tag.Air);
+        add(Tag.Mastery);
+    }}){
+        public void update(Unit host, final int level){
             if (Global.r.nextInt(40) > (level*8)-4) return;
             if (Math.random() < .2f) Sound.play("ice");
             final Projectile p = new Projectile("Ice", host.pos.getAdd(Global.nextGaussian(500),-500), host.pos.getAdd(Global.nextGaussian(500),0), 8+Global.r.nextInt(6*level)){
@@ -438,14 +428,15 @@ public enum Spells implements Moveset {
                     p.stuck();
                 }
             };
+            super.update(host, level);
         }
-    }, new Tags(){{
-        add(Tag.Cold);
-        add(Tag.Air);
+    },
+    Meteor(Actions.Cast, 40,2,240,new Tags(){{
+        add(Tag.Fire);
+        add(Tag.Conjuration);
         add(Tag.Mastery);
-    }}),
-    Meteor(Actions.Cast, 40,6,240,true,new Spell(){
-        public void perform(Unit host, int level){
+    }}){
+        public void update(Unit host, int level){
             if (Global.r.nextInt(60) > level*2) return;
             Sound.play("meteor");
             final Projectile p = new Projectile("Fireball", host.pos.getAdd(Global.nextGaussian(50),-500), host.pos.getAdd((host.target.x)+Global.nextGaussian(50),0), 12+Global.r.nextInt(6)){
@@ -471,38 +462,24 @@ public enum Spells implements Moveset {
                     p.stuck();
                 }
             };
+            super.update(host, level);
         }
-    }, new Tags(){{
-        add(Tag.Fire);
-        add(Tag.Conjuration);
-        add(Tag.Mastery);
-    }});
-    private static Spell produceBuff(final Buffs p){
-        return new Spell(){
-            public void perform(Unit host, int level){
-                host.buff(p, level);
-            }
-        };
-    }
+    };
     protected int cost;
     protected Actions action;
     protected int delay;
-    protected Spell spell;
     protected String description;
     protected int cooldown;
-    public boolean channel;
     Tags tags;
 
-    Spells(Actions action, int del, int cost, int cooldown, boolean channel, Spell performer, Tags tags){
+    Spells(Actions action, int del, int cost, int cooldown, Tags tags){
         this.action = action;
         this.delay = del;
         this.cost = cost;
         this.cooldown = cooldown;
-        this.channel = channel;
-        this.spell = performer;
         this.description = Dialog.get("mvsDsc"+name());
         this.tags = tags;
-        this.tags.add(Tag.Arms);
+        this.tags.add(Tag.Swinging);
     }
     public static Spells getByName(String p){
         for (Spells s : values()) {
@@ -543,20 +520,20 @@ public enum Spells implements Moveset {
         return delay;
     }
 
-    public Spell getEvent() {
-        return spell;
-    }
-
     @Override
     public int getCooldown(){
         return cooldown;
     }
 
     @Override
+    public int getDifficulty(){
+        return 0;
+    }
+
+    @Override
     public void update(Unit host, int level){
         host.face(host.target.x > 0 ? 1 : -1, true);
-        spell.perform(host, level);
-        if (!channel || (Global.r.nextInt(Math.max(0,40-(cost*2))) == 0 && !host.get("Stamina").require(1))) host.stateSet(Actions.Idle);
+        if (Updater.time.over() && !host.get("Stamina").require(cost)) host.stateSet(Actions.Idle);
     }
 
     @Override
@@ -573,6 +550,8 @@ public enum Spells implements Moveset {
 
     @Override
     public void trigger(Unit p, int organ){
+        Sound.play("spell");
+        p.state = this;
     }
 
     @Override

@@ -6,7 +6,7 @@ import com.ga.game.Display;
 import com.ga.game.Settings;
 import com.ga.tool.EventTimer;
 import com.ga.tool.P;
-import com.ga.unit.MainPlayer;
+import com.ga.unit.player.MainPlayer;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -26,13 +26,11 @@ public class Global {
     public static Random r = new Random();
     static int margin = 0;
     public static P rel = new P();
-    public static int gameHour = 0;
     private static float[] sinv = new float[360];
     private static float[] cosv = new float[360];
     private static int[] time = new int[]{0};
     private static int controlId = 1;
     private static int houseId = 1;
-    public static int thouseId = -1;
     public static ArrayList<EventTimer> timers = new ArrayList<>();
 
     public static void init(){
@@ -74,11 +72,11 @@ public class Global {
         System.out.println(p);
     }
     public static int mapEdge(P p){
-        int result = 1;
-        if (p.x < 0) result = 2;
-        else if (p.x > Global.map.size.x) result = 4;
-        if (p.y < 0) result = 3;
-        else if (p.y > Global.map.size.y) result = 9;
+        int result = 0;
+        if (p.x < 0) result = 4;
+        else if (p.x > Global.map.size.x) result = 6;
+        if (p.y < 0) result = 8;
+        else if (p.y > Global.map.size.y) result = 2;
         return result;
     }
     public static void mapEdgeCenter(P p){
@@ -104,24 +102,23 @@ public class Global {
             if (timer.update()) it.remove();
         }
     }
-    public static void setTime(int p){
+    public static void loadTime(int p){
         time[0] = p;
     }
     public static int[] getTime(){
         return time;
     }
+    public static int getHour(){
+        return time[0]/1000;
+    }
     public static void setHour(int p){
-        player.onTimeChange(p-gameHour);
+        player.onTimeChange(p-getHour());
         map.onTimeChange();
-        gameHour = p;
+        time[0] = (p*1000)+(time[0]%1000);
     }
     public static int getHouseId(){
         return houseId++;
     }
-    public static int getTempHouseId(){
-        return --thouseId;
-    }
-
     public static int getControlId() {
         return controlId++;
     }

@@ -1,10 +1,7 @@
 package com.ga.unit.skill;
 
 import com.ga.map.Global;
-import com.ga.tool.P;
-import com.ga.tool.Performer;
 import com.ga.tool.Timer;
-import com.ga.unit.Particle;
 import com.ga.unit.Unit;
 
 import java.util.ArrayList;
@@ -18,8 +15,7 @@ import java.util.Map;
 public class Stats {
     private ArrayList<Buff> effects = new ArrayList<>();
     private HashMap<String, Stat> stats = new HashMap<>();
-    private Timer timer = new Timer(100, true);
-    private Timer bloodTimer = new Timer(-1, true);
+    private Timer timer = new Timer(24, true);
     private Unit host;
     public Stats(Unit host){
         this.host = host;
@@ -35,7 +31,7 @@ public class Stats {
     public void addEffect(Buffs p, int level){
         Buff origBuff = getEffect(p);
         if (origBuff == null) {
-            Buff buff = p.make(host, level);
+            Buff buff = p.make(host, Math.min(10,level));
             buff.onSet();
             effects.add(buff);
         } else {
@@ -65,12 +61,10 @@ public class Stats {
             stats.get(stat).addTotal(1);
         }
     }
-    public void unrest(){
-        timer.reset();
-    }
     public boolean rest(int mag){
         if (timer.update(mag)){
-            stats.get("Stamina").heal();
+            Stat stamina = stats.get("Stamina");
+            stamina.add(1);
             return true;
         }
         return false;
@@ -84,7 +78,6 @@ public class Stats {
                 it.remove();
             }
         }
-        if (bloodTimer.update()) Particle.explode("Blood",host.getRandomPoint(),new P(),Global.r.nextInt(4),5,0,true,24);
     }
     public void load(String p){
         String[] statOrBuff = p.split("/");
@@ -96,7 +89,7 @@ public class Stats {
             stats.put(pair[0], newstat);
         }
         if (statOrBuff.length > 1) {
-            data = statOrBuff[1].split(";");
+            data = statOrBuff[1].split(",");
             for (String i : data) {
                 String[] t = i.split("&");
                 Buffs buff = Buffs.values()[Integer.parseInt(t[0])];
@@ -105,14 +98,6 @@ public class Stats {
                 effects.get(effects.size()-1).var = Integer.parseInt(t[3]);
             }
         }
-        final Stat health = stats.get("Health");
-        health.onChange = new Performer(){
-            public void perform(){
-                if (health.isFull()) bloodTimer.set(-1);
-                else bloodTimer.set((int) (health.getPercentage()*health.getPercentage()*100)+1, true);
-                if (health.get() <= 0) host.die();
-            }
-        };
     }
     public int getEffectsSize(){
         return effects.size();
@@ -133,7 +118,7 @@ public class Stats {
         }
         result = result.substring(0,result.length()-1)+"/";
         for (Buff i : effects){
-            result += i.toString()+";";
+            result += i.toString()+",";
         }
         return result.substring(0,result.length()-1);
     }

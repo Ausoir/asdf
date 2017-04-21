@@ -1,20 +1,22 @@
-package com.ga.unit;
+package com.ga.unit.player;
 
 import com.ga.game.Sound;
 import com.ga.map.Global;
+import com.ga.map.Updater;
 import com.ga.tool.Performer;
+import com.ga.unit.*;
 import com.ga.unit.intelligence.PlayerInput;
 import com.ga.unit.item.Crafts;
-import com.ga.unit.item.Inventory;
 import com.ga.unit.item.Item;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Moveset;
+import com.ga.unit.skill.Stat;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
- * Created by Ga on 7/30/2016.
+ * Created by Ga on 7/30/2016. asd
  */
 public class Player extends Man {
     public String memorized = "";
@@ -24,26 +26,29 @@ public class Player extends Man {
     public Crafts crafting;
     public int selectingItem = -1;
     public PlayerInput input;
-    public String cmap;
+    public String cmap, cworld;
+    public Health health;
+    public Moveset learning;
+    ArrayList<Trait> traits = new ArrayList<>();
     public Player(int seed) {
         super(seed);
         loadMoveset("-5,100,1000/Use&Walk&Sprint");
         speechType = "p";
         inventory = new Inventory(this);
         crafting = new Crafts(this);
+        health = new Health(this);
     }
     public void learnSkill(Moveset p){
         say("Learned spell "+p.getName()+"!");
         skillTree.addSkill(p);
-        if (skillTree.hasSkill(Actions.Skill)) tags.add(Tag.Skill);
     }
-    public void advanceSkill(Moveset p, boolean cd){
+    public void advanceSkill(Moveset p){
         if (get("Memory").require(1))
-           skillTree.advanceSkill(p, cd);
+           skillTree.advanceSkill(p);
     }
     public void setWeapon(Item p){
         if (p == null){
-            super.setWeapon(p);
+            super.setWeapon(null);
         } else if (sheathe()){
             Sound.play("wield");
             super.setWeapon(p);
@@ -52,7 +57,7 @@ public class Player extends Man {
             super.setWeapon(p);
         }
     }
-    public boolean sheathe() {
+    boolean sheathe() {
         if (wieldingNone()) return true;
         if (inventory.sheathe(weapon)){
             weapon.remove();
@@ -60,7 +65,7 @@ public class Player extends Man {
         }
         return false;
     }
-    public void dropItem(Item p) {
+    private void dropItem(Item p) {
         Item t = inventory.remove(p);
         if (t != null) {
             t.drop(this);
@@ -71,23 +76,10 @@ public class Player extends Man {
         say("Dropping " + p.getFullName());
     }
     @Override
-    protected int[] getCooldown(Moveset state){
-        int level = skillTree.getSkillCdLevel(state);
-        int[] r = cooldown.get(state);
-        if (r == null) r = new int[]{0};
-        int reduction = 0;
-        float stateCd = state.getCooldown();
-        if (stateCd > 0) {
-            float cd = stateCd * (float) (1f / (Math.pow(2, level)));
-            reduction = (int) (stateCd - cd) - level;
-        }
-        return new int[]{r[0]-reduction};
-    }
-    @Override
-    boolean tagCapable(Tags p){
+    protected boolean tagCapable(Tags p){
         if (!tags.has(p)) {
             for (Tag i : p) {
-                if (!tags.contains(i) && !armor.tags.contains(i)) return false;
+                if (!tags.contains(i) && !armor.tags.contains(i)) return true;
             }
         }
         return true;
@@ -105,21 +97,47 @@ public class Player extends Man {
                 say(state.getName() + " is available in " + Global.checkCooldown(getCooldown(state), state.getCooldown()) + " seconds!");
             } else if (r == 4){
                 say("Cannot cast!");
-            }
+            } else if (r == 5) say("This skill is beyond my abilities!");
         }
         return r;
     }
     @Override
     public int getStateLevel(Moveset state){
-        return skillTree.getSkillLevel(state);
+        int difficulty = state.getDifficulty();
+        if (difficulty == 0) return 1;
+        int power = 0;
+        for (Tag i : state.getTags().getTrainers()){
+            power += get(i.toString()).get();
+        }
+        return Math.max(0,skillTree.getSkillLevel(state)-(difficulty-power));
     }
     @Override
     public int getStatPenalty() {
         return Math.max(0, armor.getWeight()+weapon.weight-get("Strength").get());
     }
     public float getSpeed() {
-        float t = Math.max(0,super.getSpeed()-Math.max(0,inventory.weight+armor.getWeight()+weapon.weight-get("Strength").get()));
-        return t;
+        return Math.max(0,super.getSpeed()-Math.max(0,inventory.weight+armor.getWeight()+weapon.weight-get("Strength").get()));
+    }
+    public void witnessDeath(Unit p){
+        if (faction.canAttack(p.faction) && p.pos.getSubtract(pos).inOval(900,500) && learning != null){
+            boolean fast = traits.contains(Trait.Fast_Learner) && get("Motivation").require(3);
+            if (fast || get("Motivation").require(1)) {
+                Stat progress = get("Progress");
+                progress.add(Math.max(1,p.get("Level").get()*3-get("Level").get())*(fast?2:1),true);
+                if (progress.isFull()) {
+                    progress.set(progress.get()-progress.getMax(), true);
+                    int difficulty = learning.getDifficulty();
+                    Tags tags = learning.getTags().getTrainers();
+                    int amount = 10 / tags.size();
+                    int mod = 10 % tags.size();
+                    for (Tag i : tags){
+                        Stat tagStat = get(i.toString());
+                        tagStat.add(amount/Math.max(1,tagStat.get()-difficulty));
+                    }
+                    progress.add(mod*10);
+                }
+            }
+        }
     }
     public ArrayList<Prop> getAvailableItems(){
         ArrayList<Prop> items = Updater.collideProp(pos,100);
@@ -133,31 +151,43 @@ public class Player extends Man {
     }
     public String toCharacterString(){
         String r = super.toString()+"\n";
-        r += cmap+";"+gold+";"+memorized+";"+Global.getTime()[0]+";"+Global.gameHour+"\n";
+        r += Global.getTime()[0]+";"+cmap+";"+cworld+";"+gold+";"+memorized+";"+learning+"\n";
         r += input.toString()+"\n";
         r += inventory.toString()+"\n";
         r += skillTree.toString()+"\n";
-        r += crafting.toString();
+        r += crafting.toString()+"\n";
+        r += health.toString()+"\n";
+        for (Trait i : traits) r += i.name()+";";
         return r;
     }
     public void load(String p){
         String[] line = p.split("%");
         super.load(line[0]);
-        name = "Player";
         setHead("Player");
         String[] other = line[1].split(";");
-        cmap = other[0];
-        gold = Integer.parseInt(other[1]);
-        memorized = other[2];
+        cmap = other[1];
+        cworld = other[2];
+        gold = Integer.parseInt(other[3]);
+        memorized = other[4];
+        learning = SkillTree.getByName(other[5]);
         inventory.load(line[3]);
         skillTree.load(line[4]);
         crafting.load(line[5]);
+        String[] traits = line[7].split(";");
+        for (String i : traits){
+            if (!i.equals("")){
+                Trait trait = Trait.getByName(i);
+                this.traits.add(trait);
+                trait.onSet(this);
+            }
+        }
+        health.load(line[6]);
         armor.onChange = new Performer(){
             public void perform(){
                 inventory.setMaxSize(armor.getPockets());
             }
         };
         inventory.setMaxSize(armor.getPockets());
-        if (skillTree.hasSkill(Actions.Skill)) tags.add(Tag.Skill);
+        health.record("");
     }
 }

@@ -2,9 +2,7 @@ package com.ga.unit.item;
 
 import com.ga.game.Dialog;
 import com.ga.game.Sound;
-import com.ga.map.Global;
-import com.ga.map.ShadedPicture;
-import com.ga.map.Shader;
+import com.ga.map.*;
 import com.ga.tool.Interactive;
 import com.ga.tool.Line;
 import com.ga.tool.P;
@@ -50,7 +48,7 @@ public class Item extends Prop {
         }
     }
     enum SpecialtyMod{
-        None, Light, Heavy, Feather, Sharp, Dull, Hasty, Lazy, Durable, Tough, Runic, Instant, Comfortable, Cursed, Quick, Slow, Recharging;
+        None, Light, Heavy, Feather, Sharp, Dull, Hasty, Lazy, Durable, Tough, Runic, Instant, Comfortable, Cursed, Quick, Slow, Conscious;
         static SpecialtyMod get(Random seed){
             if (seed.nextGaussian() > 1) return values()[seed.nextInt(values().length)];
             return None;
@@ -151,24 +149,25 @@ public class Item extends Prop {
     protected Buffs emod = null;
     public int weight;
     public int volume = 1;
-    protected int cooldown = 0;
+    int cooldown = 0;
     public int delay = 0;
     public float probability;
     Moveset action = Actions.Slash;
     private int[] lastused = new int[]{0};
-    public Stat uses = new Stat(-1);
+    private int durability = 1;
+    public int uses = 1;
     private Tag type = Tag.Throwing;
     private Organ organ = null;
     public int speed = -4;
     public int damage = 0;
     public int value = 8;
     public boolean breakable = true;
-    public Item(String name, int seed, int weight, int uses) {
+    public Item(String name, int seed, int weight, int durability) {
         super(name, seed, 100);
         dynamic = true;
         this.name = name;
         this.weight = weight;
-        this.uses.setTotal(uses);
+        this.durability = durability;
         gravity = true;
         final Item me = this;
         onInteract = new Interactive(){
@@ -190,8 +189,9 @@ public class Item extends Prop {
         setModifier(pmod);
         setModifier(smod);
         shade();
+        uses = durability;
     }
-    public void loadMeta(String p){
+    private void loadMeta(String p){
         String[] metadata = p.split("_");
         pmod = PrefixMod.load(metadata[0]);
         smod = SpecialtyMod.load(metadata[1]);
@@ -201,16 +201,18 @@ public class Item extends Prop {
             ademod = AdenchantMod.load(metadata[4]);
             probability = ademod.magnitude;
         }
+        setModifier(pmod);
+        setModifier(smod);
         shade();
     }
     private void shade(){
         int r = getRarity();
         if (r % 10 > 3){
-            image = new ShadedPicture(name, Shader.Shine);
-            ((ShadedPicture) image).shade();
+            image = new ShadedPicture(name, Shader.Color);
+            ((ShadedPicture) image).shade(new Color(250, 220, 100, 180).getRGB());
         } else if (r >= 100){
-            image = new ShadedPicture(name, Shader.Glow);
-            ((ShadedPicture) image).shade();
+            image = new ShadedPicture(name, Shader.Color);
+            ((ShadedPicture) image).shade(new Color(48, 156, 200, 180).getRGB());
         }
     }
     public void setType(Tag p){
@@ -241,17 +243,19 @@ public class Item extends Prop {
     protected void setModifier(PrefixMod mod){
         if (mod == PrefixMod.Broken){
             speed -= 10;
-            uses.add((int) (uses.getMax()*-.7f));
+            durability = (int) (durability*.4f);
         }else if (mod == PrefixMod.Old){
             speed -= 5;
-            uses.add((int) Math.min(-1,uses.getMax()*-.3f));
+            durability = (int) (durability*.7f);
         }else if (mod == PrefixMod.Fine){
-            uses.addTotal(Math.max(1,uses.getMax()));
             probability += .1f;
+            durability = (int) (durability*1.5f);
         }else if (mod == PrefixMod.Mastercraft){
             speed += 4;
             probability += .2f;
+            durability = (int) (durability*2f);
         }else if (mod == PrefixMod.Legendary){
+            durability = -1;
             speed += 7;
             probability += .3f;
         }
@@ -268,13 +272,13 @@ public class Item extends Prop {
         else if (mod == SpecialtyMod.Slow) speed = -admod.magnitude;
         else if (mod == SpecialtyMod.Hasty) cooldown *= 1-(.2f*admod.magnitude);
         else if (mod == SpecialtyMod.Lazy) cooldown *= 1+(.2f*admod.magnitude);
-        else if (mod == SpecialtyMod.Durable) uses.addTotal(uses.getMax());
+        else if (mod == SpecialtyMod.Durable) durability *= 2;
         else if (mod == SpecialtyMod.Runic) probability += .2f;
         else if (mod == SpecialtyMod.Instant) delay = 1;
         else if (mod == SpecialtyMod.Comfortable) smod = SpecialtyMod.None;
-        else if (mod == SpecialtyMod.Recharging){
+        else if (mod == SpecialtyMod.Conscious){
             cooldown = ((cooldown+5) * 2)+40;
-            uses.setTotal(-1);
+            durability = -1;
         }
     }
     private int getRarity(){
@@ -370,16 +374,15 @@ public class Item extends Prop {
             Curse.get(host, 5);
         }
     }
-    boolean canUse(){
-        return uses.get() != 0 && Global.checkCooldown(lastused, cooldown) <= 0;
-    }
     protected void playSound(){
         Sound.play(type.getSound());
     }
     public boolean use(int p){
-        if (canUse()){
-            if (uses.get() != -1) uses.add(-p);
-            if (breakable && uses.get() == 0) remove();
+        if ((isInfinite() || uses > p) && Global.checkCooldown(lastused, cooldown) <= 0){
+            if (!isInfinite()){
+                uses -= p;
+                if (breakable && uses == 0) remove();
+            }
             return true;
         }
         return false;
@@ -389,11 +392,10 @@ public class Item extends Prop {
             target.stats.addEffect(emod, ademod.level);
         }
     }
-    public boolean use(Man host){
+    public void use(Man host){
         playSound();
         Global.cooldown(lastused, cooldown);
         host.setState(action);
-        return true;
     }
     public void drop(Man host) {
         if (host.weapon == this) host.setWeapon(null);
@@ -421,8 +423,7 @@ public class Item extends Prop {
     }
     public String getDescription() {
         String r = "";
-        int uses = this.uses.get();
-        r += Dialog.get("itemDsc",new String[]{getFullName(),weight+"",(uses==-1?"unlimited":uses+"")});
+        r += Dialog.get("itemDsc",new String[]{getFullName(),weight+"",(isInfinite()?"unlimited":uses+"")});
         if (emod != null){
             String ade = "";
             if (ademod != AdenchantMod.None) ade = "Level "+ademod.level+" ";
@@ -464,6 +465,16 @@ public class Item extends Prop {
         String r = toString();
         if (forced) save = false;
         return r;
+    }
+    @Override
+    public void load(String p){
+        String[] sections = p.split("@");
+        uses = Integer.parseInt(sections[3]);
+        loadMeta(sections[4]);
+        rotation = Float.parseFloat(sections[5]);
+    }
+    private boolean isInfinite(){
+        return durability == -1;
     }
     @Override
     public String toString(){

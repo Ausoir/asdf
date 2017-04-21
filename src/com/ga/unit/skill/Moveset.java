@@ -17,6 +17,7 @@ public interface Moveset {
 
     int getCooldown();
     float getVelX();
+    int getDifficulty();
 
     void trigger(Unit p, int organ);
     void onSet(Unit p, int level);

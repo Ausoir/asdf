@@ -2,6 +2,7 @@ package com.ga.unit;
 
 import com.ga.game.Sound;
 import com.ga.map.Global;
+import com.ga.map.Updater;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
@@ -28,6 +29,8 @@ public class Man extends Unit {
         super(seed);
         clip = new BodyHumanoid(this);
     }
+
+    @Override
     public void load(String p){
         super.load(p.split("#")[0]);
         final Man me = this;
@@ -148,7 +151,7 @@ public class Man extends Unit {
                     damageMod = 2 + stateLevel;
                     break;
                 case Thrust:
-                    damageMod = .5f + (Math.abs(vel.x) / 20) + (stateLevel*.5f);
+                    damageMod = 1 + (Math.abs(vel.x) / 20) + (stateLevel*.5f);
                     break;
                 case Dash:
                     vel.x -= getSpeed() * dir;
@@ -158,7 +161,7 @@ public class Man extends Unit {
                     break;
                 case Whirlwind:
                     delay.time += 8 * stateLevel;
-                    damageMod = .5f + ((float) stateLevel * .5f);
+                    damageMod = 1 + ((float) stateLevel * .5f);
                     delay.performer = new Performer(){
                         public void perform(){
                             setState(Actions.Rest);
@@ -169,11 +172,11 @@ public class Man extends Unit {
                     damageMod = stateLevel;
                     break;
                 case Slash:
-                    damageMod = 1+(stateLevel*.5f);
+                    damageMod = .7f+(stateLevel*.3f);
                     speed = Math.min(10,speed);
                     break;
                 default:
-                    damageMod = .5f + (stateLevel * .5f);
+                    damageMod = 1 + (stateLevel * .4f);
             }
             if (delay.max != 0) delay.set(Math.max(3, delay.time - speed));
             clip.setSpeed(speed);
@@ -208,19 +211,11 @@ public class Man extends Unit {
         return (int) armor.getArmor(organ);
     }
 
-    void restorePoise(){
-        super.restorePoise();
-        poise += armor.getArmor(3)*8;
-    }
-
     @Override
-    public boolean hit(Line hitbox, int damage, DamageType type) {
-        boolean r = super.hit(hitbox, damage, type);
-        if (r){
-            target = hitbox.pt.getAdd(0,0);
-            armor.onHit();
-        }
-        return r;
+    public void hit(Line hitbox, float knockback, DamageType type) {
+        super.hit(hitbox, knockback, type);
+        target = hitbox.pt.getAdd(0,0);
+        armor.onHit();
     }
 
     public Stat get(String p){
@@ -262,7 +257,7 @@ public class Man extends Unit {
         boolean r;
         if (r = super.checkHit(hitBox, damage, type)) {
             if (clip.organs[FIST].amputated && clip.organs[OFIST].amputated){
-                tags.remove(Tag.Arms);
+                tags.remove(Tag.Swinging);
             }
         }
         return r;
