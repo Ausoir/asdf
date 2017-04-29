@@ -21,7 +21,6 @@ import java.util.ArrayList;
 /**
  * Created by Ga on 2/3/2017. asd
  */
-@SuppressWarnings("Unused")
 public enum Stock {
     Spawn{ protected Prop make(int seed){
         Prop product = new Prop(getName(), seed, 999){
@@ -54,7 +53,7 @@ public enum Stock {
                     Global.server.requestConnection(p.getConversation().substring(5));
                     p.say("Connecting...");
                 }
-                p.setState(Actions.Wait);
+                p.setState(Actions.Hit);
             }
         };
         return process(product);
@@ -70,7 +69,6 @@ public enum Stock {
     }},
     Fist{ Prop make(int seed){
         Prop product = new Weapon(getName(),0,0,-1,1,4,Item.Tag.Spear){
-            @Override
             public void use(final Man host) {
                 host.setState(Actions.Interact);
             }
@@ -78,6 +76,7 @@ public enum Stock {
                 return "";
             }
             public void drop(Man host) {}
+            public void onUnequip(Man host){}
         };
         return process(product);
     }},
@@ -85,6 +84,7 @@ public enum Stock {
         Prop product = new Weapon("Fist",0,0,-1,1,2,Item.Tag.Spear){
             public void drop(Man host) {}
         };
+        product.image.setCenterType(2);
         return process(product);
     }},
     Stick{ Prop make(int seed){ //3
@@ -93,10 +93,12 @@ public enum Stock {
     }},
     Wooden_Sword{ Prop make(int seed){
         Prop product = new Weapon(getName(),seed,1,30,1,3,Item.Tag.Mace);
+        product.image.setCenterType(2);
         return process(product);
     }},
     Broadsword{ Prop make(int seed){
         Prop product = new Weapon(getName(),seed,3,100,1,6,Item.Tag.Sword);
+        product.image.setCenterType(2);
         return process(product);
     }},
     Bamboo_Spear{ Prop make(int seed){
@@ -111,10 +113,12 @@ public enum Stock {
     }},
     Katana{ Prop make(int seed){
         Prop product = new Weapon(getName(),seed,2,40,1,6,Item.Tag.Sword);
+        product.image.setCenterType(3);
         return process(product);
     }},
     Claw{ Prop make(int seed){
         Prop product = new Weapon(getName(),seed,1,60,1,4,Item.Tag.Claw);
+        product.image.setCenterType(2);
         return process(product);
     }},
     Spear{ Prop make(int seed){ //10
@@ -127,6 +131,7 @@ public enum Stock {
     }},
     Dagger{ Prop make(int seed){
         Prop product = new Weapon(getName(),seed,1,100,1,3,Item.Tag.Dagger);
+        product.image.setCenterType(2);
         return process(product);
     }},
     Pickaxe { Prop make(int seed){
@@ -135,18 +140,22 @@ public enum Stock {
     }},
     Cleaver{ Prop make(int seed){
         Prop product = new Weapon(getName(),seed,4,100,1,6,Item.Tag.Sword);
+        product.image.setCenterType(2);
         return process(product);
     }},
     Lancesword{ Prop make(int seed){
         Prop product = new Weapon(getName(),seed,3,300,1,6,Item.Tag.Spear);
+        product.image.setCenterType(2);
         return process(product);
     }},
     Cutlass{ Prop make(int seed){
         Prop product = new Weapon(getName(),seed,3,240,1,6,Item.Tag.Sword);
+        product.image.setCenterType(2);
         return process(product);
     }},
     Claymore{ Prop make(int seed){
         Prop product = new Weapon(getName(),seed,4,200,1,8,Item.Tag.Sword);
+        product.image.setCenterType(2);
         return process(product);
     }},
     Halberd{ Prop make(int seed){
@@ -155,22 +164,30 @@ public enum Stock {
     }},
     Greatsword{ Prop make(int seed){
         Prop product = new Weapon(getName(),seed,6,100,2,6,Item.Tag.Sword);
+        product.image.setCenterType(2);
         return process(product);
     }},
     Warhammer{ Prop make(int seed){ //20
         Prop product = new Weapon(getName(),seed,7,-1,2,8,Item.Tag.Mace);
         return process(product);
     }},
+    Bow{ Prop make(int seed){
+        Prop product = new Weapon(getName(),seed,1,6,3,6,Item.Tag.Bow);
+        return process(product);
+    }},
     Revolver{ Prop make(int seed){
         Prop product = new Weapon(getName(),seed,1,6,1,8,Item.Tag.Shoot);
+        product.image.setCenterType(2);
         return process(product);
     }},
     Pistol{ Prop make(int seed){
         Prop product = new Weapon(getName(),seed,1,12,1,8,Item.Tag.Shoot);
+        product.image.setCenterType(2);
         return process(product);
     }},
     Rifle{ Prop make(int seed){
         Prop product = new Weapon(getName(),seed,3,2,2,6,Item.Tag.Snipe);
+        product.image.setCenterType(2);
         return process(product);
     }},
     Ethersword{ Prop make(int seed){
@@ -185,12 +202,8 @@ public enum Stock {
                 super.remove();
                 Particle.holyExplosion(pos);
             }
-            public boolean use(int p) {
-                boolean r = super.use(p);
-                if (r && getOrgan() != null) {
-                    Particle.holyExplosion(pos.getAdd(getOrgan().ptd));
-                }
-                return r;
+            public void use(Man host) {
+                Particle.holyExplosion(pos);
             }
             public void update(){
                 super.update();
@@ -198,6 +211,7 @@ public enum Stock {
                 if (Math.random() < .03f) remove();
             }
         };
+        product.image.setCenterType(2);
         product.breakable = true;
         return process(product);
     }},
@@ -220,12 +234,22 @@ public enum Stock {
         return process(product);
     }},
     Suit_Legging{ Prop make(int seed){
-        Armor product = new Armor("Suit",seed,1,10,1,1,1);
+        Armor product = new Armor("Suit",seed,1,10,0,1,1);
         product.pocket = 1;
         return process(product);
     }},
     Suit_Torso{ Prop make(int seed){
-        Armor product = new Armor("Suit",seed,1,10,1,1,2);
+        Armor product = new Armor("Suit",seed,1,10,0,1,2);
+        product.pocket = 1;
+        return process(product);
+    }},
+    Robe_Legging{ Prop make(int seed){
+        Armor product = new Armor("Robe",seed,0,10,0,0,1);
+        product.pocket = 1;
+        return process(product);
+    }},
+    Robe_Torso{ Prop make(int seed){
+        Armor product = new Armor("Robe",seed,0,10,0,0,2);
         return process(product);
     }},
     Adventurewear_Legging{ Prop make(int seed){ //30
@@ -371,23 +395,13 @@ public enum Stock {
         return process(product);
     }},
     Door{ Prop make(int seed){
-        Prop product = new Prop(varies("Door",seed,2), seed, 49){
-            public void adjustToLand(){
-                super.adjustToLand();
-                rotation = 0;
-            }
-        };
+        Prop product = new Prop(varies("Door",seed,2), seed, 49);
         product.gravity = false;
         return process(product);
     }},
     SteamHouse{ Prop make(final int seed){
         final Prop entrance = Stock.Spawn.create(Global.getHouseId());
-        final Prop product = new Prop(varies("SteamHouse",seed,4), seed, 49){
-            public void adjustToLand(){
-                super.adjustToLand();
-                if (Math.abs(rotation) > .1f) rotation = 0;
-            }
-        };
+        final Prop product = new Prop(varies("SteamHouse",seed,4), seed, 49);
         product.pos = new P(){
             public void load(String p){
                 super.load(p);
@@ -412,10 +426,6 @@ public enum Stock {
     TowerHouse{ Prop make(final int seed){
         final ArrayList<Prop> addons = new ArrayList<>();
         final Prop product = new Prop(varies("TowerHouse",seed,3), seed, 49){
-            public void adjustToLand(){
-                super.adjustToLand();
-                if (Math.abs(rotation) > .1f) rotation = 0;
-            }
             public void setDepth(int depth){
                 super.setDepth(depth);
                 for (Prop i : addons) i.setDepth(depth);
@@ -480,9 +490,10 @@ public enum Stock {
                 public String toString(){
                     return "";
                 }
-                public void load(String p){
-                    super.load(p);
+                public String[] load(String p){
+                    String[] r = super.load(p);
                     speed = rand.nextInt(50)-25;
+                    return r;
                 }
                 public void onCreate(){
                     super.onCreate();
@@ -522,9 +533,10 @@ public enum Stock {
             public String toString(){
                 return "";
             }
-            public void load(String p){
-                super.load(p);
+            public String[] load(String p){
+                String[] r = super.load(p);
                 speed = rand.nextInt(50);
+                return r;
             }
             public void onCreate(){
                 super.onCreate();
@@ -590,9 +602,10 @@ public enum Stock {
     Spellbook{ Prop make(int seed){
         Item product = new Item(getName(), seed, 1, 1){
             private Spells spell;
-            public void load(String p){
-                super.load(p);
+            public String[] load(String p){
+                String[] r = super.load(p);
                 spell = Spells.values()[seed % Spells.values().length];
+                return r;
             }
             public void onCreate(){
                 super.onCreate();
@@ -623,9 +636,10 @@ public enum Stock {
                 super.onCreate();
                 skill = Actions.values()[seed % Actions.values().length];
             }
-            public void load(String p){
-                super.load(p);
+            public String[] load(String p){
+                String[] r = super.load(p);
                 skill = Actions.values()[seed % Actions.values().length];
+                return r;
             }
             @Override
             public void use(Man host){
@@ -648,15 +662,31 @@ public enum Stock {
         product.delay = 45;
         return process(product);
     }},
+    Bandage{ Prop make(int seed){
+        Item product = new Item(getName(), seed, 1, 1) {
+            public void use(Man host) {
+                if (usable(1)){
+                    super.use(host);
+                    host.stats.triggerEffect(Buffs.Bleed);
+                }
+            }
+            public String getDescription(){
+                return super.getDescription()+" Use to stop bleeding.";
+            }
+        };
+        product.setType(Item.Tag.Consumable);
+        product.delay = 45;
+        return process(product);
+    }},
     Potion{ Prop make(int seed){
         Item product = new Item(getName(), seed, 1, 1) {
             public void onCreate() {
-                imbueMeta(false, false, 1, true);
+                if (seed != 0) imbueMeta(false, false, 1, true);
             }
             public void use(Man host) {
-                if (use(1)){
+                if (usable(1)){
                     super.use(host);
-                    host.stats.addEffect(emod, ademod.level);
+                    host.buff(emod, ademod.level);
                 }
             }
             public String getName(){
@@ -675,10 +705,11 @@ public enum Stock {
             private Spells spell;
             @Override
             public void use(Man host){
-                if (use(1)) {
+                if (usable(1)) {
                     super.use(host);
                     if (spell != null && rand.nextFloat() < probability){
-                        spell.trigger(host, 3);
+                        host.stateLevel = 3;
+                        spell.trigger(host);
                     }
                 }
             }
@@ -686,9 +717,10 @@ public enum Stock {
                 super.onCreate();
                 spell = Spells.values()[rand.nextInt(Spells.values().length)];
             }
-            public void load(String p){
-                super.load(p);
+            public String[] load(String p){
+                String[] r = super.load(p);
                 spell = Spells.values()[rand.nextInt(Spells.values().length)];
+                return r;
             }
             public String getName(){
                 return super.getName()+" of "+spell.getName();
@@ -847,7 +879,7 @@ public enum Stock {
         return process(product);
     }},
     Resident{ Prop make(int seed){
-        Man product = getMan(seed,getStat(4,30,1),Faction.Helpless,"200/Sprint",
+        Man product = getMan(seed,getStat(4,10,1),Faction.Helpless,"200/Sprint",
                 null,
                 new String[]{"Cotton_Clothing","Fabric_Clothing"},null);
         product.speechType = "resident";
@@ -855,7 +887,7 @@ public enum Stock {
         return process(product);
     }},
     Merchant{ Prop make(int seed){
-        Man product = getMan(seed,getStat(4,30,1),Faction.Neutral,"200/Sprint",
+        Man product = getMan(seed,getStat(4,10,1),Faction.Neutral,"200/Sprint",
                 null,
                 new String[]{"Suit"},null);
         product.speechType = "merchant";
@@ -863,7 +895,7 @@ public enum Stock {
         return process(product);
     }},
     Guard{ Prop make(int seed){
-        Man product = getMan(seed,getStat(9,40,3),Faction.Neutral,"-5,20,800/Slash,Thrust&Dash&Sprint",
+        Man product = getMan(seed,getStat(9,20,3),Faction.Neutral,"10,20,800/Use&Dash&Sprint",
                 new String[]{"Broadsword","Spear"},
                 new String[]{"Leather_Armor"},new String[]{"Lace_Helm",null});
         product.speechType = "soldier";
@@ -871,7 +903,7 @@ public enum Stock {
         return process(product);
     }},
     Punk{ Prop make(int seed){
-        Man product = getMan(seed,getStat(6,40,2),Faction.Punk,"-5,80,200,1200/Slash,Thrust&Dash,Walk&Walk&Sprint",
+        Man product = getMan(seed,getStat(6,20,2),Faction.Punk,"10,80,200,1200/Use&Dash,Walk&Walk&Sprint",
                 new String[]{"Dagger","Axe","Pickaxe"},
                 new String[]{"Cotton_Clothing", "Fabric_Clothing"},null);
         product.speechType = "punk";
@@ -879,7 +911,7 @@ public enum Stock {
         return process(product);
     }},
     Yeller{ Prop make(int seed){
-        Man product = getMan(seed,getStat(3,40,3),Faction.Punk,"-5,80,700,1200/Slash&Backstep&Calling&Sprint",
+        Man product = getMan(seed,getStat(3,24,3),Faction.Punk,"10,80,700,1200/Use&Backstep&Calling&Sprint",
                 new String[]{"Stick","Dagger",null},
                 new String[]{"Cotton_Clothing"},new String[]{"Bandana","Mask"});
         product.speechType = "punk";
@@ -887,7 +919,7 @@ public enum Stock {
         return process(product);
     }},
     Phantom{ Prop make(int seed){
-        Man product = getMan(seed,getStat(12,40,9),Faction.Evil,"-5,20,120,1200/Slash,Thrust&Dash,Flameroll&Fireblast,Stun&Shadowstep,Meteor,Blizzard",
+        Man product = getMan(seed,getStat(12,24,9),Faction.Evil,"10,20,120,1200/Use&Dash,Flameroll&Fireblast,Stun&Shadowstep,Meteor,Blizzard",
                 new String[]{"Greatsword","Halberd","Warhammer"},
                 new String[]{"Shadowrobe"},null);
         product.brain = new IntelligenceSocial(product);
@@ -915,7 +947,7 @@ public enum Stock {
                 if (state == Actions.Sprint) vel.x *= 2;
             }
             public void onCreate(){
-                load(getUnit(name,seed,getStat(3,20,3),Faction.Evil,"5,140,1200/Kick&Thrust,Walk&Sprint"));
+                load(getUnit(name,seed,getStat(3,12,3),Faction.Evil,"10,140,1200/Kick&Thrust,Walk&Sprint"));
             }
         };
         processUnit(product);
@@ -926,17 +958,22 @@ public enum Stock {
             public void stateSet(Moveset state) {
                 super.stateSet(state);
                 if (state == Actions.Kick) {
+                    damageMod = 2;
                     moveTriggered(0);
                     delay.time = 24;
                 } else if (state == Actions.Jump){
+                    damageMod = 2;
                     vel.y -= 6;
                     get("Stamina").heal();
                 }
             }
+            public void onAttack(Unit p){
+                p.buff(Buffs.Poison, 1);
+            }
             public void stateUpdate(){
                 super.stateUpdate();
                 if (state == Actions.Jump && Math.abs(vel.y) < 32){
-                    Particle.explode("Poison",pos,new P(),8,16,0,false,4);
+                    Particle.explode("Poison",pos,new P(),8,8,0,false,4);
                     explode(156);
                 }
             }
@@ -949,7 +986,7 @@ public enum Stock {
                 super.buff(buff, level);
             }
             public void onCreate(){
-                load(getUnit(getName(),seed,getStat(1,10,1),Faction.Evil,"-5,800/Kick&Walk"));
+                load(getUnit(getName(),seed,getStat(7,10,1),Faction.Evil,"5,800/Kick&Walk"));
             }
         };
         product.tags.remove(Tag.Combustible);
@@ -968,7 +1005,7 @@ public enum Stock {
                 }
             }
             public void onCreate(){
-                load(getUnit(getName(),seed,getStat(10,100,12),Faction.Evil,"10/Kick"));
+                load(getUnit(getName(),seed,getStat(10,20,12),Faction.Evil,"10/Kick"));
             }
         };
         processUnit(product);
@@ -1038,13 +1075,12 @@ public enum Stock {
             t = values()[index].make(seed);
             t.load(p);
         }
-        if (sections.length > 2) t.pos.load(sections[2]);
         return t;
     }
     public static Prop getInstant(String p, int seed){
         Prop t = new Prop(p.substring(1), seed, 5);
         t.gravity = false;
-        t.image.centerBottom();
+        t.image.setCenterType(2);
         randomSide(t);
         return t;
     }
@@ -1060,7 +1096,9 @@ public enum Stock {
     }
     public static Prop getByName(String p, int seed){
         try {
-            return valueOf(p).create(seed);
+            Stock a = valueOf(p);
+            Prop b = a.create(seed);
+            return b;
         } catch (Exception e){
             System.out.println("Stock could not find "+p);
             return getInstant(p, seed);
@@ -1074,7 +1112,7 @@ public enum Stock {
         return product;
     }
     void isNatural(Prop product){
-        product.image.centerBottom();
+        product.image.setCenterType(2);
         product.dynamic = true;
         product.mobile = false;
         product.gravity = true;
@@ -1082,7 +1120,7 @@ public enum Stock {
         randomSide(product);
     }
     void isFurniture(Prop product){
-        product.image.centerBottom();
+        product.image.setCenterType(2);
         product.gravity = true;
         product.mobile = false;
         randomSide(product);
@@ -1104,10 +1142,10 @@ public enum Stock {
         return img+(Math.abs(seed % num)+1);
     }
     String getStat(int stamina, int speed, int level){
-        return "Stamina:"+stamina+"&Speed:"+speed+"&Proficiency:0&Strength:"+level+"&Level:"+level;
+        return "Stamina:"+stamina+"&Speed:"+speed+"&Strength:"+level+"&Level:"+level;
     }
     String getUnit(String name, int seed, String stat, Faction faction, String moves){
-        return name+"@"+seed+"@0,0@"+stat+"@"+faction.name()+"@"+moves;
+        return name+"@"+seed+"@0,0@0@"+stat+"@"+faction.name()+"@"+moves;
     }
     Unit processUnit(Unit p){
         p.clip = new Body(p, getName());

@@ -52,9 +52,6 @@ public class Stat {
     public void add(int p, boolean force){
         set(current+p, force);
     }
-    public float getByPercentage(float p){
-        return max*p;
-    }
     public float getPercentage(){
         return (float)current/max;
     }

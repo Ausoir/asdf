@@ -1,0 +1,16 @@
+Guidebook
+From Tutorial
+--------
+WASD to Move
+Space to Jump
+Shift to Rest
+R to sheathe wielded item and go unarmed
+Middle Mouse Button to throw away wielded item and go unarmed (this can be used to damage enemies)
+Left Click while unarmed to interact with objects or pick up items
+
+Basics
+--------
+Don't die! death is permanent, unless you pay for insurance in town.
+Time runs when transitioning map. Time wasted means more cost to pay for food.
+Watch for wandering trainers in town if you are favoring certain specialization.
+Access more information from the town library.

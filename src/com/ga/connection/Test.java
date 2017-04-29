@@ -1,10 +1,11 @@
 package com.ga.connection;
 
 import com.ga.map.Creation;
-import com.ga.map.Global;
-import com.ga.unit.player.MainPlayer;
+import com.ga.map.MapGenerator;
+import com.ga.tool.Line;
+import com.ga.tool.P;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 
 /**
  * Created by Ga on 12/13/2016. asdasdasdawdadqw
@@ -19,12 +20,6 @@ public class Test {
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
-//        int[][] t = Creation.test();
-//        System.out.println(Arrays.deepToString(t));
-//        print(t);
-//        Creation.create();
-//        System.out.println(Arrays.toString(Creation.getWorld(0, 2)));
-//        print(Creation.world);
         Creation.test();
     }
     private static void print(int[][] p){

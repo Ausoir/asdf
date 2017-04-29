@@ -70,12 +70,8 @@ public abstract class Texture {
         return image.getSubimage(px * sx, py * sy, sx, sy);
     }
     public static void init(){
-        ArrayList<String> pics = FileManager.searchFiles("Data/",new String[]{"png","gif"});
-        for (String i : pics) {
-            int pathEnd = i.lastIndexOf('\\');
-            String fileName = i.substring(pathEnd+1);
-            directory.put(fileName.substring(0,fileName.lastIndexOf(".")), i);
-        }
+        for (String[] i : FileManager.fileCache.get("png")) directory.put(i[0], i[1]);
+        for (String[] i : FileManager.fileCache.get("gif")) directory.put(i[0], i[1]);
         directory.put("Mantis_skin","Data/unit/Spider_skin.png");
         cache.put("Drop",getTexture(load("Icon"),24,24,0,0));
         cache.put("Buy",getTexture(load("Icon"),24,24,1,0));

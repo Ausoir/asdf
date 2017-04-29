@@ -28,17 +28,12 @@ public class Menu extends Panel {
     private class StatPanel extends JPanel{
         private GridBagConstraints statgrid = new GridBagConstraints();
         private String[][] stats = new String[][]{
-                new String[]{Dialog.get("prf"),Dialog.get("prfDsc")},
                 new String[]{Dialog.get("str"),Dialog.get("strDsc")},
                 new String[]{Dialog.get("sta"),Dialog.get("staDsc")},
                 new String[]{Dialog.get("end"),Dialog.get("endDsc")},
                 new String[]{Dialog.get("mem"),Dialog.get("memDsc")},
-                new String[]{Dialog.get("lvlPts"),Dialog.get("lvlPtsDsc")},
-                new String[]{Dialog.get("rstPts"),Dialog.get("rstPtsDsc")}
         };
         private JButton[] statButtons = new JButton[stats.length];
-        private JButton[] incButtons = new JButton[stats.length];
-        private JButton[] decButtons = new JButton[stats.length];
         StatPanel(){
             setLayout(new GridBagLayout());
             setBackground(Panel.forecolor2);
@@ -49,28 +44,13 @@ public class Menu extends Panel {
             statgrid.gridx = 0;
             statgrid.gridy = 0;
             for (int i=0;i<stats.length;i++) statButtons[i] = makeStatButton(stats[i][0],null);
-            statgrid.ipadx = 5;
             statgrid.gridx = 1;
-            statgrid.gridy = 0;
-            for (int i=0;i<stats.length;i++) incButtons[i] = makeStatButton("[+]", "level@"+stats[i][0]);
-            statgrid.gridx = 2;
-            statgrid.gridy = 0;
-            for (int i=0;i<stats.length;i++) decButtons[i] = makeStatButton("[-]", "delevel@"+stats[i][0]);
-            statgrid.gridx = 3;
             statgrid.gridy = 0;
             for (String[] i : stats) makeStatButton("", "menuDialog@"+i[0]+"@"+i[1]).setIcon(iconDescribe);
         }
         void refresh(){
             Player player = Global.player;
             for (int i=0;i<stats.length;i++) statButtons[i].setText(stats[i][0]+" - "+player.get(stats[i][0]).getMax());
-            if (player.get("Level Points").get() > 0) for (JButton i : incButtons) i.setVisible(true);
-            else for (JButton i : incButtons) i.setVisible(false);
-            if (player.get("Reset Points").get() > 0) for (JButton i : decButtons) i.setVisible(true);
-            else for (JButton i : decButtons) i.setVisible(false);
-            incButtons[5].setVisible(false);
-            incButtons[6].setVisible(false);
-            decButtons[5].setVisible(false);
-            decButtons[6].setVisible(false);
         }
         JButton makeStatButton(String p, final String cmd){
             final JButton button = new JButton(p);
@@ -302,7 +282,6 @@ public class Menu extends Panel {
             panel.add(Box.createRigidArea(new Dimension(0,12)));
             makeSlot(Actions.Use, false);
             makeSlot(Actions.Kick, false);
-            makeSlot(Actions.Rest, false);
             for (Moveset i : Global.player.skillTree.skills){
                 makeSlot(i, true);
             }

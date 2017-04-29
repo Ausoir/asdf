@@ -62,35 +62,33 @@ public class Organ extends Line {
     }
     public void draw(Graphics2D g){
         if (!amputated) image.draw(g, host.pos.x+pt.x, host.pos.y+pt.y, getAtan()-1.57f, host.dir, strokeSize, getLength()+3);
+//        if (type != 0) g.drawLine((int)(host.pos.x+pt.x+Global.rel.x), (int)(host.pos.y+pt.y+Global.rel.y),
+//                (int)(host.pos.x+ptd.x+Global.rel.x), (int)(host.pos.y+ptd.y+Global.rel.y));
     }
     void setMaxLength(int p){
         maxLength = p;
     }
-    protected void hit(Line p, int damage, DamageType type){
+    protected void hit(Line p, int damage){
         boolean pierce = Global.r.nextInt(health) < Global.r.nextInt(damage);
-        if (pierce && (type == DamageType.Cut || type == DamageType.Burn)) {
-            if (type == DamageType.Cut) {
-                if (image != null) {
-                    Projectile flyingOrgan = new Projectile(null, new P(host.pos), p.getAtan(10).add(p.ptd), 20) {
-                        public void update() {
-                            float length = getLength() * .45f;
-                            if (tangible) {
-                                Particle.explode("Blood", pos.getAdd(pt), new P(0, -15), 4, 5, 5, true, 5);
-                                pt.set(Global.cos(rotation) * -length, Global.sin(rotation) * -length);
-                                ptd.set(Global.cos(rotation) * length, Global.sin(rotation) * length);
-                            }
-                            super.update();
+        if (pierce) {
+            if (image != null) {
+                Projectile flyingOrgan = new Projectile(null, new P(host.pos), p.getAtan(10).add(p.ptd), 20) {
+                    public void update() {
+                        float length = getLength() * .45f;
+                        if (tangible) {
+                            Particle.explode("Blood", pos.getAdd(pt), new P(0, -15), 4, 5, 5, true, 5);
+                            pt.set(Global.cos(rotation) * -length, Global.sin(rotation) * -length);
+                            ptd.set(Global.cos(rotation) * length, Global.sin(rotation) * length);
                         }
-                    };
-                    flyingOrgan.gravity = true;
-                    flyingOrgan.image = image;
-                }
-                Particle.explode("Blood", p.ptd, new P(), 5, 40, 0, true, 2);
-            } else {
-                Particle.explode("Flame", p.ptd, new P(0, -5), 1, 12, 3, false, 3);
+                        super.update();
+                    }
+                };
+                flyingOrgan.gravity = true;
+                flyingOrgan.image = image;
             }
+            Particle.explode("Blood", p.ptd, new P(), 5, 40, 0, true, 2);
             amputated = true;
-            for (Organ i : children) i.hit(p, 999, type);
+            for (Organ i : children) i.hit(p, 9999);
             onAmputate.perform();
             host.clip.updateStatus();
         } else {

@@ -118,7 +118,7 @@ public class EditorInput implements Input, Updatable, Drawable {
         } else if (p.equals("invisible")) {
             landColor = new Color(0,0,0,0);
         } else if (p.equals("margin")) {
-            if (Global.margin == 0) Global.margin = -36;
+            if (Global.margin == 0) Global.margin = -3600;
             else Global.margin = 0;
         } else if (p.startsWith("pp")) {
             auxTexture = p.substring(2);

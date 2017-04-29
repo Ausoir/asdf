@@ -22,6 +22,7 @@ public class Game extends JFrame {
         }
         Settings.setScreenSize(x, y);
         setSize(Settings.screenX, Settings.screenY);
+        FileManager.init();
         Dialog.init();
         Clips.init();
         Picture.init();

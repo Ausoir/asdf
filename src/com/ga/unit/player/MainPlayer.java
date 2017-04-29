@@ -1,20 +1,16 @@
 package com.ga.unit.player;
 
-import com.ga.game.Sound;
+import com.ga.map.Creation;
 import com.ga.map.Global;
 import com.ga.map.Updater;
 import com.ga.tool.Line;
-import com.ga.tool.P;
-import com.ga.tool.Performer;
 import com.ga.unit.Prop;
 import com.ga.unit.Stock;
 import com.ga.unit.Tag;
-import com.ga.unit.item.Item;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Moveset;
 import com.ga.unit.skill.Spells;
-
-import java.util.ArrayList;
+import com.ga.unit.skill.Stat;
 
 import static com.ga.unit.BodyHumanoid.FIST;
 import static com.ga.unit.BodyHumanoid.OFIST;
@@ -23,10 +19,12 @@ import static com.ga.unit.BodyHumanoid.OFIST;
  * Created by Ga on 12/29/2016. asd
  */
 public class MainPlayer extends Player {
+    private Indicater indicater;
     public MainPlayer(int seed) {
         super(seed);
         Global.player = this;
         controlId = -1;
+        indicater = new Indicater(this);
     }
     @Override
     public void say(String p){
@@ -63,100 +61,35 @@ public class MainPlayer extends Player {
             if (input.moving > 0 == target.x > 0) state = Actions.Thrust;
             else if (skillTree.getSkillLevel(Actions.Dash) > 0) state = Actions.Dash;
         }
-        return super.setState(state);
+        int cost = state.getCost()+getStatPenalty();
+        int stamina = get("Stamina").get();
+        if (cost > 0){
+            indicater.show((float)cost/Math.max(1, stamina));
+        }
+        int r = super.setState(state);
+        if (r == 2){
+            indicater.show(1);
+        } else if (r == 3){
+            indicater.showCd(getCooldown(state)[0]);
+        }
+        return r;
     }
     @Override
     public void stateSet(Moveset state){
         super.stateSet(state);
-        if (weapon.getType() == Item.Tag.Claw)
-            weapon.rotation = weapon.getOrgan().getAtan() + (dir < 0 ? 3.14f : 0);
         if (state != Actions.Idle) input.cameraMode = false;
-        if (state instanceof Actions) {
-            switch ((Actions) state) {
-                case Idle:
-                    if (!get("Stamina").isFull()) clip.setState(Actions.Exhausted);
-                    break;
-                case Sprint:
-                case Walk:
-                    float speed = getSpeed();
-                    if (speed <= 0) clip.setState(Actions.Exhausted);
-                    else clip.setMoveSpeed((int) Global.clamp(speed-1,-20,4));
-                    face(input.moving, true);
-                    break;
-                case Use:
-                    if (weapon.uses == 0) say("Can't use " + weapon.getName());
-                    break;
-                case Interact:
-                    final Player me = this;
-                    delay.performer = new Performer() {
-                        public void perform() {
-                            P reach = pos.getAdd(clip.organs[FIST].ptd);
-                            ArrayList<Prop> obj = Updater.collideInteractive(reach);
-                            for (Prop i : obj) {
-                                if (i.onInteract != null) {
-                                    i.onInteract.interact(me);
-                                    break;
-                                }
-                            }
-                            for (final Line i : Global.map.land) {
-                                if (i.opt == 1) {
-                                    if (i.lineCross(new Line(reach.x - (12 * dir), reach.y, reach.x + (12 * dir), reach.y))) {
-                                        clip.setState(Actions.Guard);
-                                        delay.set(40);
-                                        final int firstDir = dir;
-                                        delay.performer = new Performer() {
-                                            public void perform() {
-                                                pos.x = i.pt.x - (24 * dir);
-                                                setState(Actions.Climb);
-                                                dir = firstDir;
-                                                input.moving = 0;
-                                                rope = i;
-                                            }
-                                        };
-                                    }
-                                }
-                            }
-                        }
-                    };
-                    break;
-                case Wield:
-                    delay.performer = new Performer() {
-                        public void perform() {
-                            if (selectingItem == -1) {
-                                sheathe();
-                            } else if (selectingItem < inventory.getItemSize()) {
-                                Item item = inventory.getItem(selectingItem);
-                                setWeapon(item);
-                                inventory.remove(item);
-                                selectingItem = -1;
-                            } else if (selectingItem >= 10 && selectingItem <= 16) {
-                                Sound.play("unwear");
-                                int piece = selectingItem - 10;
-                                if (sheathe() && !armor.isBare(piece)) {
-                                    setWeapon(armor.armor[piece]);
-                                    armor.set(null, piece);
-                                }
-                            }
-                        }
-                    };
-                    break;
-                case Duck:
-                    cooldown.put(state, new int[]{Global.getTime()[0] + ((armor.armor[1].encumberance + armor.armor[2].encumberance) * 4)});
-                    break;
-                case Guard:
-                    cooldown.put(state, new int[]{Global.getTime()[0] + ((armor.armor[FIST].encumberance + armor.armor[0].encumberance) * 4)});
-                    break;
-                case Snipe:
-                case Shoot:
-                    weapon.rotateTo(target.getMult(dir, dir));
-                    weapon.rotation += .1 * dir;
-            }
-        }
     }
     public float getShopPrice(){
         float r = 1;
         if (traits.contains(Trait.Dull)) r = 1.1f;
         else if (traits.contains(Trait.Sharp)) r = .9f;
+        return r;
+    }
+    public boolean checkHit(Line hitBox, int damage) {
+        Stat stamina = get("Stamina");
+        int before = stamina.get();
+        boolean r = super.checkHit(hitBox, damage);
+        if (r) indicater.show(before/Math.max(1,stamina.get()));
         return r;
     }
     public void onTimeChange(int p) {
@@ -183,21 +116,38 @@ public class MainPlayer extends Player {
     protected void stateUpdate(){
         super.stateUpdate();
         if (state == Actions.Walk && input.moving == 0) setState(Actions.Idle);
+        else if (state == Actions.Rest) indicater.show(1);
         else if (state instanceof Spells){
-            clip.rotateAppendage(FIST,11);
-            clip.rotateAppendage(OFIST,11);
+            clip.rotateAppendage(FIST,11,0);
+            clip.rotateAppendage(OFIST,11,0);
         }
     }
     public void update(){
         int edge = Global.mapEdge(pos.getAdd(vel));
-        if (edge != 0 && !Global.map.isIndoors()) Global.map.loadMap(edge+"");
+        if (edge != 0 && !Global.map.isIndoors()){
+            if (Creation.isPassable(Creation.getWorld(Global.map.id),edge)) {
+                int[] newmap = Creation.getWorld(Global.map.id, edge);
+                Global.map.loadMap(cworld + "_" + newmap[0]);
+            }
+            else if (edge == 2) die();
+        }
         super.update();
         if (input.cameraMode) Global.mapEdgeCenter(Global.cameraTo = Global.cameraTo.getAdd(input.movement));
         else Global.mapEdgeCenter(Global.cameraTo = pos.getAdd(0,0));
+        indicater.update();
     }
-    public void load(String p){
-        super.load(p);
+    public String[] load(String p){
+        String[] r = super.load(p);
         String[] other = p.split("%")[1].split(";");
         Global.loadTime(Integer.parseInt(other[0]));
+        indicater.setMeasuree(get("Stamina"));
+        return r;
+    }
+    public void reconnect() {
+        Updater.add(this);
+        Updater.add(weapon);
+        Updater.add(speech);
+        Updater.add(indicater);
+        Global.display.add(speech);
     }
 }

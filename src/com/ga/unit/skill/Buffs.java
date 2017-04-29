@@ -48,27 +48,6 @@ public enum Buffs {
             }
         };
     }},
-    Empower(new Tags(){{
-        add(Tag.Buff);
-        add(Tag.Martial);
-    }}){ Buff makeLocal(){
-        return new Buff(80) {
-            public void onSet() {
-                time += 60*level;
-                var = 8+(4*level);
-                host.get("Proficiency").add(var, true);
-            }
-
-            public void onFinish() {
-                host.get("Proficiency").add(-var, true);
-            }
-
-            public boolean update() {
-                Particle.dripFire(((Man) host).weapon.getPoint());
-                return super.update();
-            }
-        };
-    }},
     Cleave(new Tags(){{
         add(Tag.Buff);
         add(Tag.Strong);
@@ -78,31 +57,32 @@ public enum Buffs {
                 time += level*80;
             }
             public boolean update() {
-                Particle.dripHoly(((Man) host).weapon.getPoint());
+                Particle.dripHoly(((Man) host).weapon.getLine().ptd);
                 return super.update();
             }
         };
     }},
     Bleed(new Tags(){{
-        add(Tag.Buff);
+        add(Tag.Debuff);
     }}){ Buff makeLocal(){
-        return new Buff(800) {
+        return new Buff(100) {
             private int tick = 0;
             public void onSet() {
                 var = 0;
             }
             public void onStack(){
-                if (level < 10 && host.rand.nextBoolean()) level++;
+                if (level < 18 && host.rand.nextBoolean()) level++;
             }
             public void onFinish(){
-                if (var == 0) host.die();
-            }
+                if (var == 0) host.die(); }
+
             public boolean onTrigger(){
+                if (level > 0) level--;
                 var = 1;
                 return true;
             }
             public boolean update() {
-                if (tick++ % (11-level) == 0){
+                if (tick++ % (Math.max(1,20-level)) == 0){
                     Particle.explode("Blood",host.getRandomPoint(),new P(), (int) (Math.random()*level+1),5,0,true,24);
                     return super.update();
                 }
@@ -110,16 +90,43 @@ public enum Buffs {
             }
         };
     }},
+    Pain(new Tags(){{
+        add(Tag.Debuff);
+    }}){ Buff makeLocal(){
+        return new Buff(20) {
+            public void onSet() {
+                Stat speed = host.get("Speed");
+                var = Math.round(speed.get() * .1f);
+                speed.add(-var, true);
+            }
+            public void onStack(){
+                Stat speed = host.get("Speed");
+                if (level < 18 && host.rand.nextBoolean()) level++;
+                int tvar = Math.round(speed.get() * .1f);
+                if (speed.get() >= tvar){
+                    speed.add(-tvar, false);
+                    var += tvar;
+                } else {
+                    var += speed.get();
+                    speed.set(0, false);
+                }
+                time = Math.min(40, time + 10);
+            }
+            public boolean onTrigger(){
+                onFinish();
+                return true;
+            }
+            public void onFinish() {
+                host.get("Speed").add(var, false);
+            }
+        };
+    }},
     Invincible(new Tags(){{
         add(Tag.Buff);
     }}){ Buff makeLocal(){
-        return new Buff(40) {
+        return new Buff(8) {
             public void onSet() {
-                time += 40*level;
-            }
-            public boolean onTrigger(){
-                time = 0;
-                return true;
+                time += 8*level;
             }
             public boolean update() {
                 Particle.sparkle(host.getRandomPoint(),40);
@@ -133,7 +140,10 @@ public enum Buffs {
     }}){ Buff makeLocal(){
         return new Buff(120) {
             public void onSet() {
-                var = level;
+                var = level*3;
+            }
+            public void onStack(){
+                var+=level;
             }
             public boolean onTrigger(){
                 if (var > 0) var--;
@@ -166,11 +176,13 @@ public enum Buffs {
         add(Tag.Debuff);
         add(Tag.Cold);
     }}){ Buff makeLocal(){
-        return new Buff(100) {
+        return new Buff(8) {
             public void onSet() {
                 sound("freeze");
-                var = Math.round(host.get("Speed").getMax());
+                var = Math.round(host.getSpeed());
                 host.get("Speed").add(-var, false);
+                host.stats.triggerEffect(Pain);
+                time += level*24;
             }
 
             public void onFinish() {
@@ -187,9 +199,9 @@ public enum Buffs {
         add(Tag.Debuff);
         add(Tag.Agility);
     }}){ Buff makeLocal(){
-        return new Buff(80) {
+        return new Buff(40) {
             public void onSet() {
-                var = Math.round(host.get("Speed").getMax() * .5f);
+                var = Math.round(host.getSpeed() * .5f);
                 host.get("Speed").add(-var, false);
             }
             public void onFinish() {
@@ -203,6 +215,11 @@ public enum Buffs {
     }}){ Buff makeLocal(){
         return new Buff(500) {
             private Thing mark;
+            public void onLoad(){
+                mark = new Thing("Mark", 150);
+                mark.pos = host.pos;
+                mark.save = false;
+            }
             public void onSet() {
                 sound("freeze");
                 mark = new Thing("Mark", 150);
@@ -276,7 +293,7 @@ public enum Buffs {
                     final Projectile p = new Projectile("Ice", host.pos.getAdd(0, -5), new P(), 0) {
                         @Override
                         protected void onAttack(Unit p) {
-                            p.stats.addEffect(Buffs.Freeze,level);
+                            p.buff(Buffs.Freeze,level);
                             Particle.explode("Ice", pos, new P(0,-20), 30, 10, 5, true, 10);
                             remove();
                         }
@@ -342,8 +359,7 @@ public enum Buffs {
                         }
                     };
                     p.faction = host.faction;
-                    p.damage = 10+host.get("Proficiency").get();
-                    p.damageType = DamageType.Burn;
+                    p.damage = 9;
                     p.gravity = true;
                     p.delay.set(level*20);
                     p.delay.performer = new Performer(){
@@ -401,19 +417,20 @@ abstract class Buff{
         this.time = Global.getTime()[0]+time;
     }
     public void onSet(){}
+    public void onLoad(){}
     public boolean onTrigger(){
         return true;
     }
     public void onFinish(){}
     public void onStack(){}
     public boolean update(){
-        return Global.getTime()[0] == time;
+        return Global.getTime()[0] >= time;
     }
     void sound(String p){
         Sound.play(p);
     }
     public String getDescription(){
-        return buff.name() + " (Level " + level + ") - " + time + "s";
+        return buff.name() + " (Level " + level + ") - " + (time - Global.getTime()[0]) + "s";
     }
     public String toString(){
         return buff.ordinal() + "&" + level + "&" + time + "&" + var;

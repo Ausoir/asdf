@@ -84,16 +84,6 @@ public class Global {
             p.set(clamp(p.x, Settings.centerX+margin, Global.map.size.x-Settings.centerX-margin),
                 clamp(p.y, Settings.centerY+40+margin, Global.map.size.y-Settings.centerY-margin-margin));
     }
-    public static int checkCooldown(int[] p, int cd){
-        return cd-(time[0]-p[0]);
-    }
-    public static boolean cooldown(int[] p, int cd){
-        if (time[0] - p[0] >= cd){
-            p[0] = time[0];
-            return true;
-        }
-        return false;
-    }
     public static void update(){
         time[0]++;
         Iterator it = timers.iterator();
@@ -109,12 +99,12 @@ public class Global {
         return time;
     }
     public static int getHour(){
-        return time[0]/1000;
+        return time[0]/100;
     }
     public static void setHour(int p){
         player.onTimeChange(p-getHour());
         map.onTimeChange();
-        time[0] = (p*1000)+(time[0]%1000);
+        time[0] = (p*100)+(time[0]%100);
     }
     public static int getHouseId(){
         return houseId++;

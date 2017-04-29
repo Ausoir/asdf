@@ -11,7 +11,7 @@ public interface Moveset {
     String getCodeName();
     String getDescription();
 
-    float getCost();
+    int getCost();
 
     int getDel();
 
@@ -19,11 +19,11 @@ public interface Moveset {
     float getVelX();
     int getDifficulty();
 
-    void trigger(Unit p, int organ);
-    void onSet(Unit p, int level);
+    void trigger(Unit p);
+    void onSet(Unit p);
     void onFinish(Unit p);
     void onInterrupt(Unit p);
     Tags getTags();
 
-    void update(Unit p, int level);
+    void update(Unit p);
 }

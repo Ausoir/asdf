@@ -17,46 +17,62 @@ public class BodyHumanoid extends Body {
     private void setAppendages(){
         switch (this.state) {
             case Interact:
-                rotateAppendage(FIST, 15);
-                rotateAppendage(BODY, 15);
+                rotateAppendage(FIST, 15, 0);
+                localAnimation[15][OFIST][0] = localAnimation[1][OFIST][0];
+                localAnimation[15][OFIST][1] = localAnimation[1][OFIST][1];
+                rotateAppendage(BODY, 15, 0);
+                localAnimation[15][BODY][0] = (int) Global.clamp(localAnimation[15][BODY][0],-15,15);
+                localAnimation[15][BODY][1] = Math.min(5,localAnimation[15][BODY][1]);
+                break;
+            case Grab:
+                rotateAppendage(FIST, 15, 0);
+                rotateAppendage(OFIST, 15, 0);
+                rotateAppendage(BODY, 15, 0);
                 localAnimation[15][BODY][0] = (int) Global.clamp(localAnimation[15][BODY][0],-15,15);
                 localAnimation[15][BODY][1] = Math.min(5,localAnimation[15][BODY][1]);
                 break;
             case Cast:
-                rotateAppendage(OFIST, 11);
-                rotateAppendage(FIST, 11);
+                rotateAppendage(OFIST, 11, 0);
+                rotateAppendage(FIST, 11, 0);
                 break;
             case Conjure:
-                rotateAppendage(FIST, 20);
+                rotateAppendage(FIST, 20, 0);
+                break;
+            case Aim:
+                rotateAppendage(HEAD, 66, -1.6f*host.dir);
+                rotateAppendage(FIST, 67, 0);
+                rotateAppendage(OFIST, 67, 0);
                 break;
             case Shoot:
-                rotateAppendage(FIST, 39);
+                rotateAppendage(FIST, 39, 0);
                 break;
             case Snipe:
-                rotateAppendage(OFIST, 41);
-                rotateAppendage(OFIST, 42);
+                rotateAppendage(OFIST, 41, 0);
+                rotateAppendage(OFIST, 42, 0);
                 break;
             case Dart:
-                rotateAppendage(OFIST, 29);
+                rotateAppendage(OFIST, 29, 0);
                 break;
             case Underhand:
-                rotateAppendage(FIST, 23);
+                rotateAppendage(FIST, 23, 0);
                 break;
             case Throw:
             case Lunge:
             case Thrust:
+                rotateAppendage(FIST, 7, 0);
+                break;
             case Slash:
-                rotateAppendage(FIST, 7);
+                rotateAppendage(FIST, 7, 1*host.dir);
                 break;
             case Kick:
-                rotateAppendage(FOOT-1, 5);
+                rotateAppendage(FOOT-1, 5, 0);
                 break;
             case Sidekick:
-                rotateAppendage(FOOT, 14);
+                rotateAppendage(FOOT, 14, 0);
                 break;
             case Stab:
-                rotateAppendage(OFIST, 11);
-                rotateAppendage(FIST, 11);
+                rotateAppendage(OFIST, 11, 0);
+                rotateAppendage(FIST, 11, 0);
                 break;
         }
     }

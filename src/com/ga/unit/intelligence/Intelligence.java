@@ -2,13 +2,12 @@ package com.ga.unit.intelligence;
 
 import com.ga.game.Observer;
 import com.ga.map.Global;
+import com.ga.map.Updater;
 import com.ga.tool.Line;
 import com.ga.tool.P;
-import com.ga.tool.Timer;
 import com.ga.unit.Man;
 import com.ga.unit.Prop;
 import com.ga.unit.Unit;
-import com.ga.map.Updater;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Moveset;
 
@@ -19,7 +18,6 @@ import java.util.ArrayList;
  */
 public abstract class Intelligence implements Observer {
     protected Unit host;
-    protected Timer forget = new Timer(80, true);
     private ArrayList<Unit> seen;
     public Unit target;
     private Task task;
@@ -28,25 +26,18 @@ public abstract class Intelligence implements Observer {
     public Intelligence(Unit man){
         host = man;
         task = new Idle(host);
-        forget.time = 1;
         Updater.add(this);
     }
     protected void defaultTask(){
         setTaskEcho(new Wander(host));
     }
     public void update(){
-        if (forget.update()){
-            target = null;
-            defaultTask();
-        } else {
-            if (host.state != Actions.Walk || !blocked(host.dir)) task.update();
-        }
+        if (host.state != Actions.Walk || !blocked(host.dir)) task.update();
         if (alertness < 1) perceive();
     }
     protected void setTaskEcho(Task p){
         task = p;
         alertness = p.getAlertness();
-        forget.reset();
     }
     public void attacked(){
         if (target != null) {
@@ -118,10 +109,9 @@ public abstract class Intelligence implements Observer {
         for (Unit t : seen) {
             if (target != t) {
                 perceived(t);
-            } else if (target.state == Actions.Dead) forget.time = 0;
+            } else if (target.state == Actions.Dead) defaultTask();
         }
     }
     protected void perceived(Prop p){
     }
-    public void onRemove(){}
 }

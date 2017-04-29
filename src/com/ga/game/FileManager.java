@@ -17,6 +17,37 @@ import java.util.HashMap;
  * Created by Ga on 7/26/2016. asd
  */
 public class FileManager {
+    public static HashMap<String, ArrayList<String[]>> fileCache;
+
+    private static void searchFiles(String p, HashMap<String, ArrayList<String[]>> r){
+        File[] files = new File(p).listFiles();
+        if (files != null) {
+            for (File file : files) {
+                String path = file.getPath();
+                if (file.isDirectory()) {
+                    searchFiles(path, r);
+                } else if (file.isFile() && file.length() > 0){
+                    String t = file.getName();
+                    String name, ext;
+                    if (t.contains(".")){
+                        ext = t.substring(t.indexOf(".")+1);
+                        name = t.substring(0, t.indexOf("."));
+                    } else {
+                        ext = "!";
+                        name = t;
+                    }
+                    if (r.get(ext) == null) r.put(ext,new ArrayList<String[]>());
+                    r.get(ext).add(new String[]{name, path});
+                }
+            }
+        }
+    }
+
+    static void init(){
+        fileCache = new HashMap<>();
+        searchFiles("Data", fileCache);
+    }
+
     public static void saveCharacter(){
         if (Global.player.state != Actions.Dead) {
             saveMap("map/"+Global.player.cmap);
@@ -41,7 +72,7 @@ public class FileManager {
     private static String read(String dir) {
         String result = null;
         try {
-            try (BufferedReader br = new BufferedReader(new FileReader("Data/" + dir))) {
+            try (BufferedReader br = new BufferedReader(new FileReader(dir))) {
                 String line = br.readLine().split(" //")[0];
                 result = line + "%";
                 while (line != null) {
@@ -56,7 +87,7 @@ public class FileManager {
         return result;
     }
     public static PlayerInput loadPlayer(boolean main, String dir){
-        String data = read("map/"+dir);
+        String data = read("Data/map/"+dir);
         String[] line = data.split("%");
         PlayerInput pi;
         pi = new PlayerInput(main ? new MainPlayer(0) : new Player(0));
@@ -85,11 +116,6 @@ public class FileManager {
         boolean regrowths = false;
         int player = -999;
         if (mapProperties.length > 1) player = Integer.parseInt(mapProperties[1]);
-        int[] newmap = null;
-        if (map.length() == 1){
-            newmap = Creation.getWorld(Global.map.id, Integer.parseInt(map));
-            dir = Global.player.cworld+"_"+newmap[0];
-        }
         if (FileManager.isFile("Data/map/" + dir + ".map")){
             readMap(dir);
             regrowths = oldmap != null && !oldmap[0].equals("1") && !Global.map.isIndoors();
@@ -102,10 +128,9 @@ public class FileManager {
                 MapGenerator.generateHouse(Global.player.cmap, Integer.parseInt(dir.split("_")[2]), houseInfo[1]);
             }
         } else { //can't find map
-            if (newmap != null){
-                MapGenerator.generateMap(newmap);
-                regrowths = true;
-            }
+            int id = Integer.parseInt(map.split("_")[1]);
+            MapGenerator.generateMap(id, Creation.getWorld(id));
+            regrowths = true;
         }
         Global.player.cmap = dir;
         Global.map.setTexture();
@@ -113,7 +138,7 @@ public class FileManager {
         return player;
     }
     private static void readMap(String dir){
-        String data = read("map/" + dir + ".map");
+        String data = read("Data/map/" + dir + ".map");
         String[] line = data.split("%");
         String[] names = line[0].split(",");
         Global.map = new Map(names);
@@ -226,7 +251,7 @@ public class FileManager {
     }
 
     public static HashMap<String, ArrayList<String>> readDialogue(String dir){
-        String data = read(dir);
+        String data = read("Data/"+dir);
         String[] lines = data.split("%");
         HashMap<String,ArrayList<String>> result = new HashMap<>();
         for (String line1 : lines) {
@@ -240,7 +265,7 @@ public class FileManager {
     }
 
     public static String[] readText(String dir){
-        String data = read(dir+".txt");
+        String data = read("Data/"+dir+".txt");
         return data.split("%");
     }
 
@@ -249,37 +274,15 @@ public class FileManager {
         return file.isFile() && file.length() > 0;
     }
 
-    public static ArrayList<String> searchFiles(String p, String[] ext){
-        ArrayList<String> r = new ArrayList<>();
-        File[] files = new File(p).listFiles();
-        if (files != null) {
-            for (File file : files) {
-                String path = file.getPath();
-                if (file.isDirectory()) {
-                    r.addAll(searchFiles(path, ext));
-                } else if (file.isFile() && file.length() > 0){
-                    if (ext == null) r.add(path);
-                    else {
-                        String t = file.getName();
-                        for (String i : ext) {
-                            if (t.endsWith("." + i)) r.add(path);
-                        }
-                    }
-                }
-            }
-        }
-        return r;
-    }
-
-    public static int[][] readWorld(String dir){
-        int[][] world;
-        String data = read("map/"+dir+".map");
+    public static char[][] readWorld(String dir){
+        char[][] world;
+        String data = read("Data/map/"+dir+".map");
         String[] lines = data.split("%");
-        world = new int[lines.length][lines[0].length()];
+        world = new char[lines.length][lines[0].length()];
         for (int y=0;y<lines.length;y++){
             for (int x=0;x<lines[y].toCharArray().length;x++){
                 char node = lines[y].charAt(x);
-                world[y][x] = node=='*'?-1:Character.getNumericValue(node);
+                world[y][x] = node;
             }
         }
         return world;

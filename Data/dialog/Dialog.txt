@@ -1,0 +1,153 @@
+lvl:Level
+stats:Stats
+equip:Equipment
+inv:Inventory
+mvs:Skills
+train:Training
+act:Actions
+crft:Craft
+gold:Gold
+wielded:Wielded
+equipped:Equipped
+btorso:Torso
+bleg:Legging
+bhead:Head
+str:Strength
+strDsc:Decreases weight penalties by 1, which results in more efficient usable of Stamina and faster movement.
+sta:Stamina
+staDsc:Increases maximum Stamina by 1. Stamina recovers by resting, idling, spells, or enchantments.
+end:Endurance
+endDsc:Increases maximum Endurance by 100. Endurance lets you keep going without having to go to town to sleep.
+mem:Memory
+memDsc:Increases skill/rune capacity by 1, letting you usable more variety of skills or spells.
+ath:Athletics
+athDsc:Increases speed and decreases stamina cost of skills related to running.
+jmp:Jumping
+jmpDsc:Increases potency of skills involving jumping.
+swg:Swinging
+swgDsc:Increases potency of all physical actions.
+agl:Agility
+aglDsc:Increases damage and potency of all skills involving agility.
+mrt:Martial
+mrtDsc:Increases damage of all martial skills.
+cst:Casting
+cstDsc:Decreases cooldown of casting spells.
+chn:Channeling
+chnDsc:Decreases stamina cost of maintaining channeling spells.
+mvsRemap:Select a skill to re-map its keybinding.
+mvsTrain:Select a skill/spell to train.
+itemDsc:a $. Weighs $ and has $ uses left.
+itemEncDsc:This $ item is magically enchanted with $. This item's cooldown is $ seconds.
+itemEncRdy:Currently the item is ready to usable.
+itemEncNRdy:Currently the item needs $ more seconds to recharge.
+item1:Common
+item2:Fine
+item3:Rare
+item4:Ludicrous
+item5:Legendary
+itemInsc:The item is inscribed with the word $.
+reqInput:Press a key
+mvsInteract:Interact
+mvsSprint:Sprint
+mvsDuck:Duck
+mvsGuard:Guard
+mvsLunge:Lunge
+mvsThrust:Thrust
+mvsSwing:Swing
+mvsKick:Kick
+mvsSidekick:Sidekick
+mvsWhirlwind:Whirlwind
+mvsStab:Stab
+mvsUse:Use
+mvsDash:Dash
+mvsRest:Rest
+mvsMark:Mark
+mvsUnderhand:Underhand
+mvsThrow:Throw
+mvsDart:Dart
+mvsShoot:Shoot
+mvsSnipe:Snipe
+mvsTriple:Triple
+mvsJump:Jump
+mvsAirstrike:Airstrike
+mvsLeap:Leap
+mvsBackstep:Backstep
+mvsFocus:Focus
+mvsHeal:Heal
+mvsFrenzy:Frenzy
+mvsHaste:Haste
+mvsAdrenaline:Adrenaline
+mvsCleave:Cleave
+mvsEmpower:Empower
+mvsEvade:Evade
+mvsFlamestride:Flamestride
+mvsGlacialwalk:Glacialwalk
+mvsStun:Stun
+mvsSlow:Slow
+mvsPoison:Poison
+mvsCalling:Calling
+mvsShadowtwin:Shadowtwin
+mvsShadowstep:Shadowstep
+mvsFireworks:Fireworks
+mvsFireblast:Fireblast
+mvsFreeze:Freeze
+mvsFlameroll:Flameroll
+mvsFireball:Fireball
+mvsBlizzard:Blizzard
+mvsMaterialize:Materialize
+mvsMeteor:Meteor
+mvsDscInteract:Interact with wielded item.
+mvsDscSprint:Burst into sprint mode, running twice as fast as long as the skill is active.
+mvsDscDuck:A
+mvsDscGuard:A
+mvsDscLunge:A
+mvsDscThrust:Thrust your weapon in a linear fashion to attack while keeping momentum.
+mvsDscSlash:Swing your weapon from top to bottom, slashing enemies vertically.
+mvsDscKick:A
+mvsDscSidekick:A useful unarmed attack.
+mvsDscWhirlwind:Spin your weapon back and forth to attack multiple enemies multiple times, left and right.
+mvsDscStab:A
+mvsDscDash:A
+mvsDscRest:A
+mvsDscMark:Mark
+mvsDscUnderhand:A
+mvsDscThrow:Throw your weapon away.
+mvsDscDart:A
+mvsDscShoot:A
+mvsDscSnipe:A
+mvsDscTriple:Attack using three consecutive slashing motion that moves your whole body.
+mvsDscJump:A
+mvsDscAirstrike:A
+mvsDscLeap:A
+mvsDscBackstep:A
+mvsDscFocus:A
+mvsDscHeal:A
+mvsDscFrenzy:A
+mvsDscHaste:A
+mvsDscAdrenaline:A
+mvsDscCleave:A
+mvsDscEmpower:A
+mvsDscEvade:A
+mvsDscFlamestride:A
+mvsDscGlacialwalk:A
+mvsDscStun:A
+mvsDscSlow:A
+mvsDscPoison:A
+mvsDscCalling:A
+mvsDscShadowtwin:A
+mvsDscShadowstep:A
+mvsDscFireworks:A
+mvsDscFireblast:A
+mvsDscFreeze:A
+mvsDscFlameroll:A
+mvsDscFireball:A
+mvsDscBlizzard:A
+mvsDscMaterialize:Materialize energy into a polygon that you can walk on.
+mvsDscMeteor:A
+tutorial0:<The pages are blank...>
+tutorial1:Not only can you pick up items, you can also interact with objects using Left Click (while unarmed). Use the Middle Mouse Button to throw away wielded items.
+tutorial2:Press R to put the currently wielded item into your inventory. However, you'll first need clothes with pockets to have any inventory space. Once you do get any clothing, press the TAB key to access the inventory.
+tutorial3:Some actions like jumping takes Stamina. Hold Shift to rest and recover Stamina. Some actions like pushing do not require Stamina. Press F to do a quick push.
+tutorial4:You must learn most of the game systems as you go. You can always check the town libraries for information. Bye!
+tutorialSay1:I probably should take the book with me...
+tutorialSay2:The Guidebook updates itself..

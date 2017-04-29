@@ -1,0 +1,23 @@
+punk:c tgt@Come here!/What you got there buddy?/I might let you live!/I'm gonna eat your corpse!/What's this eh?
+punk:x@//WAAAAAAAH!/EEEEEEEK!!/I see light!
+punk:tgt x@Let's see what you got here, heh../Down already?/I can do this all day, buddy./You stay down!
+punk:c x@////a dead body./dead meat./poor guy../he's dead./a dead man.
+punk:atk tgt@///////Die!/Eyaaaa!/Raaaaaawr!
+punk:hear@/I hear something!/What's that?/huh?
+punk:greet@Hello.
+soldier:c tgt@Enemy!/Come here!/!!!
+soldier:x@///Urgh!/.../I'm down!/Someone help!/Medic!
+soldier:tgt x@He's dead./All's good./Stay down./Stay down!/Dead.
+soldier:c x@///a corpse?/what's this?/someone's killed./a corpse...
+soldier:atk tgt@////////Die!/Eyaa!/You're going down!
+soldier:hear@///I hear something!/What's that?/huh?
+p:hit@///Ouch!/Oof!/Urgh!/Ow!
+p:x@Nooooooo!/Not like this.../I'm dead.../...
+merchant:c@Buy something!/Come see my wares!/Check out the newest wares here!/Need anything?/Selling goodies!/An honest merchant here!/Good wares, better prices!
+merchant:sold@HUEHUEHUE! Thanks!/Making money is my profession./Thank you for your business./Thank you!/Come back anytime!
+merchant:shop@Only the best!/Take a look!/Honest wares!
+merchant:x@//////Whyyyy....
+merchant:denied@Fine, you're the one on a loss!/Your loss./Whatever./Don't have the money?/You're missing out!/Others would pay double for these.
+merchant:talk@Come see my wares./Yes?/Did you say something?/Would you like to shop?/
+:greet@Hello!/A fine day to you./Good day./Hello there.
+resident:talk@piss off./what?/go away./what do you want/?///

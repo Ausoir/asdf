@@ -14,7 +14,7 @@ import java.awt.image.BufferedImage;
  */
 public class MenuMap extends Panel {
     private JPanel panel;
-    private BufferedImage image = Picture.load("Worldmap");
+    private BufferedImage image = Picture.load("map/Worldmap");
     private ImageIcon poi = new ImageIcon(Picture.load("POI"));
     private JLabel[] labels = new JLabel[3];
     private int[] poiCoords = new int[]{

@@ -9,7 +9,7 @@ import com.ga.unit.Unit;
 import com.ga.map.Updater;
 
 /**
- * Created by Ga on 8/12/2016.
+ * Created by Ga on 8/12/2016. asd
  */
 public class Projectile extends Prop {
     public float rotSpeed = .03f;
@@ -29,7 +29,6 @@ public class Projectile extends Prop {
         stuck();
     }
     protected void onAttack(Unit p){
-        p.checkHit(new Line(pos,pos.getAdd(vel)),damage,damageType);
         stuck();
     }
     public void onField(){}
@@ -45,7 +44,7 @@ public class Projectile extends Prop {
         rotation+=rotSpeed*vel.x;
         if (tangible) {
             for (Unit i : Updater.collideUnit(pos, getCollisionSize(), faction)){
-                onAttack(i);
+                if (i.checkHit(new Line(pos,pos.getAdd(vel)),damage)) onAttack(i);
             }
         }
         if (Global.mapEdge(pos.getAdd(vel)) != 0) stuck();

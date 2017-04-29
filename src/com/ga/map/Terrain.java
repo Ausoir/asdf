@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 /**
- * Created by Ga on 1/10/2017.
+ * Created by Ga on 1/10/2017. xhfsdxghf
  */
 public class Terrain extends ShadedPicture implements Drawable{
     private int depth; //
@@ -72,8 +72,9 @@ public class Terrain extends ShadedPicture implements Drawable{
     }
     public void draw(Graphics2D g){
         if (visible) {
-            P t = new P(Global.rel.x+pos.x, Global.rel.y+pos.y);
+            P t = new P(pos.x+Global.rel.x, pos.y+Global.rel.y);
             g.drawImage(image,(int)t.x,(int)t.y,(int)size.x,(int)size.y,null);
+//            for (Line i : lines) g.drawLine((int)(t.x+i.pt.x),(int)(t.y+i.pt.y),(int)(t.x+i.ptd.x),(int)(t.y+i.ptd.y));
         }
     }
 

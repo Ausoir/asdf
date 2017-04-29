@@ -18,10 +18,9 @@ public class Prop extends Thing {
     public Random rand;
     public Interactive onInteract = null;
     public boolean gravity = false;
-    boolean mobile = true;
+    protected boolean mobile = true;
     public Faction faction = Faction.Destructive;
     public P vel = new P(0, 0);
-    public DamageType damageType = DamageType.Bash;
     protected boolean tangible = true;
     public boolean dynamic = false; //regrowth sensitive
     public Line lastLand = new Line();
@@ -44,37 +43,10 @@ public class Prop extends Thing {
         image.setSize(s.x * rx, s.y * ry);
     }
     public void onCreate(){}
-    public void load(String p) {
-    }
     public void onField(){
-        adjustToLand();
-    }
-    public void adjustToLand(){
-        Line closest = null;
-        float closestY = pos.y + 9999;
-        Line line = new Line(pos, new P(pos.x, closestY));
-        for (Line i : Global.map.land) {
-            if (line.lineCross(i)) {
-                if (i.next != -1 && i.isLandable()) {
-                    float y = i.getCrossPointY(pos.x);
-                    if (y < closestY) {
-                        closest = i;
-                        closestY = y;
-                    }
-                }
-            }
-        }
-        if (closest != null) {
-            if (gravity) rotation = (float) Math.atan(closest.getSlope());
-            setDepth(closest.depth - 2);
-        }
     }
     public int getSize(){
         return image.sizeRadius;
-    }
-    public P getPoint(){
-        float x = image.getSize().x*.5f*dir;
-        return pos.getAdd(x*Global.cos(rotation),x*Global.sin(rotation));
     }
     public boolean hittable(Faction faction){
         return tangible && faction.canAttack(this.faction);
@@ -84,14 +56,13 @@ public class Prop extends Thing {
         Line pp;
         boolean collided = true;
         int timeout = 8;
-        float maxX = vel.x;
         while (collided) {
             collided = false;
             vp = pos.getAdd(vel);
             pp = new Line(pos,vp);
             for (Line i : Global.map.land) {
-                if (i.lineCross(pp)) {
-                    if (i.isLand() && i.depth >= lastLand.depth) {
+                if (i.isLand() && i.depth >= lastLand.depth) {
+                    if (i.lineCross(pp)) {
                         onCollide(i);
                         float slope = i.getSlope();
                         boolean cc = !i.clockwise();
@@ -100,11 +71,15 @@ public class Prop extends Thing {
                             vel.set(0, 0);
                             return;
                         } else if (!cc && lineY >= pos.y) {
-                            float slopeSpeed = vel.x + (Global.sin((float) Math.atan(slope)) * Math.abs(vel.x));
-                            if (vel.x > 0) vel.x = Math.min(slopeSpeed, maxX);
-                            else if (vel.x < 0) vel.x = Math.max(slopeSpeed, maxX);
+                            float atan = (float) Math.atan(slope);
                             if (!Double.isInfinite(slope)){
+                                float test = vel.y;
                                 vel.y += (i.pt.y + (slope * (pos.x + vel.x - i.pt.x))) - (pos.y + vel.y) - 1;
+                                vel.x += Global.sin(atan)*(test-vel.y)*.05f;
+                            } else {
+                                vel.x *= -1;
+                                collide();
+                                return;
                             }
                             lastLand = i;
                             collided = true;
@@ -119,9 +94,9 @@ public class Prop extends Thing {
             }
         }
     }
-    public void explode(int r){
+    protected void explode(int r){
         for (Unit i : Updater.collideUnit(pos, getSize()+r, faction)){
-            i.checkHit(new Line(pos, pos),getDamage(),damageType);
+            i.checkHit(new Line(pos, pos),getDamage());
         }
     }
     public void onCollide(Line p){
@@ -131,7 +106,7 @@ public class Prop extends Thing {
             collide();
             int edge = Global.mapEdge(pos.getAdd(vel));
             if (edge > 0) {
-                if (Math.abs(edge-5) == 0) vel.x = 0;
+                if (Math.abs(edge-5) == 1) vel.x = 0;
                 else {
                     if (edge == 9) remove();
                     else vel.y = 0;
@@ -142,13 +117,21 @@ public class Prop extends Thing {
                 vel.y += Settings.gravity;
                 if (vel.y > Settings.gravityMax) vel.y = Settings.gravityMax;
             }
+            vel.x *= .94f;
         }
+    }
+    public String[] load(String p) {
+        String[] ps = p.split("@");
+        pos.load(ps[2]);
+        rotation = Float.parseFloat(ps[3]);
+        return ps;
     }
 
     @Override
     public String toString(){
         if (!save) return "";
-        return (factoryId==-1?name:""+factoryId) + "@" + seed + "@" + pos;
+        return (factoryId==-1?name:""+factoryId) + "@" + seed + "@" + pos
+                + "@" + String.format(java.util.Locale.US,"%.2f", rotation);
     }
 }
 

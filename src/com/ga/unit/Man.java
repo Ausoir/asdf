@@ -20,7 +20,7 @@ import static com.ga.unit.skill.Actions.Underhand;
  * Created by Ga on 5/7/2016. asd
  */
 public class Man extends Unit {
-    private Item fist = ((Item) Stock.getByName("Fist",0)).cancelAdd();
+    protected Item fist = ((Item) Stock.getByName("Fist",0)).cancelAdd();
     public Item weapon = fist;
     public ArmorSet armor;
     public Line rope;
@@ -30,36 +30,15 @@ public class Man extends Unit {
         clip = new BodyHumanoid(this);
     }
 
-    @Override
-    public void load(String p){
-        super.load(p.split("#")[0]);
-        final Man me = this;
-        clip.organs[FIST].onAmputate = new Performer(){
-            public void perform(){
-                if (clip.organs[FIST].amputated){
-                    weapon.drop(me);
-                    setWeapon(fist);
-                }
-            }
-        };
-        String[] t = p.split("#");
-        if (t[1].equals("")) setWeapon(fist);
-        else setWeapon((Item) Stock.get(t[1]));
-        armor = new ArmorSet(this, t[2]);
-    }
-
     public void setHead(String p){
         clip.organs[5].setImage(p);
     }
 
     public void setWeapon(Item p){
         if (p == null) p = fist;
-        if (weapon != fist){
-            weapon.onUnequip(this);
-        }
+        weapon.onUnequip(this);
         weapon = p;
-        weapon.pos = pos;
-        weapon.setOrgan(clip.organs[FIST]);
+        weapon.onEquip(this);
         weapon.dir = dir;
     }
 
@@ -81,7 +60,7 @@ public class Man extends Unit {
     }
 
     public float getReach(){
-        return weapon.getPoint().getSubtract(pos).getDist();
+        return weapon.getSize();
     }
 
     void stepSound(){
@@ -104,86 +83,12 @@ public class Man extends Unit {
     }
 
     public void stateSet(Moveset state){
+        damageMod = 1 + (stateLevel*.4f);
+        attackSpeed = weapon.speed-armor.getEncumberance()-weapon.weight;
         super.stateSet(state);
-        if (state instanceof Actions) {
-            int speed = weapon.speed-armor.getEncumberance()-weapon.weight;
-            damageType = weapon.damageType;
-            switch ((Actions) state) {
-                case Use:
-                    if (!clip.organs[FIST].amputated) weapon.use(this);
-                    break;
-                case Duck:
-                case Sprint:
-                case Jump:
-                    speed = 0;
-                    break;
-                case Airstrike:
-                    speed = 0;
-                    vel.y -= 20;
-                    break;
-                case Guard:
-                    weapon.rotation = target.getAtan()+(dir<0?-3.14f:0);
-                    speed = 0;
-                    break;
-                case Sidekick:
-                    speed = 0-armor.armor[clip.FOOT].encumberance;
-                    damageType = DamageType.Bash;
-                    break;
-                case Kick:
-                    speed = 0;
-                    damageType = DamageType.Push;
-                    break;
-                case Lunge:
-                    damageMod = -1;
-                    break;
-                case Triple:
-                    damageMod = 1 + stateLevel;
-                    weapon.rotation = target.getAtan()+(dir<0?-3.14f:0);
-                    speed = 0;
-                    break;
-                case Backstep:
-                    vel.x -= getSpeed() * 5 * dir;
-                    break;
-                case Underhand:
-                    damageMod = 1 + (stateLevel * .5f);
-                    break;
-                case Stab:
-                    damageMod = 2 + stateLevel;
-                    break;
-                case Thrust:
-                    damageMod = 1 + (Math.abs(vel.x) / 20) + (stateLevel*.5f);
-                    break;
-                case Dash:
-                    vel.x -= getSpeed() * dir;
-                    delay.time += 2 * stateLevel;
-                    delay.max += 2 * stateLevel;
-                    damageMod = stateLevel * .5f;
-                    break;
-                case Whirlwind:
-                    delay.time += 8 * stateLevel;
-                    damageMod = 1 + ((float) stateLevel * .5f);
-                    delay.performer = new Performer(){
-                        public void perform(){
-                            setState(Actions.Rest);
-                        }
-                    };
-                    break;
-                case Throw:
-                    damageMod = stateLevel;
-                    break;
-                case Slash:
-                    damageMod = .7f+(stateLevel*.3f);
-                    speed = Math.min(10,speed);
-                    break;
-                default:
-                    damageMod = 1 + (stateLevel * .4f);
-            }
-            if (delay.max != 0) delay.set(Math.max(3, delay.time - speed));
-            clip.setSpeed(speed);
-        } else if (state instanceof Spells){
+        if (state instanceof Spells){
             weapon.rotation = target.getAtan()+(dir<0?-3.14f:0);
             clip.setSpeed(weapon.speed-armor.getEncumberance());
-            damageMod = 1;
         }
     }
 
@@ -203,7 +108,7 @@ public class Man extends Unit {
 
     @Override
     public int getDamage(){
-        return (int) Math.max(0,((weapon.getDamage()+get("Proficiency").get())*damageMod)-armor.armor[FIST].encumberance+armor.armor[FIST].damage);
+        return (int) Math.max(0,(weapon.getDamage()*damageMod)-armor.armor[FIST].encumberance+armor.armor[FIST].damage);
     }
 
     @Override
@@ -212,9 +117,8 @@ public class Man extends Unit {
     }
 
     @Override
-    public void hit(Line hitbox, float knockback, DamageType type) {
-        super.hit(hitbox, knockback, type);
-        target = hitbox.pt.getAdd(0,0);
+    public void hit(Line hitbox, float knockback) {
+        super.hit(hitbox, knockback);
         armor.onHit();
     }
 
@@ -234,28 +138,24 @@ public class Man extends Unit {
         Line hitbox = weapon.getLine();
         Unit target = null;
         for (Unit i : Updater.collideUnit(pos, (int) hitbox.getLength(), faction)){
-            if (i.checkHit(hitbox,getDamage(),damageType)){
+            if (i.checkHit(hitbox,getDamage())){
                 target = i;
                 if (!cleave) break;
             }
         }
-        if (target != null){
-            if (weapon.use(1)) weapon.trigger(target);
+        if (target != null) {
+            if (weapon.usable(1)) weapon.trigger(target);
             Sound.play(weapon.getHitSound());
             if (state == Underhand) get("Stamina").add(4);
             if (brain != null) brain.attacked();
-            if (stats.triggerEffect(Buffs.Empower)){
-                Particle.explode("Blood",hitbox.ptd,new P(),12,20,0,true,3);
-                Particle.explode("Fire",hitbox.ptd,new P(),30,8,0,false,3);
-            }
             return true;
         }
         return false;
     }
 
-    public boolean checkHit(Line hitBox, int damage, DamageType type) {
+    public boolean checkHit(Line hitBox, int damage) {
         boolean r;
-        if (r = super.checkHit(hitBox, damage, type)) {
+        if (r = super.checkHit(hitBox, damage)) {
             if (clip.organs[FIST].amputated && clip.organs[OFIST].amputated){
                 tags.remove(Tag.Swinging);
             }
@@ -270,8 +170,8 @@ public class Man extends Unit {
                 Line hitbox = clip.organs[organ].getAdd(pos);
                 int damage = armor.armor[1].getDamage()+1;
                 for (Unit i : Updater.collideUnit(pos, (int) hitbox.getLength(), faction))
-                    i.checkHit(hitbox,damage,damageType);
-            } else state.trigger(this, organ);
+                    i.checkHit(hitbox,damage);
+            } else state.trigger(this);
         }
     }
 
@@ -292,6 +192,31 @@ public class Man extends Unit {
         String r = super.getDescription()+"\n";
         if (!wieldingNone()) r += "*Wielding - "+weapon.getFullName()+"\n";
         r += "*Wearing - "+armor.getDescription()+"\n";
+        return r;
+    }
+
+    @Override
+    public void update(){
+        super.update();
+        weapon.pos.set(pos.x + clip.organs[FIST].ptd.x, pos.y + clip.organs[FIST].ptd.y);
+    }
+
+    @Override
+    public String[] load(String p){
+        String[] r = super.load(p.split("#")[0]);
+        final Man me = this;
+        clip.organs[FIST].onAmputate = new Performer(){
+            public void perform(){
+                if (clip.organs[FIST].amputated){
+                    weapon.drop(me);
+                    setWeapon(fist);
+                }
+            }
+        };
+        String[] t = p.split("#");
+        if (t[1].equals("")) setWeapon(fist);
+        else setWeapon((Item) Stock.get(t[1]));
+        armor = new ArmorSet(this, t[2]);
         return r;
     }
 

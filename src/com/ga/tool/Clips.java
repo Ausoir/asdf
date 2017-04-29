@@ -3,7 +3,6 @@ package com.ga.tool;
 import com.ga.game.FileManager;
 import com.ga.unit.Clip;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -12,11 +11,8 @@ import java.util.HashMap;
 public class Clips {
     public static HashMap<String, Clip> clip = new HashMap<>();
     public static void init(){
-        ArrayList<String> clips = FileManager.searchFiles("Data/unit",new String[]{"2d"});
-        for (String i : clips) {
-            int pathEnd = i.lastIndexOf('\\');
-            String fileName = i.substring(pathEnd+1);
-            clip.put(fileName.substring(0,fileName.lastIndexOf(".")), FileManager.readClip("unit/"+fileName));
+        for (String[] i : FileManager.fileCache.get("2d")) {
+            clip.put(i[0], FileManager.readClip(i[1]));
         }
     }
     public static int[][][] clone(int[][][] p){

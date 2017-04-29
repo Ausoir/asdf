@@ -32,9 +32,7 @@ public class Command {
                 else if (cmd[0].equals("buff")) Global.player.buff(Buffs.valueOf(cmd[1]),3);
                 else if (cmd[0].equals("seed")) host.weapon.seed = Integer.parseInt(cmd[1]);
                 else if (cmd[0].equals("time")) Global.loadTime(Global.getTime()[0]+Integer.parseInt(cmd[1]));
-                else if (cmd[0].equals("slow")) host.stats.addEffect(Buffs.Slow, 3);
-                else if (cmd[0].equals("delevel")) host.stats.delevel(cmd[1]);
-                else if (cmd[0].equals("level")) host.stats.level(cmd[1]);
+                else if (cmd[0].equals("slow")) host.buff(Buffs.Slow, 3);
                 else if (cmd[0].equals("stat")) host.get(cmd[1].split(":")[0]).addTotal(Integer.parseInt(cmd[1].split(":")[1]));
                 else if (cmd[0].equals("advSkill")) for (int num=0;num<Integer.parseInt(cmd[1].split(":")[1]);num++) host.skillTree.advanceSkill(Actions.valueOf(cmd[1].split(":")[0]));
                 else if (cmd[0].equals("advSpell")) for (int num=0;num<Integer.parseInt(cmd[1].split(":")[1]);num++) host.skillTree.advanceSkill(Spells.valueOf(cmd[1].split(":")[0]));

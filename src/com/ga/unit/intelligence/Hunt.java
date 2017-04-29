@@ -19,7 +19,6 @@ class Hunt implements Task {
 
     @Override
     public void blocked(boolean fall) {
-        host.brain.forget.time = 5;
         host.vel.x = host.getSpeed()*host.dir;
         host.setState(Actions.Jump);
     }
@@ -33,7 +32,7 @@ class Hunt implements Task {
         float dist = Math.abs(x)-range;
         if (dist < 1000) {
             if (y < -64) {
-                Actions.Walk.update(host,1);
+                Actions.Walk.update(host);
                 host.setState(Actions.Jump);
             } else if (y > 64){
                 if (Math.abs(x) < 160 && host.lastLand != target.lastLand) host.setState(Actions.Drop);

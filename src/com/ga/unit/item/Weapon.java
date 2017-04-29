@@ -2,6 +2,7 @@ package com.ga.unit.item;
 
 import com.ga.map.Global;
 import com.ga.unit.Man;
+import com.ga.unit.Tag;
 
 /**
  * Created by Ga on 8/1/2016.
@@ -31,7 +32,11 @@ public class Weapon extends Item {
         delay = 0;
     }
     public void onCreate(){
-        imbueMeta(true, true, .03f, true);
+        imbueMeta(true, true, .04f, true);
+        if (emod != null && !emod.tags.contains(com.ga.unit.Tag.Debuff)){
+            emod = null;
+            ademod = AdenchantMod.None;
+        }
     }
     protected void setModifier(PrefixMod mod){
         super.setModifier(mod);

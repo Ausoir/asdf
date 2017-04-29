@@ -49,13 +49,13 @@ public class Food extends Item {
     }
     @Override
     public void use(Man p){
-        if (use(1)) {
+        if (usable(1)) {
             super.use(p);
             int perishTime = perish - Global.getHour();
             if (p instanceof Player){
                 Stat motivation = p.get("Motivation");
                 if (perishTime <= 0 && rand.nextInt(100) < getPoisonChance()){
-                    if (punish > 3) p.stats.addEffect(Buffs.Poison, punish-3);
+                    if (punish > 3) p.buff(Buffs.Poison, punish-3);
                     p.say("Gawrrrr! That didn't taste good...");
                     for (int i=0;i<punish;i++) nutrition = Health.mutate(nutrition);
                     motivation.add(-punish);
@@ -80,9 +80,10 @@ public class Food extends Item {
         r += "\nNutrition Facts:\n"+ Health.getDescription(nutrition);
         return r;
     }
-    public void load(String p){
-        super.load(p);
+    public String[] load(String p){
+        String[] r = super.load(p);
         perish = Integer.parseInt(p.split("@")[6]);
+        return r;
     }
     @Override
     public String toString(){

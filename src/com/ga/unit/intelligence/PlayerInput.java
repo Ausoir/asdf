@@ -30,9 +30,9 @@ public class PlayerInput implements Input {
         put(Keybinding.get("R"), Actions.Wield.getCodeName());
         put(Keybinding.get("M1"), Actions.Use.getCodeName());
         put(Keybinding.get("M2"), Actions.Throw.getCodeName());
+        put(Keybinding.get("M3"), Actions.Grab.getCodeName());
         put(Keybinding.get("Q"), Actions.Throw.getCodeName());
         put(Keybinding.get("GRAVE"), "ORecall");
-        put(Keybinding.get("]"), "OFT");
         put(Keybinding.get(","), "ORest");
     }};
     public P movement = new P();

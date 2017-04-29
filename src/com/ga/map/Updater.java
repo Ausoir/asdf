@@ -66,11 +66,7 @@ public class Updater {
                     Global.player.pos.set(Global.map.size.x-24,rightEdge.getCrossPointY(rightEdge.ptd.x-24)-1);
                 }
             }
-            addQueue.add(Global.player);
-            addQueue.add(Global.player.weapon);
-            Global.display.input = Global.player.input;
-            Global.mapEdgeCenter(Global.cameraTo = Global.player.pos.getAdd(0,0));
-            Global.mapEdgeCenter(Global.camera = Global.cameraTo.getAdd(0,0));
+            Global.player.reconnect();
             if (changeMapEvent != null){
                 changeMapEvent.perform();
                 changeMapEvent = null;

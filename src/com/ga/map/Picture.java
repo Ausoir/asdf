@@ -28,19 +28,22 @@ public class Picture extends Texture {
     public BufferedImage getImage(){
         return image;
     }
+    public P getHalfSize(){
+        return halfSize;
+    }
     public void setSize(float x, float y){
         size = new P(x,y);
         sizeRadius = (int) size.getMult(.5f,.5f).getDist();
-        if (type == 1) centerCenter();
-        else if (type == 2) centerBottom();
+        setCenterType(type);
     }
-    private void centerCenter(){
-        type = 1;
-        halfSize = new P(size.x/2, size.y/2);
+    public int getCenterType(){
+        return type;
     }
-    public void centerBottom(){
-        type = 2;
-        halfSize = new P(size.x/2, size.y-4);
+    public void setCenterType(int p){
+        type = p;
+        if (type == 1) halfSize = new P(size.x/2, size.y/2);
+        else if (type == 2) halfSize = new P(size.x/2, size.y-4);
+        else if (type == 3) halfSize = new P(4, size.y/2);
     }
     public void draw(Graphics2D g, float x, float y, float rot, int dir, float sizeX, float sizeY){
         if (visible) {

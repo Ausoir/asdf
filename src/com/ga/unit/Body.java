@@ -101,11 +101,14 @@ public class Body {
                 int type = Integer.parseInt(model[p][1]);
                 if (type < 0) organs[p] = new Organ(parent, tip) {
                                     public void draw(Graphics2D g) {
+//                                        if (type != 0) g.drawLine((int)(host.pos.x+pt.x+Global.rel.x), (int)(host.pos.y+pt.y+Global.rel.y),
+//                                                (int)(host.pos.x+ptd.x+Global.rel.x), (int)(host.pos.y+ptd.y+Global.rel.y));
                                         image.draw(g, host.pos.x + ptd.x, host.pos.y + ptd.y, (float) Math.atan2(pt.y - ptd.y, pt.x - ptd.x) - 1.57f, host.dir, strokeSize, getLength() + 6);
                                     }
                                 };
                 else if (type == 0) organs[p] = new Organ(parent, tip) {
                                         public void draw(Graphics2D g) {
+//                                            g.drawOval((int)(host.pos.x+pt.x-12+Global.rel.x), (int)(host.pos.y+pt.y-24+Global.rel.y), 24, 24);
                                             if (!amputated) image.draw(g, host.pos.x+pt.x, host.pos.y+pt.y, getAtan()+1.57f, host.dir);
                                         }
                                     };
@@ -187,11 +190,12 @@ public class Body {
         frame.set(localFrames[nextAnimation[current]]);
     }
 
-    public void rotateAppendage(int organ, int frame){
+    public void rotateAppendage(int organ, int frame, float offset){
         int length = Math.abs(clip.clip[frame][organ][0])+Math.abs(clip.clip[frame][organ][1]);
-        P atanDir = host.target.getAdd(localAnimation[frame][organ][0]*host.dir,localAnimation[frame][organ][1]).getAtan(1);
-        localAnimation[frame][organ][0] = (int) (length*atanDir.x)*host.dir;
-        localAnimation[frame][organ][1] = (int) (length*atanDir.y);
+        float atan = host.target.getAdd(localAnimation[frame][organ][0]*host.dir, localAnimation[frame][organ][1]).getAtan();
+        atan += offset;
+        localAnimation[frame][organ][0] = (int) (length*Global.cos(atan))*host.dir;
+        localAnimation[frame][organ][1] = (int) (length*Global.sin(atan));
     }
 
     public int update() {

@@ -5,7 +5,7 @@ import com.ga.map.Global;
 import java.awt.*;
 
 /**
- * Created by Ga on 7/26/2016.
+ * Created by Ga on 7/26/2016. asd
  */
 public class Line {
     public static int MAXSLOPE = 2;
@@ -65,8 +65,7 @@ public class Line {
         return pt.x <= ptd.x;
     }
     public float getAtan(){
-        float r = (float) Math.atan2(ptd.y-pt.y,ptd.x-pt.x);
-        return r;
+        return (float) Math.atan2(ptd.y-pt.y,ptd.x-pt.x);
     }
     public P getAtan(int mag){
         float r = getAtan();
@@ -84,11 +83,11 @@ public class Line {
     public boolean lineCross(Line i2){
         boolean a = i2.pt.x-pt.x >= 0, b = i2.pt.x-ptd.x > 0, c = i2.ptd.x-pt.x >= 0, d = i2.ptd.x-ptd.x > 0,
                 e = i2.pt.y-pt.y >= 0, f = i2.pt.y-ptd.y > 0, g = i2.ptd.y-pt.y >= 0, h = i2.ptd.y-ptd.y > 0;
-        if ((a != b || c != d || a != c || b != d) && (e != f || g != h || e != g || f != h))
+        if ((a != b || c != d || a != c) && (e != f || g != h || e != g))
             if (cross(i2.pt) != cross(i2.ptd)) return true;
         return false;
     }
-    public boolean cross(P p){
+    private boolean cross(P p){
         return ((p.x-pt.x)*((ptd.y-pt.y)/(ptd.x-pt.x)))-(p.y-pt.y) >= 0;
     }
     public float getSlope(){

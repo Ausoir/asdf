@@ -17,28 +17,23 @@ import java.util.Random;
  */
 public class Item extends Prop {
     public enum Tag{
-        Sword(Actions.Slash, DamageType.Cut, "swing_knife", "hit_cut"), Spear(Actions.Thrust, DamageType.Cut, "swing_silent", "hit_bloody"), Mace(Actions.Slash, DamageType.Bash, "swing_silent", "hit_bash"),
-        Dagger(Actions.Thrust, DamageType.Cut, "swing_normal", "hit_bloody"), Armor(Actions.Rest, DamageType.Push, "swing_normal"), Scroll(Actions.Guard, DamageType.Push, "scroll"),
-        Shoot(Actions.Shoot, DamageType.Cut, "swing_normal"), Snipe(Actions.Snipe, DamageType.Cut, "swing_normal"),
-        Throwing(Actions.Throw, DamageType.Cut, "swing_silent"), Darting(Actions.Dart, DamageType.Cut, "swing_normal"), Consumable(Actions.Consume, DamageType.Push, "drink"),
-        Claw(Actions.Slash, DamageType.Cut, "swing_normal"), Enchant(Actions.Buff, DamageType.Push, "swing_silent"), Food(Actions.Consume, DamageType.Push, "eat");
+        Sword(Actions.Slash, "swing_knife", "hit_cut"), Spear(Actions.Thrust, "swing_silent", "hit_bloody"), Mace(Actions.Slash, "swing_silent", "hit_bash"),
+        Dagger(Actions.Thrust, "swing_normal", "hit_bloody"), Armor(Actions.Rest, "swing_normal"), Scroll(Actions.Guard, "scroll"),
+        Shoot(Actions.Shoot, "swing_normal"), Snipe(Actions.Snipe, "swing_normal"), Bow(Actions.Aim, "swing_silent"),
+        Throwing(Actions.Throw, "swing_silent"), Darting(Actions.Dart, "swing_normal"), Consumable(Actions.Consume, "drink"),
+        Claw(Actions.Slash, "swing_normal"), Enchant(Actions.Buff, "swing_silent"), Food(Actions.Consume, "eat");
         private Moveset action;
-        private DamageType type;
         private String sound, soundHit = "hit_punch";
-        Tag(Moveset p, DamageType type, String sound){
+        Tag(Moveset p, String sound){
             action = p;
-            this.type = type;
             this.sound = sound;
         }
-        Tag(Moveset p, DamageType type, String sound, String soundHit){
-            this(p, type, sound);
+        Tag(Moveset p, String sound, String soundHit){
+            this(p, sound);
             this.soundHit = soundHit;
         }
         public Moveset getAction() {
             return action;
-        }
-        public DamageType getDamageType(){
-            return type;
         }
         public String getSound(){
             return sound;
@@ -153,11 +148,10 @@ public class Item extends Prop {
     public int delay = 0;
     public float probability;
     Moveset action = Actions.Slash;
-    private int[] lastused = new int[]{0};
+    private int[] cdTime = new int[]{0};
     private int durability = 1;
     public int uses = 1;
     private Tag type = Tag.Throwing;
-    private Organ organ = null;
     public int speed = -4;
     public int damage = 0;
     public int value = 8;
@@ -207,6 +201,7 @@ public class Item extends Prop {
     }
     private void shade(){
         int r = getRarity();
+        int ctype = image.getCenterType();
         if (r % 10 > 3){
             image = new ShadedPicture(name, Shader.Color);
             ((ShadedPicture) image).shade(new Color(250, 220, 100, 180).getRGB());
@@ -214,31 +209,14 @@ public class Item extends Prop {
             image = new ShadedPicture(name, Shader.Color);
             ((ShadedPicture) image).shade(new Color(48, 156, 200, 180).getRGB());
         }
+        image.setCenterType(ctype);
     }
     public void setType(Tag p){
         this.type = p;
         this.action = p.getAction();
-        this.damageType = p.getDamageType();
     }
     public Tag getType(){
         return type;
-    }
-    public void onField(){
-        if (organ == null) super.onField();
-    }
-    public void setOrgan(Organ p){
-        if (p == null){
-            save = true;
-            pos = pos.getAdd(0,0);
-            if (this.organ != null) lastLand = this.organ.host.lastLand;
-        } else {
-            setDepth(p.host.getDepth()-1);
-            save = false;
-        }
-        this.organ = p;
-    }
-    public Organ getOrgan() {
-        return organ;
     }
     protected void setModifier(PrefixMod mod){
         if (mod == PrefixMod.Broken){
@@ -368,52 +346,62 @@ public class Item extends Prop {
         r = r.replace("_"," ");
         return r;
     }
+    public void onEquip(Man host){
+        setDepth(host.getDepth()-1);
+        lastLand = host.lastLand;
+        save = false;
+        mobile = false;
+    }
     public void onUnequip(Man host){
-        setOrgan(null);
+        lastLand = host.lastLand;
+        save = true;
+        pos = pos.getAdd(0,0);
+        mobile = true;
         if (smod == SpecialtyMod.Cursed){
             Curse.get(host, 5);
         }
     }
+    public void remove(){
+        Global.player.inventory.remove(this);
+        cancelAdd();
+        super.remove();
+    }
     protected void playSound(){
         Sound.play(type.getSound());
     }
-    public boolean use(int p){
-        if ((isInfinite() || uses > p) && Global.checkCooldown(lastused, cooldown) <= 0){
+    public boolean usable(int p){
+        if ((isInfinite() || uses >= p) && Global.getTime()[0] >= cdTime[0]){
             if (!isInfinite()){
                 uses -= p;
-                if (breakable && uses == 0) remove();
+                if (breakable && uses == 0){
+                    remove();
+                }
             }
             return true;
         }
         return false;
     }
-    public void trigger(Unit target){
-        if (emod != null && rand.nextFloat() < probability){
-            target.stats.addEffect(emod, ademod.level);
-        }
-    }
     public void use(Man host){
         playSound();
-        Global.cooldown(lastused, cooldown);
+        cdTime[0] = Global.getTime()[0]+cooldown;
         host.setState(action);
     }
+    public void trigger(Unit target){
+        if (emod != null && rand.nextFloat() < probability){
+            target.buff(emod, ademod.level);
+        }
+    }
     public void drop(Man host) {
-        if (host.weapon == this) host.setWeapon(null);
+        if (host.weapon == this){
+            host.setWeapon(null);
+            onUnequip(host);
+        }
         pos = new P(host.pos);
-        setOrgan(null);
         rotation = (float)Global.r.nextInt(628)/100;
     }
     public Item cancelAdd(){
         Updater.cancelAdd(this);
         return this;
-    }
-    public void remove(){
-        if (organ != null) {
-            ((Man) organ.host).setWeapon(null);
-            setOrgan(null);
-        } else Global.player.inventory.remove(this);
-        cancelAdd();
-        super.remove();
     }
     public String getSound(){
         return type.getSound();
@@ -429,32 +417,19 @@ public class Item extends Prop {
             if (ademod != AdenchantMod.None) ade = "Level "+ademod.level+" ";
             if (cooldown > 0){
                 r += " "+Dialog.get("itemEncDsc",new String[]{getRarityDescription(), ade+emod.name(), cooldown+""});
-                int cd = Global.checkCooldown(lastused, cooldown);
+                int cd = cdTime[0] - Global.getTime()[0];
                 if (cd <= 0) r += " "+Dialog.get("itemEncRdy");
                 else r += " "+Dialog.get("itemEncNRdy", new String[]{cd+""});
             }
         }
         return r;
     }
-    @Override
-    public P getPoint(){
-        P result = pos.getAdd(organ.ptd);
-        float x = image.getSize().x*.5f*dir;
-        result.add(x*Global.cos(rotation),(int) (x*Global.sin(rotation)));
-        return result;
-    }
     public int getDamage() {
         return damage;
     }
     public Line getLine(){
-        return new Line(pos.getAdd(organ.pt), getPoint());
-    }
-    @Override
-    public void draw(Graphics2D g){
-        if (organ != null) {
-            P t = pos.getAdd(organ.ptd);
-            image.draw(g, t.x, t.y, rotation, dir);
-        } else image.draw(g, pos.x, pos.y, rotation, dir);
+        float len = image.getSize().x * dir;
+        return new Line(pos, pos.getAdd(len*Global.cos(rotation), len*Global.sin(rotation)));
     }
     public String forceToString(){
         boolean forced = false;
@@ -467,11 +442,11 @@ public class Item extends Prop {
         return r;
     }
     @Override
-    public void load(String p){
-        String[] sections = p.split("@");
-        uses = Integer.parseInt(sections[3]);
-        loadMeta(sections[4]);
-        rotation = Float.parseFloat(sections[5]);
+    public String[] load(String p){
+        String[] sections = super.load(p);
+        uses = Integer.parseInt(sections[4]);
+        loadMeta(sections[5]);
+        return sections;
     }
     private boolean isInfinite(){
         return durability == -1;
@@ -480,10 +455,7 @@ public class Item extends Prop {
     public String toString(){
         String t = super.toString();
         String meta = pmod+"_"+smod+"_"+admod+"_"+(emod==null?"":emod.ordinal())+"_"+ademod;
-        if (!t.equals("")) t += "@"+uses+"@"+meta+"@"+String.format(java.util.Locale.US,"%.2f", rotation);
+        if (!t.equals("")) t += "@"+uses+"@"+meta;
         return t;
-    }
-    public void update(){
-        if (organ == null) super.update();
     }
 }

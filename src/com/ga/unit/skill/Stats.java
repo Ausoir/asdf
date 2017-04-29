@@ -31,7 +31,7 @@ public class Stats {
     public void addEffect(Buffs p, int level){
         Buff origBuff = getEffect(p);
         if (origBuff == null) {
-            Buff buff = p.make(host, Math.min(10,level));
+            Buff buff = p.make(host, level);
             buff.onSet();
             effects.add(buff);
         } else {
@@ -47,19 +47,6 @@ public class Stats {
     public boolean triggerEffect(Buffs p){
         Buff buff = getEffect(p);
         return buff != null && buff.onTrigger();
-    }
-    public void delevel(String stat){
-        if (stats.get("Reset Points").get() > 0 && stats.get(stat).get() > 0) {
-            stats.get("Level Points").addTotal(1);
-            stats.get(stat).addTotal(-1);
-            stats.get("Reset Points").addTotal(-1);
-        }
-    }
-    public void level(String stat){
-        if (stats.get("Level Points").get() > 0) {
-            stats.get("Level Points").addTotal(-1);
-            stats.get(stat).addTotal(1);
-        }
     }
     public boolean rest(int mag){
         if (timer.update(mag)){
@@ -92,8 +79,10 @@ public class Stats {
             data = statOrBuff[1].split(",");
             for (String i : data) {
                 String[] t = i.split("&");
-                Buffs buff = Buffs.values()[Integer.parseInt(t[0])];
-                addEffect(buff,Integer.parseInt(t[1]));
+                Buffs buffs = Buffs.values()[Integer.parseInt(t[0])];
+                Buff buff = buffs.make(host, Integer.parseInt(t[1]));
+                buff.onLoad();
+                effects.add(buff);
                 effects.get(effects.size()-1).time = Integer.parseInt(t[2]);
                 effects.get(effects.size()-1).var = Integer.parseInt(t[3]);
             }

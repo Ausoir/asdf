@@ -153,20 +153,22 @@ public class Map extends Thing {
                     }
                 }
             } else {
-                i.depth = Terrain.toTerrainDepth(Integer.parseInt(formTextures.get(i.next)));
+                String depth = formTextures.get(i.next);
+                if (depth != null) i.depth = Terrain.toTerrainDepth(Integer.parseInt(formTextures.get(i.next)));
+                else i.depth = Terrain.toTerrainDepth(0);
             }
         }
-        if (inside) blocker.render();
         for (Object o : terrains.entrySet()) {
             java.util.Map.Entry pair = (java.util.Map.Entry) o;
             Terrain terrain = (Terrain) pair.getValue();
             terrain.render();
         }
+        if (inside) blocker.render();
     }
 
     void generateProps(){
         for (Line l : land) {
-            if (l.isLand() && Math.abs(l.getSlope()) < Line.MAXSLOPE - 1) {
+            if (l.isLand() && Math.abs(l.getSlope()) < Line.MAXSLOPE) {
                 if (Math.abs(l.getSlope()) < .5f) {
                     String texture = formTextures.get(l.next);
                     if (texture != null) {
@@ -220,6 +222,9 @@ public class Map extends Thing {
                 if (!l.clockwise()){
                     t.pos.y += (t.image.size.y / 2)-4;
                     t.rotation = 3.14f;
+                } else {
+                    t.rotation = l.getSlope();
+                    t.setDepth(l.depth-2);
                 }
             }
         }
@@ -248,7 +253,7 @@ public class Map extends Thing {
 
     public Line fallSafe(P pos, int depth){
         Line pp = new Line(pos.x,pos.y,pos.x,99999);
-        for (Line i : Global.map.land){
+        for (Line i : land){
             if (i.isLandable() && i.depth >= depth && i.lineCross(pp)){
                 return i;
             }

@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Ga on 1/25/2017. asd
@@ -15,12 +16,9 @@ import java.util.HashMap;
 public class Sound {
     private static HashMap<String,Clip> cache = new HashMap<>();
     static void init(){
-        ArrayList<String> sounds = FileManager.searchFiles("Data/sound",new String[]{"wav"});
-        for (String i : sounds) {
-            int pathEnd = i.lastIndexOf('\\');
-            String fileName = i.substring(pathEnd+1);
+        for (String[] i : FileManager.fileCache.get("wav")) {
             try {
-                cache.put(fileName.substring(0, fileName.lastIndexOf(".")), makeAudio(i));
+                cache.put(i[0], makeAudio(i[1]));
             } catch (Exception e) {
                 e.printStackTrace();
             }
