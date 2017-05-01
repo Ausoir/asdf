@@ -1,9 +1,9 @@
 package com.ga.unit.intelligence;
 
 import com.ga.map.Global;
+import com.ga.unit.Tag;
 import com.ga.unit.Unit;
 import com.ga.unit.skill.Actions;
-import com.ga.unit.skill.Spells;
 
 /**
  * Created by Ga on 7/30/2016. asd
@@ -37,8 +37,8 @@ class Hunt implements Task {
             } else if (y > 64){
                 if (Math.abs(x) < 160 && host.lastLand != target.lastLand) host.setState(Actions.Drop);
             } else {
-                int t = host.performMoveset((int) dist);
-                if (host.state instanceof Spells) {
+                int t = host.performActions((int) dist);
+                if (host.state.getTags().contains(Tag.Channel)) {
                     host.delay.set(60+ Global.r.nextInt(80));
                 }
                 if (t == 2 && target.vel.x > 0 != host.dir > 0) { //no stamina

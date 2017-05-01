@@ -43,7 +43,7 @@ public class Picture extends Texture {
         type = p;
         if (type == 1) halfSize = new P(size.x/2, size.y/2);
         else if (type == 2) halfSize = new P(size.x/2, size.y-4);
-        else if (type == 3) halfSize = new P(4, size.y/2);
+        else if (type == 3) halfSize = new P(8, size.y/2);
     }
     public void draw(Graphics2D g, float x, float y, float rot, int dir, float sizeX, float sizeY){
         if (visible) {

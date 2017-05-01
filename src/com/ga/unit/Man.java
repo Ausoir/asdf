@@ -82,14 +82,10 @@ public class Man extends Unit {
         else return super.getHand();
     }
 
-    public void stateSet(Moveset state){
+    public void stateSet(Actions state){
         damageMod = 1 + (stateLevel*.4f);
         attackSpeed = weapon.speed-armor.getEncumberance()-weapon.weight;
         super.stateSet(state);
-        if (state instanceof Spells){
-            weapon.rotation = target.getAtan()+(dir<0?-3.14f:0);
-            clip.setSpeed(weapon.speed-armor.getEncumberance());
-        }
     }
 
     @Override

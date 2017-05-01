@@ -224,7 +224,6 @@ public class Map extends Thing {
                     t.rotation = 3.14f;
                 } else {
                     t.rotation = l.getSlope();
-                    t.setDepth(l.depth-2);
                 }
             }
         }
@@ -240,14 +239,14 @@ public class Map extends Thing {
         return "none";
     }
 
-    public P randomSurface(){
+    public P randomLandableSurface(){
         Line i;
         int tx, ty;
         do {
             i = land.get((int) (Global.r.nextFloat() * land.size()));
             tx = (int) (Global.r.nextFloat() * (i.ptd.x-i.pt.x));
             ty = (int) (i.pt.y + (int) (tx * i.getSlope()));
-        } while (!i.clockwise());
+        } while (!i.clockwise() || i.getSlope() > Line.MAXSLOPE);
         return new P(i.pt.x+tx,ty);
     }
 

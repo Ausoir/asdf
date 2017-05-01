@@ -2,7 +2,6 @@ package com.ga.unit.item;
 
 import com.ga.map.Global;
 import com.ga.unit.Man;
-import com.ga.unit.Tag;
 
 /**
  * Created by Ga on 8/1/2016.
@@ -21,7 +20,7 @@ public class Weapon extends Item {
     }
     private Die damageSide = new Die(0,1);
     private int damageMod = 0;
-    public Weapon(String name, int seed, int weight, int uses, int num, int sides, Tag type) {
+    public Weapon(String name, int seed, int weight, int uses, int num, int sides, ItemType type) {
         super(name, seed, weight, uses);
         value = 36;
         breakable = false;

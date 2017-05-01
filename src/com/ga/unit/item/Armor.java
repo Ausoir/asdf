@@ -17,7 +17,7 @@ public class Armor extends Item {
     public Armor(String name, int seed, int weight, int uses, float armor, int encumberance, int piece) {
         super(name, seed, weight, uses);
         value = 24;
-        setType(Tag.Armor);
+        setType(ItemType.Armor);
         this.armor = armor;
         this.name = name;
         this.encumberance = encumberance;

@@ -23,8 +23,8 @@ public class Tags extends ArrayList<Tag> {
     public Tags getTrainers(){
         Tags r = new Tags();
         for (Tag i : this){
-            if (i == Tag.Martial || i == Tag.Agility || i == Tag.Jumping || i == Tag.Athletics || i == Tag.Swinging
-                    || i == Tag.Fire) r.add(i);
+            if (i == Tag.Martial || i == Tag.Agility || i == Tag.Jumping || i == Tag.Athletics || i == Tag.Swinging)
+                r.add(i);
         }
         return r;
     }

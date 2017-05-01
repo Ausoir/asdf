@@ -33,7 +33,12 @@ public class Health {
                 if (i == 'X') p += "X";
             }
         }
-        nutrition += p;
+        String r = "";
+        for (char i : p.toCharArray()) { //bypass mutation
+            if (i == '0') r += 'O';
+            else r += i;
+        }
+        nutrition += r;
         nutrition = nutrition.substring(Math.max(0,nutrition.length()-(max+host.get("Level").get())));
         digest();
     }

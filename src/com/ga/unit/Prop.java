@@ -44,6 +44,26 @@ public class Prop extends Thing {
     }
     public void onCreate(){}
     public void onField(){
+        adjustToLand();
+    }
+    private void adjustToLand(){
+        Line closest = null;
+        float closestY = pos.y + 9999;
+        Line line = new Line(pos, new P(pos.x, closestY));
+        for (Line i : Global.map.land) {
+            if (line.lineCross(i)) {
+                if (i.next != -1 && i.isLandable()) {
+                    float y = i.getCrossPointY(pos.x);
+                    if (y < closestY) {
+                        closest = i;
+                        closestY = y;
+                    }
+                }
+            }
+        }
+        if (closest != null) {
+            setDepth(closest.depth - 2);
+        }
     }
     public int getSize(){
         return image.sizeRadius;
@@ -68,14 +88,14 @@ public class Prop extends Thing {
                         boolean cc = !i.clockwise();
                         float lineY = i.getCrossPointY(pos.x);
                         if (cc && lineY <= pos.y){
-                            vel.set(0, 0);
+                            vel.set(0,0);
                             return;
                         } else if (!cc && lineY >= pos.y) {
                             float atan = (float) Math.atan(slope);
                             if (!Double.isInfinite(slope)){
                                 float test = vel.y;
                                 vel.y += (i.pt.y + (slope * (pos.x + vel.x - i.pt.x))) - (pos.y + vel.y) - 1;
-                                vel.x += Global.sin(atan)*(test-vel.y)*.05f;
+                                vel.x += Global.sin(atan)*(test-vel.y)*Settings.friction;
                             } else {
                                 vel.x *= -1;
                                 collide();
@@ -99,7 +119,7 @@ public class Prop extends Thing {
             i.checkHit(new Line(pos, pos),getDamage());
         }
     }
-    public void onCollide(Line p){
+    public void onCollide(Line l){
     }
     public void update(){
         if (mobile) {

@@ -8,8 +8,6 @@ import com.ga.tool.P;
 import com.ga.unit.player.Player;
 import com.ga.unit.player.SkillTree;
 import com.ga.unit.skill.Actions;
-import com.ga.unit.skill.Moveset;
-import com.ga.unit.skill.Spells;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -20,20 +18,20 @@ import java.util.Map;
  */
 public class PlayerInput implements Input {
     private HashMap<Integer, String> keyMap = new HashMap<Integer, String>(){{
-        put(-1, Actions.Idle.getCodeName());
-        put(Keybinding.get("W"), Actions.Jump.getCodeName());
-        put(Keybinding.get("A"), Actions.WalkL.getCodeName());
-        put(Keybinding.get("S"), Actions.Drop.getCodeName());
-        put(Keybinding.get("D"), Actions.Walk.getCodeName());
-        put(Keybinding.get("SHIFT"), Actions.Rest.getCodeName());
-        put(Keybinding.get("SPACE"), Actions.Kick.getCodeName());
-        put(Keybinding.get("R"), Actions.Wield.getCodeName());
-        put(Keybinding.get("M1"), Actions.Use.getCodeName());
-        put(Keybinding.get("M2"), Actions.Throw.getCodeName());
-        put(Keybinding.get("M3"), Actions.Grab.getCodeName());
-        put(Keybinding.get("Q"), Actions.Throw.getCodeName());
-        put(Keybinding.get("GRAVE"), "ORecall");
-        put(Keybinding.get(","), "ORest");
+        put(-1, Actions.Idle.getName());
+        put(Keybinding.get("W"), Actions.Jump.getName());
+        put(Keybinding.get("A"), Actions.WalkL.getName());
+        put(Keybinding.get("S"), Actions.Drop.getName());
+        put(Keybinding.get("D"), Actions.Walk.getName());
+        put(Keybinding.get("SHIFT"), Actions.Rest.getName());
+        put(Keybinding.get("SPACE"), Actions.Kick.getName());
+        put(Keybinding.get("R"), Actions.Wield.getName());
+        put(Keybinding.get("M1"), Actions.Use.getName());
+        put(Keybinding.get("M2"), Actions.Throw.getName());
+        put(Keybinding.get("M3"), Actions.Grab.getName());
+        put(Keybinding.get("Q"), Actions.Throw.getName());
+        put(Keybinding.get("GRAVE"), "_Recall");
+        put(Keybinding.get(","), "_Rest");
     }};
     public P movement = new P();
     public Player host;
@@ -58,21 +56,19 @@ public class PlayerInput implements Input {
         host.target.set(x,y);
         host.say(p);
     }
-    public void changeMapping(int key, Moveset event){
-        if (!(event instanceof Spells)) {
-            keyMap.remove(key);
-            Iterator i = keyMap.entrySet().iterator();
-            while (i.hasNext()) {
-                Map.Entry e = (Map.Entry) i.next();
-                if (e.getValue() == event) i.remove();
-            }
-            keyMap.put(key, event.getCodeName());
+    public void changeMapping(int key, Actions event){
+        keyMap.remove(key);
+        Iterator i = keyMap.entrySet().iterator();
+        while (i.hasNext()) {
+            Map.Entry e = (Map.Entry) i.next();
+            if (e.getValue() == event) i.remove();
         }
+        keyMap.put(key, event.getName());
     }
-    public String getMapping(Moveset move){
+    public String getMapping(Actions move){
         String r = null;
         for (Map.Entry<Integer, String> i : keyMap.entrySet()) {
-            if (i.getValue().equals(move.getCodeName())){
+            if (i.getValue().equals(move.getName())){
                 int key = i.getKey();
                 String keyname = ""+((char)key);
                 if (key == 1) keyname = "LMB";
@@ -103,29 +99,31 @@ public class PlayerInput implements Input {
         else if (keyMap.containsKey(mode)){
             inputDirect(keyMap.get(mode),x,y);
         } else if (mode >= 49 && mode < 55) {
-            inputDirect("I"+(mode-49),x,y);
-        } else inputDirect("O"+mode+"", x, y);
+            inputDirect("_"+(mode-49),x,y);
+        } else inputDirect("_"+mode+"", x, y);
         //Global.server.sendFromLocal("IN>"+p + "@" + tx + "@" + ty);
     }
     public void inputDirect(String p, int x, int y){
         host.target.set(x,y);
         if (p != null) {
             movement.set(0,0);
-            String t = p.substring(1);
-            if (p.startsWith("O")) {
-                if (t.equals("Recall")) host.say(host.memorized);
-            } else if (p.startsWith("I")) {
-                host.selectingItem = Integer.parseInt(t);
-                host.setState(Actions.Wield);
+            if (p.startsWith("_")) {
+                String t = p.substring(1);
+                if (t.length() == 1) {
+                    host.selectingItem = Integer.parseInt(t);
+                    host.setState(Actions.Wield);
+                } else {
+                    if (t.equals("Recall")) host.say(host.memorized);
+                }
             } else {
-                if (t.equals("Idle")){
+                if (p.equals("Idle")){
                     moving = 0;
                     if (host.state != Actions.Walk) return;
-                } else if (t.equals("WalkL")) {
+                } else if (p.equals("WalkL")) {
                     moving = -1;
-                    p = "AWalk";
-                } else if (t.equals("Walk")) moving = 1;
-                Moveset move = SkillTree.getByCodeName(p);
+                    p = "Walk";
+                } else if (p.equals("Walk")) moving = 1;
+                Actions move = Actions.getByName(p);
                 if (move != null){
                     host.setState(move);
                 }
@@ -137,9 +135,9 @@ public class PlayerInput implements Input {
             String[] data = p.substring(1).split(";");
             for (String i : data) {
                 String[] pair = i.split(":");
-                Moveset move = SkillTree.getByCodeName(pair[1]);
+                Actions move = Actions.getByName(pair[1]);
                 if (host.skillTree.hasSkill(move))
-                    keyMap.put(Integer.parseInt(pair[0]), move.getCodeName());
+                    keyMap.put(Integer.parseInt(pair[0]), move.getName());
             }
         }
     }

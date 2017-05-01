@@ -9,7 +9,6 @@ import com.ga.unit.Man;
 import com.ga.unit.Prop;
 import com.ga.unit.Unit;
 import com.ga.unit.skill.Actions;
-import com.ga.unit.skill.Moveset;
 
 import java.util.ArrayList;
 
@@ -49,7 +48,7 @@ public abstract class Intelligence implements Observer {
             }
         }
     }
-    public void setState(Moveset state){
+    public void setState(Actions state){
         if (state == Actions.Dead){
             Updater.remove(this);
             task = new Idle(host);

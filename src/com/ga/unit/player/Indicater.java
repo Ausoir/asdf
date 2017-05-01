@@ -13,20 +13,22 @@ import java.awt.*;
 public class Indicater implements Drawable {
     private Player host;
     private Color bg = new Color(58, 60, 60,0);
-    private Color fg = new Color(2, 179, 0, 0);
+    private Color fg = new Color(2, 196, 0, 0);
     private Color sg = new Color(58, 60, 60,0);
+    private Color sg2 = new Color(58, 60, 60,0);
     private float fade = 0;
     private float fade2 = 0;
+    private float min = 0;
     private Stat measuree = new Stat(1);
-    private Color[] bgFade = new Color[20];
-    private Color[] fgFade = new Color[20];
+    private Color[] bgFade = new Color[15];
+    private Color[] fgFade = new Color[15];
     private int time;
     Indicater(Player host){
         this.host = host;
         Updater.add(this);
         for (int i=bgFade.length-1;i>=0;i--){
-            bgFade[i] = new Color(58, 60, 60, i * 12);
-            fgFade[i] = new Color(19, 86, 43, i * 9);
+            bgFade[i] = new Color(58, 60, 60, i * 17);
+            fgFade[i] = new Color(19, 86, 43, i * 15);
         }
     }
     void setMeasuree(Stat p){
@@ -39,9 +41,13 @@ public class Indicater implements Drawable {
         g.fillOval(x,y,36,36);
         g.setColor(fg);
         g.fillArc(x+2,y+2,32,32,0, (int) (measuree.getPercentage()*360));
-        g.setColor(sg);
         int cd = time-Global.getTime()[0];
-        if (cd >= 0) g.drawString(cd+"",x-28,y);
+        if (cd >= 0){
+            g.setColor(sg2);
+            g.drawString(cd+"",x-28,y+24);
+            g.setColor(sg);
+            g.drawString(cd+"",x-29,y+25);
+        }
     }
     @Override
     public int getDepth() {
@@ -49,14 +55,18 @@ public class Indicater implements Drawable {
     }
     void show(float strength){
         fade = strength;
+        min = .5f;
+    }
+    void hide(){
+        min = 0;
     }
     void showCd(int time){
-        fade2 = 1;
+        fade2 = 2;
         this.time = time;
     }
     void update(){
         if (fade > 0) {
-            fade = Math.max(0, fade - .01f);
+            fade = Math.max(min, fade - .01f);
             float t = Math.min(.99f, fade);
             bg = bgFade[(int) (t*bgFade.length)];
             fg = fgFade[(int) (t*fgFade.length)];
@@ -65,6 +75,7 @@ public class Indicater implements Drawable {
             fade2 = Math.max(0, fade2 - .01f);
             float t = Math.min(.99f, fade2);
             sg = bgFade[(int) (t*bgFade.length)];
+            sg2 = fgFade[(int) (t*fgFade.length)];
         }
     }
 }

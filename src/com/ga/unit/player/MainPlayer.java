@@ -8,8 +8,6 @@ import com.ga.unit.Prop;
 import com.ga.unit.Stock;
 import com.ga.unit.Tag;
 import com.ga.unit.skill.Actions;
-import com.ga.unit.skill.Moveset;
-import com.ga.unit.skill.Spells;
 import com.ga.unit.skill.Stat;
 
 import static com.ga.unit.BodyHumanoid.FIST;
@@ -20,6 +18,7 @@ import static com.ga.unit.BodyHumanoid.OFIST;
  */
 public class MainPlayer extends Player {
     private Indicater indicater;
+    private Stat stamina;
     public MainPlayer(int seed) {
         super(seed);
         Global.player = this;
@@ -33,11 +32,9 @@ public class MainPlayer extends Player {
             p = "Memorized "+p;
         }
         speech.say(p);
-        Spells t = Spells.getByName(p);
-        if (t != null && skillTree.getSkillLevel(t) > 0) setState(t);
     }
     @Override
-    public int setState(Moveset state) {
+    public int setState(Actions state) {
         if (state == Actions.Use && this.state == Actions.Rest && skillTree.getSkillLevel(Actions.Triple) > 0) state = Actions.Triple;
         else if (state == Actions.Use && this.state == Actions.Jump && skillTree.getSkillLevel(Actions.Airstrike) > 0 && this.delay.time > 32) stateSet(Actions.Airstrike);
         else if (state == Actions.Jump && this.state == Actions.Rest && skillTree.getSkillLevel(Actions.Leap) > 0) state = Actions.Leap;
@@ -62,9 +59,8 @@ public class MainPlayer extends Player {
             else if (skillTree.getSkillLevel(Actions.Dash) > 0) state = Actions.Dash;
         }
         int cost = state.getCost()+getStatPenalty();
-        int stamina = get("Stamina").get();
         if (cost > 0){
-            indicater.show((float)cost/Math.max(1, stamina));
+            indicater.show((float)cost/Math.max(1, stamina.get()));
         }
         int r = super.setState(state);
         if (r == 2){
@@ -75,7 +71,7 @@ public class MainPlayer extends Player {
         return r;
     }
     @Override
-    public void stateSet(Moveset state){
+    public void stateSet(Actions state){
         super.stateSet(state);
         if (state != Actions.Idle) input.cameraMode = false;
     }
@@ -86,7 +82,6 @@ public class MainPlayer extends Player {
         return r;
     }
     public boolean checkHit(Line hitBox, int damage) {
-        Stat stamina = get("Stamina");
         int before = stamina.get();
         boolean r = super.checkHit(hitBox, damage);
         if (r) indicater.show(before/Math.max(1,stamina.get()));
@@ -99,7 +94,10 @@ public class MainPlayer extends Player {
         if (status == 1) {
             say("Food...");
             die();
-        } else if (status == 2) say("I'm starving!");
+        } else if (status == 2) {
+            say("I'm starving!");
+            health.record("0");
+        }
         else if (status == 3) say("I don't feel so good...");
         else if (status == 4) say("I'm hungry!");
         if (stats.getEffectsSize() == 0) {
@@ -117,14 +115,10 @@ public class MainPlayer extends Player {
         super.stateUpdate();
         if (state == Actions.Walk && input.moving == 0) setState(Actions.Idle);
         else if (state == Actions.Rest) indicater.show(1);
-        else if (state instanceof Spells){
-            clip.rotateAppendage(FIST,11,0);
-            clip.rotateAppendage(OFIST,11,0);
-        }
     }
     public void update(){
         int edge = Global.mapEdge(pos.getAdd(vel));
-        if (edge != 0 && !Global.map.isIndoors()){
+        if (edge != 0 && !Global.map.isIndoors() && jump){
             if (Creation.isPassable(Creation.getWorld(Global.map.id),edge)) {
                 int[] newmap = Creation.getWorld(Global.map.id, edge);
                 Global.map.loadMap(cworld + "_" + newmap[0]);
@@ -134,13 +128,15 @@ public class MainPlayer extends Player {
         super.update();
         if (input.cameraMode) Global.mapEdgeCenter(Global.cameraTo = Global.cameraTo.getAdd(input.movement));
         else Global.mapEdgeCenter(Global.cameraTo = pos.getAdd(0,0));
+        if (stamina.isFull()) indicater.hide();
         indicater.update();
     }
     public String[] load(String p){
         String[] r = super.load(p);
         String[] other = p.split("%")[1].split(";");
         Global.loadTime(Integer.parseInt(other[0]));
-        indicater.setMeasuree(get("Stamina"));
+        stamina = get("Stamina");
+        indicater.setMeasuree(stamina);
         return r;
     }
     public void reconnect() {

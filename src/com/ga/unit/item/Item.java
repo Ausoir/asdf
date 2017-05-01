@@ -16,23 +16,23 @@ import java.util.Random;
  * Created by Ga on 8/5/2016. asd
  */
 public class Item extends Prop {
-    public enum Tag{
+    public enum ItemType {
         Sword(Actions.Slash, "swing_knife", "hit_cut"), Spear(Actions.Thrust, "swing_silent", "hit_bloody"), Mace(Actions.Slash, "swing_silent", "hit_bash"),
         Dagger(Actions.Thrust, "swing_normal", "hit_bloody"), Armor(Actions.Rest, "swing_normal"), Scroll(Actions.Guard, "scroll"),
         Shoot(Actions.Shoot, "swing_normal"), Snipe(Actions.Snipe, "swing_normal"), Bow(Actions.Aim, "swing_silent"),
         Throwing(Actions.Throw, "swing_silent"), Darting(Actions.Dart, "swing_normal"), Consumable(Actions.Consume, "drink"),
         Claw(Actions.Slash, "swing_normal"), Enchant(Actions.Buff, "swing_silent"), Food(Actions.Consume, "eat");
-        private Moveset action;
+        private Actions action;
         private String sound, soundHit = "hit_punch";
-        Tag(Moveset p, String sound){
+        ItemType(Actions p, String sound){
             action = p;
             this.sound = sound;
         }
-        Tag(Moveset p, String sound, String soundHit){
+        ItemType(Actions p, String sound, String soundHit){
             this(p, sound);
             this.soundHit = soundHit;
         }
-        public Moveset getAction() {
+        public Actions getAction() {
             return action;
         }
         public String getSound(){
@@ -147,11 +147,11 @@ public class Item extends Prop {
     int cooldown = 0;
     public int delay = 0;
     public float probability;
-    Moveset action = Actions.Slash;
+    Actions action = Actions.Slash;
     private int[] cdTime = new int[]{0};
     private int durability = 1;
     public int uses = 1;
-    private Tag type = Tag.Throwing;
+    private ItemType type = ItemType.Throwing;
     public int speed = -4;
     public int damage = 0;
     public int value = 8;
@@ -211,11 +211,11 @@ public class Item extends Prop {
         }
         image.setCenterType(ctype);
     }
-    public void setType(Tag p){
+    public void setType(ItemType p){
         this.type = p;
         this.action = p.getAction();
     }
-    public Tag getType(){
+    public ItemType getType(){
         return type;
     }
     protected void setModifier(PrefixMod mod){

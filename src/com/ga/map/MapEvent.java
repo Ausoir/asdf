@@ -51,7 +51,7 @@ public enum MapEvent implements Updatable{
                 for (String i : moblist) {
                     String[] mobp = i.split("=");
                     if (random < Float.parseFloat(mobp[1])) {
-                        Stock.getByName(mobp[0], -1).pos.set(Global.map.randomSurface().getAdd(0,-60));
+                        Stock.getByName(mobp[0], -1).pos.set(Global.map.randomLandableSurface().getAdd(0,-60));
                         break;
                     }
                 }

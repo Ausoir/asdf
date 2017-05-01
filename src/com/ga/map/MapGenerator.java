@@ -11,47 +11,47 @@ import java.util.ArrayList;
  * Created by Ga on 2/23/2017. asd
  */
 public class MapGenerator {
-    private static void generateFloor(int depth, P mapsize, int randomness, int varianceY, String[] texture){
-        float horizon = mapsize.y-600;
+    private static void generateFloor(int depth, P mapSize, int randomness, int varianceY, String[] texture){
+        float horizon = mapSize.y-600;
         P orig = new P(0, horizon), pt1 = orig, pt2 = new P();
-        while (pt2.x < mapsize.x) {
+        while (pt2.x < mapSize.x) {
             int randX = (Global.r.nextInt(240) + 20) * (Global.r.nextInt(randomness)+1);
             int randY = (Global.r.nextInt(varianceY) - (varianceY/2)) * Global.r.nextInt(randomness);
             pt2 = new P(pt1.x + randX, orig.y + randY);
-            if (pt2.x+(200*randomness*.5f) > mapsize.x) pt2.x = mapsize.x;
+            if (pt2.x+(200*randomness*.5f) > mapSize.x) pt2.x = mapSize.x;
             Global.map.land.add(new Line(pt1, pt2, 0, 0));
             pt1 = pt2;
         }
         pt1.y = horizon;
         Line t;
-        Global.map.land.add(t = new Line(pt1, new P(pt2.x, mapsize.y), 0, 0));
-        Global.map.land.add(t = new Line(t.ptd, new P(0, mapsize.y), 0, 0));
+        Global.map.land.add(t = new Line(pt1, new P(pt2.x, mapSize.y), 0, 0));
+        Global.map.land.add(t = new Line(t.ptd, new P(0, mapSize.y), 0, 0));
         Global.map.land.add(new Line(t.ptd, orig, 0, 0));
         Global.map.formTextures.put(0, depth+"&"+texture[Global.r.nextInt(texture.length)]);
     }
-    private static void generateMound(int id, P mapsize, String[] texture, int height){
-        float horizon = mapsize.y-600;
-        P initPoint = new P(Global.r.nextFloat()*mapsize.x*.3f, mapsize.y);
+    private static void generateMound(int id, P mapSize, String[] texture, int height){
+        float horizon = mapSize.y-600;
+        P initPoint = new P(Global.r.nextFloat()*mapSize.x*.3f, mapSize.y);
         P oldPoint = initPoint;
         for (int i=0;i<Global.r.nextInt(7)+3;i++) {
-            P newPoint = new P(oldPoint.x + (Global.r.nextFloat()*mapsize.x*.24f), horizon+(Global.r.nextInt(height)-height));
+            P newPoint = new P(oldPoint.x + (Global.r.nextFloat()*mapSize.x*.24f), horizon+(Global.r.nextInt(height)-height));
             Global.map.land.add(new Line(oldPoint,newPoint,id,0));
             oldPoint = newPoint;
         }
-        oldPoint.y = mapsize.y;
+        oldPoint.y = mapSize.y;
         Global.map.land.add(new Line(oldPoint,initPoint,id,-1));
         Global.map.formTextures.put(id, (3+id)+"&"+texture[Global.r.nextInt(texture.length)]);
     }
-    private static void generateFoundation(int id, P mapsize, P point, float lastY, String[] texture){
-        int width = (int) Global.clamp((float) Math.abs(mapsize.x*(Global.r.nextGaussian()*.4f)),100,mapsize.x*(7f/8));
+    private static void generateFoundation(int id, P mapSize, P point, float lastY, String[] texture){
+        int width = (int) Global.clamp((float) Math.abs(mapSize.x*(Global.r.nextGaussian()*.4f)),100,mapSize.x*(7f/8));
         P pt1 = new P(Math.max(600, point.x-width),point.y);
-        P pt2 = new P(Math.min(mapsize.x-600,point.x+width),point.y);
+        P pt2 = new P(Math.min(mapSize.x-600,point.x+width),point.y);
         if (pt1.x == 600) pt1.x += Global.r.nextInt(300);
-        if (pt2.x == mapsize.x-600) pt2.x -= Global.r.nextInt(300);
+        if (pt2.x == mapSize.x-600) pt2.x -= Global.r.nextInt(300);
         int finalWidth = (int) (pt2.x-pt1.x);
         if (finalWidth <= 0) return;
-        P pt3 = new P(pt2.x,mapsize.y-500);
-        P pt4 = new P(pt1.x,mapsize.y-500);
+        P pt3 = new P(pt2.x,mapSize.y-500);
+        P pt4 = new P(pt1.x,mapSize.y-500);
         int midWidth = (int) ((lastY-point.y)*(Global.r.nextFloat()*.3f+.5f))*2;
         if (finalWidth-midWidth*2 > 100 && Global.r.nextInt(4) != 0){
             int mid = Global.r.nextInt(finalWidth-midWidth*2)+midWidth;
@@ -76,11 +76,11 @@ public class MapGenerator {
     }
     public static void generateHouse(final String returnAddr, int returnDoorSeed, String houseInfo){
         String[] houseInfos = houseInfo.split("&");
-        P mapsize = new P(houseInfos[0]).mult(2f);
-        Global.map = new Map(new String[]{"-1","None","None",((int)mapsize.x)+"x"+((int)mapsize.y),returnAddr});
-        float bottom = mapsize.y - 64;
-        P topleft = new P(64, 64), topright = new P(mapsize.x-64, 64),
-                bottomleft = new P(64, bottom), bottomright = new P(mapsize.x-64, bottom);
+        P mapSize = new P(houseInfos[0]).mult(2f);
+        Global.map = new Map(new String[]{"-1","None","None",((int)mapSize.x)+"x"+((int)mapSize.y),returnAddr});
+        float bottom = mapSize.y - 64;
+        P topleft = new P(64, 64), topright = new P(mapSize.x-64, 64),
+                bottomleft = new P(64, bottom), bottomright = new P(mapSize.x-64, bottom);
 
         String[] textures = new String[]{"wood","steel","brick"};
         String texture = textures[Global.r.nextInt(textures.length)];
@@ -98,16 +98,16 @@ public class MapGenerator {
             TerrainTrail floor2 = new TerrainTrail(terrain++, new P());
             alltrails.add(floor2);
             if (Global.r.nextBoolean()) {
-                floor2.reset(new P(48,mapsize.y+4));
-                floor2.add(48, mapsize.y/2);
-                floor2.add(mapsize.x-48, mapsize.y/2);
-                floor2.add(mapsize.x-48, mapsize.y+4);
-                alltrails.add(new TerrainTrail(new Line(256,mapsize.y/2-64,256,mapsize.y,-1,1)).finish(""));
+                floor2.reset(new P(48,mapSize.y+4));
+                floor2.add(48, mapSize.y/2);
+                floor2.add(mapSize.x-48, mapSize.y/2);
+                floor2.add(mapSize.x-48, mapSize.y+4);
+                alltrails.add(new TerrainTrail(new Line(256,mapSize.y/2-64,256,mapSize.y,-1,1)).finish(""));
             }
             floor2.finish("1&" + texture + "&basic");
             floor2.climbable();
         } else {
-            float floorHeight = mapsize.y/(Integer.parseInt(houseInfos[2])+1);
+            float floorHeight = mapSize.y/(Integer.parseInt(houseInfos[2])+1);
             int floors = Math.max(0,Integer.parseInt(houseInfos[2])-1);
             ArrayList<Float> returnFloor = new ArrayList<>();
             for (int i=0;i<floors;i++) {
@@ -121,13 +121,13 @@ public class MapGenerator {
                     alltrails.add(stair);
 
                     trail.move(0, -floorHeight);
-                    trail.move(-(mapsize.x -420), 0);
+                    trail.move(-(mapSize.x -420), 0);
                     trail.move(0, -20);
                     trail.move(-(420-128), 0);
                     trail.lastOpt(-1);
                     trail.move(0, -20);
                     trail.move(420-128, 0);
-                    trail.move(mapsize.x -420, 0);
+                    trail.move(mapSize.x -420, 0);
                     trail.lastOpt(2);
                 } else {
                     trail.move(0, -floorHeight-40);
@@ -140,7 +140,7 @@ public class MapGenerator {
             for (int i=returnFloor.size()-1;i>=0;i--) {
                 trail.add(64,returnFloor.get(i));
 
-                TerrainTrail stair = new TerrainTrail(terrain++,new P(mapsize.x-48,floorHeight+40+trail.last.y));
+                TerrainTrail stair = new TerrainTrail(terrain++,new P(mapSize.x-48,floorHeight+40+trail.last.y));
                 stair.move(-400,4);
                 stair.move(320,-floorHeight-40);
                 stair.move(80,0);
@@ -148,31 +148,31 @@ public class MapGenerator {
                 stair.climbable();
                 alltrails.add(stair);
 
-                trail.move(mapsize.x-420, 0);
+                trail.move(mapSize.x-420, 0);
                 trail.lastOpt(2);
                 trail.move(420-128, 0);
                 trail.move(0, 20);
                 trail.move(-(420-128), 0);
                 trail.lastOpt(-1);
                 trail.move(0, 20);
-                trail.move(-(mapsize.x - 420), 0);
+                trail.move(-(mapSize.x - 420), 0);
             }
         }
         trail.finish("3&"+texture+"&none");
 
         if (Global.r.nextBoolean()){
-            for (TerrainTrail t : alltrails) TerrainTrail.switchSides(t.lines, mapsize.x);
+            for (TerrainTrail t : alltrails) TerrainTrail.switchSides(t.lines, mapSize.x);
         }
-        P result = new P(mapsize.x / 2, bottom-4);
+        P result = new P(mapSize.x / 2, bottom-4);
         Prop door = Stock.Door.create(returnDoorSeed);
         door.pos.set(result);
         Stock.Exit.create(returnDoorSeed).pos.set(result.x,result.y-door.image.size.y/2);
         Stock.Spawn.create(returnDoorSeed).pos.set(result.x,result.y-door.image.size.y/2);
         int merchantType = Integer.parseInt(houseInfos[1]);
         if (merchantType != 0){ //1:food,2:shop,3:guild,4:training
-            Stock.Merchant.create(merchantType).pos.set(Global.r.nextInt((int) mapsize.x-130)+65,result.y-20);
+            Stock.Merchant.create(merchantType).pos.set(Global.r.nextInt((int) mapSize.x-130)+65,result.y-20);
             int spacing = Global.r.nextInt(240)+120;
-            for (int i=0;i<mapsize.x/spacing;i++) {
+            for (int i=0;i<mapSize.x/spacing;i++) {
                 int cx = spacing*i;
                 for (Line l : Global.map.land) {
                     if (l.next >= 0 && l.isLandable() && l.getSlope() == 0 && cx-l.pt.x>spacing/2-10 && l.ptd.x-cx>spacing/2-10 && Global.r.nextInt(3)!=0) {
@@ -190,12 +190,12 @@ public class MapGenerator {
         }
     }
     private static void generateMerge(int id){
-        P mapsize = new P(8000, 5600);
-        Global.map = new Map(new String[]{id+"","Rural",Global.map.maps[2],((int)mapsize.x)+"x"+((int)mapsize.y)});
+        P mapSize = new P(8000, 5600);
+        Global.map = new Map(new String[]{id+"","Rural",Global.map.maps[2],((int)mapSize.x)+"x"+((int)mapSize.y)});
         String[] texture = new String[]{"dirt&grass","dirt&grass&Rock=.1,Bush=.2,Weed=.4,Tree=1"};
-        generateFloor(9, mapsize, Global.r.nextInt(9) + 1, 40, texture);
+        generateFloor(9, mapSize, Global.r.nextInt(9) + 1, 40, texture);
         Global.map.formTextures.put(-1, "9");
-        float lastY = mapsize.y-700;
+        float lastY = mapSize.y-700;
         int max = Global.r.nextInt(5)+2;
         for (int i=0;i<max;i++){
             P pos = new P(Global.r.nextInt(6000)+1000, lastY-(Global.r.nextInt(480)+180));
@@ -212,20 +212,46 @@ public class MapGenerator {
             lastY = pos.y;
         }
     }
-    private static void createFloater(int depth, P p, int rad){
-        TerrainTrail trail = new TerrainTrail(depth, new P(p.x-rad, p.y));
-        float gap = 3.14f/(Global.r.nextInt(5)+2);
-        float gapVariance = Global.r.nextFloat() * gap * .8f - gap * .4f;
-        float startArc = 3.14f;
-        float currentArc = startArc;
-        while (currentArc > 0) {
-            int radVariance = Global.r.nextInt(rad)+rad/2;
-            currentArc -= gap + gapVariance;
-            trail.add(Global.cos(currentArc) * radVariance, Global.sin(currentArc) * radVariance);
+    private static void createFloater(int id, P p, int rad, int depth){
+        TerrainTrail trail = new TerrainTrail(id, new P(p.x+rad, p.y));
+        float gap = 3.14f/(Global.r.nextInt(5)+3);
+        float currentArc = 0;
+        while (currentArc + gap < 3.14f) {
+            currentArc += Global.r.nextFloat() * gap + gap * .5f;
+            currentArc = Math.min(currentArc, 3.14f);
+            int radVariance = Global.r.nextInt(rad/3) + rad * 2 / 3;
+            trail.add(p.x + Global.cos(currentArc) * radVariance, p.y + Global.sin(currentArc) * radVariance);
         }
+        trail.add(new P(p.x-rad, p.y));
         trail.finish(depth+"&dirt&grass");
+        trail.climbable();
     }
-    private static void divideLand(ArrayList<Line> total, int times, P mapsize){
+    private static void createFloaters(P mapSize, int num, int id){
+        for (int i=0;i<num;i++) {
+            P spot = new P(Global.r.nextInt((int) mapSize.x), Global.r.nextInt((int) mapSize.y-800)+600);
+            int floaterDepth = i + 2;
+            Line closest = null;
+            float closestY = spot.y + 9999;
+            Line line = new Line(spot, new P(spot.x, closestY));
+            for (Line l : Global.map.land) {
+                if (line.lineCross(l)) {
+                    if (l.next != -1 && l.isLandable()) {
+                        float y = l.getCrossPointY(spot.x);
+                        if (y < closestY) {
+                            closest = l;
+                            closestY = y;
+                        }
+                    }
+                }
+            }
+            if (closest != null) {
+                floaterDepth = Integer.parseInt(Global.map.formTextures.get(closest.next).split("&")[0]) - 1;
+                if (closestY-spot.y < 800) Global.map.land.add(new Line(spot.x, spot.y-64, spot.x, closestY, -1, 1));
+            }
+            createFloater(i + id, spot, Global.r.nextInt(1280) + 240, floaterDepth);
+        }
+    }
+    private static void divideLand(ArrayList<Line> total, int times, P mapSize){
         if (times >= 8) return;
         Line last = total.remove(total.size()-1);
         P mid = new P(Global.r.nextFloat()*(last.ptd.x-last.pt.x)+last.pt.x,
@@ -237,38 +263,32 @@ public class MapGenerator {
         float atan = last.getAtan()+1.57f;
         float rand = Global.r.nextFloat()*2-1;
         mid.add(Global.cos(atan)*shortest*rand, Global.sin(atan)*shortest*rand);
-        mid.x = Global.clamp(mid.x, 256, mapsize.x-mapsize.x/5);
-        mid.y = Global.clamp(mid.y, 256, mapsize.y-mapsize.y/5);
+        mid.x = Global.clamp(mid.x, 256, mapSize.x-mapSize.x/5);
+        mid.y = Global.clamp(mid.y, 256, mapSize.y-mapSize.y/5);
         total.add(one);
-        divideLand(total, ++times, mapsize);
+        divideLand(total, ++times, mapSize);
         total.add(two);
-        divideLand(total, ++times, mapsize);
+        divideLand(total, ++times, mapSize);
     }
-    private static void generateSlope(int id){
-        P mapsize = new P(10000, 5000);
-        Global.map = new Map(new String[]{id+"","Rural",Global.map.maps[2],((int)mapsize.x)+"x"+((int)mapsize.y)});
-        float preY = mapsize.y/4+Global.r.nextInt((int) (mapsize.y/2));
-        TerrainTrail trail = new TerrainTrail(1, new P(-64, preY));
-        trail.add(new P(Global.r.nextInt((int) (mapsize.x/4))+64, preY));
-        Line first = new Line(trail.last, new P(mapsize.x-Global.r.nextInt((int) (mapsize.x/5)+400)-400, mapsize.y+64));
+    private static void generateSlope(P mapSize, int id, P start, P end){
+        Global.map = new Map(new String[]{id+"","Rural",Global.map.maps[2],((int)mapSize.x)+"x"+((int)mapSize.y)});
+        TerrainTrail trail = new TerrainTrail(0, start);
+        Line first = new Line(trail.last, end);
         ArrayList<Line> total = new ArrayList<>();
         total.add(first);
-        divideLand(total, 2, mapsize);
+        divideLand(total, 2, mapSize);
         for (Line i : total) trail.add(i);
-        trail.add(trail.last.getAdd(Global.r.nextInt((int) (mapsize.x-first.ptd.x-200)), trail.last.y));
-        trail.add(new P(-64, first.ptd.y));
+        trail.add(new P(first.ptd.x, mapSize.y+64));
+        trail.add(new P(start.x, mapSize.y+64));
         trail.finish("1&dirt&grass");
-        for (int i=0;i<8;i++)
-            createFloater(2, new P(Global.r.nextInt((int) mapsize.x), Global.r.nextInt((int) mapsize.y)),
-                    Global.r.nextInt(640)+240);
     }
     private static void generatePlains(int id){
-        P mapsize = new P(7200, 1600);
-        Global.map = new Map(new String[]{id+"","Rural",Global.map.maps[2],((int)mapsize.x)+"x"+((int)mapsize.y)});
+        P mapSize = new P(7200, 1600);
+        Global.map = new Map(new String[]{id+"","Rural",Global.map.maps[2],((int)mapSize.x)+"x"+((int)mapSize.y)});
         String[] texture = new String[]{"dirt&grass","dirt&grass&Rock=.1,Bush=.2,Weed=.4,Tree=1"};
-        generateFloor(9, mapsize, Global.r.nextInt(9) + 1, 40, texture);
+        generateFloor(9, mapSize, Global.r.nextInt(9) + 1, 40, texture);
         Global.map.formTextures.put(-1, "9");
-        for (int i=0;i<Global.r.nextInt(4);i++) generateMound(i+1, mapsize, texture, Global.r.nextInt(240)+80);
+        for (int i=0;i<Global.r.nextInt(4);i++) generateMound(i+1, mapSize, texture, Global.r.nextInt(240)+80);
         for (int i=0;i<Global.map.land.size();i++){
             Line l = Global.map.land.get(i);
             if (l.next >= 0 && l.isLandable() && Math.abs(l.getSlope()) < .1f && Math.abs(l.ptd.x-l.pt.x) > 500 && Global.r.nextInt(3) == 0) {
@@ -277,14 +297,14 @@ public class MapGenerator {
         }
     }
     private static void generateCity(int id){
-        P mapsize = new P(10000, 6000);
-        Global.map = new Map(new String[]{id+"","Urban",Global.map.maps[2],((int)mapsize.x)+"x"+((int)mapsize.y)});
+        P mapSize = new P(10000, 6000);
+        Global.map = new Map(new String[]{id+"","Urban",Global.map.maps[2],((int)mapSize.x)+"x"+((int)mapSize.y)});
         Line[] lands = new Line[14];
-        int fragment = (int) (mapsize.x/14);
-        for (int i=0;i<lands.length;i++) Global.map.land.add(lands[i] = new Line(i*fragment,mapsize.y-600,(i+1)*fragment,mapsize.y-600,0,0));
-        Global.map.land.add(new Line(mapsize.x,mapsize.y-600,mapsize.x,mapsize.y,0,0));
-        Global.map.land.add(new Line(mapsize.x,mapsize.y,0,mapsize.y,0,0));
-        Global.map.land.add(new Line(0,mapsize.y,0,mapsize.y-600,0,0));
+        int fragment = (int) (mapSize.x/14);
+        for (int i=0;i<lands.length;i++) Global.map.land.add(lands[i] = new Line(i*fragment,mapSize.y-600,(i+1)*fragment,mapSize.y-600,0,0));
+        Global.map.land.add(new Line(mapSize.x,mapSize.y-600,mapSize.x,mapSize.y,0,0));
+        Global.map.land.add(new Line(mapSize.x,mapSize.y,0,mapSize.y,0,0));
+        Global.map.land.add(new Line(0,mapSize.y,0,mapSize.y-600,0,0));
         Global.map.formTextures.put(0, "9&steel&road");
         Global.map.formTextures.put(-1, "9");
         for (int i=3;i<lands.length-3;i++){
@@ -325,18 +345,18 @@ public class MapGenerator {
         }
     }
     private static void generateTown(int id){
-        P mapsize = new P(6000, 4000);
-        Global.map = new Map(new String[]{id+"","None",Global.map.maps[2],((int)mapsize.x)+"x"+((int)mapsize.y)});
+        P mapSize = new P(6000, 4000);
+        Global.map = new Map(new String[]{id+"","None",Global.map.maps[2],((int)mapSize.x)+"x"+((int)mapSize.y)});
         String[] foundationTexture = new String[]{"brick&basic","marble&basic","concrete&basic","rock&basic","wood&basic"};
-        float lastY = mapsize.y-700-Global.r.nextInt(160);
+        float lastY = mapSize.y-700-Global.r.nextInt(160);
         int max = Global.r.nextInt(6)+4;
         for (int i=0;i<max;i++){
             P pos = new P(Global.r.nextInt(4000)+1000,lastY-(Global.r.nextInt(360)+80));
-            generateFoundation(max-i, mapsize, pos, lastY, foundationTexture);
+            generateFoundation(max-i, mapSize, pos, lastY, foundationTexture);
             lastY = pos.y;
         }
         Global.map.formTextures.put(-1, ""+max+1);
-        generateFloor(max+1, mapsize, Global.r.nextInt(4) + 7, 20, new String[]{"dirt&road","dirt&grass","rock&road","rock&grass"});
+        generateFloor(max+1, mapSize, Global.r.nextInt(4) + 7, 20, new String[]{"dirt&road","dirt&grass","rock&road","rock&grass"});
         for (int i=0;i<Global.map.land.size();i++){
             Line l = Global.map.land.get(i);
             if (l.next >= 0 && l.isLandable() && Math.abs(l.getSlope()) < .1f && Math.abs(l.ptd.x-l.pt.x)>500) {
@@ -345,17 +365,39 @@ public class MapGenerator {
         }
     }
     public static void generateMap(int id, char terrain){
+        P mapSize = new P(12000, 3600);
+        int randY = (int) (Global.r.nextInt((int) (mapSize.y/2))+mapSize.y/4);
         if (terrain == '*') {
             generateMerge(id);
-        } else if (terrain == '3') {
-            generateSlope(id);
-        } else if (terrain == '-') {
-            generatePlains(id);
-        } else if (terrain == '4') {
+        } else if (terrain == '4' || terrain == '6' || terrain == '2' || terrain == '8') {
             if (Global.r.nextInt(4) != 0) generateTown(id);
             else generateCity(id);
+        } else if (terrain == '-') {
+            generatePlains(id);
+        } else if (terrain == 'I') {
+            generatePlains(id);
         } else if (terrain == '1') {
-            generateSlope(id);
+            generateSlope(mapSize, id, new P(-64, randY),
+                    new P(mapSize.x-Global.r.nextInt(800)-200, mapSize.y+64));
+            createFloaters(mapSize, Global.r.nextInt(7), 1);
+        } else if (terrain == '3') {
+            generateSlope(mapSize, id, new P(Global.r.nextInt(800)+200, mapSize.y+64),
+                    new P(mapSize.x+64, randY));
+            createFloaters(mapSize, Global.r.nextInt(7), 1);
+        } else if (terrain == '7') {
+            generateSlope(mapSize, id, new P(-64, randY),
+                    new P(mapSize.x-Global.r.nextInt(800)-200, -64));
+            createFloaters(mapSize, Global.r.nextInt(7), 1);
+        } else if (terrain == '9') {
+            generateSlope(mapSize, id, new P(Global.r.nextInt(800)+200, -64),
+                    new P(mapSize.x+64, randY));
+            createFloaters(mapSize, Global.r.nextInt(7), 1);
+        } else if (terrain == 'n') {
+            generateSlope(mapSize, id, new P(-64, randY),
+                    new P(mapSize.x+64, randY));
+            generateSlope(mapSize, id, new P(Global.r.nextInt(800)+200, mapSize.y+64),
+                    new P(mapSize.x+64, randY));
+            createFloaters(mapSize, Global.r.nextInt(7), 1);
         } else {
             System.out.println("Failed to generate map for terrain '"+terrain+"'");
             System.exit(1);

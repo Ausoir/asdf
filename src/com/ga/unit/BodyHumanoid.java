@@ -16,7 +16,7 @@ public class BodyHumanoid extends Body {
 
     private void setAppendages(){
         switch (this.state) {
-            case Interact:
+            case "Interact":
                 rotateAppendage(FIST, 15, 0);
                 localAnimation[15][OFIST][0] = localAnimation[1][OFIST][0];
                 localAnimation[15][OFIST][1] = localAnimation[1][OFIST][1];
@@ -24,53 +24,53 @@ public class BodyHumanoid extends Body {
                 localAnimation[15][BODY][0] = (int) Global.clamp(localAnimation[15][BODY][0],-15,15);
                 localAnimation[15][BODY][1] = Math.min(5,localAnimation[15][BODY][1]);
                 break;
-            case Grab:
+            case "Grab":
                 rotateAppendage(FIST, 15, 0);
                 rotateAppendage(OFIST, 15, 0);
                 rotateAppendage(BODY, 15, 0);
                 localAnimation[15][BODY][0] = (int) Global.clamp(localAnimation[15][BODY][0],-15,15);
                 localAnimation[15][BODY][1] = Math.min(5,localAnimation[15][BODY][1]);
                 break;
-            case Cast:
+            case "Cast":
                 rotateAppendage(OFIST, 11, 0);
                 rotateAppendage(FIST, 11, 0);
                 break;
-            case Conjure:
+            case "Conjure":
                 rotateAppendage(FIST, 20, 0);
                 break;
-            case Aim:
+            case "Aim":
                 rotateAppendage(HEAD, 66, -1.6f*host.dir);
                 rotateAppendage(FIST, 67, 0);
                 rotateAppendage(OFIST, 67, 0);
                 break;
-            case Shoot:
+            case "Shoot":
                 rotateAppendage(FIST, 39, 0);
                 break;
-            case Snipe:
+            case "Snipe":
                 rotateAppendage(OFIST, 41, 0);
                 rotateAppendage(OFIST, 42, 0);
                 break;
-            case Dart:
+            case "Dart":
                 rotateAppendage(OFIST, 29, 0);
                 break;
-            case Underhand:
+            case "Underhand":
                 rotateAppendage(FIST, 23, 0);
                 break;
-            case Throw:
-            case Lunge:
-            case Thrust:
+            case "Throw":
+            case "Lunge":
+            case "Thrust":
                 rotateAppendage(FIST, 7, 0);
                 break;
-            case Slash:
+            case "Slash":
                 rotateAppendage(FIST, 7, 1*host.dir);
                 break;
-            case Kick:
+            case "Kick":
                 rotateAppendage(FOOT-1, 5, 0);
                 break;
-            case Sidekick:
+            case "Sidekick":
                 rotateAppendage(FOOT, 14, 0);
                 break;
-            case Stab:
+            case "Stab":
                 rotateAppendage(OFIST, 11, 0);
                 rotateAppendage(FIST, 11, 0);
                 break;
@@ -78,28 +78,16 @@ public class BodyHumanoid extends Body {
     }
 
     @Override
-    public void setState(Actions state) {
+    public void setState(String state) {
         super.setState(state);
         setAppendages();
     }
 
     public int update() {
-        switch (state) {
-            case Buff:
-            case Cast:
-                Particle.dripHoly(host.pos.getAdd(organs[OFIST].ptd));
-            case Conjure:
-                Particle.dripHoly(host.pos.getAdd(organs[FIST].ptd));
-                Sound.play("cast");
-                break;
-            case Walk:
-            case WalkL:
-                if ((current == 0 || current == 2) && frame.over()) ((Man)host).stepSound();
-                break;
-            case Sprint:
-                if ((current == 1 || current == 3) && frame.over()) ((Man)host).stepSound();
-                break;
-        }
+        if (host.state == Actions.Walk)
+            if ((current == 0 || current == 2) && frame.over()) ((Man)host).stepSound();
+        else if (host.state == Actions.Sprint)
+            if ((current == 1 || current == 3) && frame.over()) ((Man)host).stepSound();
         return super.update();
     }
 }

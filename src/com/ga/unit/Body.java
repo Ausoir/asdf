@@ -5,7 +5,6 @@ import com.ga.map.Shader;
 import com.ga.tool.Clips;
 import com.ga.tool.P;
 import com.ga.tool.Timer;
-import com.ga.unit.skill.Actions;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -15,19 +14,19 @@ import java.util.Map;
  * Created by Ga on 8/1/2016. asd
  */
 public class Body {
-    private HashMap<Actions, int[]> animation = new HashMap<Actions, int[]>() {{
-        put(Actions.Idle, new int[]{0, -1});
+    private HashMap<String, int[]> animation = new HashMap<String, int[]>() {{
+        put("Idle", new int[]{0, -1});
     }};
     private Clip clip;
     public Unit host;
-    private int[] nextAnimation = animation.get(Actions.Idle);
+    private int[] nextAnimation = animation.get("Idle");
     public Organ[] organs;
     Timer frame;
     private int[][] nextClip;
     int[][][] localAnimation;
     private int[] localFrames;
     int current = 0;
-    protected Actions state = Actions.Idle;
+    protected String state = "Idle";
     public int BODY;
     int FOOT;
     private int legNum = 0, legCurrent = 0;
@@ -78,8 +77,7 @@ public class Body {
         for (int i = 0; i < organs.length; i++) organs[i].setMaxLength((int) Math.sqrt((nextClip[i][0]*nextClip[i][0])+(nextClip[i][1]*nextClip[i][1])));
         setProperties(p.property);
         for (Map.Entry<String, int[]> i : p.moveset.entrySet()){
-            Actions move = (Actions) Actions.getByName(i.getKey());
-            animation.put(move, i.getValue());
+            animation.put(i.getKey(), i.getValue());
         }
     }
 
@@ -139,7 +137,7 @@ public class Body {
         for (int i = 0; i < localAnimation.length; i++) {
             randomizeSection(i);
         }
-        int dead = animation.get(Actions.Dead)[0];
+        int dead = animation.get("Dead")[0];
         localAnimation[dead] = localAnimation[dead + Global.r.nextInt(3)];
         int i = (int) Math.abs(-organs[BODY].ptd.y/5f);
         if (i != 0) randomizeSection(dead);
@@ -161,13 +159,13 @@ public class Body {
         return organs[(int) (Math.random()*organs.length)].ptd;
     }
 
-    public void setState(Actions state) {
+    public void setState(String state) {
         this.state = state;
         current = 0;
         if (animation.containsKey(state)) nextAnimation = animation.get(state);
         else{
-            Global.p("Can't find current state "+state.getName());
-            nextAnimation = animation.get(Actions.Idle);
+            Global.p("Can't find current state "+state);
+            nextAnimation = animation.get("Idle");
         }
         setClip();
     }
@@ -176,7 +174,7 @@ public class Body {
         frame.set(Math.max(1, frame.time-p));
     }
     public void setMoveSpeed(int p){
-        int[] t = animation.get(Actions.Walk);
+        int[] t = animation.get("Walk");
         for (int i : t) localFrames[i] = Math.max(1, clip.frames[i]-p);
     }
 
@@ -184,7 +182,7 @@ public class Body {
         if (current >= nextAnimation.length) current = 0;
         if (nextAnimation[current] == -1) {
             current--;
-            state = Actions.Idle;
+            state = "Idle";
         }
         nextClip = localAnimation[nextAnimation[current]];
         frame.set(localFrames[nextAnimation[current]]);
@@ -229,7 +227,7 @@ public class Body {
                     legs--;
                 }
                 if (o.vital) {
-                    setState(Actions.Down);
+                    setState("Down");
                     host.die();
                     return;
                 }

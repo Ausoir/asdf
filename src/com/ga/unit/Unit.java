@@ -22,11 +22,11 @@ import java.util.Map;
  */
 public class Unit extends Prop {
     private int[] rangeZone = new int[]{-5};
-    public HashMap<Integer, Moveset[]> moveset = new HashMap<>();
-    protected HashMap<Moveset, int[]> cooldown = new HashMap<>();
+    public HashMap<Integer, Actions[]> moveset = new HashMap<>();
+    protected HashMap<Actions, int[]> cooldown = new HashMap<>();
     public int controlId;
     public Body clip;
-    public Moveset state = Actions.Idle;
+    public Actions state = Actions.Idle;
     public boolean jump = false;
     public Intelligence brain;
     public EventTimer delay = new EventTimer(5, false, null);
@@ -55,12 +55,12 @@ public class Unit extends Prop {
         String[] sections = super.load(p);
         stats.load(sections[4]);
         faction = Faction.valueOf(sections[5]);
-        loadMoveset(sections[6]);
+        loadActions(sections[6]);
         clip.setOrganHealth();
         return sections;
     }
 
-    protected void loadMoveset(String p){
+    protected void loadActions(String p){
         String[] rangeMoves = p.split("/");
         String[] ranges = rangeMoves[0].split(",");
         String[] moveZones = rangeMoves[1].split("&");
@@ -68,21 +68,15 @@ public class Unit extends Prop {
         for (int i=0;i<ranges.length;i++) rangeZone[i] = Integer.parseInt(ranges[i]);
         for (int i=0;i<moveZones.length;i++) {
             String[] moves = moveZones[i].split(",");
-            Moveset[] movesets = new Moveset[moves.length];
+            Actions[] movesets = new Actions[moves.length];
             for (int ii=0;ii<moves.length;ii++){
-                movesets[ii] = getMoveset(moves[ii]);
+                movesets[ii] = Actions.getByName(moves[ii]);
             }
             this.moveset.put(i, movesets);
         }
     }
 
-    private Moveset getMoveset(String p){
-        Moveset r = Actions.getByName(p);
-        if (r == null) r = Spells.getByName(p);
-        return r;
-    }
-
-    public int performMoveset(int dist){
+    public int performActions(int dist){
         int range = -1;
         for (int i=0;i<rangeZone.length;i++){
             if (dist <= rangeZone[i]){
@@ -91,12 +85,12 @@ public class Unit extends Prop {
             }
         }
         if (range != -1) {
-            Moveset[] t = moveset.get(range);
+            Actions[] t = moveset.get(range);
             if (t == null) {
                 Global.p("Can't find moveset for range " + dist + "@Zone " + range);
             } else {
-                Moveset move = t[Global.r.nextInt(t.length)];
-//                Global.p("Moveset for range " + dist + "@Zone " + range + " = "+move.getName());
+                Actions move = t[Global.r.nextInt(t.length)];
+//                Global.p("Actions for range " + dist + "@Zone " + range + " = "+move.getName());
                 return setState(move);
             }
         }
@@ -114,8 +108,6 @@ public class Unit extends Prop {
 
     public void say(String p) {
         speech.say(p);
-        Spells t = Spells.getByName(p);
-        if (t != null) setState(t);
     }
 
     public String getConversation(){
@@ -130,7 +122,7 @@ public class Unit extends Prop {
     public float getReach(){
         return 24;
     }
-    protected int[] getCooldown(Moveset state) {
+    protected int[] getCooldown(Actions state) {
         int[] r = cooldown.get(state);
         if (r == null) r = new int[]{Global.getTime()[0]};
         return r;
@@ -138,7 +130,7 @@ public class Unit extends Prop {
     protected boolean tagCapable(Tags p){
         return true;
     }
-    public int setState(Moveset state) {
+    public int setState(Actions state) {
         if (delay.over() && jump && this.state != state && tagCapable(state.getTags())) {
             face(target.x > 0 ? 1 : -1, true);
             int req = state.getCost();
@@ -166,28 +158,15 @@ public class Unit extends Prop {
     public void attackSound(){
         Sound.play("swing");
     }
-    public int getStateLevel(Moveset state){
+    public int getStateLevel(Actions state){
         return get("Level").get();
     }
-    public void stateSet(Moveset state){
+    public void stateSet(Actions state){
         if (state != Actions.Idle) this.state.onInterrupt(this);
         delay.set(state.getDel());
         this.state = state;
-        vel.x *= state.getVelX();
-        if (state instanceof Actions) {
-            clip.setState((Actions) state);
-            if (brain != null) brain.setState(state);
-        } else if (state instanceof Spells){
-            clip.setState(((Spells)state).getAction());
-            this.state = Actions.Cast;
-            final Unit me = this;
-            final Moveset spell = state;
-            delay.performer = new Performer(){
-                public void perform(){
-                    spell.trigger(me);
-                }
-            };
-        }
+        clip.setState(state.getClipName());
+        if (brain != null) brain.setState(state);
         this.state.onSet(this);
         if (delay.max != 0) delay.set(Math.max(3, delay.time - attackSpeed));
         clip.setSpeed(attackSpeed);
@@ -346,7 +325,7 @@ public class Unit extends Prop {
         if (state != Actions.Dead) {
             if (m != -1) moveTriggered(m);
             stats.update();
-            if (delay.update()) stateDone();
+            if (delay.update() && delay.performer == null) stateDone();
             stateUpdate();
             stats.rest(1);
         }
@@ -376,8 +355,8 @@ public class Unit extends Prop {
         Iterator it = moveset.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
-            Moveset[] moves = (Moveset[]) pair.getValue();
-            for (Moveset i : moves) r += i.getName() + ",";
+            Actions[] moves = (Actions[]) pair.getValue();
+            for (Actions i : moves) r += i.getName() + ",";
             r = r.substring(0,r.length()-1)+(it.hasNext()?"&":"");
         }
         return r;

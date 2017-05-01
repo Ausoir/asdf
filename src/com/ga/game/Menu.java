@@ -10,7 +10,6 @@ import com.ga.unit.item.Item;
 import com.ga.unit.player.Inventory;
 import com.ga.unit.player.Player;
 import com.ga.unit.skill.Actions;
-import com.ga.unit.skill.Moveset;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -282,13 +281,13 @@ public class Menu extends Panel {
             panel.add(Box.createRigidArea(new Dimension(0,12)));
             makeSlot(Actions.Use, false);
             makeSlot(Actions.Kick, false);
-            for (Moveset i : Global.player.skillTree.skills){
+            for (Actions i : Global.player.skillTree.skills){
                 makeSlot(i, true);
             }
             int points = Global.player.get("Memory").get();
             skillpoints.setText(Dialog.get("mem")+": "+points);
         }
-        void makeSlot(final Moveset move, boolean skill){
+        void makeSlot(final Actions move, boolean skill){
             final String displayName = Dialog.get("mvs"+move.getName());
             String key = Global.player.input.getMapping(move);
             if (key == null) key = "";

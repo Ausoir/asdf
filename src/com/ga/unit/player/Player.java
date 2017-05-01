@@ -11,7 +11,6 @@ import com.ga.unit.intelligence.PlayerInput;
 import com.ga.unit.item.Crafts;
 import com.ga.unit.item.Item;
 import com.ga.unit.skill.Actions;
-import com.ga.unit.skill.Moveset;
 import com.ga.unit.skill.Stat;
 
 import java.util.ArrayList;
@@ -33,24 +32,24 @@ public class Player extends Man {
     public PlayerInput input;
     public String cmap, cworld;
     public Health health;
-    public Moveset learning;
+    public Actions learning;
     private Item offhand = fist;
     private boolean leftHandMode = false;
 
     ArrayList<Trait> traits = new ArrayList<>();
     public Player(int seed) {
         super(seed);
-        loadMoveset("-5,100,1000/Use&Walk&Sprint");
+        loadActions("-5,100,1000/Use&Walk&Sprint");
         speechType = "p";
         inventory = new Inventory(this);
         crafting = new Crafts(this);
         health = new Health(this);
     }
-    public void learnSkill(Moveset p){
+    public void learnSkill(Actions p){
         say("Learned spell "+p.getName()+"!");
         skillTree.addSkill(p);
     }
-    public void advanceSkill(Moveset p){
+    public void advanceSkill(Actions p){
         if (get("Memory").require(1))
            skillTree.advanceSkill(p);
     }
@@ -69,6 +68,7 @@ public class Player extends Man {
             offhand.onUnequip(this);
             offhand = p;
             offhand.onEquip(this);
+            offhand.setDepth(getDepth()+1);
             offhand.dir = dir;
         }
     }
@@ -100,7 +100,7 @@ public class Player extends Man {
         return true;
     }
     @Override
-    public int setState(Moveset state){
+    public int setState(Actions state){
         int r = super.setState(state);
         if (r != 0){
             if (r == 2) {
@@ -113,23 +113,23 @@ public class Player extends Man {
         }
         return r;
     }
-    public void stateSet(Moveset state){
+    public void stateSet(Actions state){
         super.stateSet(state);
         if (state instanceof Actions) {
             final Player me = this;
             switch ((Actions) state) {
                 case Idle:
-                    if (!get("Stamina").isFull()) clip.setState(Actions.Exhausted);
+                    if (!get("Stamina").isFull()) clip.setState(Actions.Exhausted.getClipName());
                     break;
                 case Sprint:
                 case Walk:
                     float speed = getSpeed();
-                    if (speed <= 0) clip.setState(Actions.Exhausted);
+                    if (speed <= 0) clip.setState(Actions.Exhausted.getClipName());
                     else clip.setMoveSpeed((int) Global.clamp(speed-1,-20,4));
                     face(input.moving, true);
                     break;
                 case Use:
-                    if (weapon.uses == 0) say("Can't usable " + weapon.getName());
+                    if (weapon.uses == 0) say("Can't use " + weapon.getName());
                     break;
                 case Interact:
                     delay.performer = new Performer() {
@@ -145,7 +145,7 @@ public class Player extends Man {
                             for (final Line i : Global.map.land) {
                                 if (i.opt == 1) {
                                     if (i.lineCross(new Line(reach.x - (12 * dir), reach.y, reach.x + (12 * dir), reach.y))) {
-                                        clip.setState(Actions.Guard);
+                                        clip.setState(Actions.Guard.getClipName());
                                         delay.set(40);
                                         final int firstDir = dir;
                                         delay.performer = new Performer() {
@@ -217,7 +217,7 @@ public class Player extends Man {
         }
     }
     @Override
-    public int getStateLevel(Moveset state){
+    public int getStateLevel(Actions state){
         int difficulty = state.getDifficulty();
         if (difficulty == 0) return 1;
         int power = 0;
@@ -294,7 +294,7 @@ public class Player extends Man {
         cworld = cmap.split("_")[0];
         gold = Integer.parseInt(other[2]);
         memorized = other[3];
-        learning = SkillTree.getByName(other[4]);
+        learning = Actions.getByName(other[4]);
         inventory.load(line[3]);
         skillTree.load(line[4]);
         crafting.load(line[5]);
