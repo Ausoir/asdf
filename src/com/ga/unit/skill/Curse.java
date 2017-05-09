@@ -18,7 +18,9 @@ public enum Curse {
     },
     Shadowcurse{
         public void start(Man host, int level) {
-            for (int i=0;i<level;i++) Stock.getByName("Phantom",-1).pos.set(host.pos.x, host.pos.y - 300);
+            Unit p = (Unit) Stock.getByName("Phantom",-1);
+            p.pos.set(host.pos.x, host.pos.y - 1);
+            p.buff(Buffs.Banishment, level);
         }
     },
     Ensnare{

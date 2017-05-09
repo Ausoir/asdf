@@ -15,7 +15,7 @@ public class Projectile extends Prop {
     public float rotSpeed = .03f;
     public int damage = 0;
     public EventTimer delay = new EventTimer(-1, false, null);
-    public Projectile(String name, P pt, P dest, int speed) {
+    protected Projectile(String name, P pt, P dest, int speed) {
         super(name, 0, 60);
         pos = pt;
         save = false;

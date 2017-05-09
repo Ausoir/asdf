@@ -67,7 +67,6 @@ mvsThrow:Throw
 mvsDart:Dart
 mvsShoot:Shoot
 mvsSnipe:Snipe
-mvsTriple:Triple
 mvsJump:Jump
 mvsAirstrike:Airstrike
 mvsLeap:Leap
@@ -115,7 +114,6 @@ mvsDscThrow:Throw your weapon away.
 mvsDscDart:A
 mvsDscShoot:A
 mvsDscSnipe:A
-mvsDscTriple:Attack using three consecutive slashing motion that moves your whole body.
 mvsDscJump:A
 mvsDscAirstrike:A
 mvsDscLeap:A

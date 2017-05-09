@@ -22,9 +22,9 @@ public class Weapon extends Item {
     private int damageMod = 0;
     public Weapon(String name, int seed, int weight, int uses, int num, int sides, ItemType type) {
         super(name, seed, weight, uses);
+        setType(type);
         value = 36;
         breakable = false;
-        setType(type);
         cooldown = 0;
         setDamage(num, sides);
         rotation = 35;
@@ -72,7 +72,7 @@ public class Weapon extends Item {
         String r = super.getDescription();
         r = r.replace(" uses "," durability ");
         if (emod != null){
-            r += " This weapon has "+probability*100+"% chance of activating its enchantment every hit.";
+            r += " This weapon has "+(int)(probability*100)+"% chance of activating its enchantment every hit.";
         }
         return r + " This weapon deals "+damageSide.num+"d"+damageSide.sides+" + "+damageMod+" damage.";
     }

@@ -3,11 +3,11 @@ package com.ga.game;
 import java.util.HashMap;
 
 /**
- * Created by Ga on 1/27/2017.
+ * Created by Ga on 1/27/2017. dqwdqwdqw
  */
 public class Dialog {
     private static HashMap<String,String> cache = new HashMap<>();
-    protected static void init(){
+    static void init(){
         String[] data = FileManager.readText("dialog/Dialog");
         for (String i : data){
             String[] t = i.split(":");

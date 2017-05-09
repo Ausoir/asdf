@@ -22,7 +22,7 @@ import java.util.Map;
  */
 public class Unit extends Prop {
     private int[] rangeZone = new int[]{-5};
-    public HashMap<Integer, Actions[]> moveset = new HashMap<>();
+    private HashMap<Integer, Actions[]> moveset = new HashMap<>();
     protected HashMap<Actions, int[]> cooldown = new HashMap<>();
     public int controlId;
     public Body clip;
@@ -37,6 +37,8 @@ public class Unit extends Prop {
     protected Speech speech = new Speech(this);
     public int stateLevel = 1;
     public int attackSpeed = 0;
+    private Actions lastState = Actions.Idle;
+    private int jumpAcross = 0;
 
     public Unit(int seed) {
         super(null,seed,101);
@@ -168,8 +170,9 @@ public class Unit extends Prop {
         clip.setState(state.getClipName());
         if (brain != null) brain.setState(state);
         this.state.onSet(this);
-        if (delay.max != 0) delay.set(Math.max(3, delay.time - attackSpeed));
-        clip.setSpeed(attackSpeed);
+        int asmod = get("Attack").get();
+        if (delay.max != 0) delay.set(Math.max(3, delay.time - attackSpeed - asmod));
+        clip.setSpeed(attackSpeed+asmod);
     }
     public boolean face(int dir, boolean force) {
         if (force || (delay.over() && jump && this.dir != dir)) {
@@ -196,13 +199,12 @@ public class Unit extends Prop {
         stats.addEffect(buff, level);
     }
 
-    public void hit(Line hitbox, float knockback) {
+    public void hit(int dir, float knockback) {
         delay.performer = null;
         jump = false;
-        buff(Buffs.Slow, 2);
+        buff(Buffs.Pain, 1);
         if (stats.triggerEffect(Buffs.Mark)) knockback += .5f;
         if (state == Actions.Rest) knockback += .5f;
-        int dir = hitbox.pt.x < pos.x ? 1 : -1;
         vel.x = knockback * 8 * dir;
         vel.y = -knockback - 5;
         if (state == Actions.Down) die();
@@ -233,7 +235,7 @@ public class Unit extends Prop {
                     stamina.add(-damage);
                     damage -= tstamina;
                     if (damage > 0) {
-                        hit(hitBox, (float) (damage - getDamageReduction(3))/stamina.getMax());
+                        hit(hitBox.pt.x < pos.x ? 1 : -1, (float) (damage - getDamageReduction(3))/stamina.getMax());
                     }
                 }
                 P t = new P(pos.x, hitBox.ptd.y);
@@ -259,6 +261,10 @@ public class Unit extends Prop {
     public void collide(){
         jump = false;
         super.collide();
+        if (!jump) {
+            jumpAcross++;
+            if (jumpAcross > 5) lastLand = new Line();
+        } else jumpAcross = 0;
     }
 
     @Override
@@ -294,13 +300,9 @@ public class Unit extends Prop {
     }
 
     protected void moveTriggered(int p){
-        if (state instanceof Actions && state.getCost() > 0) {
-            for (Unit i : Updater.collideUnit(pos, (int) getReach(), faction)){
-                if (i.checkHit(clip.organs[p].getAdd(pos),getDamage())){
-                    onAttack(i);
-                    break;
-                }
-            }
+        if (lastState != state) {
+            state.trigger(this);
+            lastState = state;
         }
     }
 

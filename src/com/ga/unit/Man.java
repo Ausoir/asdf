@@ -44,7 +44,7 @@ public class Man extends Unit {
 
     public void setDepth(int depth){
         super.setDepth(depth);
-        weapon.setDepth(depth-1);
+        weapon.setDepth(depth);
     }
 
     public boolean wieldingNone(){ return weapon == null || weapon == fist; }
@@ -113,8 +113,8 @@ public class Man extends Unit {
     }
 
     @Override
-    public void hit(Line hitbox, float knockback) {
-        super.hit(hitbox, knockback);
+    public void hit(int dir, float knockback) {
+        super.hit(dir, knockback);
         armor.onHit();
     }
 
@@ -167,7 +167,7 @@ public class Man extends Unit {
                 int damage = armor.armor[1].getDamage()+1;
                 for (Unit i : Updater.collideUnit(pos, (int) hitbox.getLength(), faction))
                     i.checkHit(hitbox,damage);
-            } else state.trigger(this);
+            } else super.moveTriggered(organ);
         }
     }
 

@@ -2,7 +2,8 @@ package com.ga.game;
 
 import com.ga.map.*;
 import com.ga.tool.Line;
-import com.ga.unit.*;
+import com.ga.unit.Clip;
+import com.ga.unit.Stock;
 import com.ga.unit.intelligence.PlayerInput;
 import com.ga.unit.player.MainPlayer;
 import com.ga.unit.player.Player;
@@ -125,11 +126,11 @@ public class FileManager {
                 String[] houseInfo = dir.split("/");
                 if (houseInfo.length > 1) dir = houseInfo[0];
                 else houseInfo = new String[]{houseInfo[0], "1200,800"};
-                MapGenerator.generateHouse(Global.player.cmap, Integer.parseInt(dir.split("_")[2]), houseInfo[1]);
+                MapGenerator.generateHouse(dir, Global.player.cmap, Integer.parseInt(dir.split("_")[2]), houseInfo[1]);
             }
         } else { //can't find map
             int id = Integer.parseInt(map.split("_")[1]);
-            MapGenerator.generateMap(id, Creation.getWorld(id));
+            MapGenerator.generateMap(dir, Creation.getWorld(id));
             regrowths = true;
         }
         Global.player.cmap = dir;
@@ -141,7 +142,7 @@ public class FileManager {
         String data = read("Data/map/" + dir + ".map");
         String[] line = data.split("%");
         String[] names = line[0].split(",");
-        Global.map = new Map(names);
+        Global.map = new Map(dir, names);
         if (line.length > 1) {
             String[] sections = line[1].split(";");
             for (String section1 : sections) {

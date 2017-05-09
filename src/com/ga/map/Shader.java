@@ -14,7 +14,7 @@ public enum Shader{
             int height = image.getHeight();
             BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
             for (int y = 0; y < height; y++) {
-                float yShade = ((float) y / height) * 64;
+                float yShade = ((float) y / height) * 32;
                 for (int x = 0; x < width; x++) {
                     int rgb = image.getRGB(x, y);
                     int alpha = (rgb & 0xff000000) >>> 24;

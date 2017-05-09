@@ -177,7 +177,7 @@ public enum Stock {
         return process(product);
     }},
     Bow{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed,1,6,3,6, Item.ItemType.Bow);
+        Prop product = new Weapon(getName(),seed,1,6,1,6, Item.ItemType.Bow);
         return process(product);
     }},
     Revolver{ Prop make(int seed){
@@ -196,7 +196,7 @@ public enum Stock {
         return process(product);
     }},
     Ethersword{ Prop make(int seed){
-        Weapon product = new Weapon(getName(),seed,0,1,1,4, Item.ItemType.Sword){
+        Weapon product = new Weapon(getName(),seed,0,-1,1,4, Item.ItemType.Sword){
             public String toString(){
                 return "";
             }
@@ -207,13 +207,9 @@ public enum Stock {
                 super.remove();
                 Particle.holyExplosion(pos);
             }
-            public void use(Man host) {
+            public void trigger(Unit host) {
+                super.trigger(host);
                 Particle.holyExplosion(pos);
-            }
-            public void update(){
-                super.update();
-                Particle.explode("Glare",pos,new P(0,-1),10,24,20,false,7);
-                if (Math.random() < .03f) remove();
             }
         };
         product.image.setCenterType(3);
@@ -983,11 +979,10 @@ public enum Stock {
                 }
             }
             public void onCreate(){
-                load(getUnit(getName(),seed,getStat(10,20,12),Faction.Evil,"10/Kick"));
+                load(getUnit(getName(),seed,getStat(10,20,12),Faction.Evil,"10,800/Kick&Walk"));
             }
         };
         processUnit(product);
-        product.clip.organs[1].pt.y -= product.clip.organs[0].ptd.y;
         return process(product);
     }},
     Beholder { Prop make(int seed) {
@@ -1071,14 +1066,20 @@ public enum Stock {
         return name().replace("_"," ");
     }
     public static Prop getByName(String p, int seed){
-        try {
-            Stock a = valueOf(p);
-            Prop b = a.create(seed);
-            return b;
-        } catch (Exception e){
-            System.out.println("Stock could not find "+p);
-            return getInstant(p, seed);
+        for (Stock i : values()){
+            if (i.name().equals(p)){
+                return i.create(seed);
+            }
         }
+        return getInstant(p, seed);
+//        try {
+//            Stock a = valueOf(p);
+//            Prop b = a.create(seed);
+//            return b;
+//        } catch (Exception e){
+//            System.out.println("Stock could not find "+p);
+//            return getInstant(p, seed);
+//        }
     }
     public static String getFactoryName(int id){
         return id==-1?"":values()[id].getName();
@@ -1118,7 +1119,7 @@ public enum Stock {
         return img+(Math.abs(seed % num)+1);
     }
     String getStat(int stamina, int speed, int level){
-        return "Stamina:"+stamina+"&Speed:"+speed+"&Strength:"+level+"&Level:"+level;
+        return "Stamina:"+stamina+"&Attack:0,0&Speed:"+speed+"&Strength:"+level+"&Level:"+level;
     }
     String getUnit(String name, int seed, String stat, Faction faction, String moves){
         return name+"@"+seed+"@0,0@0@"+stat+"@"+faction.name()+"@"+moves;

@@ -20,7 +20,6 @@ import java.util.Map;
 /**
  * Created by Ga on 5/6/2016. asd
  */
-@SuppressWarnings("SuspiciousMethodCalls")
 public class Updater {
     public static boolean editor = false;
     private static ArrayList<Drawable> drawee = new ArrayList<>();
@@ -48,22 +47,32 @@ public class Updater {
     static void changeMap(boolean editor){
         clear();
         if (!editor) {
-            boolean rightSide = Global.player.pos.x > Global.map.size.x/2;
-            int pos = FileManager.loadMap(changeMap);
-            boolean spawnFound = false;
-            for (Observer i : addQueue){
-                if (i instanceof Prop && ((Prop)i).factoryId == Stock.Spawn.ordinal() && ((Prop)i).seed == pos){
-                    Global.player.pos.set(((Prop)i).pos);
-                    spawnFound = true;
-                    break;
-                }
+            int edge = 0;
+            if (changeMap.length() == 1){
+                edge = Integer.parseInt(changeMap);
+                int[] newmap = Creation.getWorld(Global.map.id, edge);
+                changeMap = Global.player.cworld + "_" + newmap[0];
             }
-            if (!spawnFound){
-                if (rightSide){
-                    Global.player.pos.set(24,Global.map.fallSafe(new P(24,0),0).getCrossPointY(24)-1);
-                } else {
-                    Line rightEdge = Global.map.fallSafe(new P(Global.map.size.x-24,0),0);
-                    Global.player.pos.set(Global.map.size.x-24,rightEdge.getCrossPointY(rightEdge.ptd.x-24)-1);
+            int pos = FileManager.loadMap(changeMap);
+            if (edge == 0) {
+                for (Observer i : addQueue) {
+                    if (i instanceof Prop && ((Prop) i).factoryId == Stock.Spawn.ordinal() && ((Prop) i).seed == pos) {
+                        Global.player.pos.set(((Prop) i).pos);
+                        break;
+                    }
+                }
+            } else {
+                if (edge == 2){
+                    Line entrance = Global.map.checkLand(new Line(1,32,Global.map.size.x-1,32),0);
+                    Global.player.pos.set(entrance.getCrossPointX(32),32);
+                } else if (edge == 4){
+                    Line entrance = Global.map.checkLand(new Line(Global.map.size.x-24,0,Global.map.size.x-24,99999),0);
+                    Global.player.pos.set(Global.map.size.x-24,entrance.getCrossPointY(entrance.ptd.x-24)-1);
+                } else if (edge == 6){
+                    Global.player.pos.set(24,Global.map.checkLand(new Line(24,0,24,99999),0).getCrossPointY(24)-1);
+                } else if (edge == 8){
+                    Line entrance = Global.map.checkLand(new Line(1,Global.map.size.y-32,Global.map.size.x-1,Global.map.size.y-32),0);
+                    Global.player.pos.set(entrance.getCrossPointX(Global.map.size.y-32), Global.map.size.y-32);
                 }
             }
             Global.player.reconnect();
@@ -146,7 +155,7 @@ public class Updater {
         int size = drawee.size();
         if (size > 0) {
             for (int i = 0; i < size; i++) {
-                if (drawee.get(i).getDepth() > p.getDepth()){
+                if (drawee.get(i).getDepth() >= p.getDepth()){
                     drawee.add(i, p);
                     return;
                 }

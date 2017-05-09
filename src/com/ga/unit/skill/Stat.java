@@ -8,7 +8,6 @@ import com.ga.tool.Performer;
 public class Stat {
     private int max;
     protected int current;
-    public int reserve = 0;
     public Performer onChange;
     public Stat(String p){
         String[] t = p.split(",");
@@ -35,7 +34,7 @@ public class Stat {
         int prev = current;
         current = p;
         if (!force) {
-            if (current > max - reserve) current = max - reserve;
+            if (current > max) current = max;
             else if (current < 0) current = 0;
         }
         if (prev != current) onChange();

@@ -83,26 +83,22 @@ public class Prop extends Thing {
             for (Line i : Global.map.land) {
                 if (i.isLand() && i.depth >= lastLand.depth) {
                     if (i.lineCross(pp)) {
-                        onCollide(i);
                         float slope = i.getSlope();
-                        boolean cc = !i.clockwise();
+                        boolean cw = i.clockwise();
                         float lineY = i.getCrossPointY(pos.x);
-                        if (cc && lineY <= pos.y){
-                            vel.set(0,0);
-                            return;
-                        } else if (!cc && lineY >= pos.y) {
+                        if (cw && lineY >= pos.y) {
+                            onCollide(i);
                             float atan = (float) Math.atan(slope);
-                            if (!Double.isInfinite(slope)){
-                                float test = vel.y;
-                                vel.y += (i.pt.y + (slope * (pos.x + vel.x - i.pt.x))) - (pos.y + vel.y) - 1;
-                                vel.x += Global.sin(atan)*(test-vel.y)*Settings.friction;
-                            } else {
-                                vel.x *= -1;
-                                collide();
-                                return;
-                            }
+                            if (vel.x > 0 != atan > 0) vel.x = vel.x * Global.cos(atan);
+                            vel.x += Global.sin(atan) * .1f;
+                            if (!Double.isInfinite(slope))
+                                vel.y += i.getCrossPointY(pos.x+vel.x) - (pos.y + vel.y) - 1;
                             lastLand = i;
                             collided = true;
+                        } else if (!cw && lineY <= pos.y) {
+                            onCollide(i);
+                            vel.set(0, 0);
+                            return;
                         }
                     }
                 }
@@ -121,17 +117,19 @@ public class Prop extends Thing {
     }
     public void onCollide(Line l){
     }
+    protected void edgeCheck(){
+        int edge = Global.mapEdge(pos.getAdd(vel));
+        if (edge > 0) {
+            if (Math.abs(edge-5) == 1) vel.x = 0;
+            else {
+                if (edge == 2) remove();
+            }
+        }
+    }
     public void update(){
         if (mobile) {
             collide();
-            int edge = Global.mapEdge(pos.getAdd(vel));
-            if (edge > 0) {
-                if (Math.abs(edge-5) == 1) vel.x = 0;
-                else {
-                    if (edge == 9) remove();
-                    else vel.y = 0;
-                }
-            }
+            edgeCheck();
             pos.add(vel);
             if (gravity) {
                 vel.y += Settings.gravity;

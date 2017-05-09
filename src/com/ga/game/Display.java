@@ -45,9 +45,10 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
 
         chatbox = new JTextField();
         chatbox.setFont(new Font("Ariel", Font.PLAIN, 18));
-        chatbox.setOpaque(false);
         chatbox.setBounds(0,Settings.screenY-100,500,40);
         chatbox.setFocusable(true);
+        chatbox.setBorder(null);
+        chatbox.setBackground(new Color(88,88,0,55));
         chatbox.addKeyListener(new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e){

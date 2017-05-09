@@ -6,7 +6,6 @@ import com.ga.map.Global;
  * Created by Ga on 5/6/2016.
  */
 public class P {
-    static final P zero = new P();
     public float x, y;
     public P(String p){
         load(p);
@@ -65,9 +64,6 @@ public class P {
     public float getAtan(){
         return (float) Math.atan2(y,x);
     }
-    public P getSwapped(){
-        return new P(y,x);
-    }
     public float getDist(){
         return (float) Math.sqrt((this.x*this.x)+(this.y*this.y));
     }
@@ -82,17 +78,11 @@ public class P {
     public float getSum(){
         return this.x+this.y;
     }
-    public float getDifference(P p){
-        return (float)(Math.pow(this.x-p.x,2)+Math.pow(this.y-p.y,2));
-    }
     public P getAdd(P p){
         return getAdd(p.x,p.y);
     }
     public P getSubtract(P p){
         return getAdd(-p.x,-p.y);
-    }
-    public P getMinus(){
-        return new P(-x,-y);
     }
     public P getAdd(float x, float y){
         return new P(this.x+x, this.y+y);
@@ -106,9 +96,5 @@ public class P {
     public void load(String p){
         String[] t = p.split(",");
         set(Float.parseFloat(t[0]), Float.parseFloat(t[1]));
-    }
-
-    public boolean collide(P p, float r) {
-        return getDist(p) <= r;
     }
 }

@@ -32,11 +32,11 @@ public class Particle extends Thing implements Effect {
     public static void dripHoly(P pt){
         explode("Glare",pt,new P(),1,4,0,true,4);
     }
-    public static void sparkle(P pt, float r){
-        for (int i=0;i<6;i++) {
-            float x = (float) (Math.random()*r-r/2);
-            float y = (float) (Math.random()*r-r/2);
-            new Particle("Glare", pt.getAdd(x,y), new P(), 0, 3, false, 1);
+    public static void sparkle(String name, P pt, float radius, int times){
+        for (int i=0;i<times;i++) {
+            float x = (float) (Math.random()*radius-radius/2);
+            float y = (float) (Math.random()*radius-radius/2);
+            new Particle(name, pt.getAdd(x,y), new P(), 0, 3, false, 1);
         }
     }
     public static void groundSlam(P pt){
@@ -77,12 +77,12 @@ public class Particle extends Thing implements Effect {
             new Particle(name,new P(pt),v, Global.r.nextFloat()*6.28f,Global.r.nextFloat()*speed, gravity, lifetime);
         }
     }
-    public void collide(){
+    private void collide(){
         P vp = pos.getAdd(vel);
         Line pp = new Line(pos,vp);
         for (Line i : Global.map.land){
             if (i.lineCross(pp)){
-                if (i.isLand()) {
+                if (i.isLand() && i.clockwise()) {
                     float slope = i.getSlope();
                     if (!Double.isInfinite(slope)) vel.y = slope * vel.x;
                     vel.x /= 2;

@@ -35,8 +35,8 @@ public class Global {
 
     public static void init(){
         for (int i=0;i<360;i++){
-            sinv[i] = (float)Math.sin(Math.toRadians(i));
-            cosv[i] = (float)Math.cos(Math.toRadians(i));
+            sinv[i] = (float)((int)(Math.sin(Math.toRadians(i))*10000))/10000;
+            cosv[i] = (float)((int)(Math.cos(Math.toRadians(i))*10000))/10000;
         }
     }
     public static int getSeed(){

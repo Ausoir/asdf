@@ -12,14 +12,15 @@ import java.util.ArrayList;
  * Created by Ga on 1/10/2017. xhfsdxghf
  */
 public class Terrain extends ShadedPicture implements Drawable{
-    private int depth; //
+    private int depth;
     private Polygon polygon;
     private TexturePaint imageTexture;
     private ArrayList<Line> lines = new ArrayList<>();
     protected P pos;
+    private int length = 0; //polygon size is always multiples of 4
     public Terrain(String texture, Shader shader, int depth){
         super(texture, shader);
-        setDepth(toTerrainDepth(depth));
+        setDepth(depth);
         polygon = new Polygon();
         imageTexture = new TexturePaint(image, new Rectangle2D.Double(0,0,size.x,size.y));
         Updater.add(this);
@@ -32,10 +33,8 @@ public class Terrain extends ShadedPicture implements Drawable{
         p.depth = depth;
     }
     public void addPoint(float x, float y){
-        addPoint((int)x, (int)y);
-    }
-    private void addPoint(int x, int y){
-        polygon.addPoint(x, y);
+        polygon.addPoint((int)x, (int)y);
+        length++;
     }
     @Override
     public void shade(int param){
@@ -51,7 +50,7 @@ public class Terrain extends ShadedPicture implements Drawable{
     }
     public void render(){
         int lowX = polygon.xpoints[0], lowY = polygon.ypoints[0], highX = polygon.xpoints[0], highY = polygon.ypoints[0];
-        for (int i=0;i<polygon.xpoints.length;i++){
+        for (int i=0;i<length;i++){
             if (polygon.xpoints[i] < lowX) lowX = polygon.xpoints[i];
             if (polygon.ypoints[i] < lowY) lowY = polygon.ypoints[i];
             if (polygon.xpoints[i] > highX) highX = polygon.xpoints[i];
@@ -64,11 +63,24 @@ public class Terrain extends ShadedPicture implements Drawable{
         size.x = highX-lowX;
         size.y = highY-lowY;
         pos = new P(lowX, lowY);
-        image = new BufferedImage(highX-lowX, highY-lowY, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = image.createGraphics();
-        g.setPaint(imageTexture);
-        g.fill(polygon);
-        shade(0);
+
+        if (lines.size() > 0){
+            image = null; //todo: turn on cache
+//            image = Texture.load(Global.player.cmap + "_" + lines.get(0).next);
+            if (image == null) {
+                image = new BufferedImage(highX - lowX, highY - lowY, BufferedImage.TYPE_INT_ARGB);
+                Graphics2D g = image.createGraphics();
+                g.setPaint(imageTexture);
+                g.fill(polygon);
+                shade(0);
+//                Texture.newImage("map/", Global.player.cmap + "_" + lines.get(0).next, image);
+            }
+        } else { //rope
+            image = new BufferedImage(highX - lowX, highY - lowY, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = image.createGraphics();
+            g.setPaint(imageTexture);
+            g.fill(polygon);
+        }
     }
     public void draw(Graphics2D g){
         if (visible) {

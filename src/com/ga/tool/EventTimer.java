@@ -1,7 +1,7 @@
 package com.ga.tool;
 
 /**
- * Created by Ga on 7/26/2016.
+ * Created by Ga on 7/26/2016. asdas
  */
 public class EventTimer extends Timer {
     public Performer performer;

@@ -77,8 +77,11 @@ public class Line {
     public P getMidPoint(){
         return new P((ptd.x-pt.x)/2+pt.x, (ptd.y-pt.y)/2+pt.y);
     }
+    public float getCrossPointX(float y){
+        return (y-pt.y)*getSlope()+pt.x;
+    }
     public float getCrossPointY(float x){
-        return ((x-pt.x)*getSlope())+pt.y;
+        return (x-pt.x)*getSlope()+pt.y;
     }
     public boolean lineCross(Line i2){
         boolean a = i2.pt.x-pt.x >= 0, b = i2.pt.x-ptd.x > 0, c = i2.ptd.x-pt.x >= 0, d = i2.ptd.x-ptd.x > 0,

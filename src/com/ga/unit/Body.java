@@ -71,10 +71,10 @@ public class Body {
         localFrames = Clips.clone(p.frames);
         frame = new Timer(0);
         nextClip = localAnimation[nextAnimation[current]];
-        for (int i = 0; i < organs.length; i++) {
+        for (int i = 0; i < organs.length; i++)
             initializeOrgan(p.model,i);
-        }
-        for (int i = 0; i < organs.length; i++) organs[i].setMaxLength((int) Math.sqrt((nextClip[i][0]*nextClip[i][0])+(nextClip[i][1]*nextClip[i][1])));
+        for (int i = 0; i < organs.length; i++)
+            organs[i].setMaxLength((int) Math.sqrt((nextClip[i][0]*nextClip[i][0])+(nextClip[i][1]*nextClip[i][1])));
         setProperties(p.property);
         for (Map.Entry<String, int[]> i : p.moveset.entrySet()){
             animation.put(i.getKey(), i.getValue());

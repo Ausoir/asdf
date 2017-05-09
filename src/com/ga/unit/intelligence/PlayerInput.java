@@ -104,7 +104,7 @@ public class PlayerInput implements Input {
         //Global.server.sendFromLocal("IN>"+p + "@" + tx + "@" + ty);
     }
     public void inputDirect(String p, int x, int y){
-        host.target.set(x,y);
+        if (host.delay.over()) host.target.set(x,y);
         if (p != null) {
             movement.set(0,0);
             if (p.startsWith("_")) {

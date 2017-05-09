@@ -21,8 +21,8 @@ public class MerchantIntelligence extends ResidentIntelligence {
                 new String[]{"Cotton Clothing Legging","Cotton Clothing Torso","Fabric Clothing Legging","Fabric Clothing Torso",
                         "Adventurewear Legging", "Adventurewear Torso","Leather Armor Torso","Leather Armor Legging",
                         "Chainmail Torso","Chainmail Legging","Platemail Torso","Platemail Legging","Steel Armor Torso","Steel Armor Legging"}}),
-        GUILD(new String[][]{new String[]{"Manual","Spellbook","Scroll","Potion","Battery","Adventurewear Torso","Adventurewear Legging","Ration"}}),
-        TRAINING(new String[][]{new String[]{"Manual","Spellbook"}});
+        GUILD(new String[][]{new String[]{"Manual","Scroll","Potion","Battery","Adventurewear Torso","Adventurewear Legging","Ration"}}),
+        TRAINING(new String[][]{new String[]{"Manual"}});
         private String[][] items;
         MerchantType(String[][] items){
             this.items = items;
@@ -50,7 +50,7 @@ public class MerchantIntelligence extends ResidentIntelligence {
                 }
             }
         };
-        type = MerchantType.values()[merchanttype-1];
+        type = MerchantType.values()[merchanttype % MerchantType.values().length];
         String r = "I'm selling ";
         int length = host.rand.nextInt(48)+1;
         String[] items = new String[length];

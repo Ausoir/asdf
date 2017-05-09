@@ -1,8 +1,8 @@
-null@0@421,1923@0.10@Speed:17,17&Progress:0,100&Channeling:0,30&Memory:0,0&Stamina:25,25&Casting:0,90&Athletics:11,80&Motivation:100,100&Swinging:0,60&Agility:0,80&Endurance:100,100&Level:1,1&Jumping:0,60&Martial:3,90&Strength:4,4/5&80&51893&0@Player@-5,100,1000/Use&Walk&Sprint##None&None&None
-51384;Garr_2;0;Innersword;null
-;-1:Idle;32:Kick;192:_Recall;65:WalkL;1:Use;2:Throw;3:Grab;68:Walk;70:Blizzard;71:Fireblast;44:_Rest;16:Rest;81:Throw;82:Wield;83:Drop;84:Flameroll;87:Jump;
+null@0@6043,3430@0.10@Speed:17,17&Progress:0,100&Channeling:0,30&Memory:0,0&Attack:0,0&Stamina:25,25&Casting:0,90&Athletics:11,80&Motivation:100,100&Swinging:0,60&Agility:0,80&Endurance:100,100&Level:1,1&Jumping:0,60&Martial:3,90&Strength:4,4@Player@-5,100,1000/Use&Walk&Sprint##97@3943@6043,3362@-0.00@10@0_0_0__0&34@2744@4003,1691@0.00@10@0_0_0__0&35@7010@3996,1691@0.00@10@0_0_0__0
+-22030;Garr_5;3333330;Innersword;null
+;-1:Idle;32:Kick;192:_Recall;65:WalkL;1:Use;2:Throw;3:Grab;67:Shock;68:Walk;69:Fireworks;70:Mark;71:Innersword;44:_Rest;16:Rest;81:Freeze;17:Shadowstep;82:Wield;83:Drop;84:Meteor;87:Jump;
 ;
-;Rest@1;Triple@1;Sprint@1;Whirlwind@1;Airstrike@1;Leap@1;Dash@1;Flameroll@1;Fireblast@1;Innersword@1;Materialize@1;Blizzard@1;
+;Rest@1;Sprint@1;Whirlwind@1;Airstrike@1;Leap@1;Dash@1;Flameroll@1;Fireblast@1;Innersword@1;Materialize@1;Blizzard@1;Sneak@1;Shock@1;Windwalk@1;Frenzy@1;Freeze@1;Meteor@1;Fireworks@1;Mark@1;Shadowstep@1;Sidekick@1;
 ;
-;PPPPPPPPPCCCCCCCCCCCCCCCCCCCCCC
+;PPPPPPCPCPCPCCCCCCCCCCCCCCCCCCC
 ;

@@ -14,7 +14,6 @@ public class Settings {
     public static int centerY = screenY/2;
     public static final int gravity = 4;
     public static final int gravityMax = 64;
-    public static final float friction = .05f;
     public static void setScreenSize(int x, int y){
         screenX = x;
         screenY = y;

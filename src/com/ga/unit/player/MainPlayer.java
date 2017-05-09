@@ -10,9 +10,6 @@ import com.ga.unit.Tag;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Stat;
 
-import static com.ga.unit.BodyHumanoid.FIST;
-import static com.ga.unit.BodyHumanoid.OFIST;
-
 /**
  * Created by Ga on 12/29/2016. asd
  */
@@ -35,8 +32,7 @@ public class MainPlayer extends Player {
     }
     @Override
     public int setState(Actions state) {
-        if (state == Actions.Use && this.state == Actions.Rest && skillTree.getSkillLevel(Actions.Triple) > 0) state = Actions.Triple;
-        else if (state == Actions.Use && this.state == Actions.Jump && skillTree.getSkillLevel(Actions.Airstrike) > 0 && this.delay.time > 32) stateSet(Actions.Airstrike);
+        if (state == Actions.Use && this.state == Actions.Jump && skillTree.getSkillLevel(Actions.Airstrike) > 0 && this.delay.time > 32) stateSet(Actions.Airstrike);
         else if (state == Actions.Jump && this.state == Actions.Rest && skillTree.getSkillLevel(Actions.Leap) > 0) state = Actions.Leap;
         else if (state == Actions.Rest && this.state == Actions.Walk && skillTree.getSkillLevel(Actions.Sprint) > 0) state = Actions.Sprint;
         else if (state == Actions.Kick && this.state == Actions.Rest && skillTree.getSkillLevel(Actions.Sidekick) > 0) state = Actions.Sidekick;
@@ -116,15 +112,13 @@ public class MainPlayer extends Player {
         if (state == Actions.Walk && input.moving == 0) setState(Actions.Idle);
         else if (state == Actions.Rest) indicater.show(1);
     }
-    public void update(){
+    protected void edgeCheck(){
         int edge = Global.mapEdge(pos.getAdd(vel));
-        if (edge != 0 && !Global.map.isIndoors() && jump){
-            if (Creation.isPassable(Creation.getWorld(Global.map.id),edge)) {
-                int[] newmap = Creation.getWorld(Global.map.id, edge);
-                Global.map.loadMap(cworld + "_" + newmap[0]);
-            }
-            else if (edge == 2) die();
-        }
+        if (edge != 0 && !Global.map.isIndoors() && Creation.isPassable(Creation.getWorld(Global.map.id),edge)){
+            Global.map.loadMap(""+edge);
+        } else super.edgeCheck();
+    }
+    public void update(){
         super.update();
         if (input.cameraMode) Global.mapEdgeCenter(Global.cameraTo = Global.cameraTo.getAdd(input.movement));
         else Global.mapEdgeCenter(Global.cameraTo = pos.getAdd(0,0));

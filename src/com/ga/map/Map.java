@@ -37,10 +37,11 @@ public class Map extends Thing {
     public P size;
     public int id;
     private static final int magnify = 2;
-    public Map(final String[] maps) {
+    public Map(String name, final String[] maps) {
         super(null,1);
+        this.name = name;
         this.maps = maps;
-        id = Integer.parseInt(maps[0]);
+        id = Integer.parseInt(name.split("_")[1]);
         if (maps[2].equals("None")) image.visible = false;
         else{
             setImage(maps[2]);
@@ -113,7 +114,7 @@ public class Map extends Thing {
         HashMap<Integer, Terrain> terrains = new HashMap<>();
         for (final Line i : land){
             if (i.opt == 1){
-                Terrain t = new Terrain("rope", null, 23);
+                Terrain t = new Terrain("rope", null, 70);
                 t.addPoint(i.pt.x-8, i.pt.y);
                 t.addPoint(i.pt.x+8, i.pt.y);
                 t.addPoint(i.ptd.x+8, i.ptd.y);
@@ -129,12 +130,13 @@ public class Map extends Thing {
                     if (formTexture == null) continue;
                     else {
                         String[] formName = formTexture.split("&");
-                        if (inside) terrain = new Terrain(formName[1], Shader.getByName(formName[2]), Integer.parseInt(formName[0])){
+                        int terrainDepth = Terrain.toTerrainDepth(Integer.parseInt(formName[0]));
+                        if (inside) terrain = new Terrain(formName[1], Shader.getByName(formName[2]), terrainDepth){
                             public int getDepth(){
                                 return 20-super.getDepth();
                             }
                         };
-                        else terrain = new Terrain(formName[1], Shader.getByName(formName[2]), Integer.parseInt(formName[0]));
+                        else terrain = new Terrain(formName[1], Shader.getByName(formName[2]), terrainDepth);
                     }
                     terrains.put(i.next, terrain);
                 }
@@ -250,18 +252,27 @@ public class Map extends Thing {
         return new P(i.pt.x+tx,ty);
     }
 
-    public Line fallSafe(P pos, int depth){
-        Line pp = new Line(pos.x,pos.y,pos.x,99999);
+    public Line checkLand(Line p, int depth){
+        ArrayList<Line> list = new ArrayList<>();
         for (Line i : land){
-            if (i.isLandable() && i.depth >= depth && i.lineCross(pp)){
-                return i;
+            if (i.isLandable() && i.depth >= depth && i.lineCross(p)){
+                list.add(i);
             }
         }
-        return null;
+        if (list.size() == 0) return null;
+        else {
+            Line highest = null;
+            for (Line i : list){
+                if (highest == null || i.depth > highest.depth){
+                    highest = i;
+                }
+            }
+            return highest;
+        }
     }
 
     public boolean isIndoors(){
-        return id == -1;
+        return id < 0;
     }
 
     void onTimeChange() {

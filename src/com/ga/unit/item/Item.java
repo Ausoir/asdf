@@ -17,19 +17,21 @@ import java.util.Random;
  */
 public class Item extends Prop {
     public enum ItemType {
-        Sword(Actions.Slash, "swing_knife", "hit_cut"), Spear(Actions.Thrust, "swing_silent", "hit_bloody"), Mace(Actions.Slash, "swing_silent", "hit_bash"),
-        Dagger(Actions.Thrust, "swing_normal", "hit_bloody"), Armor(Actions.Rest, "swing_normal"), Scroll(Actions.Guard, "scroll"),
-        Shoot(Actions.Shoot, "swing_normal"), Snipe(Actions.Snipe, "swing_normal"), Bow(Actions.Aim, "swing_silent"),
-        Throwing(Actions.Throw, "swing_silent"), Darting(Actions.Dart, "swing_normal"), Consumable(Actions.Consume, "drink"),
-        Claw(Actions.Slash, "swing_normal"), Enchant(Actions.Buff, "swing_silent"), Food(Actions.Consume, "eat");
+        Sword(Actions.Slash, -4,"swing_knife","hit_cut"), Spear(Actions.Thrust, -8,"swing_silent", "hit_bloody"),
+        Mace(Actions.Slash, -4,"swing_silent", "hit_bash"), Dagger(Actions.Thrust, 0,"swing_normal","hit_bloody"),
+        Armor(Actions.Rest, -16,"swing_normal","hit_punch"), Scroll(Actions.Guard, 0,"scroll","hit_punch"),
+        Shoot(Actions.Shoot, -8,"swing_normal","hit_punch"), Snipe(Actions.Snipe, -8,"swing_normal","hit_punch"),
+        Bow(Actions.Aim, -8,"swing_silent","hit_punch"), Throwing(Actions.Throw, 0,"swing_silent","hit_punch"),
+        Darting(Actions.Dart, 0,"swing_normal","hit_punch"), Consumable(Actions.Consume, 0,"drink","hit_punch"),
+        Claw(Actions.Slash, 2,"swing_normal","hit_punch"), Enchant(Actions.Buff, 0,"swing_silent","hit_punch"),
+        Food(Actions.Consume, 0,"eat","hit_punch");
         private Actions action;
-        private String sound, soundHit = "hit_punch";
-        ItemType(Actions p, String sound){
+        private String sound, soundHit;
+        private int speed = 0;
+        ItemType(Actions p, int speed, String sound, String soundHit){
             action = p;
+            this.speed = speed;
             this.sound = sound;
-        }
-        ItemType(Actions p, String sound, String soundHit){
-            this(p, sound);
             this.soundHit = soundHit;
         }
         public Actions getAction() {
@@ -40,6 +42,9 @@ public class Item extends Prop {
         }
         public String getHitSound(){
             return soundHit;
+        }
+        public int getSpeed(){
+            return speed;
         }
     }
     enum SpecialtyMod{
@@ -59,7 +64,7 @@ public class Item extends Prop {
         }
     }
     enum PrefixMod{
-        None(125), Broken(20), Old(20), Fine(15), Mastercraft(4), Legendary(1);
+        None(500), Broken(80), Old(80), Fine(45), Mastercraft(7), Legendary(1);
         static int pool;
         int weight;
         PrefixMod(int weight){
@@ -112,7 +117,7 @@ public class Item extends Prop {
         }
     }
     public enum AdenchantMod{
-        None(2,.15f), Minor(1,.1f), Major(3,.25f), Greater(4,.35f), Ultimate(5,.4f);
+        None(2,.2f), Minor(1,.1f), Major(3,.5f), Greater(4,.7f), Ultimate(5,.95f);
         public int level;
         public float magnitude;
         AdenchantMod(int level, float mag){
@@ -121,9 +126,9 @@ public class Item extends Prop {
         }
         public static AdenchantMod get(Random seed){
             float t = (float) seed.nextGaussian();
-            if (t > 2.5) return Ultimate;
-            else if (t > 2) return Greater;
-            else if (t > 1.5) return Major;
+            if (t > 2) return Ultimate;
+            else if (t > 1.6) return Greater;
+            else if (t > 1.2) return Major;
             else if (t < -1) return Minor;
             else return None;
         }
@@ -162,6 +167,7 @@ public class Item extends Prop {
         this.name = name;
         this.weight = weight;
         this.durability = durability;
+        this.uses = durability;
         gravity = true;
         final Item me = this;
         onInteract = new Interactive(){
@@ -214,9 +220,7 @@ public class Item extends Prop {
     public void setType(ItemType p){
         this.type = p;
         this.action = p.getAction();
-    }
-    public ItemType getType(){
-        return type;
+        this.speed += p.getSpeed();
     }
     protected void setModifier(PrefixMod mod){
         if (mod == PrefixMod.Broken){
@@ -347,7 +351,7 @@ public class Item extends Prop {
         return r;
     }
     public void onEquip(Man host){
-        setDepth(host.getDepth()-1);
+        setDepth(host.getDepth());
         lastLand = host.lastLand;
         save = false;
         mobile = false;

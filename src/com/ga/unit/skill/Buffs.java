@@ -11,14 +11,34 @@ import com.ga.unit.item.Projectile;
  * Created by Ga on 9/1/2016. asd
  */
 public enum Buffs {
+    Banishment(new Tags(){{
+        add(Tag.Debuff);
+        add(Tag.Shadow);
+    }}){ Buff makeLocal() {
+        return new Buff(8) {
+            public void onSet() { //higher level = longer till banish
+                time = level * 8;
+            }
+
+            public void onFinish() {
+                host.die();
+            }
+
+            public boolean update() {
+                Particle.smoke(host.getRandomPoint());
+                return super.update();
+            }
+        };
+    }},
     Haste(new Tags(){{
         add(Tag.Buff);
         add(Tag.Air);
     }}){ Buff makeLocal() {
-        return new Buff(100) {
+        return new Buff(15) {
             public void onSet() {
                 var = Math.round(host.get("Speed").getMax());
                 host.get("Speed").add(var, true);
+                time += level * 15;
             }
 
             public void onFinish() {
@@ -33,17 +53,39 @@ public enum Buffs {
             }
         };
     }},
+    Frenzy(new Tags(){{
+        add(Tag.Buff);
+        add(Tag.Martial);
+    }}){ Buff makeLocal() {
+        return new Buff(10) {
+            public void onSet() {
+                time += level * 10;
+                var = 8 + level;
+                host.get("Attack").add(var, true);
+            }
+
+            public void onFinish() {
+                host.get("Attack").add(-var, true);
+            }
+
+            public boolean update() {
+                Particle.sparkle("Fire", host.getRandomPoint(), 8, 3);
+                return super.update();
+            }
+        };
+    }},
     Rejuvenate(new Tags(){{
         add(Tag.Buff);
         add(Tag.Biology);
     }}){ Buff makeLocal(){
-        return new Buff(40){
+        return new Buff(20){
             private int tick = 0;
             public void onSet(){
-                time += 40*level;
+                time += level*2;
+                var = Math.max(1,10-level);
             }
             public boolean update(){
-                if (tick++ % 8 == 0) host.get("Stamina").add(1);
+                if (tick++ % var == 0) host.get("Stamina").add(1);
                 return super.update();
             }
         };
@@ -52,9 +94,9 @@ public enum Buffs {
         add(Tag.Buff);
         add(Tag.Strong);
     }}){ Buff makeLocal(){
-        return new Buff(240) {
+        return new Buff(40) {
             public void onSet() {
-                time += level*80;
+                time += level*10;
             }
             public boolean update() {
                 Particle.dripHoly(((Man) host).weapon.getLine().ptd);
@@ -78,7 +120,10 @@ public enum Buffs {
 
             public boolean onTrigger(){
                 if (level > 0) level--;
-                var = 1;
+                if (level == 0) {
+                    var = 1;
+                    time = Global.getTime()[0];
+                }
                 return true;
             }
             public boolean update() {
@@ -113,7 +158,7 @@ public enum Buffs {
                 time = Math.min(40, time + 10);
             }
             public boolean onTrigger(){
-                onFinish();
+                time = Global.getTime()[0];
                 return true;
             }
             public void onFinish() {
@@ -129,7 +174,7 @@ public enum Buffs {
                 time += 8*level;
             }
             public boolean update() {
-                Particle.sparkle(host.getRandomPoint(),40);
+                Particle.sparkle("Glare", host.getRandomPoint(),40, 6);
                 return super.update();
             }
         };
@@ -148,7 +193,7 @@ public enum Buffs {
             public boolean onTrigger(){
                 if (var > 0) var--;
                 else return false;
-                if (var <= 0) time = 0;
+                if (var <= 0) time = Global.getTime()[0];
                 return true;
             }
             public boolean update() {
@@ -227,9 +272,8 @@ public enum Buffs {
                 mark.save = false;
             }
             public boolean onTrigger(){
+                time = Global.getTime()[0];
                 if (mark != null) {
-                    onFinish();
-                    time = 0;
                     return true;
                 }
                 return false;
