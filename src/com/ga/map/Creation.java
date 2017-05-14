@@ -43,7 +43,7 @@ public class Creation {
     public static boolean isPassable(char p, int edge){
         return WorldCreation.dictionary.get(p).contains(edge);
     }
-    public static int[] getWorld(int id, int dir){
+    static int[] getWorld(int id, int dir){
         int[] pt = new int[]{id % world[0].length, id / world[0].length};
         int x = dir == 4 ? -1 : dir == 6 ? 1 : 0, y = dir == 8 ? -1 : dir == 2 ? 1 : 0;
         pt = new int[]{pt[0]+x, pt[1]+y};

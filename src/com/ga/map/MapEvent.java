@@ -59,7 +59,6 @@ public enum MapEvent implements Updatable{
         }
     }
     public void onChange(){
-        Global.setHour(Global.getHour()+1);
         regrowth();
     }
 }

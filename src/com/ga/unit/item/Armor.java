@@ -1,6 +1,7 @@
 package com.ga.unit.item;
 
 import com.ga.game.Sound;
+import com.ga.map.Global;
 import com.ga.map.Picture;
 import com.ga.tool.Performer;
 import com.ga.unit.Man;
@@ -14,8 +15,8 @@ public class Armor extends Item {
     private int armorMod = 1;
     public int encumberance = 0;
     public int pocket = 0;
-    public Armor(String name, int seed, int weight, int uses, float armor, int encumberance, int piece) {
-        super(name, seed, weight, uses);
+    public Armor(String name, int seed, int weight, float armor, int encumberance, int piece) {
+        super(name, seed, weight, 4);
         value = 24;
         setType(ItemType.Armor);
         this.armor = armor;
@@ -27,25 +28,34 @@ public class Armor extends Item {
     }
     public void onCreate(){
         imbueMeta(true, true, .03f, true);
+        if (emod != null && !emod.tags.contains(com.ga.unit.Tag.Buff)){
+            emod = null;
+            ademod = AdenchantMod.None;
+        }
     }
     float getArmor(){
         return Math.max(0,armor + armorMod);
     }
     protected void setModifier(PrefixMod mod){
         super.setModifier(mod);
-        if (mod == PrefixMod.Broken) armorMod = -2;
+        if (mod == PrefixMod.Awful) armorMod = -2;
         else if (mod == PrefixMod.Old) armorMod = -1;
         else if (mod == PrefixMod.Fine) armorMod = 1;
         else if (mod == PrefixMod.Mastercraft) armorMod = 2;
-        else if (mod == PrefixMod.Legendary) armorMod = 3;
     }
     protected void setModifier(SpecialtyMod mod){
         if (mod == SpecialtyMod.Comfortable) encumberance = Math.max(0,encumberance-admod.magnitude);
         else if (mod == SpecialtyMod.Tough) armorMod += admod.magnitude;
         else super.setModifier(mod);
     }
-    void onHit(Man host){
-        super.use(host);
+    public void remove(){
+        if (owner != null) owner.armor.remove(this);
+        super.remove();
+    }
+    void onHit(){
+        if (usable(1)){
+            if (owner != null) trigger(owner);
+        }
     }
     @Override
     public void use(final Man host){
@@ -57,7 +67,7 @@ public class Armor extends Item {
                     Sound.play("wear");
                     host.armor.set(me, piece);
                     host.setWeapon(null);
-                    me.remove();
+                    me.pos = Global.offplace;
                 }
             }
         };

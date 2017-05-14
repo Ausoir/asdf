@@ -8,13 +8,14 @@ import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.unit.item.ArmorSet;
 import com.ga.unit.item.Item;
-import com.ga.unit.skill.*;
+import com.ga.unit.skill.Actions;
+import com.ga.unit.skill.Buffs;
+import com.ga.unit.skill.Stat;
 
 import java.awt.*;
 
 import static com.ga.unit.BodyHumanoid.FIST;
 import static com.ga.unit.BodyHumanoid.OFIST;
-import static com.ga.unit.skill.Actions.Underhand;
 
 /**
  * Created by Ga on 5/7/2016. asd
@@ -39,6 +40,7 @@ public class Man extends Unit {
         weapon.onUnequip(this);
         weapon = p;
         weapon.onEquip(this);
+        weapon.pos = new P(pos);
         weapon.dir = dir;
     }
 
@@ -128,22 +130,25 @@ public class Man extends Unit {
         super.die();
     }
 
+    public void onAttack(Unit p){
+        if (weapon.usable(1)) weapon.trigger(p);
+        Sound.play(weapon.getHitSound());
+        if (brain != null) brain.onAttack();
+    }
+
     public boolean attack() {
         boolean cleave = false;
         if (stats.triggerEffect(Buffs.Cleave)) cleave = true;
         Line hitbox = weapon.getLine();
         Unit target = null;
-        for (Unit i : Updater.collideUnit(pos, (int) hitbox.getLength(), faction)){
+        for (Unit i : Updater.collideUnit(pos, (int) hitbox.getLength()+20, faction)){
             if (i.checkHit(hitbox,getDamage())){
                 target = i;
                 if (!cleave) break;
             }
         }
         if (target != null) {
-            if (weapon.usable(1)) weapon.trigger(target);
-            Sound.play(weapon.getHitSound());
-            if (state == Underhand) get("Stamina").add(4);
-            if (brain != null) brain.attacked();
+            onAttack(target);
             return true;
         }
         return false;
@@ -161,14 +166,12 @@ public class Man extends Unit {
 
     @Override
     protected void moveTriggered(int organ){
-        if (state instanceof Actions) {
-            if (state == Actions.Kick || state == Actions.Sidekick){
-                Line hitbox = clip.organs[organ].getAdd(pos);
-                int damage = armor.armor[1].getDamage()+1;
-                for (Unit i : Updater.collideUnit(pos, (int) hitbox.getLength(), faction))
-                    i.checkHit(hitbox,damage);
-            } else super.moveTriggered(organ);
-        }
+        if (state == Actions.Kick || state == Actions.Sidekick){
+            Line hitbox = clip.organs[organ].getAdd(pos);
+            int damage = armor.armor[1].getDamage()+1;
+            for (Unit i : Updater.collideUnit(pos, (int) hitbox.getLength(), faction))
+                i.checkHit(hitbox,damage);
+        } else super.moveTriggered(organ);
     }
 
     public void setVisible(boolean p) {
@@ -199,7 +202,11 @@ public class Man extends Unit {
 
     @Override
     public String[] load(String p){
-        String[] r = super.load(p.split("#")[0]);
+        String[] t = p.split("#");
+        if (t[1].equals("")) setWeapon(fist);
+        else setWeapon((Item) Stock.get(t[1]));
+        armor = new ArmorSet(this, t[2]);
+        String[] r = super.load(t[0]);
         final Man me = this;
         clip.organs[FIST].onAmputate = new Performer(){
             public void perform(){
@@ -209,10 +216,6 @@ public class Man extends Unit {
                 }
             }
         };
-        String[] t = p.split("#");
-        if (t[1].equals("")) setWeapon(fist);
-        else setWeapon((Item) Stock.get(t[1]));
-        armor = new ArmorSet(this, t[2]);
         return r;
     }
 

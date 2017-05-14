@@ -15,12 +15,15 @@ public class Projectile extends Prop {
     public float rotSpeed = .03f;
     public int damage = 0;
     public EventTimer delay = new EventTimer(-1, false, null);
-    protected Projectile(String name, P pt, P dest, int speed) {
+    protected Projectile(String name, P pt, float rot, int speed) {
         super(name, 0, 60);
         pos = pt;
         save = false;
-        vel.set(dest.getAtan(pt, speed));
-        rotation = (float) Math.atan2(dest.y-pt.y,dest.x-pt.x);
+        vel.set(Global.cos(rot)*speed, Global.sin(rot)*speed);
+        rotation = rot;
+    }
+    protected Projectile(String name, P pt, P dest, int speed) {
+        this(name, pt, (float) Math.atan2(dest.y-pt.y, dest.x-pt.x), speed);
     }
     public int getDamage(){
         return damage;

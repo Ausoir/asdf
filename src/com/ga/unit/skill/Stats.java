@@ -15,7 +15,7 @@ import java.util.Map;
 public class Stats {
     private ArrayList<Buff> effects = new ArrayList<>();
     private HashMap<String, Stat> stats = new HashMap<>();
-    private Timer timer = new Timer(24, true);
+    private Timer timer = new Timer(40, true);
     private Unit host;
     public Stats(Unit host){
         this.host = host;
@@ -44,25 +44,31 @@ public class Stats {
         }
         return null;
     }
+    public int getEffectLevel(Buffs p){
+        for (Buff i : effects){
+            if (i.buff == p) return i.level;
+        }
+        return 0;
+    }
     public boolean triggerEffect(Buffs p){
         Buff buff = getEffect(p);
         return buff != null && buff.onTrigger();
     }
+
     public boolean rest(int mag){
         if (timer.update(mag)){
             Stat stamina = stats.get("Stamina");
-            stamina.add(1);
+            stamina.add(1, false);
             return true;
         }
         return false;
     }
     public void update(){
-        Iterator it = effects.iterator();
-        while (it.hasNext()){
-            Buff buff = (Buff) it.next();
-            if (buff.update()){
-                buff.onFinish();
-                it.remove();
+        for (int i=0;i<effects.size();i++) {
+            Buff effect = effects.get(i);
+            if (effect.update()){
+                effect.onFinish();
+                effects.remove(i);
             }
         }
     }
@@ -72,7 +78,6 @@ public class Stats {
         for (String i : data){
             String[] pair = i.split(":");
             Stat newstat = new Stat(pair[1]);
-            newstat.add(0);
             stats.put(pair[0], newstat);
         }
         if (statOrBuff.length > 1) {

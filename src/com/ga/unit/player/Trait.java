@@ -6,7 +6,7 @@ import com.ga.unit.Organ;
  * Created by Ga on 4/13/2017. asd
  */
 enum Trait {
-    Fragile(1), Bulky(1), Thin(1), Fast_Learner(1), Stout(1){
+    Fragile(1), Bulky(1), Fast_Learner(1), Stout(1){
         void onSet(Player host){
             for (Organ i : host.clip.organs) i.health += 20;
         }

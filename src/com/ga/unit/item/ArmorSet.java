@@ -1,5 +1,6 @@
 package com.ga.unit.item;
 
+import com.ga.map.Global;
 import com.ga.map.Shader;
 import com.ga.tool.Performer;
 import com.ga.unit.*;
@@ -8,18 +9,22 @@ import com.ga.unit.*;
  * Created by Ga on 1/15/2017. asd
  */
 public class ArmorSet {
-    private Man host;
     private static Armor[] bare = new Armor[]{
-            (Armor) new Armor("Head", 0, 0, -1, 0, 0, 0).cancelAdd(),
-            (Armor) new Armor("Underwear", 0, 0, -1, 0, 0, 1).cancelAdd(),
-            (Armor) new Armor("Underwear", 0, 0, -1, 0, 0, 2).cancelAdd()
+            (Armor) new Armor("Head", 0, 0, 0, 0, 0){
+                void onHit(){}
+            }.cancelAdd(),
+            (Armor) new Armor("Underwear", 0, 0, 0, 0, 1){
+                void onHit(){}
+            }.cancelAdd(),
+            (Armor) new Armor("Underwear", 0, 0, 0, 0, 2){
+                void onHit(){}
+            }.cancelAdd()
     };
     public Armor[] armor;
     private Organ[] organs;
     public Performer onChange;
     public Tags tags = new Tags();
     public ArmorSet(Man host, String p){
-        this.host = host;
         organs = host.clip.organs;
         armor = new Armor[3];
         load(p);
@@ -51,7 +56,6 @@ public class ArmorSet {
             tags.addAll(i.tags);
         }
         if (getEncumberance() <= 4) tags.add(Tag.Agility);
-        if (host.get("Strength").get()-getWeight() >= 4) tags.add(Tag.Strong);
         if (onChange != null) onChange.perform();
     }
     private int organToPiece(int organ){
@@ -64,7 +68,12 @@ public class ArmorSet {
         return armor[piece] == bare[piece];
     }
     public void onHit(){
-        for (Armor i : armor) i.onHit(host);
+        for (Armor i : armor) i.onHit();
+    }
+    public void remove(Armor p){
+        for (int i=0;i<armor.length;i++){
+            if (armor[i] == p) set(null, i);
+        }
     }
     public int getEncumberance(){
         int r = 0;
@@ -101,7 +110,7 @@ public class ArmorSet {
         String[] armors = p.split("&");
         for (int i=0;i<armor.length;i++){
             if (armors[i].equals("None")) armor[i] = bare[i];
-            else armor[i] = (Armor) ((Item) Stock.get(armors[i])).cancelAdd();
+            else armor[i] = (Armor) Stock.get(armors[i]);
         }
         for (int i=0;i<armor.length;i++) set(armor[i], i);
     }

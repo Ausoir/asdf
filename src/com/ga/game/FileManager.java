@@ -98,8 +98,8 @@ public class FileManager {
         if (!Updater.editor) Global.display.input = pi;
         Command.host = pi.host;
         loadMap(Global.player.cmap);
-        Global.setHour(Global.getHour());
         Global.mapEdgeCenter(Global.camera = Global.map.size.getMult(.5f,.5f));
+        Global.map.onTimeChange();
         return pi;
     }
     public static void delete(String dir){

@@ -47,7 +47,7 @@ public class Prop extends Thing {
         adjustToLand();
     }
     private void adjustToLand(){
-        Line closest = null;
+        Line closest = Global.map.checkLand(new Line(pos, new P(pos.x, pos.y+800)));
         float closestY = pos.y + 9999;
         Line line = new Line(pos, new P(pos.x, closestY));
         for (Line i : Global.map.land) {

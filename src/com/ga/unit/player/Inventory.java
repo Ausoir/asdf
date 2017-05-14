@@ -19,24 +19,12 @@ public class Inventory {
     public Inventory(Player host){
         this.host = host;
     }
-    private boolean addItem(Item p){
+    public boolean addItem(Item p){
         if (volume+p.volume > maxSize) return false;
         items.add(p);
         weight += p.weight;
         volume += p.volume;
         return true;
-    }
-    boolean sheathe(Item p){
-        return addItem(p);
-    }
-    boolean eat(int p){
-        for (Item i : items){
-            if (i instanceof Food){
-                i.use(host);
-                return true;
-            }
-        }
-        return false;
     }
     public boolean vacant(){
         return items.size() < maxSize;

@@ -78,7 +78,7 @@ public class Line {
         return new P((ptd.x-pt.x)/2+pt.x, (ptd.y-pt.y)/2+pt.y);
     }
     public float getCrossPointX(float y){
-        return (y-pt.y)*getSlope()+pt.x;
+        return (y-pt.y)/getSlope()+pt.x;
     }
     public float getCrossPointY(float x){
         return (x-pt.x)*getSlope()+pt.y;

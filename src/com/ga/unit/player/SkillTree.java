@@ -11,7 +11,7 @@ import java.util.ArrayList;
  */
 public class SkillTree {
     public ArrayList<Actions> skills = new ArrayList<>();
-    public ArrayList<Stat> skillLevels = new ArrayList<>();
+    private ArrayList<Stat> skillLevels = new ArrayList<>();
     SkillTree(){}
     public void load(String p){
         if (p.equals(";")) return;
@@ -40,7 +40,7 @@ public class SkillTree {
         if (!advanceAble(p)) return false;
         for (int i=0;i<skills.size();i++){
             if (skills.get(i) == p){
-                skillLevels.get(i).add(1);
+                skillLevels.get(i).add(1, false);
                 return true;
             }
         }

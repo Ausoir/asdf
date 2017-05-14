@@ -12,6 +12,7 @@ import java.util.ArrayList;
  * Created by Ga on 1/10/2017. xhfsdxghf
  */
 public class Terrain extends ShadedPicture implements Drawable{
+    private static final float ZOOM = 1.5f;
     private int depth;
     private Polygon polygon;
     private TexturePaint imageTexture;
@@ -33,17 +34,17 @@ public class Terrain extends ShadedPicture implements Drawable{
         p.depth = depth;
     }
     public void addPoint(float x, float y){
-        polygon.addPoint((int)x, (int)y);
+        polygon.addPoint((int)(x/ZOOM), (int)(y/ZOOM));
         length++;
     }
     @Override
     public void shade(int param){
         if (shader != null) {
             for (Line i : lines) {
-                int origX = (int) (i.pt.x - pos.x);
-                int origY = (int) (i.pt.y - pos.y);
-                int x2 = (int) (i.ptd.x - pos.x);
-                int y2 = (int) (i.ptd.y - pos.x);
+                int origX = (int) ((i.pt.x - pos.x)/ZOOM);
+                int origY = (int) ((i.pt.y - pos.y)/ZOOM);
+                int x2 = (int) ((i.ptd.x - pos.x)/ZOOM);
+                int y2 = (int) ((i.ptd.y - pos.x)/ZOOM);
                 shader.render(image, origX, x2, origY, y2, i.getSlope());
             }
         }
@@ -60,15 +61,15 @@ public class Terrain extends ShadedPicture implements Drawable{
             polygon.xpoints[i] -= lowX;
             polygon.ypoints[i] -= lowY;
         }
-        size.x = highX-lowX;
-        size.y = highY-lowY;
+        size.set(highX-lowX, highY-lowY);
         pos = new P(lowX, lowY);
+        pos.mult(ZOOM);
 
         if (lines.size() > 0){
             image = null; //todo: turn on cache
 //            image = Texture.load(Global.player.cmap + "_" + lines.get(0).next);
             if (image == null) {
-                image = new BufferedImage(highX - lowX, highY - lowY, BufferedImage.TYPE_INT_ARGB);
+                image = new BufferedImage((int)size.x, (int)size.y, BufferedImage.TYPE_INT_ARGB);
                 Graphics2D g = image.createGraphics();
                 g.setPaint(imageTexture);
                 g.fill(polygon);
@@ -76,7 +77,7 @@ public class Terrain extends ShadedPicture implements Drawable{
 //                Texture.newImage("map/", Global.player.cmap + "_" + lines.get(0).next, image);
             }
         } else { //rope
-            image = new BufferedImage(highX - lowX, highY - lowY, BufferedImage.TYPE_INT_ARGB);
+            image = new BufferedImage((int)size.x, (int)size.y, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = image.createGraphics();
             g.setPaint(imageTexture);
             g.fill(polygon);
@@ -85,7 +86,7 @@ public class Terrain extends ShadedPicture implements Drawable{
     public void draw(Graphics2D g){
         if (visible) {
             P t = new P(pos.x+Global.rel.x, pos.y+Global.rel.y);
-            g.drawImage(image,(int)t.x,(int)t.y,(int)size.x,(int)size.y,null);
+            g.drawImage(image,(int)t.x,(int)t.y,(int)(size.x*ZOOM),(int)(size.y*ZOOM),null);
 //            for (Line i : lines) g.drawLine((int)(t.x+i.pt.x),(int)(t.y+i.pt.y),(int)(t.x+i.ptd.x),(int)(t.y+i.ptd.y));
         }
     }

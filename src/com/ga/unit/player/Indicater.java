@@ -16,9 +16,8 @@ public class Indicater implements Drawable {
     private Color fg = new Color(2, 196, 0, 0);
     private Color sg = new Color(58, 60, 60,0);
     private Color sg2 = new Color(58, 60, 60,0);
-    private float fade = 0;
+    private float fade = .5f;
     private float fade2 = 0;
-    private float min = 0;
     private Stat measuree = new Stat(1);
     private Color[] bgFade = new Color[15];
     private Color[] fgFade = new Color[15];
@@ -41,7 +40,7 @@ public class Indicater implements Drawable {
         g.fillOval(x,y,36,36);
         g.setColor(fg);
         g.fillArc(x+2,y+2,32,32,0, (int) (measuree.getPercentage()*360));
-        int cd = time-Global.getTime()[0];
+        int cd = time-Global.time;
         if (cd >= 0){
             g.setColor(sg2);
             g.drawString(cd+"",x-28,y+24);
@@ -55,10 +54,6 @@ public class Indicater implements Drawable {
     }
     void show(float strength){
         fade = strength;
-        min = .5f;
-    }
-    void hide(){
-        min = 0;
     }
     void showCd(int time){
         fade2 = 2;
@@ -66,7 +61,7 @@ public class Indicater implements Drawable {
     }
     void update(){
         if (fade > 0) {
-            fade = Math.max(min, fade - .01f);
+            fade = Math.max(0, fade - .01f);
             float t = Math.min(.99f, fade);
             bg = bgFade[(int) (t*bgFade.length)];
             fg = fgFade[(int) (t*fgFade.length)];

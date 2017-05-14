@@ -28,16 +28,13 @@ public class Stat {
     public void setTotal(int p){
         max = p;
         current = p;
-        onChange();
     }
     public void set(int p, boolean force){
-        int prev = current;
         current = p;
         if (!force) {
             if (current > max) current = max;
             else if (current < 0) current = 0;
         }
-        if (prev != current) onChange();
     }
     public void setMax(int p){
         max = p;
@@ -45,18 +42,18 @@ public class Stat {
     public void addTotal(int p){
         setTotal(max + p);
     }
-    public void add(int p){
-        add(p, false);
-    }
-    public void add(int p, boolean force){
+    public int add(int p, boolean force){
+        int prev = current;
         set(current+p, force);
+        if (!force) return current-prev;
+        else return p;
     }
     public float getPercentage(){
         return (float)current/max;
     }
     public boolean require(int p){
         if (current >= p){
-            if (p > 0) add(-p);
+            if (p > 0) add(-p, false);
             return true;
         }
         return false;
@@ -69,9 +66,6 @@ public class Stat {
     }
     public int get(){
         return current;
-    }
-    public void onChange(){
-        if (onChange != null) onChange.perform();
     }
     public String toString(){
         return current+","+max;

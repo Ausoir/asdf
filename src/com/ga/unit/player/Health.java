@@ -11,9 +11,9 @@ public class Health {
     private int max;
     private Player host;
 
-    public Health(Player host){
+    Health(Player host){
         this.host = host;
-        max = host.traits.contains(Trait.Bulky)?36:host.traits.contains(Trait.Thin)?24:30;
+        max = host.traits.contains(Trait.Bulky)?36:30;
     }
 
     public void record(String p){
@@ -61,13 +61,12 @@ public class Health {
     }
 
     void starve(int p){
-        if (host.rand.nextBoolean()) p += host.traits.contains(Trait.Fast_Metabolism) ? 1 : 0;
-        nutrition = nutrition.substring(p);
+        nutrition = nutrition.substring(p + (host.traits.contains(Trait.Fast_Metabolism) ? 1 : 0));
     }
 
     private void digest(){
-        HashMap<Character, Integer> strain = getStrain(nutrition);
-        host.get("Stamina").setMax(((strain.get('P')+strain.get('C'))/2)+9+host.get("Level").get());
+        HashMap<Character, Integer> strain = getStrain(nutrition.substring(0, Math.min(16, nutrition.length())));
+        host.get("Stamina").setMax(((strain.get('P')+strain.get('C'))/4)+host.get("Level").get()+2);
         host.get("Strength").setMax((int) Math.ceil((float) strain.get('P')/4) + (strain.get('C')>1?1:0));
         host.get("Memory").setMax(Math.max(0,strain.get('D')-strain.get('X')));
         host.get("Speed").setMax(16-strain.get('X')+strain.get('V')/4 + (strain.get('C')>1?1:0));

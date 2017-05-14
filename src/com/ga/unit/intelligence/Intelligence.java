@@ -13,38 +13,55 @@ import com.ga.unit.skill.Actions;
 import java.util.ArrayList;
 
 /**
- * Created by Ga on 8/26/2016.
+ * Created by Ga on 8/26/2016. dfasdfas
  */
-public abstract class Intelligence implements Observer {
+public class Intelligence implements Observer {
     protected Unit host;
-    private ArrayList<Unit> seen;
     public Unit target;
     private Task task;
     private int alertness = 0;
-    public int range = 150;
+    private int range = 150;
+    private int travel = -1; //top left:1, top right:2, bottom left:3, bottom right:4
+    Unit leader;
     public Intelligence(Unit man){
         host = man;
         task = new Idle(host);
         Updater.add(this);
     }
-    protected void defaultTask(){
-        setTaskEcho(new Wander(host));
+    private void defaultTask(){
+        if (leader == null || leader == host){
+            if (travel == -1) setTaskEcho(new Wander(host));
+            else setTaskEcho(new Travel(host, travel));
+        } else if (leader.state == Actions.Dead){
+            leader = null;
+        } else {
+            setTaskEcho(new Follow(host, leader));
+        }
     }
     public void update(){
         if (host.state != Actions.Walk || !blocked(host.dir)) task.update();
-        if (alertness < 1) perceive();
+        if (alertness < 1) perceive(range);
     }
-    protected void setTaskEcho(Task p){
+    void setTaskEcho(Task p){
         task = p;
         alertness = p.getAlertness();
     }
-    public void attacked(){
+    public void onAttack(){
         if (target != null) {
             if (target.state != Actions.Dead) {
                 host.say("@atk tgt");
             } else {
                 host.say("@tgt x");
                 target = null;
+            }
+        }
+    }
+    public void onHit(){
+        if (alertness < 1){
+            perceive(range*2);
+            if (alertness < 1){
+                host.face(host.dir*-1, true);
+                perceive(range*2);
             }
         }
     }
@@ -100,11 +117,12 @@ public abstract class Intelligence implements Observer {
                 }
             } else {
                 host.face(dir, false);
+                perceive(range*2);
             }
         }
     }
-    protected void perceive(){
-        seen = Updater.perceive(host, host.pos.getAdd(host.dir<0?-range:range,0), range*2);
+    private void perceive(int d){
+        ArrayList<Unit> seen = Updater.perceive(host, host.pos.getAdd(host.dir < 0 ? -d : d, 0), d * 2);
         for (Unit t : seen) {
             if (target != t) {
                 perceived(t);
@@ -112,5 +130,15 @@ public abstract class Intelligence implements Observer {
         }
     }
     protected void perceived(Prop p){
+        if (p instanceof Unit) {
+            Unit unit = (Unit) p;
+            if (host.faction.canAttack(p.faction)) {
+                if (unit.state != Actions.Dead) {
+                    target = (Unit) p;
+                    host.say("@c tgt");
+                    setTaskEcho(new Hunt(host));
+                }
+            }
+        }
     }
 }

@@ -23,13 +23,10 @@ public class Command {
                 String[] cmd = i.split("@");
                 if (cmd[0].equals("say")) host.say(cmd[1]);
                 else if (cmd[0].equals("menuDialog")) Global.display.menuDialog.show(cmd[1],cmd[2]);
-                else if (cmd[0].equals("rest")) {
-                    if (Updater.mapIsSafe(Global.player.faction)) Global.setHour(Global.getHour()+1);
-                }
                 else if (cmd[0].equals("crft")) Global.player.crafting.craft(cmd[1]);
                 else if (cmd[0].equals("buff")) Global.player.buff(Buffs.valueOf(cmd[1]),3);
                 else if (cmd[0].equals("seed")) host.weapon.seed = Integer.parseInt(cmd[1]);
-                else if (cmd[0].equals("time")) Global.loadTime(Global.getTime()[0]+Integer.parseInt(cmd[1]));
+                else if (cmd[0].equals("time")) Global.time += Integer.parseInt(cmd[1]);
                 else if (cmd[0].equals("slow")) host.buff(Buffs.Slow, 3);
                 else if (cmd[0].equals("stat")) host.get(cmd[1].split(":")[0]).addTotal(Integer.parseInt(cmd[1].split(":")[1]));
                 else if (cmd[0].equals("advance")) for (int num=0;num<Integer.parseInt(cmd[1].split(":")[1]);num++) host.skillTree.advanceSkill(Actions.valueOf(cmd[1].split(":")[0]));

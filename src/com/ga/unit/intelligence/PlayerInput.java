@@ -6,7 +6,6 @@ import com.ga.game.Keybinding;
 import com.ga.map.Global;
 import com.ga.tool.P;
 import com.ga.unit.player.Player;
-import com.ga.unit.player.SkillTree;
 import com.ga.unit.skill.Actions;
 
 import java.util.HashMap;
@@ -94,12 +93,11 @@ public class PlayerInput implements Input {
         else if (mode == Keybinding.get("RIGHT")) moveCamera(80,0);
         else if (mode == Keybinding.get("LEFT")) moveCamera(-80,0);
         else if (mode == Keybinding.get("DOWN")) moveCamera(0,80);
-        else if (mode == Keybinding.get("]")) Command.order("ft");
-        else if (mode == Keybinding.get(",")) Command.order("rest");
+        else if (mode == Keybinding.get(",")) Global.sleep(50);
         else if (keyMap.containsKey(mode)){
             inputDirect(keyMap.get(mode),x,y);
         } else if (mode >= 49 && mode < 55) {
-            inputDirect("_"+(mode-49),x,y);
+            inputDirect("_0"+(mode-49),x,y);
         } else inputDirect("_"+mode+"", x, y);
         //Global.server.sendFromLocal("IN>"+p + "@" + tx + "@" + ty);
     }
@@ -109,21 +107,22 @@ public class PlayerInput implements Input {
             movement.set(0,0);
             if (p.startsWith("_")) {
                 String t = p.substring(1);
-                if (t.length() == 1) {
+                if (t.length() == 2) {
                     host.selectingItem = Integer.parseInt(t);
                     host.setState(Actions.Wield);
                 } else {
                     if (t.equals("Recall")) host.say(host.memorized);
                 }
             } else {
-                if (p.equals("Idle")){
+                Actions move = Actions.getByName(p);
+                if (move == Actions.Idle){
                     moving = 0;
                     if (host.state != Actions.Walk) return;
-                } else if (p.equals("WalkL")) {
+                } else if (move == Actions.WalkL) {
                     moving = -1;
-                    p = "Walk";
-                } else if (p.equals("Walk")) moving = 1;
-                Actions move = Actions.getByName(p);
+                    move = Actions.Walk;
+                } else if (move == Actions.Walk) moving = 1;
+                else if (move == Actions.Wield) host.selectingItem = -1;
                 if (move != null){
                     host.setState(move);
                 }

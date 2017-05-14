@@ -58,9 +58,9 @@ public class Food extends Item {
                     if (punish > 3) p.buff(Buffs.Poison, punish-3);
                     p.say("Gawrrrr! That didn't taste good...");
                     for (int i=0;i<punish;i++) nutrition = Health.mutate(nutrition);
-                    motivation.add(-punish);
+                    motivation.add(-punish, false);
                 } else {
-                    motivation.add(happy);
+                    motivation.add(happy, false);
                 }
                 ((Player) p).health.record(nutrition);
             }

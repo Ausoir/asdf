@@ -161,7 +161,7 @@ public class MapGenerator {
         trail.finish("3&"+texture+"&none");
 
         if (Global.r.nextBoolean()){
-            for (TerrainTrail t : alltrails) TerrainTrail.switchSides(t.lines, mapSize.x);
+            for (TerrainTrail t : alltrails) t.switchSides(mapSize.x);
         }
         P result = new P(mapSize.x / 2, bottom-4);
         Prop door = Stock.Door.create(returnDoorSeed);
@@ -189,75 +189,70 @@ public class MapGenerator {
             }
         }
     }
-    private static void createFloater(P p, int rad){
-        TerrainTrail trail = new TerrainTrail(new P(p.x+rad, p.y));
-        float gap = 3.14f/(Global.r.nextInt(5)+3);
-        float currentArc = 0;
-        while (currentArc + gap < 3.14f) {
-            currentArc += Global.r.nextFloat() * gap + gap * .5f;
-            currentArc = Math.min(currentArc, 3.14f);
-            int radVariance = Global.r.nextInt(rad/3) + rad * 2 / 3;
-            trail.add(p.x + Global.cos(currentArc) * radVariance, p.y + Global.sin(currentArc) * radVariance);
+    private static void createFloater(P spot, int rad){
+        TerrainTrail trail = new TerrainTrail(new P(spot.x+rad, spot.y));
+        int num = Global.r.nextInt(7)+4;
+        float gap = 3.14f/num;
+        for (int i=1;i<num;i++){
+            float currentArc = gap*i+Global.r.nextFloat()*gap/6-gap/3;
+            int radVariance = Global.r.nextInt(rad/2) + rad * 3 / 4;
+            trail.add(spot.x + Global.cos(currentArc) * radVariance, spot.y + Global.sin(currentArc) * radVariance * .3f);
         }
-        trail.add(new P(p.x-rad, p.y));
+        trail.add(new P(spot.x-rad, spot.y));
         trail.finish("dirt&grass");
         trail.climbable();
+
+        Line closest = Global.map.checkLand(new Line(spot.getAdd(0,1), new P(spot.x, spot.y+9999)));
+        if (closest != null) {
+            float closestY = closest.getCrossPointY(spot.x);
+            depths.add(depths.indexOf(closest.next), TerrainTrail.getLastId());
+            if (Math.abs(closestY-spot.y) < 800){
+                if (closestY-spot.y < 0)
+                    Global.map.land.add(new Line(spot.x, closestY-64, spot.x, spot.y, -1, 1));
+                else
+                    Global.map.land.add(new Line(spot.x, spot.y-64, spot.x, closestY, -1, 1));
+            }
+        } else depths.add(0, TerrainTrail.getLastId());
     }
     private static void createFloaters(P mapSize, int num){
+        int lastY = (int) (mapSize.y - Global.r.nextInt((int) (mapSize.y/(num+1))));
         for (int i=0;i<num;i++) {
-            P spot = new P(Global.r.nextInt((int) mapSize.x), Global.r.nextInt((int) mapSize.y - 800) + 600);
-            Line closest = null;
-            float closestY = spot.y + 9999;
-            Line line = new Line(spot.getAdd(0,1), new P(spot.x, closestY));
-            for (Line l : Global.map.land) {
-                if (line.lineCross(l)) {
-                    if (l.next != -1 && l.isLandable()) {
-                        float y = l.getCrossPointY(spot.x);
-                        if (y < closestY) {
-                            closest = l;
-                            closestY = y;
-                        }
-                    }
-                }
-            }
+            P spot = new P(Global.r.nextInt((int) mapSize.x), lastY);
             createFloater(spot, Global.r.nextInt(1280) + 240);
-            if (closest != null) {
-                depths.add(depths.indexOf(closest.next), TerrainTrail.getLastId());
-                if (Math.abs(closestY-spot.y) < 800){
-                    if (closestY-spot.y < 0)
-                        Global.map.land.add(new Line(spot.x, closestY-64, spot.x, spot.y, -1, 1));
-                    else
-                        Global.map.land.add(new Line(spot.x, spot.y-64, spot.x, closestY, -1, 1));
-                }
-            } else depths.add(0, TerrainTrail.getLastId());
+            lastY -= Global.r.nextInt((int) (mapSize.y/(num+1)));
         }
     }
-    private static void divideLand(ArrayList<Line> total, int times){
-        if (times >= 8) return;
+    private static void divideLand(ArrayList<Line> total, int current, int max){
+        if (current >= max) return;
         Line last = total.remove(total.size()-1);
         P mid = new P(Global.r.nextFloat()*(last.ptd.x-last.pt.x)+last.pt.x,
                 Global.r.nextFloat()*(last.ptd.y-last.pt.y)+last.pt.y);
         Line one = new Line(last.pt, mid);
         Line two = new Line(mid, last.ptd);
-        float shortest = last.getLength()/(2*times);
+        float shortest = last.getLength()/(3*(current+1));
         float atan = last.getAtan()+1.57f;
         float rand = Global.rng(1);
         mid.add(Global.cos(atan)*shortest*rand, Global.sin(atan)*shortest*rand);
         total.add(one);
-        divideLand(total, ++times);
+        divideLand(total, ++current, max);
         total.add(two);
-        divideLand(total, ++times);
+        divideLand(total, ++current, max);
     }
     private static void generateSlope(P mapSize, P start, P end){
         TerrainTrail trail = new TerrainTrail(start);
-        Line first = new Line(trail.last, end);
+        int preX = Global.r.nextInt((int) (mapSize.x/8))+300;
+        int postX = Global.r.nextInt((int) (mapSize.x/8))+300;
+        trail.move(preX,0);
+        Line first = new Line(trail.last, end.getAdd(-postX,0));
         ArrayList<Line> total = new ArrayList<>();
         total.add(first);
-        divideLand(total, 2);
+        divideLand(total, 0, 8);
         for (Line i : total) trail.add(i);
-        trail.add(new P(first.ptd.x, mapSize.y+64));
+        trail.move(postX,0);
+        trail.add(new P(trail.last.x, mapSize.y+64));
         trail.add(new P(start.x, mapSize.y+64));
-        trail.finish("dirt&grass");
+        trail.finish("dirt&grass"+(Global.r.nextBoolean()?"&Rock=.1,Bush=.2,Weed=.4,Tree=1":""));
+        if (start.y > 0 && end.y > 0) trail.minY(800);
         depths.add(TerrainTrail.getLastId());
     }
     private static void generateSlope(char p, P mapSize){
@@ -268,18 +263,18 @@ public class MapGenerator {
                 break;
             case '1':
                 generateSlope(mapSize, new P(-64, Global.r.nextInt((int) (mapSize.y/2))+mapSize.y/4),
-                        new P(mapSize.x-Global.r.nextInt(800)-200, mapSize.y+64));
+                        new P(mapSize.x-64, mapSize.y+64));
                 break;
             case '3':
-                generateSlope(mapSize, new P(Global.r.nextInt(800)+200, mapSize.y+64),
+                generateSlope(mapSize, new P(64, mapSize.y+64),
                         new P(mapSize.x+64, Global.r.nextInt((int) (mapSize.y/2))+mapSize.y/4));
                 break;
             case '7':
                 generateSlope(mapSize, new P(-64, Global.r.nextInt((int) (mapSize.y/4))+mapSize.y*2/3),
-                        new P(mapSize.x+64, -Global.r.nextInt(400)-64));
+                        new P(mapSize.x+64, -64));
                 break;
             case '9':
-                generateSlope(mapSize, new P(-64, -Global.r.nextInt(400)-64),
+                generateSlope(mapSize, new P(-64, -64),
                         new P(mapSize.x+64, Global.r.nextInt((int) (mapSize.y/4))+mapSize.y*2/3));
                 break;
         }
@@ -363,7 +358,7 @@ public class MapGenerator {
     }
     public static void generateMap(String name, char terrain){
         depths = new ArrayList<>();
-        P mapSize = new P(8000, 4000);
+        P mapSize = new P(12000, 4000);
         Global.map = new Map(name, new String[]{"","None",Global.map.maps[2],((int)mapSize.x)+"x"+((int)mapSize.y)});
         if (terrain == '4' || terrain == '6' || terrain == '2' || terrain == '8') {
             if (Global.r.nextInt(4) != 0) generateTown(name, mapSize);
@@ -374,32 +369,32 @@ public class MapGenerator {
             createFloaters(mapSize, Global.r.nextInt(7)+9);
         } else if (terrain == '1') {
             generateSlope(terrain, mapSize);
-            createFloaters(mapSize, Global.r.nextInt(7));
         } else if (terrain == '3') {
             generateSlope(terrain, mapSize);
-            createFloaters(mapSize, Global.r.nextInt(7));
         } else if (terrain == '7') {
             generateSlope(terrain, mapSize);
-            createFloaters(mapSize, Global.r.nextInt(7));
         } else if (terrain == '9') {
             generateSlope(terrain, mapSize);
-            createFloaters(mapSize, Global.r.nextInt(7));
         } else if (terrain == 'n') {
             generateSlope('-', mapSize);
             if (Global.r.nextBoolean()) generateSlope('1', mapSize);
             else generateSlope('3', mapSize);
-//            createFloaters(mapSize, 12);
+            createFloaters(mapSize, Global.r.nextInt(3));
         } else if (terrain == 'U') {
             generateSlope('-', mapSize);
             if (Global.r.nextBoolean()) generateSlope('7', mapSize);
             else generateSlope('9', mapSize);
-//            createFloaters(mapSize, Global.r.nextInt(7));
+            createFloaters(mapSize, Global.r.nextInt(3));
         } else {
             System.out.println("Failed to generate map for terrain '"+terrain+"'");
             System.exit(1);
         }
         for (int i=0;i<depths.size();i++){
-            Global.map.formTextures.put(i, i+"&"+Global.map.formTextures.get(i));
+            Global.map.formTextures.put(i, depths.get(i)+"&"+Global.map.formTextures.get(i));
+        }
+        if (Global.map.formTextures.size() > depths.size()){
+            System.out.println("UNKNOWN ERROR");
+            System.exit(1);
         }
     }
 }
@@ -432,7 +427,7 @@ class ObjectGenerator{
 
 class TerrainTrail{
     private static int id = 0;
-    ArrayList<Line> lines = new ArrayList<>();
+    private ArrayList<Line> lines = new ArrayList<>();
     private int terrain;
     P last;
     TerrainTrail(P p){
@@ -475,7 +470,7 @@ class TerrainTrail{
             if (!i.clockwise()) i.opt = -1;
         }
     }
-    static void switchSides(ArrayList<Line> lines, float x2){
+    void switchSides(float x2){
         for (Line i : lines) {
             if (i.opt == 1){
                 i.pt = new P(x2-i.pt.x,i.pt.y);
@@ -500,5 +495,12 @@ class TerrainTrail{
             if (!p.equals("")) setTexture(p);
         }
         return this;
+    }
+
+    void minY(int p) {
+        for (Line i : lines){
+            if (i.pt.y < p) i.pt.y = p;
+            if (i.ptd.y < p) i.ptd.y = p;
+        }
     }
 }

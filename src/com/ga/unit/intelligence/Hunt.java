@@ -34,16 +34,17 @@ class Hunt implements Task {
             if (y < -64) {
                 Actions.Walk.update(host);
                 host.setState(Actions.Jump);
-            } else if (y > 64){
-                if (Math.abs(x) < 160 && host.lastLand != target.lastLand) host.setState(Actions.Drop);
             } else {
-                int t = host.performActions((int) dist);
-                if (host.state.getTags().contains(Tag.Channel)) {
-                    host.delay.set(60+ Global.r.nextInt(80));
-                }
-                if (t == 2 && target.vel.x > 0 != host.dir > 0) { //no stamina
-                    host.setState(Actions.Rest);
-                    host.delay.time += 40;
+                if (y > 64 && Global.r.nextBoolean()) host.setState(Actions.Drop);
+                else {
+                    int t = host.performActions((int) dist);
+                    if (host.state.getTags().contains(Tag.Channel)) {
+                        host.delay.set(60 + Global.r.nextInt(80));
+                    }
+                    if (t == 2 && target.vel.x > 0 != host.dir > 0) { //no stamina
+                        host.setState(Actions.Rest);
+                        host.delay.time += 40;
+                    }
                 }
             }
         }

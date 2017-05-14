@@ -24,7 +24,6 @@ public class Weapon extends Item {
         super(name, seed, weight, uses);
         setType(type);
         value = 36;
-        breakable = false;
         cooldown = 0;
         setDamage(num, sides);
         rotation = 35;
@@ -41,8 +40,6 @@ public class Weapon extends Item {
         super.setModifier(mod);
         if (mod == PrefixMod.Mastercraft){
             damageMod = 1;
-        } else if (mod == PrefixMod.Legendary){
-            damageMod = 2;
         }
     }
     protected void setModifier(SpecialtyMod mod){
@@ -56,11 +53,6 @@ public class Weapon extends Item {
     }
     public int getDamage() {
         return damageSide.getDamage()+super.getDamage()+damageMod;
-    }
-    @Override
-    public void use(Man host){
-        if (uses == 0) return;
-        super.use(host);
     }
     private void setDamage(int num, int sides){
         damageSide = new Die(num, sides);

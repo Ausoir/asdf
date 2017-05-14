@@ -37,13 +37,16 @@ public class Map extends Thing {
     public P size;
     public int id;
     private static final int magnify = 2;
+    private boolean panorama = true;
     public Map(String name, final String[] maps) {
         super(null,1);
         this.name = name;
         this.maps = maps;
         id = Integer.parseInt(name.split("_")[1]);
-        if (maps[2].equals("None")) image.visible = false;
-        else{
+        if (maps[2].equals("None")){
+            image.visible = false;
+            panorama = false;
+        } else{
             setImage(maps[2]);
             image.size.mult(magnify);
         }
@@ -114,15 +117,18 @@ public class Map extends Thing {
         HashMap<Integer, Terrain> terrains = new HashMap<>();
         for (final Line i : land){
             if (i.opt == 1){
-                Terrain t = new Terrain("rope", null, 70);
-                t.addPoint(i.pt.x-8, i.pt.y);
-                t.addPoint(i.pt.x+8, i.pt.y);
-                t.addPoint(i.ptd.x+8, i.ptd.y);
-                t.addPoint(i.ptd.x-8, i.ptd.y);
-                t.render();
-                Thing top = new Thing("Ropetop",80);
-                top.save = false;
-                top.pos = i.pt;
+                Line land = checkLand(new Line(i.ptd.getAdd(0,-1), i.ptd.getAdd(0,1)), 0);
+                if (land != null) {
+                    Terrain t = new Terrain("rope", null, land.depth);
+                    t.addPoint(i.pt.x - 8, i.pt.y);
+                    t.addPoint(i.pt.x + 8, i.pt.y);
+                    t.addPoint(i.ptd.x + 8, i.ptd.y);
+                    t.addPoint(i.ptd.x - 8, i.ptd.y);
+                    t.render();
+                    Thing top = new Thing("Ropetop", land.depth);
+                    top.save = false;
+                    top.pos = i.pt;
+                }
             } else if (i.next >= 0){
                 Terrain terrain = terrains.get(i.next);
                 if (terrain == null){
@@ -170,7 +176,9 @@ public class Map extends Thing {
 
     void generateProps(){
         for (Line l : land) {
-            if (l.isLand() && Math.abs(l.getSlope()) < Line.MAXSLOPE) {
+            if (l.isLand() && Math.abs(l.getSlope()) < Line.MAXSLOPE
+                    && (l.pt.y < size.y || l.ptd.y < size.y) && (l.pt.x < size.x || l.ptd.x < size.x)
+                    && (l.pt.y > 0 || l.ptd.y > 0) && (l.pt.x > 0 || l.ptd.x > 0)) {
                 if (Math.abs(l.getSlope()) < .5f) {
                     String texture = formTextures.get(l.next);
                     if (texture != null) {
@@ -219,7 +227,7 @@ public class Map extends Thing {
                 int xSize = (int) Math.abs(t.image.size.x/2);
                 if (l.clockwise()) tx = (int) Global.clamp(tx, xSize, (l.ptd.x - l.pt.x) - xSize);
                 else tx = (int) Global.clamp(tx, l.ptd.x - l.pt.x + xSize, -xSize);
-                int ty = (int) (l.pt.y + (tx * l.getSlope()));
+                int ty = (int) l.getCrossPointY(tx+l.pt.x);
                 t.pos = new P(l.pt.x + tx, ty);
                 if (!l.clockwise()){
                     t.pos.y += (t.image.size.y / 2)-4;
@@ -271,12 +279,34 @@ public class Map extends Thing {
         }
     }
 
+    public Line checkLand(Line p){
+        ArrayList<Line> list = new ArrayList<>();
+        for (Line i : land){
+            if (i.isLandable() && i.depth >= depth && i.lineCross(p)){
+                list.add(i);
+            }
+        }
+        if (list.size() == 0) return null;
+        else {
+            Line closest = null;
+            float closestY = p.ptd.y;
+            for (Line i : list){
+                float y = i.getCrossPointY(pos.x);
+                if (y <= closestY){
+                    closest = i;
+                    closestY = y;
+                }
+            }
+            return closest;
+        }
+    }
+
     public boolean isIndoors(){
         return id < 0;
     }
 
-    void onTimeChange() {
-        if (!maps[2].equals("None")){
+    public void onTimeChange() {
+        if (panorama){
             setImage(maps[2]+(weather.isNight()?"_Night":""));
             image.size.mult(magnify, magnify);
         }

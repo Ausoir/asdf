@@ -6,9 +6,7 @@ import javax.sound.sampled.Clip;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by Ga on 1/25/2017. asd
@@ -33,6 +31,7 @@ public class Sound {
             clip.setFramePosition(0);
             clip.start();
         } catch (Exception e){
+            System.out.println("Could not play sound ["+p+"]");
             e.printStackTrace();
         }
     }
@@ -52,7 +51,7 @@ public class Sound {
             } finally {
                 if (ais != null) ais.close();
             }
-            Clip clip = AudioSystem.getClip();
+            Clip clip = AudioSystem.getClip(null);
             clip.open(ais);
             return clip;
         } catch (Exception e) {

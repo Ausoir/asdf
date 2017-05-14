@@ -146,7 +146,7 @@ public class Menu extends Panel {
                 result.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        Global.player.input.inputDirect("AWield",0,0);
+                        Global.player.input.inputDirect("_Wield",0,0);
                         Global.display.menu.setVisible(false);
                     }
                 });
@@ -154,7 +154,7 @@ public class Menu extends Panel {
                 result.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        Global.player.input.inputDirect("I1"+type,0,0);
+                        Global.player.input.inputDirect("_1"+type,0,0);
                         Global.display.menu.setVisible(false);
                     }
                 });
@@ -437,7 +437,7 @@ public class Menu extends Panel {
             Global.display.menu.setVisible(false);
             switch (p) {
                 case "h":
-                    Command.order("rest");
+                    Global.sleep(100);
                     break;
                 case "stat":
                     Player player = Global.player;

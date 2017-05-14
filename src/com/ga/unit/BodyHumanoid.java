@@ -57,12 +57,11 @@ public class BodyHumanoid extends Body {
                 rotateAppendage(FIST, 23, 0);
                 break;
             case "Throw":
-            case "Lunge":
             case "Thrust":
                 rotateAppendage(FIST, 7, 0);
                 break;
             case "Slash":
-                rotateAppendage(FIST, 7, 1*host.dir);
+                rotateAppendage(FIST, 7, host.dir);
                 break;
             case "Kick":
                 rotateAppendage(FOOT-1, 5, 0);

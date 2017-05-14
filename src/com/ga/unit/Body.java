@@ -138,7 +138,7 @@ public class Body {
             randomizeSection(i);
         }
         int dead = animation.get("Dead")[0];
-        localAnimation[dead] = localAnimation[dead + Global.r.nextInt(3)];
+        localAnimation[dead] = localAnimation[dead + Global.r.nextInt(2)];
         int i = (int) Math.abs(-organs[BODY].ptd.y/5f);
         if (i != 0) randomizeSection(dead);
     }

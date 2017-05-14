@@ -10,6 +10,7 @@ import com.ga.unit.*;
 import com.ga.unit.skill.*;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -64,7 +65,7 @@ public class Item extends Prop {
         }
     }
     enum PrefixMod{
-        None(500), Broken(80), Old(80), Fine(45), Mastercraft(7), Legendary(1);
+        None(160), Awful(30), Old(40), Fine(16), Mastercraft(1);
         static int pool;
         int weight;
         PrefixMod(int weight){
@@ -155,12 +156,12 @@ public class Item extends Prop {
     Actions action = Actions.Slash;
     private int[] cdTime = new int[]{0};
     private int durability = 1;
-    public int uses = 1;
+    private int uses = 1;
     private ItemType type = ItemType.Throwing;
     public int speed = -4;
     public int damage = 0;
     public int value = 8;
-    public boolean breakable = true;
+    Man owner;
     public Item(String name, int seed, int weight, int durability) {
         super(name, seed, 100);
         dynamic = true;
@@ -172,7 +173,7 @@ public class Item extends Prop {
         final Item me = this;
         onInteract = new Interactive(){
             public void interact(Man p){
-                p.setWeapon(me);
+                if (owner == null) p.setWeapon(me);
             }
         };
         randomSize(new P(.2f,.2f));
@@ -223,11 +224,11 @@ public class Item extends Prop {
         this.speed += p.getSpeed();
     }
     protected void setModifier(PrefixMod mod){
-        if (mod == PrefixMod.Broken){
+        if (mod == PrefixMod.Awful){
             speed -= 10;
             durability = (int) (durability*.4f);
         }else if (mod == PrefixMod.Old){
-            speed -= 5;
+            speed -= 4;
             durability = (int) (durability*.7f);
         }else if (mod == PrefixMod.Fine){
             probability += .1f;
@@ -236,10 +237,6 @@ public class Item extends Prop {
             speed += 4;
             probability += .2f;
             durability = (int) (durability*2f);
-        }else if (mod == PrefixMod.Legendary){
-            durability = -1;
-            speed += 7;
-            probability += .3f;
         }
     }
     protected void setModifier(SpecialtyMod mod){
@@ -351,34 +348,40 @@ public class Item extends Prop {
         return r;
     }
     public void onEquip(Man host){
+        owner = host;
         setDepth(host.getDepth());
         lastLand = host.lastLand;
         save = false;
         mobile = false;
     }
     public void onUnequip(Man host){
+        owner = null;
         lastLand = host.lastLand;
         save = true;
         pos = pos.getAdd(0,0);
         mobile = true;
         if (smod == SpecialtyMod.Cursed){
-            Curse.get(host, 5);
+            ArrayList<Buffs> list = Buffs.getByTag(Tag.Debuff);
+            host.buff(list.get(rand.nextInt(list.size())),3);
         }
     }
     public void remove(){
-        Global.player.inventory.remove(this);
+        if (owner != null && owner.weapon == this) owner.setWeapon(null);
         cancelAdd();
         super.remove();
+    }
+    void onBreak(){
+        remove();
     }
     protected void playSound(){
         Sound.play(type.getSound());
     }
     public boolean usable(int p){
-        if ((isInfinite() || uses >= p) && Global.getTime()[0] >= cdTime[0]){
+        if ((isInfinite() || uses >= p) && Global.time >= cdTime[0]){
             if (!isInfinite()){
                 uses -= p;
-                if (breakable && uses == 0){
-                    remove();
+                if (uses == 0){
+                    onBreak();
                 }
             }
             return true;
@@ -387,7 +390,7 @@ public class Item extends Prop {
     }
     public void use(Man host){
         playSound();
-        cdTime[0] = Global.getTime()[0]+cooldown;
+        cdTime[0] = Global.time+cooldown;
         host.setState(action);
     }
     public void trigger(Unit target){
@@ -421,7 +424,7 @@ public class Item extends Prop {
             if (ademod != AdenchantMod.None) ade = "Level "+ademod.level+" ";
             if (cooldown > 0){
                 r += " "+Dialog.get("itemEncDsc",new String[]{getRarityDescription(), ade+emod.name(), cooldown+""});
-                int cd = cdTime[0] - Global.getTime()[0];
+                int cd = cdTime[0] - Global.time;
                 if (cd <= 0) r += " "+Dialog.get("itemEncRdy");
                 else r += " "+Dialog.get("itemEncNRdy", new String[]{cd+""});
             }

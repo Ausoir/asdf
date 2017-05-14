@@ -17,7 +17,7 @@ public class Follow implements Task {
 
     @Override
     public void blocked(boolean fall) {
-        ((IntelligenceSocial)host.brain).leader = null;
+        host.brain.leader = null;
     }
 
     public void update() {

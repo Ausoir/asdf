@@ -62,17 +62,23 @@ public class Updater {
                     }
                 }
             } else {
+                Global.player.vel.set(0,0);
                 if (edge == 2){
-                    Line entrance = Global.map.checkLand(new Line(1,32,Global.map.size.x-1,32),0);
-                    Global.player.pos.set(entrance.getCrossPointX(32),32);
+                    Line entrance = Global.map.checkLand(new Line(1,64,Global.map.size.x-1,64),0);
+                    Global.player.pos.set(entrance.getCrossPointX(64),64-Math.abs(entrance.getSlope()));
                 } else if (edge == 4){
-                    Line entrance = Global.map.checkLand(new Line(Global.map.size.x-24,0,Global.map.size.x-24,99999),0);
-                    Global.player.pos.set(Global.map.size.x-24,entrance.getCrossPointY(entrance.ptd.x-24)-1);
+                    Line entrance = Global.map.checkLand(new Line(Global.map.size.x-24,0,Global.map.size.x-24,Global.map.size.y),0);
+                    Global.player.pos.set(Global.map.size.x-24,entrance.getCrossPointY(entrance.ptd.x-24)-Math.abs(entrance.getSlope()));
                 } else if (edge == 6){
-                    Global.player.pos.set(24,Global.map.checkLand(new Line(24,0,24,99999),0).getCrossPointY(24)-1);
+                    Line entrance = Global.map.checkLand(new Line(24,0,24,Global.map.size.y),0);
+                    Global.player.pos.set(24,entrance.getCrossPointY(24)-Math.abs(entrance.getSlope()));
                 } else if (edge == 8){
-                    Line entrance = Global.map.checkLand(new Line(1,Global.map.size.y-32,Global.map.size.x-1,Global.map.size.y-32),0);
-                    Global.player.pos.set(entrance.getCrossPointX(Global.map.size.y-32), Global.map.size.y-32);
+                    Line entrance = Global.map.checkLand(new Line(1,Global.map.size.y-64,Global.map.size.x-1,Global.map.size.y-64),0);
+                    while (entrance.getSlope() > 1) {
+                        entrance = Global.map.checkLand(new Line(1,entrance.pt.y-1,Global.map.size.x-1,entrance.pt.y-1),0);
+                    }
+                    float y = Math.min(Global.map.size.y-64, entrance.ptd.y-1);
+                    Global.player.pos.set(entrance.getCrossPointX(y), y-Math.abs(entrance.getSlope()));
                 }
             }
             Global.player.reconnect();
@@ -126,9 +132,8 @@ public class Updater {
             }
             if (changeMap != null) changeMap(false);
             else if (time.update()){
-                Global.map.event.update();
-                Global.update();
-                FileManager.saveCharacter();
+                Global.update(1);
+                if (Global.time % 8 == 0) FileManager.saveCharacter();
             }
         }
     }

@@ -51,7 +51,6 @@ mvsInteract:Interact
 mvsSprint:Sprint
 mvsDuck:Duck
 mvsGuard:Guard
-mvsLunge:Lunge
 mvsThrust:Thrust
 mvsSwing:Swing
 mvsKick:Kick
@@ -79,7 +78,6 @@ mvsAdrenaline:Adrenaline
 mvsCleave:Cleave
 mvsEmpower:Empower
 mvsEvade:Evade
-mvsFlamestride:Flamestride
 mvsGlacialwalk:Glacialwalk
 mvsStun:Stun
 mvsSlow:Slow
@@ -87,19 +85,16 @@ mvsPoison:Poison
 mvsCalling:Calling
 mvsShadowtwin:Shadowtwin
 mvsShadowstep:Shadowstep
-mvsFireworks:Fireworks
 mvsFireblast:Fireblast
 mvsFreeze:Freeze
 mvsFlameroll:Flameroll
 mvsFireball:Fireball
 mvsBlizzard:Blizzard
 mvsMaterialize:Materialize
-mvsMeteor:Meteor
 mvsDscInteract:Interact with wielded item.
 mvsDscSprint:Burst into sprint mode, running twice as fast as long as the skill is active.
 mvsDscDuck:A
 mvsDscGuard:A
-mvsDscLunge:A
 mvsDscThrust:Thrust your weapon in a linear fashion to attack while keeping momentum.
 mvsDscSlash:Swing your weapon from top to bottom, slashing enemies vertically.
 mvsDscKick:A
@@ -126,7 +121,6 @@ mvsDscAdrenaline:A
 mvsDscCleave:A
 mvsDscEmpower:A
 mvsDscEvade:A
-mvsDscFlamestride:A
 mvsDscGlacialwalk:A
 mvsDscStun:A
 mvsDscSlow:A
@@ -134,14 +128,12 @@ mvsDscPoison:A
 mvsDscCalling:A
 mvsDscShadowtwin:A
 mvsDscShadowstep:A
-mvsDscFireworks:A
 mvsDscFireblast:A
 mvsDscFreeze:A
 mvsDscFlameroll:A
 mvsDscFireball:A
 mvsDscBlizzard:A
 mvsDscMaterialize:Materialize energy into a polygon that you can walk on.
-mvsDscMeteor:A
 tutorial0:<The pages are blank...>
 tutorial1:Not only can you pick up items, you can also interact with objects using Left Click (while unarmed). Use the Middle Mouse Button to throw away wielded items.
 tutorial2:Press R to put the currently wielded item into your inventory. However, you'll first need clothes with pockets to have any inventory space. Once you do get any clothing, press the TAB key to access the inventory.

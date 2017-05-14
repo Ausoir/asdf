@@ -53,10 +53,6 @@ public class P {
         this.y *= y;
         return this;
     }
-    public P getAtan(P pt, float mag){
-        float r = (float) Math.atan2(y-pt.y,x-pt.x);
-        return new P(Global.cos(r)*mag,Global.sin(r)*mag);
-    }
     public P getAtan(float mag){
         float r = (float) Math.atan2(y,x);
         return new P(Global.cos(r)*mag,Global.sin(r)*mag);
@@ -69,11 +65,6 @@ public class P {
     }
     public boolean inOval(float x, float y){
         return (Math.abs(this.x) < x && Math.abs(this.y) < y);
-    }
-    public float getDist(P p){
-        float x = p.x-this.x;
-        float y = p.y-this.y;
-        return (float) Math.sqrt((x*x)+(y*y));
     }
     public float getSum(){
         return this.x+this.y;

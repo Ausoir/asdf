@@ -69,7 +69,7 @@ public class Organ extends Line {
         maxLength = p;
     }
     protected void hit(Line p, int damage){
-        boolean pierce = Global.r.nextInt(health) < Global.r.nextInt(damage);
+        boolean pierce = damage > 0 && Global.r.nextInt(health)+health+1 < Global.r.nextInt(damage);
         if (pierce) {
             if (image != null) {
                 Projectile flyingOrgan = new Projectile(null, new P(host.pos), p.getAtan(10).add(p.ptd), 20) {

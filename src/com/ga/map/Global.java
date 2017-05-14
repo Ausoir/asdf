@@ -16,10 +16,12 @@ import java.util.Random;
  * Created by Ga on 7/25/2016. asd
  */
 public class Global {
+    private static final int HOUR = 100;
     public static Map map;
     public static MainPlayer player;
     public static Server server;
     public static ControllerProcess cprocess;
+    public static P offplace = new P(); //Off screen while existing
     public static P camera = new P();
     public static P cameraTo = new P();
     public static Display display;
@@ -28,7 +30,7 @@ public class Global {
     public static P rel = new P();
     private static float[] sinv = new float[360];
     private static float[] cosv = new float[360];
-    private static int[] time = new int[]{0};
+    public static int time;
     private static int controlId = 1;
     private static int houseId = 1;
     public static ArrayList<EventTimer> timers = new ArrayList<>();
@@ -42,7 +44,7 @@ public class Global {
     public static int getSeed(){
         return r.nextInt(9999)+1;
     }
-    public static void setRel(){
+    static void setRel(){
         rel.set(-camera.x+Settings.centerX, -camera.y+Settings.centerY);
     }
     public static float sin(float p){
@@ -65,7 +67,7 @@ public class Global {
     public static int nextGaussian(int p){
         return (int) (r.nextGaussian()*p);
     }
-    public static float rng(float max){
+    static float rng(float max){
         return clamp((float)r.nextGaussian(),-max,max);
     }
     public static void p(String p){
@@ -84,27 +86,25 @@ public class Global {
             p.set(clamp(p.x, Settings.centerX+margin, Global.map.size.x-Settings.centerX-margin),
                 clamp(p.y, Settings.centerY+40+margin, Global.map.size.y-Settings.centerY-margin-margin));
     }
-    public static void update(){
-        time[0]++;
+    public static boolean sleep(int p){
+        if (Updater.mapIsSafe(Global.player.faction)){
+            Global.update(p);
+            return true;
+        }
+        return false;
+    }
+    public static void update(int p){
+        time+=p;
+        map.onTimeChange();
+        map.event.update();
         Iterator it = timers.iterator();
         while (it.hasNext()){
             EventTimer timer = (EventTimer) it.next();
-            if (timer.update()) it.remove();
+            if (timer.update(p)) it.remove();
         }
     }
-    public static void loadTime(int p){
-        time[0] = p;
-    }
-    public static int[] getTime(){
-        return time;
-    }
     public static int getHour(){
-        return time[0]/100;
-    }
-    public static void setHour(int p){
-        player.onTimeChange(p-getHour());
-        map.onTimeChange();
-        time[0] = (p*100)+(time[0]%100);
+        return time/HOUR;
     }
     public static int getHouseId(){
         return houseId++;

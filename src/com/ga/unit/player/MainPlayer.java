@@ -54,10 +54,6 @@ public class MainPlayer extends Player {
             if (input.moving > 0 == target.x > 0) state = Actions.Thrust;
             else if (skillTree.getSkillLevel(Actions.Dash) > 0) state = Actions.Dash;
         }
-        int cost = state.getCost()+getStatPenalty();
-        if (cost > 0){
-            indicater.show((float)cost/Math.max(1, stamina.get()));
-        }
         int r = super.setState(state);
         if (r == 2){
             indicater.show(1);
@@ -83,25 +79,21 @@ public class MainPlayer extends Player {
         if (r) indicater.show(before/Math.max(1,stamina.get()));
         return r;
     }
-    public void onTimeChange(int p) {
-        if (Stock.getFactoryName(armor.armor[0].factoryId).equals("Stomach Full Helm")) p = 0;
-        health.starve(p);
-        int status = health.getStatus();
-        if (status == 1) {
-            say("Food...");
-            die();
-        } else if (status == 2) {
-            say("I'm starving!");
-            health.record("0");
+    public void onTimeChange() {
+        if (!Stock.getFactoryName(armor.armor[0].factoryId).equals("Stomach Full Helm")) {
+            health.starve(1);
+            int status = health.getStatus();
+            if (status == 1) {
+                say("Food...");
+                die();
+            } else if (status == 2) {
+                say("I'm starving!");
+                health.record("0");
+            } else if (status == 3) say("I don't feel so good...");
+            else if (status == 4) say("I'm hungry!");
         }
-        else if (status == 3) say("I don't feel so good...");
-        else if (status == 4) say("I'm hungry!");
-        if (stats.getEffectsSize() == 0) {
-            get("Speed").heal();
-            get("Strength").heal();
-        }
-        if (traits.contains(Trait.Optimistic)) get("Motivation").add(1);
-        else if (traits.contains(Trait.Pessimistic)) get("Motivation").add(-1);
+        if (traits.contains(Trait.Optimistic)) get("Motivation").add(1, false);
+        else if (traits.contains(Trait.Pessimistic)) get("Motivation").add(-1, false);
     }
     protected void stateDone(){
         super.stateDone();
@@ -122,18 +114,20 @@ public class MainPlayer extends Player {
         super.update();
         if (input.cameraMode) Global.mapEdgeCenter(Global.cameraTo = Global.cameraTo.getAdd(input.movement));
         else Global.mapEdgeCenter(Global.cameraTo = pos.getAdd(0,0));
-        if (stamina.isFull()) indicater.hide();
+        if (!stamina.isFull()) indicater.show(.5f);
         indicater.update();
+        Global.offplace.set(pos.x-9999,pos.y-9999);
     }
     public String[] load(String p){
         String[] r = super.load(p);
         String[] other = p.split("%")[1].split(";");
-        Global.loadTime(Integer.parseInt(other[0]));
+        Global.time = Integer.parseInt(other[0]);
         stamina = get("Stamina");
         indicater.setMeasuree(stamina);
         return r;
     }
     public void reconnect() {
+        lastLand = new Line();
         Updater.add(this);
         Updater.add(weapon);
         Updater.add(speech);
