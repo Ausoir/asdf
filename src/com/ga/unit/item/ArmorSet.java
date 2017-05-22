@@ -1,6 +1,5 @@
 package com.ga.unit.item;
 
-import com.ga.map.Global;
 import com.ga.map.Shader;
 import com.ga.tool.Performer;
 import com.ga.unit.*;
@@ -10,13 +9,13 @@ import com.ga.unit.*;
  */
 public class ArmorSet {
     private static Armor[] bare = new Armor[]{
-            (Armor) new Armor("Head", 0, 0, 0, 0, 0){
+            (Armor) new Armor("Head", 0, new Item.Material[]{Item.Material.Flesh}, 1,0, 0){
                 void onHit(){}
             }.cancelAdd(),
-            (Armor) new Armor("Underwear", 0, 0, 0, 0, 1){
+            (Armor) new Armor("Underwear", 0, new Item.Material[]{Item.Material.Flesh}, 1,0, 1){
                 void onHit(){}
             }.cancelAdd(),
-            (Armor) new Armor("Underwear", 0, 0, 0, 0, 2){
+            (Armor) new Armor("Underwear", 0, new Item.Material[]{Item.Material.Flesh}, 1,0, 2){
                 void onHit(){}
             }.cancelAdd()
     };
@@ -55,7 +54,7 @@ public class ArmorSet {
         for (Armor i : armor){
             tags.addAll(i.tags);
         }
-        if (getEncumberance() <= 4) tags.add(Tag.Agility);
+        if (getEncumberance() <= 4) tags.add(Tag.Finesse);
         if (onChange != null) onChange.perform();
     }
     private int organToPiece(int organ){
@@ -78,11 +77,6 @@ public class ArmorSet {
     public int getEncumberance(){
         int r = 0;
         for (Armor i : armor) r += i.encumberance;
-        return r;
-    }
-    public int getSpeed(){
-        int r = 0;
-        for (Armor i : armor) r += i.speed;
         return r;
     }
     public int getWeight(){

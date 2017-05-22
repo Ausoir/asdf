@@ -20,6 +20,10 @@ import java.util.HashMap;
 public class FileManager {
     public static HashMap<String, ArrayList<String[]>> fileCache;
 
+    static void init(){
+        fileCache = new HashMap<>();
+        searchFiles("Data", fileCache);
+    }
     private static void searchFiles(String p, HashMap<String, ArrayList<String[]>> r){
         File[] files = new File(p).listFiles();
         if (files != null) {
@@ -43,12 +47,6 @@ public class FileManager {
             }
         }
     }
-
-    static void init(){
-        fileCache = new HashMap<>();
-        searchFiles("Data", fileCache);
-    }
-
     public static void saveCharacter(){
         if (Global.player.state != Actions.Dead) {
             saveMap("map/"+Global.player.cmap);

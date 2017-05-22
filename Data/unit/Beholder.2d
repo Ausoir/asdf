@@ -1,5 +1,5 @@
 -2,1,Spider_skin;-3,1,Spider_skin;3,0,Spider;-3,1,Spider_skin;-4,1,Spider_skin //
-4,4,4,4,4;0,0,1,0,0;1,1,1,1,1 //linewidth,vital,health
+4,4,4,4,4;0,1,4,0,0;1,1,1,1,1 //linewidth,vital,health
 
 -5,30;-25,15;0,0;25,15;5,30/8
 15,25;-20,20;0,0;20,20;-15,25/4

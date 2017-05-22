@@ -2,18 +2,19 @@ package com.ga.unit;
 
 import com.ga.game.Settings;
 import com.ga.map.Global;
+import com.ga.map.Picture;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Timer;
 
 /**
- * Created by Ga on 8/29/2016.
+ * Created by Ga on 8/29/2016. zxc
  */
 public class Particle extends Thing implements Effect {
     private Timer timer = new Timer(4, false);
     private P vel;
     private boolean gravity;
-    public Particle(String name, P pt, P vel, float rotation, float speed, boolean gravity, int lifetime) {
+    private Particle(String name, P pt, P vel, float rotation, float speed, boolean gravity, int lifetime) {
         super(name, 800);
         pos = pt;
         save = false;
@@ -23,11 +24,8 @@ public class Particle extends Thing implements Effect {
         this.rotation = rotation;
         this.timer.set(lifetime);
     }
-    public static void dripBlood(P pt){
-        explode("Blood",pt,new P(),3,1,0,true,3);
-    }
-    public static void dripFire(P pt){
-        explode("Fire",pt,new P(0,-1),6,1,Settings.gravity,true,3);
+    public void setImage(String p){
+        image.set(Picture.loadCache(p));
     }
     public static void dripHoly(P pt){
         explode("Glare",pt,new P(),1,4,0,true,4);
@@ -42,12 +40,12 @@ public class Particle extends Thing implements Effect {
     public static void groundSlam(P pt){
         explode("Dust",pt,new P(0,-16),1,12,8,true,4);
     }
-    public static void explosion(P pt){
-        explode("Smoke",pt,new P(0,-16),50,15,15,false,7);
-        explode("Fire",pt,new P(0,-24),100,15,10,true,4);
+    static void explosion(P pt){
+        explode("Smoke",pt,new P(0,-16),32,15,15,false,7);
+        explode("Fire",pt,new P(0,-24),64,15,10,true,4);
     }
     public static void holyExplosion(P pt){
-        explode("Glare",pt,new P(0,-1),100,24,20,true,7);
+        explode("Glare",pt,new P(0,-1),64,24,20,true,7);
     }
     public static void cleanse(P pt){
         explode("Glare",pt,new P(),1,16,0,false,2);

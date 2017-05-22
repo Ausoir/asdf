@@ -17,19 +17,20 @@ import java.awt.*;
 public class Food extends Item {
     private String nutrition;
     private int perish;
-    private int punish;
     private int happy = 0;
 
-    public Food(String name, int seed, int weight, int uses, String nutrition, int perish, int punish, int happy) {
-        super(name, seed, weight, uses);
+    public Food(String name, int seed, int weight, int uses, String nutrition, int perish, int happy) {
+        super(name, seed, new Item.Material[]{Item.Material.Other}, ItemType.Consumable);
+        this.weight = weight;
+        this.durability = uses;
+        this.uses = uses;
         this.nutrition = nutrition;
-        this.perish = Global.getHour() + perish;
-        this.punish = punish;
+        this.perish = Global.time + perish;
         this.happy = happy;
         shuffleNutrition();
         int toxicity = getPoisonChance();
         if (toxicity > 0) {
-            image = new ShadedPicture(name, Shader.Color);
+            image = new ShadedPicture(rand, name, Shader.Color);
             ((ShadedPicture) image).shade(new Color(100 - toxicity, 255 - toxicity, 100 - toxicity, 180).getRGB());
         }
     }
@@ -51,14 +52,15 @@ public class Food extends Item {
     public void use(Man p){
         if (usable(1)) {
             super.use(p);
-            int perishTime = perish - Global.getHour();
+            int perishTime = perish - Global.time;
             if (p instanceof Player){
                 Stat motivation = p.get("Motivation");
-                if (perishTime <= 0 && rand.nextInt(100) < getPoisonChance()){
-                    if (punish > 3) p.buff(Buffs.Poison, punish-3);
+                if (perishTime <= 0 && rand.nextInt(10) < getPoisonChance()){
+                    int severity = perishTime / 100;
+                    p.buff(Buffs.Poison, severity);
                     p.say("Gawrrrr! That didn't taste good...");
-                    for (int i=0;i<punish;i++) nutrition = Health.mutate(nutrition);
-                    motivation.add(-punish, false);
+                    for (int i=0;i<severity;i++) nutrition = Health.mutate(nutrition);
+                    motivation.add(-severity, false);
                 } else {
                     motivation.add(happy, false);
                 }
@@ -66,17 +68,16 @@ public class Food extends Item {
             }
         }
     }
-    private int getPoisonChance(){
-        int perishTime = perish - Global.getHour();
-        return Math.min(10,1-perishTime)*10;
+    private int getPoisonChance(){ // 0 to 10
+        return (Global.time-perish)/100;
     }
     @Override
     public String getDescription(){
-        int perishTime = perish - Global.getHour();
+        int perishTime = perish - Global.time;
         String r = super.getDescription();
         r = r.replace(" uses "," servings ");
-        if (perishTime <= 0) r += " This food has "+getPoisonChance()+"% chance of causing "+getPunishDescription()+".";
-        else r += " This food will go bad in "+perishTime+" hours.";
+        if (perishTime <= 0) r += " This food has "+getPoisonChance()+"0% chance of causing food poisoning.";
+        else r += " This food will go bad in "+perishTime+" seconds.";
         r += "\nNutrition Facts:\n"+ Health.getDescription(nutrition);
         return r;
     }
@@ -90,12 +91,5 @@ public class Food extends Item {
         String r = super.toString();
         if (!r.equals("")) r += "@"+perish;
         return r;
-    }
-
-    private String getPunishDescription() {
-        if (punish > 8) return "certain death";
-        else if (punish > 2) return "cancer";
-        else if (punish > 0) return "food poisoning";
-        else return "bad breath";
     }
 }

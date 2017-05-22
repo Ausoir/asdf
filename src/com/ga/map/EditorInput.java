@@ -31,7 +31,7 @@ public class EditorInput implements Input, Updatable, Drawable {
     private ArrayList<Line> history = new ArrayList<>();
     private ArrayList<Line> lineConnection = new ArrayList<>();
     private Line current = new Line(0, 0, 0, 0);
-    private Prop currentU = new Prop();
+    private Prop currentU = new Prop(null,-1,0);
     private boolean connected = false;
     private Tool tool = Tool.NONE;
     private CreateTool subtool = CreateTool.LINE;

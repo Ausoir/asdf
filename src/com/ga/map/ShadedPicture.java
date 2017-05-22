@@ -2,21 +2,24 @@ package com.ga.map;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.Random;
 
 /**
- * Created by Ga on 3/4/2017.
+ * Created by Ga on 3/4/2017. aaa
  */
 public class ShadedPicture extends Picture {
     protected Shader shader;
-    protected BufferedImage shadow;
+    private BufferedImage shadow;
 
-    public ShadedPicture(String p, Shader shader) {
-        super(p);
+    public ShadedPicture(Random rand, String p, Shader shader) {
+        super(rand);
+        set(p);
         setShader(shader);
     }
 
-    public ShadedPicture(String p, int index, Shader shader) {
-        super(p, index);
+    public ShadedPicture(Random rand, String p, int index, Shader shader) {
+        super(rand);
+        set(p, index);
         setShader(shader);
     }
 

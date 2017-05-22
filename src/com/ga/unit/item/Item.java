@@ -2,12 +2,19 @@ package com.ga.unit.item;
 
 import com.ga.game.Dialog;
 import com.ga.game.Sound;
-import com.ga.map.*;
+import com.ga.map.Global;
+import com.ga.map.ShadedPicture;
+import com.ga.map.Shader;
+import com.ga.map.Updater;
 import com.ga.tool.Interactive;
 import com.ga.tool.Line;
 import com.ga.tool.P;
-import com.ga.unit.*;
-import com.ga.unit.skill.*;
+import com.ga.unit.Man;
+import com.ga.unit.Prop;
+import com.ga.unit.Tag;
+import com.ga.unit.Unit;
+import com.ga.unit.skill.Actions;
+import com.ga.unit.skill.Buffs;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -18,38 +25,92 @@ import java.util.Random;
  */
 public class Item extends Prop {
     public enum ItemType {
-        Sword(Actions.Slash, -4,"swing_knife","hit_cut"), Spear(Actions.Thrust, -8,"swing_silent", "hit_bloody"),
-        Mace(Actions.Slash, -4,"swing_silent", "hit_bash"), Dagger(Actions.Thrust, 0,"swing_normal","hit_bloody"),
-        Armor(Actions.Rest, -16,"swing_normal","hit_punch"), Scroll(Actions.Guard, 0,"scroll","hit_punch"),
-        Shoot(Actions.Shoot, -8,"swing_normal","hit_punch"), Snipe(Actions.Snipe, -8,"swing_normal","hit_punch"),
-        Bow(Actions.Aim, -8,"swing_silent","hit_punch"), Throwing(Actions.Throw, 0,"swing_silent","hit_punch"),
-        Darting(Actions.Dart, 0,"swing_normal","hit_punch"), Consumable(Actions.Consume, 0,"drink","hit_punch"),
-        Claw(Actions.Slash, 2,"swing_normal","hit_punch"), Enchant(Actions.Buff, 0,"swing_silent","hit_punch"),
-        Food(Actions.Consume, 0,"eat","hit_punch");
-        private Actions action;
-        private String sound, soundHit;
-        private int speed = 0;
-        ItemType(Actions p, int speed, String sound, String soundHit){
+        Slashing(Actions.Slash, 1.3f, "swing_knife"){
+            void onSet(Item host){
+                host.tags.add(Tag.Sharp);
+            }
+        }, Thrusting(Actions.Thrust, 1,"swing_silent"){
+            void onSet(Item host){
+                host.tags.add(Tag.Sharp);
+            }
+        },
+        Bashing(Actions.Slash, 2, "swing_silent"),
+        Armor(Actions.Rest, 1, "swing_normal"), Scroll(Actions.Guard, 0, "scroll"),
+        Shooting(Actions.Shoot, .8f, "swing_normal"), Rifle(Actions.Snipe, 1.2f, "swing_normal"),
+        Bow(Actions.Aim, 1, "swing_silent"), Throwing(Actions.Throw, .2f, "swing_silent"),
+        Darting(Actions.Dart, .1f, "swing_normal"), Consumable(Actions.Consume, .2f, "drink");
+        Actions action;
+        String sound;
+        float size;
+        ItemType(Actions p, float size, String sound){
             action = p;
-            this.speed = speed;
+            this.size = size;
             this.sound = sound;
-            this.soundHit = soundHit;
         }
-        public Actions getAction() {
-            return action;
+        void onSet(Item host){
         }
-        public String getSound(){
-            return sound;
+    }
+    public enum Material{
+        Wooden(.7f,2,16,1,new Color(118, 93, 0,255)){
+            void onSet(Item host) {
+                host.tags.add(Tag.Combustible);
+            }
+        }, Cloth(.7f,0,3,0){
+            void onSet(Item host) {
+                host.tags.add(Tag.Combustible);
+            }
+        }, Leather(.12f,1,6,1,new Color(133, 78, 32,255)){
+            void onSet(Item host) {
+                host.tags.add(Tag.Combustible);
+            }
+        }, Glass(.05f,1,1,7),
+        Brass(.3f,3,40,3,new Color(133, 123, 23,255)),
+        Copper(.15f,3,40,3,new Color(133, 92, 38,255)),
+        Bronze(.24f,3,70,5,new Color(133, 72, 0,255)),
+        Steel(.1f,4,120,6),
+        Titanium(.001f,2,800,6),
+        Bone(.05f,0,28,3),
+        Other(0,0,10,0),
+        Flesh(.05f,0,3,0),
+        Stone(.08f,5,5,4,new Color(107, 107, 107,255));
+        int weight, durability, hardness;
+        Color color;
+        float prevalence;
+        static float pool;
+        Material(float prevalence, int weight, int durability, int hardness){
+            expandPool(prevalence);
+            this.prevalence = prevalence;
+            this.weight = weight;
+            this.durability = durability;
+            this.hardness = hardness;
         }
-        public String getHitSound(){
-            return soundHit;
+        Material(float prevalence, int weight, int durability, int hardness, Color color){
+            this(prevalence, weight,durability,hardness);
+            this.color = color;
         }
-        public int getSpeed(){
-            return speed;
+        void onSet(Item host){
+        }
+        static Material get(Random seed, Material[] list){
+            float r = seed.nextFloat()*pool;
+            float t = 0;
+            float highest = -1;
+            Material highestMat = null;
+            for (Material i : list){
+                if (i.prevalence > highest){
+                    highest = i.prevalence;
+                    highestMat = i;
+                }
+                t += i.prevalence;
+                if (t >= r) return i;
+            }
+            return highestMat;
+        }
+        static void expandPool(float p){
+            pool += p;
         }
     }
     enum SpecialtyMod{
-        None, Light, Heavy, Feather, Sharp, Dull, Hasty, Lazy, Durable, Tough, Runic, Instant, Comfortable, Cursed, Quick, Slow, Conscious;
+        None, Light, Heavy, Feather, Sharp, Dull, Hasty, Lazy, Durable, Tough, Runic, Instant, Comfortable, Cursed, Conscious;
         static SpecialtyMod get(Random seed){
             if (seed.nextGaussian() > 1) return values()[seed.nextInt(values().length)];
             return None;
@@ -148,28 +209,28 @@ public class Item extends Prop {
     private SpecialtyMod smod = SpecialtyMod.None;
     private PrefixMod pmod = PrefixMod.None;
     protected Buffs emod = null;
+    Material material;
     public int weight;
     public int volume = 1;
     int cooldown = 0;
     public int delay = 0;
     public float probability;
-    Actions action = Actions.Slash;
     private int[] cdTime = new int[]{0};
-    private int durability = 1;
-    private int uses = 1;
-    private ItemType type = ItemType.Throwing;
-    public int speed = -4;
-    public int damage = 0;
+    int durability = 1;
+    int uses = 1;
+    ItemType type = ItemType.Throwing;
     public int value = 8;
     Man owner;
-    public Item(String name, int seed, int weight, int durability) {
+    public Item(String name, int seed, Material[] materials, ItemType type) {
         super(name, seed, 100);
         dynamic = true;
-        this.name = name;
-        this.weight = weight;
-        this.durability = durability;
-        this.uses = durability;
         gravity = true;
+        setType(type);
+        material = Material.get(rand, materials);
+        this.weight = (int) (material.weight * type.size);
+        setMaterial(material);
+        this.durability = material.durability;
+        this.uses = durability;
         final Item me = this;
         onInteract = new Interactive(){
             public void interact(Man p){
@@ -210,31 +271,39 @@ public class Item extends Prop {
         int r = getRarity();
         int ctype = image.getCenterType();
         if (r % 10 > 3){
-            image = new ShadedPicture(name, Shader.Color);
+            image = new ShadedPicture(rand, name, Shader.Color);
             ((ShadedPicture) image).shade(new Color(250, 220, 100, 180).getRGB());
         } else if (r >= 100){
-            image = new ShadedPicture(name, Shader.Color);
+            image = new ShadedPicture(rand, name, Shader.Color);
             ((ShadedPicture) image).shade(new Color(48, 156, 200, 180).getRGB());
         }
         image.setCenterType(ctype);
     }
-    public void setType(ItemType p){
+    private void setType(ItemType p){
         this.type = p;
-        this.action = p.getAction();
-        this.speed += p.getSpeed();
+        this.type.onSet(this);
+    }
+    void setMaterial(Material mat){
+        this.material = mat;
+        durability += mat.durability;
+        mat.onSet(this);
+        if (mat.color != null) {
+            int ctype = image.getCenterType();
+            image = new ShadedPicture(rand, name, Shader.Color);
+            ((ShadedPicture) image).shade(mat.color.getRGB());
+            image.setCenterType(ctype);
+        }
     }
     protected void setModifier(PrefixMod mod){
         if (mod == PrefixMod.Awful){
-            speed -= 10;
-            durability = (int) (durability*.4f);
-        }else if (mod == PrefixMod.Old){
-            speed -= 4;
-            durability = (int) (durability*.7f);
-        }else if (mod == PrefixMod.Fine){
+            weight += 2;
+        } else if (mod == PrefixMod.Old){
+            durability = (int) (durability*.5f);
+        } else if (mod == PrefixMod.Fine){
             probability += .1f;
             durability = (int) (durability*1.5f);
-        }else if (mod == PrefixMod.Mastercraft){
-            speed += 4;
+        } else if (mod == PrefixMod.Mastercraft){
+            weight = Math.max(0, weight-1);
             probability += .2f;
             durability = (int) (durability*2f);
         }
@@ -247,8 +316,6 @@ public class Item extends Prop {
         else if (mod == SpecialtyMod.Heavy) this.weight += admod.magnitude;
         else if (mod == SpecialtyMod.Light) this.weight = Math.max(0, this.weight + (-1 * admod.magnitude));
         else if (mod == SpecialtyMod.Feather) this.weight /= 2*admod.magnitude;
-        else if (mod == SpecialtyMod.Quick) speed = admod.magnitude;
-        else if (mod == SpecialtyMod.Slow) speed = -admod.magnitude;
         else if (mod == SpecialtyMod.Hasty) cooldown *= 1-(.2f*admod.magnitude);
         else if (mod == SpecialtyMod.Lazy) cooldown *= 1+(.2f*admod.magnitude);
         else if (mod == SpecialtyMod.Durable) durability *= 2;
@@ -362,7 +429,7 @@ public class Item extends Prop {
         mobile = true;
         if (smod == SpecialtyMod.Cursed){
             ArrayList<Buffs> list = Buffs.getByTag(Tag.Debuff);
-            host.buff(list.get(rand.nextInt(list.size())),3);
+            host.buff(list.get(rand.nextInt(list.size())),rand.nextInt(9)+1);
         }
     }
     public void remove(){
@@ -373,8 +440,8 @@ public class Item extends Prop {
     void onBreak(){
         remove();
     }
-    protected void playSound(){
-        Sound.play(type.getSound());
+    private void playSound(){
+        Sound.play(type.sound);
     }
     public boolean usable(int p){
         if ((isInfinite() || uses >= p) && Global.time >= cdTime[0]){
@@ -391,7 +458,7 @@ public class Item extends Prop {
     public void use(Man host){
         playSound();
         cdTime[0] = Global.time+cooldown;
-        host.setState(action);
+        host.setState(type.action);
     }
     public void trigger(Unit target){
         if (emod != null && rand.nextFloat() < probability){
@@ -410,12 +477,6 @@ public class Item extends Prop {
         Updater.cancelAdd(this);
         return this;
     }
-    public String getSound(){
-        return type.getSound();
-    }
-    public String getHitSound(){
-        return type.getHitSound();
-    }
     public String getDescription() {
         String r = "";
         r += Dialog.get("itemDsc",new String[]{getFullName(),weight+"",(isInfinite()?"unlimited":uses+"")});
@@ -432,7 +493,7 @@ public class Item extends Prop {
         return r;
     }
     public int getDamage() {
-        return damage;
+        return Global.r.nextInt(Math.max(1,weight));
     }
     public Line getLine(){
         float len = image.getSize().x * dir;

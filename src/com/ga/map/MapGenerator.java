@@ -166,8 +166,8 @@ public class MapGenerator {
         P result = new P(mapSize.x / 2, bottom-4);
         Prop door = Stock.Door.create(returnDoorSeed);
         door.pos.set(result);
-        Stock.Exit.create(returnDoorSeed).pos.set(result.x,result.y-door.image.size.y/2);
-        Stock.Spawn.create(returnDoorSeed).pos.set(result.x,result.y-door.image.size.y/2);
+        Stock.Exit.create(returnDoorSeed).pos.set(result.x,result.y-door.image.getSize().y/2);
+        Stock.Spawn.create(returnDoorSeed).pos.set(result.x,result.y-door.image.getSize().y/2);
         int merchantType = Integer.parseInt(houseInfos[1]);
         if (merchantType != 0){ //1:food,2:shop,3:guild,4:training
             Stock.Merchant.create(merchantType-1).pos.set(Global.r.nextInt((int) mapSize.x-130)+65,result.y-20);
@@ -182,7 +182,7 @@ public class MapGenerator {
                             Stock.getInstant("Shortchair", -1).pos.set(cx - 50, y - 1);
                             Stock.getInstant("Shortchair", -1).pos.set(cx + 50, y - 1);
                         } else if (merchantType == 3 || merchantType == 4){
-                            Stock.getInstant("Dummy", -1).pos.set(cx, y - 1);
+                            Stock.getInstant("Training_Dummy", -1).pos.set(cx, y - 1);
                         }
                     }
                 }
@@ -229,7 +229,7 @@ public class MapGenerator {
                 Global.r.nextFloat()*(last.ptd.y-last.pt.y)+last.pt.y);
         Line one = new Line(last.pt, mid);
         Line two = new Line(mid, last.ptd);
-        float shortest = last.getLength()/(3*(current+1));
+        float shortest = last.getLength()/(8*(current+1));
         float atan = last.getAtan()+1.57f;
         float rand = Global.rng(1);
         mid.add(Global.cos(atan)*shortest*rand, Global.sin(atan)*shortest*rand);
@@ -389,12 +389,14 @@ public class MapGenerator {
             System.out.println("Failed to generate map for terrain '"+terrain+"'");
             System.exit(1);
         }
-        for (int i=0;i<depths.size();i++){
-            Global.map.formTextures.put(i, depths.get(i)+"&"+Global.map.formTextures.get(i));
-        }
-        if (Global.map.formTextures.size() > depths.size()){
-            System.out.println("UNKNOWN ERROR");
-            System.exit(1);
+        for (java.util.Map.Entry i : Global.map.formTextures.entrySet()){
+            for (int ii=0;ii<depths.size();ii++){
+                int key = (int) i.getKey();
+                if (depths.get(ii) == key) {
+                    Global.map.formTextures.put(key, ii+"&"+Global.map.formTextures.get(key));
+                    break;
+                }
+            }
         }
     }
 }
@@ -403,14 +405,15 @@ class ObjectGenerator{
     private static void generateHouse(String name, Line land){
         Prop base = Stock.getByName(name, -1);
         float lineX = land.getMidPoint().x;
-        if (Math.abs(land.getSlope()) > .1f) lineX += base.image.size.x/2*(land.getSlope()>0?1:-1);
+        float mid = base.image.getSize().x/2;
+        if (Math.abs(land.getSlope()) > .1f) lineX += mid*(land.getSlope()>0?1:-1);
         float lineY = land.getCrossPointY(lineX);
         P tpos = new P(land.getMidPoint().x, lineY);
         base.pos.load(tpos.toString());
         P s = base.image.getSize().getMult(.5f, .5f);
         if (!name.equals("TowerTip"))
-            Global.map.land.add(new Line(tpos.x-s.x, land.getCrossPointY(land.getMidPoint().x-base.image.size.x/2)-s.y*2+8,
-                tpos.x+s.x, land.getCrossPointY(land.getMidPoint().x+base.image.size.x/2)-s.y*2+8,-1,0,land.depth));
+            Global.map.land.add(new Line(tpos.x-s.x, land.getCrossPointY(land.getMidPoint().x-mid)-s.y*2+8,
+                tpos.x+s.x, land.getCrossPointY(land.getMidPoint().x+mid)-s.y*2+8,-1,0,land.depth));
     }
     static void generateSingleHouse(Line land){
         if (Global.r.nextBoolean()) generateHouse("SteamHouse",land);

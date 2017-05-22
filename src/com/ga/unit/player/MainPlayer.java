@@ -32,11 +32,11 @@ public class MainPlayer extends Player {
     }
     @Override
     public int setState(Actions state) {
-        if (state == Actions.Use && this.state == Actions.Jump && skillTree.getSkillLevel(Actions.Airstrike) > 0 && this.delay.time > 32) stateSet(Actions.Airstrike);
-        else if (state == Actions.Jump && this.state == Actions.Rest && skillTree.getSkillLevel(Actions.Leap) > 0) state = Actions.Leap;
-        else if (state == Actions.Rest && this.state == Actions.Walk && skillTree.getSkillLevel(Actions.Sprint) > 0) state = Actions.Sprint;
-        else if (state == Actions.Kick && this.state == Actions.Rest && skillTree.getSkillLevel(Actions.Sidekick) > 0) state = Actions.Sidekick;
-        else if (state == Actions.Drop && this.state == Actions.Rest && skillTree.getSkillLevel(Actions.Sneak) > 0){
+        if (state == Actions.Use && this.state == Actions.Jump && getStateLevel(Actions.Airstrike) > 0 && this.delay.time > 32) stateSet(Actions.Airstrike);
+        else if (state == Actions.Jump && this.state == Actions.Rest) state = Actions.Leap;
+        else if (state == Actions.Rest && this.state == Actions.Walk) state = Actions.Sprint;
+        else if (state == Actions.Kick && this.state == Actions.Rest) state = Actions.Sidekick;
+        else if (state == Actions.Drop && this.state == Actions.Rest){
             state = Actions.Rest;
             if (Updater.collideUnit(pos, 360, faction).size() == 0) {
                 for (Prop i : Updater.collideProp(pos, -12)) {
@@ -97,7 +97,7 @@ public class MainPlayer extends Player {
     }
     protected void stateDone(){
         super.stateDone();
-        if (input.moving != 0) setState(Actions.Walk);
+        if (input.moving != 0 && state != Actions.Sprint) setState(Actions.Walk);
     }
     protected void stateUpdate(){
         super.stateUpdate();

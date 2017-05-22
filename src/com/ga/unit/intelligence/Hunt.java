@@ -38,10 +38,10 @@ class Hunt implements Task {
                 if (y > 64 && Global.r.nextBoolean()) host.setState(Actions.Drop);
                 else {
                     int t = host.performActions((int) dist);
-                    if (host.state.getTags().contains(Tag.Channel)) {
+                    if (host.state.getTags().contains(Tag.Channeling)) {
                         host.delay.set(60 + Global.r.nextInt(80));
                     }
-                    if (t == 2 && target.vel.x > 0 != host.dir > 0) { //no stamina
+                    if (t == 2) { //no stamina
                         host.setState(Actions.Rest);
                         host.delay.time += 40;
                     }

@@ -1,40 +1,72 @@
 package com.ga.map;
 
+import com.ga.game.FileManager;
 import com.ga.tool.P;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Random;
 
 /**
- * Created by Ga on 5/6/2016.
+ * Created by Ga on 5/6/2016. asd
  */
-public class Picture extends Texture {
+public class Picture {
+    private P size = new P();
+    private static HashMap<String,BufferedImage> cache = new HashMap<>();
+    private static HashMap<String,String> directory = new HashMap<>();
+    private static HashMap<String,Integer> multiples = new HashMap<>();
+    public boolean visible = false;
+    public BufferedImage image;
     public int sizeRadius = 10;
     private P halfSize;
+    public Random rand;
     private int type = 1; //1:center,2:bottom
-    public Picture(){
-        super();
+    public static void init(){
+        for (String[] i : FileManager.fileCache.get("png")){
+            int randIndex = i[0].indexOf("-");
+            if (randIndex != -1){
+                String category = i[0].substring(0, randIndex);
+                if (multiples.get(category) == null) multiples.put(category, 1);
+                else multiples.put(category, multiples.get(category)+1);
+            }
+            directory.put(i[0], i[1]);
+        }
+        cache.put("Drop",getTexture(loadCache("Icon"),24,24,0,0));
+        cache.put("Buy",getTexture(loadCache("Icon"),24,24,1,0));
+        cache.put("Describe",getTexture(loadCache("Icon"),24,24,2,0));
+        cache.put("POI",getTexture(loadCache("Icon"),24,24,3,0));
     }
-    private Picture(BufferedImage image){
-        super(image);
-        setSize(size.x,size.y);
+    public Picture(Random rand){
+        this.rand = rand;
     }
-    public Picture(String name){
-        this(load(name));
+    public void set(BufferedImage image){
+        this.image = image;
+        if (this.image != null) setSize(image.getWidth(), image.getHeight());
+        visible = true;
     }
-    public Picture(String name, int index){
-        this(getTexture(load(name),32,64,index,0));
+    public void set(String name){
+        set(load(name));
+    }
+    public void set(String name, int index){
+        set(getTexture(load(name),32,64,index,0));
     }
     public BufferedImage getImage(){
         return image;
     }
-    public P getHalfSize(){
-        return halfSize;
+    public void setSize(P p){
+        setSize(p.x, p.y);
     }
     public void setSize(float x, float y){
         size = new P(x,y);
         sizeRadius = (int) size.getMult(.5f,.5f).getDist();
         setCenterType(type);
+    }
+    public P getSize(){
+        return size;
     }
     public int getCenterType(){
         return type;
@@ -44,6 +76,54 @@ public class Picture extends Texture {
         if (type == 1) halfSize = new P(size.x/2, size.y/2);
         else if (type == 2) halfSize = new P(size.x/2, size.y-4);
         else if (type == 3) halfSize = new P(8, size.y/2);
+    }
+    private BufferedImage load(String dir){
+        BufferedImage image = null;
+        String file = directory.get(dir);
+        if (file == null){
+            Integer num = multiples.get(dir);
+            if (num != null) {
+                if (rand == null) rand = new Random();
+                dir += "-" + rand.nextInt(num);
+                file = directory.get(dir);
+            }
+        }
+        if (file != null) {
+            try {
+                image = ImageIO.read(new File(file));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else System.out.println("Can't read file ["+dir + "]");
+        return image;
+    }
+    public static BufferedImage loadCache(String dir){
+        BufferedImage image = cache.get(dir);
+        if (image != null) return image;
+        String file = directory.get(dir);
+        if (file != null) {
+            try {
+                image = ImageIO.read(new File(file));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            cache.put(dir, image);
+        } else System.out.println("Can't read file ["+dir + "]");
+        return image;
+    }
+    private static BufferedImage getTexture(BufferedImage image, int sx, int sy, int px, int py) {
+        return image.getSubimage(px * sx, py * sy, sx, sy);
+    }
+    static void newImage(String path, String p, BufferedImage image){
+        String fullPath = path+p+".png";
+        FileManager.save(fullPath,"");
+        File output = new File("Data/"+fullPath);
+        try {
+            ImageIO.write(image, "png", output);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        cache.put(p,image);
     }
     public void draw(Graphics2D g, float x, float y, float rot, int dir, float sizeX, float sizeY){
         if (visible) {

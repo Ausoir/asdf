@@ -19,11 +19,12 @@ public class Terrain extends ShadedPicture implements Drawable{
     private ArrayList<Line> lines = new ArrayList<>();
     protected P pos;
     private int length = 0; //polygon size is always multiples of 4
+    private P finalSize;
     public Terrain(String texture, Shader shader, int depth){
-        super(texture, shader);
+        super(null, texture, shader);
         setDepth(depth);
         polygon = new Polygon();
-        imageTexture = new TexturePaint(image, new Rectangle2D.Double(0,0,size.x,size.y));
+        imageTexture = new TexturePaint(image, new Rectangle2D.Double(0,0,getSize().x,getSize().y));
         Updater.add(this);
     }
     static int toTerrainDepth(int depth){
@@ -61,10 +62,10 @@ public class Terrain extends ShadedPicture implements Drawable{
             polygon.xpoints[i] -= lowX;
             polygon.ypoints[i] -= lowY;
         }
-        size.set(highX-lowX, highY-lowY);
+        setSize(highX-lowX, highY-lowY);
         pos = new P(lowX, lowY);
         pos.mult(ZOOM);
-
+        P size = getSize();
         if (lines.size() > 0){
             image = null; //todo: turn on cache
 //            image = Texture.load(Global.player.cmap + "_" + lines.get(0).next);
@@ -83,10 +84,14 @@ public class Terrain extends ShadedPicture implements Drawable{
             g.fill(polygon);
         }
     }
+    public void setSize(float x, float y){
+        super.setSize(x, y);
+        finalSize = new P(x*ZOOM, y*ZOOM);
+    }
     public void draw(Graphics2D g){
         if (visible) {
             P t = new P(pos.x+Global.rel.x, pos.y+Global.rel.y);
-            g.drawImage(image,(int)t.x,(int)t.y,(int)(size.x*ZOOM),(int)(size.y*ZOOM),null);
+            g.drawImage(image,(int)t.x,(int)t.y,finalSize.x(),finalSize.y(),null);
 //            for (Line i : lines) g.drawLine((int)(t.x+i.pt.x),(int)(t.y+i.pt.y),(int)(t.x+i.ptd.x),(int)(t.y+i.ptd.y));
         }
     }

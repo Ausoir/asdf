@@ -2,10 +2,7 @@ package com.ga.map;
 
 import com.ga.game.FileManager;
 import com.ga.game.Observer;
-import com.ga.tool.Line;
-import com.ga.tool.P;
-import com.ga.tool.Performer;
-import com.ga.tool.Timer;
+import com.ga.tool.*;
 import com.ga.unit.*;
 import com.ga.unit.intelligence.Intelligence;
 import com.ga.unit.item.Item;
@@ -32,7 +29,7 @@ public class Updater {
     private static ArrayList<Observer> removeQueue = new ArrayList<>();
     public static String changeMap = null;
     public static Performer changeMapEvent = null;
-    public static Timer time = new Timer(40,true);
+    static Timer time = new Timer(40,true);
     private static void clear(){
         drawee.clear();
         effects.clear();
@@ -74,11 +71,15 @@ public class Updater {
                     Global.player.pos.set(24,entrance.getCrossPointY(24)-Math.abs(entrance.getSlope()));
                 } else if (edge == 8){
                     Line entrance = Global.map.checkLand(new Line(1,Global.map.size.y-64,Global.map.size.x-1,Global.map.size.y-64),0);
-                    while (entrance.getSlope() > 1) {
-                        entrance = Global.map.checkLand(new Line(1,entrance.pt.y-1,Global.map.size.x-1,entrance.pt.y-1),0);
+                    float lastY = Global.map.size.y-128;
+                    if (entrance != null) lastY = entrance.pt.y - 1;
+                    while (entrance == null || entrance.getSlope() > 1) {
+                        if (entrance == null) lastY -= 64;
+                        else lastY = entrance.pt.y - 1;
+                        entrance = Global.map.checkLand(new Line(1,lastY,Global.map.size.x-1,lastY),0);
                     }
                     float y = Math.min(Global.map.size.y-64, entrance.ptd.y-1);
-                    Global.player.pos.set(entrance.getCrossPointX(y), y-Math.abs(entrance.getSlope()));
+                    Global.player.pos.set(entrance.getCrossPointX(y+1), y-Math.abs(entrance.getSlope()));
                 }
             }
             Global.player.reconnect();
@@ -142,6 +143,7 @@ public class Updater {
         for (Drawable i : drawee){
             i.draw(g2);
         }
+//        Grapher.draw(g2);
         Global.map.weather.draw(g2);
     }
     public static void add(Observer p){
@@ -248,12 +250,58 @@ public class Updater {
         }
         return seen;
     }
-    public static boolean mapIsSafe(Faction faction){
+    public static int sleep(int p){
+        int origTime = Global.time;
+        Unit encounter = getMapEncounter(Global.player.faction, p);
+        Global.map.weather.fadeIn();
+        if (encounter != null){
+            int timePassed = Global.time - origTime;
+            if (timePassed > 1) {
+                encounter.pos = Global.player.pos.getAdd(0, 0);
+                Actions.Blink.onSet(encounter);
+            }
+            if (encounter.brain != null) encounter.brain.target = Global.player;
+            Global.player.say("Interrupted after "+timePassed+" seconds!");
+            return timePassed;
+        } else {
+            if (p % 100 == 0) Global.player.say((p/100)+" hour(s) passed.");
+            Global.player.say(p+" seconds passed.");
+            Global.update(p);
+            return p;
+        }
+    }
+    private static Unit getMapEncounter(Faction faction, int time){
+        ArrayList<Unit> units = new ArrayList<>();
+        ArrayList<Float> dangers = new ArrayList<>();
         for (Map.Entry i : unitList.entrySet()) {
             Unit unit = (Unit) i.getValue();
-            if (unit.faction.canAttack(faction)) return false;
+            if (unit.hittable(faction)){
+                boolean sorted = false;
+                float danger = (float) Math.pow(800f/(unit.pos.getSubtract(Global.player.pos).getDist()),2);
+                for (int ii=0;ii<dangers.size();ii++){
+                    if (danger > dangers.get(ii)){
+                        sorted = true;
+                        dangers.add(ii, danger);
+                        units.add(ii, unit);
+                        break;
+                    }
+                }
+                if (!sorted){
+                    dangers.add(danger);
+                    units.add(unit);
+                }
+            }
         }
-        return true;
+        for (int ii=0;ii<time;ii+=10) {
+            for (int i=0;i<dangers.size();i++) {
+                float rand = Global.r.nextFloat();
+                if (rand < dangers.get(i)) {
+                    Global.update(ii);
+                    return units.get(i);
+                }
+            }
+        }
+        return null;
     }
     public static P getEntrancePos(int p){
         int index = 0;

@@ -3,10 +3,14 @@ package com.ga.unit;
 import java.util.ArrayList;
 
 /**
- * Created by Ga on 4/5/2017.
+ * Created by Ga on 4/5/2017. aaa
  */
 public class Tags extends ArrayList<Tag> {
-    public boolean has(Tag p){
+    public static final Tag[] trainers = new Tag[]{
+        Tag.Combat, Tag.Finesse, Tag.Might, Tag.Athletics, Tag.Aiming, Tag.Energy, Tag.Channeling, Tag.Cunning
+    };
+
+    boolean has(Tag p){
         for (Tag i : this) {
             if (i == p) return true;
         }
@@ -23,8 +27,12 @@ public class Tags extends ArrayList<Tag> {
     public Tags getTrainers(){
         Tags r = new Tags();
         for (Tag i : this){
-            if (i == Tag.Martial || i == Tag.Agility || i == Tag.Jumping || i == Tag.Athletics || i == Tag.Swinging)
-                r.add(i);
+            for (Tag ii : trainers){
+                if (ii == i){
+                    r.add(i);
+                    break;
+                }
+            }
         }
         return r;
     }

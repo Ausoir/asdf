@@ -10,12 +10,12 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
 /**
- * Created by Ga on 11/15/2016.
+ * Created by Ga on 11/15/2016. asd
  */
 public class MenuMap extends Panel {
     private JPanel panel;
-    private BufferedImage image = Picture.load("map/Worldmap");
-    private ImageIcon poi = new ImageIcon(Picture.load("POI"));
+    private BufferedImage image = Picture.loadCache("map/Worldmap");
+    private ImageIcon poi = new ImageIcon(Picture.loadCache("POI"));
     private JLabel[] labels = new JLabel[3];
     private int[] poiCoords = new int[]{
             164,400 , 245,386 , 117,356

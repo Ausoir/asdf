@@ -89,7 +89,7 @@ public class MenuShop extends Panel {
         options.setOpaque(false);
         options.setLayout(new BoxLayout(options,BoxLayout.LINE_AXIS));
         final JLabel drop = new JLabel(item.getFullName()+" - "+price);
-        drop.setIcon(new ImageIcon(Picture.load("Buy")));
+        drop.setIcon(new ImageIcon(Picture.loadCache("Buy")));
         drop.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {

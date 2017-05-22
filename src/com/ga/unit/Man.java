@@ -74,7 +74,7 @@ public class Man extends Unit {
     }
 
     public void attackSound(){
-        Sound.play(weapon.getSound());
+        Sound.play("swing_normal");
     }
 
     @Override
@@ -85,8 +85,7 @@ public class Man extends Unit {
     }
 
     public void stateSet(Actions state){
-        damageMod = 1 + (stateLevel*.4f);
-        attackSpeed = weapon.speed-armor.getEncumberance()-weapon.weight;
+        attackSpeed = -armor.getEncumberance()-weapon.weight;
         super.stateSet(state);
     }
 
@@ -106,7 +105,7 @@ public class Man extends Unit {
 
     @Override
     public int getDamage(){
-        return (int) Math.max(0,(weapon.getDamage()*damageMod)-armor.armor[FIST].encumberance+armor.armor[FIST].damage);
+        return (int) Math.max(0,(weapon.getDamage()*damageMod)-armor.armor[FIST].encumberance);
     }
 
     @Override
@@ -132,11 +131,10 @@ public class Man extends Unit {
 
     public void onAttack(Unit p){
         if (weapon.usable(1)) weapon.trigger(p);
-        Sound.play(weapon.getHitSound());
         if (brain != null) brain.onAttack();
     }
 
-    public boolean attack() {
+    public Unit attack() {
         boolean cleave = false;
         if (stats.triggerEffect(Buffs.Cleave)) cleave = true;
         Line hitbox = weapon.getLine();
@@ -149,16 +147,16 @@ public class Man extends Unit {
         }
         if (target != null) {
             onAttack(target);
-            return true;
+            return target;
         }
-        return false;
+        return null;
     }
 
     public boolean checkHit(Line hitBox, int damage) {
         boolean r;
         if (r = super.checkHit(hitBox, damage)) {
             if (clip.organs[FIST].amputated && clip.organs[OFIST].amputated){
-                tags.remove(Tag.Swinging);
+                tags.remove(Tag.Aiming);
             }
         }
         return r;
@@ -166,12 +164,8 @@ public class Man extends Unit {
 
     @Override
     protected void moveTriggered(int organ){
-        if (state == Actions.Kick || state == Actions.Sidekick){
-            Line hitbox = clip.organs[organ].getAdd(pos);
-            int damage = armor.armor[1].getDamage()+1;
-            for (Unit i : Updater.collideUnit(pos, (int) hitbox.getLength(), faction))
-                i.checkHit(hitbox,damage);
-        } else super.moveTriggered(organ);
+        weapon.pos.set(pos.x + clip.organs[FIST].ptd.x, pos.y + clip.organs[FIST].ptd.y);
+        super.moveTriggered(organ);
     }
 
     public void setVisible(boolean p) {

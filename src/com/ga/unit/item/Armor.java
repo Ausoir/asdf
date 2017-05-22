@@ -11,19 +11,19 @@ import com.ga.unit.Man;
  */
 public class Armor extends Item {
     private int piece = 0;
-    private float armor = 0;
-    private int armorMod = 1;
+    private float coverage = 0;
+    private int armorMod = 0;
     public int encumberance = 0;
     public int pocket = 0;
-    public Armor(String name, int seed, int weight, float armor, int encumberance, int piece) {
-        super(name, seed, weight, 4);
+    public Armor(String name, int seed, Material[] materials, float coverage, int pockets, int piece) {
+        super(name, seed, materials, ItemType.Armor);
+        this.coverage = coverage;
+        weight *= coverage;
         value = 24;
-        setType(ItemType.Armor);
-        this.armor = armor;
-        this.name = name;
-        this.encumberance = encumberance;
+        this.pocket = pockets;
+        this.encumberance = -material.weight/2;
         this.piece = piece;
-        if (piece != 0) image = new Picture(name, piece);
+        if (piece != 0) image.set(name, piece);
         delay = 80;
     }
     public void onCreate(){
@@ -33,8 +33,12 @@ public class Armor extends Item {
             ademod = AdenchantMod.None;
         }
     }
+    private float getMaxArmor(){
+        return Math.max(0,material.hardness + armorMod);
+    }
     float getArmor(){
-        return Math.max(0,armor + armorMod);
+        if (Global.r.nextFloat() < coverage) return getMaxArmor();
+        else return 0;
     }
     protected void setModifier(PrefixMod mod){
         super.setModifier(mod);
@@ -59,7 +63,7 @@ public class Armor extends Item {
     }
     @Override
     public void use(final Man host){
-        host.setState(action);
+        host.setState(type.action);
         final Armor me = this;
         host.delay.performer = new Performer(){
             public void perform(){
@@ -74,7 +78,7 @@ public class Armor extends Item {
     }
     @Override
     public String getName(){
-        String r = super.getName();
+        String r = material.name() + " " + super.getName();
         if (piece == 1) r+=" Leggings";
         else if (piece == 2) r+=" Armor";
         return r;
@@ -85,6 +89,7 @@ public class Armor extends Item {
         if (emod != null){
             r += " This armor has "+probability*100+"% chance of activating its enchantment on being hit.";
         }
-        return r + " This armor decreases damage by "+getArmor()+" points. It has "+pocket+" pockets.";
+        return r + " This armor decreases damage by "+getMaxArmor()+" points "+(coverage*100)+"% of the time." +
+                " It has "+pocket+" pockets.";
     }
 }

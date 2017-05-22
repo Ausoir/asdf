@@ -1,6 +1,5 @@
 package com.ga.unit;
 
-import com.ga.game.Sound;
 import com.ga.map.Global;
 import com.ga.unit.skill.Actions;
 
@@ -39,9 +38,9 @@ public class BodyHumanoid extends Body {
                 rotateAppendage(FIST, 20, 0);
                 break;
             case "Aim":
-                rotateAppendage(HEAD, 66, -1.6f*host.dir);
-                rotateAppendage(FIST, 67, 0);
-                rotateAppendage(OFIST, 67, 0);
+                rotateAppendage(HEAD, 47, -1.6f*host.dir);
+                rotateAppendage(FIST, 48, 0);
+                rotateAppendage(OFIST, 48, 0);
                 break;
             case "Shoot":
                 rotateAppendage(FIST, 39, 0);
@@ -56,7 +55,6 @@ public class BodyHumanoid extends Body {
             case "Underhand":
                 rotateAppendage(FIST, 23, 0);
                 break;
-            case "Throw":
             case "Thrust":
                 rotateAppendage(FIST, 7, 0);
                 break;
@@ -82,7 +80,7 @@ public class BodyHumanoid extends Body {
         setAppendages();
     }
 
-    public int update() {
+    public boolean update() {
         if (host.state == Actions.Walk)
             if ((current == 0 || current == 2) && frame.over()) ((Man)host).stepSound();
         else if (host.state == Actions.Sprint)

@@ -11,5 +11,4 @@ hit 2 (cut) : http://www.freesound.org/people/Abyssmal/sounds/35213/
 hit 3 (cut) : http://www.freesound.org/people/Kreastricon62/sounds/323526/
 freeze : http://www.freesound.org/people/karlis.stigis/sounds/168712/
 fire: http://www.freesound.org/people/pengo_au/sounds/90143/
-eat: http://www.freesound.org/people/j1987/sounds/106392/
 drink: http://www.freesound.org/people/Q.K./sounds/56270/

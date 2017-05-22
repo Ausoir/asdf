@@ -14,8 +14,6 @@ import java.util.Random;
  */
 public class Prop extends Thing {
     public int factoryId = -1;
-    public int seed = 0;
-    public Random rand;
     public Interactive onInteract = null;
     public boolean gravity = false;
     protected boolean mobile = true;
@@ -25,13 +23,8 @@ public class Prop extends Thing {
     public boolean dynamic = false; //regrowth sensitive
     public Line lastLand = new Line();
     public Tags tags = new Tags();
-    public Prop(){
-        super(null);
-    }
     public Prop(String name, int seed, int depth) {
-        super(name, depth);
-        this.seed = seed;
-        rand = new Random(this.seed);
+        super(name, seed, depth);
     }
     public int getDamage(){
         return 0;
@@ -46,6 +39,7 @@ public class Prop extends Thing {
     public void onField(){
         adjustToLand();
     }
+    public void onAttack(Unit p){}
     private void adjustToLand(){
         Line closest = Global.map.checkLand(new Line(pos, new P(pos.x, pos.y+800)));
         float closestY = pos.y + 9999;
@@ -112,7 +106,8 @@ public class Prop extends Thing {
     }
     protected void explode(int r){
         for (Unit i : Updater.collideUnit(pos, getSize()+r, faction)){
-            i.checkHit(new Line(pos, pos),getDamage());
+            i.checkHit(pos, getDamage());
+            onAttack(i);
         }
     }
     public void onCollide(Line l){

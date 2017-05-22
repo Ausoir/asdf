@@ -6,7 +6,7 @@ import com.ga.unit.Stock;
 /**
  * Created by Ga on 10/31/2016. asd
  */
-public enum MapEvent implements Updatable{
+public enum MapEvent{
     None(null, new Performer(){
         public void perform(){
         }
@@ -27,9 +27,6 @@ public enum MapEvent implements Updatable{
     MapEvent (String mobs, Performer p){
         this.mobs = mobs;
         event = p;
-    }
-    public void update(){
-        event.perform();
     }
     @Override
     public String toString(){

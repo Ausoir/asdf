@@ -1,9 +1,9 @@
 package com.ga.unit.intelligence;
 
-import com.ga.game.Command;
 import com.ga.game.Input;
 import com.ga.game.Keybinding;
 import com.ga.map.Global;
+import com.ga.map.Updater;
 import com.ga.tool.P;
 import com.ga.unit.player.Player;
 import com.ga.unit.skill.Actions;
@@ -93,7 +93,7 @@ public class PlayerInput implements Input {
         else if (mode == Keybinding.get("RIGHT")) moveCamera(80,0);
         else if (mode == Keybinding.get("LEFT")) moveCamera(-80,0);
         else if (mode == Keybinding.get("DOWN")) moveCamera(0,80);
-        else if (mode == Keybinding.get(",")) Global.sleep(50);
+        else if (mode == Keybinding.get(",")) Updater.sleep(50);
         else if (keyMap.containsKey(mode)){
             inputDirect(keyMap.get(mode),x,y);
         } else if (mode >= 49 && mode < 55) {

@@ -86,17 +86,9 @@ public class Global {
             p.set(clamp(p.x, Settings.centerX+margin, Global.map.size.x-Settings.centerX-margin),
                 clamp(p.y, Settings.centerY+40+margin, Global.map.size.y-Settings.centerY-margin-margin));
     }
-    public static boolean sleep(int p){
-        if (Updater.mapIsSafe(Global.player.faction)){
-            Global.update(p);
-            return true;
-        }
-        return false;
-    }
     public static void update(int p){
         time+=p;
-        map.onTimeChange();
-        map.event.update();
+        if (p != 1 || time % HOUR == 0) map.onTimeChange();
         Iterator it = timers.iterator();
         while (it.hasNext()){
             EventTimer timer = (EventTimer) it.next();

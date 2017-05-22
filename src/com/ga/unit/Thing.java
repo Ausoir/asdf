@@ -7,11 +7,14 @@ import com.ga.map.Updater;
 import com.ga.tool.P;
 
 import java.awt.*;
+import java.util.Random;
 
 /**
- * Created by Ga on 5/6/2016.
+ * Created by Ga on 5/6/2016. thing
  */
 public class Thing implements Drawable, Observer {
+    public Random rand;
+    public int seed = 0;
     public Picture image;
     public P pos;
     public String name;
@@ -19,25 +22,22 @@ public class Thing implements Drawable, Observer {
     public int dir = 1;
     public float rotation = 0;
     public boolean save = true;
-    public Thing(String name){
+    Thing(String name, int seed){
         this.name = name;
-        if (name != null) {
-            setImage(name);
-        } else {
-            image = new Picture();
-            image.visible = false;
-            image.setSize(0,0);
-        }
+        this.seed = seed;
         pos = new P();
+        rand = new Random(seed);
+        image = new Picture(rand);
+        if (name != null) setImage(name);
     }
     public void setImage(String p){
-        image = new Picture(p);
+        image.set(p);
     }
     public void rotateTo(P p){
         rotation = ((float) Math.atan2(p.y,p.x));
     }
-    public Thing(String name, int depth){
-        this(name);
+    public Thing(String name, int seed, int depth){
+        this(name, seed);
         this.depth = depth;
         Updater.add(this);
     }

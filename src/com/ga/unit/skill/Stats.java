@@ -6,7 +6,6 @@ import com.ga.unit.Unit;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -24,9 +23,6 @@ public class Stats {
         Stat stat = stats.get(p);
         if (stat == null) Global.p("Can't find stat "+p);
         return stat;
-    }
-    void setStat(String name, Stat p) {
-        stats.put(name,p);
     }
     public void addEffect(Buffs p, int level){
         Buff origBuff = getEffect(p);

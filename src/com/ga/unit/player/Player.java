@@ -211,14 +211,21 @@ public class Player extends Man {
                 break;
         }
     }
+    public int getStatePower(Actions state){
+        int power = 0;
+        int num = 0;
+        for (Tag i : state.getTags().getTrainers()){
+            power += get(i.toString()).get();
+            num++;
+        }
+        if (num == 0) return 1;
+        return (power / num) / 100;
+    }
     @Override
     public int getStateLevel(Actions state){
         int difficulty = state.getDifficulty();
         if (difficulty == 0) return 1;
-        int power = 0;
-        for (Tag i : state.getTags().getTrainers()){
-            power += get(i.toString()).get();
-        }
+        int power = getStatePower(state);
 //        return Math.max(0,skillTree.getSkillLevel(state)-(difficulty-power));
         return 1;
     }
@@ -236,20 +243,9 @@ public class Player extends Man {
                 Stat progress = get("Progress");
                 progress.add(Math.max(1,p.get("Level").get()*3-get("Level").get())*(fast?2:1),true);
                 if (progress.isFull()) {
-                    progress.set(progress.get()-progress.getMax(), true);
-                    int difficulty = learning.getDifficulty();
-                    Tags tags = learning.getTags().getTrainers();
-                    int amount = 10 / tags.size();
-                    int mod = 10 % tags.size();
-                    for (Tag i : tags){
-                        Stat tagStat = get(i.toString());
-                        tagStat.add(amount/Math.max(1,tagStat.get()-difficulty), false);
-                    }
-                    if (getStateLevel(learning) > 0){
-                        learnSkill(learning);
-                        learning = null;
-                    }
-                    progress.add(mod*10, false);
+                    learnSkill(learning);
+                    learning = null;
+                    progress.add(-progress.getMax(), true);
                 }
             }
         }
@@ -260,7 +256,6 @@ public class Player extends Man {
         while (it.hasNext()){
             if (!(it.next() instanceof Item)) it.remove();
         }
-        if (!wieldingNone()) items.add(weapon);
         items.addAll(inventory.getItems());
         return items;
     }

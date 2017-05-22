@@ -22,7 +22,7 @@ public class Organ extends Line {
     public Unit host;
     private Organ parent;
     private ArrayList<Organ> children = new ArrayList<>();
-    public int type;
+    int type;
     public int health = 1;
     private int maxLength = 80;
     boolean vital = false;
@@ -39,15 +39,13 @@ public class Organ extends Line {
         ptd = new P();
     }
     public void setImage(String p){
-        image = new ShadedPicture(p, null);
+        image = new ShadedPicture(host.rand, p, null);
     }
     public void setImage(String p, int index){
-        image = new ShadedPicture(p, index, Shader.XYLinearGradient);
-        image.setSize(strokeSize, 0);
-        image.shade(0);
+        setImage(p, index, Shader.XYLinearGradient);
     }
     public void setImage(String p, int index, Shader shader){
-        image = new ShadedPicture(p, index, shader);
+        image = new ShadedPicture(host.rand, p, index, shader);
         image.setSize(strokeSize, 0);
         image.shade(0);
     }
@@ -62,14 +60,12 @@ public class Organ extends Line {
     }
     public void draw(Graphics2D g){
         if (!amputated) image.draw(g, host.pos.x+pt.x, host.pos.y+pt.y, getAtan()-1.57f, host.dir, strokeSize, getLength()+3);
-//        if (type != 0) g.drawLine((int)(host.pos.x+pt.x+Global.rel.x), (int)(host.pos.y+pt.y+Global.rel.y),
-//                (int)(host.pos.x+ptd.x+Global.rel.x), (int)(host.pos.y+ptd.y+Global.rel.y));
     }
     void setMaxLength(int p){
         maxLength = p;
     }
-    protected void hit(Line p, int damage){
-        boolean pierce = damage > 0 && Global.r.nextInt(health)+health+1 < Global.r.nextInt(damage);
+    protected boolean hit(Line p, int damage){
+        boolean pierce = damage > 0 && Global.r.nextInt(damage) > health;
         if (pierce) {
             if (image != null) {
                 Projectile flyingOrgan = new Projectile(null, new P(host.pos), p.getAtan(10).add(p.ptd), 20) {
@@ -91,20 +87,16 @@ public class Organ extends Line {
             for (Organ i : children) i.hit(p, 9999);
             onAmputate.perform();
             host.clip.updateStatus();
+            return true;
         } else {
             ptd.set(p.getAtan(maxLength));
         }
+        return false;
     }
     boolean checkHit(Line p){
         if (!amputated) {
             Line body = getAdd(host.pos);
-            if (type == 0 && image != null) {
-                P t = body.pt;
-                P m = p.getMidPoint();
-                if (Math.pow(image.sizeRadius, 2) - ((Math.pow(m.x - t.x, 2) + Math.pow(m.y - t.y, 2))) > 0) {
-                    return true;
-                }
-            } else if (p.lineCross(body)) {
+            if (p.lineCross(body)) {
                 return true;
             }
         }

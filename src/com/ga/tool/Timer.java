@@ -1,12 +1,12 @@
 package com.ga.tool;
 
 /**
- * Created by Ga on 7/26/2016.
+ * Created by Ga on 7/26/2016. wqe
  */
 public class Timer {
     public int max;
     public int time;
-    public boolean repeat = false;
+    private boolean repeat = false;
     public Timer(String p){
         load(p);
     }

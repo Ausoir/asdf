@@ -12,28 +12,17 @@ equipped:Equipped
 btorso:Torso
 bleg:Legging
 bhead:Head
-str:Strength
-strDsc:Decreases weight penalties by 1, which results in more efficient usable of Stamina and faster movement.
-sta:Stamina
-staDsc:Increases maximum Stamina by 1. Stamina recovers by resting, idling, spells, or enchantments.
-end:Endurance
-endDsc:Increases maximum Endurance by 100. Endurance lets you keep going without having to go to town to sleep.
-mem:Memory
-memDsc:Increases skill/rune capacity by 1, letting you usable more variety of skills or spells.
-ath:Athletics
-athDsc:Increases speed and decreases stamina cost of skills related to running.
-jmp:Jumping
-jmpDsc:Increases potency of skills involving jumping.
-swg:Swinging
-swgDsc:Increases potency of all physical actions.
-agl:Agility
-aglDsc:Increases damage and potency of all skills involving agility.
-mrt:Martial
-mrtDsc:Increases damage of all martial skills.
-cst:Casting
-cstDsc:Decreases cooldown of casting spells.
-chn:Channeling
-chnDsc:Decreases stamina cost of maintaining channeling spells.
+StrengthDsc:Decreases weight penalties by 1, which results in more efficient usable of Stamina and faster movement.
+StaminaDsc:Increases maximum Stamina by 1. Stamina recovers by resting, idling, spells, or enchantments.
+EnduranceDsc:Increases maximum Endurance by 100. Endurance lets you keep going without having to go to town to sleep.
+MemoryDsc:Increases skill/rune capacity by 1, letting you usable more variety of skills or spells.
+AthleticsDsc:Increases speed and decreases stamina cost of skills related to running.
+JumpingDsc:Increases potency of skills involving jumping.
+SwingingDsc:Increases potency of all physical actions.
+AgilityDsc:Increases damage and potency of all skills involving agility.
+MartialDsc:Increases damage of all martial skills.
+EnergyDsc:Increases potency of all elemental spells.
+ChannelingDsc:Decreases stamina cost of maintaining channeling spells.
 mvsRemap:Select a skill to re-map its keybinding.
 mvsTrain:Select a skill/spell to train.
 itemDsc:a $. Weighs $ and has $ uses left.
@@ -45,7 +34,6 @@ item2:Fine
 item3:Rare
 item4:Ludicrous
 item5:Legendary
-itemInsc:The item is inscribed with the word $.
 reqInput:Press a key
 mvsInteract:Interact
 mvsSprint:Sprint
@@ -80,7 +68,6 @@ mvsEmpower:Empower
 mvsEvade:Evade
 mvsGlacialwalk:Glacialwalk
 mvsStun:Stun
-mvsSlow:Slow
 mvsPoison:Poison
 mvsCalling:Calling
 mvsShadowtwin:Shadowtwin
@@ -123,7 +110,6 @@ mvsDscEmpower:A
 mvsDscEvade:A
 mvsDscGlacialwalk:A
 mvsDscStun:A
-mvsDscSlow:A
 mvsDscPoison:A
 mvsDscCalling:A
 mvsDscShadowtwin:A

@@ -39,7 +39,7 @@ public class Map extends Thing {
     private static final int magnify = 2;
     private boolean panorama = true;
     public Map(String name, final String[] maps) {
-        super(null,1);
+        super(null,0,1);
         this.name = name;
         this.maps = maps;
         id = Integer.parseInt(name.split("_")[1]);
@@ -48,7 +48,7 @@ public class Map extends Thing {
             panorama = false;
         } else{
             setImage(maps[2]);
-            image.size.mult(magnify);
+            image.getSize().mult(magnify);
         }
         event = MapEvent.getByName(maps[1]);
         String[] size = maps[3].split("x");
@@ -125,7 +125,7 @@ public class Map extends Thing {
                     t.addPoint(i.ptd.x + 8, i.ptd.y);
                     t.addPoint(i.ptd.x - 8, i.ptd.y);
                     t.render();
-                    Thing top = new Thing("Ropetop", land.depth);
+                    Thing top = new Thing("Ropetop", 0, land.depth);
                     top.save = false;
                     top.pos = i.pt;
                 }
@@ -223,14 +223,17 @@ public class Map extends Thing {
             if (landSize > 72) {
                 int tx = (int) (Global.r.nextFloat() * (l.ptd.x - l.pt.x));
                 Prop t = Stock.getByName(prop, -1);
-                if (landSize < t.image.size.x) t.image.size.x = landSize;
-                int xSize = (int) Math.abs(t.image.size.x/2);
+                P size = t.image.getSize();
+                if (landSize < size.x){
+                    t.image.setSize(landSize, size.y);
+                }
+                int xSize = (int) Math.abs(size.x/2);
                 if (l.clockwise()) tx = (int) Global.clamp(tx, xSize, (l.ptd.x - l.pt.x) - xSize);
                 else tx = (int) Global.clamp(tx, l.ptd.x - l.pt.x + xSize, -xSize);
                 int ty = (int) l.getCrossPointY(tx+l.pt.x);
                 t.pos = new P(l.pt.x + tx, ty);
                 if (!l.clockwise()){
-                    t.pos.y += (t.image.size.y / 2)-4;
+                    t.pos.y += (size.y / 2)-4;
                     t.rotation = 3.14f;
                 } else {
                     t.rotation = l.getSlope();
@@ -249,7 +252,7 @@ public class Map extends Thing {
         return "none";
     }
 
-    public P randomLandableSurface(){
+    P randomLandableSurface(){
         Line i;
         int tx, ty;
         do {
@@ -308,7 +311,7 @@ public class Map extends Thing {
     public void onTimeChange() {
         if (panorama){
             setImage(maps[2]+(weather.isNight()?"_Night":""));
-            image.size.mult(magnify, magnify);
+            image.setSize(image.getSize().getMult(magnify, magnify));
         }
         weather.setColor();
     }
@@ -317,9 +320,10 @@ public class Map extends Thing {
     public void draw(Graphics2D g) {
         if (image.visible) {
             P t = new P(Global.rel.x + pos.x, Global.rel.y + pos.y).mult(.1f);
-            t.x = Global.clamp(t.x, -image.size.x + Settings.screenX, 0);
-            t.y = Global.clamp(t.y, -image.size.y + Settings.screenY, 0);
-            g.drawImage(image.getImage(), (int) (t.x), (int) (t.y), (int) image.size.x, (int) image.size.y, null);
+            P size = image.getSize();
+            t.x = Global.clamp(t.x, -size.x + Settings.screenX, 0);
+            t.y = Global.clamp(t.y, -size.y + Settings.screenY, 0);
+            g.drawImage(image.getImage(), (int) (t.x), (int) (t.y), (int) size.x, (int) size.y, null);
         } else {
             g.setColor(Color.black);
             g.fillRect(0,0, Settings.screenX, Settings.screenY);

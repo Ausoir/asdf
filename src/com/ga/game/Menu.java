@@ -2,6 +2,7 @@ package com.ga.game;
 
 import com.ga.map.Global;
 import com.ga.map.Picture;
+import com.ga.map.Updater;
 import com.ga.unit.Prop;
 import com.ga.unit.Tag;
 import com.ga.unit.Tags;
@@ -27,10 +28,10 @@ public class Menu extends Panel {
     private class StatPanel extends JPanel{
         private GridBagConstraints statgrid = new GridBagConstraints();
         private String[][] stats = new String[][]{
-                new String[]{Dialog.get("str"),Dialog.get("strDsc")},
-                new String[]{Dialog.get("sta"),Dialog.get("staDsc")},
-                new String[]{Dialog.get("end"),Dialog.get("endDsc")},
-                new String[]{Dialog.get("mem"),Dialog.get("memDsc")},
+                new String[]{"Strength", null},
+                new String[]{"Stamina", null},
+                new String[]{"Endurance", null},
+                new String[]{"Memory", null},
         };
         private JButton[] statButtons = new JButton[stats.length];
         StatPanel(){
@@ -45,7 +46,7 @@ public class Menu extends Panel {
             for (int i=0;i<stats.length;i++) statButtons[i] = makeStatButton(stats[i][0],null);
             statgrid.gridx = 1;
             statgrid.gridy = 0;
-            for (String[] i : stats) makeStatButton("", "menuDialog@"+i[0]+"@"+i[1]).setIcon(iconDescribe);
+            for (String[] i : stats) makeStatButton("", "menuDialog@"+i[0]+"@"+Dialog.get(i[0]+"Dsc")).setIcon(iconDescribe);
         }
         void refresh(){
             Player player = Global.player;
@@ -437,7 +438,7 @@ public class Menu extends Panel {
             Global.display.menu.setVisible(false);
             switch (p) {
                 case "h":
-                    Global.sleep(100);
+                    Updater.sleep(100);
                     break;
                 case "stat":
                     Player player = Global.player;
@@ -455,20 +456,16 @@ public class Menu extends Panel {
 
     private class TrainingPanel extends JPanel{
         private GridBagConstraints statgrid = new GridBagConstraints();
-        private String[][] stats = new String[][]{
-                new String[]{Dialog.get("ath"),Dialog.get("athDsc")},
-                new String[]{Dialog.get("jmp"),Dialog.get("jmpDsc")},
-                new String[]{Dialog.get("swg"),Dialog.get("swgDsc")},
-                new String[]{Dialog.get("agl"),Dialog.get("aglDsc")},
-                new String[]{Dialog.get("mrt"),Dialog.get("mrtDsc")},
-                new String[]{Dialog.get("cst"),Dialog.get("cstDsc")},
-                new String[]{Dialog.get("chn"),Dialog.get("chnDsc")}
-        };
+        private String[][] stats;
         private JPanel learning;
         private JButton learningButton;
         private JProgressBar learningProgress;
-        private JButton[] statButtons = new JButton[stats.length];
+        private JButton[] statButtons;
         TrainingPanel(){
+            stats = new String[Tags.trainers.length][2];
+            for (int i=0;i<Tags.trainers.length;i++){
+                stats[i] = new String[]{Tags.trainers[i].name(), Dialog.get(Tags.trainers[i].name()+"Dsc")};
+            }
             setLayout(new GridBagLayout());
             setBackground(Panel.forecolor2);
             statgrid.anchor = GridBagConstraints.LINE_START;
@@ -483,6 +480,7 @@ public class Menu extends Panel {
             add(learning,statgrid);
             statgrid.gridwidth = 1;
             statgrid.gridy = 1;
+            statButtons = new JButton[Tags.trainers.length];
             for (int i=0;i<stats.length;i++) statButtons[i] = makeStatButton(this,stats[i][0],null);
             statgrid.gridx = 1;
             statgrid.gridy = 1;
@@ -510,7 +508,10 @@ public class Menu extends Panel {
                 learningProgress.setStringPainted(true);
                 learning.add(learningProgress);
             }
-            for (int i=0;i<stats.length;i++) statButtons[i].setText(stats[i][0]+" - "+Global.player.get(stats[i][0]).get());
+            for (int i=0;i<stats.length;i++){
+                String v = "Level " + (Global.player.get(stats[i][0]).get()/100)+" / "+(Global.player.get(stats[i][0]).get()%100)+"%";
+                statButtons[i].setText(stats[i][0]+" - "+v);
+            }
         }
         JButton makeStatButton(JPanel panel, String p, final String cmd){
             final JButton button = new JButton(p);
@@ -558,14 +559,20 @@ public class Menu extends Panel {
         void refresh() {
             ArrayList<String> craftables = new ArrayList<>();
             items = new ArrayList<>();
-            for (Prop i : Global.player.getAvailableItems()) items.add(i.name);
+            for (Prop i : Global.player.getAvailableItems()){
+                items.add(i.name);
+                for (Tag ii : i.tags) items.add(ii.name());
+            }
             panel.removeAll();
             panel.add(makeOption("[Available Items]","?","Show all items available for crafting."));
             for (String i : Global.player.crafting.knowledge){
-                ArrayList<String> recipe = Crafts.recipes.get(i);
+                ArrayList<String> recipe = new ArrayList<>();
+                ArrayList<String> origRecipe = Crafts.recipes.get(i);
+                for (String ii : origRecipe) recipe.add(ii.split(":")[0]);
+                items.add("Time");
                 if (items.containsAll(recipe)) {
                     String t = "";
-                    for (String ii : recipe) t += ii+", ";
+                    for (String ii : origRecipe) t += ii+", ";
                     craftables.add(i);
                     panel.add(makeOption(i, i, "Craft a " + i + " using ["+t.substring(0,t.length()-2)+"]"));
                 }
@@ -642,7 +649,7 @@ public class Menu extends Panel {
         }
     }
 
-    private ImageIcon iconDescribe = new ImageIcon(Picture.load("Describe"));
+    private ImageIcon iconDescribe = new ImageIcon(Picture.loadCache("Describe"));
     private GridBagConstraints grid = new GridBagConstraints();
     private JPanel mainpanel = new JPanel();
     private ActionPanel actionpanel = new ActionPanel();

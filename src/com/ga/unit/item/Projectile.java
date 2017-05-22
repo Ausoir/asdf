@@ -15,7 +15,7 @@ public class Projectile extends Prop {
     public float rotSpeed = .03f;
     public int damage = 0;
     public EventTimer delay = new EventTimer(-1, false, null);
-    protected Projectile(String name, P pt, float rot, int speed) {
+    private Projectile(String name, P pt, float rot, int speed) {
         super(name, 0, 60);
         pos = pt;
         save = false;
@@ -25,15 +25,19 @@ public class Projectile extends Prop {
     protected Projectile(String name, P pt, P dest, int speed) {
         this(name, pt, (float) Math.atan2(dest.y-pt.y, dest.x-pt.x), speed);
     }
+    @Override
     public int getDamage(){
         return damage;
     }
+    @Override
     public void onCollide(Line l){
         stuck();
     }
-    protected void onAttack(Unit p){
+    @Override
+    public void onAttack(Unit p){
         stuck();
     }
+    @Override
     public void onField(){}
     public void stuck(){
         vel.set(0,0);
@@ -43,6 +47,7 @@ public class Projectile extends Prop {
     public int getCollisionSize(){
         return (int) vel.getDist()*2;
     }
+    @Override
     public void update(){
         rotation+=rotSpeed*vel.x;
         if (tangible) {

@@ -3,7 +3,6 @@ package com.ga.unit.skill;
 import com.ga.game.Sound;
 import com.ga.map.Global;
 import com.ga.map.Updater;
-import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.unit.*;
@@ -101,7 +100,7 @@ public enum Buffs {
     }},
     Frenzy(new Tags(){{
         add(Tag.Buff);
-        add(Tag.Martial);
+        add(Tag.Combat);
     }}){ Buff makeLocal() {
         return new Buff(10) {
             public void onSet() {
@@ -138,7 +137,7 @@ public enum Buffs {
     }},
     Cleave(new Tags(){{
         add(Tag.Buff);
-        add(Tag.Strong);
+        add(Tag.Might);
     }}){ Buff makeLocal(){
         return new Buff(40) {
             public void onSet() {
@@ -150,39 +149,54 @@ public enum Buffs {
             }
         };
     }},
+    Hunger(new Tags(){{
+    }}){ Buff makeLocal(){
+        return new Buff(100) {
+            public void onSet(){
+                if (host instanceof MainPlayer) ((MainPlayer)host).onTimeChange();
+            }
+            public boolean update() {
+                if (super.update()) {
+                    time += 100;
+                    if (host instanceof MainPlayer){
+                        ((MainPlayer)host).onTimeChange();
+                    } else return true;
+                }
+                return false;
+            }
+        };
+    }},
     Bleed(new Tags(){{
         add(Tag.Debuff);
     }}){ Buff makeLocal(){
         return new Buff(100) {
             private int tick = 0;
             public void onStack(){
-                if (level < 18 && host.rand.nextBoolean()) level++;
+                if (level < 18 && host.rand.nextBoolean()){
+                    level++;
+                    time += 100;
+                }
             }
             public boolean onTrigger(){
-                delevel();
+                if (level > 1) level--;
+                else time = Global.time;
                 return true;
-            }
-            private boolean delevel(){
-                level--;
-                if (level <= 0) return true;
-                time = Global.time + 100;
-                return false;
             }
             public boolean update() {
                 if (tick++ % (Math.max(1,20-level)) == 0) {
                     Particle.explode("Blood", host.getRandomPoint(), new P(), (int) (Math.random() * level + 1), 5, 0, true, 24);
-                    if (super.update()) return delevel();
                 }
-                return false;
+                level = (time-Global.time)/100+1;
+                return super.update();
             }
         };
     }},
     Invincible(new Tags(){{
         add(Tag.Buff);
     }}){ Buff makeLocal(){
-        return new Buff(8) {
+        return new Buff(2) {
             public void onSet() {
-                time += 8*level;
+                time += 4*level;
             }
             public boolean update() {
                 Particle.sparkle("Glare", host.getRandomPoint(),40, 6);
@@ -211,6 +225,32 @@ public enum Buffs {
             }
         };
     }},
+    Shock(new Tags(){{
+        add(Tag.Debuff);
+        add(Tag.Air);
+    }}){ Buff makeLocal(){
+        return new Buff(7) {
+            public void onSet(){
+                var = level;
+                if (!host.get("Stamina").require(level)){
+                    Particle.holyExplosion(host.pos);
+                    host.stateSet(Actions.Down);
+                }
+            }
+            public void onStack() {
+                var++;
+                time = Global.time + 7;
+                if (!host.get("Stamina").require(1)){
+                    Particle.holyExplosion(host.pos);
+                    host.stateSet(Actions.Down);
+                }
+            }
+            public boolean update() {
+                Particle.sparkle("Glare",host.getRandomPoint(),20+host.getSize(),4+level);
+                return super.update();
+            }
+        };
+    }},
     Burn(new Tags(){{
         add(Tag.Debuff);
         add(Tag.Fire);
@@ -222,9 +262,9 @@ public enum Buffs {
                 time += level*3;
             }
             public boolean update() {
-                if (tick++ % 12 == 0 && Global.r.nextBoolean()) {
+                if (tick++ % 10 == 0 && Global.r.nextBoolean()) {
                     for (Unit i : Updater.collideUnit(host.pos, host.getSize() + 40, Faction.Destructive)) {
-                        i.hit(0, .4f);
+                        i.checkHit(i.pos, Global.r.nextInt(3));
                         if (Global.r.nextBoolean()) i.buff(Burn, 1);
                     }
                     host.stateSet(Actions.Sprint);
@@ -240,60 +280,56 @@ public enum Buffs {
         add(Tag.Debuff);
         add(Tag.Cold);
     }}){ Buff makeLocal(){
-        return new Buff(8) {
+        return new Buff(0) {
             public void onSet() {
                 sound("freeze");
-                var = host.get("Speed").add(-Math.round(host.getSpeed()), false);
-                time += level*24;
+                var = host.get("Speed").add(-Math.round(host.getSpeed()*50), false);
+                time += level*16;
+                host.stats.triggerEffect(Buffs.Bleed);
             }
-
+            public void onStack(){
+                level++;
+                var += host.get("Speed").add(-Math.round(host.getSpeed()*50), false);
+                time += 16;
+            }
             public void onFinish() {
-                host.get("Speed").add(var, true);
+                host.get("Speed").add(-var, true);
             }
-
+            public boolean onTrigger(){
+                if (level > 1) level--;
+                else time = Global.time;
+                return true;
+            }
             public boolean update() {
                 Particle.frozen(host.pos);
+                level = (time-Global.time)/16+1;
                 return super.update();
-            }
-        };
-    }},
-    Slow(new Tags(){{
-        add(Tag.Debuff);
-        add(Tag.Agility);
-    }}){ Buff makeLocal(){
-        return new Buff(40) {
-            public void onSet() {
-                var = Math.round(host.getSpeed() * .5f);
-                host.get("Speed").add(-var, false);
-            }
-            public void onFinish() {
-                host.get("Speed").add(var, false);
             }
         };
     }},
     Mark(new Tags(){{
         add(Tag.Debuff);
-        add(Tag.Martial);
+        add(Tag.Combat);
     }}){ Buff makeLocal(){
-        return new Buff(500) {
+        return new Buff(4) {
             private Thing mark;
             public void onLoad(){
-                mark = new Thing("Mark", 150);
+                mark = new Thing("Mark", host.seed, 150);
+                mark.image.setCenterType(2);
                 mark.pos = host.pos;
                 mark.save = false;
             }
             public void onSet() {
+                time += level*6;
                 sound("freeze");
-                mark = new Thing("Mark", 150);
+                mark = new Thing("Mark", host.seed, 150);
+                mark.image.setCenterType(2);
                 mark.pos = host.pos;
                 mark.save = false;
             }
             public boolean onTrigger(){
                 time = Global.time;
-                if (mark != null) {
-                    return true;
-                }
-                return false;
+                return mark != null;
             }
             public void onFinish() {
                 if (mark != null) mark.remove();
@@ -367,7 +403,7 @@ public enum Buffs {
                 if (tick % 2 == 0) {
                     final Projectile p = new Projectile("Ice", host.pos.getAdd(0, -5), new P(), 0) {
                         @Override
-                        protected void onAttack(Unit p) {
+                        public void onAttack(Unit p) {
                             p.buff(Buffs.Freeze, level);
                             Particle.explode("Ice", pos, new P(0, -20), 30, 10, 5, true, 10);
                             remove();
@@ -426,20 +462,15 @@ public enum Buffs {
             }
         };
     }},
-    Hunger(new Tags(){{
+    Slowfall(new Tags(){{
     }}){ Buff makeLocal(){
-        return new Buff(100) {
+        return new Buff(4) {
             public void onSet(){
-                if (host instanceof MainPlayer) ((MainPlayer)host).onTimeChange();
+                time += 8*level;
             }
             public boolean update() {
-                if (super.update()) {
-                    time = Global.time + 100;
-                    if (host instanceof MainPlayer){
-                        ((MainPlayer)host).onTimeChange();
-                    } else return true;
-                }
-                return false;
+                host.vel.y /= level+1;
+                return super.update();
             }
         };
     }};

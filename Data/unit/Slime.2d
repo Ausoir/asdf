@@ -1,5 +1,5 @@
 1,-1,Slime
-60;1;1 //linewidth,vital,health
+60;7;1 //linewidth,vital,health
 
 0,-40/8
 0,-50/12
@@ -13,5 +13,5 @@ Idle@0,-1
 Walk@1,2
 Hit@1,-1
 Dead@4,-1
-Kick@3,0,-1
+Melee@0,3,0,-1
 Jump@2,0,-1

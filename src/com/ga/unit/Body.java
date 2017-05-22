@@ -14,12 +14,13 @@ import java.util.Map;
  * Created by Ga on 8/1/2016. asd
  */
 public class Body {
-    private HashMap<String, int[]> animation = new HashMap<String, int[]>() {{
-        put("Idle", new int[]{0, -1});
+    private HashMap<String, int[][]> animation = new HashMap<String, int[][]>() {{
+        put("Idle", new int[][]{new int[]{0, -1}, new int[]{-2}});
     }};
     private Clip clip;
     public Unit host;
-    private int[] nextAnimation = animation.get("Idle");
+    private int[] nextAnimation = animation.get("Idle")[0];
+    private int nextTrigger = -2;
     public Organ[] organs;
     Timer frame;
     private int[][] nextClip;
@@ -28,7 +29,7 @@ public class Body {
     int current = 0;
     protected String state = "Idle";
     public int BODY;
-    int FOOT;
+    int FOOT, HAND;
     private int legNum = 0, legCurrent = 0;
     private float appendageSize = 1;
     protected int size = 0;
@@ -54,13 +55,19 @@ public class Body {
     private void setProperties(int[][] p){
         for (int i=0;i<organs.length;i++){
             organs[i].setSize(p[0][i]);
-            if (p[1][i] == 1) organs[i].vital = true;
-            else if (p[1][i] == 2){
+            int type = p[1][i];
+            if (type >= 4){
+                organs[i].vital = true;
+                type -= 4;
+            }
+            if (type >= 2){
                 organs[i].leg = true;
                 FOOT = i;
                 legNum++;
                 legCurrent++;
+                type -= 2;
             }
+            if (type == 1) HAND = i;
             organs[i].health = p[2][i];
         }
     }
@@ -77,7 +84,22 @@ public class Body {
             organs[i].setMaxLength((int) Math.sqrt((nextClip[i][0]*nextClip[i][0])+(nextClip[i][1]*nextClip[i][1])));
         setProperties(p.property);
         for (Map.Entry<String, int[]> i : p.moveset.entrySet()){
-            animation.put(i.getKey(), i.getValue());
+            int[] v = i.getValue();
+            int high = 0;
+            int highID = v[0];
+            for (int ii=1;ii<v.length;ii++){
+                if (v[ii] != -1) {
+                    for (int iii=0;iii<organs.length;iii++) {
+                        int t = (int) (Math.pow(localAnimation[v[ii]][iii][0]-localAnimation[v[ii-1]][iii][0], 2) +
+                                Math.pow(localAnimation[v[ii]][iii][1]-localAnimation[v[ii-1]][iii][1], 2));
+                        if (t > high) {
+                            high = t;
+                            highID = v[ii];
+                        }
+                    }
+                }
+            }
+            animation.put(i.getKey(), new int[][]{v, new int[]{highID}});
         }
     }
 
@@ -111,6 +133,7 @@ public class Body {
                                         }
                                     };
                 else organs[p] = new Organ(parent, tip);
+                organs[p].host = host;
                 organs[p].type = Math.abs(type);
                 if (model[p].length > 2){
                     if (type == 0) organs[p].setImage(model[p][2]);
@@ -118,11 +141,11 @@ public class Body {
                 }
             } else {
                 organs[p] = new Organ(parent, tip);
+                organs[p].host = host;
             }
             if (Math.abs(nextClip[p][0]) > size) size = Math.abs(nextClip[p][0]);
             if (Math.abs(nextClip[p][1]) > size) size = Math.abs(nextClip[p][1]);
             organs[p].ptd = new P(nextClip[p][0],nextClip[p][1]);
-            organs[p].host = host;
         }
     }
 
@@ -137,7 +160,7 @@ public class Body {
         for (int i = 0; i < localAnimation.length; i++) {
             randomizeSection(i);
         }
-        int dead = animation.get("Dead")[0];
+        int dead = animation.get("Dead")[0][0];
         localAnimation[dead] = localAnimation[dead + Global.r.nextInt(2)];
         int i = (int) Math.abs(-organs[BODY].ptd.y/5f);
         if (i != 0) randomizeSection(dead);
@@ -162,19 +185,27 @@ public class Body {
     public void setState(String state) {
         this.state = state;
         current = 0;
-        if (animation.containsKey(state)) nextAnimation = animation.get(state);
-        else{
+        if (animation.containsKey(state)){
+            int[][] t = animation.get(state);
+            nextAnimation = t[0];
+            nextTrigger = t[1][0];
+        } else {
             Global.p("Can't find current state "+state);
-            nextAnimation = animation.get("Idle");
+            nextAnimation = animation.get("Idle")[0];
         }
         setClip();
     }
 
-    public void setSpeed(int p){
+    public int setSpeed(int p){
         frame.set(Math.max(1, frame.time-p));
+        int total = 0;
+        for (int i : nextAnimation){
+            if (i != -1) total += localFrames[i];
+        }
+        return total;
     }
     public void setMoveSpeed(int p){
-        int[] t = animation.get("Walk");
+        int[] t = animation.get("Walk")[0];
         for (int i : t) localFrames[i] = Math.max(1, clip.frames[i]-p);
     }
 
@@ -188,7 +219,7 @@ public class Body {
         frame.set(localFrames[nextAnimation[current]]);
     }
 
-    public void rotateAppendage(int organ, int frame, float offset){
+    void rotateAppendage(int organ, int frame, float offset){
         int length = Math.abs(clip.clip[frame][organ][0])+Math.abs(clip.clip[frame][organ][1]);
         float atan = host.target.getAdd(localAnimation[frame][organ][0]*host.dir, localAnimation[frame][organ][1]).getAtan();
         atan += offset;
@@ -196,27 +227,22 @@ public class Body {
         localAnimation[frame][organ][1] = (int) (length*Global.sin(atan));
     }
 
-    public int update() {
-        int r = -1;
-        float high = 40;
+    public boolean update() {
+        boolean triggered = false;
         if (!frame.update()) {
             for (int i = 0; i < nextClip.length; i++) {
                 if (!organs[i].amputated) {
                     float x = (((nextClip[i][0] * host.dir) + organs[i].pt.x) - organs[i].ptd.x) / (frame.max);
                     float y = ((nextClip[i][1] + organs[i].pt.y) - organs[i].ptd.y) / (frame.max);
                     organs[i].ptd.add(x, y);
-                    float t = (x * x) + (y * y);
-                    if (t > high) {
-                        high = t;
-                        r = i;
-                    }
                 }
             }
         } else {
+            triggered = nextAnimation[current] == nextTrigger;
             current++;
             setClip();
         }
-        return r;
+        return triggered;
     }
 
     void updateStatus(){
@@ -242,7 +268,6 @@ public class Body {
     public void setHeight(){
         if (legCurrent == 0) {
             organs[BODY].pt.y = 0;
-            host.tags.remove(Tag.Jumping);
             host.tags.remove(Tag.Athletics);
         } else organs[BODY].pt.y = -getHeight();
     }

@@ -22,6 +22,12 @@ public class P {
     public P(double x, double y){
         set((float) x, (float) y);
     }
+    public int x(){
+        return (int) x;
+    }
+    public int y(){
+        return (int) y;
+    }
     public boolean set(P p){
         return set(p.x,p.y);
     }

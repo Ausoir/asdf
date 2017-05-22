@@ -3,14 +3,14 @@ package com.ga.unit;
 import java.util.HashMap;
 
 /**
- * Created by Ga on 7/30/2016.
+ * Created by Ga on 7/30/2016. aa
  */
 public class Clip {
-    public int[][] property;
-    public String[][] model;
+    int[][] property;
+    String[][] model;
     public int[][][] clip;
-    public int[] frames;
-    public HashMap<String, int[]> moveset;
+    int[] frames;
+    HashMap<String, int[]> moveset;
     public Clip(int[][] property, String[][] model, int[][][] clip, int[] frames, HashMap<String, int[]> moveset){
         this.property = property;
         this.model = model;
