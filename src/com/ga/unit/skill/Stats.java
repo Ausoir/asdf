@@ -112,4 +112,11 @@ public class Stats {
         }
         return result.substring(0,result.length()-1);
     }
+
+    public void clearBuffs() {
+        for (int i=0;i<effects.size();i++) {
+            Buff effect = effects.remove(0);
+            effect.onFinish();
+        }
+    }
 }

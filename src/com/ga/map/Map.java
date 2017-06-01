@@ -31,7 +31,6 @@ public class Map extends Thing {
         put("dirt","Root=.15");
         put("grass","Vine=.8");
     }};
-    private Terrain blocker = null;
     public String[] maps;
     public MapEvent event;
     public P size;
@@ -95,25 +94,6 @@ public class Map extends Thing {
     }
 
     public void setTexture(){
-        float highX = 0;
-        Line high = null;
-        boolean inside = isIndoors();
-        if (inside) {
-            blocker = new Terrain("black", Shader.Basic, 10){
-                public int getDepth() {
-                    return 150;
-                }
-            };
-            for (final Line i : land) {
-                if (i.next == 0) {
-                    if (i.pt.x > highX) {
-                        highX = i.pt.x;
-                        high = i;
-                    }
-                }
-            }
-        }
-        int blockerTerrain = inside ? 0 : -1;
         HashMap<Integer, Terrain> terrains = new HashMap<>();
         for (final Line i : land){
             if (i.opt == 1){
@@ -137,29 +117,12 @@ public class Map extends Thing {
                     else {
                         String[] formName = formTexture.split("&");
                         int terrainDepth = Terrain.toTerrainDepth(Integer.parseInt(formName[0]));
-                        if (inside) terrain = new Terrain(formName[1], Shader.getByName(formName[2]), terrainDepth){
-                            public int getDepth(){
-                                return 20-super.getDepth();
-                            }
-                        };
-                        else terrain = new Terrain(formName[1], Shader.getByName(formName[2]), terrainDepth);
+                        terrain = new Terrain(formName[1], Shader.getByName(formName[2]), terrainDepth);
                     }
                     terrains.put(i.next, terrain);
                 }
                 terrain.addLine(i);
                 terrain.addPoint(i.pt.x, i.pt.y);
-                if (blockerTerrain == i.next) {
-                    blocker.addPoint(i.pt.x, i.pt.y);
-                    if (i == high){
-                        blocker.addPoint(i.pt.x, i.pt.y);
-                        blocker.addPoint(size.x+128, -128);
-                        blocker.addPoint(-128, -128);
-                        blocker.addPoint(-128, size.y+128);
-                        blocker.addPoint(size.x+128, size.y+128);
-                        blocker.addPoint(size.x+128, -128);
-                        blocker.addPoint(i.pt.x, i.pt.y);
-                    }
-                }
             } else {
                 String depth = formTextures.get(i.next);
                 if (depth != null) i.depth = Terrain.toTerrainDepth(Integer.parseInt(formTextures.get(i.next)));
@@ -171,7 +134,6 @@ public class Map extends Thing {
             Terrain terrain = (Terrain) pair.getValue();
             terrain.render();
         }
-        if (inside) blocker.render();
     }
 
     void generateProps(){
@@ -204,10 +166,10 @@ public class Map extends Thing {
         }
     }
 
-    void placeProp(Line l, String p){
+    Prop placeProp(Line l, String p){
         String prop = null;
         String[] props = p.split(",");
-        float rand = (float) Math.random();
+        float rand = Creation.r.nextFloat();
         if (props.length > 1) {
             for (String ii : props) {
                 if (rand < Float.parseFloat(ii.split("=")[1])) {
@@ -220,26 +182,24 @@ public class Map extends Thing {
         }
         if (prop != null) {
             float landSize = Math.abs(l.ptd.x-l.pt.x);
-            if (landSize > 72) {
-                int tx = (int) (Global.r.nextFloat() * (l.ptd.x - l.pt.x));
-                Prop t = Stock.getByName(prop, -1);
-                P size = t.image.getSize();
-                if (landSize < size.x){
-                    t.image.setSize(landSize, size.y);
-                }
-                int xSize = (int) Math.abs(size.x/2);
-                if (l.clockwise()) tx = (int) Global.clamp(tx, xSize, (l.ptd.x - l.pt.x) - xSize);
-                else tx = (int) Global.clamp(tx, l.ptd.x - l.pt.x + xSize, -xSize);
-                int ty = (int) l.getCrossPointY(tx+l.pt.x);
-                t.pos = new P(l.pt.x + tx, ty);
+            Prop t = Stock.getByName(prop, -1);
+            P size = t.image.getSize();
+            if (landSize >= size.x) {
+                float halfSizeX = size.x/2;
+                int tx = (int) (Creation.r.nextFloat() * (l.ptd.x - l.pt.x));
+                if (l.clockwise()) tx = (int) Global.clamp(tx, halfSizeX, (l.ptd.x - l.pt.x) - halfSizeX);
+                else tx = (int) Global.clamp(tx, l.ptd.x - l.pt.x + halfSizeX, -halfSizeX);
+                t.pos = new P(l.pt.x + tx, (int) l.getCrossPointY(l.pt.x + tx));
                 if (!l.clockwise()){
                     t.pos.y += (size.y / 2)-4;
                     t.rotation = 3.14f;
                 } else {
                     t.rotation = l.getSlope();
                 }
-            }
+                return t;
+            } else t.remove();
         }
+        return null;
     }
 
     public String getLand(int p){
@@ -256,8 +216,8 @@ public class Map extends Thing {
         Line i;
         int tx, ty;
         do {
-            i = land.get((int) (Global.r.nextFloat() * land.size()));
-            tx = (int) (Global.r.nextFloat() * (i.ptd.x-i.pt.x));
+            i = land.get((int) (Creation.r.nextFloat() * land.size()));
+            tx = (int) (Creation.r.nextFloat() * (i.ptd.x-i.pt.x));
             ty = (int) (i.pt.y + (int) (tx * i.getSlope()));
         } while (!i.clockwise() || i.getSlope() > Line.MAXSLOPE);
         return new P(i.pt.x+tx,ty);

@@ -22,24 +22,21 @@ public class Thing implements Drawable, Observer {
     public int dir = 1;
     public float rotation = 0;
     public boolean save = true;
-    Thing(String name, int seed){
+    public Thing(String name, int seed, int depth){
         this.name = name;
         this.seed = seed;
         pos = new P();
         rand = new Random(seed);
         image = new Picture(rand);
+        this.depth = depth;
         if (name != null) setImage(name);
+        Updater.add(this);
     }
     public void setImage(String p){
         image.set(p);
     }
     public void rotateTo(P p){
         rotation = ((float) Math.atan2(p.y,p.x));
-    }
-    public Thing(String name, int seed, int depth){
-        this(name, seed);
-        this.depth = depth;
-        Updater.add(this);
     }
     public boolean isFacing(P p){
         return (pos.x > p.x && dir == -1) || (pos.x < p.x && dir == 1);

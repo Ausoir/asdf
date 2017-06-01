@@ -19,12 +19,13 @@ public class Prop extends Thing {
     protected boolean mobile = true;
     public Faction faction = Faction.Destructive;
     public P vel = new P(0, 0);
-    protected boolean tangible = true;
+    public boolean tangible = true;
     public boolean dynamic = false; //regrowth sensitive
     public Line lastLand = new Line();
     public Tags tags = new Tags();
-    public Prop(String name, int seed, int depth) {
-        super(name, seed, depth);
+    boolean manualDepth = false;
+    public Prop(String name, int seed) {
+        super(name, seed, 0);
     }
     public int getDamage(){
         return 0;
@@ -37,7 +38,7 @@ public class Prop extends Thing {
     }
     public void onCreate(){}
     public void onField(){
-        adjustToLand();
+        if (!manualDepth) adjustToLand();
     }
     public void onAttack(Unit p){}
     private void adjustToLand(){
@@ -56,6 +57,7 @@ public class Prop extends Thing {
             }
         }
         if (closest != null) {
+            lastLand = closest;
             setDepth(closest.depth - 2);
         }
     }
@@ -89,7 +91,7 @@ public class Prop extends Thing {
                                 vel.y += i.getCrossPointY(pos.x+vel.x) - (pos.y + vel.y) - 1;
                             lastLand = i;
                             collided = true;
-                        } else if (!cw && lineY <= pos.y) {
+                        } else if (i.opt == 2 || !cw && lineY <= pos.y) {
                             onCollide(i);
                             vel.set(0, 0);
                             return;

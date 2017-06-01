@@ -21,7 +21,7 @@ import static com.ga.unit.BodyHumanoid.OFIST;
  * Created by Ga on 5/7/2016. asd
  */
 public class Man extends Unit {
-    protected Item fist = ((Item) Stock.getByName("Fist",0)).cancelAdd();
+    protected Item fist = ((Item) Stock.getByName("Fist",0));
     public Item weapon = fist;
     public ArmorSet armor;
     public Line rope;
@@ -85,8 +85,11 @@ public class Man extends Unit {
     }
 
     public void stateSet(Actions state){
-        attackSpeed = -armor.getEncumberance()-weapon.weight;
+        int penalty = Math.max(0, armor.armor[state.isLeg()?1:2].weight - get("Strength").get());
+        attackSpeed -= penalty;
+        if (state.getCost() >= 0) get("Stamina").add(-penalty, false);
         super.stateSet(state);
+        if (state.getCooldown() > 0) cooldown.put(state, new int[]{cooldown.get(state)[0] + penalty});
     }
 
     @Override
@@ -105,7 +108,7 @@ public class Man extends Unit {
 
     @Override
     public int getDamage(){
-        return (int) Math.max(0,(weapon.getDamage()*damageMod)-armor.armor[FIST].encumberance);
+        return (int) Math.max(0,weapon.getDamage()*damageMod);
     }
 
     @Override

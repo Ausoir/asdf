@@ -125,8 +125,8 @@ public class Menu extends Panel {
                     b = BorderFactory.createTitledBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Panel.forecolor));
                     String title = Dialog.get("equipped");
                     if (i == 0) title += " - "+Dialog.get("bhead");
-                    else if (i == 1) title += " - "+Dialog.get("btorso");
-                    else if (i == 2) title += " - "+Dialog.get("bleg");
+                    else if (i == 1) title += " - "+Dialog.get("bleg");
+                    else if (i == 2) title += " - "+Dialog.get("btorso");
                     b.setTitle(title);
                     panel.setBorder(b);
                 }
@@ -442,8 +442,9 @@ public class Menu extends Panel {
                     break;
                 case "stat":
                     Player player = Global.player;
-                    String statusDsc = "Stamina:" + player.get("Stamina") + "\nEncumberance:" + player.getStatPenalty() +
-                        "\nMetabolism:" + player.health.getStatusDescription() + "\nMotivation:" + player.get("Motivation")+"\n";
+                    String statusDsc = "Stamina:" + player.get("Stamina") +
+                        "\nMetabolism:" + player.health.getStatusDescription() +
+                            "\nMotivation:" + player.get("Motivation")+"\n";
                     statusDsc += "\nCurrent Status Effects:\n" + player.stats.getEffectsList();
                     Global.display.menuDialog.show("Current Status", statusDsc);
                     break;
@@ -499,7 +500,7 @@ public class Menu extends Panel {
                 learningButton.setIcon(iconDescribe);
                 learningProgress = new JProgressBar(0,Global.player.learning.getDifficulty()*100);
                 learningProgress.setBackground(Panel.fontcolor);
-                Tags fields = Global.player.learning.getTags().getTrainers();
+                Tags fields = Global.player.learning.getTrainers();
                 int total = 0;
                 for (Tag i : fields){
                     total += Global.player.get(i.name()).get();
@@ -574,7 +575,7 @@ public class Menu extends Panel {
                     String t = "";
                     for (String ii : origRecipe) t += ii+", ";
                     craftables.add(i);
-                    panel.add(makeOption(i, i, "Craft a " + i + " using ["+t.substring(0,t.length()-2)+"]"));
+                    panel.add(makeOption(i, i, "Craft " + i + " using ["+t.substring(0,t.length()-2)+"]"));
                 }
             }
             TitledBorder b = BorderFactory.createTitledBorder(BorderFactory.createMatteBorder(2,2,2,2,Panel.forecolor));
@@ -640,7 +641,9 @@ public class Menu extends Panel {
             Global.display.menu.setVisible(false);
             if (p.equals("?")){
                 String t = "";
-                for (String i : items) t += i + ", ";
+                for (String i : items){
+                    if (!i.equals("Time") && !i.equals("Fist")) t += i + ", ";
+                }
                 String result = t.equals("")?"None":t.substring(0,t.length()-2);
                 Global.display.menuDialog.show("Available Items",result);
             } else {

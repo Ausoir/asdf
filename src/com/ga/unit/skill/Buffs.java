@@ -2,13 +2,16 @@ package com.ga.unit.skill;
 
 import com.ga.game.Sound;
 import com.ga.map.Global;
+import com.ga.map.Shader;
 import com.ga.map.Updater;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.unit.*;
 import com.ga.unit.item.Projectile;
 import com.ga.unit.player.MainPlayer;
+import com.ga.unit.player.Trait;
 
+import java.awt.*;
 import java.util.ArrayList;
 
 /**
@@ -19,9 +22,9 @@ public enum Buffs {
         add(Tag.Debuff);
         add(Tag.Shadow);
     }}){ Buff makeLocal() {
-        return new Buff(8) {
+        return new Buff(4) {
             public void onSet() { //higher level = longer till banish
-                time += level * 8;
+                time += level * 4;
             }
 
             public void onFinish() {
@@ -121,7 +124,7 @@ public enum Buffs {
     }},
     Rejuvenate(new Tags(){{
         add(Tag.Buff);
-        add(Tag.Biology);
+        add(Tag.Mutation);
     }}){ Buff makeLocal(){
         return new Buff(20){
             private int tick = 0;
@@ -149,45 +152,39 @@ public enum Buffs {
             }
         };
     }},
-    Hunger(new Tags(){{
+    Metabolism(new Tags(){{
     }}){ Buff makeLocal(){
         return new Buff(100) {
-            public void onSet(){
-                if (host instanceof MainPlayer) ((MainPlayer)host).onTimeChange();
-            }
             public boolean update() {
                 if (super.update()) {
-                    time += 100;
+                    host.stats.triggerEffect(Bleed);
                     if (host instanceof MainPlayer){
-                        ((MainPlayer)host).onTimeChange();
-                    } else return true;
+                        time += Global.player.traits.contains(Trait.Fast_Metabolism) ? 80 : 100;
+                        Global.player.onTimeChange();
+                    }
                 }
-                return false;
+                return super.update();
             }
         };
     }},
     Bleed(new Tags(){{
         add(Tag.Debuff);
     }}){ Buff makeLocal(){
-        return new Buff(100) {
+        return new Buff(800) {
             private int tick = 0;
             public void onStack(){
-                if (level < 18 && host.rand.nextBoolean()){
-                    level++;
-                    time += 100;
-                }
+                level++;
             }
             public boolean onTrigger(){
-                if (level > 1) level--;
-                else time = Global.time;
+                if (level > 0) level--;
                 return true;
             }
             public boolean update() {
                 if (tick++ % (Math.max(1,20-level)) == 0) {
                     Particle.explode("Blood", host.getRandomPoint(), new P(), (int) (Math.random() * level + 1), 5, 0, true, 24);
                 }
-                level = (time-Global.time)/100+1;
-                return super.update();
+                if (super.update()) host.die();
+                return level == 0;
             }
         };
     }},
@@ -231,6 +228,7 @@ public enum Buffs {
     }}){ Buff makeLocal(){
         return new Buff(7) {
             public void onSet(){
+                Particle.shock(host.getRandomPoint());
                 var = level;
                 if (!host.get("Stamina").require(level)){
                     Particle.holyExplosion(host.pos);
@@ -238,6 +236,7 @@ public enum Buffs {
                 }
             }
             public void onStack() {
+                Particle.shock(host.getRandomPoint());
                 var++;
                 time = Global.time + 7;
                 if (!host.get("Stamina").require(1)){
@@ -284,13 +283,13 @@ public enum Buffs {
             public void onSet() {
                 sound("freeze");
                 var = host.get("Speed").add(-Math.round(host.getSpeed()*50), false);
-                time += level*16;
+                time += level*8;
                 host.stats.triggerEffect(Buffs.Bleed);
             }
             public void onStack(){
                 level++;
                 var += host.get("Speed").add(-Math.round(host.getSpeed()*50), false);
-                time += 16;
+                time += 8;
             }
             public void onFinish() {
                 host.get("Speed").add(-var, true);
@@ -302,7 +301,7 @@ public enum Buffs {
             }
             public boolean update() {
                 Particle.frozen(host.pos);
-                level = (time-Global.time)/16+1;
+                level = (time-Global.time)/8+1;
                 return super.update();
             }
         };
@@ -336,30 +335,9 @@ public enum Buffs {
             }
         };
     }},
-    Exhaust(new Tags(){{
-        add(Tag.Debuff);
-        add(Tag.Biology);
-    }}){ Buff makeLocal(){
-        return new Buff(100) {
-            public void onSet() {
-                sound("freeze");
-                var = level;
-                host.get("Stamina").add(-var, false);
-            }
-
-            public void onFinish() {
-                host.get("Stamina").add(var, false);
-            }
-
-            public boolean update() {
-                Particle.implode("Dust", host.pos.getAdd(0, -25), new P(), 1, 10, 1, false, 6);
-                return super.update();
-            }
-        };
-    }},
     Poison(new Tags(){{
         add(Tag.Debuff);
-        add(Tag.Biology);
+        add(Tag.Mutation);
     }}){ Buff makeLocal(){
         return new Buff(100) {
             private int tick = 0;
@@ -434,6 +412,35 @@ public enum Buffs {
                         }
                     };
                 }
+                return super.update();
+            }
+        };
+    }},
+    Stoneform(new Tags(){{
+        add(Tag.Debuff);
+        add(Tag.Crystal);
+    }}){ Buff makeLocal(){
+        return new Buff(24) {
+            public void onSet() {
+                sound("stun");
+                time += level * 8;
+                host.vel.x = 0;
+                host.get("Attack").add(-32, true);
+                var = host.get("Speed").add(-10, false);
+                host.clip.setShade(Shader.Color,new Color(26, 26, 26, 180).getRGB());
+            }
+            public void onLoad(){
+                host.stateSet(Actions.Hit);
+                host.delay.set((time-Global.time) * 40);
+                host.clip.setSpeed(99);
+            }
+            public void onFinish(){
+                host.clip.setShade(Shader.XYLinearGradient,0);
+                host.get("Attack").add(32, true);
+                host.get("Speed").add(-var, true);
+            }
+            public boolean update() {
+                Particle.implode("Glare", host.pos.getAdd(0, -24), new P(), 1, 10, 1, false, 6);
                 return super.update();
             }
         };

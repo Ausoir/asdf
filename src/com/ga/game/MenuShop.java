@@ -14,7 +14,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 /**
- * Created by Ga on 11/15/2016.
+ * Created by Ga on 11/15/2016. asd
  */
 public class MenuShop extends Panel {
     private GridBagConstraints grid = new GridBagConstraints();
@@ -23,7 +23,7 @@ public class MenuShop extends Panel {
     private JLabel gold, titleLabel;
     private Border emptyborder = new EmptyBorder(5,8,5,8);
 
-    public MenuShop(){
+    MenuShop(){
         super();
         setLayout(new BoxLayout(this,BoxLayout.PAGE_AXIS));
         titleLabel = new JLabel();
@@ -47,16 +47,16 @@ public class MenuShop extends Panel {
         add(titleLabel, BorderLayout.CENTER);
         add(scroll, BorderLayout.CENTER);
         add(gold, BorderLayout.LINE_START);
+        titleLabel.setForeground(fontcolor);
+        gold.setForeground(fontcolor);
     }
     protected void setColor() {
-        setBackground(new Color(68, 95, 120, 180));
+        setBackground(forecolor);
         scroll.setBackground(new Color(120, 86, 47, 180));
     }
     public void show(String title, Item[] wares, int[] prices, Performer[] actions){
         if (!isVisible()) {
             super.display();
-            setBackground(new Color(120,120,120,180));
-            scroll.setBackground(new Color(120,120,120,180));
             titleLabel.setText(title);
             gold.setText("Gold: " + Global.player.gold);
             panel.removeAll();
@@ -69,7 +69,7 @@ public class MenuShop extends Panel {
             }
         }
     }
-    public void makeSlot(final Item item, final int price, final Performer action){
+    private void makeSlot(final Item item, final int price, final Performer action){
         JPanel panel = new JPanel();
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel,BoxLayout.PAGE_AXIS));

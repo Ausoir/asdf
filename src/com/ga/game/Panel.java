@@ -7,19 +7,19 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Created by Ga on 1/22/2017.
+ * Created by Ga on 1/22/2017. asd
  */
 public class Panel extends JPanel implements Updatable {
-    protected Point location = new Point(4,4);
+    private Point location = new Point(4,4);
     protected Dimension size = new Dimension(512,512);
-    protected static Color forecolor = new Color(68, 102, 120, 240);
-    protected static Color forecolor2 = new Color(95, 112, 120, 255);
-    protected static Color fontcolor = new Color(205, 209, 227, 255);
-    protected static Font font = new Font("Helvetica",Font.PLAIN,18);
-    protected int targetSizeX = 512;
-    protected int targetSizeY = 512;
-    protected int animation = 1;
-    public Panel(){
+    static Color forecolor = new Color(68, 102, 120, 240);
+    static Color forecolor2 = new Color(95, 112, 120, 255);
+    static Color fontcolor = new Color(205, 209, 227, 255);
+    static Font font = new Font("Helvetica",Font.PLAIN,18);
+    int targetSizeX = 512;
+    private int targetSizeY = 512;
+    private int animation = 1;
+    Panel(){
         resize();
         setVisible(false);
         location = getLocation();
@@ -33,7 +33,7 @@ public class Panel extends JPanel implements Updatable {
     }
     protected void setColor(){
     }
-    public void resize(){
+    void resize(){
         int x = Settings.centerX-(size.width/2);
         int y = Settings.centerY-(size.height/2);
         setBounds(x,y, size.width, size.height);

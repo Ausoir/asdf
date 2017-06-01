@@ -107,33 +107,21 @@ public class FileManager {
         }
     }
     public static int loadMap(String map) {
+        Global.houseId = 1;
         Global.player.lastLand = new Line();
         String[] oldmap = null;
         if (Global.map != null) oldmap = Global.map.maps;
         String[] mapProperties = map.split("@");
         String dir = mapProperties[0];
-        boolean regrowths = false;
-        int player = -999;
-        if (mapProperties.length > 1) player = Integer.parseInt(mapProperties[1]);
+        int player = oldmap == null?-1:Integer.parseInt(mapProperties[1]);
         if (FileManager.isFile("Data/map/" + dir + ".map")){
             readMap(dir);
-            regrowths = oldmap != null && !oldmap[0].equals("1") && !Global.map.isIndoors();
-        } else if (dir.startsWith("House")){
-            if (FileManager.isFile("Data/map/" + dir + ".map")) readMap(dir);
-            else{
-                String[] houseInfo = dir.split("/");
-                if (houseInfo.length > 1) dir = houseInfo[0];
-                else houseInfo = new String[]{houseInfo[0], "1200,800"};
-                MapGenerator.generateHouse(dir, Global.player.cmap, Integer.parseInt(dir.split("_")[2]), houseInfo[1]);
-            }
-        } else { //can't find map
-            int id = Integer.parseInt(map.split("_")[1]);
-            MapGenerator.generateMap(dir, Creation.getWorld(id));
-            regrowths = true;
+        } else {
+            Generator.generate(mapProperties);
         }
         Global.player.cmap = dir;
         Global.map.setTexture();
-        if (regrowths) Global.map.event.onChange();
+        if (oldmap != null && !Global.map.isIndoors()) Global.map.event.onChange();
         return player;
     }
     private static void readMap(String dir){
@@ -273,17 +261,18 @@ public class FileManager {
         return file.isFile() && file.length() > 0;
     }
 
-    public static char[][] readWorld(String dir){
+    public static void readWorld(String dir){
         char[][] world;
         String data = read("Data/map/"+dir+".map");
         String[] lines = data.split("%");
-        world = new char[lines.length][lines[0].length()];
-        for (int y=0;y<lines.length;y++){
+        world = new char[lines.length-1][lines[1].length()];
+        for (int y=1;y<lines.length;y++){
             for (int x=0;x<lines[y].toCharArray().length;x++){
                 char node = lines[y].charAt(x);
-                world[y][x] = node;
+                world[y-1][x] = node;
             }
         }
-        return world;
+        Creation.seed = Integer.parseInt(lines[0]);
+        Creation.world = world;
     }
 }

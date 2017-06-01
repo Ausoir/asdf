@@ -14,6 +14,7 @@ import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Stat;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 
 import static com.ga.unit.BodyHumanoid.FIST;
@@ -35,7 +36,7 @@ public class Player extends Man {
     public Actions learning;
     private Item offhand = fist;
     private boolean leftHandMode = false;
-    ArrayList<Trait> traits = new ArrayList<>();
+    public ArrayList<Trait> traits = new ArrayList<>();
     public Player(int seed) {
         super(seed);
         loadActions("-5,100,1000/Use&Walk&Sprint");
@@ -43,6 +44,7 @@ public class Player extends Man {
         inventory = new Inventory(this);
         crafting = new Crafts(this);
         health = new Health(this);
+        Collections.addAll(tags, Tags.trainers);
     }
     public void learnSkill(Actions p){
         say("Learned spell "+p.getName()+"!");
@@ -92,9 +94,11 @@ public class Player extends Man {
     }
     @Override
     protected boolean tagCapable(Tags p){
-        if (!tags.has(p)) {
-            for (Tag i : p) {
-                if (!tags.contains(i) && !armor.tags.contains(i)) return true;
+        if (p.size() > 0) {
+            if (!tags.has(p)) {
+                for (Tag i : p) {
+                    if (!tags.contains(i) && !armor.tags.contains(i)) return true;
+                }
             }
         }
         return true;
@@ -104,12 +108,10 @@ public class Player extends Man {
         int r = super.setState(state);
         if (r != 0){
             if (r == 2) {
-                int req = state.getCost();
-                req += getStatPenalty();
-                if (req > get("Stamina").getMax()) say("This skill is beyond my abilities!");
-            } else if (r == 4){
+                if (state.getCost() > get("Stamina").getMax()) say("Not enough Stamina!");
+            } else if (r == 4) {
                 say("Cannot cast!");
-            } else if (r == 5) say("This skill is beyond my abilities!");
+            } else if (r == 5) say("This action is beyond my abilities!");
         }
         return r;
     }
@@ -138,26 +140,16 @@ public class Player extends Man {
                                 break;
                             }
                         }
-                        for (final Line i : Global.map.land) {
-                            if (i.opt == 1) {
-                                if (i.lineCross(new Line(reach.x - (12 * dir), reach.y, reach.x + (12 * dir), reach.y))) {
-                                    clip.setState(Actions.Guard.getClipName());
-                                    delay.set(40);
-                                    final int firstDir = dir;
-                                    delay.performer = new Performer() {
-                                        public void perform() {
-                                            pos.x = i.pt.x - (24 * dir);
-                                            setState(Actions.Climb);
-                                            dir = firstDir;
-                                            input.moving = 0;
-                                            rope = i;
-                                        }
-                                    };
-                                }
-                            }
+                        final Line wall = Global.map.checkLand(new Line(reach.x - (12 * dir), reach.y, reach.x + (12 * dir), reach.y),depth);
+                        if (wall != null) {
+                            setState(Actions.Climb);
                         }
                     }
                 };
+                break;
+            case Discard:
+                setWeapon(null);
+                stateSet(Actions.Idle);
                 break;
             case Grab:
                 if (offhand == fist) {
@@ -196,6 +188,7 @@ public class Player extends Man {
                             Sound.play("unwear");
                             int piece = selectingItem - 10;
                             if (sheathe() && !armor.isBare(piece)) {
+                                Updater.add(armor.armor[piece]);
                                 setWeapon(armor.armor[piece]);
                                 armor.set(null, piece);
                             }
@@ -203,18 +196,12 @@ public class Player extends Man {
                     }
                 };
                 break;
-            case Duck:
-                cooldown.put(state, new int[]{Global.time + ((armor.armor[1].encumberance + armor.armor[2].encumberance) * 4)});
-                break;
-            case Guard:
-                cooldown.put(state, new int[]{Global.time + ((armor.armor[FIST].encumberance + armor.armor[0].encumberance) * 4)});
-                break;
         }
     }
     public int getStatePower(Actions state){
         int power = 0;
         int num = 0;
-        for (Tag i : state.getTags().getTrainers()){
+        for (Tag i : state.getTrainers()){
             power += get(i.toString()).get();
             num++;
         }
@@ -226,15 +213,14 @@ public class Player extends Man {
         int difficulty = state.getDifficulty();
         if (difficulty == 0) return 1;
         int power = getStatePower(state);
+        if (state == Actions.Rest) power -= armor.armor[0].weight;
 //        return Math.max(0,skillTree.getSkillLevel(state)-(difficulty-power));
         return 1;
     }
-    @Override
-    public int getStatPenalty() {
-        return Math.max(0, armor.getWeight()+weapon.weight-get("Strength").get());
-    }
     public float getSpeed() {
-        return Math.max(0,super.getSpeed()-Math.max(0,inventory.weight+armor.getWeight()+weapon.weight-get("Strength").get()));
+        float speed = get("Speed").get()*clip.getLegStatus();
+        float penalty = Math.max(0,inventory.weight+armor.getWeight()+weapon.weight+offhand.weight-get("Strength").get()*2);
+        return Math.max(0,speed-penalty)*.01f;
     }
     public void witnessDeath(Unit p){
         if (faction.canAttack(p.faction) && p.pos.getSubtract(pos).inOval(900,500) && learning != null){

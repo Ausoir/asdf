@@ -25,54 +25,66 @@ import java.util.Random;
  */
 public class Item extends Prop {
     public enum ItemType {
-        Slashing(Actions.Slash, 1.3f, "swing_knife"){
-            void onSet(Item host){
-                host.tags.add(Tag.Sharp);
+        Sword(Actions.Slash, 1.3f, .7f, "swing_knife"){
+            boolean isBlunt(){
+                return false;
             }
-        }, Thrusting(Actions.Thrust, 1,"swing_silent"){
-            void onSet(Item host){
-                host.tags.add(Tag.Sharp);
+        }, Spear(Actions.Thrust, 1, .4f, "swing_silent"){
+            boolean isBlunt(){
+                return false;
+            }
+        }, Knife(Actions.Slash, .3f, .4f, "swing_knife") {
+            boolean isBlunt() {
+                return false;
             }
         },
-        Bashing(Actions.Slash, 2, "swing_silent"),
-        Armor(Actions.Rest, 1, "swing_normal"), Scroll(Actions.Guard, 0, "scroll"),
-        Shooting(Actions.Shoot, .8f, "swing_normal"), Rifle(Actions.Snipe, 1.2f, "swing_normal"),
-        Bow(Actions.Aim, 1, "swing_silent"), Throwing(Actions.Throw, .2f, "swing_silent"),
-        Darting(Actions.Dart, .1f, "swing_normal"), Consumable(Actions.Consume, .2f, "drink");
+        Bashing(Actions.Slash, 2, 2, "swing_silent"),
+        Armor(Actions.Rest, 2, 1, "swing_normal"), Scroll(Actions.Guard, 0, .5f, "scroll"),
+        Shooting(Actions.Shoot, .8f, 1, "swing_normal"), Rifle(Actions.Snipe, 1.2f, 1, "swing_normal"),
+        Bow(Actions.Aim, 1, .2f, "swing_silent"), Throwing(Actions.Throw, .2f, 1, "swing_silent"),
+        Darting(Actions.Dart, .1f, 1, "swing_normal"), Consumable(Actions.Consume, .2f, 1, "drink");
         Actions action;
         String sound;
-        float size;
-        ItemType(Actions p, float size, String sound){
+        float weightMultiplier, durabilityMultiplier;
+        ItemType(Actions p, float mass, float sturdiness, String sound){
             action = p;
-            this.size = size;
+            this.weightMultiplier = mass;
+            this.durabilityMultiplier = sturdiness;
             this.sound = sound;
+        }
+        boolean isBlunt(){
+            return true;
         }
         void onSet(Item host){
         }
     }
     public enum Material{
-        Wooden(.7f,2,16,1,new Color(118, 93, 0,255)){
+        Wooden(.3f,2,16,1,new Color(118, 93, 0,60)){
             void onSet(Item host) {
                 host.tags.add(Tag.Combustible);
             }
-        }, Cloth(.7f,0,3,0){
+        }, Cloth(.6f,0,3,0){
             void onSet(Item host) {
                 host.tags.add(Tag.Combustible);
             }
-        }, Leather(.12f,1,6,1,new Color(133, 78, 32,255)){
+        }, Leather(.3f,1,6,1,new Color(133, 78, 32,140)){
             void onSet(Item host) {
                 host.tags.add(Tag.Combustible);
             }
         }, Glass(.05f,1,1,7),
-        Brass(.3f,3,40,3,new Color(133, 123, 23,255)),
-        Copper(.15f,3,40,3,new Color(133, 92, 38,255)),
-        Bronze(.24f,3,70,5,new Color(133, 72, 0,255)),
+        Brass(.36f,3,40,3,new Color(133, 123, 23,120)),
+        Copper(.32f,4,24,4,new Color(133, 92, 38,120)),
+        Bronze(.24f,4,70,4,new Color(133, 72, 0,200)),
+        Iron(.24f,5,100,4),
+        Silver(.16f,6,40,6),
+        Lead(.2f,6,48,5,new Color(19, 31, 75,180)),
         Steel(.1f,4,120,6),
-        Titanium(.001f,2,800,6),
-        Bone(.05f,0,28,3),
+        Titanium(.001f,3,800,6),
+        Crystal(.04f,8,24,12,new Color(28, 133, 67,120)),
+        Bone(.16f,1,28,3),
         Other(0,0,10,0),
-        Flesh(.05f,0,3,0),
-        Stone(.08f,5,5,4,new Color(107, 107, 107,255));
+        Flesh(.05f,1,3,0),
+        Stone(.1f,6,5,5,new Color(107, 107, 107,255));
         int weight, durability, hardness;
         Color color;
         float prevalence;
@@ -110,7 +122,7 @@ public class Item extends Prop {
         }
     }
     enum SpecialtyMod{
-        None, Light, Heavy, Feather, Sharp, Dull, Hasty, Lazy, Durable, Tough, Runic, Instant, Comfortable, Cursed, Conscious;
+        None, Light, Heavy, Feather, Sharp, Dull, Hasty, Lazy, Durable, Tough, Runic, Instant, Cursed, Conscious;
         static SpecialtyMod get(Random seed){
             if (seed.nextGaussian() > 1) return values()[seed.nextInt(values().length)];
             return None;
@@ -222,14 +234,14 @@ public class Item extends Prop {
     public int value = 8;
     Man owner;
     public Item(String name, int seed, Material[] materials, ItemType type) {
-        super(name, seed, 100);
+        super(name, seed);
         dynamic = true;
         gravity = true;
         setType(type);
         material = Material.get(rand, materials);
-        this.weight = (int) (material.weight * type.size);
         setMaterial(material);
-        this.durability = material.durability;
+        this.weight = (int) (material.weight * type.weightMultiplier);
+        this.durability = (int) (material.durability * type.durabilityMultiplier);
         this.uses = durability;
         final Item me = this;
         onInteract = new Interactive(){
@@ -285,7 +297,6 @@ public class Item extends Prop {
     }
     void setMaterial(Material mat){
         this.material = mat;
-        durability += mat.durability;
         mat.onSet(this);
         if (mat.color != null) {
             int ctype = image.getCenterType();
@@ -321,7 +332,6 @@ public class Item extends Prop {
         else if (mod == SpecialtyMod.Durable) durability *= 2;
         else if (mod == SpecialtyMod.Runic) probability += .2f;
         else if (mod == SpecialtyMod.Instant) delay = 1;
-        else if (mod == SpecialtyMod.Comfortable) smod = SpecialtyMod.None;
         else if (mod == SpecialtyMod.Conscious){
             cooldown = ((cooldown+5) * 2)+40;
             durability = -1;
@@ -496,7 +506,7 @@ public class Item extends Prop {
         return Global.r.nextInt(Math.max(1,weight));
     }
     public Line getLine(){
-        float len = image.getSize().x * dir;
+        float len = image.getSize().x * dir + 4;
         return new Line(pos, pos.getAdd(len*Global.cos(rotation), len*Global.sin(rotation)));
     }
     public String forceToString(){

@@ -15,7 +15,7 @@ public class Particle extends Thing implements Effect {
     private P vel;
     private boolean gravity;
     private Particle(String name, P pt, P vel, float rotation, float speed, boolean gravity, int lifetime) {
-        super(name, 800);
+        super(name, 0, 800);
         pos = pt;
         save = false;
         this.vel = new P(vel);
@@ -41,11 +41,14 @@ public class Particle extends Thing implements Effect {
         explode("Dust",pt,new P(0,-16),1,12,8,true,4);
     }
     static void explosion(P pt){
-        explode("Smoke",pt,new P(0,-16),32,15,15,false,7);
-        explode("Fire",pt,new P(0,-24),64,15,10,true,4);
+        explode("Smoke",pt,new P(0,-16),16,15,15,false,7);
+        explode("Fire",pt,new P(0,-24),24,15,10,true,4);
     }
     public static void holyExplosion(P pt){
-        explode("Glare",pt,new P(0,-1),64,24,20,true,7);
+        explode("Glare",pt,new P(0,-1),24,24,20,true,7);
+    }
+    public static void shock(P pt){
+        explode("Glare",pt,new P(0,0),3,48,0,false,3);
     }
     public static void cleanse(P pt){
         explode("Glare",pt,new P(),1,16,0,false,2);

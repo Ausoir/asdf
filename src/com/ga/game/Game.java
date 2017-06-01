@@ -8,7 +8,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Created by Ga on 8/6/2016.
+ * Created by Ga on 8/6/2016. asd
  */
 public class Game extends JFrame {
     public Game(boolean editor, int x, int y){

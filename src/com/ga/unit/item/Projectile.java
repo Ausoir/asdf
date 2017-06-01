@@ -16,7 +16,7 @@ public class Projectile extends Prop {
     public int damage = 0;
     public EventTimer delay = new EventTimer(-1, false, null);
     private Projectile(String name, P pt, float rot, int speed) {
-        super(name, 0, 60);
+        super(name, 0);
         pos = pt;
         save = false;
         vel.set(Global.cos(rot)*speed, Global.sin(rot)*speed);
@@ -55,7 +55,6 @@ public class Projectile extends Prop {
                 if (i.checkHit(new Line(pos,pos.getAdd(vel)),damage)) onAttack(i);
             }
         }
-        if (Global.mapEdge(pos.getAdd(vel)) != 0) stuck();
         super.update();
         delay.update();
     }

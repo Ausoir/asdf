@@ -44,7 +44,7 @@ public class Unit extends Prop {
     public int stateDuration = 0;
 
     public Unit(int seed) {
-        super(null,seed,101);
+        super(null,seed);
         controlId = Global.getControlId();
         dynamic = true;
         gravity = true;
@@ -137,11 +137,8 @@ public class Unit extends Prop {
         if (delay.over() && jump && this.state != state && tagCapable(state.getTags())) {
             lastState = null;
             face(target.x > 0 ? 1 : -1, true);
-            int req = state.getCost();
-            if (req != -1) req += getStatPenalty();
-            else req = 0;
             if (Global.time >= getCooldown(state)[0]) {
-                if (get("Stamina").require(req)) {
+                if (get("Stamina").require(state.getCost())) {
                     if (state != Actions.Idle) delay.performer = null;
                     stateLevel = getStateLevel(state);
                     if (stateLevel >= 1){
@@ -193,10 +190,6 @@ public class Unit extends Prop {
     }
 
     protected int getDamageReduction(int organ){
-        return 0;
-    }
-
-    public int getStatPenalty() {
         return 0;
     }
 
@@ -285,14 +278,12 @@ public class Unit extends Prop {
         super.onCollide(l);
         if (!jump) {
             jump = true;
-            if (state != Actions.Sneak) setDepth(l.depth-1);
+            if (l.isLandable()) setDepth(l.depth-1);
             int mag = (int) (vel.y - Settings.gravityMax);
             if (vel.y > Settings.gravity*3) Sound.play("land");
             if (hittable(Faction.Destructive)) {
                 if (mag >= 0) {
                     stateSet(Actions.Down);
-                    int statpenalty = getStatPenalty();
-                    delay.time += statpenalty * 20;
                 } else if (state == Actions.Jump && vel.y > 0) {
                     stateSet(Actions.Hit);
                     delay.set(4);
@@ -359,7 +350,7 @@ public class Unit extends Prop {
         if (state == Actions.Dead || !save) return "";
         String r = super.toString();
         r += "@"+stats.toString()+"@"+faction.name()+"@";
-        for (int i:rangeZone) r += i+",";
+        for (int i : rangeZone) r += i+",";
         r = r.substring(0,r.length()-1)+"/";
         Iterator it = moveset.entrySet().iterator();
         while (it.hasNext()) {
@@ -381,6 +372,7 @@ public class Unit extends Prop {
     }
 
     public void revive() {
+        stats.clearBuffs();
         Particle.holyExplosion(pos);
         buff(Buffs.Invincible,1);
         stateSet(Actions.Down);

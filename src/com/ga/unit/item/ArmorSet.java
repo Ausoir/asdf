@@ -54,7 +54,7 @@ public class ArmorSet {
         for (Armor i : armor){
             tags.addAll(i.tags);
         }
-        if (getEncumberance() <= 4) tags.add(Tag.Finesse);
+        if (getWeight() <= 4) tags.add(Tag.Finesse);
         if (onChange != null) onChange.perform();
     }
     private int organToPiece(int organ){
@@ -73,11 +73,6 @@ public class ArmorSet {
         for (int i=0;i<armor.length;i++){
             if (armor[i] == p) set(null, i);
         }
-    }
-    public int getEncumberance(){
-        int r = 0;
-        for (Armor i : armor) r += i.encumberance;
-        return r;
     }
     public int getWeight(){
         int r = 0;
@@ -104,7 +99,7 @@ public class ArmorSet {
         String[] armors = p.split("&");
         for (int i=0;i<armor.length;i++){
             if (armors[i].equals("None")) armor[i] = bare[i];
-            else armor[i] = (Armor) Stock.get(armors[i]);
+            else armor[i] = (Armor) ((Armor) Stock.get(armors[i])).cancelAdd();
         }
         for (int i=0;i<armor.length;i++) set(armor[i], i);
     }

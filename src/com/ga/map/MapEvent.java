@@ -44,7 +44,7 @@ public enum MapEvent{
         if (mobs != null) { //encounter
             String[] moblist = mobs.split(",");
             for (int times = 0; times < 24; times++) {
-                float random = Global.r.nextFloat();
+                float random = Creation.r.nextFloat();
                 for (String i : moblist) {
                     String[] mobp = i.split("=");
                     if (random < Float.parseFloat(mobp[1])) {

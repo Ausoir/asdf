@@ -3,6 +3,8 @@ package com.ga.unit.item;
 import com.ga.game.Sound;
 import com.ga.map.Global;
 import com.ga.map.Picture;
+import com.ga.map.Updater;
+import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.unit.Man;
 
@@ -10,10 +12,13 @@ import com.ga.unit.Man;
  * Created by Ga on 8/9/2016. asd
  */
 public class Armor extends Item {
+    public static Material[] plateMaterials = new Material[]{
+        Material.Steel, Material.Brass, Material.Stone, Material.Bronze, Material.Copper, Material.Lead, Material.Leather,
+        Material.Iron, Material.Silver, Material.Bone, Material.Glass, Material.Titanium, Material.Crystal
+    };
     private int piece = 0;
     private float coverage = 0;
     private int armorMod = 0;
-    public int encumberance = 0;
     public int pocket = 0;
     public Armor(String name, int seed, Material[] materials, float coverage, int pockets, int piece) {
         super(name, seed, materials, ItemType.Armor);
@@ -21,7 +26,6 @@ public class Armor extends Item {
         weight *= coverage;
         value = 24;
         this.pocket = pockets;
-        this.encumberance = -material.weight/2;
         this.piece = piece;
         if (piece != 0) image.set(name, piece);
         delay = 80;
@@ -32,6 +36,8 @@ public class Armor extends Item {
             emod = null;
             ademod = AdenchantMod.None;
         }
+    }
+    public void randomSize(P sizeVariance) {
     }
     private float getMaxArmor(){
         return Math.max(0,material.hardness + armorMod);
@@ -48,8 +54,7 @@ public class Armor extends Item {
         else if (mod == PrefixMod.Mastercraft) armorMod = 2;
     }
     protected void setModifier(SpecialtyMod mod){
-        if (mod == SpecialtyMod.Comfortable) encumberance = Math.max(0,encumberance-admod.magnitude);
-        else if (mod == SpecialtyMod.Tough) armorMod += admod.magnitude;
+        if (mod == SpecialtyMod.Tough) armorMod += admod.magnitude;
         else super.setModifier(mod);
     }
     public void remove(){
@@ -69,9 +74,8 @@ public class Armor extends Item {
             public void perform(){
                 if (host.armor.isBare(piece)) {
                     Sound.play("wear");
+                    me.remove();
                     host.armor.set(me, piece);
-                    host.setWeapon(null);
-                    me.pos = Global.offplace;
                 }
             }
         };

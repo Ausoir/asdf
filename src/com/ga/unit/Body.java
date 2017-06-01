@@ -272,7 +272,7 @@ public class Body {
         } else organs[BODY].pt.y = -getHeight();
     }
 
-    float getLegStatus(){
+    public float getLegStatus(){
         if (legNum == 0) return 1;
         return (float)legCurrent/legNum;
     }

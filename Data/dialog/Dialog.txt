@@ -67,7 +67,6 @@ mvsCleave:Cleave
 mvsEmpower:Empower
 mvsEvade:Evade
 mvsGlacialwalk:Glacialwalk
-mvsStun:Stun
 mvsPoison:Poison
 mvsCalling:Calling
 mvsShadowtwin:Shadowtwin
@@ -109,7 +108,6 @@ mvsDscCleave:A
 mvsDscEmpower:A
 mvsDscEvade:A
 mvsDscGlacialwalk:A
-mvsDscStun:A
 mvsDscPoison:A
 mvsDscCalling:A
 mvsDscShadowtwin:A

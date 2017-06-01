@@ -74,9 +74,6 @@ public class Line {
     public float getLength(){
         return ptd.getSubtract(pt).getDist();
     }
-    public P getMidPoint(){
-        return new P((ptd.x-pt.x)/2+pt.x, (ptd.y-pt.y)/2+pt.y);
-    }
     public float getCrossPointX(float y){
         return (y-pt.y)/getSlope()+pt.x;
     }

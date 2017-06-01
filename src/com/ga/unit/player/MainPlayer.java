@@ -34,20 +34,10 @@ public class MainPlayer extends Player {
     public int setState(Actions state) {
         if (state == Actions.Use && this.state == Actions.Jump && getStateLevel(Actions.Airstrike) > 0 && this.delay.time > 32) stateSet(Actions.Airstrike);
         else if (state == Actions.Jump && this.state == Actions.Rest) state = Actions.Leap;
+        else if (state == Actions.Discard && this.state == Actions.Rest) state = Actions.Throw;
         else if (state == Actions.Rest && this.state == Actions.Walk) state = Actions.Sprint;
         else if (state == Actions.Kick && this.state == Actions.Rest) state = Actions.Sidekick;
-        else if (state == Actions.Drop && this.state == Actions.Rest){
-            state = Actions.Rest;
-            if (Updater.collideUnit(pos, 360, faction).size() == 0) {
-                for (Prop i : Updater.collideProp(pos, -12)) {
-                    if (i.getDepth() == depth-1 && i.tags.contains(Tag.Hideable)) {
-                        stateSet(Actions.Sneak);
-                        setDepth(i.getDepth()-1);
-                        break;
-                    }
-                }
-            }
-        } else if (input.moving != 0 && this.state == Actions.Climb){
+        else if (input.moving != 0 && this.state == Actions.Climb){
             vel.x = getSpeed()*input.moving;
             stateSet(Actions.Jump);
         } else if (state == Actions.Use && this.state == Actions.Walk && !wieldingNone()){
@@ -107,7 +97,7 @@ public class MainPlayer extends Player {
     protected void edgeCheck(){
         int edge = Global.mapEdge(pos.getAdd(vel));
         if (edge != 0 && !Global.map.isIndoors() && Creation.isPassable(Creation.getWorld(Global.map.id),edge)){
-            Global.map.loadMap(""+edge);
+            Global.map.loadMap(edge+"");
         } else super.edgeCheck();
     }
     public void update(){

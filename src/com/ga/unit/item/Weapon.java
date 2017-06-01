@@ -10,7 +10,7 @@ import static com.ga.unit.item.Item.Material.*;
 public class Weapon extends Item {
     private int damageMod = 0;
     public Weapon(String name, int seed, ItemType type) {
-        super(name, seed, new Material[]{Wooden, Glass, Stone, Copper, Brass, Bronze, Steel, Bone, Titanium}, type);
+        super(name, seed, new Material[]{Wooden, Glass, Stone, Copper, Brass, Bronze, Iron, Silver, Steel, Bone, Titanium, Lead, Crystal}, type);
         value = 36;
         cooldown = 0;
         rotation = 35;
@@ -39,7 +39,7 @@ public class Weapon extends Item {
         else super.setModifier(mod);
     }
     private int getMaxDamage(){
-        if (type == ItemType.Thrusting || type == ItemType.Slashing)
+        if (type == ItemType.Spear || type == ItemType.Sword)
             return Math.max(1,material.hardness);
         else return weight;
     }
@@ -57,6 +57,7 @@ public class Weapon extends Item {
         if (emod != null){
             r += " This weapon has "+(int)(probability*100)+"% chance of activating its enchantment every hit.";
         }
-        return r + " This weapon deals upto "+getMaxDamage()+" + "+damageMod+" "+type.name()+" damage.";
+        String damageType = type.isBlunt() ? "Blunt" : "Cutting";
+        return r + " This weapon deals upto "+getMaxDamage()+" + "+damageMod+" "+damageType+" damage.";
     }
 }

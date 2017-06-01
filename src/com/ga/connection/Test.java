@@ -1,11 +1,6 @@
 package com.ga.connection;
 
 import com.ga.map.Creation;
-import com.ga.map.MapGenerator;
-import com.ga.tool.Line;
-import com.ga.tool.P;
-
-import java.util.ArrayList;
 
 /**
  * Created by Ga on 12/13/2016. asdasdasdawdadqw

@@ -42,19 +42,23 @@ public class Updater {
         Global.display.removeSpeech();
     }
     static void changeMap(boolean editor){
+        String newMap = changeMap;
+        changeMap = null;
         clear();
         if (!editor) {
             int edge = 0;
-            if (changeMap.length() == 1){
-                edge = Integer.parseInt(changeMap);
+            if (newMap.length() == 1){
+                edge = Integer.parseInt(newMap);
                 int[] newmap = Creation.getWorld(Global.map.id, edge);
-                changeMap = Global.player.cworld + "_" + newmap[0];
-            }
-            int pos = FileManager.loadMap(changeMap);
+                Creation.prepareRandom(newmap[0]);
+                newMap = Global.player.cworld + "_" + newmap[0] + "@-1";
+            } else Creation.prepareRandom((int) Math.random()*1000);
+            int pos = FileManager.loadMap(newMap);
+            update();
             if (edge == 0) {
-                for (Observer i : addQueue) {
-                    if (i instanceof Prop && ((Prop) i).factoryId == Stock.Spawn.ordinal() && ((Prop) i).seed == pos) {
-                        Global.player.pos.set(((Prop) i).pos);
+                for (Prop i : props) {
+                    if (i.factoryId == Stock.Spawn.ordinal() && i.seed == pos) {
+                        Global.player.pos.set(i.pos);
                         break;
                     }
                 }
@@ -73,7 +77,7 @@ public class Updater {
                     Line entrance = Global.map.checkLand(new Line(1,Global.map.size.y-64,Global.map.size.x-1,Global.map.size.y-64),0);
                     float lastY = Global.map.size.y-128;
                     if (entrance != null) lastY = entrance.pt.y - 1;
-                    while (entrance == null || entrance.getSlope() > 1) {
+                    while (entrance == null || entrance.getSlope() > .5f) {
                         if (entrance == null) lastY -= 64;
                         else lastY = entrance.pt.y - 1;
                         entrance = Global.map.checkLand(new Line(1,lastY,Global.map.size.x-1,lastY),0);
@@ -82,15 +86,15 @@ public class Updater {
                     Global.player.pos.set(entrance.getCrossPointX(y+1), y-Math.abs(entrance.getSlope()));
                 }
             }
+            Creation.endRandom();
             Global.player.reconnect();
             if (changeMapEvent != null){
                 changeMapEvent.perform();
                 changeMapEvent = null;
             }
         } else {
-            FileManager.loadMap(changeMap);
+            FileManager.loadMap(newMap);
         }
-        changeMap = null;
     }
     public static void updateControl(){
         for (Intelligence i : controllee) i.update();
@@ -134,7 +138,7 @@ public class Updater {
             if (changeMap != null) changeMap(false);
             else if (time.update()){
                 Global.update(1);
-                if (Global.time % 8 == 0) FileManager.saveCharacter();
+                FileManager.saveCharacter();
             }
         }
     }
@@ -154,6 +158,9 @@ public class Updater {
     }
     public static void remove(Observer p){
         removeQueue.add(p);
+    }
+    public static void removeDrawee(Observer p){
+        drawee.remove(p);
     }
     public static void resetDepth(Drawable p){
         if (drawee.remove(p)) addDrawee(p);
@@ -238,7 +245,7 @@ public class Updater {
         int max = r;
         for (Map.Entry i : unitList.entrySet()){
             Unit unit = (Unit) i.getValue();
-            if (host != i && unit.state != Actions.Sneak) {
+            if (host != i) {
                 float x = Math.abs(unit.pos.x-vision.x), y = Math.abs(unit.pos.y - vision.y);
                 if (x < r && y < r/2) {
                     if (x+y < max){

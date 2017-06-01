@@ -25,6 +25,7 @@ public class Picture {
     private P halfSize;
     public Random rand;
     private int type = 1; //1:center,2:bottom
+    public int multiple = 0;
     public static void init(){
         for (String[] i : FileManager.fileCache.get("png")){
             int randIndex = i[0].indexOf("-");
@@ -84,7 +85,8 @@ public class Picture {
             Integer num = multiples.get(dir);
             if (num != null) {
                 if (rand == null) rand = new Random();
-                dir += "-" + rand.nextInt(num);
+                multiple = rand.nextInt(num);
+                dir += "-" + multiple;
                 file = directory.get(dir);
             }
         }

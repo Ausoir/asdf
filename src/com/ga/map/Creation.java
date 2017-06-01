@@ -3,13 +3,17 @@ package com.ga.map;
 import com.ga.game.FileManager;
 import com.ga.unit.player.MainPlayer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
 
 /**
  * Created by Ga on 4/17/2017. asd
  */
 public class Creation {
-    private static char[][] world;
+    public static Random r;
+    public static int seed;
+    public static char[][] world;
     public static void create(){
         if (!FileManager.isFile("Data/map/0")) {
             MainPlayer player = new MainPlayer(-1);
@@ -20,14 +24,26 @@ public class Creation {
             FileManager.loadPlayer(true, "0");
         }
         if (!FileManager.isFile("Data/map/"+Global.player.cworld+".map")) {
-            world = WorldCreation.create(8,4);
+            seed = (int) (Math.random()*100000);
+            world = WorldCreation.create(24,1);
             saveWorld();
         } else {
-            world = FileManager.readWorld(Global.player.cworld);
+            FileManager.readWorld(Global.player.cworld);
         }
+    }
+    static void prepareRandom(int id){
+        r = new Random(Integer.parseInt((""+id)+seed));
+    }
+    static void endRandom(){
+        r = null;
+    }
+    public static int getSeed(int p){
+        if (p == -1) return r.nextInt(9999)+1;
+        return p;
     }
     private static void saveWorld(){
         StringBuilder r = new StringBuilder();
+        r.append(seed).append("\n");
         for (char[] y : world){
             for (char x : y){
                 r.append(x);
@@ -51,11 +67,10 @@ public class Creation {
             int newId = (pt[1]*world[0].length)+pt[0];
             return new int[]{newId, world[pt[1]][pt[0]]};
         }
-        assert false;
         return null;
     }
-    public static void test(){
-        world = WorldCreation.create(10,3);
+public static void test(){
+        world = WorldCreation.create(14,2);
         print(world, false);
         print(world, true);
         int[] r = getWorld(1, 2);

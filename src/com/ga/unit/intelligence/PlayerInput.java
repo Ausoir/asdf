@@ -26,7 +26,7 @@ public class PlayerInput implements Input {
         put(Keybinding.get("SPACE"), Actions.Kick.getName());
         put(Keybinding.get("R"), Actions.Wield.getName());
         put(Keybinding.get("M1"), Actions.Use.getName());
-        put(Keybinding.get("M2"), Actions.Throw.getName());
+        put(Keybinding.get("M2"), Actions.Discard.getName());
         put(Keybinding.get("M3"), Actions.Grab.getName());
         put(Keybinding.get("Q"), Actions.Throw.getName());
         put(Keybinding.get("GRAVE"), "_Recall");

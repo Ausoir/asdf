@@ -32,7 +32,7 @@ public class Global {
     private static float[] cosv = new float[360];
     public static int time;
     private static int controlId = 1;
-    private static int houseId = 1;
+    public static int houseId = 1;
     public static ArrayList<EventTimer> timers = new ArrayList<>();
 
     public static void init(){
@@ -40,9 +40,6 @@ public class Global {
             sinv[i] = (float)((int)(Math.sin(Math.toRadians(i))*10000))/10000;
             cosv[i] = (float)((int)(Math.cos(Math.toRadians(i))*10000))/10000;
         }
-    }
-    public static int getSeed(){
-        return r.nextInt(9999)+1;
     }
     static void setRel(){
         rel.set(-camera.x+Settings.centerX, -camera.y+Settings.centerY);
@@ -95,11 +92,8 @@ public class Global {
             if (timer.update(p)) it.remove();
         }
     }
-    public static int getHour(){
+    static int getHour(){
         return time/HOUR;
-    }
-    public static int getHouseId(){
-        return houseId++;
     }
     public static int getControlId() {
         return controlId++;
