@@ -4,7 +4,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
- * Created by Ga on 1/14/2017.
+ * Created by Ga on 1/14/2017. asd
  */
 public enum Shader{
     None(new ShaderRenderer()),
@@ -22,6 +22,24 @@ public enum Shader{
                         float xShade = ((float) x / width) * 24;
                         result.setRGB(x, y, new Color(0, 0, 0, (int) Global.clamp(Math.max(xShade, yShade), 0, 255)).getRGB());
                     }
+                }
+            }
+            return result;
+        }
+    }),
+    Translucent(new ShaderRenderer(){
+        protected BufferedImage render(BufferedImage image, int x1, int x2, int y1, float slope) {
+            int width = image.getWidth();
+            int height = image.getHeight();
+            BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    int rgb = image.getRGB(x, y);
+                    int alpha = (rgb & 0xff000000) >>> 24;
+                    int red = (rgb & 0xff0000) >>> 16;
+                    int green = (rgb & 0xff00) >>> 8;
+                    int blue = (rgb & 0xff);
+                    image.setRGB(x, y, new Color(red,green,blue, alpha*.5f).getRGB());
                 }
             }
             return result;

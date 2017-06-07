@@ -29,7 +29,7 @@ public class Updater {
     private static ArrayList<Observer> removeQueue = new ArrayList<>();
     public static String changeMap = null;
     public static Performer changeMapEvent = null;
-    static Timer time = new Timer(40,true);
+    private static Timer time = new Timer(40,true);
     private static void clear(){
         drawee.clear();
         effects.clear();
@@ -52,16 +52,11 @@ public class Updater {
                 int[] newmap = Creation.getWorld(Global.map.id, edge);
                 Creation.prepareRandom(newmap[0]);
                 newMap = Global.player.cworld + "_" + newmap[0] + "@-1";
-            } else Creation.prepareRandom((int) Math.random()*1000);
+            }
             int pos = FileManager.loadMap(newMap);
             update();
             if (edge == 0) {
-                for (Prop i : props) {
-                    if (i.factoryId == Stock.Spawn.ordinal() && i.seed == pos) {
-                        Global.player.pos.set(i.pos);
-                        break;
-                    }
-                }
+                Global.player.pos.set(getEntrancePos(pos));
             } else {
                 Global.player.vel.set(0,0);
                 if (edge == 2){
@@ -86,7 +81,6 @@ public class Updater {
                     Global.player.pos.set(entrance.getCrossPointX(y+1), y-Math.abs(entrance.getSlope()));
                 }
             }
-            Creation.endRandom();
             Global.player.reconnect();
             if (changeMapEvent != null){
                 changeMapEvent.perform();
@@ -159,9 +153,6 @@ public class Updater {
     public static void remove(Observer p){
         removeQueue.add(p);
     }
-    public static void removeDrawee(Observer p){
-        drawee.remove(p);
-    }
     public static void resetDepth(Drawable p){
         if (drawee.remove(p)) addDrawee(p);
     }
@@ -216,10 +207,8 @@ public class Updater {
             if (i.onInteract != null) {
                 if (i instanceof Man){
                     if (((Man) i).getHand().getSubtract(p).getDist() <= 64) result.add(i);
-                } else if (i instanceof Item) {
-                    if (i.pos.getSubtract(p).getDist() <= 48) result.add(i);
                 } else {
-                    if (i.pos.getSubtract(p).getDist() <= i.getSize()) result.add(i);
+                    if (i.getImageCenter().getSubtract(p).getDist() <= 24) result.add(i);
                 }
             }
         }
@@ -311,11 +300,9 @@ public class Updater {
         return null;
     }
     public static P getEntrancePos(int p){
-        int index = 0;
-        for (Prop i : props){
-            if (i.factoryId == Stock.Spawn.ordinal()){
-                if (index == p) return i.pos;
-                else index++;
+        for (Prop i : props) {
+            if (i.factoryId == Stock.Spawn.ordinal() && i.seed == p) {
+                return i.pos;
             }
         }
         return new P();

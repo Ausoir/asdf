@@ -15,18 +15,23 @@ public class Generator {
     public static void generate(String[] info){
         Generator result;
         if (info[0].startsWith("I_")) {
-            result = new GenerateHouse().generateHouse(info);
+            result = new GenerateHouse().create(info);
+        } else if (info[0].startsWith("D_")) {
+            result = new GenerateDungeon().create(info);
         } else {
-            P mapSize = new P(12000, 4000);
-            Global.map = new Map(info[0], new String[]{"", "None", Global.map.maps[2], ((int) mapSize.x) + "x" + ((int) mapSize.y)});
+            P mapSize = new P(6000+Creation.r.nextInt(6000), 3200+Creation.r.nextInt(1600));
+            String id = info[0].split("_")[1];
+            Global.map = new Map(info[0], new String[]{id, "None", Creation.panoramaAt(Integer.parseInt(id)),
+                    ((int) mapSize.x) + "x" + ((int) mapSize.y)});
             if (Creation.r.nextInt(5) == 0) {
-                result = new GenerateTown().generateTown(mapSize);
+                result = new GenerateTown().create(mapSize);
             } else {
-                if (Creation.r.nextBoolean()) result = new GenerateHighlands().generatePlains(mapSize);
+                if (Creation.r.nextBoolean()) result = new GenerateHighlands().createPlains(mapSize);
                 else {
-                    result = new GenerateHighlands().generateSlope('-', mapSize);
-                    if (Creation.r.nextBoolean()) ((GenerateHighlands) result).generateSlope('-', mapSize);
+                    result = new GenerateHighlands().create('-', mapSize);
+                    if (Creation.r.nextBoolean()) ((GenerateHighlands) result).create('-', mapSize);
                 }
+                Global.map.placeProp(Global.map.randomLandableSurface(), "Dungeon=1");
             }
         }
         result.finish();

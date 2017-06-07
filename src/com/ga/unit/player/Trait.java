@@ -14,7 +14,9 @@ public enum Trait {
     Abrasive(1), Lucky(1), Unlucky(1), Greedy(1), Abusive(1), Fast_Metabolism(1),
 
     Lung_Injury,Damaged_Liver,Stomach_Injury,Hearing_Loss,Throat_Injury,Blindness,Brain_Damage,Depression,
-    Armless,Left_Arm_Injury,Right_Arm_Injury,Legless,Left_Leg_Injury,Right_Leg_Injury;
+    Armless,Left_Arm_Injury,Right_Arm_Injury,Legless,Left_Leg_Injury,Right_Leg_Injury,
+
+    Forager, Enchanter, Alchemist;
 
     private int type;
     Trait(){

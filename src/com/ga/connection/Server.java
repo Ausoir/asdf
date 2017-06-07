@@ -115,7 +115,7 @@ public class Server implements Updatable {
                         Updater.changeMapEvent = new Performer() {
                             public void perform() {
                                 for (int i = 0; i < clientSize; i++) {
-                                    PlayerInput pi = FileManager.loadPlayer(false, "" + i);
+                                    PlayerInput pi = FileManager.loadPlayer(-i-1, "" + i);
                                     clientControllers.put(i, pi);
                                 }
                             }
@@ -231,7 +231,7 @@ public class Server implements Updatable {
             try {
                 switch (cmd[0]) {
                     case "HI":
-                        PlayerInput pi = FileManager.loadPlayer(false, cmd[1]);
+                        PlayerInput pi = FileManager.loadPlayer(-Integer.parseInt(cmd[1])-1, cmd[1]);
                         clientControllers.put(Integer.parseInt(cmd[1]), pi);
                         pi.host.pos.set(Updater.getEntrancePos(0));
                         break;

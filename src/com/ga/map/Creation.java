@@ -2,6 +2,8 @@ package com.ga.map;
 
 import com.ga.game.FileManager;
 import com.ga.unit.player.MainPlayer;
+import com.ga.unit.player.Trait;
+import com.ga.unit.skill.Buffs;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,34 +13,30 @@ import java.util.Random;
  * Created by Ga on 4/17/2017. asd
  */
 public class Creation {
-    public static Random r;
+    public static Random r = new Random();
     public static int seed;
     public static char[][] world;
     public static void create(){
         if (!FileManager.isFile("Data/map/0")) {
-            MainPlayer player = new MainPlayer(-1);
-            player.load("PlayerTemplate");
-            player.cworld = "Firstworld";
-            FileManager.saveCharacter();
-        } else {
-            FileManager.loadPlayer(true, "0");
+            FileManager.loadPlayer(-1, "PlayerTemplate");
+            FileManager.save("map/0", Global.player.toCharacterString());
         }
+        FileManager.loadPlayer(-1, "0");
+        Global.player.buff(Buffs.Metabolism, Global.player.hasTrait(Trait.Fast_Metabolism)?7:10);
         if (!FileManager.isFile("Data/map/"+Global.player.cworld+".map")) {
-            seed = (int) (Math.random()*100000);
-            world = WorldCreation.create(24,1);
+            seed = (int) (Math.random()*1000000);
+//            world = WorldCreation.create(16,16);
+            world = new char[][]{new char[]{'6','-','-','-','-','-','-','-','-','-','-','-','-','-','-','4'}};
             saveWorld();
         } else {
             FileManager.readWorld(Global.player.cworld);
         }
     }
-    static void prepareRandom(int id){
+    public static void prepareRandom(int id){
         r = new Random(Integer.parseInt((""+id)+seed));
     }
-    static void endRandom(){
-        r = null;
-    }
     public static int getSeed(int p){
-        if (p == -1) return r.nextInt(9999)+1;
+        if (p == -1) return r.nextInt(9999);
         return p;
     }
     private static void saveWorld(){
@@ -69,7 +67,10 @@ public class Creation {
         }
         return null;
     }
-public static void test(){
+    static String panoramaAt(int id){
+        return "Bg_Field";
+    }
+    public static void test(){
         world = WorldCreation.create(14,2);
         print(world, false);
         print(world, true);

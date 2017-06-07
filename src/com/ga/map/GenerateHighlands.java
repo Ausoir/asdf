@@ -38,7 +38,7 @@ class GenerateHighlands extends Generator {
         total.add(two);
         divideLand(total, ++current, max);
     }
-    private void generateSlope(P mapSize, P start, P end){
+    private void create(P mapSize, P start, P end){
         TerrainTrail trail = new TerrainTrail(start);
         int preX = Creation.r.nextInt((int) (mapSize.x/8))+300;
         int postX = Creation.r.nextInt((int) (mapSize.x/8))+300;
@@ -54,35 +54,34 @@ class GenerateHighlands extends Generator {
         trail.finish(this, "dirt&grass"+(Creation.r.nextBoolean()?"&Rock=.1,Bush=.2,Weed=.4,Tree=1":""));
         if (start.y > 0 && end.y > 0) trail.minY(800);
     }
-    Generator generateSlope(char p, P mapSize){
+    Generator create(char p, P mapSize){
         switch (p){
             case '-':
-                generateSlope(mapSize, new P(-64, Creation.r.nextInt((int) (mapSize.y/3))+mapSize.y/3),
+                create(mapSize, new P(-64, Creation.r.nextInt((int) (mapSize.y/3))+mapSize.y/3),
                         new P(mapSize.x+64, Creation.r.nextInt((int) (mapSize.y/3))+mapSize.y/3));
                 break;
             case '1':
-                generateSlope(mapSize, new P(-64, Creation.r.nextInt((int) (mapSize.y/2))+mapSize.y/4),
+                create(mapSize, new P(-64, Creation.r.nextInt((int) (mapSize.y/2))+mapSize.y/4),
                         new P(mapSize.x-64, mapSize.y+64));
                 break;
             case '3':
-                generateSlope(mapSize, new P(64, mapSize.y+64),
+                create(mapSize, new P(64, mapSize.y+64),
                         new P(mapSize.x+64, Creation.r.nextInt((int) (mapSize.y/2))+mapSize.y/4));
                 break;
             case '7':
-                generateSlope(mapSize, new P(-64, Creation.r.nextInt((int) (mapSize.y/5))+mapSize.y*3/4),
+                create(mapSize, new P(-64, Creation.r.nextInt((int) (mapSize.y/5))+mapSize.y*3/4),
                         new P(mapSize.x+64, -64));
                 break;
             case '9':
-                generateSlope(mapSize, new P(-64, -64),
+                create(mapSize, new P(-64, -64),
                         new P(mapSize.x+64, Creation.r.nextInt((int) (mapSize.y/5))+mapSize.y*3/4));
                 break;
         }
         return this;
     }
-    Generator generatePlains(P mapSize){
+    Generator createPlains(P mapSize){
         String[] texture = new String[]{"dirt&grass","dirt&grass&Rock=.1,Bush=.2,Weed=.4,Tree=1"};
         generateFloor(9, mapSize, Creation.r.nextInt(9) + 1, 40, texture);
-        Global.map.formTextures.put(-1, "9");
         for (int i=0;i<Creation.r.nextInt(4);i++) generateMound(i+1, mapSize, texture, Creation.r.nextInt(240)+80);
         for (int i=0;i<Global.map.land.size();i++){
             Line l = Global.map.land.get(i);

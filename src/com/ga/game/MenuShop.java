@@ -103,7 +103,7 @@ public class MenuShop extends Panel {
         this.panel.add(panel);
     }
     private void describe(final Item item, final int price, final Performer action){
-        Global.display.menuDialog.show(item.getFullName(),"This is "+item.getDescription()+". It is being sold for "+price+" gold.",
+        Global.display.menu.showDialog(item.getFullName(),"This is "+item.getDescription()+". It is being sold for "+price+" gold.",
                 new String[]{"Buy"}, new Performer[]{new Performer(){
                     public void perform(){
                         Player player = Global.player;
@@ -117,12 +117,11 @@ public class MenuShop extends Panel {
                                 action.perform();
                             } else {
                                 Global.player.say("Not enough inventory space..");
-                                setVisible(false);
                             }
                         } else {
                             Global.player.say("Not enough Gold..");
-                            setVisible(false);
                         }
+                        setVisible(false);
                     }
                 }});
     }

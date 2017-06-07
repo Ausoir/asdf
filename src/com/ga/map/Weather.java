@@ -24,33 +24,40 @@ public class Weather implements Drawable{
     };
     private float fade = 0;
     private static Color color = new Color(0,0,0,0);
+    private static int[] fromColor, toColor;
     private static Color addition(int[] a, int[] b, float rate){
         return new Color((int) Global.clamp(a[0]+((b[0]-a[0])*rate),0,255),
                 (int) Global.clamp(a[1]+((b[1]-a[1])*rate),0,255),
                 (int) Global.clamp(a[2]+((b[2]-a[2])*rate),0,255),
                 (int) Global.clamp(a[3]+((b[3]-a[3])*rate),0,255));
     }
-    private int[] getColor(){
+    private int[] getCurrentTimeColor(){
         return colors[Math.abs(Global.getHour()%colors.length)];
     }
-    void setColor(){
-        int[] t = getColor();
-        color = new Color(t[0],t[1],t[2],t[3]);
+    void refreshTimeColor(){
+        int[] t = getCurrentTimeColor();
+        fromColor = new int[]{color.getRed(),color.getGreen(),color.getBlue(),color.getAlpha()};
+        toColor = t;
     }
-    void fadeIn(){
-        fade = 1;
+    public void fadeIn(){
+        fade = 0;
+        fromColor = new int[]{0,0,0,255};
+        toColor = getCurrentTimeColor();
         color = new Color(0,0,0,255);
+    }
+    public void fadeOut(){
+        fade = 0;
+        fromColor = new int[]{color.getRed(),color.getGreen(),color.getBlue(),color.getAlpha()};
+        toColor = new int[]{0,0,0,255};
     }
     boolean isNight(){
         return Global.getHour() % colors.length >= 8;
     }
     @Override
     public void draw(Graphics2D g) {
-        if (fade > 0){
-            setColor();
-            color = addition(new int[]{color.getRed(),color.getGreen(),color.getBlue(),color.getAlpha()}
-                            ,new int[]{0,0,0,255},fade);
-            fade-=.02f;
+        if (fade < 1){
+            color = addition(fromColor,toColor,fade);
+            fade+=.01f;
         }
         g.setColor(color);
         g.fillRect(0, 0, Settings.screenX, Settings.screenY);

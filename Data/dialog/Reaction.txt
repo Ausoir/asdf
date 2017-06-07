@@ -20,4 +20,11 @@ merchant:x@//////Whyyyy....
 merchant:denied@Fine, you're the one on a loss!/Your loss./Whatever./Don't have the money?/You're missing out!/Others would pay double for these.
 merchant:talk@Come see my wares./Yes?/Did you say something?/Would you like to shop?/
 :greet@Hello!/A fine day to you./Good day./Hello there.
-resident:talk@piss off./what?/go away./what do you want/?///
+resident0:talk@Hi./Yes?/Ok.//
+resident1:talk@hi./what do you need/?/please go away./did you say something?/please keep walking./please piss off.///
+resident2:talk@piss off./what?/go away./what do you want/?/you're ugly./i hate you.///
+resident3:talk@keep moving./no./move./*sigh*/whatever./.../////
+resident4:talk@no.////////
+resident5:talk@I'm not talking to you.///////////////////////
+resident6:talk@...///////////////////////
+resident7:talk@Shut up, I'm not drunk!/Whoa./???/Hey hey hey/Hello person./*burp*/Hmm./Good day./Good evening./Bad day.//

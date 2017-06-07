@@ -37,11 +37,8 @@ public class MainPlayer extends Player {
         else if (state == Actions.Discard && this.state == Actions.Rest) state = Actions.Throw;
         else if (state == Actions.Rest && this.state == Actions.Walk) state = Actions.Sprint;
         else if (state == Actions.Kick && this.state == Actions.Rest) state = Actions.Sidekick;
-        else if (input.moving != 0 && this.state == Actions.Climb){
-            vel.x = getSpeed()*input.moving;
-            stateSet(Actions.Jump);
-        } else if (state == Actions.Use && this.state == Actions.Walk && !wieldingNone()){
-            if (input.moving > 0 == target.x > 0) state = Actions.Thrust;
+        else if (state == Actions.Use && this.state == Actions.Walk){
+            if (input.moving > 0 == target.x > 0 && !wieldingNone()) state = Actions.Thrust;
             else if (skillTree.getSkillLevel(Actions.Dash) > 0) state = Actions.Dash;
         }
         int r = super.setState(state);
@@ -59,13 +56,13 @@ public class MainPlayer extends Player {
     }
     public float getShopPrice(){
         float r = 1;
-        if (traits.contains(Trait.Dull)) r = 1.1f;
-        else if (traits.contains(Trait.Sharp)) r = .9f;
+        if (hasTrait(Trait.Dull)) r = 1.1f;
+        else if (hasTrait(Trait.Sharp)) r = .9f;
         return r;
     }
-    public boolean checkHit(Line hitBox, int damage) {
+    public boolean checkHit(Line hitBox, int damage, boolean blunt) {
         int before = stamina.get();
-        boolean r = super.checkHit(hitBox, damage);
+        boolean r = super.checkHit(hitBox, damage, blunt);
         if (r) indicater.show(before/Math.max(1,stamina.get()));
         return r;
     }
@@ -82,8 +79,16 @@ public class MainPlayer extends Player {
             } else if (status == 3) say("I don't feel so good...");
             else if (status == 4) say("I'm hungry!");
         }
-        if (traits.contains(Trait.Optimistic)) get("Motivation").add(1, false);
-        else if (traits.contains(Trait.Pessimistic)) get("Motivation").add(-1, false);
+        if (hasTrait(Trait.Optimistic)) get("Motivation").add(1, false);
+        else if (hasTrait(Trait.Pessimistic)) get("Motivation").add(-1, false);
+    }
+    public void die(){
+        super.die();
+        Global.map.weather.fadeOut();
+    }
+    public void revive(){
+        super.revive();
+        Global.map.weather.fadeIn();
     }
     protected void stateDone(){
         super.stateDone();

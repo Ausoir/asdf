@@ -36,7 +36,7 @@ public class Player extends Man {
     public Actions learning;
     private Item offhand = fist;
     private boolean leftHandMode = false;
-    public ArrayList<Trait> traits = new ArrayList<>();
+    private ArrayList<Trait> traits = new ArrayList<>();
     public Player(int seed) {
         super(seed);
         loadActions("-5,100,1000/Use&Walk&Sprint");
@@ -58,7 +58,7 @@ public class Player extends Man {
         if (!leftHandMode){
             if (p != null) {
                 if (sheathe()) {
-                    Sound.play("wield");
+                    Sound.play(pos, "wield");
                 } else {
                     dropItem(weapon);
                 }
@@ -135,14 +135,10 @@ public class Player extends Man {
                         P reach = pos.getAdd(clip.organs[FIST].ptd);
                         ArrayList<Prop> obj = Updater.collideInteractive(reach);
                         for (Prop i : obj) {
-                            if (i != weapon && i != offhand && i.onInteract != null) {
+                            if (i.onInteract != null) {
                                 i.onInteract.interact(me);
                                 break;
                             }
-                        }
-                        final Line wall = Global.map.checkLand(new Line(reach.x - (12 * dir), reach.y, reach.x + (12 * dir), reach.y),depth);
-                        if (wall != null) {
-                            setState(Actions.Climb);
                         }
                     }
                 };
@@ -185,7 +181,7 @@ public class Player extends Man {
                             inventory.remove(item);
                             selectingItem = -1;
                         } else if (selectingItem >= 10 && selectingItem <= 16) {
-                            Sound.play("unwear");
+                            Sound.play(pos, "unwear");
                             int piece = selectingItem - 10;
                             if (sheathe() && !armor.isBare(piece)) {
                                 Updater.add(armor.armor[piece]);
@@ -222,9 +218,12 @@ public class Player extends Man {
         float penalty = Math.max(0,inventory.weight+armor.getWeight()+weapon.weight+offhand.weight-get("Strength").get()*2);
         return Math.max(0,speed-penalty)*.01f;
     }
+    public boolean hasTrait(Trait p){
+        return traits.contains(p);
+    }
     public void witnessDeath(Unit p){
         if (faction.canAttack(p.faction) && p.pos.getSubtract(pos).inOval(900,500) && learning != null){
-            boolean fast = traits.contains(Trait.Fast_Learner) && get("Motivation").require(3);
+            boolean fast = hasTrait(Trait.Fast_Learner) && get("Motivation").require(3);
             if (fast || get("Motivation").require(1)) {
                 Stat progress = get("Progress");
                 progress.add(Math.max(1,p.get("Level").get()*3-get("Level").get())*(fast?2:1),true);

@@ -2,8 +2,6 @@ package com.ga.unit.item;
 
 import com.ga.game.Sound;
 import com.ga.map.Global;
-import com.ga.map.Picture;
-import com.ga.map.Updater;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.unit.Man;
@@ -31,7 +29,7 @@ public class Armor extends Item {
         delay = 80;
     }
     public void onCreate(){
-        imbueMeta(true, true, .03f, true);
+        imbueMeta(true, true, .03f);
         if (emod != null && !emod.tags.contains(com.ga.unit.Tag.Buff)){
             emod = null;
             ademod = AdenchantMod.None;
@@ -73,7 +71,7 @@ public class Armor extends Item {
         host.delay.performer = new Performer(){
             public void perform(){
                 if (host.armor.isBare(piece)) {
-                    Sound.play("wear");
+                    Sound.play(host.pos, "wear");
                     me.remove();
                     host.armor.set(me, piece);
                 }

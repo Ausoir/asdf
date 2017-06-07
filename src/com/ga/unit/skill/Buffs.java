@@ -1,18 +1,17 @@
 package com.ga.unit.skill;
 
 import com.ga.game.Sound;
-import com.ga.map.Global;
-import com.ga.map.Shader;
-import com.ga.map.Updater;
+import com.ga.map.*;
+import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.unit.*;
 import com.ga.unit.item.Projectile;
 import com.ga.unit.player.MainPlayer;
-import com.ga.unit.player.Trait;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by Ga on 9/1/2016. asd
@@ -159,7 +158,7 @@ public enum Buffs {
                 if (super.update()) {
                     host.stats.triggerEffect(Bleed);
                     if (host instanceof MainPlayer){
-                        time += Global.player.traits.contains(Trait.Fast_Metabolism) ? 80 : 100;
+                        time += level * 10;
                         Global.player.onTimeChange();
                     }
                 }
@@ -174,6 +173,7 @@ public enum Buffs {
             private int tick = 0;
             public void onStack(){
                 level++;
+                time -= 40;
             }
             public boolean onTrigger(){
                 if (level > 0) level--;
@@ -188,33 +188,21 @@ public enum Buffs {
             }
         };
     }},
-    Invincible(new Tags(){{
-        add(Tag.Buff);
-    }}){ Buff makeLocal(){
-        return new Buff(2) {
-            public void onSet() {
-                time += 4*level;
-            }
-            public boolean update() {
-                Particle.sparkle("Glare", host.getRandomPoint(),40, 6);
-                return super.update();
-            }
-        };
-    }},
     Evade(new Tags(){{
         add(Tag.Buff);
         add(Tag.Shadow);
     }}){ Buff makeLocal(){
-        return new Buff(3) {
+        return new Buff(2) {
             public void onSet() {
-                var = level*3;
-                time += level;
+                time += level*2;
+                host.tangible = false;
             }
             public boolean onTrigger(){
-                if (var > 0) var--;
-                else return false;
-                if (var <= 0) time = Global.time;
+                time = Global.time;
                 return true;
+            }
+            public void onFinish(){
+                host.tangible = true;
             }
             public boolean update() {
                 Particle.smoke(new P(host.pos));
@@ -229,7 +217,6 @@ public enum Buffs {
         return new Buff(7) {
             public void onSet(){
                 Particle.shock(host.getRandomPoint());
-                var = level;
                 if (!host.get("Stamina").require(level)){
                     Particle.holyExplosion(host.pos);
                     host.stateSet(Actions.Down);
@@ -237,7 +224,6 @@ public enum Buffs {
             }
             public void onStack() {
                 Particle.shock(host.getRandomPoint());
-                var++;
                 time = Global.time + 7;
                 if (!host.get("Stamina").require(1)){
                     Particle.holyExplosion(host.pos);
@@ -246,6 +232,7 @@ public enum Buffs {
             }
             public boolean update() {
                 Particle.sparkle("Glare",host.getRandomPoint(),20+host.getSize(),4+level);
+                if (var++ % 40 == 0) host.get("Stamina").add(-1,false);
                 return super.update();
             }
         };
@@ -255,20 +242,23 @@ public enum Buffs {
         add(Tag.Fire);
     }}){ Buff makeLocal(){
         return new Buff(5) {
-            private int tick = 0;
             public void onSet() {
-                sound("fire");
+                Sound.play(host.pos, "fire");
                 time += level*3;
             }
             public boolean update() {
-                if (tick++ % 10 == 0 && Global.r.nextBoolean()) {
+                if (var % 10 == 0 && Global.r.nextBoolean()) {
+                    if (var % 50 == 0){
+                        host.checkHit(host.pos, level);
+                        if (host.stats.getEffectLevel(Bleed) > 3) host.stats.triggerEffect(Bleed);
+                    }
                     for (Unit i : Updater.collideUnit(host.pos, host.getSize() + 40, Faction.Destructive)) {
-                        i.checkHit(i.pos, Global.r.nextInt(3));
                         if (Global.r.nextBoolean()) i.buff(Burn, 1);
                     }
                     host.stateSet(Actions.Sprint);
-                    host.delay.time = 40;
+                    host.delay.time = 24;
                 }
+                var++;
                 Particle.smoke(host.getRandomPoint());
                 Particle.burn(host.getRandomPoint());
                 return super.update();
@@ -280,16 +270,63 @@ public enum Buffs {
         add(Tag.Cold);
     }}){ Buff makeLocal(){
         return new Buff(0) {
+            boolean frozen = false;
+            private Terrain ice;
+            private Line[] lines;
+            private final static int freezeThreshold = 16;
             public void onSet() {
-                sound("freeze");
-                var = host.get("Speed").add(-Math.round(host.getSpeed()*50), false);
-                time += level*8;
+                Sound.play(host.pos, "freeze");
+                var = host.get("Speed").add(-Math.round(host.getSpeed()*30), false);
+                time += level;
                 host.stats.triggerEffect(Buffs.Bleed);
+                host.stats.triggerEffect(Buffs.Burn);
+                host.stats.triggerEffect(Buffs.Shock);
+            }
+            public void onLoad(){
+                if (time >= freezeThreshold) freeze();
             }
             public void onStack(){
-                level++;
-                var += host.get("Speed").add(-Math.round(host.getSpeed()*50), false);
-                time += 8;
+                if (!frozen) {
+                    var += host.get("Speed").add(-1, false);
+                    time ++;
+                    if (time >= freezeThreshold) freeze();
+                }
+            }
+            private void freeze(){
+                frozen = true;
+                int size = host.getSize();
+                ice = new Terrain("ice", Shader.None, host.getDepth()+1);
+                int num = Global.r.nextInt(3)+5;
+                P[] points = new P[num];
+                float gap = 6.28f/num;
+                for (int i=0;i<num;i++){
+                    float currentArc = gap*i+Global.r.nextFloat()*gap/6-gap/3;
+                    points[i] = host.pos.getAdd(Global.cos(currentArc)*(size+16), Global.sin(currentArc)*(size+16)-size/2);
+                    ice.addPoint(points[i].x, points[i].y);
+                }
+                lines = new Line[num];
+                for (int i=0;i<num;i++) {
+                    lines[i] = new Line(points[i], points[i]) {
+                        public String toString() {
+                            return "";
+                        }
+                    };
+                    lines[i].depth = host.getDepth();
+                    if (!lines[i].clockwise()) lines[i].opt = -1;
+                    Global.map.land.add(lines[i]);
+                }
+                host.mobile = false;
+                host.tangible = false;
+                ice.render();
+                time = Global.time + freezeThreshold + 8 + Global.r.nextInt(8);
+            }
+            private void melt(){
+                host.mobile = true;
+                host.tangible = true;
+                frozen = false;
+                Global.map.land.removeAll(Arrays.asList(lines));
+                Updater.remove(ice);
+                time = Global.time;
             }
             public void onFinish() {
                 host.get("Speed").add(-var, true);
@@ -300,8 +337,13 @@ public enum Buffs {
                 return true;
             }
             public boolean update() {
-                Particle.frozen(host.pos);
-                level = (time-Global.time)/8+1;
+                if (!frozen) {
+                    Particle.frozen(host.pos);
+                    level = (time - Global.time) / 8 + 1;
+                } else {
+                    if (time - Global.time < freezeThreshold) melt();
+                    host.delay.set(2);
+                }
                 return super.update();
             }
         };
@@ -320,7 +362,7 @@ public enum Buffs {
             }
             public void onSet() {
                 time += level*6;
-                sound("freeze");
+                Sound.play(host.pos, "freeze");
                 mark = new Thing("Mark", host.seed, 150);
                 mark.image.setCenterType(2);
                 mark.pos = host.pos;
@@ -374,7 +416,7 @@ public enum Buffs {
         return new Buff(4) {
             private int tick = 1;
             public void onSet() {
-                sound("freeze");
+                Sound.play(host.pos, "freeze");
             }
             public boolean update() {
                 tick++;
@@ -422,7 +464,7 @@ public enum Buffs {
     }}){ Buff makeLocal(){
         return new Buff(24) {
             public void onSet() {
-                sound("stun");
+                Sound.play(host.pos, "stun");
                 time += level * 8;
                 host.vel.x = 0;
                 host.get("Attack").add(-32, true);
@@ -451,8 +493,8 @@ public enum Buffs {
     }}){ Buff makeLocal(){
         return new Buff(3) {
             public void onSet() {
-                sound("stun");
-                time += level;
+                Sound.play(host.pos, "stun");
+                time += level*2;
                 host.vel.x = 0;
                 host.stateSet(Actions.Hit);
                 host.delay.set((time-Global.time) * 40);
@@ -521,9 +563,6 @@ abstract class Buff{
     public void onStack(){}
     public boolean update(){
         return Global.time >= time;
-    }
-    void sound(String p){
-        Sound.play(p);
     }
     public String getDescription(){
         return buff.name() + " (Level " + level + ") - " + (time - Global.time) + "s";

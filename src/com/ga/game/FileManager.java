@@ -68,7 +68,7 @@ public class FileManager {
         result += ";"+Updater.toMapString();
         save(name+".map", result);
     }
-    private static String read(String dir) {
+    public static String read(String dir) {
         String result = null;
         try {
             try (BufferedReader br = new BufferedReader(new FileReader(dir))) {
@@ -85,13 +85,13 @@ public class FileManager {
         }
         return result;
     }
-    public static PlayerInput loadPlayer(boolean main, String dir){
+    public static PlayerInput loadPlayer(int id, String dir){
         String data = read("Data/map/"+dir);
         String[] line = data.split("%");
         PlayerInput pi;
-        pi = new PlayerInput(main ? new MainPlayer(0) : new Player(0));
+        pi = new PlayerInput(id == -1 ? new MainPlayer(0) : new Player(0));
         pi.host.load(data);
-        pi.host.controlId = -Integer.parseInt(dir)-1;
+        pi.host.controlId = id;
         pi.load(line[2]);
         if (!Updater.editor) Global.display.input = pi;
         Command.host = pi.host;
@@ -153,10 +153,9 @@ public class FileManager {
         }
     }
 
-    private static int[] readClipFrames(String dir) {
-        String data = read(dir);
+    private static int[] readClipFrames(String[] data) {
         int[] result;
-        String[] lines = data.split("%%")[1].split("%");
+        String[] lines = data[1].split("%");
         result = new int[lines.length];
         for (int line = 0; line < lines.length; line++) {
             result[line] = Integer.parseInt(lines[line].split("/")[1]);
@@ -164,10 +163,9 @@ public class FileManager {
         return result;
     }
 
-    private static int[][] readModelProperty(String dir) {
-        String data = read(dir);
+    private static int[][] readModelProperty(String[] data) {
         int[][] result;
-        String line = data.split("%")[1];
+        String line = data[0].split("%")[1];
         String[] sections = line.split(";");
         result = new int[sections.length][];
         for (int section = 0; section < sections.length; section++) {
@@ -181,10 +179,9 @@ public class FileManager {
         return result;
     }
 
-    private static String[][] readModel(String dir) {
-        String data = read(dir);
+    private static String[][] readModel(String[] data) {
         String[][] result;
-        String line = data.split("%")[0];
+        String line = data[0].split("%")[0];
         String[] sections = line.split(";");
         result = new String[sections.length][];
         for (int section = 0; section < sections.length; section++) {
@@ -195,10 +192,9 @@ public class FileManager {
         return result;
     }
 
-    private static int[][][] readAnimation(String dir) {
-        String data = read(dir);
+    private static int[][][] readAnimation(String[] data) {
         int[][][] result;
-        String[] lines = data.split("%%")[1].split("%");
+        String[] lines = data[1].split("%");
         result = new int[lines.length][][];
         for (int line = 0; line < lines.length; line++) {
             String[] sections = lines[line].split("/")[0].split(";");
@@ -216,10 +212,9 @@ public class FileManager {
         return result;
     }
 
-    private static HashMap<String, int[]> readMoveset(String dir) {
-        String data = read(dir);
+    private static HashMap<String, int[]> readMoveset(String[] data) {
         HashMap<String, int[]> result;
-        String[] lines = data.split("%%")[2].split("%");
+        String[] lines = data[2].split("%");
         result = new HashMap<>();
         for (String line1 : lines) {
             String[] sections = line1.split("@");
@@ -234,7 +229,8 @@ public class FileManager {
     }
 
     public static Clip readClip(String dir) {
-        return new Clip(readModelProperty(dir), readModel(dir), readAnimation(dir), readClipFrames(dir), readMoveset(dir));
+        String[] data = read(dir).split("%%");
+        return new Clip(readModelProperty(data), readModel(data), readAnimation(data), readClipFrames(data), readMoveset(data));
     }
 
     public static HashMap<String, ArrayList<String>> readDialogue(String dir){

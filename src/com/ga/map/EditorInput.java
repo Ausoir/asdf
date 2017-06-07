@@ -405,7 +405,7 @@ public class EditorInput implements Input, Updatable, Drawable {
             case KeyEvent.VK_INSERT:
                 if (Updater.editor) {
                     Updater.editor = false;
-                    FileManager.loadPlayer(true, "0");
+                    FileManager.loadPlayer(-1, "0");
                     Global.display.input = Global.player.input;
                     Global.player.pos.set(Global.camera);
                 }

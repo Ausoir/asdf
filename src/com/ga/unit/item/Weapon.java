@@ -17,7 +17,7 @@ public class Weapon extends Item {
         delay = 0;
     }
     public void onCreate(){
-        imbueMeta(true, true, .04f, true);
+        imbueMeta(true, true, .04f);
         if (emod != null && !emod.tags.contains(com.ga.unit.Tag.Debuff)){
             emod = null;
             ademod = AdenchantMod.None;
@@ -39,9 +39,8 @@ public class Weapon extends Item {
         else super.setModifier(mod);
     }
     private int getMaxDamage(){
-        if (type == ItemType.Spear || type == ItemType.Sword)
-            return Math.max(1,material.hardness);
-        else return weight;
+        if (type.isBlunt()) return weight+1;
+        else return Math.max(1,material.hardness);
     }
     @Override
     public int getDamage() {

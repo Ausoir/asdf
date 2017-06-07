@@ -7,7 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- * Created by Ga on 1/20/2017.
+ * Created by Ga on 1/20/2017. asd
  */
 public class ControllerProcess {
     private Timer timer;

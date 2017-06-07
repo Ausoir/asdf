@@ -14,6 +14,7 @@ import com.ga.map.Updater;
 public class Projectile extends Prop {
     public float rotSpeed = .03f;
     public int damage = 0;
+    public boolean blunt = true;
     public EventTimer delay = new EventTimer(-1, false, null);
     private Projectile(String name, P pt, float rot, int speed) {
         super(name, 0);
@@ -21,6 +22,7 @@ public class Projectile extends Prop {
         save = false;
         vel.set(Global.cos(rot)*speed, Global.sin(rot)*speed);
         rotation = rot;
+        this.depth = 3;
     }
     protected Projectile(String name, P pt, P dest, int speed) {
         this(name, pt, (float) Math.atan2(dest.y-pt.y, dest.x-pt.x), speed);
@@ -52,7 +54,7 @@ public class Projectile extends Prop {
         rotation+=rotSpeed*vel.x;
         if (tangible) {
             for (Unit i : Updater.collideUnit(pos, getCollisionSize(), faction)){
-                if (i.checkHit(new Line(pos,pos.getAdd(vel)),damage)) onAttack(i);
+                if (i.checkHit(new Line(pos,pos.getAdd(vel)),damage,blunt)) onAttack(i);
             }
         }
         super.update();

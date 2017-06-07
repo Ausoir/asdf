@@ -16,7 +16,7 @@ public class Prop extends Thing {
     public int factoryId = -1;
     public Interactive onInteract = null;
     public boolean gravity = false;
-    protected boolean mobile = true;
+    public boolean mobile = true;
     public Faction faction = Faction.Destructive;
     public P vel = new P(0, 0);
     public boolean tangible = true;
@@ -25,7 +25,7 @@ public class Prop extends Thing {
     public Tags tags = new Tags();
     boolean manualDepth = false;
     public Prop(String name, int seed) {
-        super(name, seed, 0);
+        super(name, seed, 1);
     }
     public int getDamage(){
         return 0;
@@ -104,12 +104,6 @@ public class Prop extends Thing {
                 System.out.println("Collision timeout pos@"+pos+"; vel@"+vel);
                 return;
             }
-        }
-    }
-    protected void explode(int r){
-        for (Unit i : Updater.collideUnit(pos, getSize()+r, faction)){
-            i.checkHit(pos, getDamage());
-            onAttack(i);
         }
     }
     public void onCollide(Line l){

@@ -1,8 +1,8 @@
-!Player@0@100,100@Speed:40,40&Progress:0,100&Channeling:0,30&Memory:0,0&Stamina:14,14&Casting:0,90&Athletics:0,80&Motivation:0,100&Swinging:0,60&Agility:0,80&Endurance:100,100&Level:1,1&Jumping:0,60&Martial:0,90&Strength:1,1@Player@-5,100,1000/Use&Walk&Sprint##None&None&None
--999999;Garr_3;Garr;0;Hello!;None
+null@0@3000,1@0.0@Speed:1,1&Progress:0,100&Channeling:0,900&Memory:1,1&Attack:0,0&Marksman:0,900&Stamina:1,1&Athletics:0,900&Motivation:0,100&Energy:0,900&Finesse:0,900&Combat:0,900&Might:0,900&Cunning:0,900&Endurance:1000,1000&Level:1,1&Strength:1,1@Player@-5,100,1000/Use,Walk,Sprint##None&None&None
+-99999;World_5@-1;3330332;Hi.;null
 ;
 ;
 ;
 ;
-;CCCCCCOOOOOO
+;VVCPCPCPCPCCC
 ;

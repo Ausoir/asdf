@@ -32,6 +32,9 @@ public class Thing implements Drawable, Observer {
         if (name != null) setImage(name);
         Updater.add(this);
     }
+    public P getImageCenter(){
+        return pos.getSubtract(image.getPictureCenter());
+    }
     public void setImage(String p){
         image.set(p);
     }

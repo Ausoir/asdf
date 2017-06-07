@@ -16,7 +16,7 @@ import java.util.Iterator;
  * Created by Ga on 5/7/2016. asd
  */
 public class Map extends Thing {
-    Weather weather = new Weather();
+    public Weather weather = new Weather();
     public ArrayList<Line> land = new ArrayList<>();
     public HashMap<Integer, String> formTextures = new HashMap<>();
     private static HashMap<String, String> defaultProps = new HashMap<String, String>(){{
@@ -41,7 +41,7 @@ public class Map extends Thing {
         super(null,0,1);
         this.name = name;
         this.maps = maps;
-        id = Integer.parseInt(name.split("_")[1]);
+        id = Integer.parseInt(maps[0]);
         if (maps[2].equals("None")){
             image.visible = false;
             panorama = false;
@@ -55,8 +55,8 @@ public class Map extends Thing {
         onTimeChange();
     }
     public String toString(){
-        String result = maps[0]+","+event.toString()+",";
-        for (int i=2;i<maps.length;i++){
+        String result = maps[0]+",";
+        for (int i=1;i<maps.length;i++){
             result += maps[i]+",";
         }
         result = result.substring(0,result.length()-1)+"\n";
@@ -212,15 +212,12 @@ public class Map extends Thing {
         return "none";
     }
 
-    P randomLandableSurface(){
+    Line randomLandableSurface(){
         Line i;
-        int tx, ty;
         do {
             i = land.get((int) (Creation.r.nextFloat() * land.size()));
-            tx = (int) (Creation.r.nextFloat() * (i.ptd.x-i.pt.x));
-            ty = (int) (i.pt.y + (int) (tx * i.getSlope()));
-        } while (!i.clockwise() || i.getSlope() > Line.MAXSLOPE);
-        return new P(i.pt.x+tx,ty);
+        } while (!i.isLandable() || i.getSlope() > Line.MAXSLOPE);
+        return i;
     }
 
     public Line checkLand(Line p, int depth){
@@ -273,7 +270,7 @@ public class Map extends Thing {
             setImage(maps[2]+(weather.isNight()?"_Night":""));
             image.setSize(image.getSize().getMult(magnify, magnify));
         }
-        weather.setColor();
+        weather.refreshTimeColor();
     }
 
     @Override

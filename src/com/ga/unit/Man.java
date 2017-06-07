@@ -66,15 +66,13 @@ public class Man extends Unit {
     }
 
     void stepSound(){
-        if (Global.camera.getSubtract(pos).getSum() < 1000) {
-            String ground = Global.map.getLand(lastLand.next);
-            if (Sound.has("step_" + ground)) Sound.play("step_" + ground);
-            else Sound.play("step_dirt");
-        }
+        String ground = Global.map.getLand(lastLand.next);
+        if (Sound.has("step_" + ground)) Sound.play(pos, "step_" + ground);
+        else Sound.play(pos, "step_dirt");
     }
 
     public void attackSound(){
-        Sound.play("swing_normal");
+        Sound.play(pos, "swing_normal");
     }
 
     @Override
@@ -89,7 +87,10 @@ public class Man extends Unit {
         attackSpeed -= penalty;
         if (state.getCost() >= 0) get("Stamina").add(-penalty, false);
         super.stateSet(state);
-        if (state.getCooldown() > 0) cooldown.put(state, new int[]{cooldown.get(state)[0] + penalty});
+        if (state.getCooldown() > 0){
+            int[] t = cooldown.get(state);
+            if (t != null) cooldown.put(state, new int[]{t[0] + penalty});
+        }
     }
 
     @Override
@@ -143,7 +144,7 @@ public class Man extends Unit {
         Line hitbox = weapon.getLine();
         Unit target = null;
         for (Unit i : Updater.collideUnit(pos, (int) hitbox.getLength()+20, faction)){
-            if (i.checkHit(hitbox,getDamage())){
+            if (i.checkHit(hitbox,getDamage(),weapon.type.isBlunt())){
                 target = i;
                 if (!cleave) break;
             }
@@ -155,11 +156,11 @@ public class Man extends Unit {
         return null;
     }
 
-    public boolean checkHit(Line hitBox, int damage) {
+    public boolean checkHit(Line hitBox, int damage, boolean blunt) {
         boolean r;
-        if (r = super.checkHit(hitBox, damage)) {
+        if (r = super.checkHit(hitBox, damage, blunt)) {
             if (clip.organs[FIST].amputated && clip.organs[OFIST].amputated){
-                tags.remove(Tag.Aiming);
+                tags.remove(Tag.Marksman);
             }
         }
         return r;

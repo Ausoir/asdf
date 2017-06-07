@@ -57,14 +57,14 @@ public class MenuDialog extends Panel {
         setBackground(forecolor);
         scroll.setBackground(forecolor2);
     }
-    public void show(String title, String message){
+    void show(String title, String message){
         display();
         setBackground(new Color(120,120,120,180));
         scroll.setBackground(new Color(120,120,120,180));
         titleLabel.setText(title);
         this.message.setText(message);
     }
-    public void show(String title, String message, String[] options, final Performer[] actions){
+    void show(String title, String message, String[] options, final Performer[] actions){
         show(title, message);
         optPanel.removeAll();
         this.options = new JLabel[options.length];

@@ -26,6 +26,8 @@ public class Picture {
     public Random rand;
     private int type = 1; //1:center,2:bottom
     public int multiple = 0;
+    private P pictureCenter;
+
     public static void init(){
         for (String[] i : FileManager.fileCache.get("png")){
             int randIndex = i[0].indexOf("-");
@@ -77,6 +79,9 @@ public class Picture {
         if (type == 1) halfSize = new P(size.x/2, size.y/2);
         else if (type == 2) halfSize = new P(size.x/2, size.y-4);
         else if (type == 3) halfSize = new P(8, size.y/2);
+    }
+    public P getPictureCenter() {
+        return halfSize.getAdd(-size.x/2, -size.y/2);
     }
     private BufferedImage load(String dir){
         BufferedImage image = null;

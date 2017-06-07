@@ -14,15 +14,12 @@ import java.awt.event.*;
 public class Display extends JPanel implements KeyListener, MouseListener, MouseMotionListener {
     public JTextField chatbox;
     public Input input;
-    public MenuDialog menuDialog;
-    public Menu menu;
-    public MenuShop menuShop;
-    public MenuMap menuMap;
+    public MenuInterface menu;
     private int mode = 0;
     private int mX = 0;
     private int mY = 0;
     boolean focus = true;
-    public Display() {
+    Display() {
         Global.display = this;
         setLayout(null);
         addKeyListener(this);
@@ -32,10 +29,7 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
             @Override
             public void componentResized(ComponentEvent e) {
                 Settings.setScreenSize(getWidth(), getHeight());
-                menuDialog.resize();
                 menu.resize();
-                menuShop.resize();
-                menuMap.resize();
                 chatbox.setBounds(0,Settings.screenY-40,500,40);
             }
         });
@@ -60,14 +54,8 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
             }
         });
         add(chatbox);
-        menuDialog = new MenuDialog();
-        add(menuDialog);
-        menu = new Menu();
+        menu = new MenuInterface();
         add(menu);
-        menuShop = new MenuShop();
-        add(menuShop);
-        menuMap = new MenuMap();
-        add(menuMap);
         new Timer(25, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -75,9 +63,6 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
             }
         }).start();
         Updater.addUpdatee(menu);
-        Updater.addUpdatee(menuDialog);
-        Updater.addUpdatee(menuShop);
-        Updater.addUpdatee(menuMap);
     }
 
     public void removeSpeech(){

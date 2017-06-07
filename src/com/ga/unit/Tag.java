@@ -5,7 +5,7 @@ package com.ga.unit;
  */
 public enum Tag {
     Runic, Buff, Debuff, Channeling, Energy, Air, Mutation, Shadow, Cold, Fire, Conjuration, Crystal,
-    Might, Finesse, Cunning, Aiming, Athletics, Combat, Unarmed,
+    Might, Finesse, Cunning, Marksman, Athletics, Combat, Unarmed,
     Hideable, Combustible, Freezable, Sharp, Fiber, Leather, Metal,
     Legs
 }

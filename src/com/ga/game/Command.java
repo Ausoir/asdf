@@ -22,7 +22,8 @@ public class Command {
             for (String i : cmds) {
                 String[] cmd = i.split("@");
                 if (cmd[0].equals("say")) host.say(cmd[1]);
-                else if (cmd[0].equals("menuDialog")) Global.display.menuDialog.show(cmd[1],cmd[2]);
+                else if (cmd[0].equals("menuDialog")) Global.display.menu.showDialog(cmd[1],cmd[2]);
+                else if (cmd[0].equals("die")) Global.player.die();
                 else if (cmd[0].equals("crft")) Global.player.crafting.craft(cmd[1]);
                 else if (cmd[0].equals("buff")) Global.player.buff(Buffs.valueOf(cmd[1]),1);
                 else if (cmd[0].equals("seed")) host.weapon.seed = Integer.parseInt(cmd[1]);
@@ -43,7 +44,7 @@ public class Command {
                 else if (cmd[0].equals("act")) host.setState(Actions.valueOf(cmd[1]));
                 else if (cmd[0].equals("learn")) host.learnSkill(Actions.valueOf(cmd[1]));
                 else if (cmd[0].equals("recipe")) host.crafting.knowledge.add(cmd[1]);
-                else if (cmd[0].equals("sound")) Sound.play(cmd[1]);
+                else if (cmd[0].equals("sound")) Sound.play(Global.camera, cmd[1]);
                 else if (p.equals("revive")) host.revive();
                 else if (p.equals("editor")){
                     Updater.editor = true;

@@ -88,7 +88,7 @@ public class PlayerInput implements Input {
         y = (int) (y-host.pos.y);
         if (mode == 0) inputDirect(null,x,y); //mousemove for better targetting
         else if (mode == Keybinding.get("ENTER")) Global.display.chatbox.requestFocus();
-        else if (mode == Keybinding.get("TAB")) Global.display.menu.toggle();
+        else if (mode == Keybinding.get("TAB")) Global.display.menu.showMenu();
         else if (mode == Keybinding.get("UP")) moveCamera(0,-80);
         else if (mode == Keybinding.get("RIGHT")) moveCamera(80,0);
         else if (mode == Keybinding.get("LEFT")) moveCamera(-80,0);

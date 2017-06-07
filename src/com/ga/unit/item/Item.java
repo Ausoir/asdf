@@ -26,15 +26,15 @@ import java.util.Random;
 public class Item extends Prop {
     public enum ItemType {
         Sword(Actions.Slash, 1.3f, .7f, "swing_knife"){
-            boolean isBlunt(){
+            public boolean isBlunt(){
                 return false;
             }
         }, Spear(Actions.Thrust, 1, .4f, "swing_silent"){
-            boolean isBlunt(){
+            public boolean isBlunt(){
                 return false;
             }
         }, Knife(Actions.Slash, .3f, .4f, "swing_knife") {
-            boolean isBlunt() {
+            public boolean isBlunt() {
                 return false;
             }
         },
@@ -52,7 +52,7 @@ public class Item extends Prop {
             this.durabilityMultiplier = sturdiness;
             this.sound = sound;
         }
-        boolean isBlunt(){
+        public boolean isBlunt(){
             return true;
         }
         void onSet(Item host){
@@ -199,11 +199,11 @@ public class Item extends Prop {
             this.magnitude = mag;
         }
         public static AdenchantMod get(Random seed){
-            float t = (float) seed.nextGaussian();
-            if (t > 2) return Ultimate;
-            else if (t > 1.6) return Greater;
-            else if (t > 1.2) return Major;
-            else if (t < -1) return Minor;
+            int t = seed.nextInt(100);
+            if (t < 1) return Ultimate;
+            else if (t < 5) return Greater;
+            else if (t < 15) return Major;
+            else if (t < 50) return Minor;
             else return None;
         }
         static AdenchantMod load(String p){
@@ -227,10 +227,10 @@ public class Item extends Prop {
     int cooldown = 0;
     public int delay = 0;
     public float probability;
-    private int[] cdTime = new int[]{0};
+    private int[] cdTime;
     int durability = 1;
     int uses = 1;
-    ItemType type = ItemType.Throwing;
+    public ItemType type = ItemType.Throwing;
     public int value = 8;
     Man owner;
     public Item(String name, int seed, Material[] materials, ItemType type) {
@@ -243,6 +243,7 @@ public class Item extends Prop {
         this.weight = (int) (material.weight * type.weightMultiplier);
         this.durability = (int) (material.durability * type.durabilityMultiplier);
         this.uses = durability;
+        cdTime = new int[]{Global.time};
         final Item me = this;
         onInteract = new Interactive(){
             public void interact(Man p){
@@ -251,13 +252,13 @@ public class Item extends Prop {
         };
         randomSize(new P(.2f,.2f));
     }
-    protected void imbueMeta(boolean canSmod, boolean canAdmod, float emodProb, boolean canAdemod){
+    protected void imbueMeta(boolean canSmod, boolean canAdmod, float emodProb){
         pmod = PrefixMod.get(rand);
         if (canSmod) smod = SpecialtyMod.get(rand);
         if (canAdmod) admod = AdverbMod.get(rand);
         if (rand.nextFloat() < emodProb) {
             emod = Buffs.values()[rand.nextInt(Buffs.values().length)];
-            if (canAdemod) ademod = Item.AdenchantMod.get(rand);
+            ademod = AdenchantMod.get(rand);
             probability = ademod.magnitude;
         }
         setModifier(pmod);
@@ -280,14 +281,14 @@ public class Item extends Prop {
         shade();
     }
     private void shade(){
-        int r = getRarity();
         int ctype = image.getCenterType();
-        if (r % 10 > 3){
+        if (pmod.ordinal() >= 3){
             image = new ShadedPicture(rand, name, Shader.Color);
-            ((ShadedPicture) image).shade(new Color(250, 220, 100, 180).getRGB());
-        } else if (r >= 100){
+            ((ShadedPicture) image).shade(new Color(255, 255, 255, 140).getRGB());
+        } else if (emod != null){
             image = new ShadedPicture(rand, name, Shader.Color);
-            ((ShadedPicture) image).shade(new Color(48, 156, 200, 180).getRGB());
+            int intensity = ademod.level * 30;
+            ((ShadedPicture) image).shade(new Color(48, 156, 200, intensity).getRGB());
         }
         image.setCenterType(ctype);
     }
@@ -295,7 +296,7 @@ public class Item extends Prop {
         this.type = p;
         this.type.onSet(this);
     }
-    void setMaterial(Material mat){
+    private void setMaterial(Material mat){
         this.material = mat;
         mat.onSet(this);
         if (mat.color != null) {
@@ -447,18 +448,15 @@ public class Item extends Prop {
         cancelAdd();
         super.remove();
     }
-    void onBreak(){
-        remove();
-    }
     private void playSound(){
-        Sound.play(type.sound);
+        Sound.play(pos, type.sound);
     }
     public boolean usable(int p){
         if ((isInfinite() || uses >= p) && Global.time >= cdTime[0]){
             if (!isInfinite()){
                 uses -= p;
                 if (uses == 0){
-                    onBreak();
+                    remove();
                 }
             }
             return true;
@@ -523,7 +521,8 @@ public class Item extends Prop {
     public String[] load(String p){
         String[] sections = super.load(p);
         uses = Integer.parseInt(sections[4]);
-        loadMeta(sections[5]);
+        cdTime[0] = Integer.parseInt(sections[5]);
+        loadMeta(sections[6]);
         return sections;
     }
     private boolean isInfinite(){
@@ -533,7 +532,7 @@ public class Item extends Prop {
     public String toString(){
         String t = super.toString();
         String meta = pmod+"_"+smod+"_"+admod+"_"+(emod==null?"":emod.ordinal())+"_"+ademod;
-        if (!t.equals("")) t += "@"+uses+"@"+meta;
+        if (!t.equals("")) t += "@"+uses+"@"+cdTime[0]+"@"+meta;
         return t;
     }
 }

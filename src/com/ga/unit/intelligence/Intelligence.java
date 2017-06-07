@@ -18,33 +18,33 @@ import java.util.ArrayList;
 public class Intelligence implements Observer {
     protected Unit host;
     public Unit target;
-    private Task task;
-    private int alertness = 0;
+    private Behavior task;
     private int range = 150;
     private int travel = -1; //top left:1, top right:2, bottom left:3, bottom right:4
     Unit leader;
     public Intelligence(Unit man){
         host = man;
-        task = new Idle(host);
+        task = Behavior.Idle;
         Updater.add(this);
     }
     private void defaultTask(){
         if (leader == null || leader == host){
-            if (travel == -1) setTaskEcho(new Wander(host));
-            else setTaskEcho(new Travel(host, travel));
+            if (travel == -1) setTaskEcho(Behavior.Wander);
+            else setTaskEcho(Behavior.Travel);
         } else if (leader.state == Actions.Dead){
             leader = null;
         } else {
-            setTaskEcho(new Follow(host, leader));
+            setTaskEcho(Behavior.Follow);
         }
     }
     public void update(){
-        if (host.state != Actions.Walk || !blocked(host.dir)) task.update();
-        if (alertness < 1) perceive(range);
+        if (host.state != Actions.Walk || !blocked(host.dir)) task.update(host);
+        if (task.alertness < 1){
+            if (!perceive(range)) defaultTask();
+        }
     }
-    void setTaskEcho(Task p){
+    void setTaskEcho(Behavior p){
         task = p;
-        alertness = p.getAlertness();
     }
     public void onAttack(){
         if (target != null) {
@@ -57,9 +57,9 @@ public class Intelligence implements Observer {
         }
     }
     public void onHit(){
-        if (alertness < 1){
+        if (task.alertness < 1){
             perceive(range*2);
-            if (alertness < 1){
+            if (task.alertness < 1){
                 host.face(host.dir*-1, true);
                 perceive(range*2);
             }
@@ -68,7 +68,7 @@ public class Intelligence implements Observer {
     public void setState(Actions state){
         if (state == Actions.Dead){
             Updater.remove(this);
-            task = new Idle(host);
+            task = Behavior.Idle;
         } else {
             if (target != null) {
                 P p = target.pos.getSubtract(host.pos);
@@ -97,22 +97,22 @@ public class Intelligence implements Observer {
             }
         }
         if (blocked){
-            task.blocked(false);
+            task.blocked(host, false);
             return true;
         } else if (fall){
-            task.blocked(true);
+            task.blocked(host, true);
             return true;
         }
         return false;
     }
     public void hear(Prop u, String p){
-        if (alertness < 1) {
+        if (task.alertness < 1) {
             int dir = u.pos.x - host.pos.x > 0 ? 1 : -1;
             if (!host.faction.canAttack(u.faction)) {
                 if (u instanceof Man) {
                     if (u.isFacing(host.pos) && Math.abs(u.pos.x - host.pos.x) < 240) {
                         host.face(dir, false);
-                        setTaskEcho(new Idle(host));
+                        setTaskEcho(Behavior.Idle);
                     }
                 }
             } else {
@@ -121,24 +121,27 @@ public class Intelligence implements Observer {
             }
         }
     }
-    private void perceive(int d){
+    private boolean perceive(int d){
         ArrayList<Unit> seen = Updater.perceive(host, host.pos.getAdd(host.dir < 0 ? -d : d, 0), d * 2);
         for (Unit t : seen) {
-            if (target != t) {
-                perceived(t);
-            } else if (target.state == Actions.Dead) defaultTask();
+            if (t != host && target != t) {
+                return perceived(t);
+            }
         }
+        return false;
     }
-    protected void perceived(Prop p){
+    protected boolean perceived(Prop p){
         if (p instanceof Unit) {
             Unit unit = (Unit) p;
             if (host.faction.canAttack(p.faction)) {
                 if (unit.state != Actions.Dead) {
                     target = (Unit) p;
                     host.say("@c tgt");
-                    setTaskEcho(new Hunt(host));
+                    setTaskEcho(Behavior.Hunt);
+                    return true;
                 }
             }
         }
+        return false;
     }
 }

@@ -43,7 +43,8 @@ class GenerateTown extends Generator {
         Global.map.land.add(new Line(pt4, pt1, id, -1));
         Global.map.formTextures.put(id, id+"&"+texture[Creation.r.nextInt(texture.length)]);
     }
-    Generator generateTown(P mapSize){
+    Generator create(P mapSize){
+        Global.map.maps[1] = "Urban";
         String[] landTexture = new String[][]{
                 new String[]{"dirt&grass","dirt&road"},
                 new String[]{"rock&road","rock&grass"}}[Creation.r.nextInt(2)];
@@ -59,19 +60,18 @@ class GenerateTown extends Generator {
             generateFoundation(max-i, mapSize, pos, lastY, foundationTexture);
             lastY = pos.y;
         }
-        Global.map.formTextures.put(-1, ""+max+1);
         generateFloor(max+1, mapSize, Creation.r.nextInt(4) + 7, 20, new String[]{landTexture[Creation.r.nextInt(landTexture.length)]});
         for (int i=0;i<Global.map.land.size();i++){
             Line l = Global.map.land.get(i);
-            if (l.next >= 0 && l.isLandable() && Math.abs(l.getSlope()) < .1f && Math.abs(l.ptd.x-l.pt.x)>500) {
+            if (l.next >= 0 && l.isLandable() && Math.abs(l.getSlope()) < .1f) {
                 if (Math.abs(l.getSlope()) < .01f) Global.map.placeProp(l, "TowerHouse=1");
                 else Global.map.placeProp(l, "SteamHouse=1");
+                for (int ii=0;ii<Creation.r.nextInt(9);ii++) Global.map.placeProp(l,"Stack=.2,Barrel=.5,Crate=1");
             }
         }
         return this;
     }
     Generator generateCity(P mapSize){
-        Global.map.formTextures.put(-1, "9");
         int dividend = 14;
         TerrainTrail baseline = new TerrainTrail(new P(0,mapSize.y-600));
         int fragment = (int) (mapSize.x/dividend);

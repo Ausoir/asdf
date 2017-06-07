@@ -168,7 +168,7 @@ public class Menu extends Panel {
             describe.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Global.display.menuDialog.show(item.getFullName(),item.getDescription());
+                    Global.display.menu.showDialog(item.getFullName(),item.getDescription());
                 }
             });
             final JLabel drop = new JLabel(item.getFullName()+"             ");
@@ -241,7 +241,7 @@ public class Menu extends Panel {
             describe.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Global.display.menuDialog.show(item.getFullName(),item.getDescription());
+                    Global.display.menu.showDialog(item.getFullName(),item.getDescription());
                 }
             });
             final JLabel drop = new JLabel(item.getFullName()+"             ");
@@ -425,7 +425,7 @@ public class Menu extends Panel {
             desc.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Global.display.menuDialog.show(p,description);
+                    Global.display.menu.showDialog(p,description);
                 }
             });
             subpanel.setOpaque(false);
@@ -446,10 +446,10 @@ public class Menu extends Panel {
                         "\nMetabolism:" + player.health.getStatusDescription() +
                             "\nMotivation:" + player.get("Motivation")+"\n";
                     statusDsc += "\nCurrent Status Effects:\n" + player.stats.getEffectsList();
-                    Global.display.menuDialog.show("Current Status", statusDsc);
+                    Global.display.menu.showDialog("Current Status", statusDsc);
                     break;
                 case "etc":
-                    Global.display.menuDialog.show("Options", "apparently none.");
+                    Global.display.menu.showDialog("Options", "apparently none.");
                     break;
             }
         }
@@ -628,7 +628,7 @@ public class Menu extends Panel {
             desc.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Global.display.menuDialog.show(p,description);
+                    Global.display.menu.showDialog(p,description);
                 }
             });
             subpanel.setOpaque(false);
@@ -645,7 +645,7 @@ public class Menu extends Panel {
                     if (!i.equals("Time") && !i.equals("Fist")) t += i + ", ";
                 }
                 String result = t.equals("")?"None":t.substring(0,t.length()-2);
-                Global.display.menuDialog.show("Available Items",result);
+                Global.display.menu.showDialog("Available Items",result);
             } else {
                 Command.order("crft@"+p);
             }
@@ -783,7 +783,7 @@ public class Menu extends Panel {
         super.setVisible(p);
         Global.display.focus = true;
     }
-    public void toggle(){
+    void toggle(){
         if (isVisible()) setVisible(false);
         else{
             display();

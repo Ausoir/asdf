@@ -25,7 +25,7 @@ import java.util.Map;
 public class Unit extends Prop {
     private int[] rangeZone = new int[]{-5};
     private HashMap<Integer, Actions[]> moveset = new HashMap<>();
-    protected HashMap<Actions, int[]> cooldown = new HashMap<>();
+    HashMap<Actions, int[]> cooldown = new HashMap<>();
     public int controlId;
     public Body clip;
     public Actions state = Actions.Idle;
@@ -48,10 +48,11 @@ public class Unit extends Prop {
         controlId = Global.getControlId();
         dynamic = true;
         gravity = true;
-        tags.add(Tag.Aiming);
+        tags.add(Tag.Marksman);
         tags.add(Tag.Athletics);
         tags.add(Tag.Combustible);
         tags.add(Tag.Freezable);
+        this.depth = 2;
     }
 
     @Override
@@ -67,11 +68,11 @@ public class Unit extends Prop {
     protected void loadActions(String p){
         String[] rangeMoves = p.split("/");
         String[] ranges = rangeMoves[0].split(",");
-        String[] moveZones = rangeMoves[1].split("&");
+        String[] moveZones = rangeMoves[1].split(",");
         rangeZone = new int[ranges.length];
         for (int i=0;i<ranges.length;i++) rangeZone[i] = Integer.parseInt(ranges[i]);
         for (int i=0;i<moveZones.length;i++) {
-            String[] moves = moveZones[i].split(",");
+            String[] moves = moveZones[i].split("&");
             Actions[] movesets = new Actions[moves.length];
             for (int ii=0;ii<moves.length;ii++){
                 movesets[ii] = Actions.getByName(moves[ii]);
@@ -157,7 +158,7 @@ public class Unit extends Prop {
         return get("Speed").get()*clip.getLegStatus()*.01f;
     }
     public void attackSound(){
-        Sound.play("swing_normal");
+        Sound.play(pos, "swing_normal");
     }
     public int getStateLevel(Actions state){
         return get("Level").get();
@@ -200,7 +201,6 @@ public class Unit extends Prop {
     public void hit(int dir, float knockback) {
         delay.performer = null;
         jump = false;
-        if (stats.triggerEffect(Buffs.Mark)) knockback += stats.getEffectLevel(Buffs.Mark) * .5f;
         if (state == Actions.Rest) knockback += .5f;
         vel.x = knockback * 16 * dir;
         vel.y += -knockback * 2;
@@ -208,7 +208,7 @@ public class Unit extends Prop {
             if (state == Actions.Down) die();
             else {
                 buff(Buffs.Bleed, 1);
-                if (knockback > .5f+Global.r.nextFloat()*.5f) {
+                if (stats.triggerEffect(Buffs.Mark) || knockback > .5f+Global.r.nextFloat()*.5f) {
                     stateSet(Actions.Down);
                 } else stateSet(Actions.Hit);
             }
@@ -221,30 +221,21 @@ public class Unit extends Prop {
         return super.hittable(faction) && state != Actions.Dead;
     }
 
-    public boolean checkHit(P hitPoint, int damage){
-        if (!stats.triggerEffect(Buffs.Invincible) && !stats.triggerEffect(Buffs.Evade) && state != Actions.Duck){
-            int total = (int) ((stats.getEffectLevel(Buffs.Bleed) + 1) * damage * .5f);
-            hit(hitPoint.x < pos.x ? 1 : -1, (float) total / get("Stamina").getMax());
-        }
-        return false;
+    public void checkHit(P hitPoint, int damage){
+        int total = (stats.getEffectLevel(Buffs.Bleed) + 1) * damage;
+        hit(hitPoint.x < pos.x ? 1 : hitPoint.x > pos.x ? -1 : 0, (float) total / get("Stamina").getMax());
     }
 
-    public boolean checkHit(Line hitBox, int damage){
+    public boolean checkHit(Line hitBox, int damage, boolean blunt){
         boolean r = false;
-        if (!stats.triggerEffect(Buffs.Invincible) && !stats.triggerEffect(Buffs.Evade)) {
-            int total = (stats.getEffectLevel(Buffs.Bleed) + 1) * damage;
-            for (int i = 0; i < clip.organs.length; i++) {
-                if (clip.organs[i].checkHit(hitBox)) {
-                    if (!r){
-                        hit(hitBox.pt.x < pos.x ? 1 : -1, (float) total / get("Stamina").getMax());
-                        Sound.play("hit_cut");
-                    }
-                    P t = new P(pos.x, hitBox.ptd.y);
-                    Particle.explode("Blood", t, t.getSubtract(hitBox.pt), 3, 3, 12, true, 5);
-                    int dam = Math.max(0, total - getDamageReduction(i));
-                    if (clip.organs[i].hit(hitBox, dam)) Sound.play("hit_bloody");
-                    r = true;
-                }
+        for (int i = 0; i < clip.organs.length; i++) {
+            if (clip.organs[i].checkHit(hitBox)) {
+                if (!r) checkHit(hitBox.pt, damage);
+                P t = new P(pos.x, hitBox.ptd.y);
+                Particle.explode("Blood", t, t.getSubtract(hitBox.pt), 3, 3, 12, true, 5);
+                int dam = Math.max(0, damage - getDamageReduction(i));
+                if (clip.organs[i].hit(hitBox, dam)) Sound.play(pos, "hit_bloody");
+                r = true;
             }
         }
         return r;
@@ -280,9 +271,10 @@ public class Unit extends Prop {
             jump = true;
             if (l.isLandable()) setDepth(l.depth-1);
             int mag = (int) (vel.y - Settings.gravityMax);
-            if (vel.y > Settings.gravity*3) Sound.play("land");
+            if (vel.y > Settings.gravity*4) Sound.play(pos, "land");
             if (hittable(Faction.Destructive)) {
                 if (mag >= 0) {
+                    buff(Buffs.Bleed, Global.r.nextInt(3));
                     stateSet(Actions.Down);
                 } else if (state == Actions.Jump && vel.y > 0) {
                     stateSet(Actions.Hit);
@@ -311,7 +303,7 @@ public class Unit extends Prop {
     public Unit attack(){
         for (Unit i : Updater.collideUnit(pos, (int) getReach(), faction)){
             P hand = getHand();
-            if (i.checkHit(new Line(hand, hand.getAdd(vel)),getDamage())){
+            if (i.checkHit(new Line(hand, hand.getAdd(vel)),getDamage(),true)){
                 onAttack(i);
                 return i;
             }
@@ -374,7 +366,6 @@ public class Unit extends Prop {
     public void revive() {
         stats.clearBuffs();
         Particle.holyExplosion(pos);
-        buff(Buffs.Invincible,1);
         stateSet(Actions.Down);
         delay.set(50);
         clip.setOrganHealth();

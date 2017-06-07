@@ -72,9 +72,6 @@ public class P {
     public boolean inOval(float x, float y){
         return (Math.abs(this.x) < x && Math.abs(this.y) < y);
     }
-    public float getSum(){
-        return this.x+this.y;
-    }
     public P getAdd(P p){
         return getAdd(p.x,p.y);
     }

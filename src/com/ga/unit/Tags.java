@@ -7,7 +7,7 @@ import java.util.ArrayList;
  */
 public class Tags extends ArrayList<Tag> {
     public static final Tag[] trainers = new Tag[]{
-        Tag.Combat, Tag.Finesse, Tag.Might, Tag.Athletics, Tag.Aiming, Tag.Energy, Tag.Channeling, Tag.Cunning
+        Tag.Combat, Tag.Finesse, Tag.Might, Tag.Athletics, Tag.Marksman, Tag.Energy, Tag.Channeling, Tag.Cunning
     };
 
     boolean has(Tag p){

@@ -15,7 +15,7 @@ public enum MapEvent{
         public void perform(){
         }
     }),
-    Urban("Guard=.1,Punk=.1", new Performer(){
+    Urban("Resident=.6", new Performer(){
         public void perform(){
         }
     }),
@@ -43,12 +43,12 @@ public enum MapEvent{
         Global.map.generateProps();
         if (mobs != null) { //encounter
             String[] moblist = mobs.split(",");
-            for (int times = 0; times < 24; times++) {
+            for (int times = 0; times < 48; times++) {
                 float random = Creation.r.nextFloat();
                 for (String i : moblist) {
                     String[] mobp = i.split("=");
                     if (random < Float.parseFloat(mobp[1])) {
-                        Stock.getByName(mobp[0], -1).pos.set(Global.map.randomLandableSurface().getAdd(0,-60));
+                        Global.map.placeProp(Global.map.randomLandableSurface(), i);
                         break;
                     }
                 }

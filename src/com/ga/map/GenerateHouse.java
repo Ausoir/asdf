@@ -6,15 +6,16 @@ import com.ga.unit.Prop;
 import com.ga.unit.Stock;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Created by ga on 5/28/17. asd
  */
 class GenerateHouse extends Generator {
-    Generator generateHouse(String[] houseInfo){
-        int returnDoorSeed = Integer.parseInt(houseInfo[1]);
-        P mapSize = new P(houseInfo[2]).mult(2f);
-        Global.map = new Map(houseInfo[0], new String[]{"0","None","None",((int)mapSize.x)+"x"+((int)mapSize.y),Global.player.cmap});
+    Generator create(String[] info){
+        int returnDoorSeed = Integer.parseInt(info[1]);
+        P mapSize = new P(info[2]).mult(2f);
+        Global.map = new Map(info[0], new String[]{"-1","None","None",((int)mapSize.x)+"x"+((int)mapSize.y),Global.player.cmap});
         float bottom = mapSize.y - 64;
         P topleft = new P(64, 64), topright = new P(mapSize.x-64, 64),
                 bottomleft = new P(64, bottom), bottomright = new P(mapSize.x-64, bottom);
@@ -27,11 +28,11 @@ class GenerateHouse extends Generator {
         trail.add(topright);
         trail.add(bottomright);
         trail.finish(this, texture+"&none");
-        int floorNum = Integer.parseInt(houseInfo[3]);
+        int floorNum = Integer.parseInt(info[4]);
         ArrayList<Integer> dividers = new ArrayList<>();
         if (floorNum > 1) {
-            float floorHeight = mapSize.y/(Integer.parseInt(houseInfo[3])+1);
-            int floors = Math.max(0,Integer.parseInt(houseInfo[3])-1);
+            float floorHeight = mapSize.y/(Integer.parseInt(info[3])+1);
+            int floors = Math.max(0,Integer.parseInt(info[3])-1);
             float lastY = bottomleft.y;
             boolean[] sides = new boolean[floors];
             for (int i=0;i<floors;i++) {
@@ -68,7 +69,7 @@ class GenerateHouse extends Generator {
         door.pos.set(result);
         Stock.Exit.create(returnDoorSeed).pos.set(result.x,result.y);
         Stock.Spawn.create(returnDoorSeed).pos.set(result.x,result.y);
-        int merchantType = Integer.parseInt(houseInfo[3]);
+        int merchantType = Integer.parseInt(info[3]);
         if (merchantType != 0){ //1:food,2:shop,3:guild,4:training
             Stock.Merchant.create(merchantType-1).pos.set(Global.r.nextInt((int) mapSize.x-130)+65,result.y);
             int spacing = Global.r.nextInt(240)+120;
@@ -92,7 +93,7 @@ class GenerateHouse extends Generator {
         depthBinding.put(blocker.terrain, dividers);
         return this;
     }
-    private TerrainTrail generateBlocker(int p){
+    TerrainTrail generateBlocker(int p){
         float highX = 0;
         Line high = null;
         for (final Line i : Global.map.land) {
@@ -120,6 +121,16 @@ class GenerateHouse extends Generator {
         }
         blocker.finish(this, "black&none");
         blocker.reverse();
+        Iterator it = Global.map.land.iterator();
+        Line i;
+        while (it.hasNext()) {
+            i = (Line) it.next();
+            if (i.next == p) it.remove();
+        }
+        Global.map.land.add(new Line(-64,Global.map.size.y+64, -64,-64, p,0));
+        Global.map.land.add(new Line(-64,-64, Global.map.size.x+64,-64, p,0));
+        Global.map.land.add(new Line(Global.map.size.x+64,-64, Global.map.size.x+64,Global.map.size.y+64, p,0));
+        Global.map.land.add(new Line(Global.map.size.x+64,Global.map.size.y+64, -64,Global.map.size.y+64, p,0));
         return blocker;
     }
 }

@@ -16,5 +16,6 @@ Dead@4,-1
 Down@4,-1
 Melee@3,0,-1
 Jump@1,2
+Cast@1,2
 Drop@1,2
 Rest@1,2
