@@ -2,7 +2,7 @@ package com.ga.game;
 
 import com.ga.map.Global;
 import com.ga.map.Updater;
-import com.ga.unit.intelligence.Speech;
+import com.ga.unit.Speech;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,11 +14,12 @@ import java.awt.event.*;
 public class Display extends JPanel implements KeyListener, MouseListener, MouseMotionListener {
     public JTextField chatbox;
     public Input input;
-    public MenuInterface menu;
+    public Menu menu;
     private int mode = 0;
     private int mX = 0;
     private int mY = 0;
     boolean focus = true;
+    private String lastChat = "";
     Display() {
         Global.display = this;
         setLayout(null);
@@ -45,16 +46,13 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
         chatbox.setBackground(new Color(88,88,0,55));
         chatbox.addKeyListener(new KeyAdapter() {
             @Override
-            public void keyTyped(KeyEvent e){
-                if (chatbox.getText().length() > 256) e.consume();
-            }
-            @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == Keybinding.get("ENTER")) chat();
+                else if (e.getKeyCode() == Keybinding.get("UP")) chatbox.setText(lastChat);
             }
         });
         add(chatbox);
-        menu = new MenuInterface();
+        menu = new Menu();
         add(menu);
         new Timer(25, new ActionListener() {
             @Override
@@ -76,6 +74,7 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
         requestFocus();
         chatbox.setText("");
         input.chat(text, (int) (mX-Settings.centerX+Global.camera.x), (int) (mY-Settings.centerY+Global.camera.y));
+        lastChat = text;
     }
 
     public void paintComponent(Graphics g) {

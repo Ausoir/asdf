@@ -104,7 +104,7 @@ Shoot@39,40,-1
 Snipe@41,42,-1
 Wield@43,-1
 Lunge@44,45,-1
-Backstep@4,3,2,1,-1
+Backstep@4,3,2,1
 Drop@24,-1
 Mark@65,-1
 Warcry@36,-1

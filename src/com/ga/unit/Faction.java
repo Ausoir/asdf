@@ -1,7 +1,7 @@
 package com.ga.unit;
 
 /**
- * Created by Ga on 9/5/2016.
+ * Created by Ga on 9/5/2016. a
  */
 public enum Faction {
     Player(1),
@@ -12,12 +12,14 @@ public enum Faction {
     Guard(1),
     Punk(2),
     Evil(3),
-    Destructive(0);
+    Rogue(4),
+    Temporary(0),
+    Destructive(-1);
     private int side;
     Faction(int side) {
         this.side = side;
     }
     public boolean canAttack(Faction p){
-        return side == 0 || side != p.side;
+        return side == -1 || side != p.side;
     }
 }

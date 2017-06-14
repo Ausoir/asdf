@@ -2,6 +2,7 @@ package com.ga.game;
 
 import com.ga.map.Global;
 import com.ga.map.Updatable;
+import com.ga.tool.Performer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,7 +20,6 @@ public class Panel extends JPanel implements Updatable {
     private int animation = 1;
     Panel(){
         resize();
-        setVisible(false);
     }
     public void display(){
         setVisible(true);
@@ -38,6 +38,7 @@ public class Panel extends JPanel implements Updatable {
     public void setVisible(boolean p){
         Global.display.focus = !p;
         super.setVisible(p);
+        Global.display.menu.onExit();
     }
     @Override
     public void update() {

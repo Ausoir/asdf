@@ -4,7 +4,7 @@ import com.ga.map.*;
 import com.ga.tool.Line;
 import com.ga.unit.Clip;
 import com.ga.unit.Stock;
-import com.ga.unit.intelligence.PlayerInput;
+import com.ga.unit.PlayerInput;
 import com.ga.unit.player.MainPlayer;
 import com.ga.unit.player.Player;
 import com.ga.unit.skill.Actions;
@@ -68,7 +68,7 @@ public class FileManager {
         result += ";"+Updater.toMapString();
         save(name+".map", result);
     }
-    public static String read(String dir) {
+    private static String read(String dir) {
         String result = null;
         try {
             try (BufferedReader br = new BufferedReader(new FileReader(dir))) {
@@ -89,7 +89,7 @@ public class FileManager {
         String data = read("Data/map/"+dir);
         String[] line = data.split("%");
         PlayerInput pi;
-        pi = new PlayerInput(id == -1 ? new MainPlayer(0) : new Player(0));
+        pi = new PlayerInput(id == -1 ? new MainPlayer(0) : new Player("Player", 0));
         pi.host.load(data);
         pi.host.controlId = id;
         pi.load(line[2]);
@@ -120,8 +120,9 @@ public class FileManager {
             Generator.generate(mapProperties);
         }
         Global.player.cmap = dir;
+        Global.camera.set(Global.player.pos);
         Global.map.setTexture();
-        if (oldmap != null && !Global.map.isIndoors()) Global.map.event.onChange();
+        if (oldmap != null && Integer.parseInt(oldmap[0]) >= 0 && !Global.map.isIndoors()) Global.map.event.onChange();
         return player;
     }
     private static void readMap(String dir){
@@ -239,7 +240,7 @@ public class FileManager {
         HashMap<String,ArrayList<String>> result = new HashMap<>();
         for (String line1 : lines) {
             String[] type = line1.split("@");
-            String[] results = type[1].split("/");
+            String[] results = type[1].split(";");
             ArrayList<String> values = new ArrayList<>();
             Collections.addAll(values, results);
             result.put(type[0], values);
@@ -248,7 +249,7 @@ public class FileManager {
     }
 
     public static String[] readText(String dir){
-        String data = read("Data/"+dir+".txt");
+        String data = read("Data/"+dir);
         return data.split("%");
     }
 

@@ -83,7 +83,7 @@ public class Food extends Item {
     }
     public String[] load(String p){
         String[] r = super.load(p);
-        perish = Integer.parseInt(p.split("@")[6]);
+        perish = Integer.parseInt(p.split("@")[7]);
         return r;
     }
     @Override

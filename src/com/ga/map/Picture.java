@@ -22,11 +22,10 @@ public class Picture {
     public boolean visible = false;
     public BufferedImage image;
     public int sizeRadius = 10;
-    private P halfSize;
+    private P halfSize = new P();
     public Random rand;
     private int type = 1; //1:center,2:bottom
     public int multiple = 0;
-    private P pictureCenter;
 
     public static void init(){
         for (String[] i : FileManager.fileCache.get("png")){
@@ -80,9 +79,6 @@ public class Picture {
         else if (type == 2) halfSize = new P(size.x/2, size.y-4);
         else if (type == 3) halfSize = new P(8, size.y/2);
     }
-    public P getPictureCenter() {
-        return halfSize.getAdd(-size.x/2, -size.y/2);
-    }
     private BufferedImage load(String dir){
         BufferedImage image = null;
         String file = directory.get(dir);
@@ -131,6 +127,19 @@ public class Picture {
             e.printStackTrace();
         }
         cache.put(p,image);
+    }
+    public Picture copy(){
+        Picture r = new Picture(rand);
+        int width = image.getWidth();
+        int height = image.getHeight();
+        BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                result.setRGB(x, y, image.getRGB(x, y));
+            }
+        }
+        r.set(result);
+        return r;
     }
     public void draw(Graphics2D g, float x, float y, float rot, int dir, float sizeX, float sizeY){
         if (visible) {

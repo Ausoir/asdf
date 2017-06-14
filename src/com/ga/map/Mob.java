@@ -8,10 +8,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * Created by Ga on 3/30/2017.
+ * Created by Ga on 3/30/2017. asd
  */
 public class Mob {
-    private static final HashMap<String,ArrayList<String>> mobs = FileManager.readDialogue("dialog/Mob.txt");
+    private static final HashMap<String,ArrayList<String>> mobs = FileManager.readDialogue("raw/Mob.txt");
     public static void spawn(String p, P pos){
         ArrayList<String> types = mobs.get(p);
         String mob = types.get(Global.r.nextInt(types.size()));

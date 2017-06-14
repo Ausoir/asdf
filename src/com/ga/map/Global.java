@@ -3,9 +3,13 @@ package com.ga.map;
 import com.ga.connection.Server;
 import com.ga.game.ControllerProcess;
 import com.ga.game.Display;
+import com.ga.game.FileManager;
 import com.ga.game.Settings;
 import com.ga.tool.EventTimer;
 import com.ga.tool.P;
+import com.ga.tool.Performer;
+import com.ga.tool.Timer;
+import com.ga.unit.Unit;
 import com.ga.unit.player.MainPlayer;
 
 import java.util.ArrayList;
@@ -33,6 +37,7 @@ public class Global {
     public static int time;
     private static int controlId = 1;
     public static int houseId = 1;
+    public static Timer updates = new Timer(40,true);
     public static ArrayList<EventTimer> timers = new ArrayList<>();
 
     public static void init(){
@@ -83,7 +88,13 @@ public class Global {
             p.set(clamp(p.x, Settings.centerX+margin, Global.map.size.x-Settings.centerX-margin),
                 clamp(p.y, Settings.centerY+40+margin, Global.map.size.y-Settings.centerY-margin-margin));
     }
-    public static void update(int p){
+    public static void update(){
+        if (updates.update()) {
+            timePass(1);
+            FileManager.saveCharacter();
+        }
+    }
+    static void timePass(int p){
         time+=p;
         if (p != 1 || time % HOUR == 0) map.onTimeChange();
         Iterator it = timers.iterator();

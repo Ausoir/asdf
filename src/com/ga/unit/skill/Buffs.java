@@ -27,12 +27,13 @@ public enum Buffs {
             }
 
             public void onFinish() {
-                if (host instanceof MainPlayer) Global.map.loadMap(Global.player.cworld+"_1");
-                else host.remove();
+                if (host instanceof MainPlayer){
+                    host.pos.set(Global.r.nextInt((int) Global.map.size.x-64)+36, Global.r.nextInt((int) Global.map.size.y-64)+36);
+                } else host.remove();
             }
 
             public boolean update() {
-                Particle.smoke(host.getRandomPoint());
+                Particle.smoke(host.getRandomPoint(),host.getDepth());
                 return super.update();
             }
         };
@@ -62,17 +63,15 @@ public enum Buffs {
     }}){ Buff makeLocal() {
         return new Buff(1) {
             public void onSet() {
-                Particle.sparkle("Fire", host.getRandomPoint(), 8, 5);
-                for (Unit i : Updater.collideUnit(host.pos,2000*level, Faction.Destructive)){
-                    if (i.brain != null) {
-                        i.brain.target = host;
-                        i.brain.onAttack();
-                    }
+                Particle.sparkle("Fire", host.getDepth(), host.getRandomPoint(), 8, 5);
+                for (Unit i : Updater.collideUnit(host.pos,1600*level, Faction.Destructive)){
+                    i.brain.target = host;
+                    i.brain.onHit();
                 }
             }
 
             public boolean update() {
-                Particle.sparkle("Fire", host.getRandomPoint(), 8, 5);
+                Particle.sparkle("Fire", host.getDepth(), host.getRandomPoint(), 8, 5);
                 return super.update();
             }
         };
@@ -94,7 +93,7 @@ public enum Buffs {
 
             public boolean update() {
                 if (Math.random() < .2f) {
-                    Particle.cleanse(host.pos);
+                    Particle.cleanse(host.pos, host.getDepth());
                 }
                 return super.update();
             }
@@ -116,7 +115,7 @@ public enum Buffs {
             }
 
             public boolean update() {
-                Particle.sparkle("Fire", host.getRandomPoint(), 8, 3);
+                Particle.sparkle("Fire", host.getDepth()+1, host.getRandomPoint(), 8, 3);
                 return super.update();
             }
         };
@@ -146,7 +145,7 @@ public enum Buffs {
                 time += level*10;
             }
             public boolean update() {
-                Particle.dripHoly(((Man) host).weapon.getLine().ptd);
+                Particle.dripHoly(((Man) host).weapon.getLine().ptd, host.getDepth());
                 return super.update();
             }
         };
@@ -154,6 +153,9 @@ public enum Buffs {
     Metabolism(new Tags(){{
     }}){ Buff makeLocal(){
         return new Buff(100) {
+            public void onStack(int level){
+                this.level+= level;
+            }
             public boolean update() {
                 if (super.update()) {
                     host.stats.triggerEffect(Bleed);
@@ -171,8 +173,8 @@ public enum Buffs {
     }}){ Buff makeLocal(){
         return new Buff(800) {
             private int tick = 0;
-            public void onStack(){
-                level++;
+            public void onStack(int level){
+                this.level += level;
                 time -= 40;
             }
             public boolean onTrigger(){
@@ -181,7 +183,7 @@ public enum Buffs {
             }
             public boolean update() {
                 if (tick++ % (Math.max(1,20-level)) == 0) {
-                    Particle.explode("Blood", host.getRandomPoint(), new P(), (int) (Math.random() * level + 1), 5, 0, true, 24);
+                    Particle.explode("Blood", host.getDepth()+1, host.getRandomPoint(), new P(), (int) (Math.random() * level + 1), 5, 0, true, 24);
                 }
                 if (super.update()) host.die();
                 return level == 0;
@@ -197,6 +199,9 @@ public enum Buffs {
                 time += level*2;
                 host.tangible = false;
             }
+            public void onLoad(){
+                host.tangible = false;
+            }
             public boolean onTrigger(){
                 time = Global.time;
                 return true;
@@ -205,7 +210,7 @@ public enum Buffs {
                 host.tangible = true;
             }
             public boolean update() {
-                Particle.smoke(new P(host.pos));
+                Particle.smoke(new P(host.pos), host.getDepth());
                 return super.update();
             }
         };
@@ -216,22 +221,22 @@ public enum Buffs {
     }}){ Buff makeLocal(){
         return new Buff(7) {
             public void onSet(){
-                Particle.shock(host.getRandomPoint());
+                Particle.shock(host.getRandomPoint(), host.getDepth());
                 if (!host.get("Stamina").require(level)){
-                    Particle.holyExplosion(host.pos);
+                    Particle.holyExplosion(host.pos, host.getDepth());
                     host.stateSet(Actions.Down);
                 }
             }
-            public void onStack() {
-                Particle.shock(host.getRandomPoint());
+            public void onStack(int level) {
+                Particle.shock(host.getRandomPoint(), host.getDepth());
                 time = Global.time + 7;
                 if (!host.get("Stamina").require(1)){
-                    Particle.holyExplosion(host.pos);
+                    Particle.holyExplosion(host.pos, host.getDepth());
                     host.stateSet(Actions.Down);
                 }
             }
             public boolean update() {
-                Particle.sparkle("Glare",host.getRandomPoint(),20+host.getSize(),4+level);
+                Particle.sparkle("Glare", host.getDepth(),host.getRandomPoint(),20+host.getSize(),4+level);
                 if (var++ % 40 == 0) host.get("Stamina").add(-1,false);
                 return super.update();
             }
@@ -259,8 +264,8 @@ public enum Buffs {
                     host.delay.time = 24;
                 }
                 var++;
-                Particle.smoke(host.getRandomPoint());
-                Particle.burn(host.getRandomPoint());
+                Particle.smoke(host.getRandomPoint(), host.getDepth()+1);
+                Particle.burn(host.getRandomPoint(), host.getDepth()+1);
                 return super.update();
             }
         };
@@ -273,7 +278,7 @@ public enum Buffs {
             boolean frozen = false;
             private Terrain ice;
             private Line[] lines;
-            private final static int freezeThreshold = 16;
+            private final static int freezeThreshold = 24;
             public void onSet() {
                 Sound.play(host.pos, "freeze");
                 var = host.get("Speed").add(-Math.round(host.getSpeed()*30), false);
@@ -281,15 +286,16 @@ public enum Buffs {
                 host.stats.triggerEffect(Buffs.Bleed);
                 host.stats.triggerEffect(Buffs.Burn);
                 host.stats.triggerEffect(Buffs.Shock);
+                onLoad();
             }
             public void onLoad(){
-                if (time >= freezeThreshold) freeze();
+                if (time-Global.time >= freezeThreshold) freeze();
             }
-            public void onStack(){
+            public void onStack(int level){
                 if (!frozen) {
-                    var += host.get("Speed").add(-1, false);
-                    time ++;
-                    if (time >= freezeThreshold) freeze();
+                    var += host.get("Speed").add(-level, false);
+                    time += level;
+                    onLoad();
                 }
             }
             private void freeze(){
@@ -318,7 +324,7 @@ public enum Buffs {
                 host.mobile = false;
                 host.tangible = false;
                 ice.render();
-                time = Global.time + freezeThreshold + 8 + Global.r.nextInt(8);
+                time = Global.time + freezeThreshold + Global.r.nextInt(freezeThreshold);
             }
             private void melt(){
                 host.mobile = true;
@@ -338,7 +344,7 @@ public enum Buffs {
             }
             public boolean update() {
                 if (!frozen) {
-                    Particle.frozen(host.pos);
+                    Particle.frozen(host.pos, host.getDepth()+1);
                     level = (time - Global.time) / 8 + 1;
                 } else {
                     if (time - Global.time < freezeThreshold) melt();
@@ -386,8 +392,7 @@ public enum Buffs {
             public void onSet() {
                 var = 0;
             }
-            public void onStack(){
-                if (level < 18 && host.rand.nextBoolean()) level++;
+            public void onStack(int level){
             }
             public void onFinish(){
                 if (var == 0) host.die(); }
@@ -402,7 +407,7 @@ public enum Buffs {
             }
             public boolean update() {
                 if (tick++ % (Math.max(1,20-level)) == 0){
-                    Particle.explode("Poison",host.getRandomPoint(),new P(), level+1,5,0,true,24);
+                    Particle.explode("Poison", host.getDepth(),host.getRandomPoint(),new P(), level+1,5,0,true,24);
                     return super.update();
                 }
                 return false;
@@ -425,7 +430,7 @@ public enum Buffs {
                         @Override
                         public void onAttack(Unit p) {
                             p.buff(Buffs.Freeze, level);
-                            Particle.explode("Ice", pos, new P(0, -20), 30, 10, 5, true, 10);
+                            Particle.explode("Ice", host.getDepth(), pos, new P(0, -20), 30, 10, 5, true, 10);
                             remove();
                         }
 
@@ -437,7 +442,7 @@ public enum Buffs {
                         @Override
                         public void update() {
                             super.update();
-                            Particle.explode("Ice", pos, new P(0, -5), 1, 3, 2, false, 6);
+                            Particle.explode("Ice", host.getDepth(), pos, new P(0, -5), 1, 3, 2, false, 6);
                         }
 
                         @Override
@@ -482,7 +487,7 @@ public enum Buffs {
                 host.get("Speed").add(-var, true);
             }
             public boolean update() {
-                Particle.implode("Glare", host.pos.getAdd(0, -24), new P(), 1, 10, 1, false, 6);
+                Particle.implode("Glare", host.getDepth(), host.pos.getAdd(0, -24), new P(), 1, 10, 1, false, 6);
                 return super.update();
             }
         };
@@ -506,7 +511,7 @@ public enum Buffs {
                 host.clip.setSpeed(99);
             }
             public boolean update() {
-                Particle.implode("Glare", host.pos.getAdd(0, -24), new P(), 1, 10, 1, false, 6);
+                Particle.implode("Glare", host.getDepth(), host.pos.getAdd(0, -24), new P(), 1, 10, 1, false, 6);
                 return super.update();
             }
         };
@@ -560,7 +565,7 @@ abstract class Buff{
         return true;
     }
     public void onFinish(){}
-    public void onStack(){}
+    public void onStack(int level){}
     public boolean update(){
         return Global.time >= time;
     }

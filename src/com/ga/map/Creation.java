@@ -19,10 +19,10 @@ public class Creation {
     public static void create(){
         if (!FileManager.isFile("Data/map/0")) {
             FileManager.loadPlayer(-1, "PlayerTemplate");
+            Global.player.buff(Buffs.Metabolism, 10);
             FileManager.save("map/0", Global.player.toCharacterString());
         }
         FileManager.loadPlayer(-1, "0");
-        Global.player.buff(Buffs.Metabolism, Global.player.hasTrait(Trait.Fast_Metabolism)?7:10);
         if (!FileManager.isFile("Data/map/"+Global.player.cworld+".map")) {
             seed = (int) (Math.random()*1000000);
 //            world = WorldCreation.create(16,16);
@@ -34,6 +34,11 @@ public class Creation {
     }
     public static void prepareRandom(int id){
         r = new Random(Integer.parseInt((""+id)+seed));
+    }
+    public static int getSeed(int p, int pool, int id){
+        int seed = getSeed(p);
+        seed += (id - (seed % pool))+pool;
+        return seed;
     }
     public static int getSeed(int p){
         if (p == -1) return r.nextInt(9999);

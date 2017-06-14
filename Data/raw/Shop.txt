@@ -1,0 +1,7 @@
+Food@Meal;Meat;Ration
+Guild@Katana;Broadsword;Lancesword;Cutlass;Claymore;Mace;Spear;Halberd;Bow;Pistol;Revolver;Throwing Knife;Bandana;Scroll;Potion;Fireball;Adventurewear Legging;Adventurewear Torso
+Armory@Chainmail Torso;Chainmail Legging;Lace Helm;Legion Helm;Platemail Torso;Platemail Legging;Battlewear Torso;Battlewear Legging
+Clothier@Comfortwear Torso;Comfortwear Legging;Toughwear Torso;Toughwear Legging;Dustset Torso;Dustset Legging;Adventurewear Torso;Adventurewear Legging
+Trainer@Manual
+General@Scroll;Potion;Battery;Threadball
+Craftsmen@Battery;Agent;Rock;Grass;Shell;Meat

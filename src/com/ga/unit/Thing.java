@@ -18,7 +18,7 @@ public class Thing implements Drawable, Observer {
     public Picture image;
     public P pos;
     public String name;
-    protected int depth; //5:Object, 8:Corpse, 10:Unit
+    private int depth; //5:Object, 8:Corpse, 10:Unit
     public int dir = 1;
     public float rotation = 0;
     public boolean save = true;
@@ -32,16 +32,13 @@ public class Thing implements Drawable, Observer {
         if (name != null) setImage(name);
         Updater.add(this);
     }
-    public P getImageCenter(){
-        return pos.getSubtract(image.getPictureCenter());
-    }
     public void setImage(String p){
         image.set(p);
     }
     public void rotateTo(P p){
         rotation = ((float) Math.atan2(p.y,p.x));
     }
-    public boolean isFacing(P p){
+    boolean isFacing(P p){
         return (pos.x > p.x && dir == -1) || (pos.x < p.x && dir == 1);
     }
     public void draw(Graphics2D g){

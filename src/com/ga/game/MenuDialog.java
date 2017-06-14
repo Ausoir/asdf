@@ -11,18 +11,16 @@ import java.awt.event.MouseEvent;
  * Created by Ga on 11/15/2016. asd
  */
 public class MenuDialog extends Panel {
-    private JPanel panel, optPanel;
+    private JPanel optPanel;
     private JScrollPane scroll;
     private JLabel titleLabel;
-    private JLabel[] options = new JLabel[0];
-    private Performer[] actions;
     private JTextArea message;
-    public MenuDialog(){
+    MenuDialog(){
         setLayout(new BoxLayout(this,BoxLayout.PAGE_AXIS));
         titleLabel = new JLabel();
         titleLabel.setFont(new Font("Helvetica",Font.BOLD,18));
         titleLabel.setForeground(new Color(200, 200, 200, 200));
-        panel = new JPanel();
+        JPanel panel = new JPanel();
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel,BoxLayout.PAGE_AXIS));
         message = new JTextArea();
@@ -57,6 +55,10 @@ public class MenuDialog extends Panel {
         setBackground(forecolor);
         scroll.setBackground(forecolor2);
     }
+    void rewrite(String title, String message){
+        titleLabel.setText(title);
+        this.message.setText(message);
+    }
     void show(String title, String message){
         display();
         setBackground(new Color(120,120,120,180));
@@ -67,21 +69,20 @@ public class MenuDialog extends Panel {
     void show(String title, String message, String[] options, final Performer[] actions){
         show(title, message);
         optPanel.removeAll();
-        this.options = new JLabel[options.length];
+        JLabel[] options1 = new JLabel[options.length];
         for (int i = 0; i < options.length; i++) {
-            this.options[i] = new JLabel(">"+options[i]);
+            options1[i] = new JLabel(">"+options[i]);
             final int ii = i;
-            this.options[i].addMouseListener(new MouseAdapter() {
+            options1[i].addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     setVisible(false);
                     if (actions[ii] != null) actions[ii].perform();
                 }
             });
-            this.options[i].setFont(new Font("Helvetica",Font.ITALIC,14));
-            this.options[i].setForeground(new Color(200, 200, 200, 200));
-            optPanel.add(this.options[i]);
+            options1[i].setFont(new Font("Helvetica",Font.ITALIC,14));
+            options1[i].setForeground(new Color(200, 200, 200, 200));
+            optPanel.add(options1[i]);
         }
-        this.actions = actions;
     }
 }

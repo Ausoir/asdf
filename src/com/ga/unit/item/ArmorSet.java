@@ -9,13 +9,13 @@ import com.ga.unit.*;
  */
 public class ArmorSet {
     private static Armor[] bare = new Armor[]{
-            (Armor) new Armor("Head", 0, new Item.Material[]{Item.Material.Flesh}, 1,0, 0){
+            (Armor) new Armor("Head", 0, new Item.Material[]{Item.Material.Flesh},0, 1,0, 0){
                 void onHit(){}
             }.cancelAdd(),
-            (Armor) new Armor("Underwear", 0, new Item.Material[]{Item.Material.Flesh}, 1,0, 1){
+            (Armor) new Armor("Underwear", 0, new Item.Material[]{Item.Material.Flesh},0, 1,0, 1){
                 void onHit(){}
             }.cancelAdd(),
-            (Armor) new Armor("Underwear", 0, new Item.Material[]{Item.Material.Flesh}, 1,0, 2){
+            (Armor) new Armor("Underwear", 0, new Item.Material[]{Item.Material.Flesh},0, 1,0, 2){
                 void onHit(){}
             }.cancelAdd()
     };
@@ -27,6 +27,7 @@ public class ArmorSet {
         organs = host.clip.organs;
         armor = new Armor[3];
         load(p);
+        for (Armor i : armor) i.owner = host;
     }
     public void set(Armor p, int piece){
         if (p == null || p == bare[piece]){
@@ -57,7 +58,7 @@ public class ArmorSet {
         if (getWeight() <= 4) tags.add(Tag.Finesse);
         if (onChange != null) onChange.perform();
     }
-    private int organToPiece(int organ){
+    public int organToPiece(int organ){
         if (organ == 5) return 0;
         if (organ == 1 || organ == 2) return 1;
         if (organ == 0 || organ == 3 || organ == 4) return 2;
@@ -77,6 +78,11 @@ public class ArmorSet {
     public int getWeight(){
         int r = 0;
         for (Armor i : armor) r += i.weight;
+        return r;
+    }
+    public int getEncumberance(){
+        int r = 0;
+        for (Armor i : armor) r += i.encumberance;
         return r;
     }
     public float getArmor(int p){

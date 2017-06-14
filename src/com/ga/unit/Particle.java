@@ -14,8 +14,8 @@ public class Particle extends Thing implements Effect {
     private Timer timer = new Timer(4, false);
     private P vel;
     private boolean gravity;
-    private Particle(String name, P pt, P vel, float rotation, float speed, boolean gravity, int lifetime) {
-        super(name, 0, 800);
+    private Particle(String name, int depth, P pt, P vel, float rotation, float speed, boolean gravity, int lifetime) {
+        super(name, Global.r.nextInt(9999), depth);
         pos = pt;
         save = false;
         this.vel = new P(vel);
@@ -27,55 +27,55 @@ public class Particle extends Thing implements Effect {
     public void setImage(String p){
         image.set(Picture.loadCache(p));
     }
-    public static void dripHoly(P pt){
-        explode("Glare",pt,new P(),1,4,0,true,4);
+    public static void dripHoly(P pt, int depth){
+        explode("Glare",depth,pt,new P(),1,4,0,true,4);
     }
-    public static void sparkle(String name, P pt, float radius, int times){
+    public static void sparkle(String name, int depth, P pt, float radius, int times){
         for (int i=0;i<times;i++) {
             float x = (float) (Math.random()*radius-radius/2);
             float y = (float) (Math.random()*radius-radius/2);
-            new Particle(name, pt.getAdd(x,y), new P(), 0, 3, false, 1);
+            new Particle(name, depth, pt.getAdd(x,y), new P(), 0, 3, false, 1);
         }
     }
-    public static void groundSlam(P pt){
-        explode("Dust",pt,new P(0,-16),1,12,8,true,4);
+    public static void groundSlam(P pt, int depth){
+        explode("Dust",depth,pt,new P(0,-16),1,12,8,true,4);
     }
-    static void explosion(P pt){
-        explode("Smoke",pt,new P(0,-16),16,15,15,false,7);
-        explode("Fire",pt,new P(0,-24),24,15,10,true,4);
+    static void explosion(P pt, int depth){
+        explode("Smoke",depth,pt,new P(0,-16),16,15,15,false,7);
+        explode("Fire",depth,pt,new P(0,-24),24,15,10,true,4);
     }
-    public static void holyExplosion(P pt){
-        explode("Glare",pt,new P(0,-1),24,24,20,true,7);
+    public static void holyExplosion(P pt, int depth){
+        explode("Glare",depth,pt,new P(0,-1),24,24,20,true,7);
     }
-    public static void shock(P pt){
-        explode("Glare",pt,new P(0,0),3,48,0,false,3);
+    public static void shock(P pt, int depth){
+        explode("Glare",depth,pt,new P(0,0),3,48,0,false,3);
     }
-    public static void cleanse(P pt){
-        explode("Glare",pt,new P(),1,16,0,false,2);
+    public static void cleanse(P pt, int depth){
+        explode("Glare",depth,pt,new P(),1,16,0,false,2);
     }
-    public static void frozen(P pt){
-        explode("Ice",pt,new P(),3,3,0,false,12);
+    public static void frozen(P pt, int depth){
+        explode("Ice",depth,pt,new P(),3,3,0,false,12);
     }
-    public static void smoke(P pt){
-        explode("Smoke",pt,new P(),8,16,0,false,4);
+    public static void smoke(P pt, int depth){
+        explode("Smoke",depth,pt,new P(),8,16,0,false,4);
     }
-    public static void burn(P pt){
-        Particle.explode("Flame", pt, new P(0, -5), 2, 7, 3, false, 4);
+    public static void burn(P pt, int depth){
+        Particle.explode("Flame",depth,pt,new P(0, -5), 2, 7, 3, false, 4);
     }
-    public static void implode(String name, P pt, P vel, int num, int speed, int velSpeed, boolean gravity, int lifetime){
+    public static void implode(String name, int depth, P pt, P vel, int num, int speed, int velSpeed, boolean gravity, int lifetime){
         P t;
         for (int i=0;i<num;i++){
             float rot = Global.r.nextFloat()*6.28f;
             float spd = Global.r.nextFloat()*speed;
             t = new P(pt);
             t.add(Global.cos(rot)*spd*lifetime,Global.sin(rot)*spd*lifetime);
-            new Particle(name,t,new P(),rot-3.14f,spd, gravity, lifetime);
+            new Particle(name,depth,t,new P(),rot-3.14f,spd, gravity, lifetime);
         }
     }
-    public static void explode(String name, P pt, P vel, int num, int speed, int velSpeed, boolean gravity, int lifetime){
+    public static void explode(String name, int depth, P pt, P vel, int num, int speed, int velSpeed, boolean gravity, int lifetime){
         P v = vel.getAtan(velSpeed);
         for (int i=0;i<num;i++){
-            new Particle(name,new P(pt),v, Global.r.nextFloat()*6.28f,Global.r.nextFloat()*speed, gravity, lifetime);
+            new Particle(name,depth,new P(pt),v, Global.r.nextFloat()*6.28f,Global.r.nextFloat()*speed, gravity, lifetime);
         }
     }
     private void collide(){

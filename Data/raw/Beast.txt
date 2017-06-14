@@ -1,0 +1,1 @@
+Rover;;3;12;2;Evil;3;140,1200/Melee&Walk,Walk&Sprint //Beasts-Name,Speech Type,Stamina,Speed,Level,Faction,AI Type,Moveset

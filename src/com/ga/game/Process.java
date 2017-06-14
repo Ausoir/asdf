@@ -7,10 +7,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- * Created by Ga on 12/30/2016.
+ * Created by Ga on 12/30/2016. asd
  */
-public class Process {
-    public Process(){
+class Process {
+    Process(){
         new Timer(25, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {

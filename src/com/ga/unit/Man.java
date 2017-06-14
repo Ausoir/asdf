@@ -24,15 +24,16 @@ public class Man extends Unit {
     protected Item fist = ((Item) Stock.getByName("Fist",0));
     public Item weapon = fist;
     public ArmorSet armor;
-    public Line rope;
 
-    public Man(int seed) {
-        super(seed);
+    public Man(String name, int seed) {
+        super(name, seed);
         clip = new BodyHumanoid(this);
     }
 
-    public void setHead(String p){
-        clip.organs[5].setImage(p);
+    Actions performActions(int dist) {
+        Actions r = super.performActions(dist);
+        if (r == Actions.Use && wieldingNone()) return null;
+        return r;
     }
 
     public void setWeapon(Item p){
@@ -55,10 +56,6 @@ public class Man extends Unit {
     public void remove() {
         super.remove();
         if (speech != null) speech.remove();
-    }
-
-    public void rotateWeapon(P p){
-        weapon.rotateTo(p);
     }
 
     public float getReach(){
@@ -123,19 +120,45 @@ public class Man extends Unit {
         armor.onHit();
     }
 
+    public float getSpeed() {
+        float speed = super.getSpeed();
+        float penalty = Math.max(0,armor.getWeight()+weapon.weight-get("Strength").get()*2)*.01f;
+        return Math.max(0,speed-penalty);
+    }
+
+    public int getVacancy(){
+        Stat agi = get("Agility");
+        if (agi == null) return 99;
+        return agi.get() - armor.getEncumberance();
+    }
+
     public Stat get(String p){
         return stats.getStat(p);
     }
 
     public void die() {
         say("@x");
-        weapon.drop(this);
+        if (rand.nextBoolean()) {
+            if (loot == null) loot = new Item[]{};
+            Item[] newLoot = new Item[loot.length + 4];
+            System.arraycopy(loot, 0, newLoot, 0, loot.length);
+            if (!wieldingNone()) newLoot[loot.length] = weapon;
+            if (!armor.isBare(0)) newLoot[loot.length + 1] = armor.armor[0];
+            if (!armor.isBare(1) && Global.r.nextInt(3) == 0) newLoot[loot.length + 2] = armor.armor[1];
+            if (!armor.isBare(2) && Global.r.nextInt(4) == 0) newLoot[loot.length + 3] = armor.armor[2];
+            for (int i = 0; i < clip.organs.length; i++) {
+                if (clip.organs[i].amputated) newLoot[loot.length + 1 + armor.organToPiece(i)] = null;
+            }
+            loot = newLoot;
+            weapon.drop(this);
+        }
+        weapon.remove();
         super.die();
     }
 
     public void onAttack(Unit p){
         if (weapon.usable(1)) weapon.trigger(p);
-        if (brain != null) brain.onAttack();
+        brain.onAttack();
     }
 
     public Unit attack() {

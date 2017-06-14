@@ -18,16 +18,18 @@ public class Armor extends Item {
     private float coverage = 0;
     private int armorMod = 0;
     public int pocket = 0;
-    public Armor(String name, int seed, Material[] materials, float coverage, int pockets, int piece) {
+    public Armor(String name, int seed, Material[] materials, int encumberance, float coverage, int pockets, int piece) {
         super(name, seed, materials, ItemType.Armor);
+        this.encumberance = encumberance;
         this.coverage = coverage;
         weight *= coverage;
         value = 24;
         this.pocket = pockets;
         this.piece = piece;
-        if (piece != 0) image.set(name, piece);
         delay = 80;
+        if (piece != 0) image.set(name, piece);
     }
+    void shade(int color){}
     public void onCreate(){
         imbueMeta(true, true, .03f);
         if (emod != null && !emod.tags.contains(com.ga.unit.Tag.Buff)){
@@ -66,17 +68,20 @@ public class Armor extends Item {
     }
     @Override
     public void use(final Man host){
-        host.setState(type.action);
-        final Armor me = this;
-        host.delay.performer = new Performer(){
-            public void perform(){
-                if (host.armor.isBare(piece)) {
-                    Sound.play(host.pos, "wear");
-                    me.remove();
-                    host.armor.set(me, piece);
+        if (host.getVacancy() >= encumberance) {
+            host.setState(type.action);
+            final Armor me = this;
+            host.delay.performer = new Performer() {
+                public void perform() {
+                    if (host.armor.isBare(piece)) {
+                        Sound.play(host.pos, "wear");
+                        me.remove();
+                        host.armor.set(me, piece);
+                        owner = host;
+                    }
                 }
-            }
-        };
+            };
+        } else host.say("Too encumbering!");
     }
     @Override
     public String getName(){

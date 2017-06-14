@@ -68,21 +68,34 @@ public class Organ extends Line {
         boolean pierce = damage > 0 && Global.r.nextInt(damage) > health;
         if (pierce) {
             if (image != null) {
-                Projectile flyingOrgan = new Projectile(null, new P(host.pos), p.getAtan(10).add(p.ptd), 20) {
+                final Projectile flyingOrgan = new Projectile(null, new P(host.pos), p.ptd.getAdd(Global.r.nextInt(24)-12,-Global.r.nextInt(24)), 32+damage*8) {
+                    private final int length = (int) getLength();
                     public void update() {
-                        float length = getLength() * .45f;
                         if (tangible) {
-                            Particle.explode("Blood", pos.getAdd(pt), new P(0, -15), 4, 5, 5, true, 5);
-                            pt.set(Global.cos(rotation) * -length, Global.sin(rotation) * -length);
-                            ptd.set(Global.cos(rotation) * length, Global.sin(rotation) * length);
+                            Particle.explode("Blood", host.getDepth(), pos, new P(0, -15), 4, 5, 5, true, 5);
                         }
                         super.update();
                     }
+                    public void draw(Graphics2D g){
+                        if (type == 0) super.draw(g);
+                        else image.draw(g, pos.x, pos.y, rotation, dir, strokeSize, length+3);
+                    }
                 };
+                flyingOrgan.image = image.copy();
+                flyingOrgan.rotation = getAtan()-1.57f;
+                flyingOrgan.dir = host.dir;
+                flyingOrgan.setDepth(host.getDepth());
                 flyingOrgan.gravity = true;
-                flyingOrgan.image = image;
+                flyingOrgan.delay.set(999);
+                flyingOrgan.delay.performer = new Performer(){
+                    @Override
+                    public void perform(){
+                        flyingOrgan.remove();
+                    }
+                };
+                image.visible = false;
             }
-            Particle.explode("Blood", p.ptd, new P(), 5, 40, 0, true, 2);
+            Particle.explode("Blood", host.getDepth(), p.ptd, new P(), 5, 40, 0, true, 2);
             amputated = true;
             for (Organ i : children) i.hit(p, 9999);
             onAmputate.perform();
@@ -104,5 +117,10 @@ public class Organ extends Line {
     }
     public String toString(){
         return "";
+    }
+
+    void stitch() {
+        amputated = false;
+        image.visible = true;
     }
 }

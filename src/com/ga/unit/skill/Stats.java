@@ -31,10 +31,10 @@ public class Stats {
             buff.onSet();
             effects.add(buff);
         } else {
-            origBuff.onStack();
+            origBuff.onStack(level);
         }
     }
-    private Buff getEffect(Buffs p){
+    public Buff getEffect(Buffs p){
         for (Buff i : effects){
             if (i.buff == p) return i;
         }

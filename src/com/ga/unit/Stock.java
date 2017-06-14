@@ -1,6 +1,7 @@
 package com.ga.unit;
 
 import com.ga.game.Dialog;
+import com.ga.game.FileManager;
 import com.ga.game.Sound;
 import com.ga.map.Creation;
 import com.ga.map.Global;
@@ -10,9 +11,6 @@ import com.ga.tool.Interactive;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
-import com.ga.unit.intelligence.Intelligence;
-import com.ga.unit.intelligence.MerchantIntelligence;
-import com.ga.unit.intelligence.ResidentIntelligence;
 import com.ga.unit.item.*;
 import com.ga.unit.player.Player;
 import com.ga.unit.player.Trait;
@@ -73,7 +71,7 @@ public enum Stock {
         return process(product);
     }},
     Fist{ Prop make(int seed){
-        Prop product = new Weapon(getName(),0, Item.ItemType.Bashing){
+        Prop product = new Weapon(getName(),0, Item.ItemType.Bashing, 0){
             public void use(final Man host) {
                 host.setState(Actions.Interact);
             }
@@ -82,229 +80,235 @@ public enum Stock {
             }
             public void drop(Man host) {}
             public void onUnequip(Man host){}
+            public void onCreate(){}
         };
+        ((Item)product).setMaterial(Item.Material.Flesh);
         product.image.setCenterType(3);
         product.onInteract = null;
         return process(product);
     }},
     Stick{ Prop make(int seed){ //3
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Bashing);
+        Prop product = new Weapon(getName(),seed, Item.ItemType.Bashing, 0);
         return process(product);
     }},
     Broadsword{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Sword);
+        Prop product = new Weapon(getName(),seed, Item.ItemType.Sword, 4);
         product.image.setCenterType(3);
         return process(product);
     }},
     Bamboo_Spear{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Spear);
+        Prop product = new Weapon(getName(),seed, Item.ItemType.Spear, 1);
         return process(product);
     }},
     Mace{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Bashing){
+        Prop product = new Weapon(getName(),seed, Item.ItemType.Bashing, 4){
             public void randomSize(P p){}
         };
         return process(product);
     }},
     Katana{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Sword);
+        Prop product = new Weapon(getName(),seed, Item.ItemType.Sword, 4);
         product.image.setCenterType(3);
         return process(product);
     }},
     Claw{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Knife);
+        Prop product = new Weapon(getName(),seed, Item.ItemType.Knife, 0);
         product.image.setCenterType(3);
         return process(product);
     }},
     Spear{ Prop make(int seed){ //10
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Spear);
+        Prop product = new Weapon(getName(),seed, Item.ItemType.Spear, 2);
         return process(product);
     }},
     Axe{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Sword);
+        Prop product = new Weapon(getName(),seed, Item.ItemType.Sword, 3);
         return process(product);
     }},
     Dagger{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Knife);
+        Prop product = new Weapon(getName(),seed, Item.ItemType.Knife, 0);
         product.image.setCenterType(3);
         return process(product);
     }},
     Tanto{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Knife);
+        Prop product = new Weapon(getName(),seed, Item.ItemType.Knife, 0);
         product.image.setCenterType(3);
         return process(product);
     }},
     Pickaxe { Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Sword);
+        Prop product = new Weapon(getName(),seed, Item.ItemType.Sword, 5);
         return process(product);
     }},
     Cleaver{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Sword);
+        Prop product = new Weapon(getName(),seed, Item.ItemType.Sword, 8);
         product.image.setCenterType(3);
         return process(product);
     }},
     Lancesword{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Spear);
+        Prop product = new Weapon(getName(),seed, Item.ItemType.Spear, 5);
         product.image.setCenterType(3);
         return process(product);
     }},
     Cutlass{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Sword);
+        Prop product = new Weapon(getName(),seed, Item.ItemType.Sword, 2);
         product.image.setCenterType(3);
         return process(product);
     }},
     Claymore{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Sword);
+        Prop product = new Weapon(getName(),seed, Item.ItemType.Sword, 7);
         product.image.setCenterType(3);
         return process(product);
     }},
     Halberd{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Spear);
+        Prop product = new Weapon(getName(),seed, Item.ItemType.Spear, 7);
         return process(product);
     }},
     Greatsword{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Bashing);
+        Prop product = new Weapon(getName(),seed, Item.ItemType.Bashing, 9);
         product.image.setCenterType(3);
         return process(product);
     }},
     Warhammer{ Prop make(int seed){ //20
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Bashing);
+        Prop product = new Weapon(getName(),seed, Item.ItemType.Bashing, 9);
         return process(product);
     }},
     Bow{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Bow);
+        Prop product = new Weapon(getName(),seed, Item.ItemType.Bow, 4);
         return process(product);
     }},
     Revolver{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Shooting);
+        Prop product = new Weapon(getName(),seed, Item.ItemType.Shooting, 3);
         product.image.setCenterType(3);
         return process(product);
     }},
     Pistol{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Shooting);
+        Prop product = new Weapon(getName(),seed, Item.ItemType.Shooting, 3);
         product.image.setCenterType(3);
         return process(product);
     }},
     Rifle{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Rifle);
+        Prop product = new Weapon(getName(),seed, Item.ItemType.Rifle, 7);
         product.image.setCenterType(3);
         return process(product);
     }},
     Ethersword{ Prop make(int seed){
-        Weapon product = new Weapon(getName(),seed, Item.ItemType.Sword){
+        Weapon product = new Weapon(getName(), seed, Item.ItemType.Sword, 0){
             public String toString(){
                 return "";
             }
             public void remove(){
                 super.remove();
-                Particle.holyExplosion(pos);
+                Particle.holyExplosion(pos,getDepth());
             }
             public void trigger(Unit host) {
                 super.trigger(host);
-                Particle.holyExplosion(pos);
+                Particle.holyExplosion(pos,getDepth());
+            }
+            public int getDamage(){
+                return 3;
             }
         };
+        product.weight = 0;
         product.image.setCenterType(3);
         return process(product);
     }},
     Comfortwear_Legging{ Prop make(int seed){
-        Armor product = new Armor("Comfortwear",seed, new Item.Material[]{Item.Material.Cloth},.8f,1, 1);
+        Armor product = new Armor("Comfortwear",seed, new Item.Material[]{Item.Material.Cloth},0,.8f,1, 1);
         return process(product);
     }},
     Comfortwear_Torso{ Prop make(int seed){
-        Armor product = new Armor("Comfortwear",seed, new Item.Material[]{Item.Material.Cloth},.8f,0, 2);
+        Armor product = new Armor("Comfortwear",seed, new Item.Material[]{Item.Material.Cloth},0,.8f,0, 2);
         return process(product);
     }},
     Dustset_Legging{ Prop make(int seed){
         Item.Material[] mat = new Item.Material[]{Item.Material.Cloth, Item.Material.Leather};
-        Armor product = new Armor("Dustset",seed, mat,.8f,2, 1);
+        Armor product = new Armor("Dustset",seed, mat,1,.8f,2, 1);
         return process(product);
     }},
     Dustset_Torso{ Prop make(int seed){
         Item.Material[] mat = new Item.Material[]{Item.Material.Cloth, Item.Material.Leather};
-        Armor product = new Armor("Dustset",seed, mat,1,1, 2);
+        Armor product = new Armor("Dustset",seed, mat,1,1,1, 2);
         return process(product);
     }},
     Toughwear_Legging{ Prop make(int seed){
         Item.Material[] mat = new Item.Material[]{Item.Material.Cloth, Item.Material.Leather};
-        Armor product = new Armor("Toughwear",seed, mat,1,1, 1);
+        Armor product = new Armor("Toughwear",seed, mat,1,1,1, 1);
         return process(product);
     }},
     Toughwear_Torso{ Prop make(int seed){
         Item.Material[] mat = new Item.Material[]{Item.Material.Cloth, Item.Material.Leather};
-        Armor product = new Armor("Toughwear",seed, mat,1,0, 2);
+        Armor product = new Armor("Toughwear",seed, mat,1,1,0, 2);
         return process(product);
     }},
     Suit_Legging{ Prop make(int seed){
-        Armor product = new Armor("Suit",seed, new Item.Material[]{Item.Material.Cloth},1,2, 1);
+        Armor product = new Armor("Suit",seed, new Item.Material[]{Item.Material.Cloth},1,1,2, 1);
         product.pocket = 1;
         return process(product);
     }},
     Suit_Torso{ Prop make(int seed){
-        Armor product = new Armor("Suit",seed, new Item.Material[]{Item.Material.Cloth},1,1, 2);
+        Armor product = new Armor("Suit",seed, new Item.Material[]{Item.Material.Cloth},1,1,1, 2);
         product.pocket = 1;
         return process(product);
     }},
     Robe_Legging{ Prop make(int seed){
-        Armor product = new Armor("Robe",seed, new Item.Material[]{Item.Material.Cloth},1,0, 1);
+        Armor product = new Armor("Robe",seed, new Item.Material[]{Item.Material.Cloth},0,1,0, 1);
         product.pocket = 1;
         return process(product);
     }},
     Robe_Torso{ Prop make(int seed){
-        Armor product = new Armor("Robe",seed, new Item.Material[]{Item.Material.Cloth},.6f,2, 2);
+        Armor product = new Armor("Robe",seed, new Item.Material[]{Item.Material.Cloth},0,.6f,2, 2);
         return process(product);
     }},
     Adventurewear_Legging{ Prop make(int seed){ //30
-        Armor product = new Armor("Adventurewear",seed, new Item.Material[]{Item.Material.Leather},.8f,2, 1);
+        Armor product = new Armor("Adventurewear",seed, new Item.Material[]{Item.Material.Leather},2,.8f,3, 1);
         product.pocket = 1;
         return process(product);
     }},
     Adventurewear_Torso{ Prop make(int seed){
         Item.Material[] mat = new Item.Material[]{Item.Material.Leather, Item.Material.Bone};
-        Armor product = new Armor("Adventurewear",seed, mat,.8f,1, 2);
+        Armor product = new Armor("Adventurewear",seed, mat,2,.8f,3, 2);
         return process(product);
     }},
     Chainmail_Legging{ Prop make(int seed){
         Item.Material[] mat = new Item.Material[]{Item.Material.Iron, Item.Material.Bronze, Item.Material.Copper,
                 Item.Material.Silver, Item.Material.Steel};
-        Armor product = new Armor("Chainmail",seed, mat,.6f,1, 1);
+        Armor product = new Armor("Chainmail",seed, mat,4,.6f,1, 1);
         product.pocket = 1;
         return process(product);
     }},
     Chainmail_Torso{ Prop make(int seed){
         Item.Material[] mat = new Item.Material[]{Item.Material.Iron, Item.Material.Bronze, Item.Material.Copper,
                 Item.Material.Silver, Item.Material.Steel};
-        Armor product = new Armor("Chainmail",seed, mat,.5f,0, 2);
+        Armor product = new Armor("Chainmail",seed, mat,3,.5f,0, 2);
         return process(product);
     }},
     Platemail_Legging{ Prop make(int seed){
-        Armor product = new Armor("Platemail",seed, Armor.plateMaterials,.8f,1, 1);
+        Armor product = new Armor("Platemail",seed, Armor.plateMaterials,4,.9f,1, 1);
         return process(product);
     }},
     Platemail_Torso{ Prop make(int seed){
-        Armor product = new Armor("Platemail",seed, Armor.plateMaterials,.8f,0, 2);
+        Armor product = new Armor("Platemail",seed, Armor.plateMaterials,4,.92f,0, 2);
         return process(product);
     }},
     Battlewear_Legging{ Prop make(int seed){
-        Armor product = new Armor("Battlewear",seed, Armor.plateMaterials,1,1, 1);
+        Armor product = new Armor("Battlewear",seed, Armor.plateMaterials,5,1,1, 1);
         product.pocket = 1;
         return process(product);
     }},
     Battlewear_Torso{ Prop make(int seed){
-        Armor product = new Armor("Battlewear",seed, Armor.plateMaterials,1,1, 2);
+        Armor product = new Armor("Battlewear",seed, Armor.plateMaterials,5,1,1, 2);
         return process(product);
     }},
     Shadowrobe_Legging{ Prop make(int seed){
-        Armor product = new Armor("Shadowrobe",seed, new Item.Material[]{Item.Material.Cloth},1,0, 1);
+        Armor product = new Armor("Shadowrobe",seed, new Item.Material[]{Item.Material.Cloth},2,1,0, 1);
         product.pocket = 1;
         return process(product);
     }},
     Shadowrobe_Torso{ Prop make(int seed){
-        Armor product = new Armor("Shadowrobe",seed, new Item.Material[]{Item.Material.Cloth},1,0, 2);
+        Armor product = new Armor("Shadowrobe",seed, new Item.Material[]{Item.Material.Cloth},2,1,0, 2);
         return process(product);
     }},
     Bandana{ Prop make(int seed){
-        Armor product = new Armor(getName(),seed, new Item.Material[]{Item.Material.Cloth},.3f,0, 0){
+        Armor product = new Armor(getName(),seed, new Item.Material[]{Item.Material.Cloth},1,.3f,0, 0){
             public void onCreate(){
                 imbueMeta(true,true,.2f);
             }
@@ -312,7 +316,7 @@ public enum Stock {
         return process(product);
     }},
     Mask{ Prop make(int seed){
-        Armor product = new Armor(getName(),seed, new Item.Material[]{Item.Material.Cloth},.6f,0, 0){
+        Armor product = new Armor(getName(),seed, new Item.Material[]{Item.Material.Cloth},1,.6f,0, 0){
             public void onCreate(){
                 imbueMeta(true,true,.2f);
             }
@@ -322,19 +326,19 @@ public enum Stock {
     Lace_Helm{ Prop make(int seed){
         Item.Material[] mat = new Item.Material[]{Item.Material.Steel, Item.Material.Brass,
                 Item.Material.Bronze, Item.Material.Copper, Item.Material.Bone};
-        Armor product = new Armor(getName(),seed, mat,.7f,0, 0);
+        Armor product = new Armor(getName(),seed, mat,3,.7f,0, 0);
         return process(product);
     }},
     Full_Helm{ Prop make(int seed){
         Item.Material[] mat = new Item.Material[]{Item.Material.Steel, Item.Material.Brass,
                 Item.Material.Bronze, Item.Material.Copper, Item.Material.Bone};
-        Armor product = new Armor(getName(),seed, mat,.9f,0, 0);
+        Armor product = new Armor(getName(),seed, mat,4,.9f,0, 0);
         return process(product);
     }},
     Legion_Helm{ Prop make(int seed){
         Item.Material[] mat = new Item.Material[]{Item.Material.Steel, Item.Material.Brass,
                 Item.Material.Bronze, Item.Material.Copper, Item.Material.Bone};
-        Armor product = new Armor(getName(),seed, mat,.8f,0, 0);
+        Armor product = new Armor(getName(),seed, mat,5,.8f,0, 0);
         return process(product);
     }},
     Blood{ Prop make(int seed){
@@ -476,26 +480,26 @@ public enum Stock {
         product.randomSize(new P(0,.5f));
         float baseSizeX = product.image.getSize().x-64;
         float baseSizeY = product.image.getSize().y-64;
-        Prop door = makeAddon("Door");
+        Prop door = makeAddon("Door", product.rand);
         int doorWidth = (int) (baseSizeX-door.image.getSize().x);
         P doorPos = new P(product.rand.nextInt(doorWidth)-(doorWidth)/2, -8);
         door.pos = doorPos;
         addons.add(door);
         int houseType = product.rand.nextInt(16);
         if (houseType == 1){
-            Prop sign = makeAddon("Sign_Food");
+            Prop sign = makeAddon("Sign_Food", product.rand);
             sign.pos.set(doorPos.x<0?doorPos.x+128:doorPos.x-128, doorPos.y);
             addons.add(sign);
         } else if (houseType == 2){
-            Prop sign = makeAddon("Sign_Shop");
+            Prop sign = makeAddon("Sign_Shop", product.rand);
             sign.pos.set(doorPos.x<0?doorPos.x+128:doorPos.x-128, doorPos.y);
             addons.add(sign);
         } else if (houseType == 3){
-            Prop sign = makeAddon("Sign_Guild");
+            Prop sign = makeAddon("Sign_Guild", product.rand);
             sign.pos.set(doorPos.x<0?doorPos.x+128:doorPos.x-128, doorPos.y);
             addons.add(sign);
         } else if (houseType == 4){
-            Prop sign = makeAddon("Sign_Training");
+            Prop sign = makeAddon("Sign_Training", product.rand);
             sign.pos.set(doorPos.x<0?doorPos.x+128:doorPos.x-128, doorPos.y);
             addons.add(sign);
         } else houseType = 0;
@@ -506,14 +510,14 @@ public enum Stock {
         float ymargin = baseSizeY / (ywindows+1);
         for (int ix = 0; ix < xwindows; ix++) {
             for (int iy = 0; iy < ywindows; iy++) {
-                Prop window = makeAddon("Window");
+                Prop window = makeAddon("Window", product.rand);
                 window.pos = new P(xmargin*(ix+1)-(baseSizeX/2), -ymargin*(iy+1)-door.image.getSize().y/2);
                 addons.add(window);
             }
         }
         if (product.rand.nextBoolean()) {
             for (int i = 0; i < product.rand.nextInt(3); i++) {
-                Prop appliance = makeAddon("Appliance");
+                Prop appliance = makeAddon("Appliance", product.rand);
                 appliance.pos = new P(product.rand.nextInt((int) baseSizeX)-baseSizeX/2, -product.rand.nextInt((int) baseSizeY-64));
                 addons.add(appliance);
             }
@@ -612,7 +616,7 @@ public enum Stock {
                             };
                         }
                     }
-                    Global.display.menu.showContainer("Container", products, actions);
+                    Global.display.menu.showContainer("Crate", products, actions);
                 }
             }
         };
@@ -793,16 +797,16 @@ public enum Stock {
                             final Projectile p = new Projectile("Tanto", host.pos.getAdd(host.clip.organs[BodyHumanoid.OFIST].ptd), host.pos.getAdd(host.target), 70) {
                                 @Override
                                 public void stuck() {
-                                    if (tangible) Particle.explode("Fire", pos, vel, 20, 10, 15, true, 3);
+                                    if (tangible) Particle.explode("Fire", getDepth(), pos, vel, 20, 10, 15, true, 3);
                                     super.stuck();
                                 }
                             };
                             p.rotSpeed = 0;
                             p.faction = host.faction;
-                            p.damage = 15;
+                            p.damage = getDamage();
                             p.blunt = false;
                             p.gravity = false;
-                            p.setDepth(host.depth);
+                            p.setDepth(host.getDepth());
                             p.delay.set(8);
                             p.delay.performer = new Performer() {
                                 @Override
@@ -832,7 +836,7 @@ public enum Stock {
                                     host.pos.getAdd(host.target), 0) {
                                 @Override
                                 public void stuck() {
-                                    Particle.explosion(pos);
+                                    Particle.explosion(pos, getDepth());
                                     ArrayList<Unit> t = Updater.collideUnit(pos,96,Faction.Destructive);
                                     for (Unit i : t){
                                         i.checkHit(pos, getDamage());
@@ -843,11 +847,11 @@ public enum Stock {
                                 @Override
                                 public void update() {
                                     super.update();
-                                    Particle.explode("Fire", pos, new P(0, -1), 6, 1, 4, true, 3);
+                                    Particle.explode("Fire", getDepth(), pos, new P(0, -1), 6, 1, 4, true, 3);
                                 }
                             };
                             p.faction = host.faction;
-                            p.damage = 16;
+                            p.damage = getDamage()+2;
                             p.gravity = true;
                             p.delay.set(50);
                             p.delay.performer = new Performer() {
@@ -879,7 +883,7 @@ public enum Stock {
                                 private BasicStroke stroke = new BasicStroke(4);
                                 public void stuck() {
                                     super.stuck();
-                                    Particle.groundSlam(pos);
+                                    Particle.groundSlam(pos, getDepth());
                                     host.stateSet(Actions.Jump);
                                     host.delay.set(999);
                                     host.mobile = false;
@@ -974,91 +978,63 @@ public enum Stock {
         Food product = new Food(getName(), seed, 1, 6, "PPCCV", 8000, 1);
         return process(product);
     }},
-    Dummy{ Prop make(int seed){
-        Man product = getMan(seed,getStat(6,20,2),Faction.Punk,"10/Use",
-                new String[]{"Dagger","Axe","Pickaxe"},
-                new String[]{"Comfortwear", "Toughwear"},new String[]{null});
-        product.speechType = "punk";
-        product.brain = null;
-        return process(product);
-    }},
-    Resident{ Prop make(int seed){
-        Man product = getMan(seed,getStat(4,10,1),Faction.Helpless,"200/Sprint",
-                new String[]{null,null,null,null,null,null,null,null,null,"Stick","Scroll","Potion","Battery","Bandage"},
-                new String[]{"Comfortwear","Comfortwear","Comfortwear","Dustset","Toughwear","Suit","Robe","Adventurewear"},
-                new String[]{null});
-        product.speechType = "resident"+product.rand.nextInt(8);
-        product.brain = new ResidentIntelligence(product);
+    Man{ Prop make(int seed){
+        Man product = getMan(seed);
         return process(product);
     }},
     Merchant{ Prop make(int seed){
-        Man product = getMan(seed,getStat(4,10,1),Faction.Neutral,"200/Sprint",
+        Man product = getMan(getName(),seed,getStat(4,10,1),Faction.Neutral,"2,0,0","200/Sprint",
                 new String[]{null},
                 new String[]{"Suit"},new String[]{null});
         product.speechType = "merchant";
-        product.brain = new MerchantIntelligence(product, seed);
-        return process(product);
-    }},
-    Guard{ Prop make(int seed){
-        Man product = getMan(seed,getStat(9,20,3),Faction.Neutral,"10,20,800/Use,Dash,Sprint",
-                new String[]{"Broadsword","Spear"},
-                new String[]{"Chainmail","Battlewear","Toughwear"},new String[]{"Lace_Helm",null});
-        product.speechType = "soldier";
-        product.brain = new Intelligence(product);
-        return process(product);
-    }},
-    Punk{ Prop make(int seed){
-        Man product = getMan(seed,getStat(6,20,2),Faction.Punk,"10,80,200,1200/Thrust&Slash,Dash&Walk,Walk,Sprint",
-                new String[]{"Dagger","Axe","Pickaxe"},
-                new String[]{"Comfortwear", "Dustset", "Toughwear"},new String[]{null});
-        product.speechType = "punk";
-        product.brain = new Intelligence(product);
-        return process(product);
-    }},
-    Yeller{ Prop make(int seed){
-        Man product = getMan(seed,getStat(3,24,3),Faction.Punk,"10,80,700,1200/Use,Backstep,Calling,Sprint",
-                new String[]{"Stick","Dagger",null},
-                new String[]{"Comfortwear"},new String[]{"Bandana","Mask"});
-        product.speechType = "punk";
-        product.brain = new Intelligence(product);
         return process(product);
     }},
     Phantom{ Prop make(int seed){
-        Man product = getMan(seed,getStat(12,24,9),Faction.Evil,"10,20,120,1200/Use,Dash&Flameroll,Fireblast,Shadowstep&Blizzard",
+        Man product = getMan("Phantom",seed,getStat(30,28,5),Faction.Evil,"3,0,0","10,20,120,1200/Use,Dash&Flameroll,Fireblast,Shadowstep&Blizzard",
                 new String[]{"Greatsword","Halberd","Warhammer"},
                 new String[]{"Shadowrobe"},new String[]{null});
-        product.brain = new Intelligence(product);
         product.clip.organs[5].setImage("Phantom");
         return process(product);
     }},
-    Dog { Prop make(int seed) {
-        Unit product = new Unit(seed){
+    Beast{ Prop make(int seed) {
+        Unit product = getBeast(seed);
+        return process(product);
+    }},
+    Rover{ Prop make(int seed) {
+        Unit product = new Unit(getName(), seed){
             public void stateSet(Actions state){
                 super.stateSet(state);
                 if (state == Actions.Melee){
                     delay.time = 24;
                     vel.x = 32*dir;
                     vel.y -= 20;
+                    if (rand.nextBoolean()) cooldown.put(Actions.Melee, new int[]{Global.time+2});
                 }
             }
             public Unit attack(){
-                Unit r = super.attack();
-                if (r != null) vel.x = 0;
-                return r;
+                ArrayList<Unit> t = Updater.collideUnit(pos,48,faction);
+                if (t.size() > 0){
+                    Unit i = t.get(0);
+                    i.checkHit(pos, getDamage());
+                    vel.x *= -.7f;
+                    stateSet(Actions.Idle);
+                    return i;
+                }
+                return null;
             }
             public void stateUpdate(){
                 super.stateUpdate();
                 if (state == Actions.Melee) attack();
             }
             public void onCreate(){
-                load(getUnit(name,seed,getStat(3,12,3),Faction.Evil,"140,1200/Melee&Walk,Walk&Sprint"));
+                load(getUnit(name,seed,getStat(3,12,3),Faction.Evil,"3,0,0","140,1200/Melee&Walk,Walk&Sprint"));
             }
         };
         processUnit(product);
         return process(product);
     }},
     Slime { Prop make(int seed) {
-        Unit product = new Unit(seed){
+        Unit product = new Unit(getName(), seed){
             public void stateSet(Actions state) {
                 super.stateSet(state);
                 if (state == Actions.Melee) {
@@ -1068,7 +1044,7 @@ public enum Stock {
             public void moveTriggered(int p){
                 super.moveTriggered(p);
                 if (state == Actions.Melee){
-                    Particle.explode("Poison",pos,new P(),8,8,0,false,4);
+                    Particle.explode("Poison",getDepth(),pos,new P(),8,8,0,false,4);
                     ArrayList<Unit> t = Updater.collideUnit(pos,getSize()+36,Faction.Destructive);
                     for (Unit i : t){
                         i.checkHit(pos, getDamage());
@@ -1088,16 +1064,17 @@ public enum Stock {
                 super.buff(buff, level);
             }
             public void onCreate(){
-                load(getUnit(getName(),seed,getStat(7,6,1),Faction.Evil,"8,800/Melee,Walk"));
+                load(getUnit(getName(),seed,getStat(7,6,1),Faction.Evil,"3,0,0","8,800/Melee,Walk"));
             }
         };
+        product.loot = new Item[]{(Item) Threadball.create(-1)};
         product.tags.remove(Tag.Combustible);
         processUnit(product);
         product.clip.organs[0].setSize((int) product.clip.organs[0].getImage().getSize().x);
         return process(product);
     }},
     Bird { Prop make(int seed) {
-        Unit product = new Unit(seed){
+        Unit product = new Unit(getName(), seed){
             public void collide(){
                 super.collide();
                 jump = true;
@@ -1126,7 +1103,7 @@ public enum Stock {
                 super.buff(buff, level);
             }
             public void onCreate(){
-                load(getUnit(getName(),seed,getStat(14,10,1),Faction.Evil,"80,800/Shock&Jump,Jump"));
+                load(getUnit(getName(),seed,getStat(14,10,1),Faction.Evil,"3,0,0","80,800/Shock&Jump,Jump"));
             }
         };
         processUnit(product);
@@ -1134,7 +1111,7 @@ public enum Stock {
         return process(product);
     }},
     Mantis { Prop make(int seed) {
-        Unit product = new Unit(seed) {
+        Unit product = new Unit(getName(), seed) {
             public void stateSet(Actions state) {
                 super.stateSet(state);
                 if (state == Actions.Thrust){
@@ -1144,14 +1121,14 @@ public enum Stock {
                 }
             }
             public void onCreate(){
-                load(getUnit(getName(),seed,getStat(10,20,12),Faction.Evil,"48,800/Attack,Walk"));
+                load(getUnit(getName(),seed,getStat(10,20,12),Faction.Evil,"3,0,0","48,800/Attack,Walk"));
             }
         };
         processUnit(product);
         return process(product);
     }},
     Beholder { Prop make(int seed) {
-        Unit product = new Unit(seed){
+        Unit product = new Unit(getName(), seed){
             public void collide(){
                 super.collide();
                 jump = true;
@@ -1166,20 +1143,16 @@ public enum Stock {
                 super.update();
                 vel.y += .1f;
                 if (state != Actions.Dead) {
-                    if (pos.y+vel.y+200 >= Global.map.size.y){
-                        vel.y += (Global.map.size.y - (pos.y + 200)) * .01f;
-                    } else {
-                        for (Line i : Global.map.land) {
-                            if (i.lineCross(new Line(pos, pos.getAdd(0, 200)))) {
-                                vel.y -= .2f;
-                                break;
-                            }
+                    for (Line i : Global.map.land) {
+                        if (i.lineCross(new Line(pos, pos.getAdd(0, 200)))) {
+                            vel.y -= .16f;
+                            break;
                         }
                     }
                 }
             }
             public void onCreate(){
-                load(getUnit(getName(),seed,getStat(30,10,3),Faction.Evil,"300/Fireblast&Idle&Idle&Idle"));
+                load(getUnit(getName(),seed,getStat(30,10,3),Faction.Evil,"3,0,0","300/Fireblast&Idle&Idle&Idle"));
             }
         };
         if (seed % 2 == 1) product.loadActions("200,800/Flameroll,Flameroll&Fireball");
@@ -1189,7 +1162,7 @@ public enum Stock {
     }},
     //Uniques
     Stomach_Full_Helm{ Prop make(int seed){
-        Armor product = new Armor("Full Helm",seed,new Item.Material[]{Item.Material.Titanium},1,0,0){
+        Armor product = new Armor("Full Helm",seed,new Item.Material[]{Item.Material.Titanium},0,1,0,0){
             public String getDescription(){
                 return super.getDescription()+" Something is odd about this helmet.";
             }
@@ -1260,8 +1233,8 @@ public enum Stock {
         product.mobile = false;
         randomSide(product);
     }
-    Prop makeAddon(String name){
-        return makeAddon(new Prop(name,-1));
+    Prop makeAddon(String name, Random rand){
+        return makeAddon(new Prop(name,rand.nextInt(9999)));
     }
     Prop makeAddon(Prop p){
         p.manualDepth = true;
@@ -1273,20 +1246,83 @@ public enum Stock {
     static void randomSide(Prop p){
         p.dir = p.seed % 2 == 0 ? 1 : -1;
     }
-    String getStat(int stamina, int speed, int level){
+    static String getStat(int stamina, int speed, int level){
         return "Stamina:"+stamina+"&Attack:0,0&Speed:"+speed+"&Strength:"+level+"&Level:"+level;
     }
-    String getUnit(String name, int seed, String stat, Faction faction, String moves){
-        return name+"@"+seed+"@0,0@0@"+stat+"@"+faction.name()+"@"+moves;
+    static String getUnit(String name, int seed, String stat, Faction faction, String intel, String moves){
+        return name+"@"+seed+"@0,0@0@"+stat+"@"+faction.name()+"@"+intel+"@"+moves;
     }
     void processUnit(Unit p){
         p.clip = new Body(p, getName());
-        p.brain = new Intelligence(p);
     }
-    private String getItem(String p, int piece){
-        if (p == null){
-            if (piece == 0) return "None";
-            else if (piece == -1) return "";
+    public static Unit getBeast(int p){
+        String[] units = FileManager.readText("raw/Beast.txt");
+        String[] unit = units[p % units.length].split(";");
+        Unit r = new Unit(null, Creation.getSeed(p));
+        r.clip = new Body(r, unit[0]);
+        r.load(getUnit(unit[0],r.seed,getStat(Integer.parseInt(unit[2]),Integer.parseInt(unit[3]),Integer.parseInt(unit[4])),
+                Faction.valueOf(unit[5]), unit[6]+",0,0", unit[7]));
+        r.speechType = unit[1];
+        r.factoryId = Beast.ordinal();
+        return r;
+    }
+    public static Unit getBeast(String p){
+        String[] units = FileManager.readText("raw/Beast.txt");
+        for (int i=0;i<units.length;i++){
+            if (units[i].substring(0,units[i].indexOf(";")).equals(p)){
+                String[] unit = units[i].split(";");
+                Unit r = new Unit(null, Creation.getSeed(-1, units.length, i));
+                r.clip = new Body(r, unit[0]);
+                r.load(getUnit(unit[0],r.seed,getStat(Integer.parseInt(unit[2]),Integer.parseInt(unit[3]),Integer.parseInt(unit[4])),
+                        Faction.valueOf(unit[5]), unit[6]+",0,0", unit[7]));
+                r.speechType = unit[1];
+                r.factoryId = Beast.ordinal();
+                return r;
+            }
+        }
+        return null;
+    }
+    public static Man getMan(int p){
+        String[] units = FileManager.readText("raw/Man.txt");
+        String[] unit = units[p % units.length].split(";");
+        Man r = getMan(unit[0], Creation.getSeed(p), getStat(Integer.parseInt(unit[2]),Integer.parseInt(unit[3]),Integer.parseInt(unit[4])),
+                Faction.valueOf(unit[5]), unit[6]+",0,0", unit[7], unit[8].split(","), unit[9].split(","), unit[10].split(","));
+        r.speechType = unit[1];
+        r.factoryId = Man.ordinal();
+        return r;
+    }
+    public static Man getMan(String p){
+        String[] units = FileManager.readText("raw/Man.txt");
+        for (int i=0;i<units.length;i++){
+            if (units[i].substring(0,units[i].indexOf(";")).equals(p)){
+                String[] unit = units[i].split(";");
+                Man r = getMan(unit[0], Creation.getSeed(-1, units.length, i), getStat(Integer.parseInt(unit[2]),Integer.parseInt(unit[3]),Integer.parseInt(unit[4])),
+                        Faction.valueOf(unit[5]), unit[6]+",0,0", unit[7], unit[8].split(","), unit[9].split(","), unit[10].split(","));
+                r.speechType = unit[1];
+                r.factoryId = Man.ordinal();
+                r.onCreate();
+                return r;
+            }
+        }
+        return null;
+    }
+    static Man getMan(String name, int seed, final String stat, final Faction pfaction, final String intel, final String moves, final String[] pweapon, final String[] parmor, final String[] pface){
+        Man m = new Man(name, seed){
+            public void onCreate(){
+                String str = getUnit(name,seed,stat,pfaction,intel,moves);
+                str += "#"+getItem(pweapon[seed % pweapon.length],-1);
+                String helm = getItem(pface[seed % pface.length],0);
+                String arm = parmor[seed % parmor.length];
+                str += "#"+helm+"&"+getItem(arm, 2)+"&"+getItem(arm, 1);
+                load(str);
+            }
+        };
+        return m;
+    }
+    private static String getItem(String p, int piece){
+        if (p == null || p.equals("None")){
+            if (piece == -1) return "";
+            else return "None";
         }
         String pieceName = "";
         if (piece == 1) pieceName = "_Legging";
@@ -1294,18 +1330,5 @@ public enum Stock {
         Item r = (Item) Stock.getByName(p+pieceName,-1);
         r.cancelAdd();
         return r.toString();
-    }
-    Man getMan(int seed, final String stat, final Faction pfaction, final String moves, final String[] pweapon, final String[] parmor, final String[] pface){
-        Man m = new Man(seed){
-            public void onCreate(){
-                String str = getUnit(getName(),seed,stat,pfaction,moves);
-                str += "#"+getItem(pweapon[seed % pweapon.length],-1);
-                String helm = getItem(pface[seed % pface.length],0);
-                String arm = parmor[seed % parmor.length];
-                str += "#"+helm+"&"+ getItem(arm, 2)+"&"+ getItem(arm, 1);
-                load(str);
-            }
-        };
-        return m;
     }
 }

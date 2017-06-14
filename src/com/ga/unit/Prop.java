@@ -76,23 +76,24 @@ public class Prop extends Thing {
             collided = false;
             vp = pos.getAdd(vel);
             pp = new Line(pos,vp);
-            for (Line i : Global.map.land) {
-                if (i.isLand() && i.depth >= lastLand.depth) {
-                    if (i.lineCross(pp)) {
-                        float slope = i.getSlope();
-                        boolean cw = i.clockwise();
-                        float lineY = i.getCrossPointY(pos.x);
+            for (int i=0;i<Global.map.land.size();i++) {
+                Line land = Global.map.land.get(i);
+                if (land.isLand() && land.depth >= lastLand.depth) {
+                    if (land.lineCross(pp)) {
+                        float slope = land.getSlope();
+                        boolean cw = land.clockwise();
+                        float lineY = land.getCrossPointY(pos.x);
                         if (cw && lineY >= pos.y) {
-                            onCollide(i);
+                            onCollide(land);
                             float atan = (float) Math.atan(slope);
                             if (vel.x > 0 != atan > 0) vel.x = vel.x * Global.cos(atan);
                             vel.x += Global.sin(atan) * .1f;
                             if (!Double.isInfinite(slope))
-                                vel.y += i.getCrossPointY(pos.x+vel.x) - (pos.y + vel.y) - 1;
-                            lastLand = i;
+                                vel.y += land.getCrossPointY(pos.x+vel.x) - (pos.y + vel.y) - 1;
+                            lastLand = land;
                             collided = true;
-                        } else if (i.opt == 2 || !cw && lineY <= pos.y) {
-                            onCollide(i);
+                        } else if (land.opt == 2 || !cw && lineY <= pos.y) {
+                            onCollide(land);
                             vel.set(0, 0);
                             return;
                         }

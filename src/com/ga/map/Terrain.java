@@ -45,7 +45,7 @@ public class Terrain extends ShadedPicture implements Drawable{
                 int origX = (int) ((i.pt.x - pos.x)/ZOOM);
                 int origY = (int) ((i.pt.y - pos.y)/ZOOM);
                 int x2 = (int) ((i.ptd.x - pos.x)/ZOOM);
-                int y2 = (int) ((i.ptd.y - pos.x)/ZOOM);
+                int y2 = (int) ((i.ptd.y - pos.y)/ZOOM);
                 shader.render(image, origX, x2, origY, y2, i.getSlope());
             }
         }

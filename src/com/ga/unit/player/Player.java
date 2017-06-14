@@ -3,11 +3,10 @@ package com.ga.unit.player;
 import com.ga.game.Sound;
 import com.ga.map.Global;
 import com.ga.map.Updater;
-import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.unit.*;
-import com.ga.unit.intelligence.PlayerInput;
+import com.ga.unit.PlayerInput;
 import com.ga.unit.item.Crafts;
 import com.ga.unit.item.Item;
 import com.ga.unit.skill.Actions;
@@ -34,11 +33,11 @@ public class Player extends Man {
     public String cmap, cworld;
     public Health health;
     public Actions learning;
-    private Item offhand = fist;
+    public Item offhand = fist;
     private boolean leftHandMode = false;
     private ArrayList<Trait> traits = new ArrayList<>();
-    public Player(int seed) {
-        super(seed);
+    public Player(String name, int seed) {
+        super(name, seed);
         loadActions("-5,100,1000/Use&Walk&Sprint");
         speechType = "p";
         inventory = new Inventory(this);
@@ -82,6 +81,9 @@ public class Player extends Man {
         }
         return false;
     }
+    public boolean offhandNone(){
+        return offhand == fist;
+    }
     private void dropItem(Item p) {
         Item t = inventory.remove(p);
         if (t != null) {
@@ -116,6 +118,9 @@ public class Player extends Man {
         return r;
     }
     public void stateSet(Actions state){
+        if (state.getDel() > 0 && getVacancy() < state.getEncumberance()+weapon.encumberance){
+            attackSpeed -= 50;
+        }
         super.stateSet(state);
         final Player me = this;
         switch (state) {
@@ -263,7 +268,7 @@ public class Player extends Man {
     public String[] load(String p){
         String[] line = p.split("%");
         String[] r = super.load(line[0]);
-        setHead("Player");
+        clip.organs[5].setImage("Player");
         String[] other = line[1].split(";");
         cmap = other[1];
         cworld = cmap.split("_")[0];

@@ -71,16 +71,18 @@ public class Health {
 
     private void digest(){
         HashMap<Character, Integer> strain = getStrain(nutrition.substring(0, Math.min(16, nutrition.length())));
+        int level = host.get("Level").get();
         host.get("Stamina").setMax(((strain.get('P')+strain.get('C')+strain.get('O'))/3)
                 +Math.min(4, strain.get('P'))
                 +Math.min(4, strain.get('C'))
                 +Math.min(4, strain.get('V'))
-                +host.get("Level").get()+3);
+                +level+3);
         host.get("Strength").setMax((int) Math.ceil((float) strain.get('P')/3) + Math.min(2, strain.get('C')));
+        host.get("Agility").setMax(4+Math.min(5, strain.get('V'))+Math.min(5,level));
         host.get("Memory").setMax(Math.max(1,strain.get('D')-strain.get('X')));
-        host.get("Speed").setMax(20+strain.get('V')/2+strain.get('P')/4
+        host.get("Speed").setMax(20+strain.get('P')/3
                 +Math.min(4, strain.get('C'))
-                +Math.min(4, strain.get('V'))-strain.get('X'));
+                -strain.get('X'));
         host.get("Endurance").setMax(strain.get('P')*18+strain.get('V')*12+strain.get('C')*80+80);
         host.get("Motivation").setMax(host.hasTrait(Trait.Greedy)?200:100);
     }

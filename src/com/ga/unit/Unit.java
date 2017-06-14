@@ -4,11 +4,9 @@ import com.ga.game.Settings;
 import com.ga.game.Sound;
 import com.ga.map.Global;
 import com.ga.map.Updater;
-import com.ga.tool.EventTimer;
-import com.ga.tool.Line;
-import com.ga.tool.P;
-import com.ga.unit.intelligence.Intelligence;
-import com.ga.unit.intelligence.Speech;
+import com.ga.tool.*;
+import com.ga.unit.item.Item;
+import com.ga.unit.player.MainPlayer;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Buffs;
 import com.ga.unit.skill.Stat;
@@ -30,21 +28,23 @@ public class Unit extends Prop {
     public Body clip;
     public Actions state = Actions.Idle;
     public boolean jump = false;
-    public Intelligence brain;
+    public AI brain;
     public EventTimer delay = new EventTimer(5, false, null);
-    public P target = new P(); //For appendage rotation
+    public P target = new P();
     public Stats stats = new Stats(this);
     public float damageMod = 1;
-    public String speechType;
+    protected String speechType;
     protected Speech speech = new Speech(this);
     public int stateLevel = 1;
     public int attackSpeed = 0;
     private Actions lastState = Actions.Idle;
     private int jumpAcross = 0;
     public int stateDuration = 0;
+    Item[] loot;
 
-    public Unit(int seed) {
+    public Unit(String name, int seed) {
         super(null,seed);
+        this.name = name;
         controlId = Global.getControlId();
         dynamic = true;
         gravity = true;
@@ -52,7 +52,6 @@ public class Unit extends Prop {
         tags.add(Tag.Athletics);
         tags.add(Tag.Combustible);
         tags.add(Tag.Freezable);
-        this.depth = 2;
     }
 
     @Override
@@ -60,7 +59,8 @@ public class Unit extends Prop {
         String[] sections = super.load(p);
         stats.load(sections[4]);
         faction = Faction.valueOf(sections[5]);
-        loadActions(sections[6]);
+        brain = Intelligence.get(sections[6], this);
+        loadActions(sections[7]);
         clip.setOrganHealth();
         return sections;
     }
@@ -81,24 +81,22 @@ public class Unit extends Prop {
         }
     }
 
-    public int performActions(int dist){
-        int range = -1;
+    Actions performActions(int dist){
+        int range = moveset.size()-1;
         for (int i=0;i<rangeZone.length;i++){
             if (dist <= rangeZone[i]){
                 range = i;
                 break;
             }
         }
-        if (range != -1) {
-            Actions[] t = moveset.get(range);
-            if (t == null) {
-                Global.p("Can't find moveset for range " + dist + "@Zone " + range);
-            } else {
-                Actions move = t[Global.r.nextInt(t.length)];
-                return setState(move);
-            }
+        Actions[] t = moveset.get(range);
+        if (t != null) {
+            Actions move = t[Global.r.nextInt(t.length)];
+            return move;
+        } else {
+            Global.p("Can't find moveset for range " + dist + "@Zone " + range);
         }
-        return -1;
+        return null;
     }
 
     public P getRandomPoint(){
@@ -114,11 +112,11 @@ public class Unit extends Prop {
         speech.say(p);
     }
 
-    public String getConversation(){
+    String getConversation(){
         return speech.getText();
     }
-    public void hear(Prop pos, String p){
-        if (brain != null) brain.hear(pos, p);
+    void hear(Prop pos, String p){
+        if (!speech.isVisible()) brain.hear(pos, p);
     }
     public P getHand(){
         return pos.getAdd(clip.organs[clip.HAND].ptd);
@@ -164,18 +162,19 @@ public class Unit extends Prop {
         return get("Level").get();
     }
     public void stateSet(Actions state){
-        if (state != Actions.Idle) this.state.onInterrupt(this);
-        delay.set(state.getDel());
-        this.state = state;
-        clip.setState(state.getClipName());
-        if (brain != null) brain.setState(state);
-        damageMod = 1;
-        stateDuration = 0;
-        this.state.onSet(this);
-        int asmod = 0;
-        if (attackSpeed != -1) asmod = get("Attack").get();
-        int clipspeed = clip.setSpeed(attackSpeed+asmod);
-        if (delay.max != 0) delay.set(Math.max(clipspeed, delay.time - attackSpeed - asmod));
+        if (this.state != Actions.Dead) {
+            if (state != Actions.Idle) this.state.onInterrupt(this);
+            delay.set(state.getDel());
+            this.state = state;
+            clip.setState(state.getClipName());
+            brain.setState(state);
+            damageMod = 1;
+            stateDuration = 0;
+            this.state.onSet(this);
+            int asmod = get("Attack").get();
+            int clipspeed = clip.setSpeed(attackSpeed + asmod);
+            if (delay.max != 0) delay.set(Math.max(clipspeed, delay.time - attackSpeed - asmod));
+        }
     }
     public boolean face(int dir, boolean force) {
         if (force || (delay.over() && jump && this.dir != dir)) {
@@ -202,7 +201,7 @@ public class Unit extends Prop {
         delay.performer = null;
         jump = false;
         if (state == Actions.Rest) knockback += .5f;
-        vel.x = knockback * 16 * dir;
+        vel.x = knockback * 8 * dir;
         vel.y += -knockback * 2;
         if (knockback > 0){
             if (state == Actions.Down) die();
@@ -213,7 +212,7 @@ public class Unit extends Prop {
                 } else stateSet(Actions.Hit);
             }
         }
-        if (brain != null) brain.onHit();
+        brain.onHit();
     }
 
     @Override
@@ -232,8 +231,10 @@ public class Unit extends Prop {
             if (clip.organs[i].checkHit(hitBox)) {
                 if (!r) checkHit(hitBox.pt, damage);
                 P t = new P(pos.x, hitBox.ptd.y);
-                Particle.explode("Blood", t, t.getSubtract(hitBox.pt), 3, 3, 12, true, 5);
-                int dam = Math.max(0, damage - getDamageReduction(i));
+                Particle.explode("Blood", getDepth(),t, t.getSubtract(hitBox.pt), 3, 3, 12, true, 5);
+                int dam;
+                if (!blunt) dam = Math.max(0, damage - getDamageReduction(i));
+                else dam = damage;
                 if (clip.organs[i].hit(hitBox, dam)) Sound.play(pos, "hit_bloody");
                 r = true;
             }
@@ -246,9 +247,42 @@ public class Unit extends Prop {
     }
 
     public void die() {
-        Updater.remove(brain);
         stateSet(Actions.Dead);
         Global.player.witnessDeath(this);
+        if (loot != null){
+            for (Item i : loot){
+                if (i != null){
+                    buff(Buffs.Shock,1);
+                    break;
+                }
+            }
+        }
+        onInteract = new Interactive(){
+            public void interact(Man p){
+                if (p instanceof MainPlayer && loot != null){
+                    Performer[] actions = new Performer[loot.length];
+                    boolean lootable = false;
+                    for (int i=0;i<loot.length;i++){
+                        if (loot[i] != null) {
+                            final int index = i;
+                            actions[i] = new Performer() {
+                                public void perform() {
+                                    Updater.add(loot[index]);
+                                    loot[index] = null;
+                                }
+                            };
+                            lootable = true;
+                        }
+                    }
+                    if (lootable) Global.display.menu.showContainer("Corpse of "+name, loot, actions);
+                }
+            }
+        };
+    }
+
+    public void remove(){
+        super.remove();
+        speech.remove();
     }
 
     @Override
@@ -314,13 +348,10 @@ public class Unit extends Prop {
     @Override
     public void update() {
         speech.update();
-        boolean m = clip.update();
-        if (state != Actions.Dead) {
-            if (m) moveTriggered(0);
-            stats.update();
-            if (delay.update() && delay.performer == null) stateDone();
-            stateUpdate();
-        }
+        if (clip.update()) moveTriggered(0);
+        stats.update();
+        if (delay.update() && delay.performer == null) stateDone();
+        stateUpdate();
         super.update();
     }
 
@@ -341,7 +372,7 @@ public class Unit extends Prop {
     public String toString(){
         if (state == Actions.Dead || !save) return "";
         String r = super.toString();
-        r += "@"+stats.toString()+"@"+faction.name()+"@";
+        r += "@"+stats.toString()+"@"+faction.name()+"@"+brain.toString()+"@";
         for (int i : rangeZone) r += i+",";
         r = r.substring(0,r.length()-1)+"/";
         Iterator it = moveset.entrySet().iterator();
@@ -349,28 +380,31 @@ public class Unit extends Prop {
             Map.Entry pair = (Map.Entry)it.next();
             Actions[] moves = (Actions[]) pair.getValue();
             for (Actions i : moves){
-                r += i.getName() + ",";
+                r += i.getName() + "&";
             }
-            r = r.substring(0,r.length()-1)+(it.hasNext()?"&":"");
+            r = r.substring(0,r.length()-1)+(it.hasNext()?",":"");
         }
         return r;
     }
 
     public String getDescription(){
-        String r = "*Faction - "+faction.name()+"\n";
+        String r = name + " [Genetic Code:"+seed+"]";
+        r += "*Faction - "+faction.name()+"\n";
         r += "*Stats - \n"+stats.toString().split("/")[0].replace("&"," ")+"\n";
         r += "*Effects - "+stats.getEffectsList();
         return r;
     }
 
     public void revive() {
+        onInteract = null;
         stats.clearBuffs();
-        Particle.holyExplosion(pos);
+        Particle.holyExplosion(pos,getDepth());
+        state = Actions.Idle;
         stateSet(Actions.Down);
         delay.set(50);
         clip.setOrganHealth();
         for (Organ i : clip.organs){
-            i.amputated = false;
+            i.stitch();
         }
     }
 }

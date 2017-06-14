@@ -55,8 +55,6 @@ public class Item extends Prop {
         public boolean isBlunt(){
             return true;
         }
-        void onSet(Item host){
-        }
     }
     public enum Material{
         Wooden(.3f,2,16,1,new Color(118, 93, 0,60)){
@@ -83,14 +81,12 @@ public class Item extends Prop {
         Crystal(.04f,8,24,12,new Color(28, 133, 67,120)),
         Bone(.16f,1,28,3),
         Other(0,0,10,0),
-        Flesh(.05f,1,3,0),
+        Flesh(.05f,0,-1,0),
         Stone(.1f,6,5,5,new Color(107, 107, 107,255));
         int weight, durability, hardness;
         Color color;
         float prevalence;
-        static float pool;
         Material(float prevalence, int weight, int durability, int hardness){
-            expandPool(prevalence);
             this.prevalence = prevalence;
             this.weight = weight;
             this.durability = durability;
@@ -103,6 +99,8 @@ public class Item extends Prop {
         void onSet(Item host){
         }
         static Material get(Random seed, Material[] list){
+            float pool = 0;
+            for (Material i : list) pool += i.prevalence;
             float r = seed.nextFloat()*pool;
             float t = 0;
             float highest = -1;
@@ -116,9 +114,6 @@ public class Item extends Prop {
                 if (t >= r) return i;
             }
             return highestMat;
-        }
-        static void expandPool(float p){
-            pool += p;
         }
     }
     enum SpecialtyMod{
@@ -224,6 +219,7 @@ public class Item extends Prop {
     Material material;
     public int weight;
     public int volume = 1;
+    public int encumberance = 0;
     int cooldown = 0;
     public int delay = 0;
     public float probability;
@@ -240,14 +236,14 @@ public class Item extends Prop {
         setType(type);
         material = Material.get(rand, materials);
         setMaterial(material);
-        this.weight = (int) (material.weight * type.weightMultiplier);
-        this.durability = (int) (material.durability * type.durabilityMultiplier);
-        this.uses = durability;
         cdTime = new int[]{Global.time};
         final Item me = this;
         onInteract = new Interactive(){
             public void interact(Man p){
-                if (owner == null) p.setWeapon(me);
+                if (owner == null){
+                    if (p.getVacancy() < encumberance) p.say("Too encumbering!");
+                    p.setWeapon(me);
+                }
             }
         };
         randomSize(new P(.2f,.2f));
@@ -263,7 +259,7 @@ public class Item extends Prop {
         }
         setModifier(pmod);
         setModifier(smod);
-        shade();
+        applyMetaShade();
         uses = durability;
     }
     private void loadMeta(String p){
@@ -278,33 +274,35 @@ public class Item extends Prop {
         }
         setModifier(pmod);
         setModifier(smod);
-        shade();
+        applyMetaShade();
     }
-    private void shade(){
-        int ctype = image.getCenterType();
+    private void applyMetaShade(){
         if (pmod.ordinal() >= 3){
-            image = new ShadedPicture(rand, name, Shader.Color);
-            ((ShadedPicture) image).shade(new Color(255, 255, 255, 140).getRGB());
+            shade(new Color(255, 255, 255, 140).getRGB());
         } else if (emod != null){
-            image = new ShadedPicture(rand, name, Shader.Color);
             int intensity = ademod.level * 30;
-            ((ShadedPicture) image).shade(new Color(48, 156, 200, intensity).getRGB());
+            shade(new Color(48, 156, 200, intensity).getRGB());
         }
+    }
+    void shade(int color){
+        int ctype = image.getCenterType();
+        image = new ShadedPicture(rand, name, Shader.Color);
+        ((ShadedPicture) image).shade(color);
         image.setCenterType(ctype);
     }
     private void setType(ItemType p){
         this.type = p;
-        this.type.onSet(this);
+//        this.type.onSet(this);
     }
-    private void setMaterial(Material mat){
+    public void setMaterial(Material mat){
         this.material = mat;
         mat.onSet(this);
-        if (mat.color != null) {
-            int ctype = image.getCenterType();
-            image = new ShadedPicture(rand, name, Shader.Color);
-            ((ShadedPicture) image).shade(mat.color.getRGB());
-            image.setCenterType(ctype);
-        }
+        if (mat.color != null) shade(mat.color.getRGB());
+        this.weight = (int) (material.weight * type.weightMultiplier);
+        this.durability = (int) (material.durability * type.durabilityMultiplier);
+        this.uses = durability;
+        setModifier(pmod);
+        setModifier(smod);
     }
     protected void setModifier(PrefixMod mod){
         if (mod == PrefixMod.Awful){
@@ -334,8 +332,11 @@ public class Item extends Prop {
         else if (mod == SpecialtyMod.Runic) probability += .2f;
         else if (mod == SpecialtyMod.Instant) delay = 1;
         else if (mod == SpecialtyMod.Conscious){
-            cooldown = ((cooldown+5) * 2)+40;
-            durability = -1;
+            cooldown = cooldown*2+40;
+            if (ademod != AdenchantMod.None){
+                if (ademod.level > 3) durability = -1;
+                else durability += ademod.level * 100;
+            } else durability += 100;
         }
     }
     private int getRarity(){
@@ -487,7 +488,7 @@ public class Item extends Prop {
     }
     public String getDescription() {
         String r = "";
-        r += Dialog.get("itemDsc",new String[]{getFullName(),weight+"",(isInfinite()?"unlimited":uses+"")});
+        r += Dialog.get("itemDsc",new String[]{getFullName(),weight+"",(isInfinite()?"unlimited":uses+""),encumberance+""});
         if (emod != null){
             String ade = "";
             if (ademod != AdenchantMod.None) ade = "Level "+ademod.level+" ";

@@ -19,6 +19,7 @@ public class Map extends Thing {
     public Weather weather = new Weather();
     public ArrayList<Line> land = new ArrayList<>();
     public HashMap<Integer, String> formTextures = new HashMap<>();
+    public HashMap<Integer, Terrain> terrains = new HashMap<>();
     private static HashMap<String, String> defaultProps = new HashMap<String, String>(){{
         put("grass","Rock=.1,Bush=.2,Stone=.1,Weed=1");
         put("dirt","Rock=.2");
@@ -94,7 +95,6 @@ public class Map extends Thing {
     }
 
     public void setTexture(){
-        HashMap<Integer, Terrain> terrains = new HashMap<>();
         for (final Line i : land){
             if (i.opt == 1){
                 Line land = checkLand(new Line(i.ptd.getAdd(0,-1), i.ptd.getAdd(0,1)), 0);
@@ -242,7 +242,7 @@ public class Map extends Thing {
     public Line checkLand(Line p){
         ArrayList<Line> list = new ArrayList<>();
         for (Line i : land){
-            if (i.isLandable() && i.depth >= depth && i.lineCross(p)){
+            if (i.isLandable() && i.depth >= getDepth() && i.lineCross(p)){
                 list.add(i);
             }
         }

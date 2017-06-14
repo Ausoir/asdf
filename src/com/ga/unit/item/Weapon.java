@@ -9,8 +9,9 @@ import static com.ga.unit.item.Item.Material.*;
  */
 public class Weapon extends Item {
     private int damageMod = 0;
-    public Weapon(String name, int seed, ItemType type) {
+    public Weapon(String name, int seed, ItemType type, int encumberance) {
         super(name, seed, new Material[]{Wooden, Glass, Stone, Copper, Brass, Bronze, Iron, Silver, Steel, Bone, Titanium, Lead, Crystal}, type);
+        this.encumberance = encumberance;
         value = 36;
         cooldown = 0;
         rotation = 35;

@@ -8,6 +8,7 @@ import com.ga.unit.Prop;
 import com.ga.unit.Stock;
 import com.ga.unit.Tag;
 import com.ga.unit.skill.Actions;
+import com.ga.unit.skill.Buffs;
 import com.ga.unit.skill.Stat;
 
 /**
@@ -17,7 +18,7 @@ public class MainPlayer extends Player {
     private Indicater indicater;
     private Stat stamina;
     public MainPlayer(int seed) {
-        super(seed);
+        super("Me", seed);
         Global.player = this;
         controlId = -1;
         indicater = new Indicater(this);
@@ -70,20 +71,28 @@ public class MainPlayer extends Player {
         if (!Stock.getFactoryName(armor.armor[0].factoryId).equals("Stomach Full Helm")) {
             health.starve(1);
             int status = health.getStatus();
-            if (status == 1) {
+            if (status == 0){ //normal
+                int normalLevel = Global.player.hasTrait(Trait.Fast_Metabolism)?7:10;
+                buff(Buffs.Metabolism, normalLevel-stats.getEffectLevel(Buffs.Metabolism));
+            } else if (status == 1) {
                 say("Food...");
                 die();
             } else if (status == 2) {
                 say("I'm starving!");
                 health.record("0");
+                buff(Buffs.Metabolism, 6);
             } else if (status == 3) say("I don't feel so good...");
-            else if (status == 4) say("I'm hungry!");
+            else if (status == 4){
+                say("I'm hungry!");
+                buff(Buffs.Metabolism, 2);
+            }
         }
         if (hasTrait(Trait.Optimistic)) get("Motivation").add(1, false);
         else if (hasTrait(Trait.Pessimistic)) get("Motivation").add(-1, false);
     }
     public void die(){
         super.die();
+        Updater.cancelRemove(this);
         Global.map.weather.fadeOut();
     }
     public void revive(){

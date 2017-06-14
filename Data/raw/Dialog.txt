@@ -8,6 +8,7 @@ act:Actions
 crft:Craft
 gold:Gold
 wielded:Wielded
+offhand:Offhand
 equipped:Equipped
 btorso:Torso
 bleg:Legging
@@ -25,7 +26,7 @@ EnergyDsc:Increases potency of all elemental spells.
 ChannelingDsc:Decreases stamina cost of maintaining channeling spells.
 mvsRemap:Select a skill to re-map its keybinding.
 mvsTrain:Select a skill/spell to train.
-itemDsc:a $. Weighs $ and has $ uses left.
+itemDsc:a $. Weighs $ and has $ uses left. The encumberance rating of this item is $.
 itemEncDsc:This $ item is magically enchanted with $. This item's cooldown is $ seconds.
 itemEncRdy:Currently the item is ready to usable.
 itemEncNRdy:Currently the item needs $ more seconds to recharge.

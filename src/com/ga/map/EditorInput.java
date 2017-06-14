@@ -419,7 +419,7 @@ public class EditorInput implements Input, Updatable, Drawable {
             name = name.substring(0,name.indexOf(":"));
         }
         Prop r = Stock.getByName(name, seed);
-        if (name.equals("Player")) r = new Player(0);
+        if (name.equals("Player")) r = new Player("Player", 0);
         r.pos = p;
         return r;
     }

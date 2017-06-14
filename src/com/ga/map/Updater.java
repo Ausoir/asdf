@@ -2,10 +2,10 @@ package com.ga.map;
 
 import com.ga.game.FileManager;
 import com.ga.game.Observer;
-import com.ga.tool.*;
+import com.ga.tool.Line;
+import com.ga.tool.P;
+import com.ga.tool.Performer;
 import com.ga.unit.*;
-import com.ga.unit.intelligence.Intelligence;
-import com.ga.unit.item.Item;
 import com.ga.unit.player.Player;
 import com.ga.unit.skill.Actions;
 
@@ -23,13 +23,12 @@ public class Updater {
     private static ArrayList<Effect> effects = new ArrayList<>();
     private static ArrayList<Updatable> updatee = new ArrayList<>();
     private static ArrayList<Prop> props = new ArrayList<>();
-    private static ArrayList<Intelligence> controllee = new ArrayList<>();
+    private static ArrayList<AI> controllee = new ArrayList<>();
     public static HashMap<Integer, Unit> unitList = new HashMap<>();
     private static ArrayList<Observer> addQueue = new ArrayList<>();
     private static ArrayList<Observer> removeQueue = new ArrayList<>();
     public static String changeMap = null;
     public static Performer changeMapEvent = null;
-    private static Timer time = new Timer(40,true);
     private static void clear(){
         drawee.clear();
         effects.clear();
@@ -91,7 +90,7 @@ public class Updater {
         }
     }
     public static void updateControl(){
-        for (Intelligence i : controllee) i.update();
+        for (AI i : controllee) i.update();
     }
     public static void addUpdatee(Updatable p){
         updatee.add(p);
@@ -104,7 +103,7 @@ public class Updater {
                 ((Prop)p).onField();
             }
             if (p instanceof Effect) effects.add((Effect) p);
-            if (p instanceof Intelligence) controllee.add((Intelligence) p);
+            if (p instanceof AI) controllee.add((AI) p);
             if (p instanceof Unit){
                 Unit unit = (Unit) p;
                 unitList.put(unit.controlId, unit);
@@ -130,10 +129,7 @@ public class Updater {
                 }
             }
             if (changeMap != null) changeMap(false);
-            else if (time.update()){
-                Global.update(1);
-                FileManager.saveCharacter();
-            }
+            else Global.update();
         }
     }
     public static void draw(Graphics2D g2){
@@ -149,6 +145,9 @@ public class Updater {
     }
     public static void cancelAdd(Observer p){
         addQueue.remove(p);
+    }
+    public static void cancelRemove(Observer p){
+        removeQueue.remove(p);
     }
     public static void remove(Observer p){
         removeQueue.add(p);
@@ -189,18 +188,6 @@ public class Updater {
         result = result.substring(0,result.length()-1);
         return result;
     }
-    public static void sound(Unit p, String msg){
-        for (Map.Entry i : unitList.entrySet()){
-            Unit unit = (Unit) i.getValue();
-            if (unit != p && unit.faction != p.faction) {
-                if (Math.abs(unit.pos.x - p.pos.x) < 600 && Math.abs(unit.pos.y - p.pos.y) < 200) {
-                    if (unit instanceof Man) {
-                        unit.hear(p, msg);
-                    }
-                }
-            }
-        }
-    }
     public static ArrayList<Prop> collideInteractive(P p){
         ArrayList<Prop> result = new ArrayList<>();
         for (Prop i : props){
@@ -208,7 +195,7 @@ public class Updater {
                 if (i instanceof Man){
                     if (((Man) i).getHand().getSubtract(p).getDist() <= 64) result.add(i);
                 } else {
-                    if (i.getImageCenter().getSubtract(p).getDist() <= 24) result.add(i);
+                    if (i.pos.getSubtract(p).getDist() <= 24) result.add(i);
                 }
             }
         }
@@ -256,13 +243,13 @@ public class Updater {
                 encounter.pos = Global.player.pos.getAdd(0, 0);
                 Actions.Blink.onSet(encounter);
             }
-            if (encounter.brain != null) encounter.brain.target = Global.player;
+            encounter.brain.target = Global.player;
             Global.player.say("Interrupted after "+timePassed+" seconds!");
             return timePassed;
         } else {
             if (p % 100 == 0) Global.player.say((p/100)+" hour(s) passed.");
             Global.player.say(p+" seconds passed.");
-            Global.update(p);
+            Global.timePass(p);
             return p;
         }
     }
@@ -292,7 +279,7 @@ public class Updater {
             for (int i=0;i<dangers.size();i++) {
                 float rand = Global.r.nextFloat();
                 if (rand < dangers.get(i)) {
-                    Global.update(ii);
+                    Global.timePass(ii);
                     return units.get(i);
                 }
             }

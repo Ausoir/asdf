@@ -1,9 +1,6 @@
 package com.ga.game;
 
-import com.ga.map.EditorInput;
-import com.ga.map.Global;
-import com.ga.map.Mob;
-import com.ga.map.Updater;
+import com.ga.map.*;
 import com.ga.tool.Line;
 import com.ga.unit.Stock;
 import com.ga.unit.item.Item;
@@ -25,12 +22,14 @@ public class Command {
                 else if (cmd[0].equals("menuDialog")) Global.display.menu.showDialog(cmd[1],cmd[2]);
                 else if (cmd[0].equals("die")) Global.player.die();
                 else if (cmd[0].equals("crft")) Global.player.crafting.craft(cmd[1]);
-                else if (cmd[0].equals("buff")) Global.player.buff(Buffs.valueOf(cmd[1]),1);
+                else if (cmd[0].equals("buff")) Global.player.buff(Buffs.valueOf(cmd[1]), Integer.parseInt(cmd[2]));
                 else if (cmd[0].equals("seed")) host.weapon.seed = Integer.parseInt(cmd[1]);
                 else if (cmd[0].equals("time")) Global.time += Integer.parseInt(cmd[1]);
                 else if (cmd[0].equals("stat")) host.get(cmd[1].split(":")[0]).addTotal(Integer.parseInt(cmd[1].split(":")[1]));
                 else if (cmd[0].equals("advance")) for (int num=0;num<Integer.parseInt(cmd[1].split(":")[1]);num++) host.skillTree.advanceSkill(Actions.valueOf(cmd[1].split(":")[0]));
                 else if (cmd[0].equals("unit")) Stock.getByName(cmd[1], -1).pos.set(host.pos.getAdd(host.target));
+                else if (cmd[0].equals("beast")) Stock.getBeast(cmd[1]).pos.set(host.pos.getAdd(host.target));
+                else if (cmd[0].equals("man")) Stock.getMan(cmd[1]).pos.set(host.pos.getAdd(host.target));
                 else if (cmd[0].equals("mob")) Mob.spawn(cmd[1],host.pos.getAdd(host.target));
                 else if (cmd[0].equals("item")) host.setWeapon((Item) Stock.getByName(cmd[1], -1));
                 else if (cmd[0].equals("itemN")) host.setWeapon((Item) Stock.get(cmd[1]+"@"+cmd[2]));
@@ -46,6 +45,9 @@ public class Command {
                 else if (cmd[0].equals("recipe")) host.crafting.knowledge.add(cmd[1]);
                 else if (cmd[0].equals("sound")) Sound.play(Global.camera, cmd[1]);
                 else if (p.equals("revive")) host.revive();
+                else if (p.equals("render")){
+                    for (Object terrain : Global.map.terrains.entrySet()) ((Terrain)terrain).render();
+                }
                 else if (p.equals("editor")){
                     Updater.editor = true;
                     Global.display.input = new EditorInput();

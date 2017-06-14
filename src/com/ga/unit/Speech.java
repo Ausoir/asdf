@@ -1,12 +1,11 @@
-package com.ga.unit.intelligence;
+package com.ga.unit;
 
 import com.ga.game.FileManager;
 import com.ga.map.Drawable;
 import com.ga.map.Global;
+import com.ga.map.Updater;
 import com.ga.tool.P;
 import com.ga.tool.Timer;
-import com.ga.unit.Unit;
-import com.ga.map.Updater;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,14 +16,13 @@ import java.util.HashMap;
  * Created by Ga on 7/31/2016. asd
  */
 public class Speech extends JTextArea implements Drawable {
-    public static final HashMap<String,ArrayList<String>> dialog = FileManager.readDialogue("dialog/Reaction.txt");
     private Unit host;
     private ArrayList<String> msg = new ArrayList<>();
     private Timer timer = new Timer(-1,false);
     private String recent = "";
     private Color color = new Color(255,255,255,150);
     private Font font;
-    public Speech(Unit host){
+    Speech(Unit host){
         super();
         this.host = host;
         Updater.add(this);
@@ -76,10 +74,19 @@ public class Speech extends JTextArea implements Drawable {
                 setText(t);
             }
             timer.set(120 + t.length());
-            Updater.sound(host, p.toLowerCase());
+
+            for (java.util.Map.Entry i : Updater.unitList.entrySet()){
+                Unit unit = (Unit) i.getValue();
+                if (unit != host && unit.faction != host.faction) {
+                    if (Math.abs(unit.pos.x - host.pos.x) < 600 && Math.abs(unit.pos.y - host.pos.y) < 200) {
+                        unit.hear(host, p.toLowerCase());
+                    }
+                }
+            }
         }
     }
     private String getRandom(String p){
+        HashMap<String,ArrayList<String>> dialog = FileManager.readDialogue("raw/Reaction.txt"); //static cache?
         ArrayList<String> results = dialog.get(host.speechType+":"+p);
         if (results == null){
             results = dialog.get(":"+p);

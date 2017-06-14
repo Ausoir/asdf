@@ -9,8 +9,9 @@ public class EventTimer extends Timer {
         super(time, repeat);
         this.performer = performer;
     }
-    public boolean update(){
-        boolean result = super.update();
+    @Override
+    public boolean update(int p){
+        boolean result = super.update(p);
         if (result && performer != null){
             Performer orig = performer;
             performer.perform();

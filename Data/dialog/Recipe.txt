@@ -1,5 +1,0 @@
-Battery@Time:100/Component:1/Grass:1
-Charger@Time:100/Component:1/Shocker:1
-Scroll@Time:200/Grass:*
-Grass@Time:50/Sharp:0
-Training Dummy@Time:100/Fiber:*/Fiber:*/Fiber:*

@@ -15,7 +15,7 @@ import java.util.HashMap;
  * Created by Ga on 3/26/2017. asd
  */
 public class Crafts {
-    public static final HashMap<String,ArrayList<String>> recipes = FileManager.readDialogue("dialog/Recipe.txt");
+    public static final HashMap<String,ArrayList<String>> recipes = FileManager.readDialogue("raw/Recipe.txt");
     public ArrayList<String> knowledge = new ArrayList<>();
     private Player host;
     public Crafts(Player player) {

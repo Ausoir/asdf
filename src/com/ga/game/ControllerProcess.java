@@ -11,8 +11,8 @@ import java.awt.event.ActionListener;
  */
 public class ControllerProcess {
     private Timer timer;
-    protected ControllerProcess(){
-        timer = new Timer(120, new ActionListener() {
+    ControllerProcess(){
+        timer = new Timer(360, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 Updater.updateControl();

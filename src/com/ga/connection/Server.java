@@ -10,7 +10,7 @@ import com.ga.tool.Performer;
 import com.ga.tool.Timer;
 import com.ga.unit.Unit;
 import com.ga.map.Updater;
-import com.ga.unit.intelligence.PlayerInput;
+import com.ga.unit.PlayerInput;
 
 import java.net.DatagramPacket;
 import java.util.ArrayList;
@@ -56,7 +56,7 @@ public class Server implements Updatable {
         Updater.addUpdatee(this);
     }
 
-    public void reconnect(){ //can be called from updater thread
+    private void reconnect(){ //can be called from updater thread
         try{
             clientIPs.clear();
             clientControllers.clear();

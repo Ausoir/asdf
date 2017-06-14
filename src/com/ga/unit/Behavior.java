@@ -1,9 +1,10 @@
-package com.ga.unit.intelligence;
+package com.ga.unit;
 
 import com.ga.map.Global;
-import com.ga.unit.Tag;
-import com.ga.unit.Unit;
+import com.ga.map.Updater;
 import com.ga.unit.skill.Actions;
+
+import java.util.ArrayList;
 
 /**
  * Created by ga on 6/5/17. asd
@@ -26,7 +27,7 @@ public enum Behavior {
                 }
             }
         }
-    }, Travel(0){
+    }, Travel(1){
         public void blocked(Unit host, boolean fall) {
         }
         public void update(Unit host){
@@ -34,9 +35,8 @@ public enum Behavior {
             host.face(dir, false);
             host.setState(Actions.Walk);
         }
-    }, Follow(0){
+    }, Follow(1){
         public void blocked(Unit host, boolean fall) {
-            host.brain.leader = null;
         }
         public void update(Unit host){
             if (host.brain.target != null) {
@@ -49,41 +49,58 @@ public enum Behavior {
                 } else if (absX < 40) host.setState(Actions.Idle);
             }
         }
-    }, Hunt(1){
+    }, Search(2){
+        public void update(Unit host){
+            host.face(host.dir*-1, false);
+            if (host.brain.taskProgress > 64){
+                host.brain.setTaskEcho(Idle);
+            } else if (host.brain.taskProgress % 4 == 0) {
+                ArrayList<Unit> allunits = Updater.collideUnit(host.pos, host.brain.taskProgress*128, host.faction);
+                for (Unit i : allunits) {
+                    host.brain.target = i;
+                    host.brain.setTaskEcho(Hunt);
+                }
+            }
+        }
+    }, Hunt(3){
         void blocked(Unit host, boolean fall){
             host.vel.x = host.getSpeed()*host.dir;
             host.setState(Actions.Jump);
         }
         void update(Unit host){
             Unit target = host.brain.target;
-            if (target == null || !host.delay.over()) return;
-            int x = (int) ((target.pos.x+target.vel.x) - (host.pos.x+host.vel.x));
-            int y = (int) (target.pos.y - host.pos.y);
-            host.face(target.pos.x>host.pos.x?1:-1, false);
-            float dist = Math.abs(x)-host.getReach();
-            if (dist < 1000) {
-                if (y < -64) {
+            if (target == null) host.brain.setTaskEcho(Idle);
+            else if (host.delay.over()) {
+                int x = (int) ((target.pos.x + target.vel.x) - (host.pos.x + host.vel.x));
+                int y = (int) (target.pos.y - host.pos.y);
+                host.face(target.pos.x > host.pos.x ? 1 : -1, false);
+                float dist = (float) Math.sqrt(x * x + y * y) - host.getReach();
+                if (y < -64 && Global.r.nextBoolean()) {
                     Actions.Walk.update(host);
                     host.setState(Actions.Jump);
                 } else {
                     if (y > 64 && Global.r.nextBoolean()) host.setState(Actions.Drop);
                     else {
-                        int t = host.performActions((int) dist);
-                        if (host.state.getTags().contains(Tag.Channeling)) {
-                            host.delay.set(60 + Global.r.nextInt(80));
-                        }
-                        if (t == 2) { //no stamina
-                            host.setState(Actions.Rest);
-                            host.delay.time += 40;
+                        Actions action = host.performActions((int) dist);
+                        if (action != null){
+                            if (host.setState(action) == 2){
+                                host.setState(Actions.Rest);
+                                host.delay.time += 40;
+                            } else if (host.state.getTags().contains(Tag.Channeling)) {
+                                host.delay.set(60 + Global.r.nextInt(80));
+                            }
                         }
                     }
                 }
             }
         }
     };
-    int alertness;
+    int alertness; //0:temporary, 1:normal, 2:alert, 3:active
     Behavior(int alertness){
         this.alertness = alertness;
+    }
+    void onSet(Unit host){
+
     }
     void update(Unit host){
 

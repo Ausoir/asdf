@@ -54,17 +54,15 @@ public class MenuContainer extends Panel {
         setBackground(forecolor);
         scroll.setBackground(new Color(120, 86, 47, 180));
     }
-    public void show(String title, Item[] wares, Performer[] actions){
-        if (!isVisible()) {
-            super.display();
-            titleLabel.setText(title);
-            panel.removeAll();
-            int itemsize = wares.length;
-            for (int i = 0; i < itemsize; i++) {
-                if (wares[i] != null) {
-                    grid.gridy = i + 2;
-                    makeSlot(wares[i], actions[i]);
-                }
+    void show(String title, Item[] wares, Performer[] actions){
+        display();
+        titleLabel.setText(title);
+        panel.removeAll();
+        int itemsize = wares.length;
+        for (int i = 0; i < itemsize; i++) {
+            if (wares[i] != null) {
+                grid.gridy = i + 2;
+                makeSlot(wares[i], actions[i]);
             }
         }
     }

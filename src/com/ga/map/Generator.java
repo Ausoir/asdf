@@ -21,9 +21,9 @@ public class Generator {
         } else {
             P mapSize = new P(6000+Creation.r.nextInt(6000), 3200+Creation.r.nextInt(1600));
             String id = info[0].split("_")[1];
-            Global.map = new Map(info[0], new String[]{id, "None", Creation.panoramaAt(Integer.parseInt(id)),
+            Global.map = new Map(info[0], new String[]{id, "Rural", Creation.panoramaAt(Integer.parseInt(id)),
                     ((int) mapSize.x) + "x" + ((int) mapSize.y)});
-            if (Creation.r.nextInt(5) == 0) {
+            if (Creation.r.nextInt(3) == 0) {
                 result = new GenerateTown().create(mapSize);
             } else {
                 if (Creation.r.nextBoolean()) result = new GenerateHighlands().createPlains(mapSize);
@@ -31,7 +31,7 @@ public class Generator {
                     result = new GenerateHighlands().create('-', mapSize);
                     if (Creation.r.nextBoolean()) ((GenerateHighlands) result).create('-', mapSize);
                 }
-                Global.map.placeProp(Global.map.randomLandableSurface(), "Dungeon=1");
+                if (Creation.r.nextBoolean()) Global.map.placeProp(Global.map.randomLandableSurface(), "Dungeon=1");
             }
         }
         result.finish();

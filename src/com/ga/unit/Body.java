@@ -124,7 +124,8 @@ public class Body {
                                     public void draw(Graphics2D g) {
 //                                        if (type != 0) g.drawLine((int)(host.pos.x+pt.x+Global.rel.x), (int)(host.pos.y+pt.y+Global.rel.y),
 //                                                (int)(host.pos.x+ptd.x+Global.rel.x), (int)(host.pos.y+ptd.y+Global.rel.y));
-                                        image.draw(g, host.pos.x + ptd.x, host.pos.y + ptd.y, (float) Math.atan2(pt.y - ptd.y, pt.x - ptd.x) - 1.57f, host.dir, strokeSize, getLength() + 6);
+                                        if (!amputated) image.draw(g, host.pos.x + ptd.x, host.pos.y + ptd.y,
+                                            (float) Math.atan2(pt.y-ptd.y, pt.x-ptd.x)-1.57f, host.dir, strokeSize, getLength()+6);
                                     }
                                 };
                 else if (type == 0) organs[p] = new Organ(parent, tip) {
@@ -262,11 +263,11 @@ public class Body {
         }
         if (legs != legNum){
             legCurrent = legs;
-            setHeight();
+            resetHeight();
         }
     }
 
-    public void setHeight(){
+    public void resetHeight(){
         if (legCurrent == 0) {
             organs[BODY].pt.y = 0;
             host.tags.remove(Tag.Athletics);

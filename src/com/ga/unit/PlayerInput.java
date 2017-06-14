@@ -1,4 +1,4 @@
-package com.ga.unit.intelligence;
+package com.ga.unit;
 
 import com.ga.game.Input;
 import com.ga.game.Keybinding;
@@ -38,7 +38,7 @@ public class PlayerInput implements Input {
     public boolean cameraMode = false;
     public PlayerInput(Player unit){
         host = unit;
-        unit.brain = null;
+        unit.brain = Intelligence.None.make(unit);
         unit.input = this;
     }
     public void chat(String p, int x, int y){
