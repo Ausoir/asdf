@@ -304,4 +304,12 @@ public class Updater {
             if (i instanceof Terrain) remove(i);
         }
     }
+
+    static void normalize(P adjustment) {
+        for (Observer i : addQueue){
+            if (i instanceof Prop){
+                ((Prop)i).pos = ((Prop)i).pos.getAdd(adjustment);
+            }
+        }
+    }
 }

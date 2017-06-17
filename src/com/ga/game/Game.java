@@ -3,6 +3,7 @@ package com.ga.game;
 import com.ga.connection.Server;
 import com.ga.map.*;
 import com.ga.tool.Clips;
+import com.ga.unit.Stock;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,8 +11,8 @@ import java.awt.*;
 /**
  * Created by Ga on 8/6/2016. asd
  */
-public class Game extends JFrame {
-    public Game(boolean editor, int x, int y){
+class Game extends JFrame {
+    Game(boolean editor, int x, int y){
         Keybinding.init();
         Global.init();
         Updater.editor = editor;
@@ -27,6 +28,7 @@ public class Game extends JFrame {
         Clips.init();
         Picture.init();
         Sound.init();
+        Stock.init();
         JPanel display = new Display();
         Creation.create();
         Global.server = new Server();

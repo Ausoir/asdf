@@ -32,33 +32,40 @@ public class Map extends Thing {
         put("dirt","Root=.15");
         put("grass","Vine=.8");
     }};
-    public String[] maps;
     public MapEvent event;
     public P size;
     public int id;
+    private String panorama;
+    private int lastVisited;
+    public String[] data;
     private static final int magnify = 2;
-    private boolean panorama = true;
+    private static final int dataStart = 4;
     public Map(String name, final String[] maps) {
         super(null,0,1);
         this.name = name;
-        this.maps = maps;
         id = Integer.parseInt(maps[0]);
-        if (maps[2].equals("None")){
+        panorama = maps[2];
+        if (panorama.equals("None")){
             image.visible = false;
-            panorama = false;
         } else{
-            setImage(maps[2]);
+            setImage(panorama);
             image.getSize().mult(magnify);
         }
         event = MapEvent.getByName(maps[1]);
         String[] size = maps[3].split("x");
         this.size = new P(Integer.parseInt(size[0]), Integer.parseInt(size[1]));
+        lastVisited = Integer.parseInt(maps[4]);
+        if (maps.length > dataStart) {
+            data = new String[maps.length - dataStart];
+            System.arraycopy(maps, dataStart, data, 0, maps.length - dataStart);
+        }
         onTimeChange();
+        lastVisited = Global.time;
     }
     public String toString(){
-        String result = maps[0]+",";
-        for (int i=1;i<maps.length;i++){
-            result += maps[i]+",";
+        String result = id+","+event.name()+","+panorama+","+size.x()+"x"+size.y()+","+lastVisited+",";
+        if (data != null) {
+            for (String i : data) result += i + ",";
         }
         result = result.substring(0,result.length()-1)+"\n";
         Iterator it = formTextures.entrySet().iterator();
@@ -76,13 +83,6 @@ public class Map extends Thing {
         }
         result = result.substring(0,result.length()-1);
         return result;
-    }
-    public void teleport(P p, Line l){
-        for (Line i : land){
-            if (i != l && i.pt.is(l.ptd)){
-                p.set(i.ptd);
-            }
-        }
     }
 
     public void loadMap(String p){
@@ -158,7 +158,7 @@ public class Map extends Thing {
                             } else {
                                 prop = defaultPropsCC.get(formProps[0]);
                             }
-                            if (prop != null) placeProp(l, prop);
+                            if (prop != null) placeProp(l, prop, -1);
                         }
                     }
                 }
@@ -166,7 +166,7 @@ public class Map extends Thing {
         }
     }
 
-    Prop placeProp(Line l, String p){
+    Prop placeProp(Line l, String p, int seed){
         String prop = null;
         String[] props = p.split(",");
         float rand = Creation.r.nextFloat();
@@ -182,7 +182,7 @@ public class Map extends Thing {
         }
         if (prop != null) {
             float landSize = Math.abs(l.ptd.x-l.pt.x);
-            Prop t = Stock.getByName(prop, -1);
+            Prop t = Stock.getByName(prop, seed);
             P size = t.image.getSize();
             if (landSize >= size.x) {
                 float halfSizeX = size.x/2;
@@ -266,8 +266,8 @@ public class Map extends Thing {
     }
 
     public void onTimeChange() {
-        if (panorama){
-            setImage(maps[2]+(weather.isNight()?"_Night":""));
+        if (image.visible){
+            setImage(panorama+(weather.isNight()?"_Night":""));
             image.setSize(image.getSize().getMult(magnify, magnify));
         }
         weather.refreshTimeColor();

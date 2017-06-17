@@ -109,11 +109,10 @@ public class FileManager {
     public static int loadMap(String map) {
         Global.houseId = 1;
         Global.player.lastLand = new Line();
-        String[] oldmap = null;
-        if (Global.map != null) oldmap = Global.map.maps;
         String[] mapProperties = map.split("@");
         String dir = mapProperties[0];
-        int player = oldmap == null?-1:Integer.parseInt(mapProperties[1]);
+        int player = -1;
+        if (Global.map != null) player = Integer.parseInt(mapProperties[1]);
         if (FileManager.isFile("Data/map/" + dir + ".map")){
             readMap(dir);
         } else {
@@ -122,7 +121,7 @@ public class FileManager {
         Global.player.cmap = dir;
         Global.camera.set(Global.player.pos);
         Global.map.setTexture();
-        if (oldmap != null && Integer.parseInt(oldmap[0]) >= 0 && !Global.map.isIndoors()) Global.map.event.onChange();
+        Global.map.event.onChange();
         return player;
     }
     private static void readMap(String dir){

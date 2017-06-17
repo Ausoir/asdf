@@ -42,15 +42,13 @@ class GenerateDungeon extends GenerateHouse {
             forward.add(fw.getAdd(0,0));
             backward.add(bw.getAdd(0,0));
         }
-        P margin = new P(800,400);
-        int maxDiffX = (int) (high.x-low.x)+margin.x()*2;
-        int maxDiffY = (int) (high.y-low.y)+margin.y()*2;
-        Global.map = new Map(info[0], new String[]{"-1","None","None",maxDiffX+"x"+maxDiffY,Global.player.cmap});
-        P adjustment = low.mult(-1).add(margin.x,margin.y);
-        TerrainTrail trail = new TerrainTrail(new P(0,-advance).add(adjustment));
-        for (P i : forward) trail.add(i.add(adjustment));
-        for (int i=backward.size()-1;i>=0;i--) trail.add(backward.get(i).add(adjustment));
+
+        Global.map = new Map(info[0], new String[]{"-1","None","None","40x40",Global.player.cmap,(Global.time-9999)+""});
+        TerrainTrail trail = new TerrainTrail(new P(0,-advance));
+        for (P i : forward) trail.add(i);
+        for (int i=backward.size()-1;i>=0;i--) trail.add(backward.get(i));
         trail.finish(this, "rock&none");
+
         Prop door = Stock.Door.create(returnDoorSeed);
         P doorSize = door.image.getSize();
         int exitSegment = Creation.r.nextInt(segments-6)+3;
@@ -66,6 +64,7 @@ class GenerateDungeon extends GenerateHouse {
         door.pos.set(doorPos);
         Stock.Exit.create(returnDoorSeed).pos.set(doorPos.x,doorPos.y);
         Stock.Spawn.create(returnDoorSeed).pos.set(doorPos.x,doorPos.y);
+        normalize(800,400);
         generateBlocker(trail.terrain);
         return this;
     }

@@ -19,6 +19,7 @@ import com.ga.unit.skill.Buffs;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 /**
@@ -39,7 +40,7 @@ public enum Stock {
         product.image.visible = false;
         product.onInteract = new Interactive(){
             public void interact(Man p){
-                if (p == Global.player) Global.map.loadMap(Global.map.maps[4]+"@"+seed);
+                if (p == Global.player) Global.map.loadMap(Global.map.data[0]+"@"+seed);
             }
         };
         return process(product);
@@ -453,9 +454,11 @@ public enum Stock {
     }},
     TowerHouse{ Prop make(final int seed){
         final ArrayList<Prop> addons = new ArrayList<>();
+        final Prop entrance = Stock.Spawn.create(Global.houseId++);
         final Prop product = new Prop("TowerHouse", seed){
             public void onField(){
                 super.onField();
+                Updater.add(entrance);
                 for (Prop i : addons){
                     i.onField();
                     i.pos.add(pos.x, pos.y);
@@ -523,7 +526,7 @@ public enum Stock {
             }
         }
         for (int i=0;i<product.rand.nextInt(3);i++) {
-            Prop clockwork = new Prop("Clockwork",seed){
+            Prop clockwork = new Prop("Clockwork", seed){
                 float speed;
                 public void onField(){
                     speed = (float)(rand.nextInt(50)-25)/image.getSize().x;
@@ -543,13 +546,14 @@ public enum Stock {
             clockwork.pos = new P(product.rand.nextInt((int) baseSizeX)-baseSizeX/2, -product.rand.nextInt((int) baseSizeY-64));
             addons.add(clockwork);
         }
-        final Prop entrance = Stock.Spawn.create(Global.houseId++);
+        makeAddon(entrance);
         entrance.pos = doorPos.getAdd(0,-door.image.getSize().y/2);
         addons.add(entrance);
         entrance.onInteract = new Interactive(){
             public void interact(Man p){
                 if (p == Global.player && p.lastLand.depth == product.getDepth()+2){
-                    Global.map.loadMap("I_"+Global.map.id+"_"+entrance.seed+"@"+entrance.seed+"@"+product.image.getSize().getAdd(64,64)+"@"+finalHouseType+"@"+ywindows);                }
+                    Global.map.loadMap("I_"+Global.map.id+"_"+entrance.seed+"@"+entrance.seed+"@"+product.image.getSize().getAdd(64,64)+"@"+finalHouseType+"@"+ywindows);
+                }
             }
         };
         return process(product);
@@ -648,7 +652,7 @@ public enum Stock {
             public void use(Man host){
                 super.use(host);
                 String stage = "0";
-                if (Global.map.event == MapEvent.Tutorial) stage = MapEvent.cookie;
+//                if (Global.map.event == MapEvent.Tutorial) stage = MapEvent.cookie;
                 Global.display.menu.showDialog("Guidebook by Whu", Dialog.get("tutorial"+stage));
                 if (stage.equals("4")) remove();
             }
@@ -881,6 +885,9 @@ public enum Stock {
                             final Projectile p = new Projectile(getName(), host.pos.getAdd(host.clip.organs[BodyHumanoid.FIST].ptd),
                                     host.pos.getAdd(host.target), 64+host.get("Strength").get()*16) {
                                 private BasicStroke stroke = new BasicStroke(4);
+                                public void onAttack(Unit p){
+                                    pos = p.pos;
+                                }
                                 public void stuck() {
                                     super.stuck();
                                     Particle.groundSlam(pos, getDepth());
@@ -1045,7 +1052,7 @@ public enum Stock {
                 super.moveTriggered(p);
                 if (state == Actions.Melee){
                     Particle.explode("Poison",getDepth(),pos,new P(),8,8,0,false,4);
-                    ArrayList<Unit> t = Updater.collideUnit(pos,getSize()+36,Faction.Destructive);
+                    ArrayList<Unit> t = Updater.collideUnit(pos, (int) getReach(), Faction.Destructive);
                     for (Unit i : t){
                         i.checkHit(pos, getDamage());
                         i.buff(Buffs.Poison, 1);
@@ -1110,23 +1117,6 @@ public enum Stock {
         product.clip.organs[0].setSize((int) product.clip.organs[0].getImage().getSize().x);
         return process(product);
     }},
-    Mantis { Prop make(int seed) {
-        Unit product = new Unit(getName(), seed) {
-            public void stateSet(Actions state) {
-                super.stateSet(state);
-                if (state == Actions.Thrust){
-                    delay.time = 30;
-                    vel.x += getSpeed()*3*dir;
-                    vel.y -= 20;
-                }
-            }
-            public void onCreate(){
-                load(getUnit(getName(),seed,getStat(10,20,12),Faction.Evil,"3,0,0","48,800/Attack,Walk"));
-            }
-        };
-        processUnit(product);
-        return process(product);
-    }},
     Beholder { Prop make(int seed) {
         Unit product = new Unit(getName(), seed){
             public void collide(){
@@ -1173,6 +1163,7 @@ public enum Stock {
         product.tags.add(Tag.Air);
         return process(product);
     }};
+    private static HashMap<String, String> extRegistry = new HashMap<>();
     public static Prop get(String p){
         Prop t;
         String[] sections = p.split("@");
@@ -1192,6 +1183,17 @@ public enum Stock {
         for (Stock i : values()){
             if (i.name().equals(p.replace(" ","_"))){
                 return i.create(seed);
+            }
+        }
+        String name = extRegistry.get(p);
+        if (name != null){
+            String[] data = name.split("@");
+            if (data[0].equals("Man")){
+                String[] units = FileManager.readText("raw/Man.txt");
+                return Man.create(Creation.getSeed(-1, units.length, Integer.parseInt(data[1])));
+            } else if (data[0].equals("Beast")){
+                String[] units = FileManager.readText("raw/Beast.txt");
+                return Beast.create(Creation.getSeed(-1, units.length, Integer.parseInt(data[1])));
             }
         }
         return getInstant(p, seed);
@@ -1255,7 +1257,7 @@ public enum Stock {
     void processUnit(Unit p){
         p.clip = new Body(p, getName());
     }
-    public static Unit getBeast(int p){
+    static Unit getBeast(int p){
         String[] units = FileManager.readText("raw/Beast.txt");
         String[] unit = units[p % units.length].split(";");
         Unit r = new Unit(null, Creation.getSeed(p));
@@ -1266,23 +1268,16 @@ public enum Stock {
         r.factoryId = Beast.ordinal();
         return r;
     }
-    public static Unit getBeast(String p){
+    public static int getBeast(String p){
         String[] units = FileManager.readText("raw/Beast.txt");
         for (int i=0;i<units.length;i++){
             if (units[i].substring(0,units[i].indexOf(";")).equals(p)){
-                String[] unit = units[i].split(";");
-                Unit r = new Unit(null, Creation.getSeed(-1, units.length, i));
-                r.clip = new Body(r, unit[0]);
-                r.load(getUnit(unit[0],r.seed,getStat(Integer.parseInt(unit[2]),Integer.parseInt(unit[3]),Integer.parseInt(unit[4])),
-                        Faction.valueOf(unit[5]), unit[6]+",0,0", unit[7]));
-                r.speechType = unit[1];
-                r.factoryId = Beast.ordinal();
-                return r;
+                return Creation.getSeed(-1, units.length, i);
             }
         }
-        return null;
+        return -1;
     }
-    public static Man getMan(int p){
+    static Man getMan(int p){
         String[] units = FileManager.readText("raw/Man.txt");
         String[] unit = units[p % units.length].split(";");
         Man r = getMan(unit[0], Creation.getSeed(p), getStat(Integer.parseInt(unit[2]),Integer.parseInt(unit[3]),Integer.parseInt(unit[4])),
@@ -1291,20 +1286,14 @@ public enum Stock {
         r.factoryId = Man.ordinal();
         return r;
     }
-    public static Man getMan(String p){
+    public static int getMan(String p){
         String[] units = FileManager.readText("raw/Man.txt");
         for (int i=0;i<units.length;i++){
             if (units[i].substring(0,units[i].indexOf(";")).equals(p)){
-                String[] unit = units[i].split(";");
-                Man r = getMan(unit[0], Creation.getSeed(-1, units.length, i), getStat(Integer.parseInt(unit[2]),Integer.parseInt(unit[3]),Integer.parseInt(unit[4])),
-                        Faction.valueOf(unit[5]), unit[6]+",0,0", unit[7], unit[8].split(","), unit[9].split(","), unit[10].split(","));
-                r.speechType = unit[1];
-                r.factoryId = Man.ordinal();
-                r.onCreate();
-                return r;
+                return Creation.getSeed(-1, units.length, i);
             }
         }
-        return null;
+        return -1;
     }
     static Man getMan(String name, int seed, final String stat, final Faction pfaction, final String intel, final String moves, final String[] pweapon, final String[] parmor, final String[] pface){
         Man m = new Man(name, seed){
@@ -1330,5 +1319,11 @@ public enum Stock {
         Item r = (Item) Stock.getByName(p+pieceName,-1);
         r.cancelAdd();
         return r.toString();
+    }
+    public static void init(){
+        String[] units = FileManager.readText("raw/Man.txt");
+        for (int i=0;i<units.length;i++) extRegistry.put(units[i].substring(0,units[i].indexOf(";")), "Man@"+i);
+        units = FileManager.readText("raw/Beast.txt");
+        for (int i=0;i<units.length;i++) extRegistry.put(units[i].substring(0,units[i].indexOf(";")), "Beast@"+i);
     }
 }

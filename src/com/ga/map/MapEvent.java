@@ -7,25 +7,27 @@ import com.ga.unit.Stock;
  * Created by Ga on 10/31/2016. asd
  */
 public enum MapEvent{
-    None(null, new Performer(){
+    None(new Performer(){
         public void perform(){
         }
     }),
-    Rural("Punk=.05,Slime=.1", new Performer(){
+    Rural(new Performer(){
         public void perform(){
+            Updater.regrowth();
+            Global.map.generateProps();
+            spawn("Rover=.1,Slime=.1", -1);
         }
     }),
-    Urban("Resident=.6", new Performer(){
+    Urban(new Performer(){
         public void perform(){
+            if (Global.map.weather.isNight()){
+                Mob.spawn("Gang", Global.map.randomLandableSurface());
+            }
         }
-    }),
-    Tutorial(null, new Performer(){
     });
     private Performer event;
-    private String mobs;
     public static String cookie;
-    MapEvent (String mobs, Performer p){
-        this.mobs = mobs;
+    MapEvent (Performer p){
         event = p;
     }
     @Override
@@ -38,24 +40,20 @@ public enum MapEvent{
         if (t.length > 1) cookie = t[1];
         return r;
     }
-    private void regrowth(){
-        Updater.regrowth();
-        Global.map.generateProps();
-        if (mobs != null) { //encounter
-            String[] moblist = mobs.split(",");
-            for (int times = 0; times < 48; times++) {
-                float random = Creation.r.nextFloat();
-                for (String i : moblist) {
-                    String[] mobp = i.split("=");
-                    if (random < Float.parseFloat(mobp[1])) {
-                        Global.map.placeProp(Global.map.randomLandableSurface(), i);
-                        break;
-                    }
+    private static void spawn(String p, int seed){
+        String[] moblist = p.split(",");
+        for (int times = 0; times < 48; times++) {
+            float random = Creation.r.nextFloat();
+            for (String i : moblist) {
+                String[] mobp = i.split("=");
+                if (random < Float.parseFloat(mobp[1])) {
+                    Global.map.placeProp(Global.map.randomLandableSurface(), i, seed);
+                    break;
                 }
             }
         }
     }
     public void onChange(){
-        regrowth();
+        event.perform();
     }
 }

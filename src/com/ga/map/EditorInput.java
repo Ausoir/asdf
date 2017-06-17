@@ -310,7 +310,7 @@ public class EditorInput implements Input, Updatable, Drawable {
                         if (i.lineCross(new Line(new P(x,y),lmbP))){
                             if (auxTexture != null){
                                 String[] aux = auxTexture.split("@");
-                                for (int ii=0;ii<Integer.parseInt(aux[0]);ii++) Global.map.placeProp(i, aux[1]);
+                                for (int ii=0;ii<Integer.parseInt(aux[0]);ii++) Global.map.placeProp(i, aux[1], -1);
                                 auxTexture = null;
                             } else if (texture != null) {
                                 if (texture.equals("copy")) texture = Global.map.formTextures.get(i.next);

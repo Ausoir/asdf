@@ -9,19 +9,6 @@ import java.util.ArrayList;
  * Created by Ga on 2/23/2017. asd
  */
 class GenerateHighlands extends Generator {
-    private void generateMound(int id, P mapSize, String[] texture, int height){
-        float horizon = mapSize.y-600;
-        P initPoint = new P(Creation.r.nextFloat()*mapSize.x*.3f, mapSize.y);
-        P oldPoint = initPoint;
-        for (int i=0;i<Creation.r.nextInt(7)+3;i++) {
-            P newPoint = new P(oldPoint.x + (Creation.r.nextFloat()*mapSize.x*.24f), horizon+(Creation.r.nextInt(height)-height));
-            Global.map.land.add(new Line(oldPoint,newPoint,id,0));
-            oldPoint = newPoint;
-        }
-        oldPoint.y = mapSize.y;
-        Global.map.land.add(new Line(oldPoint,initPoint,id,-1));
-        Global.map.formTextures.put(id, (3+id)+"&"+texture[Creation.r.nextInt(texture.length)]);
-    }
     private void divideLand(ArrayList<Line> total, int current, int max){
         if (current >= max) return;
         Line last = total.remove(total.size()-1);
@@ -76,18 +63,6 @@ class GenerateHighlands extends Generator {
                 create(mapSize, new P(-64, -64),
                         new P(mapSize.x+64, Creation.r.nextInt((int) (mapSize.y/5))+mapSize.y*3/4));
                 break;
-        }
-        return this;
-    }
-    Generator createPlains(P mapSize){
-        String[] texture = new String[]{"dirt&grass","dirt&grass&Rock=.1,Bush=.2,Weed=.4,Tree=1"};
-        generateFloor(9, mapSize, Creation.r.nextInt(9) + 1, 40, texture);
-        for (int i=0;i<Creation.r.nextInt(4);i++) generateMound(i+1, mapSize, texture, Creation.r.nextInt(240)+80);
-        for (int i=0;i<Global.map.land.size();i++){
-            Line l = Global.map.land.get(i);
-            if (l.next >= 0 && l.isLandable() && Math.abs(l.getSlope()) < .1f && Math.abs(l.ptd.x-l.pt.x) > 500 && Creation.r.nextInt(3) == 0) {
-                Global.map.placeProp(l, "SteamHouse=.5,TowerHouse=1");
-            }
         }
         return this;
     }

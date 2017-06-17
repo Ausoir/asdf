@@ -122,7 +122,7 @@ public class Unit extends Prop {
         return pos.getAdd(clip.organs[clip.HAND].ptd);
     }
     public float getReach(){
-        return 24;
+        return getSize()+36;
     }
     protected int[] getCooldown(Actions state) {
         int[] r = cooldown.get(state);
@@ -335,12 +335,11 @@ public class Unit extends Prop {
     }
 
     public Unit attack(){
-        for (Unit i : Updater.collideUnit(pos, (int) getReach(), faction)){
-            P hand = getHand();
-            if (i.checkHit(new Line(hand, hand.getAdd(vel)),getDamage(),true)){
-                onAttack(i);
-                return i;
-            }
+        P hand = getHand();
+        for (Unit i : Updater.collideUnit(hand, (int) getReach(), faction)){
+            i.checkHit(hand, getDamage());
+            onAttack(i);
+            return i;
         }
         return null;
     }

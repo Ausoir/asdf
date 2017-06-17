@@ -119,8 +119,9 @@ public enum Actions {
     },
     Melee(24,-1,0,0,new Tags(){{
     }}){
-        public void trigger(Unit p){
-            p.attack();
+        public void trigger(Unit host){
+            Sound.play(host.pos, "swing_silent");
+            host.attack();
         }
     },
     Duck(24,-1,6,0,new Tags(){{
@@ -924,17 +925,15 @@ public enum Actions {
             host.attackSpeed = -1;
         }
         public void trigger(Unit host){
-            if (host.delay.time < 5) {
-                Sound.play(host.pos, "shadowstep");
-                for (int i = 0; i < host.rand.nextInt(host.stateLevel + 4); i++) {
-                    Unit p = (Unit) Stock.getByName("Dog", -1);
-                    p.pos.set(host.pos);
-                    p.brain = Intelligence.Hunter.make(p);
-                    p.dir = host.dir;
-                    p.brain.target = host.brain.target;
-                    p.buff(Buffs.Banishment, 2 + (int) (host.stateLevel * .4f));
-                    p.faction = host.faction;
-                }
+            Sound.play(host.pos, "shadowstep");
+            for (int i = 0; i < host.rand.nextInt(host.stateLevel + 4); i++) {
+                Unit p = (Unit) Stock.Rover.create(-1);
+                p.brain.setTaskEcho(Behavior.Hunt);
+                p.brain.target = host.brain.target;
+                p.pos.set(host.pos);
+                p.dir = host.dir;
+                p.buff(Buffs.Banishment, 2 + (int) (host.stateLevel * .4f));
+                p.faction = host.faction;
             }
         }
     },
@@ -983,7 +982,7 @@ public enum Actions {
             Sound.play(host.pos, "shadow");
             Particle.smoke(host.pos,host.getDepth());
             for (int i=0;i<24;i++) {
-                int range = Global.r.nextInt(host.stateLevel + 320) + 128;
+                int range = Global.r.nextInt(host.stateLevel * 320) + 128;
                 float rot = Global.r.nextFloat() * 6.28318f - 3.14159f;
                 Line to = new Line(host.pos, host.pos.getAdd(Global.cos(rot) * range, Global.sin(rot) * range));
                 if (Global.map.checkLand(new Line(to.ptd, to.ptd.getAdd(0, 400)), 0) != null) {

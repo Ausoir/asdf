@@ -25,13 +25,11 @@ public abstract class AI implements Observer {
             target = Updater.unitList.get(targetId);
             targetId = 0;
         }
-        if (task.alertness == 0 && !perceive(160)) setTaskEcho(defaultTask);
-        else {
-            task.update(host);
-            taskProgress++;
-        }
+        perceive(160);
+        task.update(host);
+        taskProgress++;
     }
-    void setTaskEcho(Behavior p){
+    public void setTaskEcho(Behavior p){
         taskProgress = 0;
         task = p;
         task.onSet(host);

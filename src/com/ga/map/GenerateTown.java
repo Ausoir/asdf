@@ -44,7 +44,7 @@ class GenerateTown extends Generator {
         Global.map.formTextures.put(id, id+"&"+texture[Creation.r.nextInt(texture.length)]);
     }
     Generator create(P mapSize){
-        Global.map.maps[1] = "Urban";
+        Global.map.event = MapEvent.Urban;
         String[] landTexture = new String[][]{
                 new String[]{"dirt&grass","dirt&road"},
                 new String[]{"rock&road","rock&grass"}}[Creation.r.nextInt(2)];
@@ -64,9 +64,12 @@ class GenerateTown extends Generator {
         for (int i=0;i<Global.map.land.size();i++){
             Line l = Global.map.land.get(i);
             if (l.next >= 0 && l.isLandable() && Math.abs(l.getSlope()) < .1f) {
-                if (Math.abs(l.getSlope()) < .01f) Global.map.placeProp(l, "SteamHouse=.1,TowerHouse=1");
-                else Global.map.placeProp(l, "SteamHouse=1");
-                for (int ii=0;ii<Creation.r.nextInt(9);ii++) Global.map.placeProp(l,"Stack=.2,Barrel=.5,Crate=1");
+                if (Math.abs(l.getSlope()) < .01f) Global.map.placeProp(l, "SteamHouse=.1,TowerHouse=1", -1);
+                else Global.map.placeProp(l, "SteamHouse=1", -1);
+                for (int ii=0;ii<Creation.r.nextInt(9);ii++) Global.map.placeProp(l,"Stack=.2,Barrel=.5,Crate=1", -1);
+                for (int ii=0;ii<Creation.r.nextInt(9);ii++){
+                    Global.map.placeProp(l,"Man=.4", Stock.getMan("Resident"));
+                }
             }
         }
         return this;
@@ -121,13 +124,13 @@ class GenerateTown extends Generator {
     private void generateSkyscraper(Line land){
         if (land.getSlope() == 0) {
             Line l = land;
-            Prop last = Global.map.placeProp(l, "TowerHouse=1");
+            Prop last = Global.map.placeProp(l, "TowerHouse=1", -1);
             for (int i = 0; i < Creation.r.nextInt(7) + 3; i++) {
                 Prop t = Stock.TowerHouse.create(-1);
                 t.pos.set(last.pos.x, last.pos.y-last.image.getSize().y+4);
                 last = t;
             }
-            Global.map.placeProp(l, "TowerTip=1");
+            Global.map.placeProp(l, "TowerTip=1", -1);
         }
     }
 }

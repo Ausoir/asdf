@@ -28,9 +28,9 @@ public class Command {
                 else if (cmd[0].equals("stat")) host.get(cmd[1].split(":")[0]).addTotal(Integer.parseInt(cmd[1].split(":")[1]));
                 else if (cmd[0].equals("advance")) for (int num=0;num<Integer.parseInt(cmd[1].split(":")[1]);num++) host.skillTree.advanceSkill(Actions.valueOf(cmd[1].split(":")[0]));
                 else if (cmd[0].equals("unit")) Stock.getByName(cmd[1], -1).pos.set(host.pos.getAdd(host.target));
-                else if (cmd[0].equals("beast")) Stock.getBeast(cmd[1]).pos.set(host.pos.getAdd(host.target));
-                else if (cmd[0].equals("man")) Stock.getMan(cmd[1]).pos.set(host.pos.getAdd(host.target));
-                else if (cmd[0].equals("mob")) Mob.spawn(cmd[1],host.pos.getAdd(host.target));
+                else if (cmd[0].equals("beast")) Stock.Beast.create(Stock.getBeast(cmd[1])).pos.set(host.pos.getAdd(host.target));
+                else if (cmd[0].equals("man")) Stock.Man.create(Stock.getMan(cmd[1])).pos.set(host.pos.getAdd(host.target));
+                else if (cmd[0].equals("mob")) Mob.spawn(cmd[1],host.lastLand);
                 else if (cmd[0].equals("item")) host.setWeapon((Item) Stock.getByName(cmd[1], -1));
                 else if (cmd[0].equals("itemN")) host.setWeapon((Item) Stock.get(cmd[1]+"@"+cmd[2]));
                 else if (cmd[0].equals("tp")) host.pos.add(Integer.parseInt(cmd[1].split(",")[0]),Integer.parseInt(cmd[1].split(",")[1]));

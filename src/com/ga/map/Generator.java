@@ -19,22 +19,39 @@ public class Generator {
         } else if (info[0].startsWith("D_")) {
             result = new GenerateDungeon().create(info);
         } else {
-            P mapSize = new P(6000+Creation.r.nextInt(6000), 3200+Creation.r.nextInt(1600));
+            P mapSize = new P(6000+Creation.r.nextInt(6000), 4000);
             String id = info[0].split("_")[1];
             Global.map = new Map(info[0], new String[]{id, "Rural", Creation.panoramaAt(Integer.parseInt(id)),
-                    ((int) mapSize.x) + "x" + ((int) mapSize.y)});
-            if (Creation.r.nextInt(3) == 0) {
+                    ((int) mapSize.x) + "x" + ((int) mapSize.y), (Global.time-9999)+""});
+            if (Global.map.id % 2 == 0) {
                 result = new GenerateTown().create(mapSize);
             } else {
-                if (Creation.r.nextBoolean()) result = new GenerateHighlands().createPlains(mapSize);
-                else {
-                    result = new GenerateHighlands().create('-', mapSize);
-                    if (Creation.r.nextBoolean()) ((GenerateHighlands) result).create('-', mapSize);
-                }
-                if (Creation.r.nextBoolean()) Global.map.placeProp(Global.map.randomLandableSurface(), "Dungeon=1");
+                result = new GenerateHighlands().create('-', mapSize);
+                if (Creation.r.nextBoolean()) ((GenerateHighlands) result).create('-', mapSize);
+                if (Creation.r.nextBoolean()) Global.map.placeProp(Global.map.randomLandableSurface(), "Dungeon=1", -1);
             }
+            result.normalize(-128, 800);
         }
         result.finish();
+    }
+    void normalize(int marginX, int marginY){
+        P high = new P(), low = new P();
+        for (Line i : Global.map.land){
+            low.x = Math.min(Math.min(low.x,i.pt.x),i.ptd.x);
+            low.y = Math.min(Math.min(low.y,i.pt.y),i.ptd.y);
+            high.x = Math.max(Math.max(high.x,i.pt.x),i.ptd.x);
+            high.y = Math.max(Math.max(high.y,i.pt.y),i.ptd.y);
+        }
+        P margin = new P(marginX, marginY);
+        int maxDiffX = (int) (high.x-low.x)+margin.x();
+        int maxDiffY = (int) (high.y-low.y)+margin.y();
+        Global.map.size = new P(maxDiffX, maxDiffY);
+        P adjustment = new P(marginX/2,low.y*-1+margin.y);
+        for (Line i : Global.map.land) {
+            i.pt = i.pt.getAdd(adjustment);
+            i.ptd = i.ptd.getAdd(adjustment);
+        }
+        Updater.normalize(adjustment);
     }
     private void finish(){
         for (java.util.Map.Entry i : Global.map.formTextures.entrySet()){
@@ -53,21 +70,18 @@ public class Generator {
     }
     void generateFloor(int depth, P mapSize, int randomness, int varianceY, String[] texture){
         float horizon = mapSize.y-600;
-        P orig = new P(0, horizon), pt1 = orig, pt2 = new P();
-        while (pt2.x < mapSize.x) {
+        P orig = new P(0, horizon);
+        TerrainTrail trail = new TerrainTrail(orig);
+        while (trail.last.x < mapSize.x) {
             int randX = (Creation.r.nextInt(240) + 20) * (Creation.r.nextInt(randomness)+1);
             int randY = (Creation.r.nextInt(varianceY) - (varianceY/2)) * Creation.r.nextInt(randomness);
-            pt2 = new P(pt1.x + randX, orig.y + randY);
-            if (pt2.x+(200*randomness*.5f) > mapSize.x) pt2.x = mapSize.x;
-            Global.map.land.add(new Line(pt1, pt2, 0, 0));
-            pt1 = pt2;
+            trail.add(trail.last.x+randX, horizon+randY);
+            if (trail.last.x+(200*randomness*.5f) > mapSize.x) trail.last.x = mapSize.x;
         }
-        pt1.y = horizon;
-        Line t;
-        Global.map.land.add(t = new Line(pt1, new P(pt2.x, mapSize.y), 0, 0));
-        Global.map.land.add(t = new Line(t.ptd, new P(0, mapSize.y), 0, 0));
-        Global.map.land.add(new Line(t.ptd, orig, 0, 0));
-        Global.map.formTextures.put(0, depth+"&"+texture[Creation.r.nextInt(texture.length)]);
+        trail.last.y = horizon;
+        trail.add(trail.last.x, mapSize.y);
+        trail.add(0, mapSize.y);
+        trail.finishNoDepth(depth+"&"+texture[Creation.r.nextInt(texture.length)]);
     }
     private void createFloater(P spot, int rad){
         TerrainTrail trail = new TerrainTrail(new P(spot.x+rad, spot.y));

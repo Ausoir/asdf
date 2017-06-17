@@ -15,7 +15,7 @@ class GenerateHouse extends Generator {
     Generator create(String[] info){
         int returnDoorSeed = Integer.parseInt(info[1]);
         P mapSize = new P(info[2]).mult(2f);
-        Global.map = new Map(info[0], new String[]{"-1","None","None",((int)mapSize.x)+"x"+((int)mapSize.y),Global.player.cmap});
+        Global.map = new Map(info[0], new String[]{"-1","None","None",((int)mapSize.x)+"x"+((int)mapSize.y),Global.player.cmap,(Global.time-9999)+""});
         float bottom = mapSize.y - 64;
         P topleft = new P(64, 64), topright = new P(mapSize.x-64, 64),
                 bottomleft = new P(64, bottom), bottomright = new P(mapSize.x-64, bottom);
@@ -31,8 +31,8 @@ class GenerateHouse extends Generator {
         int floorNum = Integer.parseInt(info[4]);
         ArrayList<Integer> dividers = new ArrayList<>();
         if (floorNum > 1) {
-            float floorHeight = mapSize.y/(Integer.parseInt(info[3])+1);
-            int floors = Math.max(0,Integer.parseInt(info[3])-1);
+            float floorHeight = mapSize.y/(floorNum+1);
+            int floors = Math.max(0,floorNum-1);
             float lastY = bottomleft.y;
             boolean[] sides = new boolean[floors];
             for (int i=0;i<floors;i++) {

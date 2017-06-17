@@ -467,7 +467,7 @@ public class Item extends Prop {
     public void use(Man host){
         playSound();
         cdTime[0] = Global.time+cooldown;
-        host.setState(type.action);
+        if (host.setState(type.action) == 2) host.setState(Actions.Rest);
     }
     public void trigger(Unit target){
         if (emod != null && rand.nextFloat() < probability){
