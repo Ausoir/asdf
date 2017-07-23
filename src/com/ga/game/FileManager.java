@@ -2,8 +2,8 @@ package com.ga.game;
 
 import com.ga.map.*;
 import com.ga.tool.Line;
+import com.ga.tool.P;
 import com.ga.unit.Clip;
-import com.ga.unit.Stock;
 import com.ga.unit.PlayerInput;
 import com.ga.unit.player.MainPlayer;
 import com.ga.unit.player.Player;
@@ -50,7 +50,7 @@ public class FileManager {
     public static void saveCharacter(){
         if (Global.player.state != Actions.Dead) {
             saveMap("map/"+Global.player.cmap);
-            save("map/0", Global.player.toCharacterString());
+            save("map/0.user", Global.player.toCharacterString());
         }
     }
     public static void save(String dir, String input) {
@@ -65,10 +65,10 @@ public class FileManager {
     public static void saveMap(String name){
         String result = "" + Global.map.toString();
         result += "\n";
-        result += ";"+Updater.toMapString();
+        result += Updater.toMapString();
         save(name+".map", result);
     }
-    private static String read(String dir) {
+    public static String read(String dir) {
         String result = null;
         try {
             try (BufferedReader br = new BufferedReader(new FileReader(dir))) {
@@ -86,7 +86,7 @@ public class FileManager {
         return result;
     }
     public static PlayerInput loadPlayer(int id, String dir){
-        String data = read("Data/map/"+dir);
+        String data = read("Data/map/"+dir+".user");
         String[] line = data.split("%");
         PlayerInput pi;
         pi = new PlayerInput(id == -1 ? new MainPlayer(0) : new Player("Player", 0));
@@ -114,43 +114,15 @@ public class FileManager {
         int player = -1;
         if (Global.map != null) player = Integer.parseInt(mapProperties[1]);
         if (FileManager.isFile("Data/map/" + dir + ".map")){
-            readMap(dir);
+            Global.map = new Map(dir, new P());
+            Global.map.load(dir);
         } else {
             Generator.generate(mapProperties);
         }
         Global.player.cmap = dir;
         Global.camera.set(Global.player.pos);
         Global.map.setTexture();
-        Global.map.event.onChange();
         return player;
-    }
-    private static void readMap(String dir){
-        String data = read("Data/map/" + dir + ".map");
-        String[] line = data.split("%");
-        String[] names = line[0].split(",");
-        Global.map = new Map(dir, names);
-        if (line.length > 1) {
-            String[] sections = line[1].split(";");
-            for (String section1 : sections) {
-                String values[] = section1.split(":");
-                Global.map.formTextures.put(Integer.parseInt(values[0]), values[1]);
-            }
-            if (line.length > 2) {
-                sections = line[2].split(";");
-                for (String section1 : sections) {
-                    Line surface = new Line(section1);
-                    Global.map.land.add(surface);
-                }
-                if (line.length > 3 && !line[3].equals(";")) {
-                    sections = line[3].substring(1).split(";");
-                    if (sections.length > 0) {
-                        for (String section1 : sections) {
-                            Stock.get(section1);
-                        }
-                    }
-                }
-            }
-        }
     }
 
     private static int[] readClipFrames(String[] data) {
@@ -257,9 +229,9 @@ public class FileManager {
         return file.isFile() && file.length() > 0;
     }
 
-    public static void readWorld(String dir){
+    public static void readWorld(){
         char[][] world;
-        String data = read("Data/map/"+dir+".map");
+        String data = read("Data/map/World.map");
         String[] lines = data.split("%");
         world = new char[lines.length-1][lines[1].length()];
         for (int y=1;y<lines.length;y++){
@@ -268,7 +240,8 @@ public class FileManager {
                 world[y-1][x] = node;
             }
         }
-        Creation.seed = Integer.parseInt(lines[0]);
+        String[] meta = lines[0].split(" ");
+        Creation.seed = Integer.parseInt(meta[0]);
         Creation.world = world;
     }
 }

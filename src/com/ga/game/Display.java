@@ -104,12 +104,7 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
 
     @Override
     public void keyReleased(KeyEvent e) {
-        int t = e.getKeyCode();
-        if (t == Keybinding.get("UP") || t == Keybinding.get("LEFT") || t == Keybinding.get("DOWN") || t == Keybinding.get("RIGHT") ||
-            t == Keybinding.get("A") || t == Keybinding.get("D"))
-            input(-1);
-        else if (Updater.editor) input(-t);
-        if (t == mode) mode = -1;
+        input(-e.getKeyCode());
     }
 
     @Override
@@ -134,7 +129,8 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
 
     @Override
     public void mouseEntered(MouseEvent e) {
-
+        mX = e.getX();
+        mY = e.getY();
     }
 
     @Override

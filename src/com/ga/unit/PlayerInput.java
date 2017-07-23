@@ -17,7 +17,12 @@ import java.util.Map;
  */
 public class PlayerInput implements Input {
     private HashMap<Integer, String> keyMap = new HashMap<Integer, String>(){{
-        put(-1, Actions.Idle.getName());
+        put(-Keybinding.get("A"), Actions.Idle.getName());
+        put(-Keybinding.get("D"), Actions.Idle.getName());
+        put(-Keybinding.get("UP"), Actions.Idle.getName());
+        put(-Keybinding.get("DOWN"), Actions.Idle.getName());
+        put(-Keybinding.get("LEFT"), Actions.Idle.getName());
+        put(-Keybinding.get("RIGHT"), Actions.Idle.getName());
         put(Keybinding.get("W"), Actions.Jump.getName());
         put(Keybinding.get("A"), Actions.WalkL.getName());
         put(Keybinding.get("S"), Actions.Drop.getName());
@@ -98,7 +103,7 @@ public class PlayerInput implements Input {
             inputDirect(keyMap.get(mode),x,y);
         } else if (mode >= 49 && mode < 55) {
             inputDirect("_0"+(mode-49),x,y);
-        } else inputDirect("_"+mode+"", x, y);
+        } else if (mode > 9) inputDirect("_"+mode+"", x, y);
         //Global.server.sendFromLocal("IN>"+p + "@" + tx + "@" + ty);
     }
     public void inputDirect(String p, int x, int y){

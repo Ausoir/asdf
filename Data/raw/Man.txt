@@ -1,5 +1,6 @@
 Dummy;punk;14;28;1;Evil;0;0/Idle,Idle;None;None;None; //Humanoids-Name,Speech Type,Stamina,Speed,Level,Faction,AI Type,Moveset,Weapons,Armors,Headgears
 Resident;resident;3;12;1;Neutral;1;200/Sprint;None,None,None,None,None,None,None,None,None,Potion,Stick;Comfortwear,Dustset,Toughwear,Comfortwear,Comfortwear,Suit,Robe,Comfortwear;None;
+Merchant;merchant;3;12;1;Neutral;1;200/Sprint;None;Suit;None;
 Punk;punk;7;24;1;Punk;3;10,120,1200/Thrust&Slash,Dash&Walk,Sprint;Dagger,Axe,Pickaxe;None,Comfortwear,Dustset,Toughwear;None,Bandana;
 Yeller;punk;4;20;2;Punk;3;10,80,700,1200/Use,Backstep,Calling,Sprint;Dagger,Axe,Pickaxe;None,Comfortwear,Dustset,Toughwear;None,Bandana;
 Phantom;;24;28;5;Evil;3;10,20,120,1200/Use,Dash&Flameroll,Fireblast,Shadowstep&Blizzard;Greatsword,Halberd,Warhammer;Shadowrobe;Phantommask;

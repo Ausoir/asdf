@@ -231,7 +231,6 @@ public class Item extends Prop {
     Man owner;
     public Item(String name, int seed, Material[] materials, ItemType type) {
         super(name, seed);
-        dynamic = true;
         gravity = true;
         setType(type);
         material = Material.get(rand, materials);
@@ -483,7 +482,7 @@ public class Item extends Prop {
         rotation = (float)Global.r.nextInt(628)/100;
     }
     public Item cancelAdd(){
-        Updater.cancelAdd(this);
+        Updater.addQueue.remove(this);
         return this;
     }
     public String getDescription() {

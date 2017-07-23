@@ -12,8 +12,8 @@ public class Line {
     public P pt;
     public P ptd;
     public int next = -1;
-    public int opt = 0; //0:normal,1:rope,2:impenetrable
-    public int depth = 0;
+    public int opt = 0; //0:normal,1:intangible,2:impenetrable
+    public int depth = -1;
     public Line(String p){
         load(p);
     }
@@ -51,12 +51,6 @@ public class Line {
         this(p1, p2);
         this.next = next;
         this.opt = opt;
-    }
-    public boolean isLand(){
-        return opt != -1 && opt != 1;
-    }
-    public boolean isLandable(){
-        return isLand() && clockwise();
     }
     public Line getAdd(P p){
         return new Line(pt.getAdd(p), ptd.getAdd(p));

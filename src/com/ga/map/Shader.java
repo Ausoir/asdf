@@ -7,7 +7,9 @@ import java.awt.image.BufferedImage;
  * Created by Ga on 1/14/2017. asd
  */
 public enum Shader{
-    None(new ShaderRenderer()),
+    None(new ShaderRenderer(){
+        void postRender(BufferedImage image, int x1, int x2, int y1, int y2, float slope){}
+    }),
     XYLinearGradient(new ShaderRenderer(){
         protected BufferedImage render(BufferedImage image, int param){
             int width = image.getWidth();
@@ -133,6 +135,27 @@ public enum Shader{
                     if (y >= 0) {
                         int rgb = image.getRGB(ix, y);
                         int shadeMag = 24 - iy;
+                        int alpha = (rgb & 0xff000000) >>> 24;
+                        int red = Math.min(((rgb & 0xff0000) >>> 16) + shadeMag, 255);
+                        int green = Math.min(((rgb & 0xff00) >>> 8) + shadeMag, 255);
+                        int blue = Math.min(((rgb & 0xff)) + shadeMag, 255);
+                        image.setRGB(ix, y, new Color(red, green, blue, alpha).getRGB());
+                    }
+                }
+            }
+            return null;
+        }
+    }),
+    Emboss(new ShaderRenderer(){
+        protected BufferedImage render(BufferedImage image, int x1, int x2, int y1, float slope){
+            int y2 = image.getHeight()-1;
+            for (int ix = x1; ix < x2; ix++) {
+                int ty = y1 + (int) ((ix - x1) * slope);
+                for (int iy = -1; iy < 16; iy++) {
+                    int y = Math.min(ty+iy,y2);
+                    if (y >= 0) {
+                        int rgb = image.getRGB(ix, y);
+                        int shadeMag = y - 16;
                         int alpha = (rgb & 0xff000000) >>> 24;
                         int red = Math.min(((rgb & 0xff0000) >>> 16) + shadeMag, 255);
                         int green = Math.min(((rgb & 0xff00) >>> 8) + shadeMag, 255);
@@ -282,9 +305,31 @@ public enum Shader{
     }
     protected void render(BufferedImage image, int x1, int x2, int y1, int y2, float slope){
         shader.render(image, x1, x2, y1, slope);
-        if (shader != None.shader) postRender(image, x1, x2, y1, y2, slope);
+        shader.postRender(image, x1, x2, y1, y2, slope);
     }
-    private void postRender(BufferedImage image, int x1, int x2, int y1, int y2, float slope){ //add textures to edges in terrain
+    protected BufferedImage render(BufferedImage image, int p){
+        return shader.render(image, p);
+    }
+    public static Shader getByName(String p){
+        if (p != null) {
+            for (Shader s : values()) {
+                if (s.name().toLowerCase().equals(p.toLowerCase())) {
+                    return s;
+                }
+            }
+        }
+        return None;
+    }
+}
+
+class ShaderRenderer {
+    protected BufferedImage render(BufferedImage image, int x1, int x2, int y1, float slope){
+        return render(image, 0);
+    }
+    protected BufferedImage render(BufferedImage image, int param){
+        return null;
+    }
+    void postRender(BufferedImage image, int x1, int x2, int y1, int y2, float slope){ //add textures to edges in terrain
         int height = image.getHeight()-1;
         if (x2 < x1) {
             for (int ix = x2; ix < x1; ix++) {
@@ -335,27 +380,5 @@ public enum Shader{
                 }
             }
         }
-    }
-    protected BufferedImage render(BufferedImage image, int p){
-        return shader.render(image, p);
-    }
-    public static Shader getByName(String p){
-        if (p != null) {
-            for (Shader s : values()) {
-                if (s.name().toLowerCase().equals(p.toLowerCase())) {
-                    return s;
-                }
-            }
-        }
-        return None;
-    }
-}
-
-class ShaderRenderer {
-    protected BufferedImage render(BufferedImage image, int x1, int x2, int y1, float slope){
-        return render(image, 0);
-    }
-    protected BufferedImage render(BufferedImage image, int param){
-        return null;
     }
 }

@@ -332,7 +332,7 @@ public enum Buffs {
                 frozen = false;
                 Global.map.land.removeAll(Arrays.asList(lines));
                 Updater.remove(ice);
-                time = Global.time;
+                time = Global.time + 16;
             }
             public void onFinish() {
                 host.get("Speed").add(-var, true);

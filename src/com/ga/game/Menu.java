@@ -38,7 +38,7 @@ public class Menu extends JPanel implements Updatable {
             ((MenuDialog) current).show(title, message);
         } else ((MenuDialog) current).rewrite(title, message);
     }
-    void showDialog(String title, String message, String[] options, final Performer[] actions) {
+    public void showDialog(String title, String message, String[] options, final Performer[] actions) {
         if (current.getClass() != MenuDialog.class) select(new MenuDialog());
         ((MenuDialog) current).show(title, message, options, actions);
     }

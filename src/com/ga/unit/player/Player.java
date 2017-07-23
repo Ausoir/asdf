@@ -30,7 +30,7 @@ public class Player extends Man {
     public Crafts crafting;
     public int selectingItem = -1;
     public PlayerInput input;
-    public String cmap, cworld;
+    public String cmap;
     public Health health;
     public Actions learning;
     public Item offhand = fist;
@@ -75,7 +75,7 @@ public class Player extends Man {
     private boolean sheathe() {
         if (wieldingNone()) return true;
         if (inventory.addItem(weapon)){
-            weapon.pos = Global.offplace;
+            weapon.remove();
             setWeapon(null);
             return true;
         }
@@ -139,10 +139,12 @@ public class Player extends Man {
                     public void perform() {
                         P reach = pos.getAdd(clip.organs[FIST].ptd);
                         ArrayList<Prop> obj = Updater.collideInteractive(reach);
-                        for (Prop i : obj) {
-                            if (i.onInteract != null) {
-                                i.onInteract.interact(me);
-                                break;
+                        if (obj.size() != 0) {
+                            for (Prop i : obj) {
+                                if (i.onInteract != null) {
+                                    i.onInteract.interact(me);
+                                    break;
+                                }
                             }
                         }
                     }
@@ -189,7 +191,7 @@ public class Player extends Man {
                             Sound.play(pos, "unwear");
                             int piece = selectingItem - 10;
                             if (sheathe() && !armor.isBare(piece)) {
-                                Updater.add(armor.armor[piece]);
+                                Updater.addQueue.add(armor.armor[piece]);
                                 setWeapon(armor.armor[piece]);
                                 armor.set(null, piece);
                             }
@@ -271,7 +273,6 @@ public class Player extends Man {
         clip.organs[5].setImage("Player");
         String[] other = line[1].split(";");
         cmap = other[1];
-        cworld = cmap.split("_")[0];
         gold = Integer.parseInt(other[2]);
         memorized = other[3];
         learning = Actions.getByName(other[4]);

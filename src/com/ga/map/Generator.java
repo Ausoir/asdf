@@ -20,9 +20,7 @@ public class Generator {
             result = new GenerateDungeon().create(info);
         } else {
             P mapSize = new P(6000+Creation.r.nextInt(6000), 4000);
-            String id = info[0].split("_")[1];
-            Global.map = new Map(info[0], new String[]{id, "Rural", Creation.panoramaAt(Integer.parseInt(id)),
-                    ((int) mapSize.x) + "x" + ((int) mapSize.y), (Global.time-9999)+""});
+            Global.map = new Map(info[0], mapSize);
             if (Global.map.id % 2 == 0) {
                 result = new GenerateTown().create(mapSize);
             } else {
@@ -46,14 +44,14 @@ public class Generator {
         int maxDiffX = (int) (high.x-low.x)+margin.x();
         int maxDiffY = (int) (high.y-low.y)+margin.y();
         Global.map.size = new P(maxDiffX, maxDiffY);
-        P adjustment = new P(marginX/2,low.y*-1+margin.y);
+        P adjustment = new P(0,low.y*-1+margin.y);
         for (Line i : Global.map.land) {
             i.pt = i.pt.getAdd(adjustment);
             i.ptd = i.ptd.getAdd(adjustment);
         }
         Updater.normalize(adjustment);
     }
-    private void finish(){
+    void finish(){
         for (java.util.Map.Entry i : Global.map.formTextures.entrySet()){
             for (int ii=0;ii<depths.size();ii++){
                 int key = (int) i.getKey();
@@ -67,6 +65,7 @@ public class Generator {
                 }
             }
         }
+        Global.map.generateProps();
     }
     void generateFloor(int depth, P mapSize, int randomness, int varianceY, String[] texture){
         float horizon = mapSize.y-600;

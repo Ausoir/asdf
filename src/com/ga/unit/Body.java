@@ -279,8 +279,18 @@ public class Body {
         return (float)legCurrent/legNum;
     }
 
+    public void load(String p){
+        for (int i=0;i<p.length();i++){
+            organs[i].amputated = p.charAt(i) == '0';
+        }
+    }
+
     @Override
     public String toString() {
-        return nextAnimation[current] + "," + frame.time;
+        String r = "";
+        for (Organ i : organs){
+            r += i.amputated?"0":"1";
+        }
+        return r;
     }
 }

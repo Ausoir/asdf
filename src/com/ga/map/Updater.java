@@ -25,11 +25,11 @@ public class Updater {
     private static ArrayList<Prop> props = new ArrayList<>();
     private static ArrayList<AI> controllee = new ArrayList<>();
     public static HashMap<Integer, Unit> unitList = new HashMap<>();
-    private static ArrayList<Observer> addQueue = new ArrayList<>();
+    public static ArrayList<Observer> addQueue = new ArrayList<>();
     private static ArrayList<Observer> removeQueue = new ArrayList<>();
     public static String changeMap = null;
     public static Performer changeMapEvent = null;
-    private static void clear(){
+    static void clear(){
         drawee.clear();
         effects.clear();
         addQueue.clear();
@@ -45,41 +45,9 @@ public class Updater {
         changeMap = null;
         clear();
         if (!editor) {
-            int edge = 0;
-            if (newMap.length() == 1){
-                edge = Integer.parseInt(newMap);
-                int[] newmap = Creation.getWorld(Global.map.id, edge);
-                Creation.prepareRandom(newmap[0]);
-                newMap = Global.player.cworld + "_" + newmap[0] + "@-1";
-            }
             int pos = FileManager.loadMap(newMap);
             update();
-            if (edge == 0) {
-                Global.player.pos.set(getEntrancePos(pos));
-            } else {
-                Global.player.vel.set(0,0);
-                if (edge == 2){
-                    Line entrance = Global.map.checkLand(new Line(1,64,Global.map.size.x-1,64),0);
-                    Global.player.pos.set(entrance.getCrossPointX(64),64-Math.abs(entrance.getSlope()));
-                } else if (edge == 4){
-                    Line entrance = Global.map.checkLand(new Line(Global.map.size.x-24,0,Global.map.size.x-24,Global.map.size.y),0);
-                    Global.player.pos.set(Global.map.size.x-24,entrance.getCrossPointY(entrance.ptd.x-24)-Math.abs(entrance.getSlope()));
-                } else if (edge == 6){
-                    Line entrance = Global.map.checkLand(new Line(24,0,24,Global.map.size.y),0);
-                    Global.player.pos.set(24,entrance.getCrossPointY(24)-Math.abs(entrance.getSlope()));
-                } else if (edge == 8){
-                    Line entrance = Global.map.checkLand(new Line(1,Global.map.size.y-64,Global.map.size.x-1,Global.map.size.y-64),0);
-                    float lastY = Global.map.size.y-128;
-                    if (entrance != null) lastY = entrance.pt.y - 1;
-                    while (entrance == null || entrance.getSlope() > .5f) {
-                        if (entrance == null) lastY -= 64;
-                        else lastY = entrance.pt.y - 1;
-                        entrance = Global.map.checkLand(new Line(1,lastY,Global.map.size.x-1,lastY),0);
-                    }
-                    float y = Math.min(Global.map.size.y-64, entrance.ptd.y-1);
-                    Global.player.pos.set(entrance.getCrossPointX(y+1), y-Math.abs(entrance.getSlope()));
-                }
-            }
+            Global.player.pos.set(getEntrancePos(pos));
             Global.player.reconnect();
             if (changeMapEvent != null){
                 changeMapEvent.perform();
@@ -119,18 +87,16 @@ public class Updater {
         }
         Global.camera.add(Global.cameraTo.getSubtract(Global.camera.getAdd(0,40)).mult(.2f,.2f));
         for (Updatable i : updatee) i.update();
-        if (!editor) {
-            for (Prop i : props) i.update();
-            for (int i = 0; i < effects.size(); i++) {
-                Effect t = effects.get(i);
-                if (t.over()){
-                    drawee.remove(t);
-                    effects.remove(t);
-                }
+        if (!editor) for (Prop i : props) i.update();
+        for (int i = 0; i < effects.size(); i++) {
+            Effect t = effects.get(i);
+            if (t.over()){
+                drawee.remove(t);
+                effects.remove(t);
             }
-            if (changeMap != null) changeMap(false);
-            else Global.update();
         }
+        if (changeMap != null) changeMap(false);
+        else if (!editor) Global.update();
     }
     public static void draw(Graphics2D g2){
         Global.setRel();
@@ -139,12 +105,6 @@ public class Updater {
         }
 //        Grapher.draw(g2);
         Global.map.weather.draw(g2);
-    }
-    public static void add(Observer p){
-        addQueue.add(p);
-    }
-    public static void cancelAdd(Observer p){
-        addQueue.remove(p);
     }
     public static void cancelRemove(Observer p){
         removeQueue.remove(p);
@@ -166,18 +126,6 @@ public class Updater {
             }
         }
         drawee.add(p);
-    }
-    static void regrowth(){
-        int size = addQueue.size();
-        for (int i=size-1;i>=0;i--){
-            Observer t = addQueue.get(i);
-            if (t instanceof Prop && !(t instanceof Player)){
-                if (((Prop)t).dynamic) {
-                    addQueue.remove(t);
-                    drawee.remove(t); //drawee already added through thread gap
-                }
-            }
-        }
     }
     public static String toMapString(){
         String result = "";

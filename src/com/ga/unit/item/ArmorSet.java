@@ -70,6 +70,12 @@ public class ArmorSet {
     public void onHit(){
         for (Armor i : armor) i.onHit();
     }
+    public void remove(){
+        for (int i=0;i<armor.length;i++){
+            armor[i].remove();
+            set(null, i);
+        }
+    }
     public void remove(Armor p){
         for (int i=0;i<armor.length;i++){
             if (armor[i] == p) set(null, i);

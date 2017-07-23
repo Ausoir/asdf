@@ -15,7 +15,7 @@ class GenerateHouse extends Generator {
     Generator create(String[] info){
         int returnDoorSeed = Integer.parseInt(info[1]);
         P mapSize = new P(info[2]).mult(2f);
-        Global.map = new Map(info[0], new String[]{"-1","None","None",((int)mapSize.x)+"x"+((int)mapSize.y),Global.player.cmap,(Global.time-9999)+""});
+        Global.map = new Map(info[0], mapSize);
         float bottom = mapSize.y - 64;
         P topleft = new P(64, 64), topright = new P(mapSize.x-64, 64),
                 bottomleft = new P(64, bottom), bottomright = new P(mapSize.x-64, bottom);
@@ -67,7 +67,7 @@ class GenerateHouse extends Generator {
         Prop door = Stock.Door.create(returnDoorSeed);
         P result = new P(mapSize.x / 2, bottom-door.image.getSize().y/2-2);
         door.pos.set(result);
-        Stock.Exit.create(returnDoorSeed).pos.set(result.x,result.y);
+//        Stock.Exit.create(returnDoorSeed).pos.set(result.x,result.y);
         Stock.Spawn.create(returnDoorSeed).pos.set(result.x,result.y);
         int merchantType = Integer.parseInt(info[3]);
         if (merchantType != 0){ //1:food,2:shop,3:guild,4:training
@@ -76,7 +76,7 @@ class GenerateHouse extends Generator {
             for (int i=0;i<mapSize.x/spacing;i++) {
                 int cx = spacing*i;
                 for (Line l : Global.map.land) {
-                    if (l.next >= 0 && l.isLandable() && l.getSlope() == 0 && cx-l.pt.x>spacing/2-10 && l.ptd.x-cx>spacing/2-10 && Global.r.nextInt(3)!=0) {
+                    if (l.next >= 0 && l.clockwise() && l.getSlope() == 0 && cx-l.pt.x>spacing/2-10 && l.ptd.x-cx>spacing/2-10 && Global.r.nextInt(3)!=0) {
                         float y = l.getCrossPointY(cx);
                         if (merchantType == 1 || merchantType == 2) {
                             Stock.getInstant("Shorttable", -1).pos.set(cx, y - 1);

@@ -3,9 +3,10 @@ package com.ga.tool;
 import com.ga.map.Global;
 
 /**
- * Created by Ga on 5/6/2016.
+ * Created by Ga on 5/6/2016. asd
  */
 public class P {
+    public static final P zero = new P();
     public float x, y;
     public P(String p){
         load(p);

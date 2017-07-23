@@ -46,7 +46,6 @@ public class Unit extends Prop {
         super(null,seed);
         this.name = name;
         controlId = Global.getControlId();
-        dynamic = true;
         gravity = true;
         tags.add(Tag.Marksman);
         tags.add(Tag.Athletics);
@@ -57,10 +56,11 @@ public class Unit extends Prop {
     @Override
     public String[] load(String p){
         String[] sections = super.load(p);
-        stats.load(sections[4]);
-        faction = Faction.valueOf(sections[5]);
-        brain = Intelligence.get(sections[6], this);
-        loadActions(sections[7]);
+        clip.load(sections[4]);
+        stats.load(sections[5]);
+        faction = Faction.valueOf(sections[6]);
+        brain = Intelligence.get(sections[7], this);
+        loadActions(sections[8]);
         clip.setOrganHealth();
         return sections;
     }
@@ -209,6 +209,7 @@ public class Unit extends Prop {
                 buff(Buffs.Bleed, 1);
                 if (stats.triggerEffect(Buffs.Mark) || knockback > .5f+Global.r.nextFloat()*.5f) {
                     stateSet(Actions.Down);
+                    delay.time *= 1+stats.getEffectLevel(Buffs.Bleed)*.2f;
                 } else stateSet(Actions.Hit);
             }
         }
@@ -221,8 +222,8 @@ public class Unit extends Prop {
     }
 
     public void checkHit(P hitPoint, int damage){
-        int total = (stats.getEffectLevel(Buffs.Bleed) + 1) * damage;
-        hit(hitPoint.x < pos.x ? 1 : hitPoint.x > pos.x ? -1 : 0, (float) total / get("Stamina").getMax());
+        float total = (stats.getEffectLevel(Buffs.Bleed)*.5f + 1) * damage;
+        hit(hitPoint.x < pos.x ? 1 : hitPoint.x > pos.x ? -1 : 0, total / get("Stamina").getMax());
     }
 
     public boolean checkHit(Line hitBox, int damage, boolean blunt){
@@ -267,7 +268,7 @@ public class Unit extends Prop {
                             final int index = i;
                             actions[i] = new Performer() {
                                 public void perform() {
-                                    Updater.add(loot[index]);
+                                    Updater.addQueue.add(loot[index]);
                                     loot[index] = null;
                                 }
                             };
@@ -296,14 +297,11 @@ public class Unit extends Prop {
     }
 
     @Override
-    public void onField(){}
-
-    @Override
     public void onCollide(Line l){
         super.onCollide(l);
         if (!jump) {
             jump = true;
-            if (l.isLandable()) setDepth(l.depth-1);
+            if (l.clockwise()) setDepth(l.depth-1);
             int mag = (int) (vel.y - Settings.gravityMax);
             if (vel.y > Settings.gravity*4) Sound.play(pos, "land");
             if (hittable(Faction.Destructive)) {
@@ -371,7 +369,7 @@ public class Unit extends Prop {
     public String toString(){
         if (state == Actions.Dead || !save) return "";
         String r = super.toString();
-        r += "@"+stats.toString()+"@"+faction.name()+"@"+brain.toString()+"@";
+        r += "@"+clip.toString()+"@"+stats.toString()+"@"+faction.name()+"@"+brain.toString()+"@";
         for (int i : rangeZone) r += i+",";
         r = r.substring(0,r.length()-1)+"/";
         Iterator it = moveset.entrySet().iterator();
@@ -401,9 +399,9 @@ public class Unit extends Prop {
         state = Actions.Idle;
         stateSet(Actions.Down);
         delay.set(50);
-        clip.setOrganHealth();
         for (Organ i : clip.organs){
             i.stitch();
         }
+        clip.setOrganHealth();
     }
 }

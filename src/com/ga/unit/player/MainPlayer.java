@@ -108,19 +108,12 @@ public class MainPlayer extends Player {
         if (state == Actions.Walk && input.moving == 0) setState(Actions.Idle);
         else if (state == Actions.Rest) indicater.show(1);
     }
-    protected void edgeCheck(){
-        int edge = Global.mapEdge(pos.getAdd(vel));
-        if (edge != 0 && !Global.map.isIndoors() && Creation.isPassable(Creation.getWorld(Global.map.id),edge)){
-            Global.map.loadMap(edge+"");
-        } else super.edgeCheck();
-    }
     public void update(){
         super.update();
         if (input.cameraMode) Global.mapEdgeCenter(Global.cameraTo = Global.cameraTo.getAdd(input.movement));
         else Global.mapEdgeCenter(Global.cameraTo = pos.getAdd(0,0));
         if (!stamina.isFull()) indicater.show(.5f);
         indicater.update();
-        Global.offplace.set(pos.x-9999,pos.y-9999);
     }
     public String[] load(String p){
         String[] r = super.load(p);
@@ -132,10 +125,10 @@ public class MainPlayer extends Player {
     }
     public void reconnect() {
         lastLand = new Line();
-        Updater.add(this);
-        Updater.add(weapon);
-        Updater.add(speech);
-        Updater.add(indicater);
+        Updater.addQueue.add(this);
+        Updater.addQueue.add(weapon);
+        Updater.addQueue.add(speech);
+        Updater.addQueue.add(indicater);
         Global.display.add(speech);
     }
 }

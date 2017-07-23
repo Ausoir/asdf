@@ -44,7 +44,6 @@ class GenerateTown extends Generator {
         Global.map.formTextures.put(id, id+"&"+texture[Creation.r.nextInt(texture.length)]);
     }
     Generator create(P mapSize){
-        Global.map.event = MapEvent.Urban;
         String[] landTexture = new String[][]{
                 new String[]{"dirt&grass","dirt&road"},
                 new String[]{"rock&road","rock&grass"}}[Creation.r.nextInt(2)];
@@ -63,12 +62,12 @@ class GenerateTown extends Generator {
         generateFloor(max+1, mapSize, Creation.r.nextInt(4) + 7, 20, new String[]{landTexture[Creation.r.nextInt(landTexture.length)]});
         for (int i=0;i<Global.map.land.size();i++){
             Line l = Global.map.land.get(i);
-            if (l.next >= 0 && l.isLandable() && Math.abs(l.getSlope()) < .1f) {
+            if (l.next >= 0 && l.clockwise() && Math.abs(l.getSlope()) < .1f) {
                 if (Math.abs(l.getSlope()) < .01f) Global.map.placeProp(l, "SteamHouse=.1,TowerHouse=1", -1);
                 else Global.map.placeProp(l, "SteamHouse=1", -1);
                 for (int ii=0;ii<Creation.r.nextInt(9);ii++) Global.map.placeProp(l,"Stack=.2,Barrel=.5,Crate=1", -1);
                 for (int ii=0;ii<Creation.r.nextInt(9);ii++){
-                    Global.map.placeProp(l,"Man=.4", Stock.getMan("Resident"));
+                    Global.map.placeProp(l, "Man=.4", Stock.getMan("Resident"));
                 }
             }
         }

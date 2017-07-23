@@ -99,7 +99,7 @@ public enum Intelligence {
                             final int index = ii;
 
                             public void perform() {
-                                Updater.add(product[index]);
+                                Updater.addQueue.add(product[index]);
                                 product[index] = null;
                                 host.say("@sold");
                             }
@@ -161,12 +161,7 @@ public enum Intelligence {
                 private final int range = 160;
                 void onAttack(){
                     if (target != null) {
-                        if (target.state != Actions.Dead) {
-                            host.say("@atk tgt");
-                        } else {
-                            host.say("@tgt x");
-                            target = null;
-                        }
+                        host.say("@atk tgt");
                     }
                 }
                 public void onHit(){
@@ -180,9 +175,13 @@ public enum Intelligence {
                         task = Behavior.Idle;
                     } else {
                         if (target != null) {
-                            P p = target.pos.getSubtract(host.pos);
+                            P p = target.pos.getSubtract(host.pos).add(0,-target.getSize()/2);
                             host.target = p;
                             if (host instanceof Man) ((Man)host).weapon.rotateTo(p.getMult(host.dir,host.dir));
+                            if (target.state == Actions.Dead){
+                                target = null;
+                                setTaskEcho(defaultTask);
+                            }
                         }
                     }
                 }
@@ -195,13 +194,11 @@ public enum Intelligence {
                         Line pp = new Line(host.pos, front);
                         Line pp2 = new Line(front.getAdd(0, -40), front.getAdd(0, 40));
                         for (Line i : Global.map.land) {
-                            if (i.isLand()) {
-                                if (i.lineCross(pp) && (Math.abs(i.getSlope()) > Line.MAXSLOPE || !i.clockwise())) {
-                                    blocked = true;
-                                }
-                                if (i.lineCross(pp2)) {
-                                    fall = false;
-                                }
+                            if (i.lineCross(pp) && (Math.abs(i.getSlope()) > Line.MAXSLOPE || !i.clockwise())) {
+                                blocked = true;
+                            }
+                            if (i.lineCross(pp2)) {
+                                fall = false;
                             }
                         }
                     }
@@ -232,14 +229,11 @@ public enum Intelligence {
                 }
                 protected boolean perceived(Prop p){
                     if (p instanceof Unit) {
-                        Unit unit = (Unit) p;
                         if (host.faction.canAttack(p.faction)) {
-                            if (unit.state != Actions.Dead) {
-                                target = (Unit) p;
-                                host.say("@c tgt");
-                                setTaskEcho(Behavior.Hunt);
-                                return true;
-                            }
+                            target = (Unit) p;
+                            host.say("@c tgt");
+                            setTaskEcho(Behavior.Hunt);
+                            return true;
                         }
                     }
                     return false;

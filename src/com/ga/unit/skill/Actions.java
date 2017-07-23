@@ -13,6 +13,7 @@ import com.ga.tool.Performer;
 import com.ga.unit.*;
 import com.ga.unit.item.Item;
 import com.ga.unit.item.Projectile;
+import com.ga.unit.player.Player;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public enum Actions {
             p.attackSpeed = -1;
         }
         public void update(Unit p){
-            if (Math.abs(p.vel.x) < .5f) p.vel.x = 0;
+            if (Math.abs(p.vel.x) < 1f) p.vel.x = 0;
         }
     }, Walk(0,-1,0,0,new Tags(){{
         add(Tag.Athletics);
@@ -55,6 +56,25 @@ public enum Actions {
         public void onFinish(Unit p){
             p.clip.resetHeight();
             super.onFinish(p);
+        }
+    }, Climb {
+        public void onSet(final Unit host) {
+            if (host instanceof Player) {
+                ((Player) host).input.moving = 0;
+            }
+        }
+
+        public void update(Unit host) {
+            if (host.stateDuration > 24) {
+                P reach = host.pos.getAdd(host.clip.organs[BodyHumanoid.FIST].ptd);
+                for (Line i : Global.map.land) {
+                    if (i.opt == 1 && i.lineCross(new Line(reach.x - (24 * host.dir), reach.y, reach.x + (24 * host.dir), reach.y))) {
+                        host.vel.set(0, -8);
+                        return;
+                    }
+                }
+                host.stateSet(Jump);
+            }
         }
     }, Dead(999){
         public void onSet(final Unit p){
@@ -101,7 +121,7 @@ public enum Actions {
     }, Backstep(0,-1,0,0,new Tags(){{
     }}){
         public void update(Unit host){
-            host.vel.x += host.getSpeed() * 2 * -host.dir;
+            host.vel.x += host.getSpeed() * -host.dir;
         }
     }, Sprint(15,0,5,0,new Tags(){{
         add(Tag.Athletics);
@@ -473,7 +493,7 @@ public enum Actions {
             final Item wpn = t.weapon;
             float flytime = t.target.getDist()/100;
             int speed = (int) (35+(host.get("Strength").get()*10)+(t.rand.nextFloat()*(60/host.stateLevel)));
-            final Projectile pj = new Projectile("Arrow",tip,t.pos.getAdd(t.target), speed){
+            final Projectile pj = new Projectile("Arrow",tip,t.pos.getAdd(t.target).add(0,-host.getSize()), speed){
                 public void onField(){}
                 public void onAttack(Unit p){
                     wpn.trigger(p);
@@ -808,7 +828,7 @@ public enum Actions {
                     }
                     lightning.render();
                 }
-                if (host.stateDuration % Math.max(2,9-host.stateLevel*2) == 0) target.buff(Buffs.Shock, 1);
+                if (host.stateDuration % Math.max(1,4-host.stateLevel) == 0) target.buff(Buffs.Shock, 1);
             }
             if (host.stateDuration % (9+host.stateLevel*2) == 0) host.buff(Buffs.Shock, 1);
         }

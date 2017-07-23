@@ -63,7 +63,7 @@ public class Inventory {
         for (String aData : data) {
             Item item = (Item) Stock.get(aData);
             weight += item.weight;
-            Updater.cancelAdd(item);
+            Updater.addQueue.remove(item);
             items.add(item);
         }
     }

@@ -43,7 +43,7 @@ class GenerateDungeon extends GenerateHouse {
             backward.add(bw.getAdd(0,0));
         }
 
-        Global.map = new Map(info[0], new String[]{"-1","None","None","40x40",Global.player.cmap,(Global.time-9999)+""});
+        Global.map = new Map(info[0], new P(40,40));
         TerrainTrail trail = new TerrainTrail(new P(0,-advance));
         for (P i : forward) trail.add(i);
         for (int i=backward.size()-1;i>=0;i--) trail.add(backward.get(i));
@@ -62,7 +62,7 @@ class GenerateDungeon extends GenerateHouse {
         platform.finish(this, "wood&basic");
         platform.climbable();
         door.pos.set(doorPos);
-        Stock.Exit.create(returnDoorSeed).pos.set(doorPos.x,doorPos.y);
+//        Stock.Exit.create(returnDoorSeed).pos.set(doorPos.x,doorPos.y);
         Stock.Spawn.create(returnDoorSeed).pos.set(doorPos.x,doorPos.y);
         normalize(800,400);
         generateBlocker(trail.terrain);

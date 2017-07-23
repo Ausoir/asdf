@@ -20,7 +20,6 @@ public class Prop extends Thing {
     public Faction faction = Faction.Destructive;
     public P vel = new P(0, 0);
     public boolean tangible = true;
-    public boolean dynamic = false; //regrowth sensitive
     public Line lastLand = new Line();
     public Tags tags = new Tags();
     boolean manualDepth = false;
@@ -42,12 +41,12 @@ public class Prop extends Thing {
     }
     public void onAttack(Unit p){}
     private void adjustToLand(){
-        Line closest = Global.map.checkLand(new Line(pos, new P(pos.x, pos.y+800)));
+        Line closest = Global.map.checkLand(new Line(pos.getAdd(0,-24), new P(pos.x, pos.y+800)));
         float closestY = pos.y + 9999;
         Line line = new Line(pos, new P(pos.x, closestY));
         for (Line i : Global.map.land) {
             if (line.lineCross(i)) {
-                if (i.next != -1 && i.isLandable()) {
+                if (i.next != -1 && i.clockwise()) {
                     float y = i.getCrossPointY(pos.x);
                     if (y < closestY) {
                         closest = i;
@@ -78,12 +77,26 @@ public class Prop extends Thing {
             pp = new Line(pos,vp);
             for (int i=0;i<Global.map.land.size();i++) {
                 Line land = Global.map.land.get(i);
-                if (land.isLand() && land.depth >= lastLand.depth) {
+                if (land.depth >= lastLand.depth) {
                     if (land.lineCross(pp)) {
                         float slope = land.getSlope();
                         boolean cw = land.clockwise();
                         float lineY = land.getCrossPointY(pos.x);
-                        if (cw && lineY >= pos.y) {
+                        boolean touching = cw && lineY >= pos.y;
+                        if (touching && lastLand.depth == -1) {
+                            Line testt = new Line(pos.x, pos.y - 9999, pos.x, pos.y);
+                            int cws = 0, ccs = 0;
+                            boolean overlapped = false;
+                            for (Line ii : Global.map.land) {
+                                if (ii.depth > land.depth && ii.lineCross(testt)) {
+                                    overlapped = true;
+                                    if (ii.clockwise()) cws++;
+                                    else ccs++;
+                                }
+                            }
+                            if (overlapped && cws > ccs) touching = false;
+                        }
+                        if (touching) {
                             onCollide(land);
                             float atan = (float) Math.atan(slope);
                             if (vel.x > 0 != atan > 0) vel.x = vel.x * Global.cos(atan);
@@ -109,19 +122,14 @@ public class Prop extends Thing {
     }
     public void onCollide(Line l){
     }
-    protected void edgeCheck(){
-        int edge = Global.mapEdge(pos.getAdd(vel));
-        if (edge > 0) {
-            if (Math.abs(edge-5) == 1) vel.x = 0;
-            else {
-                if (edge == 2) remove();
-            }
-        }
-    }
     public void update(){
         if (mobile) {
             collide();
-            edgeCheck();
+            int edge = Global.mapEdge(pos.getAdd(vel));
+            if (edge > 0) {
+                if (Math.abs(edge-5) == 1) vel.x = 0;
+                else if (edge == 2) remove();
+            }
             pos.add(vel);
             if (gravity) {
                 vel.y += Settings.gravity;

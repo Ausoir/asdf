@@ -17,19 +17,19 @@ public class Creation {
     public static int seed;
     public static char[][] world;
     public static void create(){
-        if (!FileManager.isFile("Data/map/0")) {
-            FileManager.loadPlayer(-1, "PlayerTemplate");
+        if (!FileManager.isFile("Data/map/0.user")) {
+            FileManager.loadPlayer(-1, "Template");
             Global.player.buff(Buffs.Metabolism, 10);
             FileManager.save("map/0", Global.player.toCharacterString());
         }
         FileManager.loadPlayer(-1, "0");
-        if (!FileManager.isFile("Data/map/"+Global.player.cworld+".map")) {
+        if (!FileManager.isFile("Data/map/World.map")) {
             seed = (int) (Math.random()*1000000);
 //            world = WorldCreation.create(16,16);
             world = new char[][]{new char[]{'6','-','-','-','-','-','-','-','-','-','-','-','-','-','-','4'}};
             saveWorld();
         } else {
-            FileManager.readWorld(Global.player.cworld);
+            FileManager.readWorld();
         }
     }
     public static void prepareRandom(int id){
@@ -53,7 +53,7 @@ public class Creation {
             }
             r.append("\n");
         }
-        FileManager.save("map/"+Global.player.cworld+".map", r.toString());
+        FileManager.save("map/World.map", r.toString());
     }
     public static char getWorld(int id){
         int[] pt = new int[]{id % world[0].length, id / world[0].length};

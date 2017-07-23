@@ -21,13 +21,11 @@ public class Speech extends JTextArea implements Drawable {
     private Timer timer = new Timer(-1,false);
     private String recent = "";
     private Color color = new Color(255,255,255,150);
-    private Font font;
     Speech(Unit host){
         super();
         this.host = host;
-        Updater.add(this);
-        font = new Font("Helvetica",Font.PLAIN,18);
-        setFont(font);
+        Updater.addQueue.add(this);
+        setFont(Global.font);
         setBackground(color);
         setLineWrap(true);
         setWrapStyleWord(true);
@@ -43,7 +41,7 @@ public class Speech extends JTextArea implements Drawable {
     public void draw(Graphics2D g){
         if (isVisible()) {
             P t = host.pos.getAdd(0,-150);
-            int width = Math.min(g.getFontMetrics(font).stringWidth(getText()) + 30, 240);
+            int width = Math.min(g.getFontMetrics(Global.font).stringWidth(getText()) + 30, 240);
             int height = (int) getPreferredSize().getHeight();
             float rx = Global.rel.x, ry = Global.rel.y;
             setBounds((int) (t.x - (width / 2) + rx), (int) (t.y - height + ry), width, height);

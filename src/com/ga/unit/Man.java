@@ -21,7 +21,7 @@ import static com.ga.unit.BodyHumanoid.OFIST;
  * Created by Ga on 5/7/2016. asd
  */
 public class Man extends Unit {
-    protected Item fist = ((Item) Stock.getByName("Fist",0));
+    protected Item fist = ((Item) Stock.getByName("Fist",0)).cancelAdd();
     public Item weapon = fist;
     public ArmorSet armor;
 
@@ -56,6 +56,8 @@ public class Man extends Unit {
     public void remove() {
         super.remove();
         if (speech != null) speech.remove();
+        weapon.remove();
+        armor.remove();
     }
 
     public float getReach(){

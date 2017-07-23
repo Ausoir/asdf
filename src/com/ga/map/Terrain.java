@@ -25,7 +25,7 @@ public class Terrain extends ShadedPicture implements Drawable{
         setDepth(depth);
         polygon = new Polygon();
         imageTexture = new TexturePaint(image, new Rectangle2D.Double(0,0,getSize().x,getSize().y));
-        Updater.add(this);
+        Updater.addQueue.add(this);
     }
     static int toTerrainDepth(int depth){
         return 10+(depth*3);

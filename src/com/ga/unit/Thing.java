@@ -30,7 +30,7 @@ public class Thing implements Drawable, Observer {
         image = new Picture(rand);
         this.depth = depth;
         if (name != null) setImage(name);
-        Updater.add(this);
+        Updater.addQueue.add(this);
     }
     public void setImage(String p){
         image.set(p);

@@ -16,7 +16,7 @@ public enum Trait {
     Lung_Injury,Damaged_Liver,Stomach_Injury,Hearing_Loss,Throat_Injury,Blindness,Brain_Damage,Depression,
     Armless,Left_Arm_Injury,Right_Arm_Injury,Legless,Left_Leg_Injury,Right_Leg_Injury,
 
-    Forager, Enchanter, Alchemist;
+    Herbalist(3), Enchanter(3), Alchemist(3);
 
     private int type;
     Trait(){
@@ -29,8 +29,6 @@ public enum Trait {
 
     }
     public static Trait getByName(String p){
-        assert false:"SDFSDFDSF";
-        assert true:"AAASDFSDFDSF";
         for (Trait i : values()){
             if (i.name().equals(p)) return i;
         }

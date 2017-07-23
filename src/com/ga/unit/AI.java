@@ -18,7 +18,7 @@ public abstract class AI implements Observer {
     int taskProgress;
     AI(Unit host){
         this.host = host;
-        Updater.add(this);
+        Updater.addQueue.add(this);
     }
     public void update(){
         if (targetId != 0){
@@ -44,7 +44,7 @@ public abstract class AI implements Observer {
     boolean perceive(int d){
         ArrayList<Unit> seen = Updater.perceive(host, host.pos.getAdd(host.dir < 0 ? -d : d, 0), d * 2);
         for (Unit t : seen) {
-            if (t != host && target != t) {
+            if (t != host && target != t && t.state != Actions.Dead) {
                 return perceived(t);
             }
         }

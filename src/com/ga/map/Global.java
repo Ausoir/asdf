@@ -12,6 +12,7 @@ import com.ga.tool.Timer;
 import com.ga.unit.Unit;
 import com.ga.unit.player.MainPlayer;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
@@ -25,7 +26,6 @@ public class Global {
     public static MainPlayer player;
     public static Server server;
     public static ControllerProcess cprocess;
-    public static P offplace = new P(); //Off screen while existing
     public static P camera = new P();
     public static P cameraTo = new P();
     public static Display display;
@@ -39,6 +39,7 @@ public class Global {
     public static int houseId = 1;
     public static Timer updates = new Timer(40,true);
     public static ArrayList<EventTimer> timers = new ArrayList<>();
+    public static Font font = new Font("Helvetica",Font.PLAIN,18);
 
     public static void init(){
         for (int i=0;i<360;i++){
