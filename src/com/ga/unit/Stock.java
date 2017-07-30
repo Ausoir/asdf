@@ -1,6 +1,5 @@
 package com.ga.unit;
 
-import com.ga.game.Dialog;
 import com.ga.game.FileManager;
 import com.ga.game.Sound;
 import com.ga.map.Creation;
@@ -44,6 +43,224 @@ public enum Stock {
         };
         return process(product);
     }},
+    Weapon{ Prop make(int seed){
+        String[] data = FileManager.readText("raw/Weapon.txt");
+        final String[] v = data[seed % data.length].split(";");
+        Prop product = new Weapon(v[0], Creation.getSeed(seed), Item.ItemType.valueOf(v[1]),
+                Integer.parseInt(v[2]), Item.Material.load(v[3].split(",")));
+        product.factoryId = ordinal();
+        return process(product);
+    }},
+    Armor{ Prop make(int seed){
+        String[] data = FileManager.readText("raw/Armor.txt");
+        final String[] v = data[seed % data.length].split(";");
+        int piece = Integer.parseInt(v[1]);
+        if (piece == 1 || piece == 2) v[0] = v[0].substring(0,v[0].indexOf("_"));
+        Prop product = new Armor(v[0], Creation.getSeed(seed), piece,
+                Integer.parseInt(v[2]), Integer.parseInt(v[3]), Item.Material.load(v[4].split(",")));
+        product.factoryId = ordinal();
+        return process(product);
+    }},
+    Object{ Prop make(int seed){
+        String[] data = FileManager.readText("raw/Object.txt");
+        final String[] v = data[seed % data.length].split(";");
+        final Prop product = new Prop(v[0], seed);
+        product.gravity = v[2].equals("1");
+        product.mobile = v[3].equals("1");
+        product.randomSize(new P(v[4]));
+        if (v[5].equals("1")) product.dir = product.seed % 2 == 0 ? 1 : -1;
+        product.image.setCenterType(Integer.parseInt(v[1]));
+        product.factoryId = ordinal();
+        return process(product);
+    }},
+    Man{ Prop make(int seed){
+        String[] units = FileManager.readText("raw/Man.txt");
+        final String[] unit = units[seed % units.length].split(";");
+        Man product = new Man(unit[0], Creation.getSeed(seed)){
+            public void onCreate(){
+                String str = getUnit(name,seed,"111111",getStat(Integer.parseInt(unit[2]),Integer.parseInt(unit[3]),Integer.parseInt(unit[4])),
+                        Faction.valueOf(unit[5]),unit[6]+",0,0",unit[7]);
+                String[] weapon = unit[8].split(",");
+                String[] armor = unit[9].split(",");
+                String[] face = unit[10].split(",");
+                str += "#"+getItem(weapon[seed % weapon.length],-1);
+                String helm = getItem(face[seed % face.length],0);
+                String arm = armor[seed % armor.length];
+                str += "#"+helm+"&"+getItem(arm, 2)+"&"+getItem(arm, 1);
+                load(str);
+            }
+        };
+        product.speechType = unit[1];
+        product.factoryId = ordinal();
+        return process(product);
+    }},
+    Beast{ Prop make(int seed) {
+        String[] units = FileManager.readText("raw/Beast.txt");
+        String[] unit = units[seed % units.length].split(";");
+        Unit product = new Unit(null, Creation.getSeed(seed));
+        product.clip = new Body(product, unit[0]);
+        product.load(getUnit(unit[0],product.seed,product.clip.toString(),getStat(Integer.parseInt(unit[2]),Integer.parseInt(unit[3]),
+                Integer.parseInt(unit[4])), Faction.valueOf(unit[5]), unit[6]+",0,0", unit[7]));
+        product.speechType = unit[1];
+        product.factoryId = Beast.ordinal();
+        return process(product);
+    }},
+    Food{ Prop make(int seed){
+        String[] data = FileManager.readText("raw/Food.txt");
+        final String[] v = data[seed % data.length].split(";");
+        Prop product = new Food(v[0], Creation.getSeed(seed), Integer.parseInt(v[1]),
+                Integer.parseInt(v[2]), v[3], Integer.parseInt(v[4]), Integer.parseInt(v[5]));
+        product.factoryId = ordinal();
+        return process(product);
+    }},
+    Manual{ Prop make(int seed){
+        Item product = new Item(getName(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Scroll){
+            private Actions skill;
+            private int level;
+            public void onCreate(){
+                super.onCreate();
+                ArrayList<Actions> learnables = Actions.getLearnables();
+                skill = learnables.get(seed % learnables.size());
+                level = seed % 4;
+            }
+            public String[] load(String p){
+                String[] r = super.load(p);
+                ArrayList<Actions> learnables = Actions.getLearnables();
+                skill = learnables.get(seed % learnables.size());
+                level = seed % 4;
+                return r;
+            }
+            @Override
+            public void use(Man host){
+                if (host instanceof Player) {
+                    super.use(host);
+                    Player player = (Player) host;
+                    int difficulty = skill.getDifficulty();
+                    if (player.getStatePower(skill) >= difficulty) {
+                        if (player.skillTree.getSkillLevel(skill) == level) {
+                            if (Updater.sleep(100) == 100) {
+                                ((Player) host).learning = skill;
+                                host.say("Now learning " + skill.getName() + "!");
+                            }
+                        } else host.say("Inappropriate manual level!");
+                    } else host.say("Not skilled enough to learn "+skill.getName()+"!");
+                }
+            }
+            public String getName(){
+                String prefix = "Expert Level "+(level-2);
+                if (level == 0) prefix = "Novice";
+                else if (level == 1) prefix = "Intermediate";
+                else if (level == 2) prefix = "Advanced";
+                else if (level == 3) prefix = "Expert";
+                return prefix + " " + super.getName()+" of "+skill.getName();
+            }
+            public String getDescription(){
+                int difficulty = skill.getDifficulty();
+                int power = Global.player.getStatePower(skill);
+                int skillLevel = Global.player.skillTree.getSkillLevel(skill);
+                String req = "Fields of study: ";
+                for (Tag i : skill.getTrainers()) req += "[" + i.name() + "] ";
+                req += "x Difficulty "+difficulty+".";
+                req += " Your current level of expertise in this field: "+power+".";
+                if (power >= difficulty) req += " You are capable of performing this action.";
+                else req += " You lack the expertise to perform the technique described in this manual.";
+                req += " Your current knowledge level of "+skill.name()+": "+skillLevel+".";
+                req += " The book teaches level "+(level+1)+" "+skill.name();
+                return super.getDescription()+" "+req;
+            }
+        };
+        product.value = 94;
+        product.delay = 45;
+        return process(product);
+    }},
+    Bandage{ Prop make(int seed){
+        Item product = new Item(getName(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Consumable) {
+            public void use(Man host) {
+                if (usable(1)){
+                    super.use(host);
+                    host.stats.triggerEffect(Buffs.Bleed);
+                }
+            }
+            public String getDescription(){
+                return super.getDescription()+" Use to stop bleeding.";
+            }
+        };
+        product.delay = 45;
+        return process(product);
+    }},
+    Potion{ Prop make(int seed){
+        Item product = new Item(getName(), seed, new Item.Material[]{Item.Material.Glass}, Item.ItemType.Consumable) {
+            public void onCreate() {
+                if (seed != 0) imbueMeta(false, false, 1);
+            }
+            public void use(Man host) {
+                if (usable(1)){
+                    super.use(host);
+                    host.buff(emod, ademod.level);
+                }
+            }
+            public String getFullName(){
+                if (!Global.player.hasTrait(Trait.Alchemist)) return getName();
+                return super.getFullName();
+            }
+        };
+        product.delay = 45;
+        return process(product);
+    }},
+    Scroll{ Prop make(int seed){
+        Item product = new Item(getName(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Scroll){
+            private Actions spell;
+            @Override
+            public void use(Man host){
+                if (usable(1)) {
+                    super.use(host);
+                    if (spell != null){
+                        host.stateLevel = 3;
+                        host.stateSet(spell);
+                    }
+                }
+            }
+            public void onCreate(){
+                ArrayList<Actions> list = Actions.getByTag(Tag.Runic);
+                spell = list.get(rand.nextInt(list.size()));
+            }
+            public String[] load(String p){
+                String[] r = super.load(p);
+                ArrayList<Actions> list = Actions.getByTag(Tag.Runic);
+                spell = list.get(rand.nextInt(list.size()));
+                return r;
+            }
+            public String getName(){
+                if (!Global.player.hasTrait(Trait.Enchanter)) return super.getName();
+                return super.getName()+" of "+spell.getName();
+            }
+        };
+        product.value = 16;
+        product.probability = 1;
+        product.delay = 30;
+        return process(product);
+    }},
+    Ethersword{ Prop make(int seed){
+        Weapon product = new Weapon(getName(), seed, Item.ItemType.Sword, 0, new Item.Material[]{Item.Material.Crystal}){
+            public String toString(){
+                return "";
+            }
+            public void remove(){
+                super.remove();
+                Particle.holyExplosion(pos,getDepth());
+            }
+            public void trigger(Unit host) {
+                super.trigger(host);
+                Particle.holyExplosion(pos,getDepth());
+            }
+            public int getDamage(){
+                return 3;
+            }
+        };
+        product.weight = 0;
+        product.image.setCenterType(3);
+        return process(product);
+    }},
     Phone_Booth{ Prop make(int seed){
         Prop product = new Prop(getName(), seed);
         product.onInteract = new Interactive(){
@@ -71,7 +288,7 @@ public enum Stock {
         return process(product);
     }},
     Fist{ Prop make(int seed){
-        Prop product = new Weapon(getName(),0, Item.ItemType.Bashing, 0){
+        Prop product = new Weapon(getName(),0, Item.ItemType.Bashing, 0, new Item.Material[]{Item.Material.Flesh}){
             public void use(final Man host) {
                 host.setState(Actions.Interact);
             }
@@ -87,260 +304,6 @@ public enum Stock {
         product.onInteract = null;
         return process(product);
     }},
-    Stick{ Prop make(int seed){ //3
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Bashing, 0);
-        return process(product);
-    }},
-    Broadsword{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Sword, 4);
-        product.image.setCenterType(3);
-        return process(product);
-    }},
-    Bamboo_Spear{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Spear, 1);
-        return process(product);
-    }},
-    Mace{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Bashing, 4){
-            public void randomSize(P p){}
-        };
-        return process(product);
-    }},
-    Katana{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Sword, 4);
-        product.image.setCenterType(3);
-        return process(product);
-    }},
-    Claw{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Knife, 0);
-        product.image.setCenterType(3);
-        return process(product);
-    }},
-    Spear{ Prop make(int seed){ //10
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Spear, 2);
-        return process(product);
-    }},
-    Axe{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Sword, 3);
-        return process(product);
-    }},
-    Dagger{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Knife, 0);
-        product.image.setCenterType(3);
-        return process(product);
-    }},
-    Tanto{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Knife, 0);
-        product.image.setCenterType(3);
-        return process(product);
-    }},
-    Pickaxe { Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Sword, 5);
-        return process(product);
-    }},
-    Cleaver{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Sword, 8);
-        product.image.setCenterType(3);
-        return process(product);
-    }},
-    Lancesword{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Spear, 5);
-        product.image.setCenterType(3);
-        return process(product);
-    }},
-    Cutlass{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Sword, 2);
-        product.image.setCenterType(3);
-        return process(product);
-    }},
-    Claymore{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Sword, 7);
-        product.image.setCenterType(3);
-        return process(product);
-    }},
-    Halberd{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Spear, 7);
-        return process(product);
-    }},
-    Greatsword{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Bashing, 9);
-        product.image.setCenterType(3);
-        return process(product);
-    }},
-    Warhammer{ Prop make(int seed){ //20
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Bashing, 9);
-        return process(product);
-    }},
-    Bow{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Bow, 4);
-        return process(product);
-    }},
-    Revolver{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Shooting, 3);
-        product.image.setCenterType(3);
-        return process(product);
-    }},
-    Pistol{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Shooting, 3);
-        product.image.setCenterType(3);
-        return process(product);
-    }},
-    Rifle{ Prop make(int seed){
-        Prop product = new Weapon(getName(),seed, Item.ItemType.Rifle, 7);
-        product.image.setCenterType(3);
-        return process(product);
-    }},
-    Ethersword{ Prop make(int seed){
-        Weapon product = new Weapon(getName(), seed, Item.ItemType.Sword, 0){
-            public String toString(){
-                return "";
-            }
-            public void remove(){
-                super.remove();
-                Particle.holyExplosion(pos,getDepth());
-            }
-            public void trigger(Unit host) {
-                super.trigger(host);
-                Particle.holyExplosion(pos,getDepth());
-            }
-            public int getDamage(){
-                return 3;
-            }
-        };
-        product.weight = 0;
-        product.image.setCenterType(3);
-        return process(product);
-    }},
-    Comfortwear_Legging{ Prop make(int seed){
-        Armor product = new Armor("Comfortwear",seed, new Item.Material[]{Item.Material.Cloth},0,.8f,1, 1);
-        return process(product);
-    }},
-    Comfortwear_Torso{ Prop make(int seed){
-        Armor product = new Armor("Comfortwear",seed, new Item.Material[]{Item.Material.Cloth},0,.8f,0, 2);
-        return process(product);
-    }},
-    Dustset_Legging{ Prop make(int seed){
-        Item.Material[] mat = new Item.Material[]{Item.Material.Cloth, Item.Material.Leather};
-        Armor product = new Armor("Dustset",seed, mat,1,.8f,2, 1);
-        return process(product);
-    }},
-    Dustset_Torso{ Prop make(int seed){
-        Item.Material[] mat = new Item.Material[]{Item.Material.Cloth, Item.Material.Leather};
-        Armor product = new Armor("Dustset",seed, mat,1,1,1, 2);
-        return process(product);
-    }},
-    Toughwear_Legging{ Prop make(int seed){
-        Item.Material[] mat = new Item.Material[]{Item.Material.Cloth, Item.Material.Leather};
-        Armor product = new Armor("Toughwear",seed, mat,1,1,1, 1);
-        return process(product);
-    }},
-    Toughwear_Torso{ Prop make(int seed){
-        Item.Material[] mat = new Item.Material[]{Item.Material.Cloth, Item.Material.Leather};
-        Armor product = new Armor("Toughwear",seed, mat,1,1,0, 2);
-        return process(product);
-    }},
-    Suit_Legging{ Prop make(int seed){
-        Armor product = new Armor("Suit",seed, new Item.Material[]{Item.Material.Cloth},1,1,2, 1);
-        product.pocket = 1;
-        return process(product);
-    }},
-    Suit_Torso{ Prop make(int seed){
-        Armor product = new Armor("Suit",seed, new Item.Material[]{Item.Material.Cloth},1,1,1, 2);
-        product.pocket = 1;
-        return process(product);
-    }},
-    Robe_Legging{ Prop make(int seed){
-        Armor product = new Armor("Robe",seed, new Item.Material[]{Item.Material.Cloth},0,1,0, 1);
-        product.pocket = 1;
-        return process(product);
-    }},
-    Robe_Torso{ Prop make(int seed){
-        Armor product = new Armor("Robe",seed, new Item.Material[]{Item.Material.Cloth},0,.6f,2, 2);
-        return process(product);
-    }},
-    Adventurewear_Legging{ Prop make(int seed){ //30
-        Armor product = new Armor("Adventurewear",seed, new Item.Material[]{Item.Material.Leather},2,.8f,3, 1);
-        product.pocket = 1;
-        return process(product);
-    }},
-    Adventurewear_Torso{ Prop make(int seed){
-        Item.Material[] mat = new Item.Material[]{Item.Material.Leather, Item.Material.Bone};
-        Armor product = new Armor("Adventurewear",seed, mat,2,.8f,3, 2);
-        return process(product);
-    }},
-    Chainmail_Legging{ Prop make(int seed){
-        Item.Material[] mat = new Item.Material[]{Item.Material.Iron, Item.Material.Bronze, Item.Material.Copper,
-                Item.Material.Silver, Item.Material.Steel};
-        Armor product = new Armor("Chainmail",seed, mat,4,.6f,1, 1);
-        product.pocket = 1;
-        return process(product);
-    }},
-    Chainmail_Torso{ Prop make(int seed){
-        Item.Material[] mat = new Item.Material[]{Item.Material.Iron, Item.Material.Bronze, Item.Material.Copper,
-                Item.Material.Silver, Item.Material.Steel};
-        Armor product = new Armor("Chainmail",seed, mat,3,.5f,0, 2);
-        return process(product);
-    }},
-    Platemail_Legging{ Prop make(int seed){
-        Armor product = new Armor("Platemail",seed, Armor.plateMaterials,4,.9f,1, 1);
-        return process(product);
-    }},
-    Platemail_Torso{ Prop make(int seed){
-        Armor product = new Armor("Platemail",seed, Armor.plateMaterials,4,.92f,0, 2);
-        return process(product);
-    }},
-    Battlewear_Legging{ Prop make(int seed){
-        Armor product = new Armor("Battlewear",seed, Armor.plateMaterials,5,1,1, 1);
-        product.pocket = 1;
-        return process(product);
-    }},
-    Battlewear_Torso{ Prop make(int seed){
-        Armor product = new Armor("Battlewear",seed, Armor.plateMaterials,5,1,1, 2);
-        return process(product);
-    }},
-    Shadowrobe_Legging{ Prop make(int seed){
-        Armor product = new Armor("Shadowrobe",seed, new Item.Material[]{Item.Material.Cloth},2,1,0, 1);
-        product.pocket = 1;
-        return process(product);
-    }},
-    Shadowrobe_Torso{ Prop make(int seed){
-        Armor product = new Armor("Shadowrobe",seed, new Item.Material[]{Item.Material.Cloth},2,1,0, 2);
-        return process(product);
-    }},
-    Bandana{ Prop make(int seed){
-        Armor product = new Armor(getName(),seed, new Item.Material[]{Item.Material.Cloth},1,.3f,0, 0){
-            public void onCreate(){
-                imbueMeta(true,true,.2f);
-            }
-        };
-        return process(product);
-    }},
-    Mask{ Prop make(int seed){
-        Armor product = new Armor(getName(),seed, new Item.Material[]{Item.Material.Cloth},1,.6f,0, 0){
-            public void onCreate(){
-                imbueMeta(true,true,.2f);
-            }
-        };
-        return process(product);
-    }},
-    Lace_Helm{ Prop make(int seed){
-        Item.Material[] mat = new Item.Material[]{Item.Material.Steel, Item.Material.Brass,
-                Item.Material.Bronze, Item.Material.Copper, Item.Material.Bone};
-        Armor product = new Armor(getName(),seed, mat,3,.7f,0, 0);
-        return process(product);
-    }},
-    Full_Helm{ Prop make(int seed){
-        Item.Material[] mat = new Item.Material[]{Item.Material.Steel, Item.Material.Brass,
-                Item.Material.Bronze, Item.Material.Copper, Item.Material.Bone};
-        Armor product = new Armor(getName(),seed, mat,4,.9f,0, 0);
-        return process(product);
-    }},
-    Legion_Helm{ Prop make(int seed){
-        Item.Material[] mat = new Item.Material[]{Item.Material.Steel, Item.Material.Brass,
-                Item.Material.Bronze, Item.Material.Copper, Item.Material.Bone};
-        Armor product = new Armor(getName(),seed, mat,5,.8f,0, 0);
-        return process(product);
-    }},
     Signpost{ Prop make(int seed){
         final Prop travel = Stock.Travel.create(seed);
         travel.save = false;
@@ -351,57 +314,6 @@ public enum Stock {
             }
         };
         isFurniture(product);
-        return process(product);
-    }},
-    Weed{ Prop make(int seed){
-        final Prop product = new Prop("Weed", seed);
-        isNatural(product);
-        return process(product);
-    }},
-    Root{ Prop make(int seed){
-        Prop product = new Prop("Root", seed);
-        isNatural(product);
-        return process(product);
-    }},
-    Vine{ Prop make(int seed){ //75
-        Prop product = new Prop("Vine", seed);
-        isNatural(product);
-        return process(product);
-    }},
-    Rock{ Prop make(int seed){
-        Item product = new Item("Rock", seed, new Item.Material[]{Item.Material.Stone}, Item.ItemType.Bashing);
-        isNatural(product);
-        return process(product);
-    }},
-    Stone{ Prop make(int seed){ //75
-        Prop product = new Prop("Stone", seed);
-        isNatural(product);
-        product.tags.add(Tag.Hideable);
-        return process(product);
-    }},
-    Bush{ Prop make(int seed){
-        Prop product = new Prop("Bush", seed);
-        isNatural(product);
-        product.tags.add(Tag.Hideable);
-        product.gravity = true;
-        return process(product);
-    }},
-    XBush{ Prop make(int seed){
-        Prop product = new Prop("DeadBush", seed);
-        isNatural(product);
-        product.tags.add(Tag.Hideable);
-        product.gravity = true;
-        return process(product);
-    }},
-    Tree{ Prop make(int seed){
-        Prop product = new Prop("Tree", seed);
-        isNatural(product);
-        product.tags.add(Tag.Hideable);
-        return process(product);
-    }},
-    Door{ Prop make(int seed){
-        Prop product = new Prop("Door", seed);
-        product.gravity = false;
         return process(product);
     }},
     Dungeon{ Prop make(final int seed){
@@ -678,166 +590,6 @@ public enum Stock {
         product.image.setCenterType(2);
         return process(product);
     }},
-    Training_Dummy{ Prop make(int seed){
-        Prop product = new Prop(getName(), seed){
-        };
-        return process(product);
-    }},
-    Grass{ Prop make(int seed){
-        Item product = new Item(getName(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Consumable){
-            public void use(Man p){}
-        };
-        product.tags.add(Tag.Fiber);
-        return process(product);
-    }},
-    Battery{ Prop make(int seed){
-        Item product = new Item(getName(), seed, new Item.Material[]{Item.Material.Brass, Item.Material.Copper}, Item.ItemType.Bashing){
-            public void use(Man host){}
-        };
-        product.delay = 25;
-        return process(product);
-    }},
-    Guidebook{ Prop make(int seed){
-        Item product = new Item(getName(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Scroll){
-            @Override
-            public void use(Man host){
-                super.use(host);
-                String stage = "0";
-//                if (Global.map.event == MapEvent.Tutorial) stage = MapEvent.cookie;
-                Global.display.menu.showDialog("Guidebook by Whu", Dialog.get("tutorial"+stage));
-                if (stage.equals("4")) remove();
-            }
-        };
-        product.delay = 25;
-        return process(product);
-    }},
-    Manual{ Prop make(int seed){
-        Item product = new Item(getName(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Scroll){
-            private Actions skill;
-            private int level;
-            public void onCreate(){
-                super.onCreate();
-                ArrayList<Actions> learnables = Actions.getLearnables();
-                skill = learnables.get(seed % learnables.size());
-                level = seed % 4;
-            }
-            public String[] load(String p){
-                String[] r = super.load(p);
-                ArrayList<Actions> learnables = Actions.getLearnables();
-                skill = learnables.get(seed % learnables.size());
-                level = seed % 4;
-                return r;
-            }
-            @Override
-            public void use(Man host){
-                if (host instanceof Player) {
-                    super.use(host);
-                    Player player = (Player) host;
-                    int difficulty = skill.getDifficulty();
-                    if (player.getStatePower(skill) >= difficulty) {
-                        if (player.skillTree.getSkillLevel(skill) == level) {
-                            if (Updater.sleep(100) == 100) {
-                                ((Player) host).learning = skill;
-                                host.say("Now learning " + skill.getName() + "!");
-                            }
-                        } else host.say("Inappropriate manual level!");
-                    } else host.say("Not skilled enough to learn "+skill.getName()+"!");
-                }
-            }
-            public String getName(){
-                String prefix = "Expert Level "+(level-2);
-                if (level == 0) prefix = "Novice";
-                else if (level == 1) prefix = "Intermediate";
-                else if (level == 2) prefix = "Advanced";
-                else if (level == 3) prefix = "Expert";
-                return prefix + " " + super.getName()+" of "+skill.getName();
-            }
-            public String getDescription(){
-                int difficulty = skill.getDifficulty();
-                int power = Global.player.getStatePower(skill);
-                int skillLevel = Global.player.skillTree.getSkillLevel(skill);
-                String req = "Fields of study: ";
-                for (Tag i : skill.getTrainers()) req += "[" + i.name() + "] ";
-                req += "x Difficulty "+difficulty+".";
-                req += " Your current level of expertise in this field: "+power+".";
-                if (power >= difficulty) req += " You are capable of performing this action.";
-                else req += " You lack the expertise to perform the technique described in this manual.";
-                req += " Your current knowledge level of "+skill.name()+": "+skillLevel+".";
-                req += " The book teaches level "+(level+1)+" "+skill.name();
-                return super.getDescription()+" "+req;
-            }
-        };
-        product.value = 94;
-        product.delay = 45;
-        return process(product);
-    }},
-    Bandage{ Prop make(int seed){
-        Item product = new Item(getName(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Consumable) {
-            public void use(Man host) {
-                if (usable(1)){
-                    super.use(host);
-                    host.stats.triggerEffect(Buffs.Bleed);
-                }
-            }
-            public String getDescription(){
-                return super.getDescription()+" Use to stop bleeding.";
-            }
-        };
-        product.delay = 45;
-        return process(product);
-    }},
-    Potion{ Prop make(int seed){
-        Item product = new Item(getName(), seed, new Item.Material[]{Item.Material.Glass}, Item.ItemType.Consumable) {
-            public void onCreate() {
-                if (seed != 0) imbueMeta(false, false, 1);
-            }
-            public void use(Man host) {
-                if (usable(1)){
-                    super.use(host);
-                    host.buff(emod, ademod.level);
-                }
-            }
-            public String getFullName(){
-                if (!Global.player.hasTrait(Trait.Alchemist)) return getName();
-                return super.getFullName();
-            }
-        };
-        product.delay = 45;
-        return process(product);
-    }},
-    Scroll{ Prop make(int seed){
-        Item product = new Item(getName(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Scroll){
-            private Actions spell;
-            @Override
-            public void use(Man host){
-                if (usable(1)) {
-                    super.use(host);
-                    if (spell != null){
-                        host.stateLevel = 3;
-                        host.stateSet(spell);
-                    }
-                }
-            }
-            public void onCreate(){
-                ArrayList<Actions> list = Actions.getByTag(Tag.Runic);
-                spell = list.get(rand.nextInt(list.size()));
-            }
-            public String[] load(String p){
-                String[] r = super.load(p);
-                ArrayList<Actions> list = Actions.getByTag(Tag.Runic);
-                spell = list.get(rand.nextInt(list.size()));
-                return r;
-            }
-            public String getName(){
-                if (!Global.player.hasTrait(Trait.Enchanter)) return super.getName();
-                return super.getName()+" of "+spell.getName();
-            }
-        };
-        product.value = 16;
-        product.probability = 1;
-        product.delay = 30;
-        return process(product);
-    }},
     Throwing_Knife{ Prop make(int seed){
         Item product = new Item("Tanto", seed,
                 new Item.Material[]{Item.Material.Steel, Item.Material.Bone, Item.Material.Bronze, Item.Material.Titanium, Item.Material.Glass},
@@ -984,14 +736,6 @@ public enum Stock {
         product.delay = 10;
         return process(product);
     }},
-    Shell{ Prop make(int seed){
-        Item product = new Item(getName(), seed, new Item.Material[]{Item.Material.Bone}, Item.ItemType.Consumable);
-        return process(product);
-    }},
-    Starfish{ Prop make(int seed){
-        Item product = new Item(getName(), seed, new Item.Material[]{Item.Material.Flesh}, Item.ItemType.Consumable);
-        return process(product);
-    }},
     Book{ Prop make(int seed){
         Item product = new Item(getName(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Scroll){
             @Override
@@ -1001,42 +745,6 @@ public enum Stock {
             }
         };
         product.delay = 45;
-        return process(product);
-    }},
-    Meat{ Prop make(int seed){
-        Food product = new Food(getName(), seed, 1, 1, "PPCOX", 100, 0);
-        product.weight = 3;
-        return process(product);
-    }},
-    Drumstick{ Prop make(int seed){
-        Food product = new Food(getName(), seed, 1, 1, "PPCCOO", 100, 2);
-        product.weight = 3;
-        return process(product);
-    }},
-    Porkchop{ Prop make(int seed){
-        Food product = new Food(getName(), seed, 1, 1, "PPPOO", 100, 2);
-        product.weight = 3;
-        return process(product);
-    }},
-    Meal{ Prop make(int seed){
-        Food product = new Food(getName(), seed, 1, 5, "PPPCCCVO", 200, 6);
-        product.volume = 2;
-        return process(product);
-    }},
-    Burger{ Prop make(int seed){
-        Food product = new Food(getName(), seed, 1, 5, "PPPCCOX", 200, 10);
-        return process(product);
-    }},
-    Sandwich{ Prop make(int seed){
-        Food product = new Food(getName(), seed, 1, 5, "PCCCCVO", 350, 2);
-        return process(product);
-    }},
-    Ration{ Prop make(int seed){
-        Food product = new Food(getName(), seed, 1, 6, "PPCCV", 8000, 1);
-        return process(product);
-    }},
-    Man{ Prop make(int seed){
-        Man product = getMan(seed);
         return process(product);
     }},
     Merchant{ Prop make(int seed){
@@ -1051,10 +759,6 @@ public enum Stock {
                 new String[]{"Greatsword","Halberd","Warhammer"},
                 new String[]{"Shadowrobe"},new String[]{null});
         product.clip.organs[5].setImage("Phantom");
-        return process(product);
-    }},
-    Beast{ Prop make(int seed) {
-        Unit product = getBeast(seed);
         return process(product);
     }},
     Rover{ Prop make(int seed) {
@@ -1202,12 +906,11 @@ public enum Stock {
     }},
     //Uniques
     Stomach_Full_Helm{ Prop make(int seed){
-        Armor product = new Armor("Full Helm",seed,new Item.Material[]{Item.Material.Titanium},0,1,0,0){
+        Armor product = new Armor("Full Helm",seed,0,0,0,new Item.Material[]{Item.Material.Titanium}){
             public String getDescription(){
                 return super.getDescription()+" Something is odd about this helmet.";
             }
         };
-//        product.durability = -1;
         product.tags.add(Tag.Cunning);
         product.tags.add(Tag.Fire);
         product.tags.add(Tag.Air);
@@ -1238,15 +941,19 @@ public enum Stock {
         String name = extRegistry.get(p);
         if (name != null){
             String[] data = name.split("@");
-            if (data[0].equals("Man")){
-                String[] units = FileManager.readText("raw/Man.txt");
-                return Man.create(Creation.getSeed(-1, units.length, Integer.parseInt(data[1])));
-            } else if (data[0].equals("Beast")){
-                String[] units = FileManager.readText("raw/Beast.txt");
-                return Beast.create(Creation.getSeed(-1, units.length, Integer.parseInt(data[1])));
-            }
+            String[] units = FileManager.readText("raw/"+data[0]+".txt");
+            return Stock.valueOf(data[0]).create(Creation.getSeed(-1, units.length, Integer.parseInt(data[1])));
         }
         return getInstant(p, seed);
+    }
+    public static int getRawStock(String raw, String p){
+        String[] units = FileManager.readText("raw/"+raw+".txt");
+        for (int i=0;i<units.length;i++){
+            if (units[i].substring(0,units[i].indexOf(";")).equals(p)){
+                return Creation.getSeed(-1, units.length, i);
+            }
+        }
+        return -1;
     }
     public Prop create(int seed){
         Prop r = make(Creation.getSeed(seed));
@@ -1270,13 +977,6 @@ public enum Stock {
     Prop process(Prop product){
         product.factoryId = ordinal();
         return product;
-    }
-    void isNatural(Prop product){
-        product.image.setCenterType(2);
-        product.gravity = true;
-        product.mobile = false;
-        product.randomSize(new P(.3f,.3f));
-        randomSide(product);
     }
     void isFurniture(Prop product){
         product.image.setCenterType(2);
@@ -1306,44 +1006,6 @@ public enum Stock {
     void processUnit(Unit p){
         p.clip = new Body(p, getName());
     }
-    static Unit getBeast(int p){
-        String[] units = FileManager.readText("raw/Beast.txt");
-        String[] unit = units[p % units.length].split(";");
-        Unit r = new Unit(null, Creation.getSeed(p));
-        r.clip = new Body(r, unit[0]);
-        r.load(getUnit(unit[0],r.seed,r.clip.toString(),getStat(Integer.parseInt(unit[2]),Integer.parseInt(unit[3]),
-                Integer.parseInt(unit[4])), Faction.valueOf(unit[5]), unit[6]+",0,0", unit[7]));
-        r.speechType = unit[1];
-        r.factoryId = Beast.ordinal();
-        return r;
-    }
-    public static int getBeast(String p){
-        String[] units = FileManager.readText("raw/Beast.txt");
-        for (int i=0;i<units.length;i++){
-            if (units[i].substring(0,units[i].indexOf(";")).equals(p)){
-                return Creation.getSeed(-1, units.length, i);
-            }
-        }
-        return -1;
-    }
-    static Man getMan(int p){
-        String[] units = FileManager.readText("raw/Man.txt");
-        String[] unit = units[p % units.length].split(";");
-        Man r = getMan(unit[0], Creation.getSeed(p), getStat(Integer.parseInt(unit[2]),Integer.parseInt(unit[3]),Integer.parseInt(unit[4])),
-                Faction.valueOf(unit[5]), unit[6]+",0,0", unit[7], unit[8].split(","), unit[9].split(","), unit[10].split(","));
-        r.speechType = unit[1];
-        r.factoryId = Man.ordinal();
-        return r;
-    }
-    public static int getMan(String p){
-        String[] units = FileManager.readText("raw/Man.txt");
-        for (int i=0;i<units.length;i++){
-            if (units[i].substring(0,units[i].indexOf(";")).equals(p)){
-                return Creation.getSeed(-1, units.length, i);
-            }
-        }
-        return -1;
-    }
     static Man getMan(String name, int seed, final String stat, final Faction pfaction, final String intel, final String moves, final String[] pweapon, final String[] parmor, final String[] pface){
         Man m = new Man(name, seed){
             public void onCreate(){
@@ -1370,9 +1032,10 @@ public enum Stock {
         return r.toString();
     }
     public static void init(){
-        String[] units = FileManager.readText("raw/Man.txt");
-        for (int i=0;i<units.length;i++) extRegistry.put(units[i].substring(0,units[i].indexOf(";")), "Man@"+i);
-        units = FileManager.readText("raw/Beast.txt");
-        for (int i=0;i<units.length;i++) extRegistry.put(units[i].substring(0,units[i].indexOf(";")), "Beast@"+i);
+        for (String raw : new String[]{"Object","Man","Beast","Weapon","Armor","Food"}){
+            String[] data = FileManager.readText("raw/"+raw+".txt");
+            for (int i=0;i<data.length;i++)
+                extRegistry.put(data[i].substring(0,data[i].indexOf(";")), raw+"@"+i);
+        }
     }
 }

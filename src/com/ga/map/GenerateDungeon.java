@@ -10,6 +10,10 @@ import java.util.ArrayList;
  * Created by ga on 5/28/17. asd
  */
 class GenerateDungeon extends GenerateHouse {
+    public GenerateDungeon(int next) {
+        super(next);
+    }
+
     Generator create(String[] info){
         int returnDoorSeed = Integer.parseInt(info[1]);
         int origDirection = Creation.r.nextInt(360);
@@ -47,9 +51,10 @@ class GenerateDungeon extends GenerateHouse {
         TerrainTrail trail = new TerrainTrail(new P(0,-advance));
         for (P i : forward) trail.add(i);
         for (int i=backward.size()-1;i>=0;i--) trail.add(backward.get(i));
-        trail.finish(this, "rock&none");
+        trail.finish("0&rock&none");
 
-        Prop door = Stock.Door.create(returnDoorSeed);
+//        Prop door = Stock.Door.create(returnDoorSeed);
+        Prop door = Stock.Travel.create(returnDoorSeed); //temporary door replacement
         P doorSize = door.image.getSize();
         int exitSegment = Creation.r.nextInt(segments-6)+3;
         P exitPos = forward.get(exitSegment).getSubtract(backward.get(exitSegment)).mult(.5f,.5f)
@@ -59,13 +64,13 @@ class GenerateDungeon extends GenerateHouse {
         platform.move(doorSize.x,0);
         platform.move(0,24);
         platform.move(-doorSize.x,0);
-        platform.finish(this, "wood&basic");
+        platform.finish("1&wood&basic");
         platform.climbable();
         door.pos.set(doorPos);
 //        Stock.Exit.create(returnDoorSeed).pos.set(doorPos.x,doorPos.y);
         Stock.Spawn.create(returnDoorSeed).pos.set(doorPos.x,doorPos.y);
         normalize(800,400);
-        generateBlocker(trail.terrain);
+        generateBlocker(2,trail.terrain);
         return this;
     }
 }

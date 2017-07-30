@@ -41,7 +41,7 @@ public class Prop extends Thing {
     }
     public void onAttack(Unit p){}
     private void adjustToLand(){
-        Line closest = Global.map.checkLand(new Line(pos.getAdd(0,-24), new P(pos.x, pos.y+800)));
+        Line closest = Global.map.checkLand(new Line(pos.getAdd(0,-4), new P(pos.x, pos.y+800)));
         float closestY = pos.y + 9999;
         Line line = new Line(pos, new P(pos.x, closestY));
         for (Line i : Global.map.land) {

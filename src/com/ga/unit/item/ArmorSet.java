@@ -9,13 +9,13 @@ import com.ga.unit.*;
  */
 public class ArmorSet {
     private static Armor[] bare = new Armor[]{
-            (Armor) new Armor("Head", 0, new Item.Material[]{Item.Material.Flesh},0, 1,0, 0){
+            (Armor) new Armor("Head", 0,0,0,0,new Item.Material[]{Item.Material.Flesh}){
                 void onHit(){}
             }.cancelAdd(),
-            (Armor) new Armor("Underwear", 0, new Item.Material[]{Item.Material.Flesh},0, 1,0, 1){
+            (Armor) new Armor("Underwear", 0,1,0,0,new Item.Material[]{Item.Material.Flesh}){
                 void onHit(){}
             }.cancelAdd(),
-            (Armor) new Armor("Underwear", 0, new Item.Material[]{Item.Material.Flesh},0, 1,0, 2){
+            (Armor) new Armor("Underwear", 0,1,0,0,new Item.Material[]{Item.Material.Flesh}){
                 void onHit(){}
             }.cancelAdd()
     };

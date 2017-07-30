@@ -7,3 +7,4 @@ Phantom;;24;28;5;Evil;3;10,20,120,1200/Use,Dash&Flameroll,Fireblast,Shadowstep&B
 Monk;punk;12;26;3;Punk;3;4,16,240,1200/Backstep,Punch&Kick&Sidekick,Dash&Walk,Walk&Sprint&Use,Sprint&Leap;None,Threadball,Throwing Knife,Scroll,Potion;Robe;None;
 Guard;soldier;30;28;4;Neutral;3;10,20,800/Use,Dash,Sprint,Sprint;Broadsword,Spear,Mace;Chainmail,Platemail;Lace Helm,Legion Helm;
 Archer;soldier;17;26;3;Evil;3;16,500,900/Backstep&Punch&Kick,Backstep,Use,Sprint;Bow;Chainmail,Platemail,Dustset;Lace Helm;
+Skeleton;undead;17;26;3;Evil;3;16,500,900/Use&Underhand&Lunge,Dash,Sprint,Mark&Sprint;Broadsword,Mace;Skeleton;Lace Helm,Legion Helm;

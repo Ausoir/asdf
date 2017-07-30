@@ -19,14 +19,13 @@ import java.util.Iterator;
 
 public class EditorInput implements Input, Updatable, Drawable {
     private enum Tool {
-        NONE, LINE, RECTANGLE, MODIFY, DELETE,
-        SELECT, OBJECT, RECLAIM, REMOVE
+        NONE, REPOSITION, MODIFY, LINE, RECTANGLE, DELETE,
+        SELECT, OBJECT, REMOVE
     }
-    private final int SNAP = 48;
+    private final int SNAP = 24;
     private final int SCROLLSPEED = 50;
     private Stroke basicStroke = new BasicStroke(10);
     private String cunit = "Slime";
-    private String genProp = null;
     private String txDepth = "1";
     private String txTexture = "dirt";
     private String txShader = "grass";
@@ -38,7 +37,7 @@ public class EditorInput implements Input, Updatable, Drawable {
     private ArrayList<Line> history = new ArrayList<>();
     private Line current = new Line(0, 0, 0, 0);
     private Prop currentO;
-    private boolean connected = false;
+    private boolean connected = false, repos = false;
     private Tool tool = Tool.NONE;
     private P v = new P();
     private String map;
@@ -93,7 +92,7 @@ public class EditorInput implements Input, Updatable, Drawable {
     @Override
     public void chat(String p, int x, int y){
         if (p.startsWith("size")){
-            String[] size = p.substring(5).split("x");
+            String[] size = p.substring(5).split(",");
             Global.map.size.set(Integer.parseInt(size[0]), Integer.parseInt(size[1]));
         } else if (p.equals("reverse")){
             reverse = true;
@@ -123,7 +122,15 @@ public class EditorInput implements Input, Updatable, Drawable {
             Stock.Signpost.create(to).pos.set(pos);
             message("Travel to ["+(to/100)+" @ "+(Math.abs(to)%100)+"] spawned at ["+x + ", "+y+"]");
         } else if (p.startsWith("prop")) {
-            genProp = p.substring(5);
+            String[] aux = p.substring(5).split("@");
+            for (int ii=0;ii<Integer.parseInt(aux[0]);ii++){
+                int rx = (int) (Math.random()*Global.map.size.x);
+                for (Line l : Global.map.land) {
+                    if (l.next == lastSelected && l.clockwise() && l.lineCross(new Line(rx,0,rx,Global.map.size.y))) {
+                        Global.map.placeProp(l, aux[1], -1);
+                    }
+                }
+            }
         } else if (p.startsWith("copy")) {
             String[] texs = message.split(" ")[3].split("&");
             txDepth = texs[0];
@@ -131,24 +138,18 @@ public class EditorInput implements Input, Updatable, Drawable {
             txShader = texs[2];
         } else if (p.startsWith("depth")) {
             txDepth = p.substring(6);
-            if (lastSelected != -1){
-                String[] data = Global.map.formTextures.get(lastSelected).split("&");
-                Global.map.formTextures.put(lastSelected, txDepth+"&"+data[1]+"&"+data[2]);
-            }
+            String[] data = Global.map.formTextures.get(lastSelected).split("&");
+            Global.map.formTextures.put(lastSelected, txDepth+"&"+data[1]+"&"+data[2]);
             chat("show",0,0);
         } else if (p.startsWith("texture")) {
             txTexture = p.substring(8);
-            if (lastSelected != -1){
-                String[] data = Global.map.formTextures.get(lastSelected).split("&");
-                Global.map.formTextures.put(lastSelected, data[0]+"&"+txTexture+"&"+data[2]);
-            }
+            String[] data = Global.map.formTextures.get(lastSelected).split("&");
+            Global.map.formTextures.put(lastSelected, data[0]+"&"+txTexture+"&"+data[2]);
             chat("show",0,0);
         } else if (p.startsWith("shader")) {
             txShader = p.substring(7);
-            if (lastSelected != -1){
-                String[] data = Global.map.formTextures.get(lastSelected).split("&");
-                Global.map.formTextures.put(lastSelected, data[0]+"&"+data[1]+"&"+txShader);
-            }
+            String[] data = Global.map.formTextures.get(lastSelected).split("&");
+            Global.map.formTextures.put(lastSelected, data[0]+"&"+data[1]+"&"+txShader);
             chat("show",0,0);
         } else if (p.startsWith("seedO")){
             currentO.seed = Integer.parseInt(p.substring(6));
@@ -159,22 +160,23 @@ public class EditorInput implements Input, Updatable, Drawable {
         } else if (p.equals("show")){
             message("Depth: "+txDepth+", Texture: "+txTexture+", Shader: "+txShader);
         } else if (p.equals("bg")) {
-            if (lastSelected != -1){
-                for (Line l : Global.map.land){
-                    if (l.next == lastSelected){
-                        l.opt = 1;
-                        message("Intangibility Applied");
-                    }
+            for (Line l : Global.map.land){
+                if (l.next == lastSelected){
+                    l.opt = 1;
+                    message("Intangibility Applied");
                 }
             }
         } else if (p.equals("grow")){
             Global.map.generateProps();
-        } else if (p.equals("gen land")){
-            Generator result = new GenerateHighlands().create('-', Global.map.size);
-            result.finish();
-        } else if (p.equals("gen town")){
-            Generator result = new GenerateTown().create(Global.map.size);
-            result.finish();
+        } else if (p.startsWith("gen land")){
+            int depth = Integer.parseInt(p.substring(9));
+            Creation.prepareRandom(-(int) (Math.random()*1000));
+            new GenerateHighlands(getNext()).create(depth, Global.map.size);
+        } else if (p.startsWith("gen town")){
+            Creation.prepareRandom(-(int) (Math.random()*1000));
+            new GenerateTown(getNext()).create(Global.map.size);
+        } else if (p.equals("clearO")){
+            Updater.clearProps();
         } else if (p.equals("clear")){
             Updater.clear();
             Global.map = new Map(Global.map.id+"", Global.map.size);
@@ -184,7 +186,8 @@ public class EditorInput implements Input, Updatable, Drawable {
             Updater.unrender();
             Global.map.setTexture();
         } else if (p.startsWith("save")){
-            save("map/"+p.substring(5));
+            map = p.substring(5);
+            save("map/"+map);
         } else if (p.startsWith("load")){
             Updater.changeMap = p.substring(5)+"@0";
             Updater.changeMap(true);
@@ -206,7 +209,6 @@ public class EditorInput implements Input, Updatable, Drawable {
                 message(p + " Not found");
             }
         }
-        lastSelected = -1;
     }
 
     private void reverse(int p){
@@ -224,7 +226,7 @@ public class EditorInput implements Input, Updatable, Drawable {
         return txDepth+"&"+txTexture+"&"+txShader;
     }
 
-    private void makePolygon(Line p){
+    private int getNext(){
         int high = -1;
         int nextPolygon = 0;
         for (Line i : Global.map.land){
@@ -233,6 +235,11 @@ public class EditorInput implements Input, Updatable, Drawable {
                 nextPolygon = i.next+1;
             }
         }
+        return nextPolygon;
+    }
+
+    private void makePolygon(Line p){
+        int nextPolygon = getNext();
         if (p.ptd.is(history.get(0).pt)) {
             for (Line i : history) {
                 i.next = nextPolygon;
@@ -260,7 +267,7 @@ public class EditorInput implements Input, Updatable, Drawable {
     @Override
     public void input(int mode, int x, int y) {
         if (mode == -2) v.set(0, 0);
-        if (tool == Tool.LINE || tool == Tool.RECTANGLE) {
+        if (tool == Tool.LINE || tool == Tool.RECTANGLE || tool == Tool.REPOSITION) {
             x = ((x + SNAP / 2) / SNAP) * SNAP;
             y = ((y + SNAP / 2) / SNAP) * SNAP;
             if (current != null) {
@@ -296,9 +303,11 @@ public class EditorInput implements Input, Updatable, Drawable {
             case 0:
                 if (tool == Tool.LINE || tool == Tool.RECTANGLE) {
                     if (connected) current.ptd.set(x, y);
+                } else if (tool == Tool.REPOSITION) {
+                    if (repos) current.pt.set(x, y);
                 } else if (tool == Tool.OBJECT) {
                     currentO.pos.set(x, y);
-                } else if (tool == Tool.REMOVE && lmb){
+                } else if (tool == Tool.REMOVE && lmb) {
                     ArrayList<Prop> props = Updater.collideProp(new P(x,y),40);
                     for (Prop i : props) {
                         String name = i.name;
@@ -315,6 +324,10 @@ public class EditorInput implements Input, Updatable, Drawable {
                         current.ptd = new P(x, y);
                         makePolygon(current);
                     }
+                    current = new Line(x, y, x, y);
+                    Global.map.land.add(current);
+                    history.add(current);
+                    connected = true;
                 } else if (tool == Tool.RECTANGLE){
                     if (connected) {
                         Global.map.land.remove(current);
@@ -328,7 +341,28 @@ public class EditorInput implements Input, Updatable, Drawable {
                             history.add(l);
                         }
                         makePolygon(lines[3]);
-                        break;
+                    }
+                    current = new Line(x, y, x, y);
+                    Global.map.land.add(current);
+                    history.add(current);
+                    connected = true;
+                } else if (tool == Tool.REPOSITION) {
+                    if (!repos){
+                        P pt = new P();
+                        for (Line i : Global.map.land){
+                            if (i.pt.getSubtract(new P(x,y)).getDist() < 64){
+                                pt = i.pt;
+                                break;
+                            } else if (i.ptd.getSubtract(new P(x,y)).getDist() < 64){
+                                pt = i.ptd;
+                                break;
+                            }
+                        }
+                        current = new Line(pt, new P());
+                        repos = true;
+                    } else {
+                        current = new Line();
+                        repos = false;
                     }
                 } else if (tool == Tool.OBJECT) {
                     currentO = make(cunit, new P(x, y));
@@ -376,11 +410,6 @@ public class EditorInput implements Input, Updatable, Drawable {
                     while (it.hasNext()){
                         i = (Line) it.next();
                         if (i.lineCross(new Line(new P(x,y),lmbP))){
-                            if (genProp != null){
-                                String[] aux = genProp.split("@");
-                                for (int ii=0;ii<Integer.parseInt(aux[0]);ii++) Global.map.placeProp(i, aux[1], -1);
-                                genProp = null;
-                            }
                             if (reverse){
                                 reverse(i.next);
                                 reverse = false;
@@ -405,30 +434,34 @@ public class EditorInput implements Input, Updatable, Drawable {
                 Global.display.chatbox.requestFocus();
                 break;
             case KeyEvent.VK_1:
-                if (!shift) selectTool(Tool.NONE);
-                else selectTool(Tool.SELECT);
+                selectTool(Tool.NONE);
                 break;
             case KeyEvent.VK_2:
-                if (!shift) selectTool(Tool.LINE);
-                else {
-                    selectTool(Tool.OBJECT);
-                    currentO.remove();
-                    currentO = make(cunit, new P(x, y));
-                }
+                selectTool(Tool.REPOSITION);
                 break;
             case KeyEvent.VK_3:
-                if (!shift) selectTool(Tool.MODIFY);
-                else selectTool(Tool.RECLAIM);
+                selectTool(Tool.MODIFY);
                 break;
             case KeyEvent.VK_4:
-                if (!shift) selectTool(Tool.DELETE);
-                else {
-                    currentO.remove();
-                    selectTool(Tool.REMOVE);
-                }
+                selectTool(Tool.LINE);
                 break;
             case KeyEvent.VK_5:
                 selectTool(Tool.RECTANGLE);
+                break;
+            case KeyEvent.VK_6:
+                selectTool(Tool.DELETE);
+                break;
+            case KeyEvent.VK_7:
+                selectTool(Tool.SELECT);
+                break;
+            case KeyEvent.VK_8:
+                selectTool(Tool.OBJECT);
+                currentO.remove();
+                currentO = make(cunit, new P(x, y));
+                break;
+            case KeyEvent.VK_9:
+                currentO.remove();
+                selectTool(Tool.REMOVE);
                 break;
             case KeyEvent.VK_W:
                 setSpeed(0,-1);
@@ -478,9 +511,10 @@ public class EditorInput implements Input, Updatable, Drawable {
             case KeyEvent.VK_INSERT:
                 if (Updater.editor) {
                     Updater.editor = false;
+                    Global.map = null;
+                    P newPos = Global.camera.getAdd(0,0);
                     FileManager.loadPlayer(-1, "0");
-                    Global.display.input = Global.player.input;
-                    Global.player.pos.set(Global.camera);
+                    Global.player.pos.set(newPos);
                     Global.player.say("Beware the intangibility");
                 }
                 break;
@@ -512,7 +546,12 @@ public class EditorInput implements Input, Updatable, Drawable {
         }
     }
     private void selectTool(Tool tool) {
-        message(tool.name());
+        String test = "";
+        for (Tool i : Tool.values()){
+            if (tool == i) test += " ["+i.name()+"] ";
+            else test += " "+i.name()+" ";
+        }
+        message(test);
         this.tool = tool;
         if (current != null && connected){
             Global.map.land.remove(current);
@@ -520,6 +559,7 @@ public class EditorInput implements Input, Updatable, Drawable {
         }
         currentO.remove();
         connected = false;
+        repos = false;
     }
 
     public void update() {
@@ -544,7 +584,7 @@ public class EditorInput implements Input, Updatable, Drawable {
         g.drawLine(Global.rel.x(), (int) (Global.map.size.y+Global.rel.y), Global.rel.x(), Global.rel.y());
         g.setColor(Color.MAGENTA);
         g.setFont(Global.font);
-        g.drawString(message, Settings.centerX-96, Settings.screenY-64);
+        g.drawString(message, Settings.centerX-96-(message.length()*6), Settings.screenY-64);
     }
 
     private void save(String p){

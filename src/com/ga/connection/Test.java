@@ -1,7 +1,5 @@
 package com.ga.connection;
 
-import com.ga.map.Creation;
-
 /**
  * Created by Ga on 12/13/2016. asdasdasdawdadqw
  */
@@ -15,7 +13,6 @@ public class Test {
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
-        Creation.test();
     }
     private static void print(int[][] p){
         for (int[] i : p){

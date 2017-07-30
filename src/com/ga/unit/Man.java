@@ -159,7 +159,7 @@ public class Man extends Unit {
     }
 
     public void onAttack(Unit p){
-        if (weapon.usable(1)) weapon.trigger(p);
+        if (weapon.usable(2)) weapon.trigger(p);
         brain.onAttack();
     }
 

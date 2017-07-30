@@ -1,7 +1,6 @@
 package com.ga.unit.item;
 
 import com.ga.game.Sound;
-import com.ga.map.Global;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.unit.Man;
@@ -10,19 +9,12 @@ import com.ga.unit.Man;
  * Created by Ga on 8/9/2016. asd
  */
 public class Armor extends Item {
-    public static Material[] plateMaterials = new Material[]{
-        Material.Steel, Material.Brass, Material.Stone, Material.Bronze, Material.Copper, Material.Lead, Material.Leather,
-        Material.Iron, Material.Silver, Material.Bone, Material.Glass, Material.Titanium, Material.Crystal
-    };
     private int piece = 0;
-    private float coverage = 0;
     private int armorMod = 0;
-    public int pocket = 0;
-    public Armor(String name, int seed, Material[] materials, int encumberance, float coverage, int pockets, int piece) {
+    int pocket = 0;
+    public Armor(String name, int seed, int piece, int encumberance, int pockets, Material[] materials) {
         super(name, seed, materials, ItemType.Armor);
         this.encumberance = encumberance;
-        this.coverage = coverage;
-        weight *= coverage;
         value = 24;
         this.pocket = pockets;
         this.piece = piece;
@@ -39,12 +31,8 @@ public class Armor extends Item {
     }
     public void randomSize(P sizeVariance) {
     }
-    private float getMaxArmor(){
-        return Math.max(0,material.hardness + armorMod);
-    }
     float getArmor(){
-        if (Global.r.nextFloat() < coverage) return getMaxArmor();
-        else return 0;
+        return Math.max(0,material.hardness + armorMod);
     }
     protected void setModifier(PrefixMod mod){
         super.setModifier(mod);
@@ -96,7 +84,7 @@ public class Armor extends Item {
         if (emod != null){
             r += " This armor has "+probability*100+"% chance of activating its enchantment on being hit.";
         }
-        return r + " This armor decreases damage by "+getMaxArmor()+" points "+(coverage*100)+"% of the time." +
+        return r + " This armor decreases damage by "+getArmor()+" points." +
                 " It has "+pocket+" pockets.";
     }
 }

@@ -29,6 +29,9 @@ public class Updater {
     private static ArrayList<Observer> removeQueue = new ArrayList<>();
     public static String changeMap = null;
     public static Performer changeMapEvent = null;
+    static void clearProps(){
+        for (Prop i : props) i.remove();
+    }
     static void clear(){
         drawee.clear();
         effects.clear();

@@ -9,7 +9,7 @@ import java.util.ArrayList;
  * Created by ga on 5/28/17. asd
  */
 class TerrainTrail {
-    private static int id = 0;
+    static int id = 0;
     private ArrayList<Line> lines = new ArrayList<>();
     int terrain;
     P last;
@@ -64,21 +64,11 @@ class TerrainTrail {
     private void setTexture(String p){
         Global.map.formTextures.put(terrain, p);
     }
-    void finishNoDepth(String p){
+    void finish(String p){
         if (lines.size() > 0) {
             connect();
             Global.map.land.addAll(lines);
             if (!p.equals("")) setTexture(p);
-        }
-    }
-    void finish(Generator gen, String p){
-        finishNoDepth(p);
-        gen.depths.add(terrain);
-    }
-    void minY(int p) {
-        for (Line i : lines){
-            if (i.pt.y < p) i.pt.y = p;
-            if (i.ptd.y < p) i.ptd.y = p;
         }
     }
     void reverse() {

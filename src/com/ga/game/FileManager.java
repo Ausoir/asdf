@@ -20,7 +20,7 @@ import java.util.HashMap;
 public class FileManager {
     public static HashMap<String, ArrayList<String[]>> fileCache;
 
-    static void init(){
+    public static void init(){
         fileCache = new HashMap<>();
         searchFiles("Data", fileCache);
     }
@@ -93,7 +93,7 @@ public class FileManager {
         pi.host.load(data);
         pi.host.controlId = id;
         pi.load(line[2]);
-        if (!Updater.editor) Global.display.input = pi;
+        Global.display.input = pi;
         Command.host = pi.host;
         loadMap(Global.player.cmap);
         Global.mapEdgeCenter(Global.camera = Global.map.size.getMult(.5f,.5f));
@@ -113,12 +113,8 @@ public class FileManager {
         String dir = mapProperties[0];
         int player = -1;
         if (Global.map != null) player = Integer.parseInt(mapProperties[1]);
-        if (FileManager.isFile("Data/map/" + dir + ".map")){
-            Global.map = new Map(dir, new P());
-            Global.map.load(dir);
-        } else {
-            Generator.generate(mapProperties);
-        }
+        Global.map = new Map(dir, new P());
+        Global.map.load(dir);
         Global.player.cmap = dir;
         Global.camera.set(Global.player.pos);
         Global.map.setTexture();
@@ -231,7 +227,7 @@ public class FileManager {
 
     public static void readWorld(){
         char[][] world;
-        String data = read("Data/map/World.map");
+        String data = read("Data/map/World.txt");
         String[] lines = data.split("%");
         world = new char[lines.length-1][lines[1].length()];
         for (int y=1;y<lines.length;y++){

@@ -1,0 +1,11 @@
+Weed;2;1;0;.3,.3;1 //Name, Image Center Type, Gravity, Mobility, Random Size, Random Side
+Reed;2;1;0;.3,.3;1
+Root;2;1;0;.3,.3;1
+Vine;2;1;0;.3,.3;1
+Rock;2;1;0;.3,.3;1
+Stone;2;1;0;.3,.3;1
+Bush;2;1;0;.3,.3;1
+XBush;2;1;0;.3,.3;1
+Tree;2;1;0;.3,.3;1
+Training_Dummy;2;1;0;0,0;1
+Door;2;0;0;0,0;1

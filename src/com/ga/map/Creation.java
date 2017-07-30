@@ -23,7 +23,7 @@ public class Creation {
             FileManager.save("map/0", Global.player.toCharacterString());
         }
         FileManager.loadPlayer(-1, "0");
-        if (!FileManager.isFile("Data/map/World.map")) {
+        if (!FileManager.isFile("Data/map/World.txt")) {
             seed = (int) (Math.random()*1000000);
 //            world = WorldCreation.create(16,16);
             world = new char[][]{new char[]{'6','-','-','-','-','-','-','-','-','-','-','-','-','-','-','4'}};
@@ -33,7 +33,7 @@ public class Creation {
         }
     }
     public static void prepareRandom(int id){
-        r = new Random(Integer.parseInt((""+id)+seed));
+        r = new Random(id+seed);
     }
     public static int getSeed(int p, int pool, int id){
         int seed = getSeed(p);
@@ -41,7 +41,7 @@ public class Creation {
         return seed;
     }
     public static int getSeed(int p){
-        if (p == -1) return r.nextInt(9999);
+        if (p == -1) return r.nextInt(99999);
         return p;
     }
     private static void saveWorld(){
@@ -53,7 +53,7 @@ public class Creation {
             }
             r.append("\n");
         }
-        FileManager.save("map/World.map", r.toString());
+        FileManager.save("map/World.txt", r.toString());
     }
     public static char getWorld(int id){
         int[] pt = new int[]{id % world[0].length, id / world[0].length};

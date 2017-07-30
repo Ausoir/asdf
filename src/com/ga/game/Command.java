@@ -30,13 +30,11 @@ public class Command {
                 else if (cmd[0].equals("unit")) Stock.getByName(cmd[1], -1).pos.set(host.pos.getAdd(host.target));
                 else if (cmd[0].equals("mob")) Mob.spawn(cmd[1],host.lastLand);
                 else if (cmd[0].equals("item")) host.setWeapon((Item) Stock.getByName(cmd[1], -1));
-                else if (cmd[0].equals("itemN")) host.setWeapon((Item) Stock.get(cmd[1]+"@"+cmd[2]));
                 else if (cmd[0].equals("tp")) host.pos.add(Integer.parseInt(cmd[1].split(",")[0]),Integer.parseInt(cmd[1].split(",")[1]));
                 else if (cmd[0].equals("to")){
                     host.lastLand = new Line();
                     host.pos.add(host.target);
                 }
-//                else if (cmd[0].equals("inside")) host.say(Prop.isInside(host.pos.getAdd(host.target).x, host.pos.getAdd(host.target).y)+"");
                 else if (cmd[0].equals("tpto")) host.pos.set(Integer.parseInt(cmd[1].split(",")[0]),Integer.parseInt(cmd[1].split(",")[1]));
                 else if (cmd[0].equals("act")) host.setState(Actions.valueOf(cmd[1]));
                 else if (cmd[0].equals("learn")) host.learnSkill(Actions.valueOf(cmd[1]));

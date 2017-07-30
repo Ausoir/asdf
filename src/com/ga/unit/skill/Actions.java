@@ -723,7 +723,7 @@ public enum Actions {
             rock.render();
         }
     },
-    Shock(40,4,7,1,new Tags(){{
+    Shock(2,4,7,1,new Tags(){{
         add(Tag.Runic);
         add(Tag.Energy);
     }}){
@@ -776,7 +776,7 @@ public enum Actions {
             }
         }
     },
-    Lightning(40,0,17,3,new Tags(){{
+    Lightning(32,0,17,3,new Tags(){{
         add(Tag.Runic);
         add(Tag.Energy);
         add(Tag.Channeling);
@@ -1044,7 +1044,7 @@ public enum Actions {
             }
         }
     },
-    Fireblast(40,0,24,1,new Tags(){{
+    Fireblast(60,0,24,1,new Tags(){{
         add(Tag.Runic);
         add(Tag.Channeling);
         add(Tag.Fire);
@@ -1183,7 +1183,7 @@ public enum Actions {
             };
         }
     },
-    Fireball(40,5,16,1,new Tags(){{
+    Fireball(48,5,16,1,new Tags(){{
         add(Tag.Runic);
         add(Tag.Fire);
     }}){

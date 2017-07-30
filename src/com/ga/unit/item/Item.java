@@ -29,6 +29,9 @@ public class Item extends Prop {
             public boolean isBlunt(){
                 return false;
             }
+            public boolean isTip(){
+                return true;
+            }
         }, Spear(Actions.Thrust, 1, .4f, "swing_silent"){
             public boolean isBlunt(){
                 return false;
@@ -36,6 +39,14 @@ public class Item extends Prop {
         }, Knife(Actions.Slash, .3f, .4f, "swing_knife") {
             public boolean isBlunt() {
                 return false;
+            }
+            public boolean isTip(){
+                return true;
+            }
+        },
+        Swinging(Actions.Slash, 2, 2, "swing_silent"){
+            public boolean isTip(){
+                return true;
             }
         },
         Bashing(Actions.Slash, 2, 2, "swing_silent"),
@@ -55,31 +66,35 @@ public class Item extends Prop {
         public boolean isBlunt(){
             return true;
         }
+        public boolean isTip(){
+            return false;
+        }
     }
     public enum Material{
-        Wooden(.3f,2,16,1,new Color(118, 93, 0,60)){
+        Wooden(.3f,2,30,1,new Color(118, 93, 0,60)){
             void onSet(Item host) {
                 host.tags.add(Tag.Combustible);
             }
-        }, Cloth(.6f,0,3,0){
+        }, Cloth(.6f,0,8,0){
             void onSet(Item host) {
                 host.tags.add(Tag.Combustible);
             }
-        }, Leather(.3f,1,6,1,new Color(133, 78, 32,140)){
+        }, Leather(.3f,1,24,1,new Color(133, 78, 32,140)){
             void onSet(Item host) {
                 host.tags.add(Tag.Combustible);
             }
         }, Glass(.05f,1,1,7),
-        Brass(.36f,3,40,3,new Color(133, 123, 23,120)),
-        Copper(.32f,4,24,4,new Color(133, 92, 38,120)),
-        Bronze(.24f,4,70,4,new Color(133, 72, 0,200)),
-        Iron(.24f,5,100,4),
-        Silver(.16f,6,40,6),
-        Lead(.2f,6,48,5,new Color(19, 31, 75,180)),
-        Steel(.1f,4,120,6),
-        Titanium(.001f,3,800,6),
+        Brass(.36f,5,110,4,new Color(133, 123, 23,120)),
+        Copper(.32f,5,80,3,new Color(133, 92, 38,120)),
+        Bronze(.24f,5,160,4,new Color(133, 72, 0,200)),
+        Iron(.24f,4,200,5),
+        Silver(.16f,6,140,3),
+        Gold(.16f,12,40,2),
+        Lead(.2f,7,70,2,new Color(19, 31, 75,180)),
+        Steel(.1f,4,8000,6),
+        Titanium(.001f,3,-1,7),
         Crystal(.04f,8,24,12,new Color(28, 133, 67,120)),
-        Bone(.16f,1,28,3),
+        Bone(.16f,1,80,3),
         Other(0,0,10,0),
         Flesh(.05f,0,-1,0),
         Stone(.1f,6,5,5,new Color(107, 107, 107,255));
@@ -97,6 +112,11 @@ public class Item extends Prop {
             this.color = color;
         }
         void onSet(Item host){
+        }
+        public static Material[] load(String[] plist){
+            Material[] list = new Material[plist.length];
+            for (int i=0;i<plist.length;i++) list[i] = valueOf(plist[i]);
+            return list;
         }
         static Material get(Random seed, Material[] list){
             float pool = 0;
@@ -233,6 +253,7 @@ public class Item extends Prop {
         super(name, seed);
         gravity = true;
         setType(type);
+        image.setCenterType(type.isTip()?3:2);
         material = Material.get(rand, materials);
         setMaterial(material);
         cdTime = new int[]{Global.time};

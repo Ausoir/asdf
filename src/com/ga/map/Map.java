@@ -19,11 +19,11 @@ import java.util.Iterator;
 public class Map extends Thing {
     public Weather weather = new Weather();
     public ArrayList<Line> land = new ArrayList<>();
-    public ArrayList<Line> landX = new ArrayList<>();
-    public HashMap<Integer, String> formTextures = new HashMap<>();
+    ArrayList<Line> landX = new ArrayList<>();
+    HashMap<Integer, String> formTextures = new HashMap<>();
     public HashMap<Integer, Terrain> terrains = new HashMap<>();
     private static HashMap<String, String> defaultProps = new HashMap<String, String>(){{
-        put("grass","Rock=.1,Bush=.2,Stone=.1,Weed=1");
+        put("grass","Rock=.1,Bush=.2,Weed=1");
         put("dirt","Rock=.2");
         put("rock","Rock=.2");
         put("road","Rock=.1");

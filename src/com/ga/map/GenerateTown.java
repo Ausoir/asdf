@@ -11,6 +11,10 @@ import java.util.ArrayList;
  * Created by ga on 5/28/17. asd
  */
 class GenerateTown extends Generator {
+    GenerateTown(int next) {
+        super(next);
+    }
+
     private void generateFoundation(int id, P mapSize, P point, float lastY, String[] texture){
         int width = (int) Global.clamp((float) Math.abs(mapSize.x*(Creation.r.nextGaussian()*.4f)),100,mapSize.x*(7f/8));
         P pt1 = new P(Math.max(600, point.x-width),point.y);
@@ -67,7 +71,7 @@ class GenerateTown extends Generator {
                 else Global.map.placeProp(l, "SteamHouse=1", -1);
                 for (int ii=0;ii<Creation.r.nextInt(9);ii++) Global.map.placeProp(l,"Stack=.2,Barrel=.5,Crate=1", -1);
                 for (int ii=0;ii<Creation.r.nextInt(9);ii++){
-                    Global.map.placeProp(l, "Man=.4", Stock.getMan("Resident"));
+                    Global.map.placeProp(l, "Man=.4", Stock.getRawStock("Man","Resident"));
                 }
             }
         }
@@ -84,7 +88,7 @@ class GenerateTown extends Generator {
         baseline.add(new Line(mapSize.x,mapSize.y-600,mapSize.x,mapSize.y,0,0));
         baseline.add(new Line(mapSize.x,mapSize.y,0,mapSize.y,0,0));
         baseline.add(new Line(0,mapSize.y,0,mapSize.y-600,0,0));
-        baseline.finish(this, "steel&road");
+        baseline.finish("0&steel&road");
         ArrayList<TerrainTrail> alltrails = new ArrayList<>();
         for (Line l : Global.map.land){
             if (l.next == -1 && Creation.r.nextInt(3)!=0){
@@ -115,7 +119,7 @@ class GenerateTown extends Generator {
             }
         }
         for (TerrainTrail trail : alltrails){
-            trail.finish(this, "stair&none");
+            trail.finish("1&stair&none");
             trail.climbable();
         }
         return this;

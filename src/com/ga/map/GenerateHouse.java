@@ -12,7 +12,12 @@ import java.util.Iterator;
  * Created by ga on 5/28/17. asd
  */
 class GenerateHouse extends Generator {
+    public GenerateHouse(int next) {
+        super(next);
+    }
+
     Generator create(String[] info){
+        int startDepth = 0;
         int returnDoorSeed = Integer.parseInt(info[1]);
         P mapSize = new P(info[2]).mult(2f);
         Global.map = new Map(info[0], mapSize);
@@ -27,7 +32,7 @@ class GenerateHouse extends Generator {
         trail.add(topleft);
         trail.add(topright);
         trail.add(bottomright);
-        trail.finish(this, texture+"&none");
+        trail.finish(startDepth+"&"+texture+"&none");
         int floorNum = Integer.parseInt(info[4]);
         ArrayList<Integer> dividers = new ArrayList<>();
         if (floorNum > 1) {
@@ -40,7 +45,7 @@ class GenerateHouse extends Generator {
                 stair.move(0, -floorHeight);
                 stair.move(80, 0);
                 stair.move(320, floorHeight);
-                stair.finish(this, texture + "&basic");
+                stair.finish((startDepth+1)+"&"+texture+"&basic");
                 stair.climbable();
                 lastY -= floorHeight;
                 sides[i] = Global.r.nextBoolean();
@@ -57,14 +62,15 @@ class GenerateHouse extends Generator {
                 divider.move(-mapSize.x+112+420, 0);
                 divider.move(0, -20);
                 divider.move(-436, 0);
-                divider.finishNoDepth("black&none");
+                divider.finish("black&none");
                 divider.climbable();
                 if (sides[i]) divider.switchSides(mapSize.x);
                 dividers.add(divider.terrain);
             }
         }
 
-        Prop door = Stock.Door.create(returnDoorSeed);
+//        Prop door = Stock.Door.create(returnDoorSeed);
+        Prop door = Stock.Travel.create(returnDoorSeed); //temporary door replacement
         P result = new P(mapSize.x / 2, bottom-door.image.getSize().y/2-2);
         door.pos.set(result);
 //        Stock.Exit.create(returnDoorSeed).pos.set(result.x,result.y);
@@ -89,11 +95,11 @@ class GenerateHouse extends Generator {
                 }
             }
         }
-        TerrainTrail blocker = generateBlocker(trail.terrain);
-        depthBinding.put(blocker.terrain, dividers);
+        TerrainTrail blocker = generateBlocker(startDepth+2,trail.terrain);
+//        depthBinding.put(blocker.terrain, dividers);
         return this;
     }
-    TerrainTrail generateBlocker(int p){
+    TerrainTrail generateBlocker(int depth, int p){
         float highX = 0;
         Line high = null;
         for (final Line i : Global.map.land) {
@@ -119,7 +125,7 @@ class GenerateHouse extends Generator {
                 }
             }
         }
-        blocker.finish(this, "black&none");
+        blocker.finish(depth+"&black&none");
         blocker.reverse();
         Iterator it = Global.map.land.iterator();
         Line i;
