@@ -55,7 +55,7 @@ public class Armor extends Item {
         }
     }
     @Override
-    public void use(final Man host){
+    public boolean use(final Man host){
         if (host.getVacancy() >= encumberance) {
             host.setState(type.action);
             final Armor me = this;
@@ -69,7 +69,9 @@ public class Armor extends Item {
                     }
                 }
             };
+            return true;
         } else host.say("Too encumbering!");
+        return false;
     }
     @Override
     public String getName(){

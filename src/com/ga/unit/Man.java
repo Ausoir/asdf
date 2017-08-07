@@ -21,19 +21,14 @@ import static com.ga.unit.BodyHumanoid.OFIST;
  * Created by Ga on 5/7/2016. asd
  */
 public class Man extends Unit {
-    protected Item fist = ((Item) Stock.getByName("Fist",0)).cancelAdd();
+    private String face;
+    protected Item fist = ((Item)Stock.Fist.create(-1,0)).cancelAdd();
     public Item weapon = fist;
     public ArmorSet armor;
 
     public Man(String name, int seed) {
         super(name, seed);
         clip = new BodyHumanoid(this);
-    }
-
-    Actions performActions(int dist) {
-        Actions r = super.performActions(dist);
-        if (r == Actions.Use && wieldingNone()) return null;
-        return r;
     }
 
     public void setWeapon(Item p){
@@ -81,17 +76,6 @@ public class Man extends Unit {
         else return super.getHand();
     }
 
-    public void stateSet(Actions state){
-        int penalty = Math.max(0, armor.armor[state.isLeg()?1:2].weight - get("Strength").get());
-        attackSpeed -= penalty;
-        if (state.getCost() >= 0) get("Stamina").add(-penalty, false);
-        super.stateSet(state);
-        if (state.getCooldown() > 0){
-            int[] t = cooldown.get(state);
-            if (t != null) cooldown.put(state, new int[]{t[0] + penalty});
-        }
-    }
-
     @Override
     public boolean face(int dir, boolean force) {
         if (super.face(dir, force)) {
@@ -122,12 +106,6 @@ public class Man extends Unit {
         armor.onHit();
     }
 
-    public float getSpeed() {
-        float speed = super.getSpeed();
-        float penalty = Math.max(0,armor.getWeight()+weapon.weight-get("Strength").get()*2)*.01f;
-        return Math.max(0,speed-penalty);
-    }
-
     public int getVacancy(){
         Stat agi = get("Agility");
         if (agi == null) return 99;
@@ -140,20 +118,7 @@ public class Man extends Unit {
 
     public void die() {
         say("@x");
-        if (rand.nextBoolean()) {
-            if (loot == null) loot = new Item[]{};
-            Item[] newLoot = new Item[loot.length + 4];
-            System.arraycopy(loot, 0, newLoot, 0, loot.length);
-            if (!wieldingNone()) newLoot[loot.length] = weapon;
-            if (!armor.isBare(0)) newLoot[loot.length + 1] = armor.armor[0];
-            if (!armor.isBare(1) && Global.r.nextInt(3) == 0) newLoot[loot.length + 2] = armor.armor[1];
-            if (!armor.isBare(2) && Global.r.nextInt(4) == 0) newLoot[loot.length + 3] = armor.armor[2];
-            for (int i = 0; i < clip.organs.length; i++) {
-                if (clip.organs[i].amputated) newLoot[loot.length + 1 + armor.organToPiece(i)] = null;
-            }
-            loot = newLoot;
-            weapon.drop(this);
-        }
+        if (rand.nextBoolean()) weapon.drop(this);
         weapon.remove();
         super.die();
     }
@@ -223,12 +188,18 @@ public class Man extends Unit {
         weapon.pos.set(pos.x + clip.organs[FIST].ptd.x, pos.y + clip.organs[FIST].ptd.y);
     }
 
+    private void setFace(String p){
+        face = p;
+        clip.organs[5].setImage(p);
+    }
+
     @Override
     public String[] load(String p){
         String[] t = p.split("#");
-        if (t[1].equals("")) setWeapon(fist);
-        else setWeapon((Item) Stock.get(t[1]));
-        armor = new ArmorSet(this, t[2]);
+        setFace(t[1]);
+        if (t[2].equals("")) setWeapon(fist);
+        else setWeapon((Item) Stock.get(t[2]));
+        armor = new ArmorSet(this, t[3]);
         String[] r = super.load(t[0]);
         final Man me = this;
         clip.organs[FIST].onAmputate = new Performer(){
@@ -245,7 +216,7 @@ public class Man extends Unit {
     @Override
     public String toString(){
         String r = super.toString();
-        if (!r.equals("")) r += "#"+weapon.forceToString()+"#"+armor.toString();
+        if (!r.equals("")) r += "#"+face+"#"+weapon.forceToString()+"#"+armor.toString();
         return r;
     }
 }

@@ -1,12 +1,9 @@
 package com.ga.unit.player;
 
-import com.ga.map.Creation;
 import com.ga.map.Global;
 import com.ga.map.Updater;
 import com.ga.tool.Line;
-import com.ga.unit.Prop;
 import com.ga.unit.Stock;
-import com.ga.unit.Tag;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Buffs;
 import com.ga.unit.skill.Stat;
@@ -36,6 +33,7 @@ public class MainPlayer extends Player {
         if (state == Actions.Use && this.state == Actions.Jump && getStateLevel(Actions.Airstrike) > 0 && this.delay.time > 32) stateSet(Actions.Airstrike);
         else if (state == Actions.Jump && this.state == Actions.Rest) state = Actions.Leap;
         else if (state == Actions.Discard && this.state == Actions.Rest) state = Actions.Throw;
+        else if (state == Actions.Grab && this.state == Actions.Rest) state = Actions.Use2;
         else if (state == Actions.Rest && this.state == Actions.Walk) state = Actions.Sprint;
         else if (state == Actions.Kick && this.state == Actions.Rest) state = Actions.Sidekick;
         else if (state == Actions.Use && this.state == Actions.Walk){
@@ -43,11 +41,8 @@ public class MainPlayer extends Player {
             else if (skillTree.getSkillLevel(Actions.Dash) > 0) state = Actions.Dash;
         }
         int r = super.setState(state);
-        if (r == 2){
-            indicater.show(1);
-        } else if (r == 3){
-            indicater.showCd(getCooldown(state)[0]);
-        }
+        if (r == 2) indicater.show(1);
+        else if (r == 3) indicater.showCd(getCooldown(state)[0]);
         return r;
     }
     @Override

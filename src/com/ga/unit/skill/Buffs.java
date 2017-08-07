@@ -282,6 +282,7 @@ public enum Buffs {
             public void onSet() {
                 Sound.play(host.pos, "freeze");
                 var = host.get("Speed").add(-Math.round(host.getSpeed()*30), false);
+                host.get("Attack").add(-15, true);
                 time += level;
                 host.stats.triggerEffect(Buffs.Bleed);
                 host.stats.triggerEffect(Buffs.Burn);
@@ -301,7 +302,7 @@ public enum Buffs {
             private void freeze(){
                 frozen = true;
                 int size = host.getSize();
-                ice = new Terrain("ice", Shader.None, host.getDepth()+1);
+                ice = new Terrain("_130,180,255,140", Shader.None, host.getDepth()+1);
                 int num = Global.r.nextInt(3)+5;
                 P[] points = new P[num];
                 float gap = 6.28f/num;
@@ -324,7 +325,7 @@ public enum Buffs {
                 host.mobile = false;
                 host.tangible = false;
                 ice.render();
-                time = Global.time + freezeThreshold + Global.r.nextInt(freezeThreshold);
+                time = Global.time + freezeThreshold + Global.r.nextInt(freezeThreshold) + (freezeThreshold/2);
             }
             private void melt(){
                 host.mobile = true;
@@ -336,6 +337,7 @@ public enum Buffs {
             }
             public void onFinish() {
                 host.get("Speed").add(-var, true);
+                host.get("Attack").add(15, true);
             }
             public boolean onTrigger(){
                 if (level > 1) level--;

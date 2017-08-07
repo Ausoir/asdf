@@ -38,12 +38,13 @@ public class Player extends Man {
     private ArrayList<Trait> traits = new ArrayList<>();
     public Player(String name, int seed) {
         super(name, seed);
-        loadActions("-5,100,1000/Use&Walk&Sprint");
         speechType = "p";
         inventory = new Inventory(this);
         crafting = new Crafts(this);
         health = new Health(this);
         Collections.addAll(tags, Tags.trainers);
+    }
+    public void onField(){
     }
     public void learnSkill(Actions p){
         say("Learned spell "+p.getName()+"!");
@@ -107,6 +108,10 @@ public class Player extends Man {
     }
     @Override
     public int setState(Actions state){
+        if ((state == Actions.Use || state == Actions.Use2) && getVacancy() < state.getEncumberance()+weapon.encumberance){
+            say("Too encumbering!");
+            return 0;
+        }
         int r = super.setState(state);
         if (r != 0){
             if (r == 2) {
@@ -118,10 +123,14 @@ public class Player extends Man {
         return r;
     }
     public void stateSet(Actions state){
-        if (state.getDel() > 0 && getVacancy() < state.getEncumberance()+weapon.encumberance){
-            attackSpeed -= 50;
-        }
+        int penalty = Math.max(0, armor.armor[state.isLeg()?1:2].weight - get("Strength").get());
+        attackSpeed -= penalty;
+        if (state.getCost() >= 0) get("Stamina").add(-penalty, false);
         super.stateSet(state);
+        if (state.getCooldown() > 0){
+            int[] t = cooldown.get(state);
+            if (t != null) cooldown.put(state, new int[]{t[0] + penalty});
+        }
         final Player me = this;
         switch (state) {
             case Idle:
@@ -270,7 +279,6 @@ public class Player extends Man {
     public String[] load(String p){
         String[] line = p.split("%");
         String[] r = super.load(line[0]);
-        clip.organs[5].setImage("Player");
         String[] other = line[1].split(";");
         cmap = other[1];
         gold = Integer.parseInt(other[2]);

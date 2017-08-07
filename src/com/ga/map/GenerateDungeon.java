@@ -54,7 +54,7 @@ class GenerateDungeon extends GenerateHouse {
         trail.finish("0&rock&none");
 
 //        Prop door = Stock.Door.create(returnDoorSeed);
-        Prop door = Stock.Travel.create(returnDoorSeed); //temporary door replacement
+        Prop door = Stock.Travel.create(-1,returnDoorSeed); //temporary door replacement
         P doorSize = door.image.getSize();
         int exitSegment = Creation.r.nextInt(segments-6)+3;
         P exitPos = forward.get(exitSegment).getSubtract(backward.get(exitSegment)).mult(.5f,.5f)
@@ -68,7 +68,7 @@ class GenerateDungeon extends GenerateHouse {
         platform.climbable();
         door.pos.set(doorPos);
 //        Stock.Exit.create(returnDoorSeed).pos.set(doorPos.x,doorPos.y);
-        Stock.Spawn.create(returnDoorSeed).pos.set(doorPos.x,doorPos.y);
+        Stock.Spawn.create(-1,returnDoorSeed).pos.set(doorPos.x,doorPos.y);
         normalize(800,400);
         generateBlocker(2,trail.terrain);
         return this;

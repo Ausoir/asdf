@@ -74,22 +74,27 @@ public enum Behavior {
                 int x = (int) ((target.pos.x + target.vel.x) - (host.pos.x + host.vel.x));
                 int y = (int) (target.pos.y - host.pos.y);
                 host.face(target.pos.x > host.pos.x ? 1 : -1, false);
-                float dist = (float) Math.sqrt(x * x + y * y) - host.getReach();
-                if (y < -64 && Global.r.nextBoolean()) {
-                    Actions.Walk.update(host);
-                    host.setState(Actions.Jump);
-                } else {
-                    if (y > 64 && Global.r.nextBoolean()) host.setState(Actions.Drop);
-                    else {
-                        Actions action = host.performActions((int) dist);
-                        if (action != null){
-                            if (host.setState(action) == 2){
-                                host.setState(Actions.Rest);
-                                host.delay.time += 40;
-                            } else if (host.state.getTags().contains(Tag.Channeling)) {
-                                host.delay.set(60 + Global.r.nextInt(80));
-                            }
+                float dist = (float) Math.abs(Math.sqrt(x * x + y * y) - host.getReach());
+                Actions action = Actions.Idle;
+                float lowest = 1000;
+                float current;
+                for (Actions act : host.moveset){
+                    current = act.getRange(host)-dist;
+                    if (current >= 0) {
+                        if (current < lowest || (current == lowest && Math.random() < .5f)) {
+                            lowest = current;
+                            action = act;
                         }
+                    }
+                }
+                if (dist>action.getRange(host)) host.setState(Actions.Walk);
+                else {
+                    if (Math.random() > host.get("Stamina").getPercentage()){
+                        host.setState(Actions.Rest);
+                        host.delay.time += 40;
+                    } else host.setState(action);
+                    if (host.state.getTags().contains(Tag.Channeling)) {
+                        host.delay.set(60 + Global.r.nextInt(80));
                     }
                 }
             }

@@ -19,7 +19,7 @@ import java.util.Iterator;
 public class Map extends Thing {
     public Weather weather = new Weather();
     public ArrayList<Line> land = new ArrayList<>();
-    ArrayList<Line> landX = new ArrayList<>();
+    ArrayList<Line> landRaw = new ArrayList<>();
     HashMap<Integer, String> formTextures = new HashMap<>();
     public HashMap<Integer, Terrain> terrains = new HashMap<>();
     private static HashMap<String, String> defaultProps = new HashMap<String, String>(){{
@@ -30,17 +30,15 @@ public class Map extends Thing {
         put("snow","Rock=.1,Bush=.1");
         put("sand","XBush=.1,Shell=.2,Starfish=.3");
     }};
-    private static HashMap<String, String> defaultPropsCC = new HashMap<String, String>(){{
-        put("dirt","Root=.15");
-        put("grass","Vine=.8");
-    }};
     public P size;
     public int id;
     private String panorama;
     private static final int magnify = 2;
     public Map(String id, P size) {
         super(null,0,1);
-        this.id = Integer.parseInt(id);
+        char firstchar = id.charAt(0);
+        if (firstchar == '-' || (firstchar >= 48 && firstchar <= 57)) this.id = Integer.parseInt(id);
+        else this.id = -1;
         this.panorama = Creation.panoramaAt(this.id);
         if (panorama.equals("None")){
             image.visible = false;
@@ -56,7 +54,6 @@ public class Map extends Thing {
         String data = FileManager.read("Data/map/" + dir + ".map");
         String[] line = data.split("%");
         String[] names = line[0].split(";");
-        this.id = Integer.parseInt(dir);
         this.size = new P(names[2]);
         if (line.length > 1) {
             String[] sections = line[1].split(";");
@@ -68,7 +65,8 @@ public class Map extends Thing {
                 sections = line[2].split(";");
                 for (String section1 : sections) {
                     Line surface = new Line(section1);
-                    Global.map.land.add(surface);
+                    Global.map.landRaw.add(surface);
+                    if (surface.opt != 1) Global.map.land.add(surface);
                 }
                 if (line.length > 3 && !line[3].equals(";")) {
                     sections = line[3].split(";");
@@ -91,13 +89,10 @@ public class Map extends Thing {
             if (it.hasNext()) result.append(";");
         }
         result.append("\n");
-        for (Line i : land){
+        for (Line i : landRaw){
             if (!i.toString().equals("")) result.append(i).append(";");
         }
-        for (Line i : landX){
-            if (!i.toString().equals("")) result.append(i).append(";");
-        }
-        if (land.size() > 0 || landX.size() > 0) result = new StringBuilder(result.substring(0, result.length() - 1));
+        if (landRaw.size() > 0) result = new StringBuilder(result.substring(0, result.length() - 1));
         return result.toString();
     }
 
@@ -107,7 +102,7 @@ public class Map extends Thing {
 
     void clear(){
         land.clear();
-        landX.clear();
+        landRaw.clear();
         terrains.clear();
         formTextures.clear();
     }
@@ -118,7 +113,7 @@ public class Map extends Thing {
         int terrainDepth = Terrain.toTerrainDepth(Integer.parseInt(formName[0]));
         Terrain terrain = new Terrain(formName[1], Shader.getByName(formName[2]), terrainDepth);
         terrains.put(target, terrain);
-        for (final Line i : land){
+        for (final Line i : landRaw){
             if (i.next == target){
                 terrain.addLine(i);
                 terrain.addPoint(i.pt.x, i.pt.y);
@@ -128,7 +123,7 @@ public class Map extends Thing {
     }
 
     public void setTexture(){
-        for (final Line i : land){
+        for (final Line i : landRaw){
             if (i.next >= 0){
                 Terrain terrain = terrains.get(i.next);
                 if (terrain == null){
@@ -143,14 +138,12 @@ public class Map extends Thing {
                 }
                 terrain.addLine(i);
                 terrain.addPoint(i.pt.x, i.pt.y);
-                if (i.opt == 1) landX.add(i);
             } else {
                 String depth = formTextures.get(i.next);
                 if (depth != null) i.depth = Terrain.toTerrainDepth(Integer.parseInt(formTextures.get(i.next)));
                 else i.depth = Terrain.toTerrainDepth(0);
             }
         }
-        land.removeAll(landX);
         for (Object o : terrains.entrySet()) {
             java.util.Map.Entry pair = (java.util.Map.Entry) o;
             Terrain terrain = (Terrain) pair.getValue();
@@ -160,27 +153,24 @@ public class Map extends Thing {
 
     void generateProps(){
         for (Line l : land) {
-            if (Math.abs(l.getSlope()) < Line.MAXSLOPE
-                    && (l.pt.y < size.y || l.ptd.y < size.y) && (l.pt.x < size.x || l.ptd.x < size.x)
-                    && (l.pt.y > 0 || l.ptd.y > 0) && (l.pt.x > 0 || l.ptd.x > 0)) {
-                if (Math.abs(l.getSlope()) < .5f) {
-                    String texture = formTextures.get(l.next);
-                    if (texture != null) {
-                        String[] formProps = formTextures.get(l.next).split("&");
-                        boolean cw = l.clockwise();
-                        int size = (int) (Math.abs(l.ptd.x - l.pt.x) * .02f);
-                        for (int ii = 0; ii < size; ii++) {
-                            String prop = null;
-                            if (cw) {
+            if (l.clockwise()) {
+                if (Math.abs(l.getSlope()) < Line.MAXSLOPE
+                        && (l.pt.y < size.y || l.ptd.y < size.y) && (l.pt.x < size.x || l.ptd.x < size.x)
+                        && (l.pt.y > 0 || l.ptd.y > 0) && (l.pt.x > 0 || l.ptd.x > 0)) {
+                    if (Math.abs(l.getSlope()) < .5f) {
+                        String texture = formTextures.get(l.next);
+                        if (texture != null) {
+                            String[] formProps = formTextures.get(l.next).split("&");
+                            int size = (int) (Math.abs(l.ptd.x - l.pt.x) * .02f);
+                            for (int ii = 0; ii < size; ii++) {
+                                String prop = null;
                                 if (formProps.length > 3) {
                                     prop = formProps[3];
                                 } else if (formProps.length > 2) {
                                     prop = defaultProps.get(formProps[2]);
                                 }
-                            } else {
-                                prop = defaultPropsCC.get(formProps[0]);
+                                if (prop != null) placeProp(l, prop, -1);
                             }
-                            if (prop != null) placeProp(l, prop, -1);
                         }
                     }
                 }
@@ -209,15 +199,9 @@ public class Map extends Thing {
             if (landSize >= size.x) {
                 float halfSizeX = size.x/2;
                 int tx = (int) (Creation.r.nextFloat() * (l.ptd.x - l.pt.x));
-                if (l.clockwise()) tx = (int) Global.clamp(tx, halfSizeX, (l.ptd.x - l.pt.x) - halfSizeX);
-                else tx = (int) Global.clamp(tx, l.ptd.x - l.pt.x + halfSizeX, -halfSizeX);
+                tx = (int) Global.clamp(tx, halfSizeX, (l.ptd.x - l.pt.x) - halfSizeX);
                 t.pos = new P(l.pt.x + tx, (int) l.getCrossPointY(l.pt.x + tx));
-                if (!l.clockwise()){
-                    t.pos.y += (size.y / 2)-4;
-                    t.rotation = 3.14f;
-                } else {
-                    t.rotation = l.getSlope();
-                }
+                t.rotation = l.getAtan();
                 return t;
             } else t.remove();
         }
@@ -264,7 +248,7 @@ public class Map extends Thing {
     public Line checkLand(Line p){
         ArrayList<Line> list = new ArrayList<>();
         for (Line i : land){
-            if (i.clockwise() && i.depth >= getDepth() && i.lineCross(p)){
+            if (i.clockwise() && i.lineCross(p)){
                 list.add(i);
             }
         }

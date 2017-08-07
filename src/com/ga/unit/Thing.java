@@ -50,10 +50,8 @@ public class Thing implements Drawable, Observer {
         return depth;
     }
     public void setDepth(int depth) {
-        if (this.depth != depth) {
-            this.depth = depth;
-            Updater.resetDepth(this);
-        }
+        this.depth = depth;
+        Updater.resetDepth(this);
     }
 
     public void remove(){

@@ -1,4 +1,5 @@
-Weed;2;1;0;.3,.3;1 //Name, Image Center Type, Gravity, Mobility, Random Size, Random Side
+Error;1;0;0;0,0;0 //Name, Image Center Type, Gravity, Mobility, Random Size, Random Side
+Weed;2;1;0;.3,.3;1
 Reed;2;1;0;.3,.3;1
 Root;2;1;0;.3,.3;1
 Vine;2;1;0;.3,.3;1
@@ -9,3 +10,7 @@ XBush;2;1;0;.3,.3;1
 Tree;2;1;0;.3,.3;1
 Training_Dummy;2;1;0;0,0;1
 Door;2;0;0;0,0;1
+Signpost;2;1;0;0,0;1
+Streetlight;2;1;0;0,0;1
+Pole;2;1;0;0,.2;1
+Cone;2;1;0;0,0;1

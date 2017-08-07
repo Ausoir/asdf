@@ -37,7 +37,7 @@ public class Body {
     Body(Unit host, String current) {
         this.host = host;
         this.clip = Clips.clip.get(current);
-        reset(clip);
+        set(clip);
         appendageSize = (float) Math.abs(host.rand.nextGaussian()*.3f)+.7f;
         randomize();
         organs[BODY].pt.y = -getHeight();
@@ -73,7 +73,7 @@ public class Body {
         }
     }
 
-    private void reset(Clip p) {
+    private void set(Clip p) {
         organs = new Organ[p.model.length];
         localAnimation = Clips.clone(p.clip);
         localFrames = Clips.clone(p.frames);
@@ -124,14 +124,14 @@ public class Body {
                                     public void draw(Graphics2D g) {
 //                                        if (type != 0) g.drawLine((int)(host.pos.x+pt.x+Global.rel.x), (int)(host.pos.y+pt.y+Global.rel.y),
 //                                                (int)(host.pos.x+ptd.x+Global.rel.x), (int)(host.pos.y+ptd.y+Global.rel.y));
-                                        if (!amputated) image.draw(g, host.pos.x + ptd.x, host.pos.y + ptd.y,
+                                        image.draw(g, host.pos.x + ptd.x, host.pos.y + ptd.y,
                                             (float) Math.atan2(pt.y-ptd.y, pt.x-ptd.x)-1.57f, host.dir, strokeSize, getLength()+6);
                                     }
                                 };
                 else if (type == 0) organs[p] = new Organ(parent, tip) {
                                         public void draw(Graphics2D g) {
 //                                            g.drawOval((int)(host.pos.x+pt.x-12+Global.rel.x), (int)(host.pos.y+pt.y-24+Global.rel.y), 24, 24);
-                                            if (!amputated) image.draw(g, host.pos.x+pt.x, host.pos.y+pt.y, getAtan()+1.57f, host.dir);
+                                            image.draw(g, host.pos.x+pt.x, host.pos.y+pt.y, getAtan()+1.57f, host.dir);
                                         }
                                     };
                 else organs[p] = new Organ(parent, tip);
@@ -177,7 +177,7 @@ public class Body {
     }
 
     private int getHeight(){
-        return legNum==0?0:localAnimation[0][FOOT][1]-1;
+        return legNum==0?0:localAnimation[0][FOOT][1];
     }
 
     P randomPoint(){

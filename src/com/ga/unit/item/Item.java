@@ -25,49 +25,38 @@ import java.util.Random;
  */
 public class Item extends Prop {
     public enum ItemType {
-        Sword(Actions.Slash, 1.3f, .7f, "swing_knife"){
+        Sword(Actions.Slash, 3, 1.3f, .7f, "swing_knife"){
             public boolean isBlunt(){
                 return false;
             }
-            public boolean isTip(){
-                return true;
-            }
-        }, Spear(Actions.Thrust, 1, .4f, "swing_silent"){
+        }, Spear(Actions.Thrust, 1, 1, .4f, "swing_silent"){
             public boolean isBlunt(){
                 return false;
             }
-        }, Knife(Actions.Slash, .3f, .4f, "swing_knife") {
+        }, Knife(Actions.Slash, 3, .3f, .4f, "swing_knife") {
             public boolean isBlunt() {
                 return false;
             }
-            public boolean isTip(){
-                return true;
-            }
         },
-        Swinging(Actions.Slash, 2, 2, "swing_silent"){
-            public boolean isTip(){
-                return true;
-            }
-        },
-        Bashing(Actions.Slash, 2, 2, "swing_silent"),
-        Armor(Actions.Rest, 2, 1, "swing_normal"), Scroll(Actions.Guard, 0, .5f, "scroll"),
-        Shooting(Actions.Shoot, .8f, 1, "swing_normal"), Rifle(Actions.Snipe, 1.2f, 1, "swing_normal"),
-        Bow(Actions.Aim, 1, .2f, "swing_silent"), Throwing(Actions.Throw, .2f, 1, "swing_silent"),
-        Darting(Actions.Dart, .1f, 1, "swing_normal"), Consumable(Actions.Consume, .2f, 1, "drink");
+        Swinging(Actions.Slash, 3, 2, 2, "swing_silent"),
+        Bashing(Actions.Slash, 1, 2, 2, "swing_silent"),
+        Armor(Actions.Rest, 1, 2, 1, "swing_normal"), Scroll(Actions.Guard, 1, 0, .5f, "scroll"),
+        Shooting(Actions.Shoot, 3, .8f, 1, "swing_normal"), Rifle(Actions.Snipe, 3, 1.2f, 1, "swing_normal"),
+        Bow(Actions.Aim, 1, 1, .2f, "swing_silent"), Throwing(Actions.Throw, 3, .2f, 1, "swing_silent"),
+        Darting(Actions.Dart, 3, .1f, 1, "swing_normal"), Consumable(Actions.Consume, 1, .2f, 1, "drink");
         Actions action;
         String sound;
+        int centerType;
         float weightMultiplier, durabilityMultiplier;
-        ItemType(Actions p, float mass, float sturdiness, String sound){
+        ItemType(Actions p, int centerType, float mass, float sturdiness, String sound){
             action = p;
+            this.centerType = centerType;
             this.weightMultiplier = mass;
             this.durabilityMultiplier = sturdiness;
             this.sound = sound;
         }
         public boolean isBlunt(){
             return true;
-        }
-        public boolean isTip(){
-            return false;
         }
     }
     public enum Material{
@@ -237,7 +226,7 @@ public class Item extends Prop {
     private PrefixMod pmod = PrefixMod.None;
     protected Buffs emod = null;
     Material material;
-    public int weight;
+    public int weight, range;
     public int volume = 1;
     public int encumberance = 0;
     int cooldown = 0;
@@ -253,7 +242,6 @@ public class Item extends Prop {
         super(name, seed);
         gravity = true;
         setType(type);
-        image.setCenterType(type.isTip()?3:2);
         material = Material.get(rand, materials);
         setMaterial(material);
         cdTime = new int[]{Global.time};
@@ -267,6 +255,7 @@ public class Item extends Prop {
             }
         };
         randomSize(new P(.2f,.2f));
+        range = getSize()-8;
     }
     protected void imbueMeta(boolean canSmod, boolean canAdmod, float emodProb){
         pmod = PrefixMod.get(rand);
@@ -312,6 +301,7 @@ public class Item extends Prop {
     }
     private void setType(ItemType p){
         this.type = p;
+        image.setCenterType(type.centerType);
 //        this.type.onSet(this);
     }
     public void setMaterial(Material mat){
@@ -472,7 +462,7 @@ public class Item extends Prop {
     private void playSound(){
         Sound.play(pos, type.sound);
     }
-    public boolean usable(int p){
+    public boolean usable(int p){ //return: is item in usable state
         if ((isInfinite() || uses >= p) && Global.time >= cdTime[0]){
             if (!isInfinite()){
                 uses -= p;
@@ -484,10 +474,13 @@ public class Item extends Prop {
         }
         return false;
     }
-    public void use(Man host){
-        playSound();
-        cdTime[0] = Global.time+cooldown;
-        if (host.setState(type.action) == 2) host.setState(Actions.Rest);
+    public boolean use(Man host){ //return: is host in a state capable of using item
+        if (host.setState(type.action) == 0){
+            cdTime[0] = Global.time+cooldown;
+            playSound();
+            return true;
+        }
+        return false;
     }
     public void trigger(Unit target){
         if (emod != null && rand.nextFloat() < probability){
@@ -541,9 +534,9 @@ public class Item extends Prop {
     @Override
     public String[] load(String p){
         String[] sections = super.load(p);
-        uses = Integer.parseInt(sections[4]);
-        cdTime[0] = Integer.parseInt(sections[5]);
-        loadMeta(sections[6]);
+        uses = Integer.parseInt(sections[5]);
+        cdTime[0] = Integer.parseInt(sections[6]);
+        loadMeta(sections[7]);
         return sections;
     }
     private boolean isInfinite(){

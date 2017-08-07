@@ -49,9 +49,8 @@ public class Food extends Item {
         nutrition = new String(data);
     }
     @Override
-    public void use(Man p){
-        if (usable(1)) {
-            super.use(p);
+    public boolean use(Man p){
+        if (usable(1) && super.use(p)) {
             int perishTime = perish - Global.time;
             if (p instanceof Player){
                 Stat motivation = p.get("Motivation");
@@ -65,8 +64,10 @@ public class Food extends Item {
                     motivation.add(happy, false);
                 }
                 ((Player) p).health.record(nutrition);
+                return true;
             }
         }
+        return false;
     }
     private int getPoisonChance(){ // 0 to 10
         return (Global.time-perish)/100;

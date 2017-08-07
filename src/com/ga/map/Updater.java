@@ -22,16 +22,13 @@ public class Updater {
     private static ArrayList<Drawable> drawee = new ArrayList<>();
     private static ArrayList<Effect> effects = new ArrayList<>();
     private static ArrayList<Updatable> updatee = new ArrayList<>();
-    private static ArrayList<Prop> props = new ArrayList<>();
+    static ArrayList<Prop> props = new ArrayList<>();
     private static ArrayList<AI> controllee = new ArrayList<>();
     public static HashMap<Integer, Unit> unitList = new HashMap<>();
     public static ArrayList<Observer> addQueue = new ArrayList<>();
     private static ArrayList<Observer> removeQueue = new ArrayList<>();
     public static String changeMap = null;
     public static Performer changeMapEvent = null;
-    static void clearProps(){
-        for (Prop i : props) i.remove();
-    }
     static void clear(){
         drawee.clear();
         effects.clear();

@@ -1,3 +1,7 @@
+Textures
+junkyard : https://www.pexels.com/photo/scrap-metal-trash-litter-scrapyard-128421/
+
+Sounds
 grass footstep : http://www.freesound.org/people/Badkitty67044/sounds/274679/
 cloth 1 & 2 : http://www.freesound.org/people/Walter_Odington/sounds/18626/
 cloth 3 : http://www.freesound.org/people/RutgerMuller/sounds/51140/

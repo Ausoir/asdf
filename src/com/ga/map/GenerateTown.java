@@ -71,7 +71,7 @@ class GenerateTown extends Generator {
                 else Global.map.placeProp(l, "SteamHouse=1", -1);
                 for (int ii=0;ii<Creation.r.nextInt(9);ii++) Global.map.placeProp(l,"Stack=.2,Barrel=.5,Crate=1", -1);
                 for (int ii=0;ii<Creation.r.nextInt(9);ii++){
-                    Global.map.placeProp(l, "Man=.4", Stock.getRawStock("Man","Resident"));
+                    Global.map.placeProp(l, "Resident=.4", -1);
                 }
             }
         }
@@ -129,7 +129,7 @@ class GenerateTown extends Generator {
             Line l = land;
             Prop last = Global.map.placeProp(l, "TowerHouse=1", -1);
             for (int i = 0; i < Creation.r.nextInt(7) + 3; i++) {
-                Prop t = Stock.TowerHouse.create(-1);
+                Prop t = Stock.TowerHouse.create(-1,-1);
                 t.pos.set(last.pos.x, last.pos.y-last.image.getSize().y+4);
                 last = t;
             }

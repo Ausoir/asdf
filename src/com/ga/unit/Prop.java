@@ -14,6 +14,7 @@ import java.util.Random;
  */
 public class Prop extends Thing {
     public int factoryId = -1;
+    public int subId = -1;
     public Interactive onInteract = null;
     public boolean gravity = false;
     public boolean mobile = true;
@@ -41,20 +42,7 @@ public class Prop extends Thing {
     }
     public void onAttack(Unit p){}
     private void adjustToLand(){
-        Line closest = Global.map.checkLand(new Line(pos.getAdd(0,-4), new P(pos.x, pos.y+800)));
-        float closestY = pos.y + 9999;
-        Line line = new Line(pos, new P(pos.x, closestY));
-        for (Line i : Global.map.land) {
-            if (line.lineCross(i)) {
-                if (i.next != -1 && i.clockwise()) {
-                    float y = i.getCrossPointY(pos.x);
-                    if (y < closestY) {
-                        closest = i;
-                        closestY = y;
-                    }
-                }
-            }
-        }
+        Line closest = Global.map.checkLand(new Line(pos.getAdd(0,-4), new P(pos.x, pos.y+600)));
         if (closest != null) {
             lastLand = closest;
             setDepth(closest.depth - 2);
@@ -140,15 +128,15 @@ public class Prop extends Thing {
     }
     public String[] load(String p) {
         String[] ps = p.split("@");
-        pos.load(ps[2]);
-        rotation = Float.parseFloat(ps[3]);
+        pos.load(ps[3]);
+        rotation = Float.parseFloat(ps[4]);
         return ps;
     }
 
     @Override
     public String toString(){
         if (!save) return "";
-        return (factoryId==-1?name:""+factoryId) + "@" + seed + "@" + pos
+        return (factoryId==-1?name:""+factoryId) + "@" + subId + "@" + seed + "@" + pos
                 + "@" + String.format(java.util.Locale.US,"%.2f", rotation);
     }
 }

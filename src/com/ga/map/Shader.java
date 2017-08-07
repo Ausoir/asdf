@@ -125,6 +125,40 @@ public enum Shader{
             return null;
         }
     }),
+    Cartoon2(new ShaderRenderer(){
+        protected BufferedImage render(BufferedImage image, int param){
+            int width = image.getWidth();
+            int height = image.getHeight();
+            for (int y = 4; y < height-4; y++) {
+                for (int x = 4; x < width-4; x++) {
+                    if ((image.getRGB(x, y)&0xff000000)>>24!=0 && (
+                            ((image.getRGB(x-1, y)&0xff000000)>>24==0) ||
+                            ((image.getRGB(x, y-1)&0xff000000)>>24==0) ||
+                            ((image.getRGB(x+1, y)&0xff000000)>>24==0) ||
+                            ((image.getRGB(x, y+1)&0xff000000)>>24==0) ||
+
+                            ((image.getRGB(x-2, y)&0xff000000)>>24==0) ||
+                            ((image.getRGB(x, y-2)&0xff000000)>>24==0) ||
+                            ((image.getRGB(x+2, y)&0xff000000)>>24==0) ||
+                            ((image.getRGB(x, y+2)&0xff000000)>>24==0) ||
+
+                            ((image.getRGB(x-3, y)&0xff000000)>>24==0) ||
+                            ((image.getRGB(x, y-3)&0xff000000)>>24==0) ||
+                            ((image.getRGB(x+3, y)&0xff000000)>>24==0) ||
+                            ((image.getRGB(x, y+3)&0xff000000)>>24==0) ||
+
+                            ((image.getRGB(x-4, y)&0xff000000)>>24==0) ||
+                            ((image.getRGB(x, y-4)&0xff000000)>>24==0) ||
+                            ((image.getRGB(x+4, y)&0xff000000)>>24==0) ||
+                            ((image.getRGB(x, y+4)&0xff000000)>>24==0)
+                        )) {
+                        image.setRGB(x, y, new Color(0, 0, 0, 255).getRGB());
+                    }
+                }
+            }
+            return null;
+        }
+    }),
     Basic(new ShaderRenderer(){
         protected BufferedImage render(BufferedImage image, int x1, int x2, int y1, float slope){
             int y2 = image.getHeight()-1;
@@ -157,9 +191,9 @@ public enum Shader{
                         int rgb = image.getRGB(ix, y);
                         int shadeMag = y - 16;
                         int alpha = (rgb & 0xff000000) >>> 24;
-                        int red = Math.min(((rgb & 0xff0000) >>> 16) + shadeMag, 255);
-                        int green = Math.min(((rgb & 0xff00) >>> 8) + shadeMag, 255);
-                        int blue = Math.min(((rgb & 0xff)) + shadeMag, 255);
+                        int red = (int) Global.clamp(((rgb & 0xff0000) >>> 16) + shadeMag, 0, 255);
+                        int green = (int) Global.clamp(((rgb & 0xff00) >>> 8) + shadeMag, 0, 255);
+                        int blue = (int) Global.clamp(((rgb & 0xff)) + shadeMag, 0, 255);
                         image.setRGB(ix, y, new Color(red, green, blue, alpha).getRGB());
                     }
                 }
@@ -255,7 +289,7 @@ public enum Shader{
             return null;
         }
     }),
-    Road(new ShaderRenderer(){
+    Road_Unpaved(new ShaderRenderer(){
         protected BufferedImage render(BufferedImage image, int x1, int x2, int y1, float slope){
             int y2 = image.getHeight()-1;
             for (int ix = x1; ix < x2; ix++) {
@@ -271,6 +305,43 @@ public enum Shader{
                         int green = (int) Global.clamp(((rgb & 0xff00) >>> 8) + shadeMag, 0, 90 + randMax);
                         int blue = (int) Global.clamp(((rgb & 0xff)) + shadeMag, 0, 60 + randMax);
                         image.setRGB(ix, y, new Color(red, green, blue, alpha).getRGB());
+                    }
+                }
+            }
+            return null;
+        }
+    }),
+    Road_Normal(new ShaderRenderer(){
+        protected BufferedImage render(BufferedImage image, int x1, int x2, int y1, float slope){
+            int y2 = image.getHeight()-1;
+            int color = new Color(35, 35, 35,255).getRGB();
+            int line = new Color(215, 215, 215,255).getRGB();
+            for (int ix = x1; ix < x2; ix++) {
+                int ty = y1 + (int) ((ix - x1) * slope);
+                for (int iy = -1; iy < 20; iy++) {
+                    int y = Math.min(ty+iy,y2);
+                    if (y >= 0 && Math.random()*(iy+2) < 18){
+                        if (ix / 20 % 5 <= 2 && iy < 4) image.setRGB(ix, y, line);
+                        else image.setRGB(ix, y, color);
+
+                    }
+                }
+            }
+            return null;
+        }
+    }),
+    Road_Highway(new ShaderRenderer(){
+        protected BufferedImage render(BufferedImage image, int x1, int x2, int y1, float slope){
+            int y2 = image.getHeight()-1;
+            int color = new Color(35, 35, 35,255).getRGB();
+            int line = new Color(184, 184, 0,255).getRGB();
+            for (int ix = x1; ix < x2; ix++) {
+                int ty = y1 + (int) ((ix - x1) * slope);
+                for (int iy = -1; iy < 20; iy++) {
+                    int y = Math.min(ty+iy,y2);
+                    if (y >= 0){
+                        if (iy < 6 && iy != 2 && iy != 1) image.setRGB(ix, y, line);
+                        else image.setRGB(ix, y, color);
                     }
                 }
             }

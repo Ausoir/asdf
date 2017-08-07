@@ -18,6 +18,8 @@ Battlewear_Torso;2;5;2;Brass,Silver,Steel,Titanium
 Battlewear_Legging;1;5;4;Brass,Silver,Steel,Titanium
 Shadowrobe_Torso;2;1;3;Cloth
 Shadowrobe_Legging;1;2;3;Cloth
+Skeleton_Torso;1;2;3;Bone
+Skeleton_Legging;1;2;3;Bone
 Bandana;0;3;0;Cloth
 Mask;0;3;0;Cloth,Leather
 Lace_Helm;0;3;0;Copper,Bronze,Iron

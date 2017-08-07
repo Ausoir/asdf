@@ -67,7 +67,7 @@ class TerrainTrail {
     void finish(String p){
         if (lines.size() > 0) {
             connect();
-            Global.map.land.addAll(lines);
+            Global.map.landRaw.addAll(lines);
             if (!p.equals("")) setTexture(p);
         }
     }

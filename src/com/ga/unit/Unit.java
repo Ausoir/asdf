@@ -4,9 +4,9 @@ import com.ga.game.Settings;
 import com.ga.game.Sound;
 import com.ga.map.Global;
 import com.ga.map.Updater;
-import com.ga.tool.*;
-import com.ga.unit.item.Item;
-import com.ga.unit.player.MainPlayer;
+import com.ga.tool.EventTimer;
+import com.ga.tool.Line;
+import com.ga.tool.P;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Buffs;
 import com.ga.unit.skill.Stat;
@@ -14,16 +14,13 @@ import com.ga.unit.skill.Stats;
 
 import java.awt.*;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * Created by Ga on 5/7/2016. asd
  */
 public class Unit extends Prop {
-    private int[] rangeZone = new int[]{-5};
-    private HashMap<Integer, Actions[]> moveset = new HashMap<>();
-    HashMap<Actions, int[]> cooldown = new HashMap<>();
+    Actions[] moveset;
+    protected HashMap<Actions, int[]> cooldown = new HashMap<>();
     public int controlId;
     public Body clip;
     public Actions state = Actions.Idle;
@@ -40,7 +37,6 @@ public class Unit extends Prop {
     private Actions lastState = Actions.Idle;
     private int jumpAcross = 0;
     public int stateDuration = 0;
-    Item[] loot;
 
     public Unit(String name, int seed) {
         super(null,seed);
@@ -56,47 +52,15 @@ public class Unit extends Prop {
     @Override
     public String[] load(String p){
         String[] sections = super.load(p);
-        clip.load(sections[4]);
-        stats.load(sections[5]);
-        faction = Faction.valueOf(sections[6]);
-        brain = Intelligence.get(sections[7], this);
-        loadActions(sections[8]);
+        clip.load(sections[5]);
+        stats.load(sections[6]);
+        faction = Faction.valueOf(sections[7]);
+        brain = Intelligence.get(sections[8], this);
+        String[] movesets = sections[9].split(",");
+        moveset = new Actions[movesets.length];
+        for (int i=0;i<movesets.length;i++) moveset[i] = Actions.getByName(movesets[i]);
         clip.setOrganHealth();
         return sections;
-    }
-
-    protected void loadActions(String p){
-        String[] rangeMoves = p.split("/");
-        String[] ranges = rangeMoves[0].split(",");
-        String[] moveZones = rangeMoves[1].split(",");
-        rangeZone = new int[ranges.length];
-        for (int i=0;i<ranges.length;i++) rangeZone[i] = Integer.parseInt(ranges[i]);
-        for (int i=0;i<moveZones.length;i++) {
-            String[] moves = moveZones[i].split("&");
-            Actions[] movesets = new Actions[moves.length];
-            for (int ii=0;ii<moves.length;ii++){
-                movesets[ii] = Actions.getByName(moves[ii]);
-            }
-            this.moveset.put(i, movesets);
-        }
-    }
-
-    Actions performActions(int dist){
-        int range = moveset.size()-1;
-        for (int i=0;i<rangeZone.length;i++){
-            if (dist <= rangeZone[i]){
-                range = i;
-                break;
-            }
-        }
-        Actions[] t = moveset.get(range);
-        if (t != null) {
-            Actions move = t[Global.r.nextInt(t.length)];
-            return move;
-        } else {
-            Global.p("Can't find moveset for range " + dist + "@Zone " + range);
-        }
-        return null;
     }
 
     public P getRandomPoint(){
@@ -223,7 +187,7 @@ public class Unit extends Prop {
 
     public void checkHit(P hitPoint, int damage){
         float total = (stats.getEffectLevel(Buffs.Bleed)*.5f + 1) * damage;
-        hit(hitPoint.x < pos.x ? 1 : hitPoint.x > pos.x ? -1 : 0, total / get("Stamina").getMax());
+        hit(Float.compare(pos.x, hitPoint.x), total / get("Stamina").getMax());
     }
 
     public boolean checkHit(Line hitBox, int damage, boolean blunt){
@@ -250,35 +214,6 @@ public class Unit extends Prop {
     public void die() {
         stateSet(Actions.Dead);
         Global.player.witnessDeath(this);
-        if (loot != null){
-            for (Item i : loot){
-                if (i != null){
-                    buff(Buffs.Shock,1);
-                    break;
-                }
-            }
-        }
-        onInteract = new Interactive(){
-            public void interact(Man p){
-                if (p instanceof MainPlayer && loot != null){
-                    Performer[] actions = new Performer[loot.length];
-                    boolean lootable = false;
-                    for (int i=0;i<loot.length;i++){
-                        if (loot[i] != null) {
-                            final int index = i;
-                            actions[i] = new Performer() {
-                                public void perform() {
-                                    Updater.addQueue.add(loot[index]);
-                                    loot[index] = null;
-                                }
-                            };
-                            lootable = true;
-                        }
-                    }
-                    if (lootable) Global.display.menu.showContainer("Corpse of "+name, loot, actions);
-                }
-            }
-        };
     }
 
     public void remove(){
@@ -346,9 +281,11 @@ public class Unit extends Prop {
     public void update() {
         speech.update();
         if (clip.update()) moveTriggered(0);
-        stats.update();
-        if (delay.update() && delay.performer == null) stateDone();
-        stateUpdate();
+        if (state != Actions.Dead) {
+            stats.update();
+            if (delay.update() && delay.performer == null) stateDone();
+            stateUpdate();
+        }
         super.update();
     }
 
@@ -368,20 +305,10 @@ public class Unit extends Prop {
     @Override
     public String toString(){
         if (state == Actions.Dead || !save) return "";
-        String r = super.toString();
-        r += "@"+clip.toString()+"@"+stats.toString()+"@"+faction.name()+"@"+brain.toString()+"@";
-        for (int i : rangeZone) r += i+",";
-        r = r.substring(0,r.length()-1)+"/";
-        Iterator it = moveset.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
-            Actions[] moves = (Actions[]) pair.getValue();
-            for (Actions i : moves){
-                r += i.getName() + "&";
-            }
-            r = r.substring(0,r.length()-1)+(it.hasNext()?",":"");
-        }
-        return r;
+        StringBuilder r = new StringBuilder(super.toString());
+        r.append("@").append(clip.toString()).append("@").append(stats.toString()).append("@").append(faction.name()).append("@").append(brain.toString()).append("@");
+        for (Actions i : moveset) r.append(i.getName()).append(",");
+        return r.deleteCharAt(r.length()-1).toString();
     }
 
     public String getDescription(){
@@ -393,7 +320,6 @@ public class Unit extends Prop {
     }
 
     public void revive() {
-        onInteract = null;
         stats.clearBuffs();
         Particle.holyExplosion(pos,getDepth());
         state = Actions.Idle;
@@ -403,5 +329,6 @@ public class Unit extends Prop {
             i.stitch();
         }
         clip.setOrganHealth();
+        clip.updateStatus();
     }
 }

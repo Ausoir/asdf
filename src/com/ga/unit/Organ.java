@@ -59,7 +59,7 @@ public class Organ extends Line {
         }
     }
     public void draw(Graphics2D g){
-        if (!amputated) image.draw(g, host.pos.x+pt.x, host.pos.y+pt.y, getAtan()-1.57f, host.dir, strokeSize, getLength()+3);
+        image.draw(g, host.pos.x+pt.x, host.pos.y+pt.y, getAtan()-1.57f, host.dir, strokeSize, getLength()+3);
     }
     void setMaxLength(int p){
         maxLength = p;

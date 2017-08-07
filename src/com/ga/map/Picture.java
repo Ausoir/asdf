@@ -19,7 +19,7 @@ public class Picture {
     private static HashMap<String,BufferedImage> cache = new HashMap<>();
     private static HashMap<String,String> directory = new HashMap<>();
     private static HashMap<String,Integer> multiples = new HashMap<>();
-    public boolean visible = false;
+    public boolean visible = true;
     public BufferedImage image;
     public int sizeRadius = 10;
     private P halfSize = new P();
@@ -48,13 +48,12 @@ public class Picture {
     public void set(BufferedImage image){
         this.image = image;
         if (this.image != null) setSize(image.getWidth(), image.getHeight());
-        visible = true;
     }
     public void set(String name){
-        set(load(name));
+        if (name != null) set(load(name));
     }
     public void set(String name, int index){
-        set(getTexture(load(name),32,64,index,0));
+        if (name != null) set(getTexture(load(name),32,64,index,0));
     }
     public BufferedImage getImage(){
         return image;
@@ -97,7 +96,14 @@ public class Picture {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else System.out.println("Can't read file ["+dir + "]");
+        } else {
+            System.out.println("Can't read file ["+dir + "]");
+            try {
+                image = ImageIO.read(new File("Data/Error.png"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         return image;
     }
     public static BufferedImage loadCache(String dir){
