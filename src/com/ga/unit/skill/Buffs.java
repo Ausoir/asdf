@@ -9,7 +9,6 @@ import com.ga.unit.*;
 import com.ga.unit.item.Projectile;
 import com.ga.unit.player.MainPlayer;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -17,7 +16,7 @@ import java.util.Arrays;
  * Created by Ga on 9/1/2016. asd
  */
 public enum Buffs {
-    Banishment(new Tags(){{
+    Banishment(10, new Tags(){{
         add(Tag.Debuff);
         add(Tag.Shadow);
     }}){ Buff makeLocal() {
@@ -38,7 +37,7 @@ public enum Buffs {
             }
         };
     }},
-    Shadowcurse(new Tags(){{
+    Shadowcurse(100,new Tags(){{
         add(Tag.Debuff);
         add(Tag.Shadow);
         add(Tag.Conjuration);
@@ -57,7 +56,7 @@ public enum Buffs {
             }
         };
     }},
-    Alert(new Tags(){{
+    Alert(1,new Tags(){{
         add(Tag.Debuff);
         add(Tag.Air);
     }}){ Buff makeLocal() {
@@ -76,7 +75,7 @@ public enum Buffs {
             }
         };
     }},
-    Haste(new Tags(){{
+    Haste(5,new Tags(){{
         add(Tag.Buff);
         add(Tag.Air);
     }}){ Buff makeLocal() {
@@ -99,9 +98,9 @@ public enum Buffs {
             }
         };
     }},
-    Frenzy(new Tags(){{
+    Frenzy(5,new Tags(){{
         add(Tag.Buff);
-        add(Tag.Combat);
+        add(Tag.Might);
     }}){ Buff makeLocal() {
         return new Buff(10) {
             public void onSet() {
@@ -120,7 +119,7 @@ public enum Buffs {
             }
         };
     }},
-    Rejuvenate(new Tags(){{
+    Rejuvenate(5,new Tags(){{
         add(Tag.Buff);
         add(Tag.Mutation);
     }}){ Buff makeLocal(){
@@ -136,7 +135,7 @@ public enum Buffs {
             }
         };
     }},
-    Cleave(new Tags(){{
+    Cleave(5,new Tags(){{
         add(Tag.Buff);
         add(Tag.Might);
     }}){ Buff makeLocal(){
@@ -150,7 +149,7 @@ public enum Buffs {
             }
         };
     }},
-    Metabolism(new Tags(){{
+    Metabolism(2,new Tags(){{
     }}){ Buff makeLocal(){
         return new Buff(100) {
             public void onStack(int level){
@@ -161,14 +160,14 @@ public enum Buffs {
                     host.stats.triggerEffect(Bleed);
                     if (host instanceof MainPlayer){
                         time += level * 10;
-                        Global.player.onTimeChange();
+                        Global.player.metabolise();
                     }
                 }
                 return super.update();
             }
         };
     }},
-    Bleed(new Tags(){{
+    Bleed(5,new Tags(){{
         add(Tag.Debuff);
     }}){ Buff makeLocal(){
         return new Buff(800) {
@@ -190,7 +189,7 @@ public enum Buffs {
             }
         };
     }},
-    Evade(new Tags(){{
+    Evade(5,new Tags(){{
         add(Tag.Buff);
         add(Tag.Shadow);
     }}){ Buff makeLocal(){
@@ -215,7 +214,7 @@ public enum Buffs {
             }
         };
     }},
-    Shock(new Tags(){{
+    Shock(1,new Tags(){{
         add(Tag.Debuff);
         add(Tag.Air);
     }}){ Buff makeLocal(){
@@ -242,7 +241,7 @@ public enum Buffs {
             }
         };
     }},
-    Burn(new Tags(){{
+    Burn(3,new Tags(){{
         add(Tag.Debuff);
         add(Tag.Fire);
     }}){ Buff makeLocal(){
@@ -255,7 +254,9 @@ public enum Buffs {
                 if (var % 10 == 0 && Global.r.nextBoolean()) {
                     if (var % 50 == 0){
                         host.checkHit(host.pos, level);
-                        if (host.stats.getEffectLevel(Bleed) > 3) host.stats.triggerEffect(Bleed);
+                        if (host.stats.getEffectLevel(Bleed) > 2){
+                            host.stats.getEffect(Bleed).time += Global.r.nextInt(100);
+                        }
                     }
                     for (Unit i : Updater.collideUnit(host.pos, host.getSize() + 40, Faction.Destructive)) {
                         if (Global.r.nextBoolean()) i.buff(Burn, 1);
@@ -270,9 +271,10 @@ public enum Buffs {
             }
         };
     }},
-    Freeze(new Tags(){{
+    Freeze(3,new Tags(){{
+        add(Tag.Buff);
         add(Tag.Debuff);
-        add(Tag.Cold);
+        add(Tag.Ice);
     }}){ Buff makeLocal(){
         return new Buff(0) {
             boolean frozen = false;
@@ -356,9 +358,9 @@ public enum Buffs {
             }
         };
     }},
-    Mark(new Tags(){{
+    Mark(7,new Tags(){{
         add(Tag.Debuff);
-        add(Tag.Combat);
+        add(Tag.Shadow);
     }}){ Buff makeLocal(){
         return new Buff(4) {
             private Thing mark;
@@ -385,7 +387,7 @@ public enum Buffs {
             }
         };
     }},
-    Poison(new Tags(){{
+    Poison(7,new Tags(){{
         add(Tag.Debuff);
         add(Tag.Mutation);
     }}){ Buff makeLocal(){
@@ -416,9 +418,9 @@ public enum Buffs {
             }
         };
     }},
-    Glacialwalk(new Tags(){{
+    Glacialwalk(5,new Tags(){{
         add(Tag.Buff);
-        add(Tag.Cold);
+        add(Tag.Ice);
     }}){ Buff makeLocal(){
         return new Buff(4) {
             private int tick = 1;
@@ -465,38 +467,9 @@ public enum Buffs {
             }
         };
     }},
-    Stoneform(new Tags(){{
+    Stun(8,new Tags(){{
         add(Tag.Debuff);
-        add(Tag.Crystal);
-    }}){ Buff makeLocal(){
-        return new Buff(24) {
-            public void onSet() {
-                Sound.play(host.pos, "stun");
-                time += level * 8;
-                host.vel.x = 0;
-                host.get("Attack").add(-32, true);
-                var = host.get("Speed").add(-10, false);
-                host.clip.setShade(Shader.Color,new Color(26, 26, 26, 180).getRGB());
-            }
-            public void onLoad(){
-                host.stateSet(Actions.Hit);
-                host.delay.set((time-Global.time) * 40);
-                host.clip.setSpeed(99);
-            }
-            public void onFinish(){
-                host.clip.setShade(Shader.XYLinearGradient,0);
-                host.get("Attack").add(32, true);
-                host.get("Speed").add(-var, true);
-            }
-            public boolean update() {
-                Particle.implode("Glare", host.getDepth(), host.pos.getAdd(0, -24), new P(), 1, 10, 1, false, 6);
-                return super.update();
-            }
-        };
-    }},
-    Stun(new Tags(){{
-        add(Tag.Debuff);
-        add(Tag.Cunning);
+        add(Tag.Agility);
     }}){ Buff makeLocal(){
         return new Buff(3) {
             public void onSet() {
@@ -518,7 +491,7 @@ public enum Buffs {
             }
         };
     }},
-    Slowfall(new Tags(){{
+    Slowfall(2,new Tags(){{
     }}){ Buff makeLocal(){
         return new Buff(4) {
             public void onSet(){
@@ -531,7 +504,9 @@ public enum Buffs {
         };
     }};
     public Tags tags;
-    Buffs(Tags tags){
+    public float value;
+    Buffs(float value, Tags tags){
+        this.value = value;
         this.tags = tags;
     }
     Buff makeLocal(){
@@ -554,9 +529,7 @@ public enum Buffs {
 }
 abstract class Buff{
     Unit host;
-    int level;
-    int time;
-    int var;
+    int level, time, var;
     Buffs buff;
     Buff(int time){
         this.time = Global.time+time;

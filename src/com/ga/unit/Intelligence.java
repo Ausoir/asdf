@@ -1,5 +1,6 @@
 package com.ga.unit;
 
+import com.ga.game.Dialog;
 import com.ga.game.FileManager;
 import com.ga.map.Global;
 import com.ga.map.Updater;
@@ -8,7 +9,6 @@ import com.ga.unit.item.Item;
 import com.ga.unit.skill.Actions;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Created by ga on 6/11/17. asd
@@ -37,7 +37,10 @@ public enum Intelligence {
             }
             @Override
             public boolean perceived(Prop p){
-                if (p instanceof Man) {
+                if (p.faction.canAttack(host.faction) && p instanceof Unit) {
+                    host.face(host.pos.x < p.pos.x ? -1 : 1, true);
+                    host.setState(Actions.Sprint);
+                } else if (p instanceof Man) {
                     if (target != p) {
                         target = (Man) p;
                         setTaskEcho(Behavior.Idle);
@@ -70,21 +73,21 @@ public enum Intelligence {
 
                 void load(String p) {
                     super.load(p);
-                    HashMap<String, ArrayList<String>> stock = FileManager.readDialogue("raw/Shop.txt");
+                    String[] data = FileManager.readText("raw/Shop.txt");
                     advertise = new Timer(100+host.rand.nextInt(200), false);
-                    low = host.rand.nextFloat() + .3f;
-                    high = host.rand.nextInt(4) + 2;
+                    low = host.rand.nextFloat()*2 + .5f;
+                    high = host.rand.nextFloat()*2 + 2.5f;
                     host.onInteract = new Interactive() {
                         public void interact(Man p) {
-                            if (p == Global.player) hear(p, "shop");
+                            if (p == Global.player) hear(p, "hi");
                         }
                     };
                     String r = "I'm selling ";
                     int length = host.rand.nextInt(48) + 1;
                     String[] items = new String[length];
+                    String[] inventory = data[host.seed % data.length].split(";");
                     for (int i = 0; i < length; i++) {
-                        ArrayList<String> typeItems = stock.get("General");
-                        items[i] = typeItems.get(host.rand.nextInt(typeItems.size()));
+                        items[i] = inventory[host.rand.nextInt(inventory.length)];
                     }
                     product = new Item[length];
                     price = new int[length];
@@ -118,7 +121,10 @@ public enum Intelligence {
                 }
 
                 public boolean perceived(Prop p){
-                    if (p instanceof Man) {
+                    if (p.faction.canAttack(host.faction) && p instanceof Unit) {
+                        host.face(host.pos.x < p.pos.x ? -1 : 1, true);
+                        host.setState(Actions.Sprint);
+                    } else if (p instanceof Man) {
                         if (target != p) {
                             target = (Man) p;
                             setTaskEcho(Behavior.Idle);
@@ -141,14 +147,185 @@ public enum Intelligence {
                 public void hear(Prop u, String p) {
                     super.hear(u, p);
                     if (u == Global.player) {
-                        if (p.equals("shop")) {
+                        if (p.equals("hi")) {
                             if ((u.dir == 1 && u.pos.x < host.pos.x) || u.dir == -1 && u.pos.x > host.pos.x) {
                                 if (u.pos.getSubtract(host.pos).getDist() < 160){
+                                    host.say("@shop");
+                                    host.face(u.pos.x<host.pos.x?-1:1,true);
                                     int[] newPrice = price;
                                     for (int i = 0; i < newPrice.length; i++) {
                                         newPrice[i] *= Global.player.getShopPrice();
                                     }
                                     Global.display.menu.showShop("Trader's Wares - \"" + host.getConversation() + "\"", product, price, action);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }, Pawnbroker{
+        public AI make(Unit host) {
+            return process(new AI(host) {
+                private String[] wanted;
+                private float[] priceR;
+                Timer advertise;
+
+                void load(String p) {
+                    super.load(p);
+                    String[] data = FileManager.readText("raw/Pawn.txt");
+                    advertise = new Timer(100+host.rand.nextInt(200), false);
+                    host.onInteract = new Interactive() {
+                        public void interact(Man p) {
+                            if (p == Global.player) hear(p, "hi");
+                        }
+                    };
+                    wanted = data[host.seed % data.length].split(";");
+                    priceR = new float[wanted.length];
+                    for (int i=0;i<priceR.length;i++){
+                        priceR[i] = host.rand.nextFloat()*2;
+                    }
+                }
+
+                public boolean perceived(Prop p){
+                    if (p.faction.canAttack(host.faction) && p instanceof Unit) {
+                        host.face(host.pos.x < p.pos.x ? -1 : 1, true);
+                        host.setState(Actions.Sprint);
+                    } else if (p instanceof Man) {
+                        if (target != p) {
+                            target = (Man) p;
+                            setTaskEcho(Behavior.Idle);
+                            if (advertise.over() && host.getConversation().equals("")){
+                                host.say("@c");
+                                advertise.reset();
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
+                }
+
+                public void update(){
+                    super.update();
+                    advertise.update();
+                }
+
+                public void hear(Prop u, String p) {
+                    super.hear(u, p);
+                    if (u == Global.player) {
+                        if (p.equals("hi")) {
+                            if ((u.dir == 1 && u.pos.x < host.pos.x) || u.dir == -1 && u.pos.x > host.pos.x) {
+                                if (u.pos.getSubtract(host.pos).getDist() < 160){
+                                    host.face(u.pos.x<host.pos.x?-1:1,true);
+                                    shop();
+                                }
+                            }
+                        }
+                    }
+                }
+
+                private void shop(){
+                    ArrayList<Prop> inventory = Global.player.getAvailableItems();
+                    ArrayList<Prop> available = new ArrayList<>();
+                    ArrayList<Float> fluctuation = new ArrayList<>();
+                    for (Prop i : inventory){
+                        for (int ii=0;ii<wanted.length;ii++){
+                            if (i.name.equals(wanted[ii])){
+                                available.add(i);
+                                fluctuation.add(priceR[ii]);
+                                break;
+                            }
+                        }
+                    }
+                    if (available.size() == 0){
+                        String list = "I'm a broker. I buy ";
+                        for (int i=0;i<wanted.length;i++){
+                            if (i != wanted.length-1) list += wanted[i]+"s, ";
+                            else if (i > 0) list += "or "+wanted[i]+"s.";
+                            else list += wanted[i]+"s.";
+                        }
+                        Global.display.menu.showDialog("Buyer", list+" Do you need something?");
+                    } else {
+                        Performer[] action = new Performer[available.size()];
+                        String[] options = new String[action.length];
+                        for (int i = 0; i < action.length; i++) {
+                            final Item item = (Item) available.get(i);
+                            final int price = (int) (item.getValue() * fluctuation.get(i));
+                            options[i] = item.getFullName() + " - "+ Dialog.money(price);
+                            action[i] = new Performer() {
+                                public void perform() {
+                                    item.remove();
+                                    Global.player.gold += price;
+                                    host.say("@sold");
+                                }
+                            };
+                        }
+                        Global.display.menu.showDialog("Wanted list",
+                                "What would you like to sell?", options, action);
+                    }
+                }
+            });
+        }
+    }, Transporter{
+        public AI make(Unit host) {
+            return process(new AI(host) {
+                private String[] options;
+                private Performer[] performers;
+                void load(String p) {
+                    super.load(p);
+                    final ArrayList<Integer> prices = new ArrayList<>();
+                    ArrayList<Integer> destinations = new ArrayList<>();
+                    for (int i=-6;i<=6;i++){
+                        if (i != 0 && host.rand.nextInt(6) == 0){
+                            int newmap = Integer.parseInt(Global.map.name)+i;
+                            if (FileManager.isFile("Data/map/"+newmap+".map")){
+                                destinations.add(newmap);
+                                prices.add(Math.abs(i));
+                            }
+                        }
+                    }
+                    options = new String[destinations.size()];
+                    performers = new Performer[destinations.size()];
+                    for (int i=0;i<destinations.size();i++){
+                        final int destination = destinations.get(i);
+                        final int price = prices.get(i);
+                        options[i] = FileManager.read("Data/map/"+destination+".map").split("%")[0]
+                                .split(";")[0] + " - "+Dialog.money(price);
+                        performers[i] = new Performer(){
+                            public void perform(){
+                                if (Global.player.gold >= price) {
+                                    Global.player.gold -= price;
+                                    Global.map.loadMap(destination+"@-1");
+                                } else {
+                                    Global.player.say("Not enough money..");
+                                }
+                            }
+                        };
+                    }
+                    host.onInteract = new Interactive() {
+                        public void interact(Man p) {
+                            if (p == Global.player) hear(p, "transport");
+                        }
+                    };
+                }
+
+                public boolean perceived(Prop p){
+                    if (p.faction.canAttack(host.faction) && p instanceof Unit) {
+                        host.face(host.pos.x < p.pos.x ? -1 : 1, true);
+                        host.setState(Actions.Sprint);
+                    }
+                    return false;
+                }
+
+                public void hear(Prop u, String p) {
+                    super.hear(u, p);
+                    if (u == Global.player) {
+                        if (p.equals("transport")) {
+                            if ((u.dir == 1 && u.pos.x < host.pos.x) || u.dir == -1 && u.pos.x > host.pos.x) {
+                                if (u.pos.getSubtract(host.pos).getDist() < 160){
+                                    host.face(u.pos.x<host.pos.x?-1:1,true);
+                                    Global.display.menu.showDialog("Transportation",
+                                        "Where would you like to go?", options, performers);
                                 }
                             }
                         }
@@ -162,11 +339,6 @@ public enum Intelligence {
                 void onAttack(){
                     if (target != null) {
                         host.say("@atk tgt");
-                    }
-                }
-                public void onHit(){
-                    if (task.alertness < 1){
-                        setTaskEcho(Behavior.Search);
                     }
                 }
                 void setState(Actions state){

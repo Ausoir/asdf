@@ -9,10 +9,7 @@ import com.ga.map.Updater;
 import com.ga.tool.Interactive;
 import com.ga.tool.Line;
 import com.ga.tool.P;
-import com.ga.unit.Man;
-import com.ga.unit.Prop;
-import com.ga.unit.Tag;
-import com.ga.unit.Unit;
+import com.ga.unit.*;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Buffs;
 
@@ -37,8 +34,11 @@ public class Item extends Prop {
             public boolean isBlunt() {
                 return false;
             }
+        }, Swinging(Actions.Slash, 3, 2, 2, "swing_silent"){
+            public boolean isBlunt() {
+                return false;
+            }
         },
-        Swinging(Actions.Slash, 3, 2, 2, "swing_silent"),
         Bashing(Actions.Slash, 1, 2, 2, "swing_silent"),
         Armor(Actions.Rest, 1, 2, 1, "swing_normal"), Scroll(Actions.Guard, 1, 0, .5f, "scroll"),
         Shooting(Actions.Shoot, 3, .8f, 1, "swing_normal"), Rifle(Actions.Snipe, 3, 1.2f, 1, "swing_normal"),
@@ -60,32 +60,67 @@ public class Item extends Prop {
         }
     }
     public enum Material{
-        Wooden(.3f,2,30,1,new Color(118, 93, 0,60)){
-            void onSet(Item host) {
-                host.tags.add(Tag.Combustible);
+        Wooden(.3f,2,32,1,new Color(118, 93, 0,60)),
+        Cloth(.6f,0,12,0),
+        Leather(.3f,1,50,1,new Color(133, 78, 32,140)),
+        Glass(.05f,1,1,7){
+            public void onSet(Item host){
+                host.tags.add(Tag.Ice);
             }
-        }, Cloth(.6f,0,8,0){
-            void onSet(Item host) {
-                host.tags.add(Tag.Combustible);
-            }
-        }, Leather(.3f,1,24,1,new Color(133, 78, 32,140)){
-            void onSet(Item host) {
-                host.tags.add(Tag.Combustible);
-            }
-        }, Glass(.05f,1,1,7),
+        },
         Brass(.36f,5,110,4,new Color(133, 123, 23,120)),
-        Copper(.32f,5,80,3,new Color(133, 92, 38,120)),
-        Bronze(.24f,5,160,4,new Color(133, 72, 0,200)),
-        Iron(.24f,4,200,5),
-        Silver(.16f,6,140,3),
-        Gold(.16f,12,40,2),
-        Lead(.2f,7,70,2,new Color(19, 31, 75,180)),
+        Copper(.32f,5,80,3,new Color(133, 92, 38,120)){
+            public void onSet(Item host){
+                host.tags.add(Tag.Electric);
+                host.tags.add(Tag.Channeling);
+            }
+        },
+        Bronze(.24f,5,500,4,new Color(133, 72, 0,200)),
+        Iron(.24f,4,600,5),
+        Silver(.16f,6,140,3){
+            public void onSet(Item host){
+                host.tags.add(Tag.Shadow);
+                host.tags.add(Tag.Mutation);
+            }
+        },
+        Gold(.16f,12,40,2){
+            public void onSet(Item host){
+                host.tags.add(Tag.Shadow);
+                host.tags.add(Tag.Channeling);
+            }
+        },
+        Lead(.2f,7,50,2,new Color(19, 31, 75,180)){
+            public void onSet(Item host){
+                host.tags.add(Tag.Electric);
+            }
+        },
         Steel(.1f,4,8000,6),
-        Titanium(.001f,3,-1,7),
-        Crystal(.04f,8,24,12,new Color(28, 133, 67,120)),
-        Bone(.16f,1,80,3),
+        Titanium(.01f,3,-1,7),
+        Crystal(.04f,8,24,12,new Color(28, 133, 67,120)){
+            public void onSet(Item host){
+                host.tags.add(Tag.Ice);
+                host.tags.add(Tag.Channeling);
+            }
+        },
+        Obsidian(.06f,3,40,4){
+            public void onSet(Item host){
+                host.tags.add(Tag.Shadow);
+                host.tags.add(Tag.Fire);
+            }
+        },
+        Bone(.16f,1,80,3){
+            public void onSet(Item host){
+                host.tags.add(Tag.Shadow);
+                host.tags.add(Tag.Conjuration);
+            }
+        },
         Other(0,0,10,0),
-        Flesh(.05f,0,-1,0),
+        Flesh(.05f,0,-1,0){
+            public void onSet(Item host){
+                host.tags.add(Tag.Conjuration);
+                host.tags.add(Tag.Mutation);
+            }
+        },
         Stone(.1f,6,5,5,new Color(107, 107, 107,255));
         int weight, durability, hardness;
         Color color;
@@ -100,8 +135,7 @@ public class Item extends Prop {
             this(prevalence, weight,durability,hardness);
             this.color = color;
         }
-        void onSet(Item host){
-        }
+        void onSet(Item host){}
         public static Material[] load(String[] plist){
             Material[] list = new Material[plist.length];
             for (int i=0;i<plist.length;i++) list[i] = valueOf(plist[i]);
@@ -228,7 +262,7 @@ public class Item extends Prop {
     Material material;
     public int weight, range;
     public int volume = 1;
-    public int encumberance = 0;
+    public int encumbrance = 0;
     int cooldown = 0;
     public int delay = 0;
     public float probability;
@@ -249,7 +283,7 @@ public class Item extends Prop {
         onInteract = new Interactive(){
             public void interact(Man p){
                 if (owner == null){
-                    if (p.getVacancy() < encumberance) p.say("Too encumbering!");
+                    if (p.getVacancy() < encumbrance) p.say("Too encumbering!");
                     p.setWeapon(me);
                 }
             }
@@ -400,11 +434,10 @@ public class Item extends Prop {
                 break;
         }
         if (smod == SpecialtyMod.Cursed){
-            r *= .1f;
+            r = Math.max(1,r-400);
         } else if (special) r += (r*adverb);
         if (emod != null){
-            r += 500;
-            r *= 2;
+            r *= emod.value;
         }
         return (int) r;
     }
@@ -467,6 +500,7 @@ public class Item extends Prop {
             if (!isInfinite()){
                 uses -= p;
                 if (uses == 0){
+                    Particle.groundSlam(pos, getDepth());
                     remove();
                 }
             }
@@ -501,7 +535,7 @@ public class Item extends Prop {
     }
     public String getDescription() {
         String r = "";
-        r += Dialog.get("itemDsc",new String[]{getFullName(),weight+"",(isInfinite()?"unlimited":uses+""),encumberance+""});
+        r += Dialog.get("itemDsc",new String[]{getFullName(),weight+"",(isInfinite()?"unlimited":uses+""),encumbrance+""});
         if (emod != null){
             String ade = "";
             if (ademod != AdenchantMod.None) ade = "Level "+ademod.level+" ";

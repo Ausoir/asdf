@@ -55,17 +55,15 @@ public class MenuShop extends Panel {
         scroll.setBackground(new Color(120, 86, 47, 180));
     }
     public void show(String title, Item[] wares, int[] prices, Performer[] actions){
-        if (!isVisible()) {
-            super.display();
-            titleLabel.setText(title);
-            gold.setText("Gold: " + Global.player.gold);
-            panel.removeAll();
-            int itemsize = wares.length;
-            for (int i = 0; i < itemsize; i++) {
-                if (wares[i] != null) {
-                    grid.gridy = i + 2;
-                    makeSlot(wares[i], prices[i], actions[i]);
-                }
+        display();
+        titleLabel.setText(title);
+        gold.setText("Cash: " + Global.player.gold+"$");
+        panel.removeAll();
+        int itemsize = wares.length;
+        for (int i = 0; i < itemsize; i++) {
+            if (wares[i] != null) {
+                grid.gridy = i + 2;
+                makeSlot(wares[i], prices[i], actions[i]);
             }
         }
     }
@@ -88,7 +86,7 @@ public class MenuShop extends Panel {
         JPanel options = new JPanel();
         options.setOpaque(false);
         options.setLayout(new BoxLayout(options,BoxLayout.LINE_AXIS));
-        final JLabel drop = new JLabel(item.getFullName()+" - "+price);
+        final JLabel drop = new JLabel(item.getFullName()+" - "+Dialog.money(price));
         drop.setIcon(new ImageIcon(Picture.loadCache("Buy")));
         drop.addMouseListener(new MouseAdapter() {
             @Override
@@ -103,7 +101,7 @@ public class MenuShop extends Panel {
         this.panel.add(panel);
     }
     private void describe(final Item item, final int price, final Performer action){
-        Global.display.menu.showDialog(item.getFullName(),"This is "+item.getDescription()+". It is being sold for "+price+" gold.",
+        Global.display.menu.showDialog(item.getFullName(),"This is "+item.getDescription()+". It is being sold for "+Dialog.money(price)+".",
                 new String[]{"Buy"}, new Performer[]{new Performer(){
                     public void perform(){
                         Player player = Global.player;
@@ -119,7 +117,7 @@ public class MenuShop extends Panel {
                                 Global.player.say("Not enough inventory space..");
                             }
                         } else {
-                            Global.player.say("Not enough Gold..");
+                            Global.player.say("Not enough money..");
                         }
                         setVisible(false);
                     }

@@ -19,7 +19,7 @@ import java.util.HashMap;
  * Created by Ga on 5/7/2016. asd
  */
 public class Unit extends Prop {
-    Actions[] moveset;
+    public Actions[] moveset;
     protected HashMap<Actions, int[]> cooldown = new HashMap<>();
     public int controlId;
     public Body clip;
@@ -37,25 +37,22 @@ public class Unit extends Prop {
     private Actions lastState = Actions.Idle;
     private int jumpAcross = 0;
     public int stateDuration = 0;
+    private boolean moveTriggered = false;
 
     public Unit(String name, int seed) {
         super(null,seed);
         this.name = name;
         controlId = Global.getControlId();
         gravity = true;
-        tags.add(Tag.Marksman);
-        tags.add(Tag.Athletics);
-        tags.add(Tag.Combustible);
-        tags.add(Tag.Freezable);
     }
 
     @Override
     public String[] load(String p){
         String[] sections = super.load(p);
         clip.load(sections[5]);
-        stats.load(sections[6]);
         faction = Faction.valueOf(sections[7]);
         brain = Intelligence.get(sections[8], this);
+        stats.load(sections[6]);
         String[] movesets = sections[9].split(",");
         moveset = new Actions[movesets.length];
         for (int i=0;i<movesets.length;i++) moveset[i] = Actions.getByName(movesets[i]);
@@ -83,7 +80,7 @@ public class Unit extends Prop {
         if (!speech.isVisible()) brain.hear(pos, p);
     }
     public P getHand(){
-        return pos.getAdd(clip.organs[clip.HAND].ptd);
+        return pos.getAdd(clip.organs[clip.getHand()].ptd);
     }
     public float getReach(){
         return getSize()+36;
@@ -138,6 +135,7 @@ public class Unit extends Prop {
             int asmod = get("Attack").get();
             int clipspeed = clip.setSpeed(attackSpeed + asmod);
             if (delay.max != 0) delay.set(Math.max(clipspeed, delay.time - attackSpeed - asmod));
+            moveTriggered = false;
         }
     }
     public boolean face(int dir, boolean force) {
@@ -150,11 +148,11 @@ public class Unit extends Prop {
 
     @Override
     public int getDamage(){
-        return (int) (rand.nextInt(get("Level").get()+3)*damageMod);
+        return (int) (rand.nextInt(get("Level").get()+2)*damageMod);
     }
 
-    protected int getDamageReduction(int organ){
-        return 0;
+    protected int processDamage(int organ, int damage){
+        return damage;
     }
 
     public void buff(Buffs buff, int level){
@@ -198,7 +196,7 @@ public class Unit extends Prop {
                 P t = new P(pos.x, hitBox.ptd.y);
                 Particle.explode("Blood", getDepth(),t, t.getSubtract(hitBox.pt), 3, 3, 12, true, 5);
                 int dam;
-                if (!blunt) dam = Math.max(0, damage - getDamageReduction(i));
+                if (!blunt) dam = processDamage(i, damage);
                 else dam = damage;
                 if (clip.organs[i].hit(hitBox, dam)) Sound.play(pos, "hit_bloody");
                 r = true;
@@ -212,8 +210,10 @@ public class Unit extends Prop {
     }
 
     public void die() {
-        stateSet(Actions.Dead);
-        Global.player.witnessDeath(this);
+        if (state != Actions.Dead) {
+            stateSet(Actions.Dead);
+            Global.player.witnessDeath(this);
+        }
     }
 
     public void remove(){
@@ -239,14 +239,12 @@ public class Unit extends Prop {
             if (l.clockwise()) setDepth(l.depth-1);
             int mag = (int) (vel.y - Settings.gravityMax);
             if (vel.y > Settings.gravity*4) Sound.play(pos, "land");
-            if (hittable(Faction.Destructive)) {
-                if (mag >= 0) {
-                    buff(Buffs.Bleed, Global.r.nextInt(3));
-                    stateSet(Actions.Down);
-                } else if (state == Actions.Jump && vel.y > 0) {
-                    stateSet(Actions.Hit);
-                    delay.set(4);
-                }
+            if (mag >= 0 && hittable(Faction.Destructive)) {
+                buff(Buffs.Bleed, Global.r.nextInt(3));
+                stateSet(Actions.Down);
+            } else if (state == Actions.Jump && vel.y > 0) {
+                stateSet(Actions.Hit);
+                delay.set(4);
             }
         }
     }
@@ -262,6 +260,7 @@ public class Unit extends Prop {
 
     protected void moveTriggered(int p){
         if (lastState != state) {
+            moveTriggered = true;
             state.trigger(this);
             lastState = state;
         }
@@ -272,7 +271,7 @@ public class Unit extends Prop {
         for (Unit i : Updater.collideUnit(hand, (int) getReach(), faction)){
             i.checkHit(hand, getDamage());
             onAttack(i);
-            return i;
+            if (!stats.triggerEffect(Buffs.Cleave)) return i;
         }
         return null;
     }
@@ -283,7 +282,10 @@ public class Unit extends Prop {
         if (clip.update()) moveTriggered(0);
         if (state != Actions.Dead) {
             stats.update();
-            if (delay.update() && delay.performer == null) stateDone();
+            if (delay.update() && delay.performer == null){
+                if (!moveTriggered) moveTriggered(0);
+                stateDone();
+            }
             stateUpdate();
         }
         super.update();

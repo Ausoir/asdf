@@ -72,9 +72,6 @@ public class Creation {
         }
         return null;
     }
-    static String panoramaAt(int id){
-        return "Bg_Field";
-    }
     public static void test(){
         world = WorldCreation.create(14,2);
         print(world, false);

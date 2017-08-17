@@ -29,8 +29,8 @@ public class Body {
     int current = 0;
     protected String state = "Idle";
     public int BODY;
-    int FOOT, HAND;
     private int legNum = 0, legCurrent = 0;
+    private int handNum = 0, handCurrent = 0;
     private float appendageSize = 1;
     protected int size = 0;
 
@@ -63,12 +63,15 @@ public class Body {
             }
             if (type >= 2){
                 organs[i].leg = true;
-                FOOT = i;
                 legNum++;
                 legCurrent++;
                 type -= 2;
             }
-            if (type == 1) HAND = i;
+            if (type == 1){
+                organs[i].hand = true;
+                handNum++;
+                handCurrent++;
+            }
             organs[i].health = p[2][i];
         }
     }
@@ -177,7 +180,7 @@ public class Body {
     }
 
     private int getHeight(){
-        return legNum==0?0:localAnimation[0][FOOT][1];
+        return legNum==0?0:localAnimation[0][getLeg()][1];
     }
 
     P randomPoint(){
@@ -248,11 +251,15 @@ public class Body {
     }
 
     void updateStatus(){
-        int legs = legNum;
+        legCurrent = legNum;
+        handCurrent = handNum;
         for (Organ o : organs) {
             if (o.amputated) {
                 if (o.leg){
-                    legs--;
+                    legCurrent--;
+                }
+                if (o.hand){
+                    handCurrent--;
                 }
                 if (o.vital) {
                     setState("Down");
@@ -261,10 +268,7 @@ public class Body {
                 }
             }
         }
-        if (legs != legNum){
-            legCurrent = legs;
-            resetHeight();
-        }
+        resetHeight();
     }
 
     public void resetHeight(){
@@ -279,10 +283,29 @@ public class Body {
         return (float)legCurrent/legNum;
     }
 
+    float getHandStatus(){
+        if (handNum == 0) return 1;
+        return (float)handCurrent/handNum;
+    }
+
+    int getHand(){
+        for (int i=0;i<organs.length;i++) {
+            if (organs[i].hand && !organs[i].amputated) return i;
+        }
+        return -1;
+    }
+    private int getLeg(){
+        for (int i=0;i<organs.length;i++) {
+            if (organs[i].leg && !organs[i].amputated) return i;
+        }
+        return -1;
+    }
+
     public void load(String p){
         for (int i=0;i<p.length();i++){
-            organs[i].amputated = p.charAt(i) == '0';
+            organs[i].image.visible = !(organs[i].amputated = p.charAt(i) == '0');
         }
+        updateStatus();
     }
 
     @Override

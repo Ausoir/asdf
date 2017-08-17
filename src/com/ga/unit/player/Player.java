@@ -26,7 +26,6 @@ public class Player extends Man {
     public String memorized = "";
     public int gold;
     public Inventory inventory;
-    public SkillTree skillTree = new SkillTree();
     public Crafts crafting;
     public int selectingItem = -1;
     public PlayerInput input;
@@ -42,17 +41,12 @@ public class Player extends Man {
         inventory = new Inventory(this);
         crafting = new Crafts(this);
         health = new Health(this);
-        Collections.addAll(tags, Tags.trainers);
+        tags.add(Tag.Athletics);
+        tags.add(Tag.Might);
+        tags.add(Tag.Agility);
+        tags.add(Tag.Channeling);
     }
     public void onField(){
-    }
-    public void learnSkill(Actions p){
-        say("Learned spell "+p.getName()+"!");
-        skillTree.addSkill(p);
-    }
-    public void advanceSkill(Actions p){
-        if (get("Memory").require(1))
-           skillTree.advanceSkill(p);
     }
     public void setWeapon(Item p){
         if (!leftHandMode){
@@ -96,22 +90,14 @@ public class Player extends Man {
         say("Dropping " + p.getFullName());
     }
     @Override
-    protected boolean tagCapable(Tags p){
+    public boolean tagCapable(Tags p){
         if (p.size() > 0) {
-            if (!tags.has(p)) {
-                for (Tag i : p) {
-                    if (!tags.contains(i) && !armor.tags.contains(i)) return true;
-                }
-            }
+            if (!tags.has(p) && !armor.tags.has(p) && !weapon.tags.has(p)) return false;
         }
         return true;
     }
     @Override
     public int setState(Actions state){
-        if ((state == Actions.Use || state == Actions.Use2) && getVacancy() < state.getEncumberance()+weapon.encumberance){
-            say("Too encumbering!");
-            return 0;
-        }
         int r = super.setState(state);
         if (r != 0){
             if (r == 2) {
@@ -124,8 +110,18 @@ public class Player extends Man {
     }
     public void stateSet(Actions state){
         int penalty = Math.max(0, armor.armor[state.isLeg()?1:2].weight - get("Strength").get());
+        Stat end = get("Endurance");
+        if (end.get() > end.getMax()) penalty += (end.get()-end.getMax())/10;
         attackSpeed -= penalty;
-        if (state.getCost() >= 0) get("Stamina").add(-penalty, false);
+        if (state.getCost() >= 0){
+            end.add(state.getCost(), true);
+            get("Stamina").add(-penalty, false);
+            if (getVacancy() < state.getDifficulty()){
+                if (state.getDifficulty() > 0) say("Too encumbering! This action requires "+state.getDifficulty()+" extra encumbrance.");
+                else say("Too encumbering!");
+                state = Actions.Hit;
+            }
+        }
         super.stateSet(state);
         if (state.getCooldown() > 0){
             int[] t = cooldown.get(state);
@@ -214,7 +210,8 @@ public class Player extends Man {
         int power = 0;
         int num = 0;
         for (Tag i : state.getTrainers()){
-            power += get(i.toString()).get();
+            if (i == Tag.Agility) power += get(i.toString()).get() * 100;
+            else power += get(i.toString()).get();
             num++;
         }
         if (num == 0) return 1;
@@ -223,33 +220,29 @@ public class Player extends Man {
     @Override
     public int getStateLevel(Actions state){
         int difficulty = state.getDifficulty();
-        if (difficulty == 0) return 1;
+        if (difficulty == 0 && state.getTrainers().size() == 0) return 1;
         int power = getStatePower(state);
-        if (state == Actions.Rest) power -= armor.armor[0].weight;
-//        return Math.max(0,skillTree.getSkillLevel(state)-(difficulty-power));
-        return 1;
+        return Math.max(0,power+1-difficulty);
     }
     public float getSpeed() {
         float speed = get("Speed").get()*clip.getLegStatus();
         float penalty = Math.max(0,inventory.weight+armor.getWeight()+weapon.weight+offhand.weight-get("Strength").get()*2);
         return Math.max(0,speed-penalty)*.01f;
     }
+    public boolean hasSkill(Actions move){
+        for (Actions i : moveset){
+            if (i == move) return true;
+        }
+        return false;
+    }
+    public void learnSkill(Actions move){
+        Actions[] newset = new Actions[moveset.length+1];
+        System.arraycopy(moveset, 0, newset, 0, moveset.length);
+        newset[newset.length-1] = move;
+        moveset = newset;
+    }
     public boolean hasTrait(Trait p){
         return traits.contains(p);
-    }
-    public void witnessDeath(Unit p){
-        if (faction.canAttack(p.faction) && p.pos.getSubtract(pos).inOval(900,500) && learning != null){
-            boolean fast = hasTrait(Trait.Fast_Learner) && get("Motivation").require(3);
-            if (fast || get("Motivation").require(1)) {
-                Stat progress = get("Progress");
-                progress.add(Math.max(1,p.get("Level").get()*3-get("Level").get())*(fast?2:1),true);
-                if (progress.isFull()) {
-                    learnSkill(learning);
-                    learning = null;
-                    progress.add(-progress.getMax(), true);
-                }
-            }
-        }
     }
     public ArrayList<Prop> getAvailableItems(){
         ArrayList<Prop> items = Updater.collideProp(pos,100);
@@ -260,6 +253,11 @@ public class Player extends Man {
         items.addAll(inventory.getItems());
         return items;
     }
+    public int getVacancy(){
+        Stat dex = get("Dexterity");
+        if (dex == null) return 99;
+        return dex.get() - armor.getEncumbrance() - weapon.encumbrance;
+    }
     public void update(){
         super.update();
         offhand.pos.set(pos.x + clip.organs[OFIST].ptd.x, pos.y + clip.organs[OFIST].ptd.y);
@@ -269,7 +267,6 @@ public class Player extends Man {
         r += Global.time+";"+cmap+";"+gold+";"+memorized+";"+learning+"\n";
         r += input.toString()+"\n";
         r += inventory.toString()+"\n";
-        r += skillTree.toString()+"\n";
         r += crafting.toString()+"\n";
         r += health.toString()+"\n";
         r += ";";
@@ -285,9 +282,9 @@ public class Player extends Man {
         memorized = other[3];
         learning = Actions.getByName(other[4]);
         inventory.load(line[3]);
-        skillTree.load(line[4]);
-        crafting.load(line[5]);
-        String[] traits = line[7].split(";");
+        crafting.load(line[4]);
+        health.load(line[5]);
+        String[] traits = line[6].split(";");
         for (String i : traits){
             if (!i.equals("")){
                 Trait trait = Trait.getByName(i);
@@ -295,7 +292,6 @@ public class Player extends Man {
                 trait.onSet(this);
             }
         }
-        health.load(line[6]);
         armor.onChange = new Performer(){
             public void perform(){
                 inventory.setMaxSize(armor.getPockets());
@@ -303,6 +299,15 @@ public class Player extends Man {
         };
         inventory.setMaxSize(armor.getPockets());
         health.record("");
+        final Player me = this;
+        clip.organs[OFIST].onAmputate = new Performer(){
+            public void perform(){
+                offhand.drop(me);
+                leftHandMode = true;
+                setWeapon(fist);
+                leftHandMode = false;
+            }
+        };
         return r;
     }
 }

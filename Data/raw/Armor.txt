@@ -1,5 +1,5 @@
-Comfortwear_Torso;2;0;0;Cloth //Armor, Type, Encumberance, Pockets, Materials
-Comfortwear_Legging;1;0;0;Cloth //Armor, Type, Encumberance, Pockets, Materials
+Comfortwear_Torso;2;0;0;Cloth //Armor, Type, Encumbrance, Pockets, Materials
+Comfortwear_Legging;1;0;0;Cloth //Armor, Type, Encumbrance, Pockets, Materials
 Dustset_Torso;2;1;0;Cloth,Leather
 Dustset_Legging;1;1;1;Cloth,Leather
 Toughwear_Torso;2;2;0;Cloth,Leather

@@ -12,9 +12,9 @@ public class Armor extends Item {
     private int piece = 0;
     private int armorMod = 0;
     int pocket = 0;
-    public Armor(String name, int seed, int piece, int encumberance, int pockets, Material[] materials) {
+    public Armor(String name, int seed, int piece, int encumbrance, int pockets, Material[] materials) {
         super(name, seed, materials, ItemType.Armor);
-        this.encumberance = encumberance;
+        this.encumbrance = encumbrance;
         value = 24;
         this.pocket = pockets;
         this.piece = piece;
@@ -49,14 +49,16 @@ public class Armor extends Item {
         if (owner != null) owner.armor.remove(this);
         super.remove();
     }
-    void onHit(){
-        if (usable(1)){
+    public int onHit(int damage){ //damage reduction
+        int r = (int) Math.max(0, damage - getArmor());
+        if (usable(r)){
             if (owner != null) trigger(owner);
         }
+        return r;
     }
     @Override
     public boolean use(final Man host){
-        if (host.getVacancy() >= encumberance) {
+        if (host.getVacancy() >= encumbrance) {
             host.setState(type.action);
             final Armor me = this;
             host.delay.performer = new Performer() {

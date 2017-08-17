@@ -1,7 +1,8 @@
-Meat;1;1;PPCOX;100;0 //Name, Weight, Uses, Nutrition, Perish, Motivation
-Drumstick;1;1;PPP;100;0
-Porkchop;1;1;PPP;100;0
-Meal;1;1;PPP;100;0
-Burger;1;1;PPP;100;0
-Sandwich;1;1;PPP;100;0
-Ration;1;1;PPP;100;0
+Meat;1;1;PCOXX;100;-10 //Name, Weight, Uses, Nutrition, Perish, Motivation
+Drumstick;3;3;PPO;400;40
+Porkchop;1;1;PPOO;400;40
+Meal;6;1;PPCCCV;200;40
+Burger;2;1;PPCCO;200;40
+Sandwich;1;1;CCO;200;10
+Ration;1;1;PC;8000;0
+Fruit;1;1;CCO;100;16

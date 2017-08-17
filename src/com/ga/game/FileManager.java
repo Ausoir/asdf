@@ -100,12 +100,6 @@ public class FileManager {
         Global.map.onTimeChange();
         return pi;
     }
-    public static void delete(String dir){
-        File file = new File("Data/"+dir);
-        if (file.exists()){
-            if (!file.delete()) System.out.println("Instance Map File Deletion Failed! ("+dir+")");
-        }
-    }
     public static int loadMap(String map) {
         Global.houseId = 1;
         Global.player.lastLand = new Line();

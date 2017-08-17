@@ -9,9 +9,9 @@ import static com.ga.unit.item.Item.Material.*;
  */
 public class Weapon extends Item {
     private int damageMod = 0;
-    public Weapon(String name, int seed, ItemType type, int encumberance, Material[] materials) {
+    public Weapon(String name, int seed, ItemType type, int encumbrance, Material[] materials) {
         super(name, seed, materials, type);
-        this.encumberance = encumberance;
+        this.encumbrance = encumbrance;
         value = 36;
         cooldown = 0;
         rotation = 35;
@@ -40,12 +40,12 @@ public class Weapon extends Item {
         else super.setModifier(mod);
     }
     private int getMaxDamage(){
-        if (type.isBlunt()) return weight+1;
+        if (type.isBlunt()) return weight;
         else return Math.max(1,material.hardness);
     }
     @Override
     public int getDamage() {
-        return Global.r.nextInt(getMaxDamage())+damageMod;
+        return Global.r.nextInt(Math.max(1,getMaxDamage()))+damageMod;
     }
     @Override
     public String getName() {

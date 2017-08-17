@@ -55,10 +55,9 @@ public class ArmorSet {
         for (Armor i : armor){
             tags.addAll(i.tags);
         }
-        if (getWeight() <= 4) tags.add(Tag.Finesse);
         if (onChange != null) onChange.perform();
     }
-    public int organToPiece(int organ){
+    private int organToPiece(int organ){
         if (organ == 5) return 0;
         if (organ == 1 || organ == 2) return 1;
         if (organ == 0 || organ == 3 || organ == 4) return 2;
@@ -66,9 +65,6 @@ public class ArmorSet {
     }
     public boolean isBare(int piece){
         return armor[piece] == bare[piece];
-    }
-    public void onHit(){
-        for (Armor i : armor) i.onHit();
     }
     public void remove(){
         for (int i=0;i<armor.length;i++){
@@ -86,13 +82,10 @@ public class ArmorSet {
         for (Armor i : armor) r += i.weight;
         return r;
     }
-    public int getEncumberance(){
+    public int getEncumbrance(){
         int r = 0;
-        for (Armor i : armor) r += i.encumberance;
+        for (Armor i : armor) r += i.encumbrance;
         return r;
-    }
-    public float getArmor(int p){
-        return armor[organToPiece(p)].getArmor();
     }
     public int getPockets(){
         int r = 0;

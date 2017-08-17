@@ -87,12 +87,14 @@ public enum Behavior {
                         }
                     }
                 }
-                if (dist>action.getRange(host)) host.setState(Actions.Walk);
+                if (dist>action.getRange(host)) move(host);
                 else {
                     if (Math.random() > host.get("Stamina").getPercentage()){
                         host.setState(Actions.Rest);
                         host.delay.time += 40;
-                    } else host.setState(action);
+                    } else if (host.setState(action) != 0){
+                        move(host);
+                    }
                     if (host.state.getTags().contains(Tag.Channeling)) {
                         host.delay.set(60 + Global.r.nextInt(80));
                     }
@@ -112,5 +114,8 @@ public enum Behavior {
     }
     void blocked(Unit host, boolean fall){
 
+    }
+    void move(Unit host){
+        if (host.setState(Actions.Sprint) != 0) host.setState(Actions.Walk);
     }
 }

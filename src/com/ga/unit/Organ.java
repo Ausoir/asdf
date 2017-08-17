@@ -26,8 +26,8 @@ public class Organ extends Line {
     public int health = 1;
     private int maxLength = 80;
     boolean vital = false;
-    boolean leg = false;
-    Performer onAmputate = new Performer();
+    boolean leg = false, hand = false;
+    public Performer onAmputate = new Performer();
 
     Organ(Organ p, boolean tip){
         parent = p;
@@ -68,7 +68,7 @@ public class Organ extends Line {
         boolean pierce = damage > 0 && Global.r.nextInt(damage) > health;
         if (pierce) {
             if (image != null) {
-                final Projectile flyingOrgan = new Projectile(null, new P(host.pos), p.ptd.getAdd(Global.r.nextInt(24)-12,-Global.r.nextInt(24)), 32+damage*8) {
+                final Projectile flyingOrgan = new Projectile(null, new P(host.pos), p.ptd.getAdd(Global.r.nextInt(24)-12,-Global.r.nextInt(12)), 32+damage*8) {
                     private final int length = (int) getLength();
                     public void update() {
                         if (tangible) {

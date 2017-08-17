@@ -1,4 +1,5 @@
 lvl:Level
+pwr:Power
 stats:Stats
 equip:Equipment
 inv:Inventory
@@ -6,27 +7,28 @@ mvs:Skills
 train:Training
 act:Actions
 crft:Craft
-gold:Gold
+gold:$
 wielded:Wielded
 offhand:Offhand
 equipped:Equipped
 btorso:Torso
 bleg:Legging
 bhead:Head
-StrengthDsc:Decreases weight penalties by 1, which results in more efficient usable of Stamina and faster movement.
-StaminaDsc:Increases maximum Stamina by 1. Stamina recovers by resting, idling, spells, or enchantments.
-EnduranceDsc:Increases maximum Endurance by 100. Endurance lets you keep going without having to go to town to sleep.
-MemoryDsc:Increases skill/rune capacity by 1, letting you usable more variety of skills or spells.
-AthleticsDsc:Increases speed and decreases stamina cost of skills related to running.
-JumpingDsc:Increases potency of skills involving jumping.
-SwingingDsc:Increases potency of all physical actions.
+mem:Memory
+StrengthDsc:Decreases weight penalties by 1, which reduces slow effects from heavy equipment.
+DexterityDsc:Increases maximum encumbrance by 1.
 AgilityDsc:Increases damage and potency of all skills involving agility.
+StaminaDsc:Increases maximum Stamina by 1. Stamina recovers usually by resting.
+MemoryDsc:Increases memory capacity by 1, which lets you progress in 1 extra expertise level from textbooks and learn 1 additional skill from manuals.
+AthleticsDsc:Increases speed and decreases stamina cost of skills related to running.
+JumpingDsc:Increases jump range for all skills involving jump.
+SwingingDsc:Increases potency of all physical actions.
 MartialDsc:Increases damage of all martial skills.
 EnergyDsc:Increases potency of all elemental spells.
-ChannelingDsc:Decreases stamina cost of maintaining channeling spells.
+ChannelingDsc:Decreases stamina cost of maintaining channels.
 mvsRemap:Select a skill to re-map its keybinding.
 mvsTrain:Select a skill/spell to train.
-itemDsc:a $. Weighs $ and has $ uses left. The encumberance rating of this item is $.
+itemDsc:a $. Weighs $ and has $ uses left. The encumbrance rating of this item is $.
 itemEncDsc:This $ item is magically enchanted with $. This item's cooldown is $ seconds.
 itemEncRdy:Currently the item is ready to usable.
 itemEncNRdy:Currently the item needs $ more seconds to recharge.
@@ -55,7 +57,7 @@ mvsThrow:Throw
 mvsDart:Dart
 mvsShoot:Shoot
 mvsSnipe:Snipe
-mvsJump:Jump
+mvsJump:Jump into the air.
 mvsAirstrike:Airstrike
 mvsLeap:Leap
 mvsBackstep:Backstep
@@ -78,7 +80,7 @@ mvsFlameroll:Flameroll
 mvsFireball:Fireball
 mvsBlizzard:Blizzard
 mvsMaterialize:Materialize
-mvsDscInteract:Interact with wielded item.
+mvsDscUse:Interact with the held item or the environment if unarmed.
 mvsDscSprint:Burst into sprint mode, running twice as fast as long as the skill is active.
 mvsDscDuck:A
 mvsDscGuard:A

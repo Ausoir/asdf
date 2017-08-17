@@ -72,12 +72,12 @@ public class Terrain extends ShadedPicture implements Drawable{
         pos = new P(lowX, lowY);
         pos.mult(ZOOM);
         P size = getSize();
-            image = new BufferedImage((int)size.x, (int)size.y, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g = image.createGraphics();
-            if (imageTexture != null) g.setPaint(imageTexture);
-            else g.setColor(color);
-            g.fill(polygon);
-            shade(0);
+        image = new BufferedImage((int)size.x, (int)size.y, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = image.createGraphics();
+        if (imageTexture != null) g.setPaint(imageTexture);
+        else g.setColor(color);
+        g.fill(polygon);
+        shade(0);
     }
     public void setSize(float x, float y){
         super.setSize(x, y);

@@ -2,12 +2,9 @@ package com.ga.unit;
 
 import com.ga.game.Settings;
 import com.ga.map.Global;
-import com.ga.map.Updater;
 import com.ga.tool.Interactive;
 import com.ga.tool.Line;
 import com.ga.tool.P;
-
-import java.util.Random;
 
 /**
  * Created by Ga on 3/13/2017. asd
@@ -73,9 +70,9 @@ public class Prop extends Thing {
                         boolean touching = cw && lineY >= pos.y;
                         if (touching && lastLand.depth == -1) {
                             Line testt = new Line(pos.x, pos.y - 9999, pos.x, pos.y);
-                            int cws = 0, ccs = 0;
+                            int cws = 0, ccs = 0; //check if landsite is overlapped behind a higher depth polygon
                             boolean overlapped = false;
-                            for (Line ii : Global.map.land) {
+                            for (Line ii : Global.map.landRaw) {
                                 if (ii.depth > land.depth && ii.lineCross(testt)) {
                                     overlapped = true;
                                     if (ii.clockwise()) cws++;
@@ -88,13 +85,11 @@ public class Prop extends Thing {
                             onCollide(land);
                             float atan = (float) Math.atan(slope);
                             if (vel.x > 0 != atan > 0) vel.x = vel.x * Global.cos(atan);
-                            vel.x += Global.sin(atan) * .1f;
                             if (!Double.isInfinite(slope))
                                 vel.y += land.getCrossPointY(pos.x+vel.x) - (pos.y + vel.y) - 1;
                             lastLand = land;
                             collided = true;
-                        } else if (land.opt == 2 || !cw && lineY <= pos.y) {
-                            onCollide(land);
+                        } else if (!cw && lineY <= pos.y) {
                             vel.set(0, 0);
                             return;
                         }

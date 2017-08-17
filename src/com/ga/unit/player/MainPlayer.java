@@ -1,19 +1,21 @@
 package com.ga.unit.player;
 
+import com.ga.game.Sound;
 import com.ga.map.Global;
 import com.ga.map.Updater;
 import com.ga.tool.Line;
-import com.ga.unit.Stock;
+import com.ga.unit.*;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Buffs;
 import com.ga.unit.skill.Stat;
+
+import static com.ga.unit.BodyHumanoid.BODY;
 
 /**
  * Created by Ga on 12/29/2016. asd
  */
 public class MainPlayer extends Player {
     private Indicater indicater;
-    private Stat stamina;
     public MainPlayer(int seed) {
         super("Me", seed);
         Global.player = this;
@@ -30,16 +32,12 @@ public class MainPlayer extends Player {
     }
     @Override
     public int setState(Actions state) {
-        if (state == Actions.Use && this.state == Actions.Jump && getStateLevel(Actions.Airstrike) > 0 && this.delay.time > 32) stateSet(Actions.Airstrike);
+        if (state == Actions.Use && this.state == Actions.Jump && getStateLevel(Actions.Airstrike) > 0
+                && this.delay.time > 32 && hasSkill(Actions.Airstrike)) stateSet(Actions.Airstrike);
         else if (state == Actions.Jump && this.state == Actions.Rest) state = Actions.Leap;
         else if (state == Actions.Discard && this.state == Actions.Rest) state = Actions.Throw;
         else if (state == Actions.Grab && this.state == Actions.Rest) state = Actions.Use2;
         else if (state == Actions.Rest && this.state == Actions.Walk) state = Actions.Sprint;
-        else if (state == Actions.Kick && this.state == Actions.Rest) state = Actions.Sidekick;
-        else if (state == Actions.Use && this.state == Actions.Walk){
-            if (input.moving > 0 == target.x > 0 && !wieldingNone()) state = Actions.Thrust;
-            else if (skillTree.getSkillLevel(Actions.Dash) > 0) state = Actions.Dash;
-        }
         int r = super.setState(state);
         if (r == 2) indicater.show(1);
         else if (r == 3) indicater.showCd(getCooldown(state)[0]);
@@ -57,12 +55,73 @@ public class MainPlayer extends Player {
         return r;
     }
     public boolean checkHit(Line hitBox, int damage, boolean blunt) {
-        int before = stamina.get();
+        int before = get("Stamina").get();
         boolean r = super.checkHit(hitBox, damage, blunt);
-        if (r) indicater.show(before/Math.max(1,stamina.get()));
+        if (r) indicater.show(before/Math.max(1,get("Stamina").get()));
         return r;
     }
-    public void onTimeChange() {
+    public boolean learnable(){
+        return getTotalExpertise() < get("Memory").getMax();
+    }
+    private int getTotalExpertise(){
+        int total = 0;
+        for (Tag i : Tags.trainers){
+            total += get(i.name()).get()/100;
+        }
+        return total;
+    }
+    public void witnessDeath(Unit p){
+        if (p.pos.getSubtract(pos).inOval(900,500)){
+            int exp = Math.max(0,p.get("Level").get()*3-get("Level").get());
+            if (exp > 0) {
+                if (learning != null) {
+                    boolean fast = hasTrait(Trait.Fast_Learner) && get("Motivation").require(3);
+                    if (fast || get("Motivation").require(1)) {
+                        Stat progress = get("Progress");
+                        progress.add(exp * (fast ? 2 : 1), true);
+                        if (progress.isFull()) {
+                            learnSkill(learning);
+                            exp = Math.max(0, progress.get() - progress.getMax()); //residue exp
+                            progress.setMax(0);
+                            progress.set(0, true);
+                            learning = null;
+                        } else exp = 0;
+                    }
+                }
+                level(exp);
+            }
+        }
+    }
+    private void level(int p){
+        Stat exp = get("Experience");
+        Stat level = get("Level");
+        exp.add(p, true);
+        if (exp.isFull()){
+            Sound.play(pos, "heal");
+            Particle.holyExplosion(pos.getAdd(clip.organs[BODY].ptd), getDepth()-1);
+            level.setMax(level.getMax()+1);
+            int residue = exp.get() - exp.getMax();
+            exp.setMax(10*level.getMax());
+            exp.set(residue, true);
+            get("Endurance").setMax(1000+level.getMax()*50);
+            int prev = 1;
+            int current = 1;
+            boolean pass = true;
+            while (pass) {
+                int pprev = prev;
+                prev = current;
+                current += pprev;
+                if (level.getMax() > 30 || 30 - current == level.getMax()){ //decay
+                    String[] stats = new String[]{
+                            "Stamina", "Strength", "Dexterity", "Agility", "Memory"
+                    };
+                    get(stats[Global.r.nextInt(5)]).add(-1, true);
+                    pass = false;
+                } else if (30 - current < level.getMax()) pass = false;
+            }
+        }
+    }
+    public void metabolise() {
         if (!Stock.getFactoryName(armor.armor[0].factoryId).equals("Stomach Full Helm")) {
             health.starve(1);
             int status = health.getStatus();
@@ -107,15 +166,14 @@ public class MainPlayer extends Player {
         super.update();
         if (input.cameraMode) Global.mapEdgeCenter(Global.cameraTo = Global.cameraTo.getAdd(input.movement));
         else Global.mapEdgeCenter(Global.cameraTo = pos.getAdd(0,0));
-        if (!stamina.isFull()) indicater.show(.5f);
+        if (!get("Stamina").isFull()) indicater.show(.5f);
         indicater.update();
     }
     public String[] load(String p){
         String[] r = super.load(p);
         String[] other = p.split("%")[1].split(";");
         Global.time = Integer.parseInt(other[0]);
-        stamina = get("Stamina");
-        indicater.setMeasuree(stamina);
+        indicater.setMeasuree(get("Stamina"));
         return r;
     }
     public void reconnect() {

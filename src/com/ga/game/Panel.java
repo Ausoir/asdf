@@ -16,6 +16,7 @@ public class Panel extends JPanel implements Updatable {
     static Color forecolor2 = new Color(95, 112, 120, 255);
     static Color fontcolor = new Color(205, 209, 227, 255);
     static Font font = new Font("Helvetica",Font.PLAIN,18);
+    static Font smallfont = new Font("Helvetica",Font.PLAIN,16);
     int targetSizeX = 512;
     private int animation = 1;
     Panel(){

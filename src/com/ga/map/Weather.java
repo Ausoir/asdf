@@ -24,7 +24,7 @@ public class Weather implements Drawable{
     };
     private float fade = 0;
     private static Color color = new Color(0,0,0,0);
-    private static int[] fromColor, toColor;
+    private static int[] fromColor=new int[]{0,0,0,0}, toColor=new int[]{0,0,0,0};
     private static Color addition(int[] a, int[] b, float rate){
         return new Color((int) Global.clamp(a[0]+((b[0]-a[0])*rate),0,255),
                 (int) Global.clamp(a[1]+((b[1]-a[1])*rate),0,255),

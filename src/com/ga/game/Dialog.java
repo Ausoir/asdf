@@ -14,6 +14,9 @@ public class Dialog {
             cache.put(t[0],t[1]);
         }
     }
+    public static String money(int p){
+        return String.format(java.util.Locale.US,"%.2f", (float)p/100)+"$";
+    }
     public static String get(String p){
         String r = cache.get(p);
         if (r == null) return p;

@@ -28,14 +28,12 @@ import java.util.ArrayList;
 public class MenuPlayer extends Panel {
     private class StatPanel extends JPanel{
         private GridBagConstraints statgrid = new GridBagConstraints();
-        private String[][] stats = new String[][]{
-                new String[]{"Strength", null},
-                new String[]{"Agility", null},
-                new String[]{"Stamina", null},
-                new String[]{"Endurance", null},
-                new String[]{"Memory", null},
+        private String[] stats = new String[]{
+                "Stamina", "Strength", "Dexterity", "Agility", "Memory"
         };
         private JButton[] statButtons = new JButton[stats.length];
+        private JLabel level = new JLabel();
+        private JLabel points = new JLabel();
         StatPanel(){
             setLayout(new GridBagLayout());
             setBackground(Panel.forecolor2);
@@ -43,18 +41,55 @@ public class MenuPlayer extends Panel {
             statgrid.fill = GridBagConstraints.BOTH;
             statgrid.ipadx = 120;
             statgrid.ipady = 20;
-            statgrid.gridx = 0;
-            statgrid.gridy = 0;
-            for (int i=0;i<stats.length;i++) statButtons[i] = makeStatButton(stats[i][0],null);
             statgrid.gridx = 1;
             statgrid.gridy = 0;
-            for (String[] i : stats) makeStatButton("", "menuDialog@"+i[0]+"@"+Dialog.get(i[0]+"Dsc")).setIcon(iconDescribe);
+            add(points, statgrid);
+            statgrid.gridx = 0;
+            add(level, statgrid);
+            statgrid.gridy = 1;
+            for (int i=0;i<stats.length;i++) statButtons[i] = makeStatButton(stats[i]);
+            statgrid.gridx = 1;
+            statgrid.gridy = 1;
+            for (int i=0;i<stats.length;i++){
+                final int var = i;
+                JButton button = makeStatButton("");
+                button.setIcon(iconDescribe);
+                final Performer perf = new Performer() {
+                    public void perform() {
+                        Global.player.get("Level").add(-1, true);
+                        Global.player.get(stats[var]).setMax(Global.player.get(stats[var]).getMax() + 1);
+                    }
+                };
+                statButtons[var].addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        perf.perform();
+                        refresh();
+                    }
+                });
+                button.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        if (Global.player.get("Level").get() > 0) {
+                            Global.display.menu.showDialog(stats[var], Dialog.get(stats[var] + "Dsc"),
+                                    new String[]{"Increase Stat"}, new Performer[]{perf});
+                            refresh();
+                        } else Global.display.menu.showDialog(stats[var], Dialog.get(stats[var] + "Dsc"));
+                    }
+                });
+            }
         }
         void refresh(){
             Player player = Global.player;
-            for (int i=0;i<stats.length;i++) statButtons[i].setText(stats[i][0]+" - "+player.get(stats[i][0]).getMax());
+            level.setFont(Panel.font);
+            level.setForeground(Panel.fontcolor);
+            level.setText("Level "+player.get("Level").getMax() + " ");
+            points.setFont(Panel.smallfont);
+            points.setForeground(Color.RED);
+            points.setText("Available Points "+player.get("Level").get());
+            for (int i=0;i<stats.length;i++) statButtons[i].setText(stats[i]+" - "+player.get(stats[i]).getMax());
         }
-        JButton makeStatButton(String p, final String cmd){
+        JButton makeStatButton(String p){
             final JButton button = new JButton(p);
             button.setFont(Panel.font);
             button.setForeground(Panel.fontcolor);
@@ -69,14 +104,6 @@ public class MenuPlayer extends Panel {
                 @Override
                 public void mouseReleased(MouseEvent e) {
                     button.setForeground(Panel.fontcolor);
-                }
-            });
-            if (cmd == null) button.removeMouseListener(button.getMouseListeners()[0]);
-            button.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    Command.order(cmd);
-                    refresh();
                 }
             });
             add(button, statgrid);
@@ -109,9 +136,9 @@ public class MenuPlayer extends Panel {
             add(scroll, BorderLayout.LINE_START);
         }
         void refresh(){
-            int agi = Global.player.get("Agility").get();
-            gold.setText("Gold: "+Global.player.gold +
-                    "                 Encumberance:"+(agi-Global.player.getVacancy()+Global.player.weapon.encumberance)+"/"+agi);
+            int maxEncumbrance = Global.player.get("Dexterity").get();
+            gold.setText("Cash: "+Dialog.money(Global.player.gold) +
+                    "                 Encumbrance:"+(maxEncumbrance-Global.player.getVacancy())+"/"+maxEncumbrance);
             panel.removeAll();
 
             grid.gridy = 0;
@@ -225,7 +252,7 @@ public class MenuPlayer extends Panel {
             add(scroll, BorderLayout.LINE_START);
         }
         void refresh(){
-            gold.setText("Gold: "+Global.player.gold);
+            gold.setText("Cash: "+Dialog.money(Global.player.gold));
             panel.removeAll();
             Inventory inv = Global.player.inventory;
             int itemsize = inv.getItemSize();
@@ -299,15 +326,11 @@ public class MenuPlayer extends Panel {
             panel.removeAll();
             panel.add(new JLabel(Dialog.get("mvsRemap")));
             panel.add(Box.createRigidArea(new Dimension(0,12)));
-            makeSlot(Actions.Use, false);
-            makeSlot(Actions.Kick, false);
-            for (Actions i : Global.player.skillTree.skills){
-                makeSlot(i, true);
-            }
+            for (Actions i : Global.player.moveset) makeSlot(i);
             int points = Global.player.get("Memory").get();
             skillpoints.setText(Dialog.get("mem")+": "+points);
         }
-        void makeSlot(final Actions move, boolean skill){
+        void makeSlot(final Actions move){
             final String displayName = Dialog.get("mvs"+move.getName());
             String key = Global.player.input.getMapping(move);
             if (key == null) key = "";
@@ -316,38 +339,21 @@ public class MenuPlayer extends Panel {
             panel.setOpaque(false);
             panel.setLayout(new BoxLayout(panel,BoxLayout.LINE_AXIS));
             panel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
-            final JLabel advance = new JLabel(" [+ Proficiency]");
-            if (!Global.player.skillTree.advanceAble(move)) advance.setVisible(false);
-            if (skill) {
-                int points = Global.player.get("Memory").get();
-                if (points <= 0) {
-                    advance.setVisible(false);
-                }
-                advance.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        Global.player.say("Leveled up " + displayName + "!");
-                        Global.player.advanceSkill(move);
-                    }
-                });
-                panel.add(advance);
-            }
             final JLabel describe = new JLabel(iconDescribe);
             describe.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Command.order("menuDialog@"+move.getName()+"@"+move.getDescription());
+                    Global.display.menu.showDialog(move.getName(), move.getDescription());
                 }
             });
-            int level = Global.player.skillTree.getSkillLevel(move);
-            final JLabel equip = new JLabel(displayName+" "+Dialog.get("lvl")+" "+level);
+            int level = Global.player.getStateLevel(move);
+            final JLabel equip = new JLabel(displayName+" "+Dialog.get("pwr")+" "+level);
             final JLabel keyLabel = new JLabel(" "+key+" ");
             keyLabel.setForeground(Color.RED);
             equip.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseReleased(MouseEvent e) {
                     describe.setVisible(false);
-                    advance.setVisible(false);
                     equip.setText(" "+Dialog.get("reqInput"));
                     equip.requestFocus();
                 }
@@ -359,7 +365,6 @@ public class MenuPlayer extends Panel {
                         Global.player.input.changeMapping(e.getButton(), move);
                         Global.display.requestFocus();
                         describe.setVisible(true);
-                        advance.setVisible(true);
                         refresh();
                     }
                 }
@@ -370,7 +375,6 @@ public class MenuPlayer extends Panel {
                     Global.player.input.changeMapping(e.getKeyCode(), move);
                     Global.display.requestFocus();
                     describe.setVisible(true);
-                    advance.setVisible(true);
                     refresh();
                 }
             });
@@ -464,6 +468,7 @@ public class MenuPlayer extends Panel {
                             Player player = Global.player;
                             String statusDsc = "Stamina:" + player.get("Stamina") +
                                     "\nMetabolism:" + player.health.getStatusDescription() +
+                                    "\nTiredness:" + player.get("Endurance") +
                                     "\nMotivation:" + player.get("Motivation")+"\n";
                             statusDsc += "\nCurrent Status Effects:\n" + player.stats.getEffectsList();
                             Global.display.menu.showDialog("Current Status", statusDsc);
@@ -481,17 +486,23 @@ public class MenuPlayer extends Panel {
     private class TrainingPanel extends JPanel{
         private GridBagConstraints statgrid = new GridBagConstraints();
         private String[][] stats;
+        private JPanel panel;
         private JPanel learning;
+        private JScrollPane scroll;
         private JButton learningButton;
         private JProgressBar learningProgress;
         private JButton[] statButtons;
         TrainingPanel(){
+            setOpaque(false);
+            setLayout(new BoxLayout(this,BoxLayout.PAGE_AXIS));
             stats = new String[Tags.trainers.length][2];
             for (int i=0;i<Tags.trainers.length;i++){
                 stats[i] = new String[]{Tags.trainers[i].name(), Dialog.get(Tags.trainers[i].name()+"Dsc")};
             }
-            setLayout(new GridBagLayout());
-            setBackground(Panel.forecolor2);
+            panel = new JPanel();
+            panel.setOpaque(false);
+            panel.setLayout(new GridBagLayout());
+            panel.setBackground(Panel.forecolor2);
             statgrid.anchor = GridBagConstraints.LINE_START;
             statgrid.fill = GridBagConstraints.BOTH;
             statgrid.ipadx = 120;
@@ -501,16 +512,24 @@ public class MenuPlayer extends Panel {
             statgrid.gridwidth = 2;
             learning = new JPanel();
             learning.setOpaque(false);
-            add(learning,statgrid);
+            panel.add(learning,statgrid);
             statgrid.gridwidth = 1;
             statgrid.gridy = 1;
             statButtons = new JButton[Tags.trainers.length];
-            for (int i=0;i<stats.length;i++) statButtons[i] = makeStatButton(this,stats[i][0],null);
+            for (int i=0;i<stats.length;i++) statButtons[i] = makeStatButton(panel,stats[i][0],null);
             statgrid.gridx = 1;
             statgrid.gridy = 1;
             for (String[] i : stats){
-                makeStatButton(this,"", "menuDialog@"+i[0]+"@"+i[1]).setIcon(iconDescribe);
+                makeStatButton(panel,"", "menuDialog@"+i[0]+"@"+i[1]).setIcon(iconDescribe);
             }
+            scroll = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            scroll.getVerticalScrollBar().setUI(new ScrollBar());
+            scroll.getVerticalScrollBar().setOpaque(false);
+            scroll.getVerticalScrollBar().setUnitIncrement(24);
+            scroll.getViewport().setOpaque(false);
+            scroll.setBorder(null);
+            scroll.setOpaque(false);
+            add(scroll);
         }
         void refresh(){
             learning.removeAll();
@@ -521,14 +540,9 @@ public class MenuPlayer extends Panel {
                 String title = Global.player.learning.toString();
                 learningButton = makeStatButton(learning, title, "menuDialog@"+title+"@"+Global.player.learning.getDescription());
                 learningButton.setIcon(iconDescribe);
-                learningProgress = new JProgressBar(0,Global.player.learning.getDifficulty()*100);
+                learningProgress = new JProgressBar(0,Global.player.get("Progress").getMax());
                 learningProgress.setBackground(Panel.fontcolor);
-                Tags fields = Global.player.learning.getTrainers();
-                int total = 0;
-                for (Tag i : fields){
-                    total += Global.player.get(i.name()).get();
-                }
-                learningProgress.setValue((total*100)+Global.player.get("Progress").get());
+                learningProgress.setValue(Global.player.get("Progress").get());
                 learningProgress.setStringPainted(true);
                 learning.add(learningProgress);
             }

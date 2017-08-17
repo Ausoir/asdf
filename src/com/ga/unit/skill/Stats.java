@@ -34,7 +34,7 @@ public class Stats {
             origBuff.onStack(level);
         }
     }
-    public Buff getEffect(Buffs p){
+    Buff getEffect(Buffs p){
         for (Buff i : effects){
             if (i.buff == p) return i;
         }

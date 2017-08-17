@@ -8,14 +8,12 @@ import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.unit.item.ArmorSet;
 import com.ga.unit.item.Item;
-import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Buffs;
 import com.ga.unit.skill.Stat;
 
 import java.awt.*;
 
-import static com.ga.unit.BodyHumanoid.FIST;
-import static com.ga.unit.BodyHumanoid.OFIST;
+import static com.ga.unit.BodyHumanoid.*;
 
 /**
  * Created by Ga on 5/7/2016. asd
@@ -96,20 +94,12 @@ public class Man extends Unit {
     }
 
     @Override
-    protected int getDamageReduction(int organ){
-        return (int) armor.getArmor(organ);
-    }
-
-    @Override
-    public void hit(int dir, float knockback) {
-        super.hit(dir, knockback);
-        armor.onHit();
+    protected int processDamage(int organ, int damage){
+        return armor.armor[organ].onHit(damage);
     }
 
     public int getVacancy(){
-        Stat agi = get("Agility");
-        if (agi == null) return 99;
-        return agi.get() - armor.getEncumberance();
+        return 99;
     }
 
     public Stat get(String p){
@@ -144,16 +134,6 @@ public class Man extends Unit {
             return target;
         }
         return null;
-    }
-
-    public boolean checkHit(Line hitBox, int damage, boolean blunt) {
-        boolean r;
-        if (r = super.checkHit(hitBox, damage, blunt)) {
-            if (clip.organs[FIST].amputated && clip.organs[OFIST].amputated){
-                tags.remove(Tag.Marksman);
-            }
-        }
-        return r;
     }
 
     @Override
@@ -204,10 +184,13 @@ public class Man extends Unit {
         final Man me = this;
         clip.organs[FIST].onAmputate = new Performer(){
             public void perform(){
-                if (clip.organs[FIST].amputated){
-                    weapon.drop(me);
-                    setWeapon(fist);
-                }
+                weapon.drop(me);
+                setWeapon(null);
+            }
+        };
+        clip.organs[HEAD].onAmputate = new Performer(){
+            public void perform(){
+                armor.set(null, 0);
             }
         };
         return r;

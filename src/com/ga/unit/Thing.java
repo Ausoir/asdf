@@ -19,7 +19,7 @@ public class Thing implements Drawable, Observer {
     public P pos;
     public String name;
     private int depth; //5:Object, 8:Corpse, 10:Unit
-    public int dir = 1;
+    public int dir = Math.random()<.5f?1:-1;
     public float rotation = 0;
     public boolean save = true;
     public Thing(String name, int seed, int depth){

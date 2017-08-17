@@ -61,10 +61,10 @@ public class BodyHumanoid extends Body {
                 rotateAppendage(FIST, 7, host.dir);
                 break;
             case "Kick":
-                rotateAppendage(FOOT-1, 5, 0);
+                rotateAppendage(LLEG, 5, 0);
                 break;
             case "Sidekick":
-                rotateAppendage(FOOT, 14, 0);
+                rotateAppendage(RLEG, 14, 0);
                 break;
             case "Stab":
                 rotateAppendage(OFIST, 11, 0);

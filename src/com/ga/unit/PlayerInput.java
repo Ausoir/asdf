@@ -8,6 +8,7 @@ import com.ga.tool.P;
 import com.ga.unit.player.Player;
 import com.ga.unit.skill.Actions;
 
+import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -65,7 +66,7 @@ public class PlayerInput implements Input {
         Iterator i = keyMap.entrySet().iterator();
         while (i.hasNext()) {
             Map.Entry e = (Map.Entry) i.next();
-            if (e.getValue() == event) i.remove();
+            if (e.getValue().equals(event.getName())) i.remove();
         }
         keyMap.put(key, event.getName());
     }
@@ -74,11 +75,9 @@ public class PlayerInput implements Input {
         for (Map.Entry<Integer, String> i : keyMap.entrySet()) {
             if (i.getValue().equals(move.getName())){
                 int key = i.getKey();
-                String keyname = ""+((char)key);
+                String keyname = KeyEvent.getKeyText(key);
                 if (key == 1) keyname = "LMB";
                 else if (key == 3) keyname = "RMB";
-                else if (key == 32) keyname = "SPACE";
-                else if (key == 16) keyname = "SHIFT";
                 r = keyname;
             }
         }
@@ -140,8 +139,7 @@ public class PlayerInput implements Input {
             for (String i : data) {
                 String[] pair = i.split(":");
                 Actions move = Actions.getByName(pair[1]);
-                if (host.skillTree.hasSkill(move))
-                    keyMap.put(Integer.parseInt(pair[0]), move.getName());
+                if (host.hasSkill(move)) keyMap.put(Integer.parseInt(pair[0]), move.getName());
             }
         }
     }

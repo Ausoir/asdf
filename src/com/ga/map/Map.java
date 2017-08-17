@@ -19,7 +19,7 @@ import java.util.Iterator;
 public class Map extends Thing {
     public Weather weather = new Weather();
     public ArrayList<Line> land = new ArrayList<>();
-    ArrayList<Line> landRaw = new ArrayList<>();
+    public ArrayList<Line> landRaw = new ArrayList<>();
     HashMap<Integer, String> formTextures = new HashMap<>();
     public HashMap<Integer, Terrain> terrains = new HashMap<>();
     private static HashMap<String, String> defaultProps = new HashMap<String, String>(){{
@@ -31,22 +31,14 @@ public class Map extends Thing {
         put("sand","XBush=.1,Shell=.2,Starfish=.3");
     }};
     public P size;
-    public int id;
-    private String panorama;
+    private String callname = "Somewhere";
+    private String panorama = "None";
     private static final int magnify = 2;
-    public Map(String id, P size) {
+    public Map(String name, P size) {
         super(null,0,1);
-        char firstchar = id.charAt(0);
-        if (firstchar == '-' || (firstchar >= 48 && firstchar <= 57)) this.id = Integer.parseInt(id);
-        else this.id = -1;
-        this.panorama = Creation.panoramaAt(this.id);
-        if (panorama.equals("None")){
-            image.visible = false;
-        } else{
-            setImage(panorama);
-            image.getSize().mult(magnify);
-        }
+        this.name = name;
         this.size = size;
+        image.visible = false;
         onTimeChange();
     }
 
@@ -54,6 +46,13 @@ public class Map extends Thing {
         String data = FileManager.read("Data/map/" + dir + ".map");
         String[] line = data.split("%");
         String[] names = line[0].split(";");
+        callname = names[0];
+        setPanorama(names[1]);
+        if (!panorama.equals("None")) {
+            image.visible = true;
+            setImage(panorama);
+            image.getSize().mult(magnify);
+        }
         this.size = new P(names[2]);
         if (line.length > 1) {
             String[] sections = line[1].split(";");
@@ -81,7 +80,7 @@ public class Map extends Thing {
     }
 
     public String toString(){
-        StringBuilder result = new StringBuilder(id + ";" + panorama + ";" + size.x() + "," + size.y() + "\n");
+        StringBuilder result = new StringBuilder(callname + ";" + panorama + ";" + size.x() + "," + size.y() + "\n");
         Iterator it = formTextures.entrySet().iterator();
         while (it.hasNext()){
             java.util.Map.Entry pair = (java.util.Map.Entry) it.next();
@@ -218,14 +217,6 @@ public class Map extends Thing {
         return "none";
     }
 
-    Line randomLandableSurface(){
-        Line i;
-        do {
-            i = land.get((int) (Creation.r.nextFloat() * land.size()));
-        } while (!i.clockwise() || i.getSlope() > Line.MAXSLOPE);
-        return i;
-    }
-
     public Line checkLand(Line p, int depth){
         ArrayList<Line> list = new ArrayList<>();
         for (Line i : land){
@@ -257,7 +248,7 @@ public class Map extends Thing {
             Line closest = null;
             float closestY = p.ptd.y;
             for (Line i : list){
-                float y = i.getCrossPointY(pos.x);
+                float y = i.getCrossPointY(p.pt.x);
                 if (y <= closestY){
                     closest = i;
                     closestY = y;
@@ -267,12 +258,18 @@ public class Map extends Thing {
         }
     }
 
+    void setPanorama(String p){
+        this.panorama = p;
+        image.visible = !p.equals("None");
+        onTimeChange();
+    }
+
     public void onTimeChange() {
-        if (image.visible){
-            setImage(panorama+(weather.isNight()?"_Night":""));
+        if (image.visible) {
+            setImage(panorama + (weather.isNight() ? "_Night" : ""));
             image.setSize(image.getSize().getMult(magnify, magnify));
+            weather.refreshTimeColor();
         }
-        weather.refreshTimeColor();
     }
 
     @Override

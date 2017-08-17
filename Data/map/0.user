@@ -1,8 +1,7 @@
-Me@-1@0@3389,1547@0.00@111111@Speed:23,23&Progress:0,100&Channeling:0,900&Memory:1,1&Attack:0,0&Marksman:0,900&Stamina:16,16&Athletics:0,900&Motivation:100,100&Energy:0,900&Finesse:0,900&Combat:0,900&Agility:5,5&Might:0,900&Cunning:0,900&Endurance:508,508&Level:1,1&Strength:4,4/8&1&-9065&0@Player@0,0,0@Use#Player##None&None&None
--9787;test;3330332;Hi.;null
-;-65:Idle;192:_Recall;65:WalkL;1:Use;2:Discard;66:Blink;-68:Idle;3:Grab;67:Lightning;68:Walk;69:Punch;70:Fireball;71:Freeze;16:Rest;81:Materialize;17:Shadowstep;82:Wield;83:Drop;84:Shadowtwin;86:Focus;87:Jump;88:Fireblast;89:Whirlwind;32:Kick;-37:Idle;-38:Idle;-39:Idle;-40:Idle;44:_Rest;
+Me@-1@0@3833,1547@0.00@111111@Speed:23,23&Progress:0,0&Dexterity:1,1&Channeling:0,400&Memory:1,1&Electric:0,400&Shadow:0,400&Ice:700,700&Attack:0,0&Air:0,400&Stamina:8,8&Unarmed:0,400&Experience:6,10&Athletics:0,400&Motivation:100,100&Conjuration:0,400&Fire:100,100&Agility:1,1&Might:0,400&Endurance:404,1000&Level:0,1&Mutation:0,400&Strength:1,1@Player@0,4,0@Use,Rest#Player##None&None&None
+24689;test;17;Hi.;null
+;-65:Idle;32:Kick;192:_Recall;65:WalkL;1:Use;2:Discard;-68:Idle;3:Grab;-37:Idle;68:Walk;-38:Idle;-39:Idle;-40:Idle;44:_Rest;16:Rest;81:Throw;82:Wield;83:Drop;87:Jump;
 ;
-;Punch@1;Fireball@1;Dash@1;Whirlwind@1;Shadowstep@1;Freeze@1;Blink@1;Lightning@1;Calling@1;Blizzard@1;Lunge@1;Flameroll@1;Fireblast@1;Shadowtwin@1;Focus@1;Materialize@1;
 ;
 ;OXOPCCPPXOPCCPPXOPCCPPXOPCPXP
 ;

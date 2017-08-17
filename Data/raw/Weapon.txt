@@ -1,11 +1,11 @@
-Stick;Bashing;0;-1;Wooden,Iron //Weapon, Type, Encumberance, Range, Materials
+Stick;Bashing;0;-1;Wooden,Iron //Weapon, Type, Encumbrance, Range, Materials
 Bamboo_Spear;1;-1;Wooden
 Broadsword;Sword;4;-1;Copper,Bronze,Iron,Silver,Steel
 Mace;Bashing;4;-1;Copper,Bronze,Iron,Silver,Steel
 Katana;Sword;4;-1;Bronze,Iron,Steel,Titanium,Crystal
 Claw;Knife;1;-1;Copper,Bronze,Iron,Silver,Steel,Bone,Titanium,Crystal
 Spear;Spear;2;-1;Copper,Bronze,Iron,Steel,Bone
-Axe;Sword;3;-1;Copper,Bronze,Iron,Steel
+Axe;Swinging;3;-1;Copper,Bronze,Iron,Steel
 Dagger;Knife;1;-1;Glass,Copper,Bronze,Iron,Silver,Steel
 Tanto;Knife;1;-1;Bronze,Iron,Steel,Crystal
 Pickaxe;Sword;5;-1;Copper,Bronze,Iron
@@ -20,8 +20,3 @@ Bow;Bow;4;700;Wooden
 Revolver;Shooting;3;480;Brass,Bronze
 Pistol;Shooting;3;480;Brass,Bronze
 Rifle;Rifle;7;700;Bronze,Iron
-Rock;Bashing;0;-1;Stone
-Shell;Bashing;0;-1;Bone
-Starfish;Bashing;0;-1;Flesh
-Grass;Bashing;0;-1;Cloth
-Battery;Bashing;0;-1;Brass,Copper,Lead

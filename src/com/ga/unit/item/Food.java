@@ -10,11 +10,20 @@ import com.ga.unit.skill.Buffs;
 import com.ga.unit.skill.Stat;
 
 import java.awt.*;
+import java.util.HashMap;
 
 /**
  * Created by Ga on 2/17/2017. asd
  */
 public class Food extends Item {
+    private static HashMap<Character, Integer> valueMap = new HashMap<Character, Integer>(){{
+        put('P',2);
+        put('C',2);
+        put('V',3);
+        put('D',3);
+        put('O',1);
+        put('X',0);
+    }};
     private String nutrition;
     private int perish;
     private int happy = 0;
@@ -33,6 +42,13 @@ public class Food extends Item {
             image = new ShadedPicture(rand, name, Shader.Color);
             ((ShadedPicture) image).shade(new Color(100 - toxicity, 255 - toxicity, 100 - toxicity, 180).getRGB());
         }
+    }
+    public int getValue(){
+        int r = happy/5 + perish/100;
+        for (char i : nutrition.toCharArray()){
+            r += valueMap.get(i);
+        }
+        return r;
     }
     private void shuffleNutrition(){
         char[] data = nutrition.toCharArray();

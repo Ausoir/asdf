@@ -12,7 +12,7 @@ public class Line {
     public P pt;
     public P ptd;
     public int next = -1;
-    public int opt = 0; //0:normal,1:intangible,2:impenetrable
+    public int opt = 0; //0:normal,1:intangible
     public int depth = -1;
     public Line(String p){
         load(p);

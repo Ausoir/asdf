@@ -7,21 +7,14 @@ import java.util.ArrayList;
  */
 public class Tags extends ArrayList<Tag> {
     public static final Tag[] trainers = new Tag[]{
-        Tag.Combat, Tag.Finesse, Tag.Might, Tag.Athletics, Tag.Marksman, Tag.Energy, Tag.Channeling, Tag.Cunning
+        Tag.Agility, Tag.Might, Tag.Athletics, Tag.Unarmed, Tag.Electric, Tag.Channeling, Tag.Shadow, Tag.Fire, Tag.Ice, Tag.Air, Tag.Mutation, Tag.Conjuration
     };
-
-    boolean has(Tag p){
-        for (Tag i : this) {
-            if (i == p) return true;
-        }
-        return false;
-    }
 
     public boolean has(Tags p){
         for (Tag i : p) {
-            if (!contains(i)) return false;
+            if (contains(i)) return true;
         }
-        return true;
+        return false;
     }
 
     public Tags getTrainers(){

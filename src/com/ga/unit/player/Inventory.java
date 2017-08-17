@@ -1,9 +1,8 @@
 package com.ga.unit.player;
 
-import com.ga.unit.item.Food;
-import com.ga.unit.item.Item;
 import com.ga.map.Updater;
 import com.ga.unit.Stock;
+import com.ga.unit.item.Item;
 
 import java.util.ArrayList;
 

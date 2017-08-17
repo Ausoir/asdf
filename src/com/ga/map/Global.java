@@ -97,7 +97,10 @@ public class Global {
     }
     static void timePass(int p){
         time+=p;
-        if (p != 1 || time % HOUR == 0) map.onTimeChange();
+        if (p != 1 || time % HOUR == 0){
+            map.onTimeChange();
+            GlobalEvent.onHourChange();
+        }
         Iterator it = timers.iterator();
         while (it.hasNext()){
             EventTimer timer = (EventTimer) it.next();

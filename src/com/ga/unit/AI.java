@@ -35,7 +35,11 @@ public abstract class AI implements Observer {
         task.onSet(host);
     }
     void onAttack(){}
-    public void onHit(){}
+    public void onHit(){
+        if (task.alertness < 1){
+            setTaskEcho(Behavior.Search);
+        }
+    }
     void setState(Actions state){}
     boolean blocked(int dir){
         return false;
