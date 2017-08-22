@@ -78,9 +78,7 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
     }
 
     public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        Graphics2D g2 = (Graphics2D) g.create();//.getDrawGraphics();
-        Updater.draw(g2);
+        Updater.draw((Graphics2D) g.create());
     }
 
     private void input(int mode){

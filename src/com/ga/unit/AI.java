@@ -11,23 +11,28 @@ import java.util.ArrayList;
  */
 public abstract class AI implements Observer {
     int factoryId = -1;
-    Unit host;
+    public Unit host;
     Behavior task = Behavior.Wander, defaultTask = Behavior.Wander;
     public Unit target;
     private int targetId = 0;
     int taskProgress;
     AI(Unit host){
         this.host = host;
+    }
+    public void start(){
         Updater.addQueue.add(this);
     }
     public void update(){
-        if (targetId != 0){
-            target = Updater.unitList.get(targetId);
+        if (targetId > 0){
+            target = Updater.getLoadedActor(targetId);
             targetId = 0;
         }
         perceive(160);
         task.update(host);
         taskProgress++;
+    }
+    void updateOutside(){
+        task.updateOutside(host);
     }
     public void setTaskEcho(Behavior p){
         taskProgress = 0;

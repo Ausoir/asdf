@@ -1,13 +1,13 @@
-Dummy;punk;Stamina:3&Speed:12&Level:1;Evil;0;Idle;Man;None;None;None; //Humanoids-Name,Speech Type,Stat,Faction,AI Type,Moveset,Face,Weapons,Armors,Headgears
-Resident;resident;Stamina:12&Speed:20&Level:1;Neutral;1;Sprint;Man;None,None,None,None,None,None,None,None,None,Potion,Stick;Comfortwear,Dustset,Toughwear,Comfortwear,Comfortwear,Suit,Robe,Comfortwear;None;
-Merchant;merchant;Stamina:10&Speed:12&Level:1;Neutral;2;Sprint;Man;None;Suit;None;
-Punk;punk;Stamina:7&Speed:24&Level:1;Punk;5;Use,Lunge,Underhand,Dash;Man;Dagger,Axe,Pickaxe;None,Comfortwear,Dustset,Toughwear;None,Bandana;
-Yeller;punk;Stamina:4&Speed:20&Level:2;Punk;5;Use,Backstep,Calling;Man;Dagger,Axe,Pickaxe;None,Comfortwear,Dustset,Toughwear;None,Bandana;
-Phantom;;Stamina:24&Speed:26&Level:8;Evil;5;Use,Dash,Flameroll,Fireblast,Shadowstep,Blizzard;Phantom;Greatsword,Halberd,Warhammer;Shadowrobe;Phantommask;
-Monk;punk;Stamina:12&Speed:26&Level:3;Punk;5;Backstep,Use,Punch,Kick,Sidekick,Dash,Leap;Man;None,Fireball,Threadball,Throwing Knife,Scroll,Potion;Robe;None;
-Guard;soldier;Stamina:30&Speed:27&Level:5;Neutral;5;Use,Sidekick,Underhand,Dash,Whirlwind;Man;Broadsword,Spear,Mace;Chainmail,Platemail;Lace_Helm,Legion_Helm;
-Archer;soldier;Stamina:24&Speed:26&Level:6;Punk;5;Punch,Kick,Use,Backstep;Man;Bow;Chainmail,Platemail,Dustset;Lace_Helm;
-Undead;undead;Stamina:99&Speed:14&Level:9;Evil;5;Use,Thrust,Underhand,Lunge,Mark;Skull;Broadsword,Mace;Skeleton;Lace_Helm,Legion_Helm;
-Hunter;soldier;Stamina:16&Speed:32&Level:6;Punk;5;Backstep,Kick,Dash,Blink,Use;Man;Revolver,Rifle,Pistol;Suit,Dustset;None;
-Transporter;merchant;Stamina:3&Speed:12&Level:1;Neutral;4;Sprint;Man;None;Adventurewear;None;
-Pawnbroker;seafood;Stamina:3&Speed:12&Level:1;Neutral;3;Sprint;Man;None;Suit;None;
+Dummy;punk;Stamina:3&Speed:12&Attack:0&Level:1;Evil;0;Idle;Man;None;None;None; //Humanoids-Name,Speech Type,Stat,Faction,AI Type,Moveset,Face,Weapons,Armors,Headgears
+Resident;resident;Stamina:12&Attack:0&Speed:20&Level:1;Neutral;1;Sprint;Man;None,None,None,None,None,None,None,None,None,Potion,Stick;Comfortwear,Dustset,Toughwear,Comfortwear,Comfortwear,Suit,Robe,Comfortwear;None;
+Merchant;merchant;Stamina:10&Attack:0&Speed:12&Level:1;Neutral;2;Sprint;Man;None;Suit;None;
+Punk;punk;Stamina:7&Speed:24&Attack:1&Level:1;Punk;5;Use,Lunge,Underhand,Dash;Man;Dagger,Axe,Pickaxe;None,Comfortwear,Dustset,Toughwear;None,Bandana;
+Yeller;punk;Stamina:4&Speed:20&Attack:1&Level:2;Punk;5;Use,Backstep,Calling;Man;Dagger,Axe,Pickaxe;None,Comfortwear,Dustset,Toughwear;None,Bandana;
+Phantom;;Stamina:24&Speed:26&Attack:4&Level:8;Evil;5;Use,Dash,Flameroll,Fireblast,Shadowstep,Blizzard;Phantom;Greatsword,Halberd,Warhammer;Shadowrobe;Phantommask;
+Monk;punk;Stamina:12&Speed:26&Attack:4&Level:3;Punk;5;Backstep,Use,Punch,Kick,Sidekick,Dash,Leap;Man;None,Fireball,Threadball,Throwing Knife,Scroll,Potion;Robe;None;
+Guard;soldier;Stamina:30&Speed:27&Attack:1&Level:5;Neutral;5;Use,Sidekick,Underhand,Dash,Whirlwind;Man;Broadsword,Spear,Mace;Chainmail,Platemail;Lace_Helm,Legion_Helm;
+Archer;soldier;Stamina:24&Speed:26&Attack:0&Level:6;Punk;5;Punch,Kick,Use,Backstep;Man;Bow;Chainmail,Platemail,Dustset;Lace_Helm;
+Undead;undead;Stamina:99&Speed:14&Attack:-16&Level:9;Evil;5;Use,Thrust,Underhand,Lunge,Mark;Skull;Broadsword,Mace;Skeleton;Lace_Helm,Legion_Helm;
+Hunter;soldier;Stamina:16&Speed:32&Attack:2&Level:6;Evil;5;Backstep,Kick,Dash,Blink,Use;Man;Revolver,Rifle,Pistol;Suit,Dustset;None;
+Transporter;merchant;Stamina:3&Speed:12&Attack:0&Level:1;Neutral;4;Sprint;Man;None;Adventurewear;None;
+Pawnbroker;seafood;Stamina:3&Speed:12&Attack:0&Level:1;Neutral;3;Sprint;Man;None;Suit;None;

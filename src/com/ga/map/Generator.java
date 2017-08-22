@@ -168,6 +168,7 @@ class Generator {
         }
 
         Global.map = new Map(info[0], new P(40,40));
+        Global.map.start();
         TerrainTrail trail = new TerrainTrail(new P(0,-advance));
         for (P i : forward) trail.add(i);
         for (int i=backward.size()-1;i>=0;i--) trail.add(backward.get(i));
@@ -235,6 +236,7 @@ class Generator {
         int returnDoorSeed = Integer.parseInt(info[1]);
         P mapSize = new P(info[2]).mult(2f);
         Global.map = new Map(info[0], mapSize);
+        Global.map.start();
         float bottom = mapSize.y - 64;
         P topleft = new P(64, 64), topright = new P(mapSize.x-64, 64),
                 bottomleft = new P(64, bottom), bottomright = new P(mapSize.x-64, bottom);

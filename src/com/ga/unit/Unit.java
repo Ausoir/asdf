@@ -38,22 +38,24 @@ public class Unit extends Prop {
     private int jumpAcross = 0;
     public int stateDuration = 0;
     private boolean moveTriggered = false;
+    public String cmap;
 
     public Unit(String name, int seed) {
         super(null,seed);
         this.name = name;
-        controlId = Global.getControlId();
         gravity = true;
     }
 
     @Override
     public String[] load(String p){
         String[] sections = super.load(p);
-        clip.load(sections[5]);
-        faction = Faction.valueOf(sections[7]);
-        brain = Intelligence.get(sections[8], this);
-        stats.load(sections[6]);
-        String[] movesets = sections[9].split(",");
+        controlId = Integer.parseInt(sections[5]);
+        cmap = sections[6];
+        clip.load(sections[7]);
+        faction = Faction.valueOf(sections[9]);
+        brain = Intelligence.get(sections[10], this);
+        stats.load(sections[8]);
+        String[] movesets = sections[11].split(",");
         moveset = new Actions[movesets.length];
         for (int i=0;i<movesets.length;i++) moveset[i] = Actions.getByName(movesets[i]);
         clip.setOrganHealth();
@@ -210,6 +212,8 @@ public class Unit extends Prop {
     }
 
     public void die() {
+        save = false;
+        onInteract = null;
         if (state != Actions.Dead) {
             stateSet(Actions.Dead);
             Global.player.witnessDeath(this);
@@ -306,15 +310,14 @@ public class Unit extends Prop {
 
     @Override
     public String toString(){
-        if (state == Actions.Dead || !save) return "";
         StringBuilder r = new StringBuilder(super.toString());
-        r.append("@").append(clip.toString()).append("@").append(stats.toString()).append("@").append(faction.name()).append("@").append(brain.toString()).append("@");
+        r.append("@").append(controlId).append("@").append(cmap).append("@").append(clip.toString()).append("@").append(stats.toString()).append("@").append(faction.name()).append("@").append(brain.toString()).append("@");
         for (Actions i : moveset) r.append(i.getName()).append(",");
         return r.deleteCharAt(r.length()-1).toString();
     }
 
     public String getDescription(){
-        String r = name + " [Genetic Code:"+seed+"]";
+        String r = name + " [Genetic Code:"+seed+"]\n";
         r += "*Faction - "+faction.name()+"\n";
         r += "*Stats - \n"+stats.toString().split("/")[0].replace("&"," ")+"\n";
         r += "*Effects - "+stats.getEffectsList();

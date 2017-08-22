@@ -101,6 +101,9 @@ public enum Behavior {
                 }
             }
         }
+        void updateOutside(Unit host){
+            host.cmap = Updater.moveToward(host.cmap, host.brain.target.cmap);
+        }
     };
     int alertness; //0:temporary, 1:normal, 2:alert, 3:active
     Behavior(int alertness){
@@ -110,6 +113,9 @@ public enum Behavior {
 
     }
     void update(Unit host){
+
+    }
+    void updateOutside(Unit host){
 
     }
     void blocked(Unit host, boolean fall){

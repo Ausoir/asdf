@@ -15,11 +15,11 @@ import static com.ga.unit.BodyHumanoid.BODY;
  * Created by Ga on 12/29/2016. asd
  */
 public class MainPlayer extends Player {
+    public PlayerInput input;
     private Indicater indicater;
     public MainPlayer(int seed) {
-        super("Me", seed);
+        super(seed);
         Global.player = this;
-        controlId = -1;
         indicater = new Indicater(this);
     }
     @Override
@@ -46,7 +46,10 @@ public class MainPlayer extends Player {
     @Override
     public void stateSet(Actions state){
         super.stateSet(state);
-        if (state != Actions.Idle) input.cameraMode = false;
+        if (state != Actions.Idle){
+            input.cameraMode = false;
+            if (state == Actions.Walk) face(input.moving, true);
+        }
     }
     public float getShopPrice(){
         float r = 1;
@@ -146,7 +149,6 @@ public class MainPlayer extends Player {
     }
     public void die(){
         super.die();
-        Updater.cancelRemove(this);
         Global.map.weather.fadeOut();
     }
     public void revive(){
@@ -171,17 +173,10 @@ public class MainPlayer extends Player {
     }
     public String[] load(String p){
         String[] r = super.load(p);
-        String[] other = p.split("%")[1].split(";");
-        Global.time = Integer.parseInt(other[0]);
         indicater.setMeasuree(get("Stamina"));
         return r;
     }
-    public void reconnect() {
-        lastLand = new Line();
-        Updater.addQueue.add(this);
-        Updater.addQueue.add(weapon);
-        Updater.addQueue.add(speech);
-        Updater.addQueue.add(indicater);
-        Global.display.add(speech);
+    public String toCharacterString() {
+        return super.toCharacterString()+input.toString()+"\n";
     }
 }

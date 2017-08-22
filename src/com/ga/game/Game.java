@@ -1,6 +1,5 @@
 package com.ga.game;
 
-import com.ga.connection.Server;
 import com.ga.map.*;
 import com.ga.tool.Clips;
 import com.ga.unit.Stock;
@@ -31,14 +30,12 @@ class Game extends JFrame {
         Stock.init();
         JPanel display = new Display();
         Creation.create();
-        Global.server = new Server();
-        Global.server.start();
         if (editor) new EditorInput();
         add(display);
         setVisible(true);
         setExtendedState( getExtendedState()|JFrame.MAXIMIZED_BOTH );
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         new Process();
-        Global.cprocess = new ControllerProcess();
+        Global.cprocess = new OtherProcess();
     }
 }

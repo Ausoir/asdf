@@ -44,13 +44,14 @@ public class Weapon extends Item {
         else return Math.max(1,material.hardness);
     }
     @Override
+    public String getName(){
+        return material.name() + " " + super.getName();
+    }
+    @Override
     public int getDamage() {
         return Global.r.nextInt(Math.max(1,getMaxDamage()))+damageMod;
     }
     @Override
-    public String getName() {
-        return material.name() + " " + super.getName();
-    }
     public String getDescription(){
         String r = super.getDescription();
         r = r.replace(" uses "," durability ");

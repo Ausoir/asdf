@@ -73,11 +73,10 @@ public class Speech extends JTextArea implements Drawable {
             }
             timer.set(120 + t.length());
 
-            for (java.util.Map.Entry i : Updater.unitList.entrySet()){
-                Unit unit = (Unit) i.getValue();
-                if (unit != host && unit.faction != host.faction) {
-                    if (Math.abs(unit.pos.x - host.pos.x) < 600 && Math.abs(unit.pos.y - host.pos.y) < 200) {
-                        unit.hear(host, p.toLowerCase());
+            for (Unit i : Updater.unitsLoaded){
+                if (i != host && i.faction != host.faction) {
+                    if (Math.abs(i.pos.x - host.pos.x) < 600 && Math.abs(i.pos.y - host.pos.y) < 200) {
+                        i.hear(host, p.toLowerCase());
                     }
                 }
             }

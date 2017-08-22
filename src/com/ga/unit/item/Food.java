@@ -29,7 +29,7 @@ public class Food extends Item {
     private int happy = 0;
 
     public Food(String name, int seed, int weight, int uses, String nutrition, int perish, int happy) {
-        super(name, seed, new Item.Material[]{Item.Material.Other}, ItemType.Consumable);
+        super(name, seed, new Item.Material[]{Item.Material.Flesh}, ItemType.Consumable);
         this.weight = weight;
         this.durability = uses;
         this.uses = uses;

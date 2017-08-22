@@ -57,25 +57,6 @@ public enum Actions {
             p.clip.resetHeight();
             super.onFinish(p);
         }
-    }, Climb {
-        public void onSet(final Unit host) {
-            if (host instanceof Player) {
-                ((Player) host).input.moving = 0;
-            }
-        }
-
-        public void update(Unit host) {
-            if (host.stateDuration > 24) {
-                P reach = host.pos.getAdd(host.clip.organs[BodyHumanoid.FIST].ptd);
-                for (Line i : Global.map.land) {
-                    if (i.opt == 1 && i.lineCross(new Line(reach.x - (24 * host.dir), reach.y, reach.x + (24 * host.dir), reach.y))) {
-                        host.vel.set(0, -8);
-                        return;
-                    }
-                }
-                host.stateSet(Jump);
-            }
-        }
     }, Dead(999){
         public void onSet(final Unit p){
             p.attackSpeed = -1;
@@ -694,9 +675,6 @@ public enum Actions {
         public String getClipName(){
             return "Cast";
         }
-        public void onSet(Unit host){
-            host.attackSpeed = 12;
-        }
         public void trigger(final Unit host){
             Man man = (Man)host;
             if (man.wieldingNone()) {
@@ -713,6 +691,7 @@ public enum Actions {
                         t.remove();
                     }
                 }));
+                t.start();
             }
         }
     },
@@ -958,6 +937,7 @@ public enum Actions {
                 p.dir = host.dir;
                 p.buff(Buffs.Banishment, 2 + (int) (host.stateLevel * .4f));
                 p.faction = host.faction;
+                p.start();
             }
         }
     },
@@ -996,6 +976,7 @@ public enum Actions {
                 p.dir = -host.dir;
                 p.faction = host.faction;
                 p.clip.setState("Buff");
+                p.start();
             }
         }
     },

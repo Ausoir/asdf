@@ -20,7 +20,7 @@ import static com.ga.unit.BodyHumanoid.*;
  */
 public class Man extends Unit {
     private String face;
-    protected Item fist = ((Item)Stock.Fist.create(-1,0)).cancelAdd();
+    protected Item fist = ((Item)Stock.Fist.create(-1,0));
     public Item weapon = fist;
     public ArmorSet armor;
 
@@ -95,7 +95,7 @@ public class Man extends Unit {
 
     @Override
     protected int processDamage(int organ, int damage){
-        return armor.armor[organ].onHit(damage);
+        return armor.getOrganArmor(organ).onHit(damage);
     }
 
     public int getVacancy(){
@@ -171,6 +171,11 @@ public class Man extends Unit {
     private void setFace(String p){
         face = p;
         clip.organs[5].setImage(p);
+    }
+
+    public void start(){
+        super.start();
+        if (!wieldingNone()) weapon.start();
     }
 
     @Override

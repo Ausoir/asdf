@@ -17,6 +17,7 @@ public enum Intelligence {
     None{
         public AI make(Unit host) { return process(new AI(host){
             public void update(){}
+            public void start(){}
         }); }
     }, Neutral{
         public AI make(Unit host){ return process(new AI(host){
@@ -93,7 +94,7 @@ public enum Intelligence {
                     price = new int[length];
                     action = new Performer[length];
                     for (int i = 0; i < length; i++) {
-                        Item item = ((Item) Stock.getByName(items[i], -1)).cancelAdd();
+                        Item item = ((Item) Stock.getByName(items[i], -1));
                         int value = fluctuate(item.getValue());
                         product[i] = item;
                         price[i] = value;

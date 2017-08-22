@@ -30,6 +30,8 @@ public class Thing implements Drawable, Observer {
         image = new Picture(rand);
         this.depth = depth;
         if (name != null) setImage(name);
+    }
+    public void start(){
         Updater.addQueue.add(this);
     }
     public void setImage(String p){
@@ -58,7 +60,6 @@ public class Thing implements Drawable, Observer {
         Updater.remove(this);
     }
     public String toString(){
-        if (!save) return "";
         return name + "@" + pos;
     }
 }

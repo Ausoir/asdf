@@ -2,6 +2,7 @@ package com.ga.game;
 
 import com.ga.map.*;
 import com.ga.tool.Line;
+import com.ga.unit.Prop;
 import com.ga.unit.Stock;
 import com.ga.unit.Unit;
 import com.ga.unit.item.Item;
@@ -27,9 +28,17 @@ public class Command {
                 else if (cmd[0].equals("seed")) host.weapon.seed = Integer.parseInt(cmd[1]);
                 else if (cmd[0].equals("time")) Global.time += Integer.parseInt(cmd[1]);
                 else if (cmd[0].equals("stat")) host.get(cmd[1]).addTotal(Integer.parseInt(cmd[2]));
-                else if (cmd[0].equals("unit")) Stock.getByName(cmd[1], -1).pos.set(host.pos.getAdd(host.target));
+                else if (cmd[0].equals("unit")){
+                    Prop unit = Stock.getByName(cmd[1], -1);
+                    unit.start();
+                    unit.pos.set(host.pos.getAdd(host.target));
+                }
                 else if (cmd[0].equals("mob")) Mob.spawn(cmd[1],host.lastLand);
-                else if (cmd[0].equals("item")) host.setWeapon((Item) Stock.getByName(cmd[1], -1));
+                else if (cmd[0].equals("item")){
+                    Item item = (Item) Stock.getByName(cmd[1], -1);
+                    item.start();
+                    host.setWeapon(item);
+                }
                 else if (cmd[0].equals("tp")) host.pos.add(Integer.parseInt(cmd[1].split(",")[0]),Integer.parseInt(cmd[1].split(",")[1]));
                 else if (cmd[0].equals("to")){
                     host.lastLand = new Line();
@@ -56,10 +65,10 @@ public class Command {
                     Updater.editor = true;
                     Global.display.input = new EditorInput();
                 } else if (p.equals("online")) {
-                    Global.server.online();
+//                    Global.server.online();
                 } else if (p.startsWith("cellcall")) {
-                    Global.server.online();
-                    Global.server.requestConnection(p.substring(9));
+//                    Global.server.online();
+//                    Global.server.requestConnection(p.substring(9));
                 }
             }
         } catch (Exception e){

@@ -58,7 +58,7 @@ public class Armor extends Item {
     }
     @Override
     public boolean use(final Man host){
-        if (host.getVacancy() >= encumbrance) {
+        if (host.getVacancy() >= 0) {
             host.setState(type.action);
             final Armor me = this;
             host.delay.performer = new Performer() {

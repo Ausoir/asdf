@@ -16,18 +16,14 @@ public class Creation {
     public static Random r = new Random();
     public static int seed;
     public static char[][] world;
+
     public static void create(){
-        if (!FileManager.isFile("Data/map/0.user")) {
-            FileManager.loadPlayer(-1, "Template");
-            Global.player.buff(Buffs.Metabolism, 10);
-            FileManager.save("map/0", Global.player.toCharacterString());
-        }
-        FileManager.loadPlayer(-1, "0");
+        FileManager.loadGame();
         if (!FileManager.isFile("Data/map/World.txt")) {
             seed = (int) (Math.random()*1000000);
 //            world = WorldCreation.create(16,16);
             world = new char[][]{new char[]{'6','-','-','-','-','-','-','-','-','-','-','-','-','-','-','4'}};
-            saveWorld();
+            FileManager.saveWorld();
         } else {
             FileManager.readWorld();
         }
@@ -43,17 +39,6 @@ public class Creation {
     public static int getSeed(int p){
         if (p == -1) return r.nextInt(99999);
         return p;
-    }
-    private static void saveWorld(){
-        StringBuilder r = new StringBuilder();
-        r.append(seed).append("\n");
-        for (char[] y : world){
-            for (char x : y){
-                r.append(x);
-            }
-            r.append("\n");
-        }
-        FileManager.save("map/World.txt", r.toString());
     }
     public static char getWorld(int id){
         int[] pt = new int[]{id % world[0].length, id / world[0].length};

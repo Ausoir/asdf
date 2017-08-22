@@ -9,15 +9,15 @@ import com.ga.unit.*;
  */
 public class ArmorSet {
     private static Armor[] bare = new Armor[]{
-            (Armor) new Armor("Head", 0,0,0,0,new Item.Material[]{Item.Material.Flesh}){
+            new Armor("Head", 0,0,0,0,new Item.Material[]{Item.Material.Flesh}){
                 void onHit(){}
-            }.cancelAdd(),
-            (Armor) new Armor("Underwear", 0,1,0,0,new Item.Material[]{Item.Material.Flesh}){
+            },
+            new Armor("Underwear", 0,1,0,0,new Item.Material[]{Item.Material.Flesh}){
                 void onHit(){}
-            }.cancelAdd(),
-            (Armor) new Armor("Underwear", 0,1,0,0,new Item.Material[]{Item.Material.Flesh}){
+            },
+            new Armor("Underwear", 0,1,0,0,new Item.Material[]{Item.Material.Flesh}){
                 void onHit(){}
-            }.cancelAdd()
+            }
     };
     public Armor[] armor;
     private Organ[] organs;
@@ -57,11 +57,11 @@ public class ArmorSet {
         }
         if (onChange != null) onChange.perform();
     }
-    private int organToPiece(int organ){
-        if (organ == 5) return 0;
-        if (organ == 1 || organ == 2) return 1;
-        if (organ == 0 || organ == 3 || organ == 4) return 2;
-        return -1;
+    public Armor getOrganArmor(int organ){
+        if (organ == 5) return armor[0];
+        if (organ == 1 || organ == 2) return armor[1];
+        if (organ == 0 || organ == 3 || organ == 4) return armor[2];
+        return null;
     }
     public boolean isBare(int piece){
         return armor[piece] == bare[piece];
@@ -96,15 +96,15 @@ public class ArmorSet {
         if (isBare(0) && isBare(1) && isBare(2)) return "Nothing";
         String r = "";
         if (!isBare(0)) r += armor[0].getFullName()+", ";
-        if (!isBare(1)) r += armor[1].getFullName()+" Legging, ";
-        if (!isBare(2)) r += armor[2].getFullName()+" Torso, ";
+        if (!isBare(1)) r += armor[1].getFullName()+", ";
+        if (!isBare(2)) r += armor[2].getFullName()+", ";
         return r.substring(0,r.length()-2);
     }
     private void load(String p){
         String[] armors = p.split("&");
         for (int i=0;i<armor.length;i++){
             if (armors[i].equals("None")) armor[i] = bare[i];
-            else armor[i] = (Armor) ((Armor) Stock.get(armors[i])).cancelAdd();
+            else armor[i] = (Armor) Stock.get(armors[i]);
         }
         for (int i=0;i<armor.length;i++) set(armor[i], i);
     }

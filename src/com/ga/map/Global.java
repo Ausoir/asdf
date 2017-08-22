@@ -1,15 +1,13 @@
 package com.ga.map;
 
 import com.ga.connection.Server;
-import com.ga.game.ControllerProcess;
+import com.ga.game.OtherProcess;
 import com.ga.game.Display;
 import com.ga.game.FileManager;
 import com.ga.game.Settings;
 import com.ga.tool.EventTimer;
 import com.ga.tool.P;
-import com.ga.tool.Performer;
 import com.ga.tool.Timer;
-import com.ga.unit.Unit;
 import com.ga.unit.player.MainPlayer;
 
 import java.awt.*;
@@ -25,7 +23,7 @@ public class Global {
     public static Map map;
     public static MainPlayer player;
     public static Server server;
-    public static ControllerProcess cprocess;
+    public static OtherProcess cprocess;
     public static P camera = new P();
     public static P cameraTo = new P();
     public static Display display;
@@ -35,11 +33,11 @@ public class Global {
     private static float[] sinv = new float[360];
     private static float[] cosv = new float[360];
     public static int time;
-    private static int controlId = 1;
     public static int houseId = 1;
     public static Timer updates = new Timer(40,true);
     public static ArrayList<EventTimer> timers = new ArrayList<>();
     public static Font font = new Font("Helvetica",Font.PLAIN,18);
+    public static int controlId;
 
     public static void init(){
         for (int i=0;i<360;i++){
@@ -95,6 +93,9 @@ public class Global {
             FileManager.saveCharacter();
         }
     }
+    public static int getControlId(){
+        return controlId++;
+    }
     static void timePass(int p){
         time+=p;
         if (p != 1 || time % HOUR == 0){
@@ -109,8 +110,5 @@ public class Global {
     }
     static int getHour(){
         return time/HOUR;
-    }
-    public static int getControlId() {
-        return controlId++;
     }
 }

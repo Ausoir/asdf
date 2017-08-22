@@ -23,6 +23,7 @@ public class Particle extends Thing implements Effect {
         this.gravity = gravity;
         this.rotation = rotation;
         this.timer.set(lifetime);
+        start();
     }
     public void setImage(String p){
         image.set(Picture.loadCache(p));

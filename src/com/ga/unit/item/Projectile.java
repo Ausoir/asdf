@@ -23,6 +23,7 @@ public class Projectile extends Prop {
         vel.set(Global.cos(rot)*speed, Global.sin(rot)*speed);
         rotation = rot;
         setDepth(100);
+        start();
     }
     protected Projectile(String name, P pt, P dest, int speed) {
         this(name, pt, (float) Math.atan2(dest.y-pt.y, dest.x-pt.x), speed);

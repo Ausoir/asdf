@@ -63,30 +63,27 @@ public class Item extends Prop {
         Wooden(.3f,2,32,1,new Color(118, 93, 0,60)),
         Cloth(.6f,0,12,0),
         Leather(.3f,1,50,1,new Color(133, 78, 32,140)),
-        Glass(.05f,1,1,7){
+        Glass(.16f,1,1,7){
             public void onSet(Item host){
                 host.tags.add(Tag.Ice);
             }
         },
         Brass(.36f,5,110,4,new Color(133, 123, 23,120)),
-        Copper(.32f,5,80,3,new Color(133, 92, 38,120)){
+        Copper(.3f,5,80,3,new Color(133, 92, 38,120)){
             public void onSet(Item host){
                 host.tags.add(Tag.Electric);
-                host.tags.add(Tag.Channeling);
             }
         },
         Bronze(.24f,5,500,4,new Color(133, 72, 0,200)),
         Iron(.24f,4,600,5),
-        Silver(.16f,6,140,3){
+        Silver(.1f,6,140,3){
             public void onSet(Item host){
-                host.tags.add(Tag.Shadow);
                 host.tags.add(Tag.Mutation);
             }
         },
         Gold(.16f,12,40,2){
             public void onSet(Item host){
-                host.tags.add(Tag.Shadow);
-                host.tags.add(Tag.Channeling);
+                host.tags.add(Tag.Electric);
             }
         },
         Lead(.2f,7,50,2,new Color(19, 31, 75,180)){
@@ -99,7 +96,6 @@ public class Item extends Prop {
         Crystal(.04f,8,24,12,new Color(28, 133, 67,120)){
             public void onSet(Item host){
                 host.tags.add(Tag.Ice);
-                host.tags.add(Tag.Channeling);
             }
         },
         Obsidian(.06f,3,40,4){
@@ -110,14 +106,12 @@ public class Item extends Prop {
         },
         Bone(.16f,1,80,3){
             public void onSet(Item host){
-                host.tags.add(Tag.Shadow);
                 host.tags.add(Tag.Conjuration);
             }
         },
         Other(0,0,10,0),
         Flesh(.05f,0,-1,0){
             public void onSet(Item host){
-                host.tags.add(Tag.Conjuration);
                 host.tags.add(Tag.Mutation);
             }
         },
@@ -455,10 +449,10 @@ public class Item extends Prop {
     }
     public String getFullName(){
         String r = "";
-        if (admod != AdverbMod.None) r+=admod.name()+" ";
-        if (smod != SpecialtyMod.None) r+=smod.name()+" ";
-        if (pmod != PrefixMod.None) r+=pmod.name()+" ";
-        r += getName();
+        if (admod != AdverbMod.None) r+=admod.name();
+        if (smod != SpecialtyMod.None) r+=smod.name();
+        if (pmod != PrefixMod.None) r+=pmod.name();
+        r += " " + getName();
         if (emod != null){
             r+=" of ";
             if (ademod != AdenchantMod.None){
@@ -489,7 +483,6 @@ public class Item extends Prop {
     }
     public void remove(){
         if (owner != null && owner.weapon == this) owner.setWeapon(null);
-        cancelAdd();
         super.remove();
     }
     private void playSound(){
@@ -529,13 +522,10 @@ public class Item extends Prop {
         pos = new P(host.pos);
         rotation = (float)Global.r.nextInt(628)/100;
     }
-    public Item cancelAdd(){
-        Updater.addQueue.remove(this);
-        return this;
-    }
     public String getDescription() {
         String r = "";
         r += Dialog.get("itemDsc",new String[]{getFullName(),weight+"",(isInfinite()?"unlimited":uses+""),encumbrance+""});
+        r += " This item is made of "+material.name()+".";
         if (emod != null){
             String ade = "";
             if (ademod != AdenchantMod.None) ade = "Level "+ademod.level+" ";

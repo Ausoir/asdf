@@ -1,11 +1,12 @@
 package com.ga.unit;
 
+import com.ga.game.Command;
 import com.ga.game.Input;
 import com.ga.game.Keybinding;
 import com.ga.map.Global;
 import com.ga.map.Updater;
 import com.ga.tool.P;
-import com.ga.unit.player.Player;
+import com.ga.unit.player.MainPlayer;
 import com.ga.unit.skill.Actions;
 
 import java.awt.event.KeyEvent;
@@ -39,27 +40,22 @@ public class PlayerInput implements Input {
         put(Keybinding.get(","), "_Rest");
     }};
     public P movement = new P();
-    public Player host;
+    public MainPlayer host;
     public int moving = 0;
     public boolean cameraMode = false;
-    public PlayerInput(Player unit){
+    public PlayerInput(MainPlayer unit){
         host = unit;
         unit.brain = Intelligence.None.make(unit);
         unit.input = this;
     }
     public void chat(String p, int x, int y){
-        if (p.startsWith("/") && Global.server.server) Global.server.order(p.substring(1));
+        if (p.startsWith("/")) Command.order(p.substring(1));
         else if (!p.equals("")){
             int tx = (int) (x-host.pos.x);
             int ty = (int) (y-host.pos.y);
             host.target.set(tx,ty);
-            Global.server.sendFromLocal("CT>"+p + "@" + tx + "@" + ty);
             host.say(p);
         }
-    }
-    public void chatDirect(String p, int x, int y){
-        host.target.set(x,y);
-        host.say(p);
     }
     public void changeMapping(int key, Actions event){
         keyMap.remove(key);
@@ -111,7 +107,7 @@ public class PlayerInput implements Input {
             movement.set(0,0);
             if (p.startsWith("_")) {
                 String t = p.substring(1);
-                if (t.length() == 2) {
+                if (Character.digit(t.charAt(0),10) >= 0) {
                     host.selectingItem = Integer.parseInt(t);
                     host.setState(Actions.Wield);
                 } else {

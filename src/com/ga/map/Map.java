@@ -71,7 +71,7 @@ public class Map extends Thing {
                     sections = line[3].split(";");
                     if (sections.length > 0) {
                         for (String section1 : sections) {
-                            Stock.get(section1);
+                            Stock.get(section1).start();
                         }
                     }
                 }

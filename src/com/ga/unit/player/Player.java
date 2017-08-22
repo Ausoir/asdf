@@ -28,15 +28,14 @@ public class Player extends Man {
     public Inventory inventory;
     public Crafts crafting;
     public int selectingItem = -1;
-    public PlayerInput input;
-    public String cmap;
     public Health health;
     public Actions learning;
     public Item offhand = fist;
     private boolean leftHandMode = false;
     private ArrayList<Trait> traits = new ArrayList<>();
-    public Player(String name, int seed) {
-        super(name, seed);
+    public Player(int seed) {
+        super(null, seed);
+        name = "Player";
         speechType = "p";
         inventory = new Inventory(this);
         crafting = new Crafts(this);
@@ -137,7 +136,6 @@ public class Player extends Man {
                 float speed = getSpeed();
                 if (speed <= 0) clip.setState(Actions.Exhausted.getClipName());
                 else clip.setMoveSpeed((int) Global.clamp(speed-1,-20,4));
-                face(input.moving, true);
                 break;
             case Interact:
                 delay.performer = new Performer() {
@@ -191,6 +189,7 @@ public class Player extends Man {
                             Item item = inventory.getItem(selectingItem);
                             setWeapon(item);
                             inventory.remove(item);
+                            item.start();
                             selectingItem = -1;
                         } else if (selectingItem >= 10 && selectingItem <= 16) {
                             Sound.play(pos, "unwear");
@@ -198,6 +197,7 @@ public class Player extends Man {
                             if (sheathe() && !armor.isBare(piece)) {
                                 Updater.addQueue.add(armor.armor[piece]);
                                 setWeapon(armor.armor[piece]);
+                                armor.armor[piece].start();
                                 armor.set(null, piece);
                             }
                         }
@@ -258,33 +258,26 @@ public class Player extends Man {
         if (dex == null) return 99;
         return dex.get() - armor.getEncumbrance() - weapon.encumbrance;
     }
+    public void die(){
+        super.die();
+        save = true;
+    }
     public void update(){
         super.update();
         offhand.pos.set(pos.x + clip.organs[OFIST].ptd.x, pos.y + clip.organs[OFIST].ptd.y);
     }
     public String toCharacterString(){
-        String r = super.toString()+"\n";
-        r += Global.time+";"+cmap+";"+gold+";"+memorized+";"+learning+"\n";
-        r += input.toString()+"\n";
-        r += inventory.toString()+"\n";
-        r += crafting.toString()+"\n";
-        r += health.toString()+"\n";
-        r += ";";
-        for (Trait i : traits) r += i.name()+";";
-        return r;
+        StringBuilder r = new StringBuilder();
+        r.append(gold).append(";").append(memorized).append(";").append(learning).append("\n");
+        r.append(health.toString()).append("\n;");
+        for (Trait i : traits) r.append(i.name()).append(";");
+        r.append("\n");
+        r.append(inventory.toString()).append("\n");
+        r.append(crafting.toString()).append("\n");
+        return r.toString();
     }
-    public String[] load(String p){
-        String[] line = p.split("%");
-        String[] r = super.load(line[0]);
-        String[] other = line[1].split(";");
-        cmap = other[1];
-        gold = Integer.parseInt(other[2]);
-        memorized = other[3];
-        learning = Actions.getByName(other[4]);
-        inventory.load(line[3]);
-        crafting.load(line[4]);
-        health.load(line[5]);
-        String[] traits = line[6].split(";");
+    public void loadTraits(String p){
+        String[] traits = p.split(";");
         for (String i : traits){
             if (!i.equals("")){
                 Trait trait = Trait.getByName(i);
@@ -292,6 +285,16 @@ public class Player extends Man {
                 trait.onSet(this);
             }
         }
+    }
+    public void loadPlayer(String[] line){
+        String[] other = line[0].split(";");
+        gold = Integer.parseInt(other[0]);
+        memorized = other[1];
+        learning = Actions.getByName(other[2]);
+        inventory.load(line[3]);
+        crafting.load(line[4]);
+        health.load(line[1]);
+        loadTraits(line[2]);
         armor.onChange = new Performer(){
             public void perform(){
                 inventory.setMaxSize(armor.getPockets());
@@ -308,6 +311,5 @@ public class Player extends Man {
                 leftHandMode = false;
             }
         };
-        return r;
     }
 }

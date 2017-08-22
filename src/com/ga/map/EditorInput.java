@@ -64,7 +64,8 @@ public class EditorInput implements Input, Updatable, Drawable {
             if (obs instanceof AI) Updater.addQueue.remove(i);
             else if (obs instanceof Unit) ((Unit)obs).say(((Unit) obs).name);
             else if (obs instanceof Prop){
-                if (((Prop)obs).factoryId == Stock.Spawn.ordinal() || ((Prop)obs).factoryId == Stock.Travel.ordinal()){
+                if (((Prop)obs).factoryId == Stock.Spawn.ordinal() || ((Prop)obs).factoryId == Stock.Travel.ordinal()
+                        || ((Prop)obs).factoryId == Stock.Spawner.ordinal()){
                     ((Prop)obs).image.visible = true;
                     ((Prop)obs).setDepth(999);
                 }
@@ -118,8 +119,7 @@ public class EditorInput implements Input, Updatable, Drawable {
             int to = Integer.parseInt(p.substring(6));
             selectTool(Tool.OBJECT);
             currentO = Stock.Spawn.create(-1,to);
-            currentO.setDepth(999);
-            currentO.image.visible = true;
+            make(currentO);
             message("Spawn id ["+to+"] spawned at ["+x+", "+y+"]");
         } else if (p.equals("travel")) {
             String msg = "";
@@ -134,9 +134,15 @@ public class EditorInput implements Input, Updatable, Drawable {
             if (to.length == 1) to = new String[]{to[0], "-1"};
             selectTool(Tool.OBJECT);
             currentO = Stock.Travel.create(Integer.parseInt(to[0]), Integer.parseInt(to[1]));
-            currentO.setDepth(999);
-            currentO.image.visible = true;
+            make(currentO);
             message("Travel to ["+to[0]+" @ "+to[1]+"] spawned");
+        } else if (p.startsWith("spawner")) {
+            String[] to = p.substring(8).split("@");
+            if (to.length == 1) to = new String[]{to[0], "-1"};
+            selectTool(Tool.OBJECT);
+            currentO = Stock.Spawner.create(Integer.parseInt(to[0]), Integer.parseInt(to[1]));
+            make(currentO);
+            message("Spawner ["+to[0]+" @ "+to[1]+"] spawned");
         } else if (p.startsWith("prop")) {
             String[] aux = p.substring(5).split("@");
             for (int ii=0;ii<Integer.parseInt(aux[0]);ii++){
@@ -230,6 +236,7 @@ public class EditorInput implements Input, Updatable, Drawable {
         } else if (p.equals("clear")){
             Updater.clear();
             Global.map = new Map(Global.map.name+"", Global.map.size);
+            Global.map.start();
             Updater.addQueue.add(this);
         } else if (p.equals("refresh")){
             Updater.unrender();
@@ -240,7 +247,7 @@ public class EditorInput implements Input, Updatable, Drawable {
         } else if (p.startsWith("load")){
             command("clear",0,0);
             Updater.changeMap = p.substring(5)+"@0";
-            Updater.changeMap(true);
+            Updater.changeMap();
             map = p.substring(5);
             init();
         } else if (p.equals("exit")){
@@ -355,7 +362,7 @@ public class EditorInput implements Input, Updatable, Drawable {
                 } else if (tool == Tool.OBJECT) {
                     currentO.pos.set(x, y);
                 } else if (tool == Tool.REMOVE && lmb) {
-                    ArrayList<Prop> props = Updater.collideProp(new P(x,y),24);
+                    ArrayList<Prop> props = Updater.collideAll(new P(x,y),24);
                     for (Prop i : props) {
                         String name = i.name;
                         try{i.remove();}catch(Exception e){message("Error deleting "+name);}
@@ -576,8 +583,8 @@ public class EditorInput implements Input, Updatable, Drawable {
                 Updater.editor = false;
                 Global.map = null;
                 final P newPos = Global.camera.getAdd(0,0);
-                FileManager.loadPlayer(-1, "0");
-                Global.map.loadMap(map+"@0");
+                FileManager.loadPlayer(1);
+                FileManager.loadMap(map+"@0");
                 Updater.changeMapEvent = new Performer(){
                     public void perform(){
                         Global.player.pos.set(newPos);
@@ -596,14 +603,19 @@ public class EditorInput implements Input, Updatable, Drawable {
             name = name.substring(0,name.indexOf(":"));
         }
         Prop r = Stock.getByName(name, seed);
-        if (r instanceof Unit){
-            ((Unit) r).say(name);
-            Updater.addQueue.remove(((Unit) r).brain);
-        }
-        r.setDepth(999);
-        r.image.visible = true;
+        make(r);
         r.pos = p;
         return r;
+    }
+    private Prop make(Prop p){
+        if (p instanceof Unit){
+            ((Unit) p).say(p.name);
+            Updater.addQueue.remove(((Unit) p).brain);
+        }
+        p.setDepth(999);
+        p.image.visible = true;
+        p.start();
+        return p;
     }
     private void setSpeed(int x, int y){
         v.x = x * SCROLLSPEED;
@@ -656,5 +668,6 @@ public class EditorInput implements Input, Updatable, Drawable {
         message("Saved ("+p+")");
         currentO.remove();
         FileManager.saveMap(p);
+        FileManager.saveWorld();
     }
 }

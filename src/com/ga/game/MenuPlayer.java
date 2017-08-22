@@ -275,7 +275,7 @@ public class MenuPlayer extends Panel {
             result.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Global.player.input.inputDirect("I"+index,0,0);
+                    Global.player.input.inputDirect("_"+index,0,0);
                     Global.display.menu.showMenu();
                 }
             });

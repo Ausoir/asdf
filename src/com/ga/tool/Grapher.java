@@ -7,7 +7,6 @@ import com.ga.unit.Organ;
 import com.ga.unit.Unit;
 
 import java.awt.*;
-import java.util.Map;
 
 /**
  * Created by ga on 5/14/17. qewqew
@@ -16,14 +15,13 @@ public class Grapher {
     public static void draw(Graphics2D g){
         g.setColor(Color.RED);
         g.setStroke(new BasicStroke(1));
-        for (Map.Entry<Integer, Unit> i : Updater.unitList.entrySet()){
-            Unit v = i.getValue();
-            for (Organ o : v.clip.organs){
-                g.drawLine((int)(v.pos.x+o.pt.x+ Global.rel.x), (int)(v.pos.y+o.pt.y+Global.rel.y),
-                        (int)(v.pos.x+o.ptd.x+Global.rel.x), (int)(v.pos.y+o.ptd.y+Global.rel.y));
+        for (Unit unit : Updater.unitsLoaded){
+            for (Organ o : unit.clip.organs){
+                g.drawLine((int)(unit.pos.x+o.pt.x+ Global.rel.x), (int)(unit.pos.y+o.pt.y+Global.rel.y),
+                        (int)(unit.pos.x+o.ptd.x+Global.rel.x), (int)(unit.pos.y+o.ptd.y+Global.rel.y));
             }
-            if (v instanceof Man){
-                Line test = ((Man)v).weapon.getLine();
+            if (unit instanceof Man){
+                Line test = ((Man)unit).weapon.getLine();
                 test = test.getAdd(Global.rel);
                 g.drawLine(test.pt.x(),test.pt.y(),test.ptd.x(), test.ptd.y());
             }
