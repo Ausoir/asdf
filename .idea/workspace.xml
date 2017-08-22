@@ -7,62 +7,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b3f1cf2f-6723-4007-a9a3-83f98a816882" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Data/map/0.user" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Data/map/null.map" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Data/map/test.map" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/ga/game/ControllerProcess.java" afterPath="$PROJECT_DIR$/src/com/ga/game/OtherProcess.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/game/Command.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/game/Command.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/game/Display.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/game/Display.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/game/FileManager.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/game/FileManager.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/game/Game.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/game/Game.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/map/Global.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/map/Global.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/map/Map.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/map/Map.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Man$1.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Man$1.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Man.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Man.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Thing.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Thing.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Unit.class" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Unit.class" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Data/item/Bone.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Data/object/Spawner.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Data/map/111.map" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Data/map/112.map" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Data/map/Actors.map" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Data/map/Player.user" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Data/map/-10.map" afterPath="$PROJECT_DIR$/Data/map/-10.map" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Data/map/-11.map" afterPath="$PROJECT_DIR$/Data/map/-11.map" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Data/map/1.map" afterPath="$PROJECT_DIR$/Data/map/1.map" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Data/map/World.txt" afterPath="$PROJECT_DIR$/Data/map/World.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Data/raw/Etc.txt" afterPath="$PROJECT_DIR$/Data/raw/Etc.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Data/raw/Man.txt" afterPath="$PROJECT_DIR$/Data/raw/Man.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Data/raw/Object.txt" afterPath="$PROJECT_DIR$/Data/raw/Object.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/connection/Server.java" afterPath="$PROJECT_DIR$/src/com/ga/connection/Server.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/game/Command.java" afterPath="$PROJECT_DIR$/src/com/ga/game/Command.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/game/Display.java" afterPath="$PROJECT_DIR$/src/com/ga/game/Display.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/game/FileManager.java" afterPath="$PROJECT_DIR$/src/com/ga/game/FileManager.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/game/Game.java" afterPath="$PROJECT_DIR$/src/com/ga/game/Game.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/game/MenuPlayer.java" afterPath="$PROJECT_DIR$/src/com/ga/game/MenuPlayer.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/game/MenuShop.java" afterPath="$PROJECT_DIR$/src/com/ga/game/MenuShop.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/map/Creation.java" afterPath="$PROJECT_DIR$/src/com/ga/map/Creation.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/map/EditorInput.java" afterPath="$PROJECT_DIR$/src/com/ga/map/EditorInput.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/map/Generator.java" afterPath="$PROJECT_DIR$/src/com/ga/map/Generator.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/map/Global.java" afterPath="$PROJECT_DIR$/src/com/ga/map/Global.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/map/Map.java" afterPath="$PROJECT_DIR$/src/com/ga/map/Map.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/map/Updater.java" afterPath="$PROJECT_DIR$/src/com/ga/map/Updater.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/tool/Grapher.java" afterPath="$PROJECT_DIR$/src/com/ga/tool/Grapher.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/AI.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/AI.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/Behavior.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/Behavior.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/Faction.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/Faction.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/Intelligence.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/Intelligence.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/Man.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/Man.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/Particle.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/Particle.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/PlayerInput.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/PlayerInput.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/Speech.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/Speech.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/Stock.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/Stock.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/Thing.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/Thing.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/Unit.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/Unit.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/item/Armor.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/item/Armor.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/item/ArmorSet.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/item/ArmorSet.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/item/Food.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/item/Food.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/item/Item.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/item/Item.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/item/Projectile.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/item/Projectile.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/item/Weapon.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/item/Weapon.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/player/MainPlayer.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/player/MainPlayer.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/player/Player.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/player/Player.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/ga/unit/skill/Actions.java" afterPath="$PROJECT_DIR$/src/com/ga/unit/skill/Actions.java" />
     </list>
     <ignored path="asdf.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -122,8 +73,8 @@
       <file leaf-file-name="FileManager.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/com/ga/game/FileManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="399">
-              <caret line="142" column="9" lean-forward="true" selection-start-line="142" selection-start-column="9" selection-end-line="142" selection-end-column="9" />
+            <state relative-caret-position="380">
+              <caret line="141" column="13" lean-forward="true" selection-start-line="141" selection-start-column="13" selection-end-line="141" selection-end-column="13" />
               <folding />
             </state>
           </provider>
@@ -907,7 +858,14 @@
       <option name="project" value="LOCAL" />
       <updated>1502981662295</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="Outside map updates">
+      <created>1503433081080</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1503433081080</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="TodoView">
@@ -971,7 +929,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Multiplayer complete" />
     <MESSAGE value="before Server Client multiplayer to P2P transition" />
     <MESSAGE value="attempt at P2P" />
     <MESSAGE value="Polygon &amp; Collision" />
@@ -996,7 +953,8 @@
     <MESSAGE value="Stocks into Raws" />
     <MESSAGE value="AI &amp; Textures" />
     <MESSAGE value="Maps, sprites" />
-    <option name="LAST_COMMIT_MESSAGE" value="Maps, sprites" />
+    <MESSAGE value="Outside map updates" />
+    <option name="LAST_COMMIT_MESSAGE" value="Outside map updates" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1405,8 +1363,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/ga/game/FileManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="399">
-          <caret line="142" column="9" lean-forward="true" selection-start-line="142" selection-start-column="9" selection-end-line="142" selection-end-column="9" />
+        <state relative-caret-position="380">
+          <caret line="141" column="13" lean-forward="true" selection-start-line="141" selection-start-column="13" selection-end-line="141" selection-end-column="13" />
           <folding />
         </state>
       </provider>
