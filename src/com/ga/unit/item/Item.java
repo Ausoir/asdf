@@ -266,8 +266,8 @@ public class Item extends Prop {
     public ItemType type = ItemType.Throwing;
     public int value = 8;
     Man owner;
-    public Item(String name, int seed, Material[] materials, ItemType type) {
-        super(name, seed);
+    public Item(Updater map, String name, int seed, Material[] materials, ItemType type) {
+        super(map, name, seed);
         gravity = true;
         setType(type);
         material = Material.get(rand, materials);
@@ -493,7 +493,7 @@ public class Item extends Prop {
             if (!isInfinite()){
                 uses -= p;
                 if (uses == 0){
-                    Particle.groundSlam(pos, getDepth());
+                    Particle.groundSlam(map, pos, getDepth());
                     remove();
                 }
             }

@@ -54,13 +54,6 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
         add(chatbox);
         menu = new Menu();
         add(menu);
-        new Timer(25, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                repaint();
-            }
-        }).start();
-        Updater.addUpdatee(menu);
     }
 
     public void removeSpeech(){
@@ -78,7 +71,7 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
     }
 
     public void paintComponent(Graphics g) {
-        Updater.draw((Graphics2D) g.create());
+        Global.player.map.draw((Graphics2D) g.create());
     }
 
     private void input(int mode){

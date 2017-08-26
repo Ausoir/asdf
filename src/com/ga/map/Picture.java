@@ -1,6 +1,7 @@
 package com.ga.map;
 
 import com.ga.game.FileManager;
+import com.ga.game.Settings;
 import com.ga.tool.P;
 
 import javax.imageio.ImageIO;
@@ -104,7 +105,7 @@ public class Picture {
                 e.printStackTrace();
             }
         }
-        return image;
+        return toCompatibleImage(image);
     }
     public static BufferedImage loadCache(String dir){
         BufferedImage image = cache.get(dir);
@@ -118,7 +119,26 @@ public class Picture {
             }
             cache.put(dir, image);
         } else System.out.println("Can't read file ["+dir + "]");
-        return image;
+        return toCompatibleImage(image);
+    }
+    static BufferedImage toCompatibleImage(BufferedImage image)
+    {
+        GraphicsConfiguration gfx_config = GraphicsEnvironment.
+                getLocalGraphicsEnvironment().getDefaultScreenDevice().
+                getDefaultConfiguration();
+        if (image.getColorModel().equals(gfx_config.getColorModel()))
+            return image;
+        BufferedImage new_image = gfx_config.createCompatibleImage(
+                image.getWidth(), image.getHeight(), Transparency.BITMASK);
+        // get the graphics context of the new image to draw the old image on
+        Graphics2D g2d = (Graphics2D) new_image.getGraphics();
+
+        // actually draw the image and dispose of context no longer needed
+        g2d.drawImage(image, 0, 0, null);
+        g2d.dispose();
+
+        // return the new optimized image
+        return new_image;
     }
     private static BufferedImage getTexture(BufferedImage image, int sx, int sy, int px, int py) {
         return image.getSubimage(px * sx, py * sy, sx, sy);
@@ -148,7 +168,7 @@ public class Picture {
         return r;
     }
     public void draw(Graphics2D g, float x, float y, float rot, int dir, float sizeX, float sizeY){
-        if (visible) {
+        if (visible && x > 0 && y > 0 && x < Settings.screenX && y < Settings.screenY) {
             float xMid = halfSize.x*dir;
             float yMid = halfSize.y;
             float rx = x + Global.rel.x;

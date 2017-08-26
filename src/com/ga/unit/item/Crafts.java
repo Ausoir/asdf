@@ -47,8 +47,8 @@ public class Crafts {
         }
         if (ingredients.size() == 1){
             int time = Integer.parseInt(usage.get(0));
-            if (Updater.sleep(time) == time) {
-                Prop result = Stock.getByName(p, -1);
+            if (host.map.sleep(time) == time) {
+                Prop result = Stock.getByName(host.map, p, -1);
                 if (host.wieldingNone()) host.setWeapon((Item) result);
                 else result.pos.set(host.pos);
             }

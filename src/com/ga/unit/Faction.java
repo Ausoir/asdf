@@ -1,5 +1,6 @@
 package com.ga.unit;
 
+import com.ga.map.Global;
 import com.ga.map.Updater;
 
 import java.util.ArrayList;
@@ -18,7 +19,6 @@ public enum Faction {
         void updateArmy(){
             super.updateArmy();
             if (armySize > 0){
-                attack(1);
             }
         }
     },
@@ -37,18 +37,20 @@ public enum Faction {
     }
     void updateArmy(){
         int prevArmySize = armySize;
+        controlIds = new ArrayList<>();
         for (Unit i : Updater.units){
             if (i.faction == this){
-                if (i.brain != null) i.brain.updateOutside();
-                armySize++;
-                controlIds.add(i.controlId);
+//                if (i.brain != null && !i.map.equals(Global.map.name)){
+//                    i.brain.updateOutside();
+//                    if (i.cmap.equals(Global.map.name)) i.start();
+//                }
+//                armySize++;
+//                controlIds.add(i.controlId);
             }
         }
     }
-    void attack(int id){
-        String destination = Updater.getUnloadedActor(id).cmap;
-    }
     public static void update(){
         Evil.updateArmy();
+        Neutral.updateArmy();
     }
 }

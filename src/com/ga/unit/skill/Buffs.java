@@ -27,12 +27,12 @@ public enum Buffs {
 
             public void onFinish() {
                 if (host instanceof MainPlayer){
-                    host.pos.set(Global.r.nextInt((int) Global.map.size.x-64)+36, Global.r.nextInt((int) Global.map.size.y-64)+36);
+                    host.pos.set(Global.r.nextInt((int) host.map.size.x-64)+36, Global.r.nextInt((int) host.map.size.y-64)+36);
                 } else host.remove();
             }
 
             public boolean update() {
-                Particle.smoke(host.getRandomPoint(),host.getDepth());
+                Particle.smoke(host.map, host.getRandomPoint(),host.getDepth());
                 return super.update();
             }
         };
@@ -45,7 +45,7 @@ public enum Buffs {
         return new Buff(1) {
             private Man unit;
             public void onSet() {
-                unit = (Man) Stock.getByName("Phantom",-1);
+                unit = (Man) Stock.getByName(host.map, "Phantom",-1);
                 unit.weapon.remove();
                 unit.pos.set(host.pos.x, host.pos.y);
             }
@@ -62,15 +62,15 @@ public enum Buffs {
     }}){ Buff makeLocal() {
         return new Buff(1) {
             public void onSet() {
-                Particle.sparkle("Fire", host.getDepth(), host.getRandomPoint(), 8, 5);
-                for (Unit i : Updater.collideUnit(host.pos,1600*level, Faction.Destructive)){
+                Particle.sparkle(host.map, "Fire", host.getDepth(), host.getRandomPoint(), 8, 5);
+                for (Unit i : host.map.collideUnit(host.pos,1600*level, Faction.Destructive)){
                     i.brain.target = host;
                     i.brain.onHit();
                 }
             }
 
             public boolean update() {
-                Particle.sparkle("Fire", host.getDepth(), host.getRandomPoint(), 8, 5);
+                Particle.sparkle(host.map, "Fire", host.getDepth(), host.getRandomPoint(), 8, 5);
                 return super.update();
             }
         };
@@ -92,7 +92,7 @@ public enum Buffs {
 
             public boolean update() {
                 if (Math.random() < .2f) {
-                    Particle.cleanse(host.pos, host.getDepth());
+                    Particle.cleanse(host.map, host.pos, host.getDepth());
                 }
                 return super.update();
             }
@@ -114,7 +114,7 @@ public enum Buffs {
             }
 
             public boolean update() {
-                Particle.sparkle("Fire", host.getDepth()+1, host.getRandomPoint(), 8, 3);
+                Particle.sparkle(host.map, "Fire", host.getDepth()+1, host.getRandomPoint(), 8, 3);
                 return super.update();
             }
         };
@@ -144,7 +144,7 @@ public enum Buffs {
                 time += level*10;
             }
             public boolean update() {
-                Particle.dripHoly(((Man) host).weapon.getLine().ptd, host.getDepth());
+                Particle.dripHoly(host.map, ((Man) host).weapon.getLine().ptd, host.getDepth());
                 return super.update();
             }
         };
@@ -182,7 +182,7 @@ public enum Buffs {
             }
             public boolean update() {
                 if (tick++ % (Math.max(1,20-level)) == 0) {
-                    Particle.explode("Blood", host.getDepth()+1, host.getRandomPoint(), new P(), (int) (Math.random() * level + 1), 5, 0, true, 24);
+                    Particle.explode(host.map, "Blood", host.getDepth()+1, host.getRandomPoint(), new P(), (int) (Math.random() * level + 1), 5, 0, true, 24);
                 }
                 if (super.update()) host.die();
                 return level == 0;
@@ -209,7 +209,7 @@ public enum Buffs {
                 host.tangible = true;
             }
             public boolean update() {
-                Particle.smoke(new P(host.pos), host.getDepth());
+                Particle.smoke(host.map, new P(host.pos), host.getDepth());
                 return super.update();
             }
         };
@@ -220,22 +220,22 @@ public enum Buffs {
     }}){ Buff makeLocal(){
         return new Buff(7) {
             public void onSet(){
-                Particle.shock(host.getRandomPoint(), host.getDepth());
+                Particle.shock(host.map, host.getRandomPoint(), host.getDepth());
                 if (!host.get("Stamina").require(level)){
-                    Particle.holyExplosion(host.pos, host.getDepth());
+                    Particle.holyExplosion(host.map, host.pos, host.getDepth());
                     host.stateSet(Actions.Down);
                 }
             }
             public void onStack(int level) {
-                Particle.shock(host.getRandomPoint(), host.getDepth());
+                Particle.shock(host.map, host.getRandomPoint(), host.getDepth());
                 time = Global.time + 7;
                 if (!host.get("Stamina").require(1)){
-                    Particle.holyExplosion(host.pos, host.getDepth());
+                    Particle.holyExplosion(host.map, host.pos, host.getDepth());
                     host.stateSet(Actions.Down);
                 }
             }
             public boolean update() {
-                Particle.sparkle("Glare", host.getDepth(),host.getRandomPoint(),20+host.getSize(),4+level);
+                Particle.sparkle(host.map, "Glare", host.getDepth(),host.getRandomPoint(),20+host.getSize(),4);
                 if (var++ % 40 == 0) host.get("Stamina").add(-1,false);
                 return super.update();
             }
@@ -258,15 +258,15 @@ public enum Buffs {
                             host.stats.getEffect(Bleed).time += Global.r.nextInt(100);
                         }
                     }
-                    for (Unit i : Updater.collideUnit(host.pos, host.getSize() + 40, Faction.Destructive)) {
+                    for (Unit i : host.map.collideUnit(host.pos, host.getSize() + 40, Faction.Destructive)) {
                         if (Global.r.nextBoolean()) i.buff(Burn, 1);
                     }
                     host.stateSet(Actions.Sprint);
                     host.delay.time = 24;
                 }
                 var++;
-                Particle.smoke(host.getRandomPoint(), host.getDepth()+1);
-                Particle.burn(host.getRandomPoint(), host.getDepth()+1);
+                Particle.smoke(host.map, host.getRandomPoint(), host.getDepth()+1);
+                Particle.burn(host.map, host.getRandomPoint(), host.getDepth()+1);
                 return super.update();
             }
         };
@@ -322,7 +322,7 @@ public enum Buffs {
                     };
                     lines[i].depth = host.getDepth();
                     if (!lines[i].clockwise()) lines[i].opt = -1;
-                    Global.map.land.add(lines[i]);
+                    host.map.land.add(lines[i]);
                 }
                 host.mobile = false;
                 host.tangible = false;
@@ -333,8 +333,8 @@ public enum Buffs {
                 host.mobile = true;
                 host.tangible = true;
                 frozen = false;
-                Global.map.land.removeAll(Arrays.asList(lines));
-                Updater.remove(ice);
+                host.map.land.removeAll(Arrays.asList(lines));
+                host.map.remove(ice);
                 time = Global.time + 16;
             }
             public void onFinish() {
@@ -348,7 +348,7 @@ public enum Buffs {
             }
             public boolean update() {
                 if (!frozen) {
-                    Particle.frozen(host.pos, host.getDepth()+1);
+                    Particle.frozen(host.map, host.pos, host.getDepth()+1);
                     level = (time - Global.time) / 8 + 1;
                 } else {
                     if (time - Global.time < freezeThreshold) melt();
@@ -365,7 +365,7 @@ public enum Buffs {
         return new Buff(4) {
             private Thing mark;
             public void onLoad(){
-                mark = new Thing("Mark", host.seed, 150);
+                mark = new Thing(host.map, "Mark", host.seed, 150);
                 mark.image.setCenterType(2);
                 mark.pos = host.pos;
                 mark.save = false;
@@ -373,7 +373,7 @@ public enum Buffs {
             public void onSet() {
                 time += level*6;
                 Sound.play(host.pos, "freeze");
-                mark = new Thing("Mark", host.seed, 150);
+                mark = new Thing(host.map, "Mark", host.seed, 150);
                 mark.image.setCenterType(2);
                 mark.pos = host.pos;
                 mark.save = false;
@@ -411,7 +411,7 @@ public enum Buffs {
             }
             public boolean update() {
                 if (tick++ % (Math.max(1,20-level)) == 0){
-                    Particle.explode("Poison", host.getDepth(),host.getRandomPoint(),new P(), level+1,5,0,true,24);
+                    Particle.explode(host.map, "Poison", host.getDepth(),host.getRandomPoint(),new P(), level+1,5,0,true,24);
                     return super.update();
                 }
                 return false;
@@ -430,11 +430,11 @@ public enum Buffs {
             public boolean update() {
                 tick++;
                 if (tick % 2 == 0) {
-                    final Projectile p = new Projectile("Ice", host.pos.getAdd(0, -5), new P(), 0) {
+                    final Projectile p = new Projectile(host.map, "Ice", host.pos.getAdd(0, -5), new P(), 0) {
                         @Override
                         public void onAttack(Unit p) {
                             p.buff(Buffs.Freeze, level);
-                            Particle.explode("Ice", host.getDepth(), pos, new P(0, -20), 30, 10, 5, true, 10);
+                            Particle.explode(host.map, "Ice", host.getDepth(), pos, new P(0, -20), 30, 10, 5, true, 10);
                             remove();
                         }
 
@@ -446,7 +446,7 @@ public enum Buffs {
                         @Override
                         public void update() {
                             super.update();
-                            Particle.explode("Ice", host.getDepth(), pos, new P(0, -5), 1, 3, 2, false, 6);
+                            Particle.explode(host.map, "Ice", host.getDepth(), pos, new P(0, -5), 1, 3, 2, false, 6);
                         }
 
                         @Override
@@ -486,7 +486,7 @@ public enum Buffs {
                 host.clip.setSpeed(99);
             }
             public boolean update() {
-                Particle.implode("Glare", host.getDepth(), host.pos.getAdd(0, -24), new P(), 1, 10, 1, false, 6);
+                Particle.implode(host.map, "Glare", host.getDepth(), host.pos.getAdd(0, -24), new P(), 1, 10, 1, false, 6);
                 return super.update();
             }
         };

@@ -14,20 +14,26 @@ import java.util.ArrayList;
 /**
  * Created by Ga on 5/6/2016. asd
  */
-public class Updater {
+public class Updater extends Map{
     public static boolean editor = false;
-    private static ArrayList<Drawable> drawee = new ArrayList<>();
-    private static ArrayList<Effect> effects = new ArrayList<>();
-    private static ArrayList<Updatable> updatee = new ArrayList<>();
-    static ArrayList<Prop> props = new ArrayList<>();
-    private static ArrayList<AI> controllee = new ArrayList<>();
-    public static ArrayList<Unit> unitsLoaded = new ArrayList<>();
+    private ArrayList<Drawable> drawee = new ArrayList<>();
+    private ArrayList<Effect> effects = new ArrayList<>();
+    private ArrayList<Updatable> updatee = new ArrayList<>();
+    ArrayList<Prop> props = new ArrayList<>();
+    private ArrayList<AI> controllee = new ArrayList<>();
+    public ArrayList<Unit> unitsLoaded = new ArrayList<>();
     public static ArrayList<Unit> units = new ArrayList<>();
     public static ArrayList<Observer> addQueue = new ArrayList<>();
     private static ArrayList<Observer> removeQueue = new ArrayList<>();
-    static String changeMap = null;
+    public String changeMap = null;
     static Performer changeMapEvent = null;
-    static void clear(){
+
+    public Updater(String name) {
+        super(name);
+    }
+
+    void clear(){
+        super.clear();
         drawee.clear();
         effects.clear();
         addQueue.clear();
@@ -36,28 +42,29 @@ public class Updater {
         units.clear();
         controllee.clear();
         props.clear();
-        Global.map.clear();
         Global.display.removeSpeech();
     }
-    static void changeMap(){
+    private void changeMap(){
         String newMap = changeMap;
         changeMap = null;
         final ArrayList<Integer> chasers = new ArrayList<>();
         for (AI i : controllee){
-            if (i.target == Global.player || i.host.faction == Global.player.faction){
+            if (i.host.faction == Global.player.faction ||
+                    (i.target == Global.player && i.host.pos.getSubtract(Global.player.pos).getDist() < 900)){
                 chasers.add(i.host.controlId);
             }
         }
         clear();
         FileManager.loadActors();
         FileManager.loadPlayer(1);
-        int pos = FileManager.loadMap(newMap);
+        int newMapPos = Integer.parseInt(newMap.split("@")[1]);
+        FileManager.loadMap(newMap);
         update();
-        Global.player.pos.set(getEntrancePos(pos));
+        Global.player.pos.set(getEntrancePos(newMapPos));
         for (int i : chasers){
             Unit unit = getUnloadedActor(i);
             unit.pos.set(Global.player.pos);
-            unit.cmap = Global.player.cmap;
+            unit.map = Global.player.map;
             units.remove(unit);
             unit.start();
         }
@@ -66,29 +73,22 @@ public class Updater {
             changeMapEvent = null;
         }
     }
-    public static void updateControl(){
+    public void updateControl(){
         for (AI i : controllee) i.update();
     }
-    public static void updateOutside(){
+    public void updateOutside(){
         Faction.update();
     }
-    public static String moveToward(String from, String to){
-        for (Prop i : props) {
-            if (i.factoryId == Stock.Travel.ordinal()) {
-                return i.pos;
-            }
-        }
-    }
-    public static void addUpdatee(Updatable p){
+    public void addUpdatee(Updatable p){
         updatee.add(p);
     }
-    public static void update(){
+    public void update(){
         while (addQueue.size() > 0){
             Observer p = addQueue.remove(0);
             if (p instanceof Unit){
                 Unit unit = (Unit)p;
-                units.add((Unit) p);
-                if (((Unit)p).cmap.equals(Global.map.name)){
+                if (!units.contains(p)) units.add((Unit) p);
+                if (((Unit)p).map == this){
                     unitsLoaded.add(unit);
                     unit.onField();
                     unit.brain.start();
@@ -128,21 +128,22 @@ public class Updater {
         if (changeMap != null) changeMap();
         else if (!editor) Global.update();
     }
-    public static void draw(Graphics2D g2){
+    public void draw(Graphics2D g2){
+        ArrayList<Drawable> draweeTest = (ArrayList<Drawable>) drawee.clone();
         Global.setRel();
-        for (Drawable i : drawee){
+        for (Drawable i : draweeTest){
             i.draw(g2);
         }
 //        Grapher.draw(g2);
-        Global.map.weather.draw(g2);
+        weather.draw(g2);
     }
-    public static void remove(Observer p){
+    public void remove(Observer p){
         removeQueue.add(p);
     }
-    public static void resetDepth(Drawable p){
+    public void resetDepth(Drawable p){
         if (drawee.remove(p)) addDrawee(p);
     }
-    private static void addDrawee(Drawable p){
+    private void addDrawee(Drawable p){
         int size = drawee.size();
         if (size > 0) {
             for (int i = 0; i < size; i++) {
@@ -154,8 +155,8 @@ public class Updater {
         }
         drawee.add(p);
     }
-    public static String toPropString(){
-        String result = "";
+    public String toString(){
+        String result = super.toString()+"\n";
         for (Prop i : props){
             if (i.save) result += i.toString()+";";
         }
@@ -178,13 +179,13 @@ public class Updater {
         }
         return null;
     }
-    public static Unit getLoadedActor(int p){
+    public Unit getLoadedActor(int p){
         for (Unit i : unitsLoaded){
             if (i.controlId == p) return i;
         }
         return null;
     }
-    public static ArrayList<Prop> collideInteractive(P p){
+    public ArrayList<Prop> collideInteractive(P p){
         ArrayList<Prop> result = new ArrayList<>();
         for (Prop i : props){
             if (i.onInteract != null) {
@@ -202,7 +203,7 @@ public class Updater {
         }
         return result;
     }
-    public static ArrayList<Prop> collideAll(P p, int r){
+    public ArrayList<Prop> collideAll(P p, int r){
         ArrayList<Prop> result = new ArrayList<>();
         for (Prop i : props){
             if (p.getSubtract(i.pos).getDist() <= r+i.getSize()) result.add(i);
@@ -212,21 +213,21 @@ public class Updater {
         }
         return result;
     }
-    public static ArrayList<Prop> collideProp(P p, int r){
+    public ArrayList<Prop> collideProp(P p, int r){
         ArrayList<Prop> result = new ArrayList<>();
         for (Prop i : props){
             if (i.hittable(Faction.Destructive) && p.getSubtract(i.pos).getDist() <= r+i.getSize()) result.add(i);
         }
         return result;
     }
-    public static ArrayList<Unit> collideUnit(P p, int r, Faction faction){
+    public ArrayList<Unit> collideUnit(P p, int r, Faction faction){
         ArrayList<Unit> result = new ArrayList<>();
         for (Unit i : unitsLoaded){
             if (i.hittable(faction) && p.getSubtract(i.pos).getDist() <= r) result.add(i);
         }
         return result;
     }
-    public static ArrayList<Unit> perceive(Unit host, P vision, int r){
+    public ArrayList<Unit> perceive(Unit host, P vision, int r){
         ArrayList<Unit> seen = new ArrayList<>();
         int max = r;
         for (Unit i : unitsLoaded){
@@ -242,10 +243,10 @@ public class Updater {
         }
         return seen;
     }
-    public static int sleep(int p){
+    public int sleep(int p){
         int origTime = Global.time;
         Unit encounter = getMapEncounter(Global.player.faction, p);
-        Global.map.weather.fadeIn();
+        weather.fadeIn();
         if (encounter != null){
             int timePassed = Global.time - origTime;
             if (timePassed > 1) {
@@ -262,10 +263,10 @@ public class Updater {
             return p;
         }
     }
-    private static Unit getMapEncounter(Faction faction, int time){
+    private Unit getMapEncounter(Faction faction, int time){
         ArrayList<Unit> units = new ArrayList<>();
         ArrayList<Float> dangers = new ArrayList<>();
-        for (Unit i : Updater.unitsLoaded) {
+        for (Unit i : unitsLoaded) {
             if (i.hittable(faction)){
                 boolean sorted = false;
                 float danger = (float) Math.pow(800f/(i.pos.getSubtract(Global.player.pos).getDist()),2);
@@ -294,7 +295,7 @@ public class Updater {
         }
         return null;
     }
-    private static P getEntrancePos(int p){
+    private P getEntrancePos(int p){
         for (Prop i : props) {
             if (i.factoryId == Stock.Spawn.ordinal() && i.seed == p) {
                 return i.pos;
@@ -303,13 +304,13 @@ public class Updater {
         return new P();
     }
 
-    static void unrender() {
+    void unrender() {
         for (Observer i : drawee){
             if (i instanceof Terrain) remove(i);
         }
     }
 
-    static void normalize(P adjustment) {
+    void normalize(P adjustment) {
         for (Observer i : addQueue){
             if (i instanceof Prop){
                 ((Prop)i).pos = ((Prop)i).pos.getAdd(adjustment);

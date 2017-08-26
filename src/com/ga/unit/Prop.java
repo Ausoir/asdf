@@ -2,6 +2,7 @@ package com.ga.unit;
 
 import com.ga.game.Settings;
 import com.ga.map.Global;
+import com.ga.map.Updater;
 import com.ga.tool.Interactive;
 import com.ga.tool.Line;
 import com.ga.tool.P;
@@ -21,8 +22,8 @@ public class Prop extends Thing {
     public Line lastLand = new Line();
     public Tags tags = new Tags();
     boolean manualDepth = false;
-    public Prop(String name, int seed) {
-        super(name, seed, 1);
+    public Prop(Updater map, String name, int seed) {
+        super(map, name, seed, 1);
     }
     public int getDamage(){
         return 0;
@@ -39,7 +40,7 @@ public class Prop extends Thing {
     }
     public void onAttack(Unit p){}
     private void adjustToLand(){
-        Line closest = Global.map.checkLand(new Line(pos.getAdd(0,-4), new P(pos.x, pos.y+600)));
+        Line closest = map.checkLand(new Line(pos.getAdd(0,-4), new P(pos.x, pos.y+600)));
         if (closest != null) {
             lastLand = closest;
             setDepth(closest.depth - 2);
@@ -60,8 +61,8 @@ public class Prop extends Thing {
             collided = false;
             vp = pos.getAdd(vel);
             pp = new Line(pos,vp);
-            for (int i=0;i<Global.map.land.size();i++) {
-                Line land = Global.map.land.get(i);
+            for (int i=0;i<map.land.size();i++) {
+                Line land = map.land.get(i);
                 if (land.depth >= lastLand.depth) {
                     if (land.lineCross(pp)) {
                         float slope = land.getSlope();
@@ -72,7 +73,7 @@ public class Prop extends Thing {
                             Line testt = new Line(pos.x, pos.y - 9999, pos.x, pos.y);
                             int cws = 0, ccs = 0; //check if landsite is overlapped behind a higher depth polygon
                             boolean overlapped = false;
-                            for (Line ii : Global.map.landRaw) {
+                            for (Line ii : map.landRaw) {
                                 if (ii.depth > land.depth && ii.lineCross(testt)) {
                                     overlapped = true;
                                     if (ii.clockwise()) cws++;
@@ -108,7 +109,7 @@ public class Prop extends Thing {
     public void update(){
         if (mobile) {
             collide();
-            int edge = Global.mapEdge(pos.getAdd(vel));
+            int edge = map.mapEdge(pos.getAdd(vel));
             if (edge > 0) {
                 if (Math.abs(edge-5) == 1) vel.x = 0;
                 else if (edge == 2) remove();

@@ -9,21 +9,23 @@ import com.ga.unit.*;
  */
 public class ArmorSet {
     private static Armor[] bare = new Armor[]{
-            new Armor("Head", 0,0,0,0,new Item.Material[]{Item.Material.Flesh}){
-                void onHit(){}
+            new Armor(null, "Head", 0,0,0,0,new Item.Material[]{Item.Material.Flesh}){
+                public int onHit(int d){ return d; }
             },
-            new Armor("Underwear", 0,1,0,0,new Item.Material[]{Item.Material.Flesh}){
-                void onHit(){}
+            new Armor(null, "Underwear", 0,1,0,0,new Item.Material[]{Item.Material.Flesh}){
+                public int onHit(int d){ return d; }
             },
-            new Armor("Underwear", 0,1,0,0,new Item.Material[]{Item.Material.Flesh}){
-                void onHit(){}
+            new Armor(null, "Underwear", 0,1,0,0,new Item.Material[]{Item.Material.Flesh}){
+                public int onHit(int d){ return d; }
             }
     };
     public Armor[] armor;
     private Organ[] organs;
     public Performer onChange;
     public Tags tags = new Tags();
+    private Man host;
     public ArmorSet(Man host, String p){
+        this.host = host;
         organs = host.clip.organs;
         armor = new Armor[3];
         load(p);
@@ -104,7 +106,7 @@ public class ArmorSet {
         String[] armors = p.split("&");
         for (int i=0;i<armor.length;i++){
             if (armors[i].equals("None")) armor[i] = bare[i];
-            else armor[i] = (Armor) Stock.get(armors[i]);
+            else armor[i] = (Armor) Stock.get(host.map, armors[i]);
         }
         for (int i=0;i<armor.length;i++) set(armor[i], i);
     }

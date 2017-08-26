@@ -56,7 +56,7 @@ public class Line {
         return new Line(pt.getAdd(p), ptd.getAdd(p));
     }
     public boolean clockwise(){
-        return pt.x <= ptd.x;
+        return pt.x < ptd.x;
     }
     public float getAtan(){
         return (float) Math.atan2(ptd.y-pt.y,ptd.x-pt.x);

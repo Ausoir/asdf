@@ -3,6 +3,7 @@ package com.ga.unit.item;
 import com.ga.map.Global;
 import com.ga.map.ShadedPicture;
 import com.ga.map.Shader;
+import com.ga.map.Updater;
 import com.ga.unit.Man;
 import com.ga.unit.player.Health;
 import com.ga.unit.player.Player;
@@ -28,8 +29,8 @@ public class Food extends Item {
     private int perish;
     private int happy = 0;
 
-    public Food(String name, int seed, int weight, int uses, String nutrition, int perish, int happy) {
-        super(name, seed, new Item.Material[]{Item.Material.Flesh}, ItemType.Consumable);
+    public Food(Updater map, String name, int seed, int weight, int uses, String nutrition, int perish, int happy) {
+        super(map, name, seed, new Item.Material[]{Item.Material.Flesh}, ItemType.Consumable);
         this.weight = weight;
         this.durability = uses;
         this.uses = uses;

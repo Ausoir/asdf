@@ -38,10 +38,9 @@ public class Unit extends Prop {
     private int jumpAcross = 0;
     public int stateDuration = 0;
     private boolean moveTriggered = false;
-    public String cmap;
 
-    public Unit(String name, int seed) {
-        super(null,seed);
+    public Unit(Updater map, String name, int seed) {
+        super(map, null,seed);
         this.name = name;
         gravity = true;
     }
@@ -50,7 +49,7 @@ public class Unit extends Prop {
     public String[] load(String p){
         String[] sections = super.load(p);
         controlId = Integer.parseInt(sections[5]);
-        cmap = sections[6];
+        map = Global.getMap(sections[6]);
         clip.load(sections[7]);
         faction = Faction.valueOf(sections[9]);
         brain = Intelligence.get(sections[10], this);
@@ -196,7 +195,7 @@ public class Unit extends Prop {
             if (clip.organs[i].checkHit(hitBox)) {
                 if (!r) checkHit(hitBox.pt, damage);
                 P t = new P(pos.x, hitBox.ptd.y);
-                Particle.explode("Blood", getDepth(),t, t.getSubtract(hitBox.pt), 3, 3, 12, true, 5);
+                Particle.explode(map, "Blood", getDepth(),t, t.getSubtract(hitBox.pt), 3, 3, 12, true, 5);
                 int dam;
                 if (!blunt) dam = processDamage(i, damage);
                 else dam = damage;
@@ -272,7 +271,7 @@ public class Unit extends Prop {
 
     public Unit attack(){
         P hand = getHand();
-        for (Unit i : Updater.collideUnit(hand, (int) getReach(), faction)){
+        for (Unit i : map.collideUnit(hand, (int) getReach(), faction)){
             i.checkHit(hand, getDamage());
             onAttack(i);
             if (!stats.triggerEffect(Buffs.Cleave)) return i;
@@ -311,7 +310,7 @@ public class Unit extends Prop {
     @Override
     public String toString(){
         StringBuilder r = new StringBuilder(super.toString());
-        r.append("@").append(controlId).append("@").append(cmap).append("@").append(clip.toString()).append("@").append(stats.toString()).append("@").append(faction.name()).append("@").append(brain.toString()).append("@");
+        r.append("@").append(controlId).append("@").append(map.name).append("@").append(clip.toString()).append("@").append(stats.toString()).append("@").append(faction.name()).append("@").append(brain.toString()).append("@");
         for (Actions i : moveset) r.append(i.getName()).append(",");
         return r.deleteCharAt(r.length()-1).toString();
     }
@@ -326,7 +325,7 @@ public class Unit extends Prop {
 
     public void revive() {
         stats.clearBuffs();
-        Particle.holyExplosion(pos,getDepth());
+        Particle.holyExplosion(map, pos,getDepth());
         state = Actions.Idle;
         stateSet(Actions.Down);
         delay.set(50);

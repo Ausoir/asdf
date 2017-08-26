@@ -20,12 +20,12 @@ import static com.ga.unit.BodyHumanoid.*;
  */
 public class Man extends Unit {
     private String face;
-    protected Item fist = ((Item)Stock.Fist.create(-1,0));
+    protected Item fist;
     public Item weapon = fist;
     public ArmorSet armor;
 
-    public Man(String name, int seed) {
-        super(name, seed);
+    public Man(Updater map, String name, int seed) {
+        super(map, name, seed);
         clip = new BodyHumanoid(this);
     }
 
@@ -58,7 +58,7 @@ public class Man extends Unit {
     }
 
     void stepSound(){
-        String ground = Global.map.getLand(lastLand.next);
+        String ground = map.getLand(lastLand.next);
         if (Sound.has("step_" + ground)) Sound.play(pos, "step_" + ground);
         else Sound.play(pos, "step_dirt");
     }
@@ -123,7 +123,7 @@ public class Man extends Unit {
         if (stats.triggerEffect(Buffs.Cleave)) cleave = true;
         Line hitbox = weapon.getLine();
         Unit target = null;
-        for (Unit i : Updater.collideUnit(pos, (int) hitbox.getLength()+20, faction)){
+        for (Unit i : map.collideUnit(pos, (int) hitbox.getLength()+20, faction)){
             if (i.checkHit(hitbox,getDamage(),weapon.type.isBlunt())){
                 target = i;
                 if (!cleave) break;
@@ -182,10 +182,10 @@ public class Man extends Unit {
     public String[] load(String p){
         String[] t = p.split("#");
         setFace(t[1]);
-        if (t[2].equals("")) setWeapon(fist);
-        else setWeapon((Item) Stock.get(t[2]));
-        armor = new ArmorSet(this, t[3]);
         String[] r = super.load(t[0]);
+        weapon = fist = ((Item)Stock.Fist.create(map, -1,0));
+        if (!t[2].equals("")) setWeapon((Item) Stock.get(map, t[2]));
+        armor = new ArmorSet(this, t[3]);
         final Man me = this;
         clip.organs[FIST].onAmputate = new Performer(){
             public void perform(){

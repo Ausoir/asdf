@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public abstract class AI implements Observer {
     int factoryId = -1;
     public Unit host;
-    Behavior task = Behavior.Wander, defaultTask = Behavior.Wander;
+    Behavior task = Behavior.Wander;
     public Unit target;
     private int targetId = 0;
     int taskProgress;
@@ -23,10 +23,6 @@ public abstract class AI implements Observer {
         Updater.addQueue.add(this);
     }
     public void update(){
-        if (targetId > 0){
-            target = Updater.getLoadedActor(targetId);
-            targetId = 0;
-        }
         perceive(160);
         task.update(host);
         taskProgress++;
@@ -34,7 +30,7 @@ public abstract class AI implements Observer {
     void updateOutside(){
         task.updateOutside(host);
     }
-    public void setTaskEcho(Behavior p){
+    public void setTask(Behavior p){
         taskProgress = 0;
         task = p;
         task.onSet(host);
@@ -42,7 +38,7 @@ public abstract class AI implements Observer {
     void onAttack(){}
     public void onHit(){
         if (task.alertness < 1){
-            setTaskEcho(Behavior.Search);
+            setTask(Behavior.Search);
         }
     }
     void setState(Actions state){}
@@ -51,7 +47,7 @@ public abstract class AI implements Observer {
     }
     void hear(Prop u, String p){}
     boolean perceive(int d){
-        ArrayList<Unit> seen = Updater.perceive(host, host.pos.getAdd(host.dir < 0 ? -d : d, 0), d * 2);
+        ArrayList<Unit> seen = host.map.perceive(host, host.pos.getAdd(host.dir < 0 ? -d : d, 0), d * 2);
         for (Unit t : seen) {
             if (t != host && target != t && t.state != Actions.Dead) {
                 return perceived(t);
@@ -64,8 +60,12 @@ public abstract class AI implements Observer {
     }
     void load(String p){
         String[] data = p.split(",");
-        setTaskEcho(Behavior.values()[Integer.parseInt(data[1])]);
+        setTask(Behavior.values()[Integer.parseInt(data[1])]);
         targetId = Integer.parseInt(data[2]);
+        if (targetId > 0){
+            target = Updater.getUnloadedActor(targetId);
+            targetId = 0;
+        }
     }
     public String toString(){
         int targetId = 0;

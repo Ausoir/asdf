@@ -1,9 +1,6 @@
 package com.ga.map;
 
-import com.ga.game.FileManager;
-import com.ga.game.Input;
-import com.ga.game.Observer;
-import com.ga.game.Settings;
+import com.ga.game.*;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
@@ -40,24 +37,26 @@ public class EditorInput implements Input, Updatable, Drawable {
     private boolean connected = false, repos = false;
     private Tool tool = Tool.NONE;
     private P v = new P();
-    private String map;
+    private Updater map;
     private Color landColor = Color.pink;
     private String message = "";
     private String lastCommand = "";
     private int smooth = 0;
 
     public EditorInput() {
-        Global.margin = -3600;
-        Updater.addUpdatee(this);
+        map = Global.player.map;
+        map.margin = -3600;
+        map.addUpdatee(this);
         init();
-        map = Global.player.cmap;
+        Processes.editorMode();
+        currentO = Global.player;
     }
 
     private void init(){
         Global.display.input = this;
         Updater.addQueue.add(this);
-        Global.camera = new P(Global.map.size.getMult(.5f,.5f));
-        currentO = new Prop(null,-1);
+        Global.camera = new P(map.size.getMult(.5f,.5f));
+        currentO = new Prop(map, null,-1);
         currentO.save = false;
         for (int i=0;i<Updater.addQueue.size();i++){
             Observer obs = Updater.addQueue.get(i);
@@ -85,12 +84,10 @@ public class EditorInput implements Input, Updatable, Drawable {
     }
     private void command(String p, int x, int y){
         if (p.equals("size")) {
-            message(Global.map.size.toString());
+            message(map.size.toString());
         } else if (p.startsWith("size")){
             String[] size = p.substring(5).split(",");
-            Global.map.size.set(Integer.parseInt(size[0]), Integer.parseInt(size[1]));
-        } else if (p.startsWith("panorama")){
-            Global.map.setPanorama(p.substring(9));
+            map.size.set(Integer.parseInt(size[0]), Integer.parseInt(size[1]));
         } else if (p.startsWith("camera")){
             Global.cameraTo.set(new P(p.substring(7)));
         } else if (p.equals("reverse")){
@@ -105,11 +102,11 @@ public class EditorInput implements Input, Updatable, Drawable {
         } else if (p.equals("none")) {
             landColor = new Color(0,0,0,0);
         } else if (p.equals("margin")) {
-            if (Global.margin == 0) Global.margin = -3600;
-            else Global.margin = 0;
+            if (map.margin == 0) map.margin = -3600;
+            else map.margin = 0;
         } else if (p.equals("spawn")) {
             String msg = "";
-            for (Prop i : Updater.props){
+            for (Prop i : map.props){
                 if (i.factoryId == Stock.Spawn.ordinal()){
                     msg += " ["+i.seed+"@"+i.pos+"] ";
                 }
@@ -118,12 +115,12 @@ public class EditorInput implements Input, Updatable, Drawable {
         } else if (p.startsWith("spawn")) {
             int to = Integer.parseInt(p.substring(6));
             selectTool(Tool.OBJECT);
-            currentO = Stock.Spawn.create(-1,to);
+            currentO = Stock.Spawn.create(map, -1,to);
             make(currentO);
             message("Spawn id ["+to+"] spawned at ["+x+", "+y+"]");
         } else if (p.equals("travel")) {
             String msg = "";
-            for (Prop i : Updater.props){
+            for (Prop i : map.props){
                 if (i.factoryId == Stock.Travel.ordinal()){
                     msg += " ["+i.subId+"@"+i.seed+"@"+i.pos+"] ";
                 }
@@ -133,23 +130,23 @@ public class EditorInput implements Input, Updatable, Drawable {
             String[] to = p.substring(7).split("@");
             if (to.length == 1) to = new String[]{to[0], "-1"};
             selectTool(Tool.OBJECT);
-            currentO = Stock.Travel.create(Integer.parseInt(to[0]), Integer.parseInt(to[1]));
+            currentO = Stock.Travel.create(map, Integer.parseInt(to[0]), Integer.parseInt(to[1]));
             make(currentO);
             message("Travel to ["+to[0]+" @ "+to[1]+"] spawned");
         } else if (p.startsWith("spawner")) {
             String[] to = p.substring(8).split("@");
             if (to.length == 1) to = new String[]{to[0], "-1"};
             selectTool(Tool.OBJECT);
-            currentO = Stock.Spawner.create(Integer.parseInt(to[0]), Integer.parseInt(to[1]));
+            currentO = Stock.Spawner.create(map, Integer.parseInt(to[0]), Integer.parseInt(to[1]));
             make(currentO);
             message("Spawner ["+to[0]+" @ "+to[1]+"] spawned");
         } else if (p.startsWith("prop")) {
             String[] aux = p.substring(5).split("@");
             for (int ii=0;ii<Integer.parseInt(aux[0]);ii++){
-                int rx = (int) (Math.random()*Global.map.size.x);
-                for (Line l : Global.map.landRaw) {
-                    if (l.next == lastSelected && l.clockwise() && l.lineCross(new Line(rx,0,rx,Global.map.size.y))) {
-                        Global.map.placeProp(l, aux[1], -1);
+                int rx = (int) (Math.random()*map.size.x);
+                for (Line l : map.landRaw) {
+                    if (l.next == lastSelected && l.clockwise() && l.lineCross(new Line(rx,0,rx,map.size.y))) {
+                        map.placeProp(l, aux[1], -1);
                     }
                 }
             }
@@ -165,22 +162,22 @@ public class EditorInput implements Input, Updatable, Drawable {
         } else if (p.startsWith("shader")) {
             txShader = p.substring(7);
         } else if (p.startsWith("cdepth")) {
-            String[] data = Global.map.formTextures.get(lastSelected).split("&");
-            Global.map.formTextures.put(lastSelected, p.substring(7)+"&"+data[1]+"&"+data[2]);
-            Updater.remove(Global.map.terrains.get(lastSelected));
-            Global.map.render(lastSelected);
+            String[] data = map.formTextures.get(lastSelected).split("&");
+            map.formTextures.put(lastSelected, p.substring(7)+"&"+data[1]+"&"+data[2]);
+            map.remove(map.terrains.get(lastSelected));
+            map.render(lastSelected);
             command("show",0,0);
         } else if (p.startsWith("ctexture")) {
-            String[] data = Global.map.formTextures.get(lastSelected).split("&");
-            Global.map.formTextures.put(lastSelected, data[0]+"&"+p.substring(9)+"&"+data[2]);
-            Updater.remove(Global.map.terrains.get(lastSelected));
-            Global.map.render(lastSelected);
+            String[] data = map.formTextures.get(lastSelected).split("&");
+            map.formTextures.put(lastSelected, data[0]+"&"+p.substring(9)+"&"+data[2]);
+            map.remove(map.terrains.get(lastSelected));
+            map.render(lastSelected);
             command("show",0,0);
         } else if (p.startsWith("cshader")) {
-            String[] data = Global.map.formTextures.get(lastSelected).split("&");
-            Global.map.formTextures.put(lastSelected, data[0]+"&"+data[1]+"&"+p.substring(8));
-            Updater.remove(Global.map.terrains.get(lastSelected));
-            Global.map.render(lastSelected);
+            String[] data = map.formTextures.get(lastSelected).split("&");
+            map.formTextures.put(lastSelected, data[0]+"&"+data[1]+"&"+p.substring(8));
+            map.remove(map.terrains.get(lastSelected));
+            map.render(lastSelected);
             command("show",0,0);
         } else if (p.startsWith("idO")){
             currentO.subId = Integer.parseInt(p.substring(4));
@@ -193,7 +190,7 @@ public class EditorInput implements Input, Updatable, Drawable {
         } else if (p.equals("show")){
             message("Depth: "+txDepth+", Texture: "+txTexture+", Shader: "+txShader);
         } else if (p.equals("climb")) {
-            for (Line l : Global.map.landRaw){
+            for (Line l : map.landRaw){
                 if (l.next == lastSelected && !l.clockwise()){
                     l.opt = 1;
                     message("Climbable");
@@ -201,54 +198,52 @@ public class EditorInput implements Input, Updatable, Drawable {
             }
         } else if (p.startsWith("opt")) {
             int option = Integer.parseInt(p.substring(4));
-            for (Line l : Global.map.landRaw){
+            for (Line l : map.landRaw){
                 if (l.next == lastSelected){
                     l.opt = option;
                     message("Option changed to "+option);
                 }
             }
         } else if (p.equals("grow")){
-            Global.map.generateProps();
+            map.generateProps();
         } else if (p.startsWith("smooth")){
             smooth = Integer.parseInt(p.substring(7));
             message("Select a land to smooth");
         } else if (p.startsWith("gen land")){
             int depth = Integer.parseInt(p.substring(9));
             Creation.prepareRandom(-(int) (Math.random()*1000));
-            Generator.init(getNext());
-            Generator.generateLand(depth, Global.map.size);
+            Generator gen = new Generator(map, getNext());
+            gen.generateLand(depth, map.size);
         } else if (p.startsWith("gen town")){
             Creation.prepareRandom(-(int) (Math.random()*1000));
-            Generator.init(getNext());
-            Generator.generateTown(Global.map.size);
+            Generator gen = new Generator(map, getNext());
+            gen.generateTown(map.size);
         } else if (p.startsWith("blocker")){
-            Generator.init(getNext());
-            Generator.generateBlocker(Integer.parseInt(p.substring(8)), lastSelected);
+            Generator gen = new Generator(map, getNext());
+            gen.generateBlocker(Integer.parseInt(p.substring(8)), lastSelected);
         } else if (p.startsWith("move")){
             P m = new P(p.substring(5));
-            for (Line l : Global.map.landRaw){
+            for (Line l : map.landRaw){
                 l.pt.add(m);
                 l.ptd.add(m);
             }
-            for (Prop i : Updater.props) i.pos.add(m);
+            for (Prop i : map.props) i.pos.add(m);
         } else if (p.equals("clearO")){
-            Updater.props.clear();
+            map.props.clear();
         } else if (p.equals("clear")){
-            Updater.clear();
-            Global.map = new Map(Global.map.name+"", Global.map.size);
-            Global.map.start();
+            map.clear();
+            map = new Updater(map.name);
             Updater.addQueue.add(this);
         } else if (p.equals("refresh")){
-            Updater.unrender();
-            Global.map.setTexture();
+            map.unrender();
+            map.setTexture();
         } else if (p.startsWith("save")){
-            map = p.substring(5);
-            save("map/"+map);
+            save("map/"+map.name);
         } else if (p.startsWith("load")){
             command("clear",0,0);
-            Updater.changeMap = p.substring(5)+"@0";
-            Updater.changeMap();
-            map = p.substring(5);
+            FileManager.loadActors();
+            FileManager.loadPlayer(1);
+            FileManager.loadMap(map.name+"@0");
             init();
         } else if (p.equals("exit")){
             System.exit(0);
@@ -264,7 +259,7 @@ public class EditorInput implements Input, Updatable, Drawable {
     }
 
     private void reverse(int p){
-        for (Line l : Global.map.landRaw) {
+        for (Line l : map.landRaw) {
             if (l.next == p) {
                 P t = l.pt;
                 l.pt = l.ptd;
@@ -280,7 +275,7 @@ public class EditorInput implements Input, Updatable, Drawable {
     private int getNext(){
         int high = -1;
         int nextPolygon = 0;
-        for (Line i : Global.map.landRaw){
+        for (Line i : map.landRaw){
             if (i.next > high){
                 high = i.next;
                 nextPolygon = i.next+1;
@@ -296,14 +291,14 @@ public class EditorInput implements Input, Updatable, Drawable {
                 i.next = nextPolygon;
             }
             connected = false;
-            Global.map.formTextures.put(nextPolygon, getTexture());
-            Global.map.render(nextPolygon);
+            map.formTextures.put(nextPolygon, getTexture());
+            map.render(nextPolygon);
             history.clear();
         }
     }
 
     private void removeTerrain(int next) {
-        Iterator it = Global.map.landRaw.iterator();
+        Iterator it = map.landRaw.iterator();
         Line i;
         while (it.hasNext()) {
             i = (Line) it.next();
@@ -312,8 +307,8 @@ public class EditorInput implements Input, Updatable, Drawable {
                 history.remove(i);
             }
         }
-        Global.map.formTextures.remove(next);
-        Updater.remove(Global.map.terrains.get(next));
+        map.formTextures.remove(next);
+        map.remove(map.terrains.get(next));
     }
 
     @Override
@@ -327,8 +322,8 @@ public class EditorInput implements Input, Updatable, Drawable {
             if (current != null) {
                 if (shift) {
                     boolean snap = false;
-                    for (int i = 0; i < Global.map.landRaw.size(); i++) {
-                        Line l = Global.map.landRaw.get(i);
+                    for (int i = 0; i < map.landRaw.size(); i++) {
+                        Line l = map.landRaw.get(i);
                         if (l != current) {
                             final int snapThreshold = 24;
                             if (Math.abs(l.pt.x - x) < snapThreshold && Math.abs(l.pt.y - y) < snapThreshold) {
@@ -362,7 +357,7 @@ public class EditorInput implements Input, Updatable, Drawable {
                 } else if (tool == Tool.OBJECT) {
                     currentO.pos.set(x, y);
                 } else if (tool == Tool.REMOVE && lmb) {
-                    ArrayList<Prop> props = Updater.collideAll(new P(x,y),24);
+                    ArrayList<Prop> props = map.collideAll(new P(x,y),24);
                     for (Prop i : props) {
                         String name = i.name;
                         try{i.remove();}catch(Exception e){message("Error deleting "+name);}
@@ -379,31 +374,31 @@ public class EditorInput implements Input, Updatable, Drawable {
                         makePolygon(current);
                     }
                     current = new Line(x, y, x, y);
-                    Global.map.landRaw.add(current);
+                    map.landRaw.add(current);
                     history.add(current);
                     connected = true;
                 } else if (tool == Tool.RECTANGLE){
                     if (connected) {
-                        Global.map.landRaw.remove(current);
+                        map.landRaw.remove(current);
                         history.remove(current);
                         Line[] lines = new Line[]{new Line(current.pt.x, current.pt.y, x, current.pt.y),
                                 new Line(x, current.pt.y, x, y),
                                 new Line(x, y, current.pt.x, y),
                                 new Line(current.pt.x, y, current.pt.x, current.pt.y)};
                         for (Line l : lines) {
-                            Global.map.landRaw.add(l);
+                            map.landRaw.add(l);
                             history.add(l);
                         }
                         makePolygon(lines[3]);
                     }
                     current = new Line(x, y, x, y);
-                    Global.map.landRaw.add(current);
+                    map.landRaw.add(current);
                     history.add(current);
                     connected = true;
                 } else if (tool == Tool.REPOSITION) {
                     if (!repos){
                         P pt = new P();
-                        for (Line i : Global.map.landRaw){
+                        for (Line i : map.landRaw){
                             if (i.pt.getSubtract(new P(x,y)).getDist() < 24){
                                 pt = i.pt;
                                 break;
@@ -421,7 +416,7 @@ public class EditorInput implements Input, Updatable, Drawable {
                 } else if (tool == Tool.OBJECT) {
                     if (shift) {
                         Line check = new Line(x,y,x,y+64);
-                        for (Line i : Global.map.landRaw) {
+                        for (Line i : map.landRaw) {
                             if (check.lineCross(i)) {
                                 currentO.pos.set(x, i.getCrossPointY(x)-(currentO instanceof Item ? 2 : 1));
                                 currentO.rotation = i.getAtan() + (control?3.14f:0);
@@ -431,7 +426,7 @@ public class EditorInput implements Input, Updatable, Drawable {
                     }
                     currentO = make(currentO.name, new P(x, y));
                 } else if (tool == Tool.SELECT) {
-                    final ArrayList<Prop> list = Updater.collideProp(new P(x, y), 16);
+                    final ArrayList<Prop> list = map.collideProp(new P(x, y), 16);
                     final String[] listString = new String[list.size()];
                     Performer[] performers = new Performer[listString.length];
                     for (int i=0;i<listString.length;i++){
@@ -451,23 +446,23 @@ public class EditorInput implements Input, Updatable, Drawable {
                 break;
             case -1:
                 if (tool == Tool.DELETE){
-                    for (int i = 0; i< Global.map.landRaw.size(); i++){
-                        Line l = Global.map.landRaw.get(i);
+                    for (int i = 0; i< map.landRaw.size(); i++){
+                        Line l = map.landRaw.get(i);
                         if (l.lineCross(new Line(new P(x, y), lmbP))) {
                             if (shift){
                                 history.remove(l);
-                                Global.map.landRaw.remove(l);
+                                map.landRaw.remove(l);
                             } else removeTerrain(l.next);
                         }
                     }
                 } else if (tool == Tool.MODIFY){
-                    for (int i = 0; i < Global.map.landRaw.size(); i++) {
-                        Line l = Global.map.landRaw.get(i);
+                    for (int i = 0; i < map.landRaw.size(); i++) {
+                        Line l = map.landRaw.get(i);
                         if (l.lineCross(new Line(new P(x, y), lmbP))) {
-                            Updater.remove(Global.map.terrains.get(l.next));
-                            Global.map.formTextures.put(l.next, getTexture());
-                            Global.map.render(l.next);
-                            message(l.toString() + " slope:" + l.getSlope() + " " + (l.clockwise() ? "cw" : "cc") + " " + Global.map.formTextures.get(l.next));
+                            map.remove(map.terrains.get(l.next));
+                            map.formTextures.put(l.next, getTexture());
+                            map.render(l.next);
+                            message(l.toString() + " slope:" + l.getSlope() + " " + (l.clockwise() ? "cw" : "cc") + " " + map.formTextures.get(l.next));
                             break;
                         }
                     }
@@ -475,27 +470,27 @@ public class EditorInput implements Input, Updatable, Drawable {
                     if (smooth > 0){
                         int order = -1;
                         ArrayList<Line> lines = new ArrayList<>();
-                        for (int i = 0; i < Global.map.landRaw.size(); i++) {
-                            Line l = Global.map.landRaw.get(i);
+                        for (int i = 0; i < map.landRaw.size(); i++) {
+                            Line l = map.landRaw.get(i);
                             if (l.lineCross(new Line(new P(x, y), lmbP))) {
                                 lines.add(l);
-                                Global.map.landRaw.remove(l);
+                                map.landRaw.remove(l);
                                 order = i;
                                 break;
                             }
                         }
                         int next = lines.get(0).next;
-                        Generator.divideLand(lines, 0, smooth);
+                        new Generator(map,-1).divideLand(lines, 0, smooth);
                         for (Line i : lines) i.next = next;
-                        Global.map.landRaw.addAll(order, lines);
+                        map.landRaw.addAll(order, lines);
                         smooth = 0;
                     } else {
-                        Iterator it = Global.map.landRaw.iterator();
+                        Iterator it = map.landRaw.iterator();
                         Line i;
                         while (it.hasNext()) {
                             i = (Line) it.next();
                             if (i.lineCross(new Line(new P(x, y), lmbP))) {
-                                message(i.toString() + " slope:" + i.getSlope() + " " + (i.clockwise() ? "cw" : "cc") + " " + Global.map.formTextures.get(i.next));
+                                message(i.toString() + " slope:" + i.getSlope() + " " + (i.clockwise() ? "cw" : "cc") + " " + map.formTextures.get(i.next));
                                 lastSelected = i.next;
                             }
                         }
@@ -581,7 +576,7 @@ public class EditorInput implements Input, Updatable, Drawable {
                 break;
             case KeyEvent.VK_INSERT:
                 Updater.editor = false;
-                Global.map = null;
+                map = null;
                 final P newPos = Global.camera.getAdd(0,0);
                 FileManager.loadPlayer(1);
                 FileManager.loadMap(map+"@0");
@@ -602,7 +597,7 @@ public class EditorInput implements Input, Updatable, Drawable {
             seed = Integer.parseInt(name.split(":")[1]);
             name = name.substring(0,name.indexOf(":"));
         }
-        Prop r = Stock.getByName(name, seed);
+        Prop r = Stock.getByName(map, name, seed);
         make(r);
         r.pos = p;
         return r;
@@ -631,7 +626,7 @@ public class EditorInput implements Input, Updatable, Drawable {
         message(test);
         this.tool = tool;
         if (current != null && connected){
-            Global.map.landRaw.remove(current);
+            map.landRaw.remove(current);
         }
         history.clear();
         currentO.remove();
@@ -641,7 +636,7 @@ public class EditorInput implements Input, Updatable, Drawable {
 
     public void update() {
         Global.cameraTo.add(v);
-        Global.mapEdgeCenter(Global.cameraTo);
+        map.mapEdgeCenter(Global.cameraTo);
     }
 
     private void message(String p){
@@ -652,13 +647,13 @@ public class EditorInput implements Input, Updatable, Drawable {
     public void draw(Graphics2D g) {
         g.setColor(landColor);
         g.setStroke(basicStroke);
-        for (Line i : Global.map.landRaw) i.draw(g, P.zero);
+        for (Line i : map.landRaw) i.draw(g, P.zero);
         g.setColor(Color.GREEN);
         g.setStroke(new BasicStroke(2));
-        g.drawLine(Global.rel.x(), Global.rel.y(), (int) (Global.map.size.x+Global.rel.x), Global.rel.y());
-        g.drawLine((int) (Global.map.size.x+Global.rel.x), Global.rel.y(), (int) (Global.map.size.x+Global.rel.x), (int) (Global.map.size.y+Global.rel.y));
-        g.drawLine((int) (Global.map.size.x+Global.rel.x), (int) (Global.map.size.y+Global.rel.y), Global.rel.x(), (int) (Global.map.size.y+Global.rel.y));
-        g.drawLine(Global.rel.x(), (int) (Global.map.size.y+Global.rel.y), Global.rel.x(), Global.rel.y());
+        g.drawLine(Global.rel.x(), Global.rel.y(), (int) (map.size.x+Global.rel.x), Global.rel.y());
+        g.drawLine((int) (map.size.x+Global.rel.x), Global.rel.y(), (int) (map.size.x+Global.rel.x), (int) (map.size.y+Global.rel.y));
+        g.drawLine((int) (map.size.x+Global.rel.x), (int) (map.size.y+Global.rel.y), Global.rel.x(), (int) (map.size.y+Global.rel.y));
+        g.drawLine(Global.rel.x(), (int) (map.size.y+Global.rel.y), Global.rel.x(), Global.rel.y());
         g.setColor(Color.MAGENTA);
         g.setFont(Global.font);
         g.drawString(message, Settings.centerX-96-(message.length()*6), Settings.screenY-64);

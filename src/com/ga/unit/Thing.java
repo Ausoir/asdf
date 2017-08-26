@@ -13,6 +13,7 @@ import java.util.Random;
  * Created by Ga on 5/6/2016. thing
  */
 public class Thing implements Drawable, Observer {
+    public Updater map;
     public Random rand;
     public int seed = 0;
     public Picture image;
@@ -22,7 +23,8 @@ public class Thing implements Drawable, Observer {
     public int dir = Math.random()<.5f?1:-1;
     public float rotation = 0;
     public boolean save = true;
-    public Thing(String name, int seed, int depth){
+    public Thing(Updater map, String name, int seed, int depth){
+        this.map = map;
         this.name = name;
         this.seed = seed;
         pos = new P();
@@ -53,11 +55,11 @@ public class Thing implements Drawable, Observer {
     }
     public void setDepth(int depth) {
         this.depth = depth;
-        Updater.resetDepth(this);
+        map.resetDepth(this);
     }
 
     public void remove(){
-        Updater.remove(this);
+        map.remove(this);
     }
     public String toString(){
         return name + "@" + pos;

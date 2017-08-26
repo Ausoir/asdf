@@ -17,8 +17,8 @@ import static com.ga.unit.BodyHumanoid.BODY;
 public class MainPlayer extends Player {
     public PlayerInput input;
     private Indicater indicater;
-    public MainPlayer(int seed) {
-        super(seed);
+    public MainPlayer(Updater map, int seed) {
+        super(map, seed);
         Global.player = this;
         indicater = new Indicater(this);
     }
@@ -101,7 +101,7 @@ public class MainPlayer extends Player {
         exp.add(p, true);
         if (exp.isFull()){
             Sound.play(pos, "heal");
-            Particle.holyExplosion(pos.getAdd(clip.organs[BODY].ptd), getDepth()-1);
+            Particle.holyExplosion(map, pos.getAdd(clip.organs[BODY].ptd), getDepth()-1);
             level.setMax(level.getMax()+1);
             int residue = exp.get() - exp.getMax();
             exp.setMax(10*level.getMax());
@@ -149,11 +149,11 @@ public class MainPlayer extends Player {
     }
     public void die(){
         super.die();
-        Global.map.weather.fadeOut();
+        map.weather.fadeOut();
     }
     public void revive(){
         super.revive();
-        Global.map.weather.fadeIn();
+        map.weather.fadeIn();
     }
     protected void stateDone(){
         super.stateDone();
@@ -166,8 +166,8 @@ public class MainPlayer extends Player {
     }
     public void update(){
         super.update();
-        if (input.cameraMode) Global.mapEdgeCenter(Global.cameraTo = Global.cameraTo.getAdd(input.movement));
-        else Global.mapEdgeCenter(Global.cameraTo = pos.getAdd(0,0));
+        if (input.cameraMode) map.mapEdgeCenter(Global.cameraTo = Global.cameraTo.getAdd(input.movement));
+        else map.mapEdgeCenter(Global.cameraTo = pos.getAdd(0,0));
         if (!get("Stamina").isFull()) indicater.show(.5f);
         indicater.update();
     }

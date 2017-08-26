@@ -44,7 +44,7 @@ public enum Intelligence {
                 } else if (p instanceof Man) {
                     if (target != p) {
                         target = (Man) p;
-                        setTaskEcho(Behavior.Idle);
+                        setTask(Behavior.Idle);
                         if (advertise.over() && host.getConversation().equals("")){
                             if (host.rand.nextFloat() < .5f) host.say("@c");
                             else host.say(ad);
@@ -61,6 +61,80 @@ public enum Intelligence {
                 advertise.update();
             }
         });}
+    }, Hunter{
+        public AI make(Unit host){ return process(new AI(host){
+            private final int range = 160;
+            void onAttack(){
+                if (target != null) {
+                    host.say("@atk tgt");
+                }
+            }
+            void setState(Actions state){
+                if (target != null) {
+                    P p = target.pos.getSubtract(host.pos).add(0,-target.getSize()/2);
+                    host.target = p;
+                    if (host instanceof Man) ((Man)host).weapon.rotateTo(p.getMult(host.dir,host.dir));
+                    if (target.state == Actions.Dead){
+                        target = null;
+                        setTask(Behavior.Wander);
+                    }
+                }
+            }
+            boolean blocked(int dir){
+                boolean blocked = false;
+                boolean fall = true;
+                P front = host.pos.getAdd((host.getSpeed()*3+48)*dir,0);
+                if (Math.abs(host.map.mapEdge(front)-5) == 1) blocked = true;
+                else {
+                    Line pp = new Line(host.pos, front);
+                    Line pp2 = new Line(front.getAdd(0, -40), front.getAdd(0, 40));
+                    for (Line i : host.map.land) {
+                        if (i.lineCross(pp) && (Math.abs(i.getSlope()) > Line.MAXSLOPE || !i.clockwise())) {
+                            blocked = true;
+                        }
+                        if (i.lineCross(pp2)) {
+                            fall = false;
+                        }
+                    }
+                }
+                if (blocked){
+                    task.blocked(host, false);
+                    return true;
+                } else if (fall){
+                    task.blocked(host, true);
+                    return true;
+                }
+                return false;
+            }
+            void hear(Prop u, String p){
+                if (task.alertness < 1) {
+                    int dir = u.pos.x - host.pos.x > 0 ? 1 : -1;
+                    if (!host.faction.canAttack(u.faction)) {
+                        if (u instanceof Man) {
+                            if (u.isFacing(host.pos) && Math.abs(u.pos.x - host.pos.x) < 240) {
+                                host.face(dir, false);
+                                setTask(Behavior.Idle);
+                            }
+                        }
+                    } else {
+                        host.face(dir, false);
+                        perceive(range*2);
+                    }
+                }
+            }
+            protected boolean perceived(Prop p){
+                if (p instanceof Unit) {
+                    if (host.faction.canAttack(p.faction)) {
+                        target = (Unit) p;
+                        host.say("@c tgt");
+                        setTask(Behavior.Hunt);
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
+        }
     }, Merchant{
         public AI make(Unit host) {
             return process(new AI(host) {
@@ -94,7 +168,7 @@ public enum Intelligence {
                     price = new int[length];
                     action = new Performer[length];
                     for (int i = 0; i < length; i++) {
-                        Item item = ((Item) Stock.getByName(items[i], -1));
+                        Item item = ((Item) Stock.getByName(host.map, items[i], -1));
                         int value = fluctuate(item.getValue());
                         product[i] = item;
                         price[i] = value;
@@ -128,7 +202,7 @@ public enum Intelligence {
                     } else if (p instanceof Man) {
                         if (target != p) {
                             target = (Man) p;
-                            setTaskEcho(Behavior.Idle);
+                            setTask(Behavior.Idle);
                             if (advertise.over() && host.getConversation().equals("")){
                                 if (host.rand.nextFloat() < .5f) host.say("@c");
                                 else host.say(ad);
@@ -195,7 +269,7 @@ public enum Intelligence {
                     } else if (p instanceof Man) {
                         if (target != p) {
                             target = (Man) p;
-                            setTaskEcho(Behavior.Idle);
+                            setTask(Behavior.Idle);
                             if (advertise.over() && host.getConversation().equals("")){
                                 host.say("@c");
                                 advertise.reset();
@@ -278,7 +352,7 @@ public enum Intelligence {
                     ArrayList<Integer> destinations = new ArrayList<>();
                     for (int i=-6;i<=6;i++){
                         if (i != 0 && host.rand.nextInt(6) == 0){
-                            int newmap = Integer.parseInt(Global.map.name)+i;
+                            int newmap = Integer.parseInt(host.map.name)+i;
                             if (FileManager.isFile("Data/map/"+newmap+".map")){
                                 destinations.add(newmap);
                                 prices.add(Math.abs(i));
@@ -296,7 +370,7 @@ public enum Intelligence {
                             public void perform(){
                                 if (Global.player.gold >= price) {
                                     Global.player.gold -= price;
-                                    Global.map.loadMap(destination+"@-1");
+                                    host.map.changeMap = destination+"@-1";
                                 } else {
                                     Global.player.say("Not enough money..");
                                 }
@@ -331,85 +405,6 @@ public enum Intelligence {
                             }
                         }
                     }
-                }
-            });
-        }
-    }, Hunter{
-        public AI make(Unit host){ return process(new AI(host){
-                private final int range = 160;
-                void onAttack(){
-                    if (target != null) {
-                        host.say("@atk tgt");
-                    }
-                }
-                void setState(Actions state){
-                    if (state == Actions.Dead){
-                        Updater.remove(this);
-                        task = Behavior.Idle;
-                    } else {
-                        if (target != null) {
-                            P p = target.pos.getSubtract(host.pos).add(0,-target.getSize()/2);
-                            host.target = p;
-                            if (host instanceof Man) ((Man)host).weapon.rotateTo(p.getMult(host.dir,host.dir));
-                            if (target.state == Actions.Dead){
-                                target = null;
-                                setTaskEcho(defaultTask);
-                            }
-                        }
-                    }
-                }
-                boolean blocked(int dir){
-                    boolean blocked = false;
-                    boolean fall = true;
-                    P front = host.pos.getAdd((host.getSpeed()*3+48)*dir,0);
-                    if (Math.abs(Global.mapEdge(front)-5) == 1) blocked = true;
-                    else {
-                        Line pp = new Line(host.pos, front);
-                        Line pp2 = new Line(front.getAdd(0, -40), front.getAdd(0, 40));
-                        for (Line i : Global.map.land) {
-                            if (i.lineCross(pp) && (Math.abs(i.getSlope()) > Line.MAXSLOPE || !i.clockwise())) {
-                                blocked = true;
-                            }
-                            if (i.lineCross(pp2)) {
-                                fall = false;
-                            }
-                        }
-                    }
-                    if (blocked){
-                        task.blocked(host, false);
-                        return true;
-                    } else if (fall){
-                        task.blocked(host, true);
-                        return true;
-                    }
-                    return false;
-                }
-                void hear(Prop u, String p){
-                    if (task.alertness < 1) {
-                        int dir = u.pos.x - host.pos.x > 0 ? 1 : -1;
-                        if (!host.faction.canAttack(u.faction)) {
-                            if (u instanceof Man) {
-                                if (u.isFacing(host.pos) && Math.abs(u.pos.x - host.pos.x) < 240) {
-                                    host.face(dir, false);
-                                    setTaskEcho(Behavior.Idle);
-                                }
-                            }
-                        } else {
-                            host.face(dir, false);
-                            perceive(range*2);
-                        }
-                    }
-                }
-                protected boolean perceived(Prop p){
-                    if (p instanceof Unit) {
-                        if (host.faction.canAttack(p.faction)) {
-                            target = (Unit) p;
-                            host.say("@c tgt");
-                            setTaskEcho(Behavior.Hunt);
-                            return true;
-                        }
-                    }
-                    return false;
                 }
             });
         }

@@ -35,7 +35,7 @@ public class Speech extends JTextArea implements Drawable {
         setVisible(false);
     }
     public void remove(){
-        Updater.remove(this);
+        host.map.remove(this);
         Global.display.remove(this);
     }
     public void draw(Graphics2D g){
@@ -73,7 +73,7 @@ public class Speech extends JTextArea implements Drawable {
             }
             timer.set(120 + t.length());
 
-            for (Unit i : Updater.unitsLoaded){
+            for (Unit i : host.map.unitsLoaded){
                 if (i != host && i.faction != host.faction) {
                     if (Math.abs(i.pos.x - host.pos.x) < 600 && Math.abs(i.pos.y - host.pos.y) < 200) {
                         i.hear(host, p.toLowerCase());

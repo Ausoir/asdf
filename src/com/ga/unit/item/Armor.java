@@ -1,6 +1,7 @@
 package com.ga.unit.item;
 
 import com.ga.game.Sound;
+import com.ga.map.Updater;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.unit.Man;
@@ -12,8 +13,8 @@ public class Armor extends Item {
     private int piece = 0;
     private int armorMod = 0;
     int pocket = 0;
-    public Armor(String name, int seed, int piece, int encumbrance, int pockets, Material[] materials) {
-        super(name, seed, materials, ItemType.Armor);
+    public Armor(Updater map, String name, int seed, int piece, int encumbrance, int pockets, Material[] materials) {
+        super(map, name, seed, materials, ItemType.Armor);
         this.encumbrance = encumbrance;
         value = 24;
         this.pocket = pockets;

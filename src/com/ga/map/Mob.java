@@ -13,7 +13,7 @@ import java.util.HashMap;
  */
 public class Mob {
     private static final HashMap<String,ArrayList<String>> mobs = FileManager.readDialogue("raw/Mob.txt");
-    public static void spawn(String p, Line land){
+    public static void spawn(Updater map, String p, Line land){
         float landSize = Math.abs(land.ptd.x-land.pt.x);
         if (landSize > 200) {
             ArrayList<String> types = mobs.get(p);
@@ -26,7 +26,7 @@ public class Mob {
                     if (land.clockwise()) tx = (int) Global.clamp(tx, 120, (land.ptd.x - land.pt.x) - 120);
                     else tx = (int) Global.clamp(tx, land.ptd.x - land.pt.x + 120, -120);
                     P pos = new P(land.pt.x + tx, (int) land.getCrossPointY(land.pt.x + tx));
-                    Stock.getByName(unitProperty[0], -1).pos.set(pos);
+                    Stock.getByName(map, unitProperty[0], -1).pos.set(pos);
                 }
             }
         }

@@ -1,0 +1,11 @@
+receiverPort:1992
+senderPort:1992
+tcpPort:2016
+screenX:1024
+screenY:720
+gravity:4
+gravityMax:64
+spf:17
+spu:25
+spc:360
+spo:4000

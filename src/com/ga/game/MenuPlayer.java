@@ -460,7 +460,7 @@ public class MenuPlayer extends Panel {
         private void command(String p){
             switch (p) {
                 case "h":
-                    Updater.sleep(100);
+                    Global.player.map.sleep(100);
                     break;
                 case "stat":
                     Global.display.menu.onUpdate = new Performer(){

@@ -1,4 +1,4 @@
--4,3;4,2;4,2;4,-1;-4,3;-4,0 //larm,lleg,rleg,body,rarm,head
+-4,3,Underwear;4,2,Underwear;4,2,Underwear;4,-1,Underwear;-4,3,Underwear;-4,0,Underwear //larm,lleg,rleg,body,rarm,head
 18,21,21,27,18,15;1,2,2,4,1,4;2,3,3,6,2,2 //linewidth,vital,health
 
 -1,35;2,40;-2,40;0,-35;1,37;0,-15/4

@@ -15,7 +15,7 @@ public class Grapher {
     public static void draw(Graphics2D g){
         g.setColor(Color.RED);
         g.setStroke(new BasicStroke(1));
-        for (Unit unit : Updater.unitsLoaded){
+        for (Unit unit : Global.player.map.unitsLoaded){
             for (Organ o : unit.clip.organs){
                 g.drawLine((int)(unit.pos.x+o.pt.x+ Global.rel.x), (int)(unit.pos.y+o.pt.y+Global.rel.y),
                         (int)(unit.pos.x+o.ptd.x+Global.rel.x), (int)(unit.pos.y+o.ptd.y+Global.rel.y));

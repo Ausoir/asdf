@@ -1,8 +1,9 @@
 package com.ga.game;
 
-import com.ga.map.*;
+import com.ga.map.Creation;
+import com.ga.map.Global;
+import com.ga.map.Updater;
 import com.ga.tool.Line;
-import com.ga.tool.P;
 import com.ga.unit.Clip;
 import com.ga.unit.PlayerInput;
 import com.ga.unit.Stock;
@@ -58,15 +59,13 @@ public class FileManager {
     }
     public static void saveCharacter(){
         if (Global.player.state != Actions.Dead) {
-            saveMap("map/"+Global.player.cmap);
+            saveMap("map/"+Global.player.map.name);
             save("map/Player.user", Global.player.toCharacterString());
             saveWorld();
         }
     }
     public static void saveMap(String name){
-        String result = "" + Global.map.toString();
-        result += "\n";
-        result += Updater.toPropString();
+        String result = Global.player.map.toString();
         save(name+".map", result);
     }
     public static String read(String dir) {
@@ -89,9 +88,9 @@ public class FileManager {
     public static void loadGame(){
         loadActors();
         loadPlayer(1);
-        loadMap(Global.player.cmap);
+        loadMap(Global.player.map.name);
     }
-    public static PlayerInput loadPlayer(int id){
+    public static void loadPlayer(int id){
         String[] data = read("Data/map/Player.user").split("%");
         PlayerInput pi;
         if (id == 1) {
@@ -103,24 +102,15 @@ public class FileManager {
             pi = new PlayerInput((MainPlayer) Updater.getUnloadedActor(id));
         }
         pi.host.loadPlayer(data);
-        return pi;
+        pi.host.lastLand = new Line();
+        Global.camera.set(pi.host.pos);
     }
-    public static int loadMap(String map) {
-        Global.houseId = 1;
-        Global.player.lastLand = new Line();
-        String[] mapProperties = map.split("@");
-        String dir = mapProperties[0];
-        int player = -1;
-        if (Global.map != null) player = Integer.parseInt(mapProperties[1]);
-        Global.map = new Map(dir, new P());
-        Global.map.start();
-        Global.map.load(dir);
-        Global.player.cmap = dir;
-        Global.camera.set(Global.player.pos);
-        Global.map.setTexture();
-        Global.mapEdgeCenter(Global.camera = Global.map.size.getMult(.5f,.5f));
-        Global.map.onTimeChange();
-        return player;
+    public static void loadMap(String p) {
+        Updater map = Global.getMap(p);
+        Global.player.map = map;
+        map.setTexture();
+        map.mapEdgeCenter(Global.camera = map.size.getMult(.5f,.5f));
+        map.onTimeChange();
     }
 
     public static void loadActors(){
@@ -128,31 +118,9 @@ public class FileManager {
         if (data.length() > 0) {
             String[] actors = data.split("%");
             for (String i : actors) {
-                Stock.get(i).start();
+                Stock.get(null, i).start();
             }
         }
-    }
-
-    public static boolean moveToward(int from, int to){
-        String[] objects = read("Data/map/"+from+".map").split("%")[3].split(";");
-        for (String i : objects) {
-            String[] sections = i.split("@");
-            if (Integer.parseInt(sections[0]) == Stock.Travel.ordinal()) {
-                if (moveTowardRecurse())
-            }
-        }
-    }
-
-    private static boolean moveTowardRecurse(int from, int to){
-        if (from == to) return true;
-        String[] objects = read("Data/map/"+from+".map").split("%")[3].split(";");
-        for (String i : objects){
-            String[] sections = i.split("@");
-            if (Integer.parseInt(sections[0]) == Stock.Travel.ordinal()){
-                if (moveToward(Integer.parseInt(sections[1]), to)) return true;
-            }
-        }
-        return false;
     }
 
     private static int[] readClipFrames(String[] data) {

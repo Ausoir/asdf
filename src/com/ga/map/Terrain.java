@@ -97,7 +97,7 @@ public class Terrain extends ShadedPicture implements Drawable{
 
     public void setDepth(int depth) {
         this.depth = depth;
-        Updater.resetDepth(this);
+        Global.player.map.resetDepth(this);
         for (Line i : lines) i.depth = depth;
     }
 }

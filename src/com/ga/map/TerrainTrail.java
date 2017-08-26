@@ -13,8 +13,10 @@ class TerrainTrail {
     private ArrayList<Line> lines = new ArrayList<>();
     int terrain;
     P last;
-    TerrainTrail(P p){
+    Updater map;
+    TerrainTrail(Updater map, P p){
         this.terrain = id++;
+        this.map = map;
         reset(p);
     }
     private void reset(P p){
@@ -62,12 +64,12 @@ class TerrainTrail {
         if (lines.size() > 1) add(lines.get(0).pt);
     }
     private void setTexture(String p){
-        Global.map.formTextures.put(terrain, p);
+        map.formTextures.put(terrain, p);
     }
     void finish(String p){
         if (lines.size() > 0) {
             connect();
-            Global.map.landRaw.addAll(lines);
+            map.landRaw.addAll(lines);
             if (!p.equals("")) setTexture(p);
         }
     }

@@ -30,11 +30,11 @@ public class Player extends Man {
     public int selectingItem = -1;
     public Health health;
     public Actions learning;
-    public Item offhand = fist;
+    public Item offhand;
     private boolean leftHandMode = false;
     private ArrayList<Trait> traits = new ArrayList<>();
-    public Player(int seed) {
-        super(null, seed);
+    public Player(Updater map, int seed) {
+        super(map, null, seed);
         name = "Player";
         speechType = "p";
         inventory = new Inventory(this);
@@ -141,7 +141,7 @@ public class Player extends Man {
                 delay.performer = new Performer() {
                     public void perform() {
                         P reach = pos.getAdd(clip.organs[FIST].ptd);
-                        ArrayList<Prop> obj = Updater.collideInteractive(reach);
+                        ArrayList<Prop> obj = map.collideInteractive(reach);
                         if (obj.size() != 0) {
                             for (Prop i : obj) {
                                 if (i.onInteract != null) {
@@ -162,7 +162,7 @@ public class Player extends Man {
                     delay.performer = new Performer() {
                         public void perform() {
                             P reach = pos.getAdd(clip.organs[OFIST].ptd);
-                            ArrayList<Prop> obj = Updater.collideInteractive(reach);
+                            ArrayList<Prop> obj = map.collideInteractive(reach);
                             for (Prop i : obj) {
                                 if (i != weapon && i != offhand && i.onInteract != null) {
                                     leftHandMode = true;
@@ -245,7 +245,7 @@ public class Player extends Man {
         return traits.contains(p);
     }
     public ArrayList<Prop> getAvailableItems(){
-        ArrayList<Prop> items = Updater.collideProp(pos,100);
+        ArrayList<Prop> items = map.collideProp(pos,100);
         Iterator it = items.iterator();
         while (it.hasNext()){
             if (!(it.next() instanceof Item)) it.remove();
@@ -287,6 +287,7 @@ public class Player extends Man {
         }
     }
     public void loadPlayer(String[] line){
+        offhand = fist;
         String[] other = line[0].split(";");
         gold = Integer.parseInt(other[0]);
         memorized = other[1];

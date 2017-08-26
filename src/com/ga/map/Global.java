@@ -1,7 +1,7 @@
 package com.ga.map;
 
 import com.ga.connection.Server;
-import com.ga.game.OtherProcess;
+import com.ga.game.Processes;
 import com.ga.game.Display;
 import com.ga.game.FileManager;
 import com.ga.game.Settings;
@@ -20,20 +20,18 @@ import java.util.Random;
  */
 public class Global {
     private static final int HOUR = 100;
-    public static Map map;
+    public static ArrayList<Updater> maps = new ArrayList<>();
     public static MainPlayer player;
     public static Server server;
-    public static OtherProcess cprocess;
+    public static Processes cprocess;
     public static P camera = new P();
     public static P cameraTo = new P();
     public static Display display;
     public static Random r = new Random();
-    static int margin = 0;
     public static P rel = new P();
     private static float[] sinv = new float[360];
     private static float[] cosv = new float[360];
     public static int time;
-    public static int houseId = 1;
     public static Timer updates = new Timer(40,true);
     public static ArrayList<EventTimer> timers = new ArrayList<>();
     public static Font font = new Font("Helvetica",Font.PLAIN,18);
@@ -74,19 +72,6 @@ public class Global {
     public static void p(String p){
         System.out.println(p);
     }
-    public static int mapEdge(P p){
-        int result = 0;
-        if (p.x < 0) result = 4;
-        else if (p.x > Global.map.size.x) result = 6;
-        if (p.y < 0) result = 8;
-        else if (p.y > Global.map.size.y) result = 2;
-        return result;
-    }
-    public static void mapEdgeCenter(P p){
-        if (Global.map.size.x > Settings.screenX && Global.map.size.y > Settings.screenY)
-            p.set(clamp(p.x, Settings.centerX+margin, Global.map.size.x-Settings.centerX-margin),
-                clamp(p.y, Settings.centerY+40+margin, Global.map.size.y-Settings.centerY-margin-margin));
-    }
     public static void update(){
         if (updates.update()) {
             timePass(1);
@@ -99,7 +84,7 @@ public class Global {
     static void timePass(int p){
         time+=p;
         if (p != 1 || time % HOUR == 0){
-            map.onTimeChange();
+            for (Map i : maps) i.onTimeChange();
             GlobalEvent.onHourChange();
         }
         Iterator it = timers.iterator();
@@ -110,5 +95,13 @@ public class Global {
     }
     static int getHour(){
         return time/HOUR;
+    }
+    public static Updater getMap(String name){
+        for (Updater i : maps){
+            if (i.name.equals(name)) return i;
+        }
+        Updater r = new Updater(name);
+        maps.add(r);
+        return r;
     }
 }

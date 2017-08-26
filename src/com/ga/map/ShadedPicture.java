@@ -29,6 +29,7 @@ public class ShadedPicture extends Picture {
 
     public void shade(int p) {
         shadow = shader.render(image, p);
+        if (shadow != null) shadow = Picture.toCompatibleImage(shadow);
     }
 
     protected void drawImage(Graphics2D g, int x, int y, int sizeX, int sizeY) {

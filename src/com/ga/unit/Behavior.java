@@ -1,5 +1,6 @@
 package com.ga.unit;
 
+import com.ga.game.MapManager;
 import com.ga.map.Global;
 import com.ga.map.Updater;
 import com.ga.unit.skill.Actions;
@@ -11,7 +12,9 @@ import java.util.ArrayList;
  */
 public enum Behavior {
     Idle(0){
-
+        public void update(Unit host){
+            if (host.brain.taskProgress > 32) host.brain.setTask(Wander);
+        }
     }, Wander(0){
         public void blocked(Unit host, boolean fall) {
             host.face(-host.dir, true);
@@ -26,6 +29,11 @@ public enum Behavior {
                     host.setState(Actions.Idle);
                 }
             }
+        }
+        void updateOutside(Unit host){
+//            String[] returns = MapManager.moveRandom(host.cmap);
+//            host.cmap = returns[0];
+//            host.pos.load(returns[1]);
         }
     }, Travel(1){
         public void blocked(Unit host, boolean fall) {
@@ -49,16 +57,21 @@ public enum Behavior {
                 } else if (absX < 40) host.setState(Actions.Idle);
             }
         }
+        void updateOutside(Unit host){
+//            String[] returns = MapManager.moveToward(host.cmap, host.brain.target.cmap);
+//            host.cmap = returns[0];
+//            host.pos.load(returns[1]);
+        }
     }, Search(2){
         public void update(Unit host){
             host.face(host.dir*-1, false);
             if (host.brain.taskProgress > 64){
-                host.brain.setTaskEcho(Idle);
+                host.brain.setTask(Idle);
             } else if (host.brain.taskProgress % 4 == 0) {
-                ArrayList<Unit> allunits = Updater.collideUnit(host.pos, host.brain.taskProgress*128, host.faction);
+                ArrayList<Unit> allunits = host.map.collideUnit(host.pos, host.brain.taskProgress*128, host.faction);
                 for (Unit i : allunits) {
                     host.brain.target = i;
-                    host.brain.setTaskEcho(Hunt);
+                    host.brain.setTask(Hunt);
                 }
             }
         }
@@ -69,7 +82,7 @@ public enum Behavior {
         }
         void update(Unit host){
             Unit target = host.brain.target;
-            if (target == null) host.brain.setTaskEcho(Idle);
+            if (target == null) host.brain.setTask(Idle);
             else if (host.delay.over()) {
                 int x = (int) ((target.pos.x + target.vel.x) - (host.pos.x + host.vel.x));
                 int y = (int) (target.pos.y - host.pos.y);
@@ -102,7 +115,9 @@ public enum Behavior {
             }
         }
         void updateOutside(Unit host){
-            host.cmap = Updater.moveToward(host.cmap, host.brain.target.cmap);
+//            String[] returns = MapManager.moveToward(host.cmap, host.brain.target.cmap);
+//            host.cmap = returns[0];
+//            host.pos.load(returns[1]);
         }
     };
     int alertness; //0:temporary, 1:normal, 2:alert, 3:active

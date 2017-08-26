@@ -68,11 +68,11 @@ public class Organ extends Line {
         boolean pierce = damage > 0 && Global.r.nextInt(damage) > health;
         if (pierce) {
             if (image != null) {
-                final Projectile flyingOrgan = new Projectile(null, new P(host.pos), p.ptd.getAdd(Global.r.nextInt(24)-12,-Global.r.nextInt(12)), 32+damage*8) {
+                final Projectile flyingOrgan = new Projectile(host.map, null, new P(host.pos), p.ptd.getAdd(Global.r.nextInt(24)-12,-Global.r.nextInt(12)), 32+damage*8) {
                     private final int length = (int) getLength();
                     public void update() {
                         if (tangible) {
-                            Particle.explode("Blood", host.getDepth(), pos, new P(0, -15), 4, 5, 5, true, 5);
+                            Particle.explode(host.map, "Blood", host.getDepth(), pos, new P(0, -15), 4, 5, 5, true, 5);
                         }
                         super.update();
                     }
@@ -95,7 +95,7 @@ public class Organ extends Line {
                 };
                 image.visible = false;
             }
-            Particle.explode("Blood", host.getDepth(), p.ptd, new P(), 5, 40, 0, true, 2);
+            Particle.explode(host.map, "Blood", host.getDepth(), p.ptd, new P(), 5, 40, 0, true, 2);
             amputated = true;
             for (Organ i : children) i.hit(p, 9999);
             onAmputate.perform();

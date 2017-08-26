@@ -29,13 +29,13 @@ public class Command {
                 else if (cmd[0].equals("time")) Global.time += Integer.parseInt(cmd[1]);
                 else if (cmd[0].equals("stat")) host.get(cmd[1]).addTotal(Integer.parseInt(cmd[2]));
                 else if (cmd[0].equals("unit")){
-                    Prop unit = Stock.getByName(cmd[1], -1);
+                    Prop unit = Stock.getByName(host.map, cmd[1], -1);
                     unit.start();
                     unit.pos.set(host.pos.getAdd(host.target));
                 }
-                else if (cmd[0].equals("mob")) Mob.spawn(cmd[1],host.lastLand);
+                else if (cmd[0].equals("mob")) Mob.spawn(host.map, cmd[1],host.lastLand);
                 else if (cmd[0].equals("item")){
-                    Item item = (Item) Stock.getByName(cmd[1], -1);
+                    Item item = (Item) Stock.getByName(host.map, cmd[1], -1);
                     item.start();
                     host.setWeapon(item);
                 }
@@ -47,8 +47,8 @@ public class Command {
                 else if (cmd[0].equals("tpto")) host.pos.set(Integer.parseInt(cmd[1].split(",")[0]),Integer.parseInt(cmd[1].split(",")[1]));
                 else if (cmd[0].equals("act")) host.setState(Actions.valueOf(cmd[1]));
                 else if (cmd[0].equals("level")){
-                    Unit victim = new Unit("",-1);
-                    Updater.remove(victim);
+                    Unit victim = new Unit(host.map, "",-1);
+                    Global.player.map.remove(victim);
                     victim.pos.set(Global.player.pos);
                     victim.stats.load("Level:10,10");
                     Global.player.witnessDeath(victim);
@@ -59,7 +59,7 @@ public class Command {
                 else if (cmd[0].equals("sound")) Sound.play(Global.camera, cmd[1]);
                 else if (p.equals("revive")) host.revive();
                 else if (p.equals("render")){
-                    for (Object terrain : Global.map.terrains.entrySet()) ((Terrain)terrain).render();
+                    for (Object terrain : Global.player.map.terrains.entrySet()) ((Terrain)terrain).render();
                 }
                 else if (p.equals("editor")){
                     Updater.editor = true;

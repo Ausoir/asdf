@@ -12,6 +12,7 @@ import java.awt.*;
  */
 class Game extends JFrame {
     Game(boolean editor, int x, int y){
+        Settings.init();
         Keybinding.init();
         Global.init();
         Updater.editor = editor;
@@ -30,12 +31,11 @@ class Game extends JFrame {
         Stock.init();
         JPanel display = new Display();
         Creation.create();
+        Global.cprocess = new Processes();
         if (editor) new EditorInput();
         add(display);
         setVisible(true);
         setExtendedState( getExtendedState()|JFrame.MAXIMIZED_BOTH );
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        new Process();
-        Global.cprocess = new OtherProcess();
     }
 }

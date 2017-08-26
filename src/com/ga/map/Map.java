@@ -16,7 +16,8 @@ import java.util.Iterator;
 /**
  * Created by Ga on 5/7/2016. asd
  */
-public class Map extends Thing {
+public class Map {
+    int margin = 0;
     public Weather weather = new Weather();
     public ArrayList<Line> land = new ArrayList<>();
     public ArrayList<Line> landRaw = new ArrayList<>();
@@ -31,15 +32,14 @@ public class Map extends Thing {
         put("sand","XBush=.1,Shell=.2,Starfish=.3");
     }};
     public P size;
-    private String callname = "Somewhere";
-    private String panorama = "None";
+    public String name = "0";
+    public String callname = "Somewhere";
     private static final int magnify = 2;
-    public Map(String name, P size) {
-        super(null,0,1);
+    private Thing panorama;
+    Map(String name) {
         this.name = name;
-        this.size = size;
-        image.visible = false;
         onTimeChange();
+        load(name);
     }
 
     public void load(String dir){
@@ -47,31 +47,47 @@ public class Map extends Thing {
         String[] line = data.split("%");
         String[] names = line[0].split(";");
         callname = names[0];
-        setPanorama(names[1]);
-        if (!panorama.equals("None")) {
-            image.visible = true;
-            setImage(panorama);
-            image.getSize().mult(magnify);
+        if (names[1].equals("")){
+            panorama = new Thing((Updater) this, names[1], 0, 0){
+                @Override
+                public void draw(Graphics2D g) {
+                    g.setColor(Color.black);
+                    g.fillRect(0, 0, Settings.screenX, Settings.screenY);
+                }
+            };
+        } else {
+            panorama = new Thing((Updater) this, names[1], 0, 0) {
+                @Override
+                public void draw(Graphics2D g) {
+                    P t = new P(Global.rel.x + pos.x, Global.rel.y + pos.y).mult(.1f);
+                    P size = image.getSize();
+                    t.x = Global.clamp(t.x, -size.x + Settings.screenX, 0);
+                    t.y = Global.clamp(t.y, -size.y + Settings.screenY, 0);
+                    g.drawImage(image.getImage(), (int) (t.x), (int) (t.y), (int) size.x, (int) size.y, null);
+                }
+            };
         }
+        panorama.start();
+        panorama.image.getSize().mult(magnify);
         this.size = new P(names[2]);
         if (line.length > 1) {
             String[] sections = line[1].split(";");
             for (String section1 : sections) {
                 String values[] = section1.split(":");
-                Global.map.formTextures.put(Integer.parseInt(values[0]), values[1]);
+                formTextures.put(Integer.parseInt(values[0]), values[1]);
             }
             if (line.length > 2) {
                 sections = line[2].split(";");
                 for (String section1 : sections) {
                     Line surface = new Line(section1);
-                    Global.map.landRaw.add(surface);
-                    if (surface.opt != 1) Global.map.land.add(surface);
+                    landRaw.add(surface);
+                    if (surface.opt != 1) land.add(surface);
                 }
                 if (line.length > 3 && !line[3].equals(";")) {
                     sections = line[3].split(";");
                     if (sections.length > 0) {
                         for (String section1 : sections) {
-                            Stock.get(section1).start();
+                            Stock.get((Updater) this, section1).start();
                         }
                     }
                 }
@@ -80,7 +96,7 @@ public class Map extends Thing {
     }
 
     public String toString(){
-        StringBuilder result = new StringBuilder(callname + ";" + panorama + ";" + size.x() + "," + size.y() + "\n");
+        StringBuilder result = new StringBuilder(name + ";" + panorama.name + ";" + size.x() + "," + size.y() + "\n");
         Iterator it = formTextures.entrySet().iterator();
         while (it.hasNext()){
             java.util.Map.Entry pair = (java.util.Map.Entry) it.next();
@@ -93,10 +109,6 @@ public class Map extends Thing {
         }
         if (landRaw.size() > 0) result = new StringBuilder(result.substring(0, result.length() - 1));
         return result.toString();
-    }
-
-    public void loadMap(String p){
-        Updater.changeMap = p;
     }
 
     void clear(){
@@ -193,7 +205,7 @@ public class Map extends Thing {
         }
         if (prop != null) {
             float landSize = Math.abs(l.ptd.x-l.pt.x);
-            Prop t = Stock.getByName(prop, seed);
+            Prop t = Stock.getByName((Updater) this, prop, seed);
             P size = t.image.getSize();
             if (landSize >= size.x) {
                 float halfSizeX = size.x/2;
@@ -258,31 +270,40 @@ public class Map extends Thing {
         }
     }
 
-    void setPanorama(String p){
-        this.panorama = p;
-        image.visible = !p.equals("None");
-        onTimeChange();
-    }
-
     public void onTimeChange() {
-        if (image.visible) {
-            setImage(panorama + (weather.isNight() ? "_Night" : ""));
-            image.setSize(image.getSize().getMult(magnify, magnify));
+//        if (image.visible) {
+//            setImage(panorama + (weather.isNight() ? "_Night" : ""));
+//            image.setSize(image.getSize().getMult(magnify, magnify));
             weather.refreshTimeColor();
-        }
+//        }
     }
 
-    @Override
-    public void draw(Graphics2D g) {
-        if (image.visible) {
-            P t = new P(Global.rel.x + pos.x, Global.rel.y + pos.y).mult(.1f);
-            P size = image.getSize();
-            t.x = Global.clamp(t.x, -size.x + Settings.screenX, 0);
-            t.y = Global.clamp(t.y, -size.y + Settings.screenY, 0);
-            g.drawImage(image.getImage(), (int) (t.x), (int) (t.y), (int) size.x, (int) size.y, null);
-        } else {
-            g.setColor(Color.black);
-            g.fillRect(0,0, Settings.screenX, Settings.screenY);
-        }
+//    @Override
+//    public void draw(Graphics2D g) {
+//        if (image.visible) {
+//            P t = new P(Global.rel.x + pos.x, Global.rel.y + pos.y).mult(.1f);
+//            P size = image.getSize();
+//            t.x = Global.clamp(t.x, -size.x + Settings.screenX, 0);
+//            t.y = Global.clamp(t.y, -size.y + Settings.screenY, 0);
+//            g.drawImage(image.getImage(), (int) (t.x), (int) (t.y), (int) size.x, (int) size.y, null);
+//        } else {
+//            g.setColor(Color.black);
+//            g.fillRect(0,0, Settings.screenX, Settings.screenY);
+//        }
+//    }
+
+    public int mapEdge(P p){
+        int result = 0;
+        if (p.x < 0) result = 4;
+        else if (p.x > size.x) result = 6;
+        if (p.y < 0) result = 8;
+        else if (p.y > size.y) result = 2;
+        return result;
+    }
+
+    public void mapEdgeCenter(P p){
+        if (size.x > Settings.screenX && size.y > Settings.screenY)
+            p.set(Global.clamp(p.x, Settings.centerX+margin, size.x-Settings.centerX-margin),
+                    Global.clamp(p.y, Settings.centerY+40+margin, size.y-Settings.centerY-margin-margin));
     }
 }

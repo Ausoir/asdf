@@ -140,10 +140,8 @@ public class Body {
                 else organs[p] = new Organ(parent, tip);
                 organs[p].host = host;
                 organs[p].type = Math.abs(type);
-                if (model[p].length > 2){
-                    if (type == 0) organs[p].setImage(model[p][2]);
-                    else organs[p].setImage(model[p][2],organs[p].type-1);
-                }
+                if (type == 0) organs[p].setImage(model[p][2]);
+                else organs[p].setImage(model[p][2],organs[p].type-1);
             } else {
                 organs[p] = new Organ(parent, tip);
                 organs[p].host = host;

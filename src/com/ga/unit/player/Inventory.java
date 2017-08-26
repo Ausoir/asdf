@@ -60,7 +60,7 @@ public class Inventory {
         if (p.equals(";")) return;
         String[] data = p.substring(1).split(";");
         for (String aData : data) {
-            Item item = (Item) Stock.get(aData);
+            Item item = (Item) Stock.get(host.map, aData);
             weight += item.weight;
             Updater.addQueue.remove(item);
             items.add(item);
