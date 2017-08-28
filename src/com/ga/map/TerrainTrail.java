@@ -13,8 +13,8 @@ class TerrainTrail {
     private ArrayList<Line> lines = new ArrayList<>();
     int terrain;
     P last;
-    Updater map;
-    TerrainTrail(Updater map, P p){
+    Map map;
+    TerrainTrail(Map map, P p){
         this.terrain = id++;
         this.map = map;
         reset(p);

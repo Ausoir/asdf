@@ -37,7 +37,7 @@ public class EditorInput implements Input, Updatable, Drawable {
     private boolean connected = false, repos = false;
     private Tool tool = Tool.NONE;
     private P v = new P();
-    private Updater map;
+    private Map map;
     private Color landColor = Color.pink;
     private String message = "";
     private String lastCommand = "";
@@ -45,31 +45,27 @@ public class EditorInput implements Input, Updatable, Drawable {
 
     public EditorInput() {
         map = Global.player.map;
-        map.margin = -3600;
-        map.addUpdatee(this);
         init();
         Processes.editorMode();
-        currentO = Global.player;
+        currentO = new Prop(map, "Error", 0);
     }
 
     private void init(){
+        map.updater.addUpdatee(this);
         Global.display.input = this;
-        Updater.addQueue.add(this);
+        map.updater.addQueue.add(this);
         Global.camera = new P(map.size.getMult(.5f,.5f));
         currentO = new Prop(map, null,-1);
         currentO.save = false;
-        for (int i=0;i<Updater.addQueue.size();i++){
-            Observer obs = Updater.addQueue.get(i);
-            if (obs instanceof AI) Updater.addQueue.remove(i);
-            else if (obs instanceof Unit) ((Unit)obs).say(((Unit) obs).name);
-            else if (obs instanceof Prop){
-                if (((Prop)obs).factoryId == Stock.Spawn.ordinal() || ((Prop)obs).factoryId == Stock.Travel.ordinal()
-                        || ((Prop)obs).factoryId == Stock.Spawner.ordinal()){
-                    ((Prop)obs).image.visible = true;
-                    ((Prop)obs).setDepth(999);
-                }
+        map.updater.update();
+        for (Prop i : map.updater.props){
+            if (i.factoryId == Stock.Spawn.ordinal() || i.factoryId == Stock.Travel.ordinal()
+                    || i.factoryId == Stock.Spawner.ordinal()){
+                i.image.visible = true;
             }
         }
+        for (Unit i : map.updater.unitsLoaded) i.say(i.name);
+        map.updater.controllee.clear();
     }
 
     @Override
@@ -106,7 +102,7 @@ public class EditorInput implements Input, Updatable, Drawable {
             else map.margin = 0;
         } else if (p.equals("spawn")) {
             String msg = "";
-            for (Prop i : map.props){
+            for (Prop i : map.updater.props){
                 if (i.factoryId == Stock.Spawn.ordinal()){
                     msg += " ["+i.seed+"@"+i.pos+"] ";
                 }
@@ -120,7 +116,7 @@ public class EditorInput implements Input, Updatable, Drawable {
             message("Spawn id ["+to+"] spawned at ["+x+", "+y+"]");
         } else if (p.equals("travel")) {
             String msg = "";
-            for (Prop i : map.props){
+            for (Prop i : map.updater.props){
                 if (i.factoryId == Stock.Travel.ordinal()){
                     msg += " ["+i.subId+"@"+i.seed+"@"+i.pos+"] ";
                 }
@@ -164,19 +160,19 @@ public class EditorInput implements Input, Updatable, Drawable {
         } else if (p.startsWith("cdepth")) {
             String[] data = map.formTextures.get(lastSelected).split("&");
             map.formTextures.put(lastSelected, p.substring(7)+"&"+data[1]+"&"+data[2]);
-            map.remove(map.terrains.get(lastSelected));
+            map.updater.remove(map.terrains.get(lastSelected));
             map.render(lastSelected);
             command("show",0,0);
         } else if (p.startsWith("ctexture")) {
             String[] data = map.formTextures.get(lastSelected).split("&");
             map.formTextures.put(lastSelected, data[0]+"&"+p.substring(9)+"&"+data[2]);
-            map.remove(map.terrains.get(lastSelected));
+            map.updater.remove(map.terrains.get(lastSelected));
             map.render(lastSelected);
             command("show",0,0);
         } else if (p.startsWith("cshader")) {
             String[] data = map.formTextures.get(lastSelected).split("&");
             map.formTextures.put(lastSelected, data[0]+"&"+data[1]+"&"+p.substring(8));
-            map.remove(map.terrains.get(lastSelected));
+            map.updater.remove(map.terrains.get(lastSelected));
             map.render(lastSelected);
             command("show",0,0);
         } else if (p.startsWith("idO")){
@@ -227,23 +223,21 @@ public class EditorInput implements Input, Updatable, Drawable {
                 l.pt.add(m);
                 l.ptd.add(m);
             }
-            for (Prop i : map.props) i.pos.add(m);
+            for (Prop i : map.updater.props) i.pos.add(m);
         } else if (p.equals("clearO")){
-            map.props.clear();
+            map.updater.props.clear();
         } else if (p.equals("clear")){
             map.clear();
-            map = new Updater(map.name);
-            Updater.addQueue.add(this);
+            map = new Map(map.name);
+            map.updater.addQueue.add(this);
         } else if (p.equals("refresh")){
-            map.unrender();
+            map.updater.unrender();
             map.setTexture();
         } else if (p.startsWith("save")){
-            save("map/"+map.name);
+            save("map/"+p.substring(5));
         } else if (p.startsWith("load")){
-            command("clear",0,0);
-            FileManager.loadActors();
-            FileManager.loadPlayer(1);
-            FileManager.loadMap(map.name+"@0");
+            Global.maps.clear();
+            map = FileManager.loadMap(p.substring(5));
             init();
         } else if (p.equals("exit")){
             System.exit(0);
@@ -308,7 +302,7 @@ public class EditorInput implements Input, Updatable, Drawable {
             }
         }
         map.formTextures.remove(next);
-        map.remove(map.terrains.get(next));
+        map.updater.remove(map.terrains.get(next));
     }
 
     @Override
@@ -357,7 +351,7 @@ public class EditorInput implements Input, Updatable, Drawable {
                 } else if (tool == Tool.OBJECT) {
                     currentO.pos.set(x, y);
                 } else if (tool == Tool.REMOVE && lmb) {
-                    ArrayList<Prop> props = map.collideAll(new P(x,y),24);
+                    ArrayList<Prop> props = map.updater.collideAll(new P(x,y),24);
                     for (Prop i : props) {
                         String name = i.name;
                         try{i.remove();}catch(Exception e){message("Error deleting "+name);}
@@ -426,7 +420,7 @@ public class EditorInput implements Input, Updatable, Drawable {
                     }
                     currentO = make(currentO.name, new P(x, y));
                 } else if (tool == Tool.SELECT) {
-                    final ArrayList<Prop> list = map.collideProp(new P(x, y), 16);
+                    final ArrayList<Prop> list = map.updater.collideProp(new P(x, y), 16);
                     final String[] listString = new String[list.size()];
                     Performer[] performers = new Performer[listString.length];
                     for (int i=0;i<listString.length;i++){
@@ -459,7 +453,7 @@ public class EditorInput implements Input, Updatable, Drawable {
                     for (int i = 0; i < map.landRaw.size(); i++) {
                         Line l = map.landRaw.get(i);
                         if (l.lineCross(new Line(new P(x, y), lmbP))) {
-                            map.remove(map.terrains.get(l.next));
+                            map.updater.remove(map.terrains.get(l.next));
                             map.formTextures.put(l.next, getTexture());
                             map.render(l.next);
                             message(l.toString() + " slope:" + l.getSlope() + " " + (l.clockwise() ? "cw" : "cc") + " " + map.formTextures.get(l.next));
@@ -533,7 +527,7 @@ public class EditorInput implements Input, Updatable, Drawable {
                 break;
             case KeyEvent.VK_S:
                 setSpeed(0,1);
-                if (control) save("map/"+map);
+                if (control) save("map/"+map.name);
                 break;
             case KeyEvent.VK_A:
                 setSpeed(-1,0);
@@ -579,7 +573,7 @@ public class EditorInput implements Input, Updatable, Drawable {
                 map = null;
                 final P newPos = Global.camera.getAdd(0,0);
                 FileManager.loadPlayer(1);
-                FileManager.loadMap(map+"@0");
+                FileManager.loadMap(map.name);
                 Updater.changeMapEvent = new Performer(){
                     public void perform(){
                         Global.player.pos.set(newPos);
@@ -605,7 +599,7 @@ public class EditorInput implements Input, Updatable, Drawable {
     private Prop make(Prop p){
         if (p instanceof Unit){
             ((Unit) p).say(p.name);
-            Updater.addQueue.remove(((Unit) p).brain);
+            map.updater.addQueue.remove(((Unit) p).brain);
         }
         p.setDepth(999);
         p.image.visible = true;
@@ -660,8 +654,8 @@ public class EditorInput implements Input, Updatable, Drawable {
     }
 
     private void save(String p){
-        message("Saved ("+p+")");
         currentO.remove();
+        message("Saved ("+p+")");
         FileManager.saveMap(p);
         FileManager.saveWorld();
     }

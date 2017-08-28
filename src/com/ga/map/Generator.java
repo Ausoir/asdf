@@ -12,8 +12,8 @@ import java.util.Iterator;
  * Created by ga on 5/28/17. asd
  */
 class Generator {
-    private Updater map;
-    public Generator(Updater map, int next){
+    private Map map;
+    Generator(Map map, int next){
         this.map = map;
         if (next != -1) TerrainTrail.id = next;
     }
@@ -169,7 +169,7 @@ class Generator {
             backward.add(bw.getAdd(0,0));
         }
 
-        map = new Updater(info[0]);
+        map = new Map(info[0]);
         TerrainTrail trail = new TerrainTrail(map, new P(0,-advance));
         for (P i : forward) trail.add(i);
         for (int i=backward.size()-1;i>=0;i--) trail.add(backward.get(i));
@@ -236,7 +236,7 @@ class Generator {
         int startDepth = 0;
         int returnDoorSeed = Integer.parseInt(info[1]);
         P mapSize = new P(info[2]).mult(2f);
-        map = new Updater(info[0]);
+        map = new Map(info[0]);
         float bottom = mapSize.y - 64;
         P topleft = new P(64, 64), topright = new P(mapSize.x-64, 64),
                 bottomleft = new P(64, bottom), bottomright = new P(mapSize.x-64, bottom);
@@ -329,7 +329,7 @@ class Generator {
             i.pt = i.pt.getAdd(adjustment);
             i.ptd = i.ptd.getAdd(adjustment);
         }
-        map.normalize(adjustment);
+        map.updater.normalize(adjustment);
     }
     void generateFloor(int depth, P mapSize, int randomness, int varianceY, String[] texture){
         float horizon = mapSize.y-600;

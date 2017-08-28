@@ -36,8 +36,10 @@ public class Map {
     public String callname = "Somewhere";
     private static final int magnify = 2;
     private Thing panorama;
+    public Updater updater;
     Map(String name) {
         this.name = name;
+        updater = new Updater(this);
         onTimeChange();
         load(name);
     }
@@ -48,7 +50,7 @@ public class Map {
         String[] names = line[0].split(";");
         callname = names[0];
         if (names[1].equals("")){
-            panorama = new Thing((Updater) this, names[1], 0, 0){
+            panorama = new Thing(this, names[1], 0, 0){
                 @Override
                 public void draw(Graphics2D g) {
                     g.setColor(Color.black);
@@ -56,7 +58,7 @@ public class Map {
                 }
             };
         } else {
-            panorama = new Thing((Updater) this, names[1], 0, 0) {
+            panorama = new Thing(this, names[1], 0, 0) {
                 @Override
                 public void draw(Graphics2D g) {
                     P t = new P(Global.rel.x + pos.x, Global.rel.y + pos.y).mult(.1f);
@@ -87,7 +89,7 @@ public class Map {
                     sections = line[3].split(";");
                     if (sections.length > 0) {
                         for (String section1 : sections) {
-                            Stock.get((Updater) this, section1).start();
+                            Stock.get(this, section1).start();
                         }
                     }
                 }
@@ -96,7 +98,7 @@ public class Map {
     }
 
     public String toString(){
-        StringBuilder result = new StringBuilder(name + ";" + panorama.name + ";" + size.x() + "," + size.y() + "\n");
+        StringBuilder result = new StringBuilder(callname + ";" + panorama.name + ";" + size.x() + "," + size.y() + "\n");
         Iterator it = formTextures.entrySet().iterator();
         while (it.hasNext()){
             java.util.Map.Entry pair = (java.util.Map.Entry) it.next();
@@ -108,10 +110,12 @@ public class Map {
             if (!i.toString().equals("")) result.append(i).append(";");
         }
         if (landRaw.size() > 0) result = new StringBuilder(result.substring(0, result.length() - 1));
+        result.append("\n").append(updater.toString());
         return result.toString();
     }
 
     void clear(){
+        updater.clear();
         land.clear();
         landRaw.clear();
         terrains.clear();
@@ -122,7 +126,7 @@ public class Map {
         String texture = formTextures.get(target);
         String[] formName = texture.split("&");
         int terrainDepth = Terrain.toTerrainDepth(Integer.parseInt(formName[0]));
-        Terrain terrain = new Terrain(formName[1], Shader.getByName(formName[2]), terrainDepth);
+        Terrain terrain = new Terrain(this, formName[1], Shader.getByName(formName[2]), terrainDepth);
         terrains.put(target, terrain);
         for (final Line i : landRaw){
             if (i.next == target){
@@ -143,7 +147,7 @@ public class Map {
                     else {
                         String[] formName = formTexture.split("&");
                         int terrainDepth = Terrain.toTerrainDepth(Integer.parseInt(formName[0]));
-                        terrain = new Terrain(formName[1], Shader.getByName(formName[2]), terrainDepth);
+                        terrain = new Terrain(this, formName[1], Shader.getByName(formName[2]), terrainDepth);
                     }
                     terrains.put(i.next, terrain);
                 }
@@ -205,7 +209,7 @@ public class Map {
         }
         if (prop != null) {
             float landSize = Math.abs(l.ptd.x-l.pt.x);
-            Prop t = Stock.getByName((Updater) this, prop, seed);
+            Prop t = Stock.getByName(this, prop, seed);
             P size = t.image.getSize();
             if (landSize >= size.x) {
                 float halfSizeX = size.x/2;

@@ -20,7 +20,7 @@ public abstract class AI implements Observer {
         this.host = host;
     }
     public void start(){
-        Updater.addQueue.add(this);
+        host.map.updater.addQueue.add(this);
     }
     public void update(){
         perceive(160);
@@ -47,7 +47,7 @@ public abstract class AI implements Observer {
     }
     void hear(Prop u, String p){}
     boolean perceive(int d){
-        ArrayList<Unit> seen = host.map.perceive(host, host.pos.getAdd(host.dir < 0 ? -d : d, 0), d * 2);
+        ArrayList<Unit> seen = host.map.updater.perceive(host, host.pos.getAdd(host.dir < 0 ? -d : d, 0), d * 2);
         for (Unit t : seen) {
             if (t != host && target != t && t.state != Actions.Dead) {
                 return perceived(t);

@@ -21,11 +21,13 @@ public class Terrain extends ShadedPicture implements Drawable{
     protected P pos;
     private int length = 0; //polygon size is always multiples of 4
     private P finalSize;
-    public Terrain(String texture, Shader shader, int depth){
+    private Map map;
+    public Terrain(Map map, String texture, Shader shader, int depth){
         super(null, texture.startsWith("_")?null:texture, shader);
+        this.map = map;
         setDepth(depth);
         polygon = new Polygon();
-        Updater.addQueue.add(this);
+        map.updater.addQueue.add(this);
         if (image == null){
             String[] data = texture.substring(1).split(",");
             this.color = new Color(Integer.parseInt(data[0]),Integer.parseInt(data[1]),Integer.parseInt(data[2]),Integer.parseInt(data[3]));
@@ -97,7 +99,7 @@ public class Terrain extends ShadedPicture implements Drawable{
 
     public void setDepth(int depth) {
         this.depth = depth;
-        Global.player.map.resetDepth(this);
+        map.updater.resetDepth(this);
         for (Line i : lines) i.depth = depth;
     }
 }

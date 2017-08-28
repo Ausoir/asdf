@@ -2,18 +2,19 @@ package com.ga.unit.player;
 
 import com.ga.game.Sound;
 import com.ga.map.Global;
-import com.ga.map.Updater;
+import com.ga.map.Map;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
-import com.ga.unit.*;
-import com.ga.unit.PlayerInput;
+import com.ga.unit.Man;
+import com.ga.unit.Prop;
+import com.ga.unit.Tag;
+import com.ga.unit.Tags;
 import com.ga.unit.item.Crafts;
 import com.ga.unit.item.Item;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Stat;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 
 import static com.ga.unit.BodyHumanoid.FIST;
@@ -33,7 +34,7 @@ public class Player extends Man {
     public Item offhand;
     private boolean leftHandMode = false;
     private ArrayList<Trait> traits = new ArrayList<>();
-    public Player(Updater map, int seed) {
+    public Player(Map map, int seed) {
         super(map, null, seed);
         name = "Player";
         speechType = "p";
@@ -141,7 +142,7 @@ public class Player extends Man {
                 delay.performer = new Performer() {
                     public void perform() {
                         P reach = pos.getAdd(clip.organs[FIST].ptd);
-                        ArrayList<Prop> obj = map.collideInteractive(reach);
+                        ArrayList<Prop> obj = map.updater.collideInteractive(reach);
                         if (obj.size() != 0) {
                             for (Prop i : obj) {
                                 if (i.onInteract != null) {
@@ -162,7 +163,7 @@ public class Player extends Man {
                     delay.performer = new Performer() {
                         public void perform() {
                             P reach = pos.getAdd(clip.organs[OFIST].ptd);
-                            ArrayList<Prop> obj = map.collideInteractive(reach);
+                            ArrayList<Prop> obj = map.updater.collideInteractive(reach);
                             for (Prop i : obj) {
                                 if (i != weapon && i != offhand && i.onInteract != null) {
                                     leftHandMode = true;
@@ -195,7 +196,6 @@ public class Player extends Man {
                             Sound.play(pos, "unwear");
                             int piece = selectingItem - 10;
                             if (sheathe() && !armor.isBare(piece)) {
-                                Updater.addQueue.add(armor.armor[piece]);
                                 setWeapon(armor.armor[piece]);
                                 armor.armor[piece].start();
                                 armor.set(null, piece);
@@ -245,7 +245,7 @@ public class Player extends Man {
         return traits.contains(p);
     }
     public ArrayList<Prop> getAvailableItems(){
-        ArrayList<Prop> items = map.collideProp(pos,100);
+        ArrayList<Prop> items = map.updater.collideProp(pos,100);
         Iterator it = items.iterator();
         while (it.hasNext()){
             if (!(it.next() instanceof Item)) it.remove();

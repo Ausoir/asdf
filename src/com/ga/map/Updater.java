@@ -2,6 +2,7 @@ package com.ga.map;
 
 import com.ga.game.FileManager;
 import com.ga.game.Observer;
+import com.ga.game.Processes;
 import com.ga.tool.EventTimer;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
@@ -14,26 +15,25 @@ import java.util.ArrayList;
 /**
  * Created by Ga on 5/6/2016. asd
  */
-public class Updater extends Map{
+public class Updater {
     public static boolean editor = false;
-    private ArrayList<Drawable> drawee = new ArrayList<>();
+    private Map map;
+    public ArrayList<Drawable> drawee = new ArrayList<>();
     private ArrayList<Effect> effects = new ArrayList<>();
     private ArrayList<Updatable> updatee = new ArrayList<>();
     ArrayList<Prop> props = new ArrayList<>();
-    private ArrayList<AI> controllee = new ArrayList<>();
+    ArrayList<AI> controllee = new ArrayList<>();
     public ArrayList<Unit> unitsLoaded = new ArrayList<>();
     public static ArrayList<Unit> units = new ArrayList<>();
-    public static ArrayList<Observer> addQueue = new ArrayList<>();
-    private static ArrayList<Observer> removeQueue = new ArrayList<>();
+    public ArrayList<Observer> addQueue = new ArrayList<>();
+    private ArrayList<Observer> removeQueue = new ArrayList<>();
     public String changeMap = null;
     static Performer changeMapEvent = null;
 
-    public Updater(String name) {
-        super(name);
+    public Updater(Map map){
+        this.map = map;
     }
-
     void clear(){
-        super.clear();
         drawee.clear();
         effects.clear();
         addQueue.clear();
@@ -54,13 +54,14 @@ public class Updater extends Map{
                 chasers.add(i.host.controlId);
             }
         }
-        clear();
-        FileManager.loadActors();
-        FileManager.loadPlayer(1);
-        int newMapPos = Integer.parseInt(newMap.split("@")[1]);
-        FileManager.loadMap(newMap);
+        String[] mapData = newMap.split("@");
+        map.terrains.clear();
+        Global.player.disconnect();
         update();
-        Global.player.pos.set(getEntrancePos(newMapPos));
+        FileManager.loadMap(mapData[0]);
+        Global.player.map.updater.update();
+        Global.player.pos.set(Global.player.map.updater.getEntrancePos(Integer.parseInt(mapData[1])));
+        Global.player.start();
         for (int i : chasers){
             Unit unit = getUnloadedActor(i);
             unit.pos.set(Global.player.pos);
@@ -88,7 +89,7 @@ public class Updater extends Map{
             if (p instanceof Unit){
                 Unit unit = (Unit)p;
                 if (!units.contains(p)) units.add((Unit) p);
-                if (((Unit)p).map == this){
+                if (((Unit)p).map == map){
                     unitsLoaded.add(unit);
                     unit.onField();
                     unit.brain.start();
@@ -126,7 +127,6 @@ public class Updater extends Map{
             }
         }
         if (changeMap != null) changeMap();
-        else if (!editor) Global.update();
     }
     public void draw(Graphics2D g2){
         ArrayList<Drawable> draweeTest = (ArrayList<Drawable>) drawee.clone();
@@ -135,7 +135,7 @@ public class Updater extends Map{
             i.draw(g2);
         }
 //        Grapher.draw(g2);
-        weather.draw(g2);
+        map.weather.draw(g2);
     }
     public void remove(Observer p){
         removeQueue.add(p);
@@ -156,7 +156,7 @@ public class Updater extends Map{
         drawee.add(p);
     }
     public String toString(){
-        String result = super.toString()+"\n";
+        String result = "";
         for (Prop i : props){
             if (i.save) result += i.toString()+";";
         }
@@ -171,8 +171,10 @@ public class Updater extends Map{
         return result;
     }
     public static Unit getUnloadedActor(int p){
-        for (Observer i : addQueue){
-            if (i instanceof Unit && ((Unit)i).controlId == p) return (Unit) i;
+        for (Map map : Global.maps) {
+            for (Observer i : map.updater.addQueue) {
+                if (i instanceof Unit && ((Unit) i).controlId == p) return (Unit) i;
+            }
         }
         for (Unit i : units){
             if (i.controlId == p) return i;
@@ -246,7 +248,7 @@ public class Updater extends Map{
     public int sleep(int p){
         int origTime = Global.time;
         Unit encounter = getMapEncounter(Global.player.faction, p);
-        weather.fadeIn();
+        map.weather.fadeIn();
         if (encounter != null){
             int timePassed = Global.time - origTime;
             if (timePassed > 1) {

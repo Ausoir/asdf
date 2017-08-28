@@ -2,7 +2,7 @@ package com.ga.unit;
 
 import com.ga.game.Settings;
 import com.ga.map.Global;
-import com.ga.map.Updater;
+import com.ga.map.Map;
 import com.ga.tool.Interactive;
 import com.ga.tool.Line;
 import com.ga.tool.P;
@@ -22,7 +22,7 @@ public class Prop extends Thing {
     public Line lastLand = new Line();
     public Tags tags = new Tags();
     boolean manualDepth = false;
-    public Prop(Updater map, String name, int seed) {
+    public Prop(Map map, String name, int seed) {
         super(map, name, seed, 1);
     }
     public int getDamage(){

@@ -70,8 +70,10 @@ public class ArmorSet {
     }
     public void remove(){
         for (int i=0;i<armor.length;i++){
-            armor[i].remove();
-            set(null, i);
+            if (armor[i] != bare[i]){
+                armor[i].remove();
+                set(null, i);
+            }
         }
     }
     public void remove(Armor p){

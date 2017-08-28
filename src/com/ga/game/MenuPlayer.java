@@ -2,7 +2,6 @@ package com.ga.game;
 
 import com.ga.map.Global;
 import com.ga.map.Picture;
-import com.ga.map.Updater;
 import com.ga.tool.Performer;
 import com.ga.unit.Prop;
 import com.ga.unit.Tag;
@@ -460,7 +459,7 @@ public class MenuPlayer extends Panel {
         private void command(String p){
             switch (p) {
                 case "h":
-                    Global.player.map.sleep(100);
+                    Global.player.map.updater.sleep(100);
                     break;
                 case "stat":
                     Global.display.menu.onUpdate = new Performer(){

@@ -13,7 +13,7 @@ import java.util.HashMap;
  */
 public class Mob {
     private static final HashMap<String,ArrayList<String>> mobs = FileManager.readDialogue("raw/Mob.txt");
-    public static void spawn(Updater map, String p, Line land){
+    public static void spawn(Map map, String p, Line land){
         float landSize = Math.abs(land.ptd.x-land.pt.x);
         if (landSize > 200) {
             ArrayList<String> types = mobs.get(p);

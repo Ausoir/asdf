@@ -2,7 +2,6 @@ package com.ga.game;
 
 import com.ga.map.Global;
 import com.ga.map.Updatable;
-import com.ga.map.Updater;
 import com.ga.tool.Performer;
 import com.ga.unit.item.Item;
 
@@ -22,7 +21,7 @@ public class Menu extends JPanel implements Updatable {
         setFocusable(false);
     }
     private void select(Panel p){
-        Global.player.map.addUpdatee(menu);
+        Global.player.map.updater.addUpdatee(this);
         remove(current);
         current = p;
         add(p);

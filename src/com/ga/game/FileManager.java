@@ -2,6 +2,7 @@ package com.ga.game;
 
 import com.ga.map.Creation;
 import com.ga.map.Global;
+import com.ga.map.Map;
 import com.ga.map.Updater;
 import com.ga.tool.Line;
 import com.ga.unit.Clip;
@@ -105,12 +106,13 @@ public class FileManager {
         pi.host.lastLand = new Line();
         Global.camera.set(pi.host.pos);
     }
-    public static void loadMap(String p) {
-        Updater map = Global.getMap(p);
+    public static Map loadMap(String p) {
+        Map map = Global.getMap(p);
         Global.player.map = map;
         map.setTexture();
         map.mapEdgeCenter(Global.camera = map.size.getMult(.5f,.5f));
         map.onTimeChange();
+        return map;
     }
 
     public static void loadActors(){

@@ -4,7 +4,7 @@ import com.ga.game.FileManager;
 import com.ga.game.Sound;
 import com.ga.map.Creation;
 import com.ga.map.Global;
-import com.ga.map.Updater;
+import com.ga.map.Map;
 import com.ga.tool.Interactive;
 import com.ga.tool.Line;
 import com.ga.tool.P;
@@ -25,14 +25,14 @@ import java.util.Random;
  * Created by Ga on 2/3/2017. asd
  */
 public enum Stock {
-    Spawn{ protected Prop make(Updater map, int id, int seed){
+    Spawn{ protected Prop make(Map map, int id, int seed){
         Prop product = new Prop(map, getName(), seed);
         product.manualDepth = true;
         product.mobile = false;
         product.image.visible = false;
         return product;
     }},
-    Travel{ Prop make(Updater map, final int id, final int seed){
+    Travel{ Prop make(Map map, final int id, final int seed){
         Prop product = new Prop(map, getName(), seed);
         product.manualDepth = true;
         product.mobile = false;
@@ -40,13 +40,13 @@ public enum Stock {
         product.onInteract = new Interactive(){
             public void interact(Man p){
                 if (p == Global.player){
-                    p.map.changeMap = id+"@"+seed;
+                    p.map.updater.changeMap = id+"@"+seed;
                 }
             }
         };
         return product;
     }},
-    Object{ Prop make(Updater map, int id, int seed){
+    Object{ Prop make(Map map, int id, int seed){
         String[] data = FileManager.readText("raw/Object.txt");
         final String[] v = data[id].split(";");
         final Prop product;
@@ -54,7 +54,8 @@ public enum Stock {
             product = new Prop(map, v[0], seed){
                 public void onField(){
                     super.onField();
-                    P s = image.getSize().getMult(.5f, 1).add(0, -Integer.parseInt(v[6]));
+                    int offset = -Integer.parseInt(v[6]);
+                    P s = image.getSize().getMult(.5f, image.getCenterType() == 1 ? .5f : 1).add(0,offset);
                     P top = new P(Math.sin(rotation) * s.y, Math.cos(rotation) * s.y);
                     P width = new P(Math.sin(rotation) * s.x, Math.cos(rotation) * s.x);
                     map.land.add(new Line(pos.x + top.x - width.y, pos.y - top.y - width.x,
@@ -74,7 +75,7 @@ public enum Stock {
         product.image.setCenterType(Integer.parseInt(v[1]));
         return product;
     }},
-    Beast{ Prop make(Updater map, int id, int seed) {
+    Beast{ Prop make(Map map, int id, int seed) {
         String[] units = FileManager.readText("raw/Beast.txt");
         String[] unit = units[id].split(";");
         Unit product = new Unit(map, null, Creation.getSeed(seed));
@@ -84,7 +85,7 @@ public enum Stock {
         product.subId = id;
         return product;
     }},
-    Man{ Prop make(Updater map, int id, int seed){
+    Man{ Prop make(Map map, int id, int seed){
         String[] units = FileManager.readText("raw/Man.txt");
         final String[] unit = units[id].split(";");
         Man product = new Man(map, unit[0], Creation.getSeed(seed)){
@@ -104,7 +105,7 @@ public enum Stock {
         product.subId = id;
         return product;
     }},
-    Etc{ Prop make(Updater map, int id, int seed){
+    Etc{ Prop make(Map map, int id, int seed){
         String[] data = FileManager.readText("raw/Etc.txt");
         final String[] v = data[id].split(";");
         Item product = new Item(map, v[0], Creation.getSeed(seed), Item.Material.load(v[4].split(",")), Item.ItemType.Bashing);
@@ -115,7 +116,7 @@ public enum Stock {
         product.subId = id;
         return product;
     }},
-    Weapon{ Prop make(Updater map, int id, int seed){
+    Weapon{ Prop make(Map map, int id, int seed){
         String[] data = FileManager.readText("raw/Weapon.txt");
         final String[] v = data[id].split(";");
         Item product = new Weapon(map, v[0], Creation.getSeed(seed), Item.ItemType.valueOf(v[1]),
@@ -125,7 +126,7 @@ public enum Stock {
         product.subId = id;
         return product;
     }},
-    Armor{ Prop make(Updater map, int id, int seed){
+    Armor{ Prop make(Map map, int id, int seed){
         String[] data = FileManager.readText("raw/Armor.txt");
         final String[] v = data[id].split(";");
         int piece = Integer.parseInt(v[1]);
@@ -135,7 +136,7 @@ public enum Stock {
         product.subId = id;
         return product;
     }},
-    Food{ Prop make(Updater map, int id, int seed){
+    Food{ Prop make(Map map, int id, int seed){
         String[] data = FileManager.readText("raw/Food.txt");
         final String[] v = data[id].split(";");
         Prop product = new Food(map, v[0], Creation.getSeed(seed), Integer.parseInt(v[1]),
@@ -143,11 +144,11 @@ public enum Stock {
         product.subId = id;
         return product;
     }},
-    Player{ Prop make(Updater map, int id, int seed){
+    Player{ Prop make(Map map, int id, int seed){
         if (id == 1) return new MainPlayer(map, seed);
         return new Player(map, seed);
     }},
-    Manual{ Prop make(Updater map, int id, int seed){
+    Manual{ Prop make(Map map, int id, int seed){
         Item product = new Item(map, getName(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Scroll){
             private Actions skill;
             public void onCreate(){
@@ -167,7 +168,7 @@ public enum Stock {
                     Player player = (Player) host;
                     int difficulty = skill.getDifficulty();
                     if (player.getStatePower(skill) >= difficulty) {
-                        if (map.sleep(100) == 100) {
+                        if (map.updater.sleep(100) == 100) {
                             if (player.get("Memory").require(1)) {
                                 if (difficulty == 0) host.get("Progress").setMax(1);
                                 else host.get("Progress").setMax(difficulty * 25);
@@ -200,7 +201,7 @@ public enum Stock {
         product.delay = 45;
         return product;
     }},
-    Textbook{ Prop make(Updater map, final int id, int seed){
+    Textbook{ Prop make(Map map, final int id, int seed){
         Item product = new Item(map, getName(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Scroll){
             private String stat;
             public void onCreate(){
@@ -218,7 +219,7 @@ public enum Stock {
                 if (host instanceof MainPlayer && super.use(host)) {
                     if (Global.player.learnable()) {
                         if (Global.player.get(stat).get() / 100 == subId) {
-                            ArrayList<Prop> t = map.collideProp(pos, 240);
+                            ArrayList<Prop> t = map.updater.collideProp(pos, 240);
                             Prop dummy = null;
                             for (Prop i : t) {
                                 if (i.name.equals("Training_Dummy")) {
@@ -226,7 +227,7 @@ public enum Stock {
                                 }
                             }
                             if (dummy != null) {
-                                if (map.sleep(100) == 100) {
+                                if (map.updater.sleep(100) == 100) {
                                     if (host.get("Motivation").require(10)) {
                                         host.get(stat).add(rand.nextInt((400 - host.get(stat).get()) / 10) + 1, true);
                                         host.say("Trained up " + stat + ".");
@@ -267,7 +268,7 @@ public enum Stock {
         product.delay = 45;
         return product;
     }},
-    Bandage{ Prop make(Updater map, int id, int seed){
+    Bandage{ Prop make(Map map, int id, int seed){
         Item product = new Item(map, getName(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Consumable) {
             public boolean use(Man host) {
                 if (usable(1) && super.use(host)){
@@ -283,7 +284,7 @@ public enum Stock {
         product.delay = 45;
         return product;
     }},
-    Potion{ Prop make(Updater map, int id, int seed){
+    Potion{ Prop make(Map map, int id, int seed){
         Item product = new Item(map, getName(), seed, new Item.Material[]{Item.Material.Glass}, Item.ItemType.Consumable) {
             public void onCreate() {
                 if (seed != 0) imbueMeta(false, false, 1);
@@ -304,7 +305,7 @@ public enum Stock {
         product.delay = 45;
         return product;
     }},
-    Scroll{ Prop make(Updater map, int id, int seed){
+    Scroll{ Prop make(Map map, int id, int seed){
         Item product = new Item(map, getName(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Scroll){
             Actions spell;
             @Override
@@ -340,7 +341,7 @@ public enum Stock {
         product.delay = 30;
         return product;
     }},
-    Ethersword{ Prop make(Updater map, int id, int seed){
+    Ethersword{ Prop make(Map map, int id, int seed){
         Weapon product = new Weapon(map, getName(), seed, Item.ItemType.Sword, 0, new Item.Material[]{Item.Material.Crystal}){
             public String toString(){
                 return "";
@@ -361,7 +362,7 @@ public enum Stock {
         product.image.setCenterType(3);
         return product;
     }},
-    Phone_Booth{ Prop make(Updater map, int id, int seed){
+    Phone_Booth{ Prop make(Map map, int id, int seed){
         Prop product = new Prop(map, getName(), seed);
         product.onInteract = new Interactive(){
             public void interact(Man p){
@@ -378,7 +379,7 @@ public enum Stock {
         };
         return product;
     }},
-    Map{ Prop make(Updater map, int id, int seed){ //unused
+    Map{ Prop make(Map map, int id, int seed){ //unused
         Prop product = new Prop(map, getName(), seed);
         product.onInteract = new Interactive(){
             public void interact(Man p){
@@ -386,7 +387,7 @@ public enum Stock {
         };
         return product;
     }},
-    Fist{ Prop make(Updater map, int id, int seed){
+    Fist{ Prop make(Map map, int id, int seed){
         Item product = new Weapon(map, getName(),0, Item.ItemType.Bashing, 0, new Item.Material[]{Item.Material.Flesh}){
             public boolean use(final Man host) {
                 host.setState(Actions.Interact);
@@ -405,7 +406,7 @@ public enum Stock {
         product.onInteract = null;
         return product;
     }},
-    Dungeon{ Prop make(Updater map, int id, final int seed){
+    Dungeon{ Prop make(Map map, int id, final int seed){
         final Prop entrance = Stock.Spawn.create(map, -1, 0);
         final Prop product = new Prop(map, getName(), seed){
             public void onField(){
@@ -426,7 +427,7 @@ public enum Stock {
         isFurniture(product);
         return product;
     }},
-    SteamHouse{ Prop make(Updater map, int id, final int seed){
+    SteamHouse{ Prop make(Map map, int id, final int seed){
         final Prop spawn = Stock.Spawn.create(map, -1, 0);
         final Prop entrance = Stock.Travel.create(map, -1, -(spawn.seed*100));
         final Prop product = new Prop(map, getName(), seed){
@@ -455,13 +456,13 @@ public enum Stock {
         entrance.pos.set(spawn.pos);
         return product;
     }},
-    TowerHouse{ Prop make(Updater map, int id, final int seed){
+    TowerHouse{ Prop make(Map map, int id, final int seed){
         final ArrayList<Prop> addons = new ArrayList<>();
         final Prop entrance = Stock.Spawn.create(map, -1, 0);
         final Prop product = new Prop(map, "TowerHouse", seed){
             public void onField(){
                 super.onField();
-                Updater.addQueue.add(entrance);
+                map.updater.addQueue.add(entrance);
                 for (Prop i : addons){
                     i.onField();
                     i.pos.add(pos.x, pos.y);
@@ -561,7 +562,7 @@ public enum Stock {
         };
         return product;
     }},
-    TowerTip{ Prop make(Updater map, int id, int seed){
+    TowerTip{ Prop make(Map map, int id, int seed){
         final Prop fan = new Prop(map, "Propeller",seed){
             float speed;
             public void onField(){
@@ -593,14 +594,14 @@ public enum Stock {
         fan.pos = new P(0,-product.image.getSize().y+4);
         return product;
     }},
-    Spawner{ Prop make(Updater map, final int id, int seed) {
+    Spawner{ Prop make(Map map, final int id, int seed) {
         Prop product = new Prop(map, getName(), seed){
             public void onField(){
                 super.onField();
                 rotation = Math.min(Global.time, rotation);
                 if (Global.time - rotation > 10) {
                     boolean exist = false;
-                    for (Unit i : map.unitsLoaded){
+                    for (Unit i : map.updater.unitsLoaded){
                         if (i.brain.factoryId == id && i.seed == seed){
                             exist = true; //counts the fresh dead
                             break;
@@ -619,7 +620,7 @@ public enum Stock {
         product.image.visible = false;
         return product;
     }},
-    Crate{ Prop make(final Updater map, int id, int seed){
+    Crate{ Prop make(final Map map, int id, int seed){
         if (seed < 100000) seed *= 100000;
         final Prop product = new Prop(map, getName(), seed){
             public void onField(){
@@ -657,7 +658,7 @@ public enum Stock {
                                 public void perform() {
                                     String newIndex = finalIndex.substring(0, current) + '2' + finalIndex.substring(current + 1);
                                     product.seed = Integer.parseInt(productSeed.substring(0, productSeed.length() - 5) + newIndex);
-                                    Updater.addQueue.add(products[current]);
+                                    map.updater.addQueue.add(products[current]);
                                 }
                             };
                         }
@@ -669,7 +670,7 @@ public enum Stock {
         product.image.setCenterType(2);
         return product;
     }},
-    Throwing_Knife{ Prop make(Updater map, int id, int seed){
+    Throwing_Knife{ Prop make(Map map, int id, int seed){
         Item product = new Item(map, "Tanto", seed,
                 new Item.Material[]{Item.Material.Steel, Item.Material.Bone, Item.Material.Bronze, Item.Material.Titanium, Item.Material.Glass},
                 Item.ItemType.Darting){
@@ -712,7 +713,7 @@ public enum Stock {
         product.delay = 10;
         return product;
     }},
-    Fireball{ Prop make(Updater map, int id, int seed){
+    Fireball{ Prop make(Map map, int id, int seed){
         Item product = new Item(map, getName(), seed, new Item.Material[]{Item.Material.Stone}, Item.ItemType.Throwing) {
             @Override
             public boolean use(final Man host) {
@@ -724,7 +725,7 @@ public enum Stock {
                                 @Override
                                 public void stuck() {
                                     Particle.explosion(map, pos, getDepth());
-                                    ArrayList<Unit> t = map.collideUnit(pos,96,Faction.Destructive);
+                                    ArrayList<Unit> t = map.updater.collideUnit(pos,96,Faction.Destructive);
                                     for (Unit i : t){
                                         i.checkHit(pos, getDamage());
                                     }
@@ -759,7 +760,7 @@ public enum Stock {
         product.delay = 10;
         return product;
     }},
-    Threadball{ Prop make(Updater map, int id, int seed){
+    Threadball{ Prop make(Map map, int id, int seed){
         Item product = new Item(map, getName(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Throwing) {
             @Override
             public boolean use(final Man host) {
@@ -823,7 +824,7 @@ public enum Stock {
         product.delay = 10;
         return product;
     }},
-    Book{ Prop make(Updater map, int id, int seed){
+    Book{ Prop make(Map map, int id, int seed){
         Item product = new Item(map, getName(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Scroll){
             @Override
             public boolean use(Man host){
@@ -837,7 +838,7 @@ public enum Stock {
         product.delay = 45;
         return product;
     }},
-    Rover{ Prop make(Updater map, int id, int seed) {
+    Rover{ Prop make(Map map, int id, int seed) {
         Unit product = new Unit(map, getName(), seed){
             public void stateSet(Actions state){
                 super.stateSet(state);
@@ -849,7 +850,7 @@ public enum Stock {
                 }
             }
             public Unit attack(){
-                ArrayList<Unit> t = map.collideUnit(pos,48,faction);
+                ArrayList<Unit> t = map.updater.collideUnit(pos,48,faction);
                 if (t.size() > 0){
                     Unit i = t.get(0);
                     i.checkHit(pos, getDamage());
@@ -870,7 +871,7 @@ public enum Stock {
         product.clip = new Body(product, getName());
         return product;
     }},
-    Slime { Prop make(Updater map, int id, int seed) {
+    Slime { Prop make(Map map, int id, int seed) {
         Unit product = new Unit(map, getName(), seed){
             public void stateSet(Actions state) {
                 super.stateSet(state);
@@ -882,7 +883,7 @@ public enum Stock {
                 super.moveTriggered(p);
                 if (state == Actions.Melee){
                     Particle.explode(map, "Poison",getDepth(),pos,new P(),8,8,0,false,4);
-                    ArrayList<Unit> t = map.collideUnit(pos, (int) getReach(), Faction.Destructive);
+                    ArrayList<Unit> t = map.updater.collideUnit(pos, (int) getReach(), Faction.Destructive);
                     for (Unit i : t){
                         i.checkHit(pos, getDamage());
                         i.buff(Buffs.Poison, 1);
@@ -908,7 +909,7 @@ public enum Stock {
         product.clip.organs[0].setSize((int) product.clip.organs[0].getImage().getSize().x);
         return product;
     }},
-    Bird { Prop make(Updater map, int id, int seed) {
+    Bird { Prop make(Map map, int id, int seed) {
         Unit product = new Unit(map, getName(), seed){
             public void collide(){
                 super.collide();
@@ -945,7 +946,7 @@ public enum Stock {
         product.clip.organs[0].setSize((int) product.clip.organs[0].getImage().getSize().x);
         return product;
     }},
-    Beholder { Prop make(Updater map, int id, int seed) {
+    Beholder { Prop make(Map map, int id, int seed) {
         Unit product = new Unit(map, getName(), seed){
             public void collide(){
                 super.collide();
@@ -980,7 +981,7 @@ public enum Stock {
         product.clip = new Body(product, getName());
         return product;
     }},
-    Golem { Prop make(Updater map, int id, int seed) {
+    Golem { Prop make(Map map, int id, int seed) {
         Unit product = new Unit(map, getName(), seed){
             public int processDamage(int p, int damage){
                 return Math.max(0,damage-5);
@@ -993,7 +994,7 @@ public enum Stock {
         product.clip = new Body(product, getName());
         return product;
     }},
-    Wyvern { Prop make(Updater map, int id, int seed) {
+    Wyvern { Prop make(Map map, int id, int seed) {
         Unit product = new Unit(map, getName(), seed){
             public int processDamage(int p, int damage){
                 return Math.max(0,damage-4);
@@ -1007,7 +1008,7 @@ public enum Stock {
         return product;
     }},
     //Uniques
-    Stomach_Full_Helm{ Prop make(Updater map, int id, int seed){
+    Stomach_Full_Helm{ Prop make(Map map, int id, int seed){
         Armor product = new Armor(map, "Full_Helm",seed,0,0,0,new Item.Material[]{Item.Material.Titanium}){
             public String getDescription(){
                 return super.getDescription()+" Something is odd about this helmet.";
@@ -1019,7 +1020,7 @@ public enum Stock {
         return product;
     }};
     private static HashMap<String, String> extRegistry = new HashMap<>();
-    public static Prop get(Updater map, String p){
+    public static Prop get(com.ga.map.Map map, String p){
         Prop t;
         String[] sections = p.split("@");
         int subId = Integer.parseInt(sections[1]);
@@ -1031,7 +1032,7 @@ public enum Stock {
         t.load(p);
         return t;
     }
-    public static Prop getByName(Updater map, String p, int seed){ // Return to reflection
+    public static Prop getByName(Map map, String p, int seed){ // Return to reflection
         for (Stock i : values()){
             if (i.name().equals(p.replace(" ","_"))){
                 return i.create(map, -1, seed);
@@ -1044,14 +1045,14 @@ public enum Stock {
         }
         return Stock.Object.create(map, 0,0);
     }
-    public Prop create(Updater map, int subId, int seed){
+    public Prop create(Map map, int subId, int seed){
         Prop r = make(map, subId, Creation.getSeed(seed));
         r.factoryId = ordinal();
         r.subId = subId;
         r.onCreate();
         return r;
     }
-    abstract Prop make(Updater map, int subid, int seed);
+    abstract Prop make(Map map, int subid, int seed);
     public String getName(){
         return name().replace("_"," ");
     }
@@ -1064,13 +1065,12 @@ public enum Stock {
         product.mobile = false;
         randomSide(product);
     }
-    Prop makeAddon(Updater map, String name, Random rand){
+    Prop makeAddon(Map map, String name, Random rand){
         return makeAddon(new Prop(map, name,rand.nextInt(9999)));
     }
     Prop makeAddon(Prop p){
         p.manualDepth = true;
         p.save = false;
-        Updater.addQueue.remove(p);
         isFurniture(p);
         return p;
     }
@@ -1080,7 +1080,7 @@ public enum Stock {
     static String getUnit(String name, int seed, String clip, String stat, Faction faction, String intel, String moves){
         return name+"@-1@"+seed+"@0,0@0@"+Global.getControlId()+"@"+Global.player.map.name+"@"+clip+"@"+stat+"@"+faction.name()+"@"+intel+"@"+moves;
     }
-    private static String getItem(Updater map, String p, int piece){
+    private static String getItem(Map map, String p, int piece){
         if (p == null || p.equals("None")){
             if (piece == -1) return "";
             else return "None";

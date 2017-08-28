@@ -1,6 +1,5 @@
 package com.ga.unit.player;
 
-import com.ga.map.Updater;
 import com.ga.unit.Stock;
 import com.ga.unit.item.Item;
 
@@ -62,7 +61,7 @@ public class Inventory {
         for (String aData : data) {
             Item item = (Item) Stock.get(host.map, aData);
             weight += item.weight;
-            Updater.addQueue.remove(item);
+            host.map.updater.addQueue.remove(item);
             items.add(item);
         }
     }

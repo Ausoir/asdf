@@ -1,7 +1,7 @@
 package com.ga.unit.item;
 
 import com.ga.game.Sound;
-import com.ga.map.Updater;
+import com.ga.map.Map;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.unit.Man;
@@ -13,7 +13,7 @@ public class Armor extends Item {
     private int piece = 0;
     private int armorMod = 0;
     int pocket = 0;
-    public Armor(Updater map, String name, int seed, int piece, int encumbrance, int pockets, Material[] materials) {
+    public Armor(Map map, String name, int seed, int piece, int encumbrance, int pockets, Material[] materials) {
         super(map, name, seed, materials, ItemType.Armor);
         this.encumbrance = encumbrance;
         value = 24;
@@ -66,7 +66,8 @@ public class Armor extends Item {
                 public void perform() {
                     if (host.armor.isBare(piece)) {
                         Sound.play(host.pos, "wear");
-                        me.remove();
+                        host.map.updater.remove(me);
+                        host.setWeapon(null);
                         host.armor.set(me, piece);
                         owner = host;
                     }

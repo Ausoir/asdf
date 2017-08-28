@@ -3,7 +3,6 @@ package com.ga.unit;
 import com.ga.game.Dialog;
 import com.ga.game.FileManager;
 import com.ga.map.Global;
-import com.ga.map.Updater;
 import com.ga.tool.*;
 import com.ga.unit.item.Item;
 import com.ga.unit.skill.Actions;
@@ -177,7 +176,7 @@ public enum Intelligence {
                             final int index = ii;
 
                             public void perform() {
-                                Updater.addQueue.add(product[index]);
+                                host.map.updater.addQueue.add(product[index]);
                                 product[index] = null;
                                 host.say("@sold");
                             }
@@ -370,7 +369,7 @@ public enum Intelligence {
                             public void perform(){
                                 if (Global.player.gold >= price) {
                                     Global.player.gold -= price;
-                                    host.map.changeMap = destination+"@-1";
+                                    host.map.updater.changeMap = destination+"@-1";
                                 } else {
                                     Global.player.say("Not enough money..");
                                 }

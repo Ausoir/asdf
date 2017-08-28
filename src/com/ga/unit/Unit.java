@@ -3,6 +3,7 @@ package com.ga.unit;
 import com.ga.game.Settings;
 import com.ga.game.Sound;
 import com.ga.map.Global;
+import com.ga.map.Map;
 import com.ga.map.Updater;
 import com.ga.tool.EventTimer;
 import com.ga.tool.Line;
@@ -31,7 +32,7 @@ public class Unit extends Prop {
     public Stats stats = new Stats(this);
     public float damageMod = 1;
     protected String speechType;
-    protected Speech speech = new Speech(this);
+    protected Speech speech;
     public int stateLevel = 1;
     public int attackSpeed = 0;
     private Actions lastState = Actions.Idle;
@@ -39,7 +40,7 @@ public class Unit extends Prop {
     public int stateDuration = 0;
     private boolean moveTriggered = false;
 
-    public Unit(Updater map, String name, int seed) {
+    public Unit(Map map, String name, int seed) {
         super(map, null,seed);
         this.name = name;
         gravity = true;
@@ -59,6 +60,11 @@ public class Unit extends Prop {
         for (int i=0;i<movesets.length;i++) moveset[i] = Actions.getByName(movesets[i]);
         clip.setOrganHealth();
         return sections;
+    }
+
+    public void start(){
+        super.start();
+        speech = new Speech(this);
     }
 
     public P getRandomPoint(){
@@ -219,6 +225,11 @@ public class Unit extends Prop {
         }
     }
 
+    public void disconnect(){
+        super.remove();
+        speech.remove();
+    }
+
     public void remove(){
         super.remove();
         speech.remove();
@@ -271,7 +282,7 @@ public class Unit extends Prop {
 
     public Unit attack(){
         P hand = getHand();
-        for (Unit i : map.collideUnit(hand, (int) getReach(), faction)){
+        for (Unit i : map.updater.collideUnit(hand, (int) getReach(), faction)){
             i.checkHit(hand, getDamage());
             onAttack(i);
             if (!stats.triggerEffect(Buffs.Cleave)) return i;

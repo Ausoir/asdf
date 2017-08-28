@@ -2,8 +2,8 @@ package com.ga.unit;
 
 import com.ga.game.Observer;
 import com.ga.map.Drawable;
+import com.ga.map.Map;
 import com.ga.map.Picture;
-import com.ga.map.Updater;
 import com.ga.tool.P;
 
 import java.awt.*;
@@ -13,7 +13,7 @@ import java.util.Random;
  * Created by Ga on 5/6/2016. thing
  */
 public class Thing implements Drawable, Observer {
-    public Updater map;
+    public Map map;
     public Random rand;
     public int seed = 0;
     public Picture image;
@@ -23,7 +23,7 @@ public class Thing implements Drawable, Observer {
     public int dir = Math.random()<.5f?1:-1;
     public float rotation = 0;
     public boolean save = true;
-    public Thing(Updater map, String name, int seed, int depth){
+    public Thing(Map map, String name, int seed, int depth){
         this.map = map;
         this.name = name;
         this.seed = seed;
@@ -34,7 +34,7 @@ public class Thing implements Drawable, Observer {
         if (name != null) setImage(name);
     }
     public void start(){
-        Updater.addQueue.add(this);
+        map.updater.addQueue.add(this);
     }
     public void setImage(String p){
         image.set(p);
@@ -55,11 +55,11 @@ public class Thing implements Drawable, Observer {
     }
     public void setDepth(int depth) {
         this.depth = depth;
-        map.resetDepth(this);
+        map.updater.resetDepth(this);
     }
 
     public void remove(){
-        map.remove(this);
+        map.updater.remove(this);
     }
     public String toString(){
         return name + "@" + pos;

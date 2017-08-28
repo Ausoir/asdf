@@ -68,7 +68,7 @@ public enum Behavior {
             if (host.brain.taskProgress > 64){
                 host.brain.setTask(Idle);
             } else if (host.brain.taskProgress % 4 == 0) {
-                ArrayList<Unit> allunits = host.map.collideUnit(host.pos, host.brain.taskProgress*128, host.faction);
+                ArrayList<Unit> allunits = host.map.updater.collideUnit(host.pos, host.brain.taskProgress*128, host.faction);
                 for (Unit i : allunits) {
                     host.brain.target = i;
                     host.brain.setTask(Hunt);

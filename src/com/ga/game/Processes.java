@@ -1,8 +1,10 @@
 package com.ga.game;
 
 import com.ga.map.Global;
+import com.ga.map.Map;
 import com.ga.map.Updater;
 
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -12,34 +14,45 @@ import java.util.TimerTask;
 public class Processes {
     private static Timer display, update, controllers, outside;
     Processes(){
+        resume();
+    }
+    public static void pause(){
+        update.cancel();
+        display.cancel();
+        controllers.cancel();
+        outside.cancel();
+    }
+    private static void resume(){
+        display = new Timer();
+        update = new Timer();
         controllers = new Timer();
-        controllers.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run(){
-                for (Updater i : Global.maps) i.updateControl();
-            }
-        }, 0, Settings.spc);
         outside = new Timer();
         outside.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run(){
-                for (Updater i : Global.maps) i.updateOutside();
+                for (Map i : Global.maps) i.updater.updateOutside();
             }
-        }, 0, Settings.spo);
-        display = new Timer();
+        }, 400, Settings.spo);
+        controllers.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run(){
+                for (Map i : Global.maps) i.updater.updateControl();
+            }
+        }, 300, Settings.spc);
         display.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run(){
                 Global.display.repaint();
             }
-        }, 0, Settings.spf);
-        update = new Timer();
+        }, 200, Settings.spf);
         update.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run(){
-                for (Updater i : Global.maps) i.update();
+                ArrayList<Map> maps = (ArrayList<Map>) Global.maps.clone();
+                for (Map i : maps) i.updater.update();
+                Global.update();
             }
-        }, 0, Settings.spu);
+        }, 100, Settings.spu);
     }
     public static void editorMode(){
         outside.cancel();

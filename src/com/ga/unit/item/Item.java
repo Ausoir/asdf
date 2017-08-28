@@ -3,9 +3,9 @@ package com.ga.unit.item;
 import com.ga.game.Dialog;
 import com.ga.game.Sound;
 import com.ga.map.Global;
+import com.ga.map.Map;
 import com.ga.map.ShadedPicture;
 import com.ga.map.Shader;
-import com.ga.map.Updater;
 import com.ga.tool.Interactive;
 import com.ga.tool.Line;
 import com.ga.tool.P;
@@ -266,7 +266,7 @@ public class Item extends Prop {
     public ItemType type = ItemType.Throwing;
     public int value = 8;
     Man owner;
-    public Item(Updater map, String name, int seed, Material[] materials, ItemType type) {
+    public Item(Map map, String name, int seed, Material[] materials, ItemType type) {
         super(map, name, seed);
         gravity = true;
         setType(type);

@@ -24,11 +24,14 @@ public class Indicater implements Drawable {
     private int time;
     Indicater(Player host){
         this.host = host;
-        Updater.addQueue.add(this);
+        host.map.updater.addQueue.add(this);
         for (int i=bgFade.length-1;i>=0;i--){
             bgFade[i] = new Color(58, 60, 60, i * 17);
             fgFade[i] = new Color(19, 86, 43, i * 15);
         }
+    }
+    void remove(){
+        host.map.updater.remove(this);
     }
     void setMeasuree(Stat p){
         measuree = p;

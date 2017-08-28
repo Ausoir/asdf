@@ -6,7 +6,6 @@ import com.ga.game.Sound;
 import com.ga.map.Global;
 import com.ga.map.Shader;
 import com.ga.map.Terrain;
-import com.ga.map.Updater;
 import com.ga.tool.EventTimer;
 import com.ga.tool.Line;
 import com.ga.tool.P;
@@ -226,7 +225,7 @@ public enum Actions {
             host.attackSound();
             Man t = (Man)host;
             Line hitbox = t.clip.organs[1].getAdd(t.pos);
-            for (Unit i : host.map.collideUnit(t.pos, (int) hitbox.getLength()+64, t.faction)) {
+            for (Unit i : host.map.updater.collideUnit(t.pos, (int) hitbox.getLength()+64, t.faction)) {
                 if (i.state != Actions.Down && i.checkHit(hitbox, 0, true)) {
                     i.stateSet(Actions.Hit);
                     Sound.play(host.pos, "hit_whip");
@@ -259,7 +258,7 @@ public enum Actions {
             t.vel.x = 4 * t.dir;
             Line hitbox = t.clip.organs[2].getAdd(t.pos.getAdd(t.vel));
             int damage = (int)(t.armor.armor[1].getDamage()+host.stateLevel*.5f)+1;
-            for (Unit i : host.map.collideUnit(t.pos, (int) hitbox.getLength()+64, t.faction)) {
+            for (Unit i : host.map.updater.collideUnit(t.pos, (int) hitbox.getLength()+64, t.faction)) {
                 if (i.checkHit(hitbox, damage, true)) {
                     Sound.play(host.pos, "hit_bash");
                     new Thing(host.map, "hit_1", -1, 150) {
@@ -290,7 +289,7 @@ public enum Actions {
             Man t = (Man)host;
             Line hitbox = t.clip.organs[0].getAdd(t.pos);
             int damage = Global.r.nextInt((int) (t.armor.armor[2].getDamage()+host.stateLevel*.5f)+1);
-            for (Unit i : host.map.collideUnit(hitbox.ptd, (int) hitbox.getLength()+64, t.faction)) {
+            for (Unit i : host.map.updater.collideUnit(hitbox.ptd, (int) hitbox.getLength()+64, t.faction)) {
                 if (i.checkHit(hitbox, damage, true)) {
                     Sound.play(host.pos, "hit_punch");
                     new Thing(host.map, "hit_1", -1, 150) {
@@ -408,7 +407,7 @@ public enum Actions {
         add(Tag.Agility);
     }}){
         public void onSet(Unit host){
-            ArrayList<Unit> t = host.map.collideUnit(host.target.getAdd(host.pos),40,Faction.Destructive);
+            ArrayList<Unit> t = host.map.updater.collideUnit(host.target.getAdd(host.pos),40,Faction.Destructive);
             if (t.size() > 0) t.get(0).buff(Buffs.Mark, host.stateLevel);
         }
     },
@@ -416,7 +415,7 @@ public enum Actions {
     }}){
         public void onSet(Unit host){
             if (host == Global.player) {
-                ArrayList<Unit> t = host.map.collideUnit(host.target.getAdd(host.pos), 40, Faction.Destructive);
+                ArrayList<Unit> t = host.map.updater.collideUnit(host.target.getAdd(host.pos), 40, Faction.Destructive);
                 if (t.size() > 0){
                     Unit target = t.get(0);
                     Global.display.menu.showDialog(target.name,target.getDescription());
@@ -606,7 +605,7 @@ public enum Actions {
         add(Tag.Might);
     }}){
         public void onSet(Unit host){
-            ArrayList<Unit> t = host.map.collideUnit(host.pos,240+(120*host.stateLevel),Faction.Destructive);
+            ArrayList<Unit> t = host.map.updater.collideUnit(host.pos,240+(120*host.stateLevel),Faction.Destructive);
             for (Unit i : t){
                 if (i != host) i.buff(Buffs.Stun,3+host.stateLevel);
             }
@@ -705,10 +704,10 @@ public enum Actions {
             host.attackSpeed = 12;
         }
         public void trigger(final Unit host){
-            Terrain rock = new Terrain("steel", Shader.None, 50){
+            Terrain rock = new Terrain(host.map, "steel", Shader.None, 50){
                 public void draw(Graphics2D g) {
                     super.draw(g);
-                    host.map.remove(this);
+                    host.map.updater.remove(this);
                 }
             };
             P origin = host.pos;
@@ -731,7 +730,7 @@ public enum Actions {
             Particle.explode(host.map, "Glare",host.getDepth(),host.getHand(),new P(0,-1),8,20,12,true,4);
             Sound.play(host.pos, "shadowstep");
             P origin = host.getHand();
-            ArrayList<Unit> t = host.map.collideUnit(origin,800,host.faction);
+            ArrayList<Unit> t = host.map.updater.collideUnit(origin,800,host.faction);
             int size = t.size();
             if (size > 0) {
                 Unit target = t.get(Global.r.nextInt(size));
@@ -742,10 +741,10 @@ public enum Actions {
                 float atan = host.target.getAdd(host.pos.getSubtract(origin)).getAtan();
                 P[] points = new P[num * 2 - 2];
                 for (int ii = 0; ii < Global.r.nextInt(2) + 2; ii++) {
-                    Terrain lightning = new Terrain("yellow", Shader.None, 50){
+                    Terrain lightning = new Terrain(host.map, "yellow", Shader.None, 50){
                         public void draw(Graphics2D g) {
                             super.draw(g);
-                            host.map.remove(this);
+                            host.map.updater.remove(this);
                         }
                     };
                     for (int i = 0; i < points.length; i++) {
@@ -788,7 +787,7 @@ public enum Actions {
             if (host.delay.time > 0) return;
             Sound.play(host.pos, "shadowstep");
             P origin = host.getHand();
-            ArrayList<Unit> t = host.map.collideUnit(origin,800,host.faction);
+            ArrayList<Unit> t = host.map.updater.collideUnit(origin,800,host.faction);
             int size = t.size();
             if (size > 0) {
                 Unit target = t.get(Global.r.nextInt(size));
@@ -799,10 +798,10 @@ public enum Actions {
                 float atan = host.target.getAdd(host.pos.getSubtract(origin)).getAtan();
                 P[] points = new P[num * 2 - 2];
                 for (int ii=0;ii<2;ii++) {
-                    Terrain lightning = new Terrain("_255,255,0,255", Shader.None, host.getDepth()+1) {
+                    Terrain lightning = new Terrain(host.map, "_255,255,0,255", Shader.None, host.getDepth()+1) {
                         public void draw(Graphics2D g) {
                             super.draw(g);
-                            host.map.remove(this);
+                            host.map.updater.remove(this);
                         }
                     };
                     for (int i = 0; i < points.length; i++) {
@@ -837,7 +836,7 @@ public enum Actions {
         }
         public void trigger(final Unit host){
             Sound.play(host.pos, "shadowstep");
-            final Terrain r = new Terrain("water", Shader.None, 50);
+            final Terrain r = new Terrain(host.map, "water", Shader.None, 50);
             P[] points = new P[3];
             int power = 40+(40*host.stateLevel);
             final P target = host.target.getAdd(host.pos);
@@ -863,7 +862,7 @@ public enum Actions {
                     for (int i = 0;i<3;i++) {
                         host.map.land.remove(lines[i]);
                     }
-                    host.map.remove(r);
+                    host.map.updater.remove(r);
                 }
             }));
         }
@@ -1130,7 +1129,7 @@ public enum Actions {
                     attackHitSound();
                     Particle.explode(host.map, "Fire", host.getDepth(), pos, new P(), 85+(level*10), 10+(level*2), 0, false, 4);
                     Particle.smoke(host.map, pos, host.getDepth());
-                    ArrayList<Unit> t = host.map.collideUnit(pos,48+level*16,Faction.Destructive);
+                    ArrayList<Unit> t = host.map.updater.collideUnit(pos,48+level*16,Faction.Destructive);
                     for (Unit i : t){
                         if (i != host) i.checkHit(pos, getDamage());
                     }
@@ -1173,7 +1172,7 @@ public enum Actions {
                     attackHitSound();
                     Particle.explode(host.map, "Fire", getDepth(), pos, new P(), 36, 16+(level*2), 0, false, 4+level);
                     Particle.smoke(host.map, pos, getDepth());
-                    ArrayList<Unit> t = host.map.collideUnit(pos,128+level*8,Faction.Destructive);
+                    ArrayList<Unit> t = host.map.updater.collideUnit(pos,128+level*8,Faction.Destructive);
                     for (Unit i : t){
                         i.checkHit(pos, getDamage());
                     }
@@ -1221,7 +1220,7 @@ public enum Actions {
                 @Override
                 public void stuck(){
                     Particle.explode(host.map, "Ice",getDepth(),pos,new P(), 30, 20, 0, false, 1);
-                    ArrayList<Unit> t = host.map.collideUnit(pos,96,host.faction);
+                    ArrayList<Unit> t = host.map.updater.collideUnit(pos,96,host.faction);
                     for (Unit i : t){
                         i.checkHit(host.pos, getDamage());
                         i.buff(Buffs.Freeze, 16+Global.r.nextInt(16));

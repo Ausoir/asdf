@@ -1,9 +1,9 @@
 package com.ga.map;
 
 import com.ga.connection.Server;
-import com.ga.game.Processes;
 import com.ga.game.Display;
 import com.ga.game.FileManager;
+import com.ga.game.Processes;
 import com.ga.game.Settings;
 import com.ga.tool.EventTimer;
 import com.ga.tool.P;
@@ -20,7 +20,7 @@ import java.util.Random;
  */
 public class Global {
     private static final int HOUR = 100;
-    public static ArrayList<Updater> maps = new ArrayList<>();
+    public static ArrayList<Map> maps = new ArrayList<>();
     public static MainPlayer player;
     public static Server server;
     public static Processes cprocess;
@@ -96,11 +96,11 @@ public class Global {
     static int getHour(){
         return time/HOUR;
     }
-    public static Updater getMap(String name){
-        for (Updater i : maps){
+    public static Map getMap(String name){
+        for (Map i : maps){
             if (i.name.equals(name)) return i;
         }
-        Updater r = new Updater(name);
+        Map r = new Map(name);
         maps.add(r);
         return r;
     }

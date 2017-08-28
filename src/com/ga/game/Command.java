@@ -48,7 +48,7 @@ public class Command {
                 else if (cmd[0].equals("act")) host.setState(Actions.valueOf(cmd[1]));
                 else if (cmd[0].equals("level")){
                     Unit victim = new Unit(host.map, "",-1);
-                    Global.player.map.remove(victim);
+                    Global.player.map.updater.remove(victim);
                     victim.pos.set(Global.player.pos);
                     victim.stats.load("Level:10,10");
                     Global.player.witnessDeath(victim);

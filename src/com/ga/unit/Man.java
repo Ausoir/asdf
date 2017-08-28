@@ -1,8 +1,7 @@
 package com.ga.unit;
 
 import com.ga.game.Sound;
-import com.ga.map.Global;
-import com.ga.map.Updater;
+import com.ga.map.Map;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
@@ -24,7 +23,7 @@ public class Man extends Unit {
     public Item weapon = fist;
     public ArmorSet armor;
 
-    public Man(Updater map, String name, int seed) {
+    public Man(Map map, String name, int seed) {
         super(map, name, seed);
         clip = new BodyHumanoid(this);
     }
@@ -48,7 +47,6 @@ public class Man extends Unit {
     @Override
     public void remove() {
         super.remove();
-        if (speech != null) speech.remove();
         weapon.remove();
         armor.remove();
     }
@@ -123,7 +121,7 @@ public class Man extends Unit {
         if (stats.triggerEffect(Buffs.Cleave)) cleave = true;
         Line hitbox = weapon.getLine();
         Unit target = null;
-        for (Unit i : map.collideUnit(pos, (int) hitbox.getLength()+20, faction)){
+        for (Unit i : map.updater.collideUnit(pos, (int) hitbox.getLength()+20, faction)){
             if (i.checkHit(hitbox,getDamage(),weapon.type.isBlunt())){
                 target = i;
                 if (!cleave) break;

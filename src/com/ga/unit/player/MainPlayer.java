@@ -2,7 +2,7 @@ package com.ga.unit.player;
 
 import com.ga.game.Sound;
 import com.ga.map.Global;
-import com.ga.map.Updater;
+import com.ga.map.Map;
 import com.ga.tool.Line;
 import com.ga.unit.*;
 import com.ga.unit.skill.Actions;
@@ -17,10 +17,9 @@ import static com.ga.unit.BodyHumanoid.BODY;
 public class MainPlayer extends Player {
     public PlayerInput input;
     private Indicater indicater;
-    public MainPlayer(Updater map, int seed) {
+    public MainPlayer(Map map, int seed) {
         super(map, seed);
         Global.player = this;
-        indicater = new Indicater(this);
     }
     @Override
     public void say(String p){
@@ -37,7 +36,10 @@ public class MainPlayer extends Player {
         else if (state == Actions.Jump && this.state == Actions.Rest) state = Actions.Leap;
         else if (state == Actions.Discard && this.state == Actions.Rest) state = Actions.Throw;
         else if (state == Actions.Grab && this.state == Actions.Rest) state = Actions.Use2;
-        else if (state == Actions.Rest && this.state == Actions.Walk) state = Actions.Sprint;
+        else if (state == Actions.Rest && this.state == Actions.Walk){
+            if (vel.x != 0) target.x = dir;
+            state = Actions.Sprint;
+        }
         int r = super.setState(state);
         if (r == 2) indicater.show(1);
         else if (r == 3) indicater.showCd(getCooldown(state)[0]);
@@ -173,8 +175,16 @@ public class MainPlayer extends Player {
     }
     public String[] load(String p){
         String[] r = super.load(p);
-        indicater.setMeasuree(get("Stamina"));
         return r;
+    }
+    public void disconnect(){
+        super.disconnect();
+        indicater.remove();
+    }
+    public void start(){
+        super.start();
+        indicater = new Indicater(this);
+        indicater.setMeasuree(get("Stamina"));
     }
     public String toCharacterString() {
         return super.toCharacterString()+input.toString()+"\n";

@@ -63,7 +63,7 @@ public enum Buffs {
         return new Buff(1) {
             public void onSet() {
                 Particle.sparkle(host.map, "Fire", host.getDepth(), host.getRandomPoint(), 8, 5);
-                for (Unit i : host.map.collideUnit(host.pos,1600*level, Faction.Destructive)){
+                for (Unit i : host.map.updater.collideUnit(host.pos,1600*level, Faction.Destructive)){
                     i.brain.target = host;
                     i.brain.onHit();
                 }
@@ -258,7 +258,7 @@ public enum Buffs {
                             host.stats.getEffect(Bleed).time += Global.r.nextInt(100);
                         }
                     }
-                    for (Unit i : host.map.collideUnit(host.pos, host.getSize() + 40, Faction.Destructive)) {
+                    for (Unit i : host.map.updater.collideUnit(host.pos, host.getSize() + 40, Faction.Destructive)) {
                         if (Global.r.nextBoolean()) i.buff(Burn, 1);
                     }
                     host.stateSet(Actions.Sprint);
@@ -304,7 +304,7 @@ public enum Buffs {
             private void freeze(){
                 frozen = true;
                 int size = host.getSize();
-                ice = new Terrain("_130,180,255,140", Shader.None, host.getDepth()+1);
+                ice = new Terrain(host.map, "_130,180,255,140", Shader.None, host.getDepth()+1);
                 int num = Global.r.nextInt(3)+5;
                 P[] points = new P[num];
                 float gap = 6.28f/num;
@@ -334,7 +334,7 @@ public enum Buffs {
                 host.tangible = true;
                 frozen = false;
                 host.map.land.removeAll(Arrays.asList(lines));
-                host.map.remove(ice);
+                host.map.updater.remove(ice);
                 time = Global.time + 16;
             }
             public void onFinish() {

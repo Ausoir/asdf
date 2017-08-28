@@ -1,16 +1,14 @@
 package com.ga.unit.item;
 
 import com.ga.map.Global;
-import com.ga.map.Updater;
-
-import static com.ga.unit.item.Item.Material.*;
+import com.ga.map.Map;
 
 /**
  * Created by Ga on 8/1/2016. asd
  */
 public class Weapon extends Item {
     private int damageMod = 0;
-    public Weapon(Updater map, String name, int seed, ItemType type, int encumbrance, Material[] materials) {
+    public Weapon(Map map, String name, int seed, ItemType type, int encumbrance, Material[] materials) {
         super(map, name, seed, materials, type);
         this.encumbrance = encumbrance;
         value = 36;

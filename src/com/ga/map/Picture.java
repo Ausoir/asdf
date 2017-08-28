@@ -168,7 +168,8 @@ public class Picture {
         return r;
     }
     public void draw(Graphics2D g, float x, float y, float rot, int dir, float sizeX, float sizeY){
-        if (visible && x > 0 && y > 0 && x < Settings.screenX && y < Settings.screenY) {
+        if (visible && x > Global.camera.x-Settings.centerX && y > Global.camera.y-Settings.centerY
+                && x < Global.camera.x+Settings.centerX && y < Global.camera.y+Settings.centerY) {
             float xMid = halfSize.x*dir;
             float yMid = halfSize.y;
             float rx = x + Global.rel.x;
