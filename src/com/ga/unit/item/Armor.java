@@ -16,7 +16,7 @@ public class Armor extends Item {
     public Armor(Map map, String name, int seed, int piece, int encumbrance, int pockets, Material[] materials) {
         super(map, name, seed, materials, ItemType.Armor);
         this.encumbrance = encumbrance;
-        value = 24;
+        value = 1000;
         this.pocket = pockets;
         this.piece = piece;
         delay = 80;
@@ -65,7 +65,7 @@ public class Armor extends Item {
             host.delay.performer = new Performer() {
                 public void perform() {
                     if (host.armor.isBare(piece)) {
-                        Sound.play(host.pos, "wear");
+                        Sound.play(host.map, host.pos, "wear");
                         host.map.updater.remove(me);
                         host.setWeapon(null);
                         host.armor.set(me, piece);

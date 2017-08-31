@@ -4,7 +4,6 @@ import com.ga.game.Settings;
 import com.ga.game.Sound;
 import com.ga.map.Global;
 import com.ga.map.Map;
-import com.ga.map.Updater;
 import com.ga.tool.EventTimer;
 import com.ga.tool.Line;
 import com.ga.tool.P;
@@ -63,8 +62,8 @@ public class Unit extends Prop {
     }
 
     public void start(){
-        super.start();
         speech = new Speech(this);
+        super.start();
     }
 
     public P getRandomPoint(){
@@ -124,7 +123,7 @@ public class Unit extends Prop {
         return get("Speed").get()*clip.getLegStatus()*.01f;
     }
     public void attackSound(){
-        Sound.play(pos, "swing_normal");
+        Sound.play(map, pos, "swing_normal");
     }
     public int getStateLevel(Actions state){
         return get("Level").get();
@@ -205,7 +204,7 @@ public class Unit extends Prop {
                 int dam;
                 if (!blunt) dam = processDamage(i, damage);
                 else dam = damage;
-                if (clip.organs[i].hit(hitBox, dam)) Sound.play(pos, "hit_bloody");
+                if (clip.organs[i].hit(hitBox, dam)) Sound.play(map, pos, "hit_bloody");
                 r = true;
             }
         }
@@ -252,7 +251,7 @@ public class Unit extends Prop {
             jump = true;
             if (l.clockwise()) setDepth(l.depth-1);
             int mag = (int) (vel.y - Settings.gravityMax);
-            if (vel.y > Settings.gravity*4) Sound.play(pos, "land");
+            if (vel.y > Settings.gravity*4) Sound.play(map, pos, "land");
             if (mag >= 0 && hittable(Faction.Destructive)) {
                 buff(Buffs.Bleed, Global.r.nextInt(3));
                 stateSet(Actions.Down);
@@ -345,5 +344,19 @@ public class Unit extends Prop {
         }
         clip.setOrganHealth();
         clip.updateStatus();
+    }
+
+    public boolean changeMap(String p){
+        Map map = Global.getMap(p.split("@")[0]);
+        if (this.map != map) {
+            String[] mapData = p.split("@");
+            map.terrains.clear();
+            disconnect();
+            this.map = map;
+            pos.set(map.updater.getEntrancePos(Integer.parseInt(mapData[1])));
+            start();
+            return true;
+        }
+        return false;
     }
 }

@@ -8,4 +8,3 @@ gravityMax:64
 spf:17
 spu:25
 spc:360
-spo:4000

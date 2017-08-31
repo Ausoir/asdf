@@ -11,7 +11,7 @@ public class Weapon extends Item {
     public Weapon(Map map, String name, int seed, ItemType type, int encumbrance, Material[] materials) {
         super(map, name, seed, materials, type);
         this.encumbrance = encumbrance;
-        value = 36;
+        value = 10000;
         cooldown = 0;
         rotation = 35;
         delay = 0;

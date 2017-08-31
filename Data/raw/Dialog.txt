@@ -15,7 +15,7 @@ btorso:Torso
 bleg:Legging
 bhead:Head
 mem:Memory
-StrengthDsc:Decreases weight penalties by 1, which reduces slow effects from heavy equipment.
+MightDsc:Decreases weight penalties by 1, which reduces slow effects from heavy equipment. Also increases potency of all skills involving might.
 DexterityDsc:Increases maximum encumbrance by 1.
 AgilityDsc:Increases damage and potency of all skills involving agility.
 StaminaDsc:Increases maximum Stamina by 1. Stamina recovers usually by resting.

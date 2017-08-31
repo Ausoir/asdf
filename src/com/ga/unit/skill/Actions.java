@@ -145,7 +145,7 @@ public enum Actions {
     Melee(24,-1,0,0,new Tags(){{
     }}){
         public void trigger(Unit host){
-            Sound.play(host.pos, "swing_silent");
+            Sound.play(host.map, host.pos, "swing_silent");
             host.attack();
         }
     },
@@ -228,7 +228,7 @@ public enum Actions {
             for (Unit i : host.map.updater.collideUnit(t.pos, (int) hitbox.getLength()+64, t.faction)) {
                 if (i.state != Actions.Down && i.checkHit(hitbox, 0, true)) {
                     i.stateSet(Actions.Hit);
-                    Sound.play(host.pos, "hit_whip");
+                    Sound.play(host.map, host.pos, "hit_whip");
                     new Thing(host.map, "hit_0", -1, 150) {
                         private int n = 0;
                         public void draw(Graphics2D g) {
@@ -260,7 +260,7 @@ public enum Actions {
             int damage = (int)(t.armor.armor[1].getDamage()+host.stateLevel*.5f)+1;
             for (Unit i : host.map.updater.collideUnit(t.pos, (int) hitbox.getLength()+64, t.faction)) {
                 if (i.checkHit(hitbox, damage, true)) {
-                    Sound.play(host.pos, "hit_bash");
+                    Sound.play(host.map, host.pos, "hit_bash");
                     new Thing(host.map, "hit_1", -1, 150) {
                         private int n = 0;
                         public void draw(Graphics2D g) {
@@ -291,7 +291,7 @@ public enum Actions {
             int damage = Global.r.nextInt((int) (t.armor.armor[2].getDamage()+host.stateLevel*.5f)+1);
             for (Unit i : host.map.updater.collideUnit(hitbox.ptd, (int) hitbox.getLength()+64, t.faction)) {
                 if (i.checkHit(hitbox, damage, true)) {
-                    Sound.play(host.pos, "hit_punch");
+                    Sound.play(host.map, host.pos, "hit_punch");
                     new Thing(host.map, "hit_1", -1, 150) {
                         private int n = 0;
                         public void draw(Graphics2D g) {
@@ -435,9 +435,9 @@ public enum Actions {
             if (!t.wieldingNone()) {
                 int speed = 5;
                 int damage = 0;
-                int str = t.get("Strength").get();
+                int str = t.get("Might").get();
                 if (t.weapon.weight != 0 && t.get("Stamina").require(Math.max(0,t.weapon.weight-str))){
-                    speed = 18+(12*Math.max(1,str-t.weapon.weight))+host.stateLevel*2;
+                    speed = 20+(16*Math.max(1,str-t.weapon.weight))+host.stateLevel*4;
                     damage = (int) (t.rand.nextInt(t.getDamage()+t.weapon.weight)*(.4f+host.stateLevel*.2f));
                 }
                 Projectile pj = new Projectile(host.map, null, t.pos.getAdd(t.clip.organs[OFIST].ptd), t.pos.getAdd(t.target), speed) {
@@ -452,7 +452,7 @@ public enum Actions {
                     public void onAttack(Unit p) {
                         if (p.checkHit(new Line(pos,pos.getAdd(vel)),damage, true)){
                             if (wpn.usable(1)) wpn.trigger(p);
-                            Sound.play(host.pos, "hit_bash");
+                            Sound.play(host.map, host.pos, "hit_bash");
                         }
                     }
                     public void update(){
@@ -461,7 +461,7 @@ public enum Actions {
                     }
                 };
                 pj.gravity = true;
-                pj.rotSpeed = speed*.01f;
+                pj.rotSpeed = .03f;
                 pj.faction = t.faction;
                 pj.damage = damage;
                 Item item = t.weapon;
@@ -486,7 +486,7 @@ public enum Actions {
             P tip = t.weapon.getLine().ptd;
             final Item wpn = t.weapon;
             float flytime = t.target.getDist() / 100;
-            int speed = (int) (36 + (host.get("Strength").get() * 12) - (t.rand.nextFloat() * (60 / host.stateLevel)));
+            int speed = (int) (36 + (host.get("Might").get() * 12) - (t.rand.nextFloat() * (60 / host.stateLevel)));
             float calcY = Math.abs(t.target.x / speed) * Settings.gravity * Settings.gravity;
             final Projectile pj = new Projectile(host.map, "Arrow", tip, t.pos.getAdd(t.target).add(0, -calcY), speed) {
                 public void onField() {
@@ -494,7 +494,7 @@ public enum Actions {
 
                 public void onAttack(Unit p) {
                     wpn.trigger(p);
-                    Sound.play(host.pos, "hit_bloody");
+                    Sound.play(host.map, host.pos, "hit_bloody");
                     remove();
                 }
 
@@ -594,7 +594,7 @@ public enum Actions {
         public void onSet(Unit host){
             float x = Math.abs(host.vel.x);
             float t = Math.max(0, 32 + host.stateLevel*4 - x);
-            Sound.play(host.pos, "jump");
+            Sound.play(host.map, host.pos, "jump");
             host.vel.y -= t;
             host.vel.x *= 5;
             if (Math.abs(host.vel.x) >= -host.vel.y) host.stateSet(Down);
@@ -662,7 +662,7 @@ public enum Actions {
             return 1200;
         }
         public void trigger(Unit host){
-            Sound.play(host.pos, "jump");
+            Sound.play(host.map, host.pos, "jump");
             host.vel.y -= 80;
             host.vel.x = 80 * host.dir;
         }
@@ -677,7 +677,7 @@ public enum Actions {
         public void trigger(final Unit host){
             Man man = (Man)host;
             if (man.wieldingNone()) {
-                Sound.play(host.pos, "shadowstep");
+                Sound.play(host.map, host.pos, "shadowstep");
                 final Item t = (Item) Stock.getByName(host.map, "Ethersword", -1);
                 man.setWeapon(t);
                 int duration = 2;
@@ -728,7 +728,7 @@ public enum Actions {
         }
         public void trigger(final Unit host){
             Particle.explode(host.map, "Glare",host.getDepth(),host.getHand(),new P(0,-1),8,20,12,true,4);
-            Sound.play(host.pos, "shadowstep");
+            Sound.play(host.map, host.pos, "shadowstep");
             P origin = host.getHand();
             ArrayList<Unit> t = host.map.updater.collideUnit(origin,800,host.faction);
             int size = t.size();
@@ -785,7 +785,7 @@ public enum Actions {
         }
         public void update(final Unit host){
             if (host.delay.time > 0) return;
-            Sound.play(host.pos, "shadowstep");
+            Sound.play(host.map, host.pos, "shadowstep");
             P origin = host.getHand();
             ArrayList<Unit> t = host.map.updater.collideUnit(origin,800,host.faction);
             int size = t.size();
@@ -835,7 +835,7 @@ public enum Actions {
             host.attackSpeed = -1;
         }
         public void trigger(final Unit host){
-            Sound.play(host.pos, "shadowstep");
+            Sound.play(host.map, host.pos, "shadowstep");
             final Terrain r = new Terrain(host.map, "water", Shader.None, 50);
             P[] points = new P[3];
             int power = 40+(40*host.stateLevel);
@@ -878,7 +878,7 @@ public enum Actions {
             host.attackSpeed = -1;
         }
         public void trigger(Unit host){
-            Sound.play(host.pos, "heal");
+            Sound.play(host.map, host.pos, "heal");
             host.get("Stamina").heal();
             host.stateSet(Down);
             host.delay.time *= .6f - host.stateLevel * .1f;
@@ -927,7 +927,7 @@ public enum Actions {
             return "Buff";
         }
         public void trigger(Unit host){
-            Sound.play(host.pos, "shadowstep");
+            Sound.play(host.map, host.pos, "shadowstep");
             for (int i = 0; i < host.rand.nextInt(host.stateLevel + 4); i++) {
                 Unit p = (Unit) Stock.Rover.create(host.map, -1,-1);
                 p.brain.setTask(Behavior.Hunt);
@@ -956,7 +956,7 @@ public enum Actions {
             host.buff(Buffs.Shock, 1);
         }
         public void trigger(final Unit host){
-            Sound.play(host.pos, "shadowstep");
+            Sound.play(host.map, host.pos, "shadowstep");
             for (int i=0;i<host.rand.nextInt(host.stateLevel+1);i++) {
                 Man p = new Man(host.map, Stock.Man.ordinal()+"", host.seed) {
                     @Override
@@ -986,7 +986,7 @@ public enum Actions {
             return "Conjure";
         }
         public void onSet(Unit host){
-            Sound.play(host.pos, "shadow");
+            Sound.play(host.map, host.pos, "shadow");
             Particle.smoke(host.map, host.pos,host.getDepth());
             for (int i=0;i<24;i++) {
                 int range = Global.r.nextInt(host.stateLevel * 320) + 128;
@@ -1008,7 +1008,7 @@ public enum Actions {
         }
         public void onSet(Unit host){
             host.attackSpeed = -1;
-            Sound.play(host.pos, "shadow");
+            Sound.play(host.map, host.pos, "shadow");
             Particle.smoke(host.map, host.pos,host.getDepth());
             int power = 300 + host.stateLevel * 100;
             P target = host.target.getAdd(host.pos);
@@ -1020,7 +1020,7 @@ public enum Actions {
                     Particle.smoke(host.map, host.pos,host.getDepth());
                     Particle.smoke(host.map, target,host.getDepth());
                     if (host.map.checkLand(new Line(target,target.getAdd(0,800)), 0) != null) {
-                        Sound.play(host.pos, "shadowstep");
+                        Sound.play(host.map, host.pos, "shadowstep");
                         host.pos.set(target);
                         host.setState(Actions.Idle);
                         return;
@@ -1041,7 +1041,7 @@ public enum Actions {
         public void onFinish(Unit host){}
         public void update(final Unit host){
             if (host.delay.time > 0) return;
-            Sound.play(host.pos, "fire");
+            Sound.play(host.map, host.pos, "fire");
             final int level = host.stateLevel;
             for (int i=0;i<3;i++) {
                 final Projectile p = new Projectile(host.map, "Flame", host.getHand(), host.target.getAdd(host.pos)
@@ -1083,7 +1083,7 @@ public enum Actions {
         public void onFinish(Unit host){}
         public void update(final Unit host){
             if (host.delay.time > 0) return;
-            Sound.play(host.pos, "ice");
+            Sound.play(host.map, host.pos, "ice");
             final int speed = 8+host.stateLevel*8;
             for (int i=0;i<3;i++) {
                 final Projectile p = new Projectile(host.map, "Ice", host.getHand(), host.target.getAdd(host.pos).getAdd(Global.r.nextInt(150)-75, Global.r.nextInt(150)-75), speed){
@@ -1142,7 +1142,7 @@ public enum Actions {
                     Particle.explode(host.map, "Fire", host.getDepth(), pos, new P(), 15, 10, 0, true, 4);
                 }
                 void attackHitSound(){
-                    Sound.play(host.pos, "explosion_small");
+                    Sound.play(host.map, host.pos, "explosion_small");
                 }
             };
             host.setVisible(false);
@@ -1184,7 +1184,7 @@ public enum Actions {
                     Particle.explode(host.map, "Fire", getDepth(), pos, new P(), 12, 10, 0, true, 4);
                 }
                 void attackHitSound(){
-                    Sound.play(host.pos, "explosion_small");
+                    Sound.play(host.map, host.pos, "explosion_small");
                 }
                 public int getDepth(){
                     return host.getDepth();
@@ -1215,7 +1215,7 @@ public enum Actions {
         public void update(final Unit host){
             final int level = host.stateLevel;
             if (Global.r.nextInt(40) > (level*8)-4) return;
-            if (Math.random() < .2f) Sound.play(host.pos, "ice");
+            if (Math.random() < .2f) Sound.play(host.map, host.pos, "ice");
             final Projectile p = new Projectile(host.map, "Ice", host.pos.getAdd(Global.nextGaussian(500),-500), host.pos.getAdd(Global.nextGaussian(500),0), 8+Global.r.nextInt(6*level)){
                 @Override
                 public void stuck(){

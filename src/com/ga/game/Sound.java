@@ -1,6 +1,7 @@
 package com.ga.game;
 
 import com.ga.map.Global;
+import com.ga.map.Map;
 import com.ga.tool.P;
 
 import javax.sound.sampled.AudioInputStream;
@@ -28,16 +29,18 @@ public class Sound {
     public static boolean has(String p){
         return cache.get(p) != null;
     }
-    public static void play(P location, String p){
-        P dist = Global.camera.getSubtract(location);
-        if (Math.abs(dist.x) < Settings.centerX && Math.abs(dist.y) < Settings.centerY) {
-            try {
-                final Clip clip = cache.get(p);
-                clip.setFramePosition(0);
-                clip.start();
-            } catch (Exception e) {
-                System.out.println("Could not play sound [" + p + "]");
-                e.printStackTrace();
+    public static void play(Map map, P location, String p){
+        if (map == Global.player.map) {
+            P dist = Global.camera.getSubtract(location);
+            if (Math.abs(dist.x) < Settings.centerX && Math.abs(dist.y) < Settings.centerY) {
+                try {
+                    final Clip clip = cache.get(p);
+                    clip.setFramePosition(0);
+                    clip.start();
+                } catch (Exception e) {
+                    System.out.println("Could not play sound [" + p + "]");
+                    e.printStackTrace();
+                }
             }
         }
     }

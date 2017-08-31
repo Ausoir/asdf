@@ -44,7 +44,6 @@ public class PlayerInput implements Input {
     public boolean cameraMode = false;
     public PlayerInput(MainPlayer unit){
         host = unit;
-        unit.brain = Intelligence.None.make(unit);
         unit.input = this;
     }
     public void chat(String p, int x, int y){

@@ -1,10 +1,13 @@
 package com.ga.unit;
 
 import com.ga.game.Observer;
-import com.ga.map.Updater;
+import com.ga.map.Global;
+import com.ga.tool.Interactive;
+import com.ga.tool.Timer;
 import com.ga.unit.skill.Actions;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 /**
  * Created by ga on 6/12/17. asd
@@ -12,10 +15,8 @@ import java.util.ArrayList;
 public abstract class AI implements Observer {
     int factoryId = -1;
     public Unit host;
-    Behavior task = Behavior.Wander;
+    Stack<Task> tasks = new Stack<>();
     public Unit target;
-    private int targetId = 0;
-    int taskProgress;
     AI(Unit host){
         this.host = host;
     }
@@ -24,20 +25,20 @@ public abstract class AI implements Observer {
     }
     public void update(){
         perceive(160);
-        task.update(host);
-        taskProgress++;
+        if (tasks.peek().update(host)){
+            tasks.pop();
+            if (tasks.empty()) bored();
+        }
     }
-    void updateOutside(){
-        task.updateOutside(host);
+    void bored(){
+        setTask(Behavior.Wander);
     }
     public void setTask(Behavior p){
-        taskProgress = 0;
-        task = p;
-        task.onSet(host);
+        tasks.push(p.get(host));
     }
     void onAttack(){}
     public void onHit(){
-        if (task.alertness < 1){
+        if (tasks.peek().alertness < 1){
             setTask(Behavior.Search);
         }
     }
@@ -46,7 +47,7 @@ public abstract class AI implements Observer {
         return false;
     }
     void hear(Prop u, String p){}
-    boolean perceive(int d){
+    boolean perceive(int d) {
         ArrayList<Unit> seen = host.map.updater.perceive(host, host.pos.getAdd(host.dir < 0 ? -d : d, 0), d * 2);
         for (Unit t : seen) {
             if (t != host && target != t && t.state != Actions.Dead) {
@@ -58,18 +59,74 @@ public abstract class AI implements Observer {
     boolean perceived(Prop p){
         return false;
     }
-    void load(String p){
-        String[] data = p.split(",");
-        setTask(Behavior.values()[Integer.parseInt(data[1])]);
-        targetId = Integer.parseInt(data[2]);
-        if (targetId > 0){
-            target = Updater.getUnloadedActor(targetId);
-            targetId = 0;
+    void load(String p) {
+        String[] tasks = p.split("/")[1].split(",");
+        for (int i=tasks.length-1;i>=0;i--) {
+            String[] v = tasks[i].split("&");
+            setTask(Behavior.values()[Integer.parseInt(v[0])]);
+            this.tasks.peek().load(Integer.parseInt(v[1]));
         }
     }
-    public String toString(){
-        int targetId = 0;
-        if (target != null) targetId = target.controlId;
-        return factoryId+","+task.ordinal()+","+targetId;
+    public String toString() {
+        String r = "";
+        for (int i=tasks.size()-1;i>=0;i--) {
+            r += tasks.get(i).toString()+",";
+        }
+        if (r.length()>0) r = r.substring(0,r.length()-1);
+        return factoryId+"/"+r;
+    }
+}
+
+class NeutralAI extends AI{
+    Timer advertise;
+    String ad = "@talk";
+    NeutralAI(Unit host) {
+        super(host);
+    }
+    void load(String p){
+        super.load(p);
+        advertise = new Timer(100+host.rand.nextInt(200), false);
+        host.onInteract = new Interactive() {
+            public void interact(Man p) {
+                if (p == Global.player) hear(p, "hi");
+            }
+        };
+    }
+    public boolean perceived(Prop p){
+        if (p.faction.canAttack(host.faction) && p instanceof Unit) {
+            host.face(host.pos.x < p.pos.x ? -1 : 1, true);
+            host.setState(Actions.Sprint);
+        } else if (p instanceof Man) {
+            if (target != p) {
+                target = (Man) p;
+                setState(Actions.Idle);
+                if (advertise.over() && host.getConversation().equals("")){
+                    if (host.rand.nextFloat() < .5f) host.say("@c");
+                    else host.say(ad);
+                    advertise.reset();
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    public void hear(Prop u, String p) {
+        super.hear(u, p);
+        if (u == Global.player) {
+            if (p.equals("hi")) {
+                if ((u.dir == 1 && u.pos.x < host.pos.x) || u.dir == -1 && u.pos.x > host.pos.x) {
+                    if (u.pos.getSubtract(host.pos).getDist() < 160){
+                        host.say("@use");
+                        host.face(u.pos.x<host.pos.x?-1:1,true);
+                        shop();
+                    }
+                }
+            }
+        }
+    }
+    void shop(){}
+    public void update(){
+        super.update();
+        advertise.update();
     }
 }

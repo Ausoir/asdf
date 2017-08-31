@@ -28,6 +28,7 @@ public class Command {
                 else if (cmd[0].equals("seed")) host.weapon.seed = Integer.parseInt(cmd[1]);
                 else if (cmd[0].equals("time")) Global.time += Integer.parseInt(cmd[1]);
                 else if (cmd[0].equals("stat")) host.get(cmd[1]).addTotal(Integer.parseInt(cmd[2]));
+                else if (cmd[0].equals("gold")) Global.player.gold = Integer.parseInt(cmd[1]);
                 else if (cmd[0].equals("unit")){
                     Prop unit = Stock.getByName(host.map, cmd[1], -1);
                     unit.start();
@@ -56,7 +57,7 @@ public class Command {
                 }
                 else if (cmd[0].equals("learn")) Global.player.learnSkill(Actions.valueOf(cmd[1]));
                 else if (cmd[0].equals("recipe")) host.crafting.knowledge.add(cmd[1]);
-                else if (cmd[0].equals("sound")) Sound.play(Global.camera, cmd[1]);
+                else if (cmd[0].equals("sound")) Sound.play(Global.player.map, Global.camera, cmd[1]);
                 else if (p.equals("revive")) host.revive();
                 else if (p.equals("render")){
                     for (Object terrain : Global.player.map.terrains.entrySet()) ((Terrain)terrain).render();

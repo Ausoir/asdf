@@ -102,7 +102,7 @@ public class MainPlayer extends Player {
         Stat level = get("Level");
         exp.add(p, true);
         if (exp.isFull()){
-            Sound.play(pos, "heal");
+            Sound.play(map, pos, "heal");
             Particle.holyExplosion(map, pos.getAdd(clip.organs[BODY].ptd), getDepth()-1);
             level.setMax(level.getMax()+1);
             int residue = exp.get() - exp.getMax();
@@ -118,7 +118,7 @@ public class MainPlayer extends Player {
                 current += pprev;
                 if (level.getMax() > 30 || 30 - current == level.getMax()){ //decay
                     String[] stats = new String[]{
-                            "Stamina", "Strength", "Dexterity", "Agility", "Memory"
+                            "Stamina", "Might", "Dexterity", "Agility", "Memory"
                     };
                     get(stats[Global.r.nextInt(5)]).add(-1, true);
                     pass = false;
@@ -188,5 +188,14 @@ public class MainPlayer extends Player {
     }
     public String toCharacterString() {
         return super.toCharacterString()+input.toString()+"\n";
+    }
+    public boolean changeMap(String p){
+        if (super.changeMap(p)) {
+            map.setTexture();
+            map.mapEdgeCenter(Global.camera = map.size.getMult(.5f, .5f));
+            map.onTimeChange();
+            return true;
+        }
+        return false;
     }
 }

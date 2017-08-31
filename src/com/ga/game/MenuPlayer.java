@@ -28,7 +28,7 @@ public class MenuPlayer extends Panel {
     private class StatPanel extends JPanel{
         private GridBagConstraints statgrid = new GridBagConstraints();
         private String[] stats = new String[]{
-                "Stamina", "Strength", "Dexterity", "Agility", "Memory"
+                "Stamina", "Might", "Dexterity", "Agility", "Memory"
         };
         private JButton[] statButtons = new JButton[stats.length];
         private JLabel level = new JLabel();
@@ -137,7 +137,8 @@ public class MenuPlayer extends Panel {
         void refresh(){
             int maxEncumbrance = Global.player.get("Dexterity").get();
             gold.setText("Cash: "+Dialog.money(Global.player.gold) +
-                    "                 Encumbrance:"+(maxEncumbrance-Global.player.getVacancy())+"/"+maxEncumbrance);
+                    "                 Encumbrance:"+(maxEncumbrance-Global.player.getVacancy())+"/"+maxEncumbrance+
+                    "                 Weight:"+Global.player.getWeight()+"/"+Global.player.get("Might").get()*2);
             panel.removeAll();
 
             grid.gridy = 0;
@@ -251,7 +252,8 @@ public class MenuPlayer extends Panel {
             add(scroll, BorderLayout.LINE_START);
         }
         void refresh(){
-            gold.setText("Cash: "+Dialog.money(Global.player.gold));
+            gold.setText("Cash: "+Dialog.money(Global.player.gold)+
+                    "                 Weight:"+Global.player.getWeight()+"/"+Global.player.get("Might").get()*2);
             panel.removeAll();
             Inventory inv = Global.player.inventory;
             int itemsize = inv.getItemSize();

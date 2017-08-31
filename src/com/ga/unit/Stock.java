@@ -39,9 +39,7 @@ public enum Stock {
         product.image.visible = false;
         product.onInteract = new Interactive(){
             public void interact(Man p){
-                if (p == Global.player){
-                    p.map.updater.changeMap = id+"@"+seed;
-                }
+                p.changeMap(id+"@"+seed);
             }
         };
         return product;
@@ -80,7 +78,7 @@ public enum Stock {
         String[] unit = units[id].split(";");
         Unit product = new Unit(map, null, Creation.getSeed(seed));
         product.clip = new Body(product, unit[0]);
-        product.load(getUnit(unit[0],product.seed,product.clip.toString(),unit[2], Faction.valueOf(unit[3]), unit[4]+",0,0", unit[5]));
+        product.load(getUnit(unit[0],product.seed,product.clip.toString(),unit[2], Faction.valueOf(unit[3]), unit[4]+"/1&0", unit[5]));
         product.speechType = unit[1];
         product.subId = id;
         return product;
@@ -90,7 +88,7 @@ public enum Stock {
         final String[] unit = units[id].split(";");
         Man product = new Man(map, unit[0], Creation.getSeed(seed)){
             public void onCreate(){
-                String str = getUnit(name,seed,"111111",unit[2],Faction.valueOf(unit[3]),unit[4]+",0,0",unit[5]);
+                String str = getUnit(name,seed,"111111",unit[2],Faction.valueOf(unit[3]),unit[4]+"/1&0",unit[5]);
                 String[] weapon = unit[7].split(",");
                 String[] armor = unit[8].split(",");
                 String[] helms = unit[9].split(",");
@@ -865,7 +863,7 @@ public enum Stock {
                 if (state == Actions.Melee) attack();
             }
             public void onCreate(){
-                load(getUnit(name,seed,clip.toString(),"Stamina:3&Speed:12&Attack:0&Level:3",Faction.Predator,"3,0,0","Melee"));
+                load(getUnit(name,seed,clip.toString(),"Stamina:3&Speed:12&Attack:0&Level:3",Faction.Predator,"3/1&0","Melee"));
             }
         };
         product.clip = new Body(product, getName());
@@ -889,7 +887,7 @@ public enum Stock {
                         i.buff(Buffs.Poison, 1);
                         i.vel.x = (i.pos.x > i.pos.x ? -1 : 1)*6;
                         i.vel.y -= 16;
-                        Sound.play(pos, "drink");
+                        Sound.play(map, pos, "drink");
                     }
                 }
             }
@@ -899,7 +897,7 @@ public enum Stock {
                 super.buff(buff, level);
             }
             public void onCreate(){
-                load(getUnit(getName(),seed,clip.toString(),"Stamina:7&Speed:6&Attack:0&Level:1",Faction.Predator,"3,0,0","Melee"));
+                load(getUnit(getName(),seed,clip.toString(),"Stamina:7&Speed:6&Attack:0&Level:1",Faction.Predator,"3/1&0","Melee"));
             }
             public void die(){
                 Threadball.create(map, -1, -1).pos.set(pos);
@@ -939,7 +937,7 @@ public enum Stock {
                 super.buff(buff, level);
             }
             public void onCreate(){
-                load(getUnit(getName(),seed,clip.toString(),"Stamina:14&Speed:12&Attack:0&Level:2",Faction.Predator,"3,0,0","Shock,Jump"));
+                load(getUnit(getName(),seed,clip.toString(),"Stamina:14&Speed:12&Attack:0&Level:2",Faction.Predator,"3/1&0","Shock,Jump"));
             }
         };
         product.clip = new Body(product, getName());
@@ -974,7 +972,7 @@ public enum Stock {
                 String moves;
                 if (seed % 2 == 1) moves = "Flameroll,Fireball";
                 else moves = "Fireblast";
-                load(getUnit(getName(),seed,clip.toString(),"Stamina:30&Speed:10&Attack:0&Level:7",Faction.Predator,"3,0,0",moves));
+                load(getUnit(getName(),seed,clip.toString(),"Stamina:30&Speed:10&Attack:0&Level:7",Faction.Predator,"3/1&0",moves));
             }
         };
         product.gravity = false;
@@ -987,7 +985,7 @@ public enum Stock {
                 return Math.max(0,damage-5);
             }
             public void onCreate(){
-                load(getUnit(getName(),seed,clip.toString(),"Stamina:30&Speed:10&Attack:0&Level:12",Faction.Predator,"3,0,0","Melee"));
+                load(getUnit(getName(),seed,clip.toString(),"Stamina:30&Speed:10&Attack:0&Level:12",Faction.Predator,"3/1&0","Melee"));
             }
         };
         product.gravity = false;
@@ -1000,7 +998,7 @@ public enum Stock {
                 return Math.max(0,damage-4);
             }
             public void onCreate(){
-                load(getUnit(getName(),seed,clip.toString(),"Stamina:30&Speed:30&Attack:0&Level:16",Faction.Predator,"3,0,0","Melee"));
+                load(getUnit(getName(),seed,clip.toString(),"Stamina:30&Speed:30&Attack:0&Level:16",Faction.Predator,"3/1&0","Melee"));
             }
         };
         product.gravity = false;

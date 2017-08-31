@@ -16,7 +16,7 @@ p:hit@;;;Ouch!;Oof!;Urgh!;Ow!
 p:x@Nooooooo!;Not like this...;I'm dead...;...
 merchant:c@Buy something!;Come see my wares!;Check out the newest wares here!;Need anything?;Selling goodies!;An honest merchant here!;Good wares, better prices!
 merchant:sold@HUEHUEHUE! Thanks!;Making money is my profession.;Thank you for your business.;Thank you!;Come back anytime!
-merchant:shop@Only the best!;Take a look!;Honest wares!
+merchant:use@Only the best!;Take a look!;Honest wares!
 merchant:x@;;;;;;Whyyyy....
 merchant:denied@Fine, you're the one on a loss!;Your loss.;Whatever.;Don't have the money?;You're missing out!;Others would pay double for these.
 merchant:talk@Come see my wares.;Yes?;Did you say something?;Would you like to shop?;

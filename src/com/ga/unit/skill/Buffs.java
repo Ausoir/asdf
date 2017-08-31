@@ -247,7 +247,7 @@ public enum Buffs {
     }}){ Buff makeLocal(){
         return new Buff(5) {
             public void onSet() {
-                Sound.play(host.pos, "fire");
+                Sound.play(host.map, host.pos, "fire");
                 time += level*3;
             }
             public boolean update() {
@@ -282,7 +282,7 @@ public enum Buffs {
             private Line[] lines;
             private final static int freezeThreshold = 24;
             public void onSet() {
-                Sound.play(host.pos, "freeze");
+                Sound.play(host.map, host.pos, "freeze");
                 var = host.get("Speed").add(-Math.round(host.getSpeed()*30), false);
                 host.get("Attack").add(-15, true);
                 time += level;
@@ -372,7 +372,7 @@ public enum Buffs {
             }
             public void onSet() {
                 time += level*6;
-                Sound.play(host.pos, "freeze");
+                Sound.play(host.map, host.pos, "freeze");
                 mark = new Thing(host.map, "Mark", host.seed, 150);
                 mark.image.setCenterType(2);
                 mark.pos = host.pos;
@@ -425,7 +425,7 @@ public enum Buffs {
         return new Buff(4) {
             private int tick = 1;
             public void onSet() {
-                Sound.play(host.pos, "freeze");
+                Sound.play(host.map, host.pos, "freeze");
             }
             public boolean update() {
                 tick++;
@@ -473,7 +473,7 @@ public enum Buffs {
     }}){ Buff makeLocal(){
         return new Buff(3) {
             public void onSet() {
-                Sound.play(host.pos, "stun");
+                Sound.play(host.map, host.pos, "stun");
                 time += level*2;
                 host.vel.x = 0;
                 host.stateSet(Actions.Hit);

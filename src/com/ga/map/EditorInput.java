@@ -237,7 +237,7 @@ public class EditorInput implements Input, Updatable, Drawable {
             save("map/"+p.substring(5));
         } else if (p.startsWith("load")){
             Global.maps.clear();
-            map = FileManager.loadMap(p.substring(5));
+            Global.player.changeMap(p.substring(5));
             init();
         } else if (p.equals("exit")){
             System.exit(0);
@@ -571,14 +571,8 @@ public class EditorInput implements Input, Updatable, Drawable {
             case KeyEvent.VK_INSERT:
                 Updater.editor = false;
                 map = null;
-                final P newPos = Global.camera.getAdd(0,0);
                 FileManager.loadPlayer(1);
-                FileManager.loadMap(map.name);
-                Updater.changeMapEvent = new Performer(){
-                    public void perform(){
-                        Global.player.pos.set(newPos);
-                    }
-                };
+                Global.player.changeMap(map.name+"@0");
                 break;
             case KeyEvent.VK_F2:
                 Updater.editor = !Updater.editor;

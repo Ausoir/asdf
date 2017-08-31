@@ -264,7 +264,7 @@ public class Item extends Prop {
     int durability = 1;
     int uses = 1;
     public ItemType type = ItemType.Throwing;
-    public int value = 8;
+    public int value = 100;
     Man owner;
     public Item(Map map, String name, int seed, Material[] materials, ItemType type) {
         super(map, name, seed);
@@ -428,7 +428,7 @@ public class Item extends Prop {
                 break;
         }
         if (smod == SpecialtyMod.Cursed){
-            r = Math.max(1,r-400);
+            r = Math.max(1,r-1000)*.7f;
         } else if (special) r += (r*adverb);
         if (emod != null){
             r *= emod.value;
@@ -481,12 +481,15 @@ public class Item extends Prop {
             host.buff(list.get(rand.nextInt(list.size())),rand.nextInt(9)+1);
         }
     }
+    public void disconnect(){
+        super.remove();
+    }
     public void remove(){
         if (owner != null && owner.weapon == this) owner.setWeapon(null);
         super.remove();
     }
     private void playSound(){
-        Sound.play(pos, type.sound);
+        Sound.play(map, pos, type.sound);
     }
     public boolean usable(int p){ //return: is item in usable state
         if ((isInfinite() || uses >= p) && Global.time >= cdTime[0]){

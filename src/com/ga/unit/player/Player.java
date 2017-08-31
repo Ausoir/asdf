@@ -52,7 +52,7 @@ public class Player extends Man {
         if (!leftHandMode){
             if (p != null) {
                 if (sheathe()) {
-                    Sound.play(pos, "wield");
+                    Sound.play(map, pos, "wield");
                 } else {
                     dropItem(weapon);
                 }
@@ -109,13 +109,13 @@ public class Player extends Man {
         return r;
     }
     public void stateSet(Actions state){
-        int penalty = Math.max(0, armor.armor[state.isLeg()?1:2].weight - get("Strength").get());
+        int penalty = Math.max(0, armor.armor[state.isLeg()?1:2].weight - get("Might").get())*10;
         Stat end = get("Endurance");
         if (end.get() > end.getMax()) penalty += (end.get()-end.getMax())/10;
         attackSpeed -= penalty;
         if (state.getCost() >= 0){
             end.add(state.getCost(), true);
-            get("Stamina").add(-penalty, false);
+            get("Stamina").add(-penalty/10, false);
             if (getVacancy() < state.getDifficulty()){
                 if (state.getDifficulty() > 0) say("Too encumbering! This action requires "+state.getDifficulty()+" extra encumbrance.");
                 else say("Too encumbering!");
@@ -193,7 +193,7 @@ public class Player extends Man {
                             item.start();
                             selectingItem = -1;
                         } else if (selectingItem >= 10 && selectingItem <= 16) {
-                            Sound.play(pos, "unwear");
+                            Sound.play(map, pos, "unwear");
                             int piece = selectingItem - 10;
                             if (sheathe() && !armor.isBare(piece)) {
                                 setWeapon(armor.armor[piece]);
@@ -224,9 +224,12 @@ public class Player extends Man {
         int power = getStatePower(state);
         return Math.max(0,power+1-difficulty);
     }
+    public int getWeight(){
+        return inventory.weight+armor.getWeight()+weapon.weight+offhand.weight;
+    }
     public float getSpeed() {
         float speed = get("Speed").get()*clip.getLegStatus();
-        float penalty = Math.max(0,inventory.weight+armor.getWeight()+weapon.weight+offhand.weight-get("Strength").get()*2);
+        float penalty = Math.max(0,getWeight()-get("Might").get()*2);
         return Math.max(0,speed-penalty)*.01f;
     }
     public boolean hasSkill(Actions move){
@@ -265,6 +268,17 @@ public class Player extends Man {
     public void update(){
         super.update();
         offhand.pos.set(pos.x + clip.organs[OFIST].ptd.x, pos.y + clip.organs[OFIST].ptd.y);
+    }
+    public void disconnect(){
+        super.disconnect();
+        offhand.disconnect();
+    }
+    public void start(){
+        super.start();
+        if (offhand != null){
+            offhand.map = map;
+            offhand.start();
+        }
     }
     public String toCharacterString(){
         StringBuilder r = new StringBuilder();

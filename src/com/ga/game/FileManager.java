@@ -89,7 +89,6 @@ public class FileManager {
     public static void loadGame(){
         loadActors();
         loadPlayer(1);
-        loadMap(Global.player.map.name);
     }
     public static void loadPlayer(int id){
         String[] data = read("Data/map/Player.user").split("%");
@@ -105,14 +104,9 @@ public class FileManager {
         pi.host.loadPlayer(data);
         pi.host.lastLand = new Line();
         Global.camera.set(pi.host.pos);
-    }
-    public static Map loadMap(String p) {
-        Map map = Global.getMap(p);
-        Global.player.map = map;
-        map.setTexture();
-        map.mapEdgeCenter(Global.camera = map.size.getMult(.5f,.5f));
-        map.onTimeChange();
-        return map;
+        pi.host.map.setTexture();
+        pi.host.map.mapEdgeCenter(Global.camera = pi.host.map.size.getMult(.5f, .5f));
+        pi.host.map.onTimeChange();
     }
 
     public static void loadActors(){

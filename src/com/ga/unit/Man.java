@@ -57,12 +57,12 @@ public class Man extends Unit {
 
     void stepSound(){
         String ground = map.getLand(lastLand.next);
-        if (Sound.has("step_" + ground)) Sound.play(pos, "step_" + ground);
-        else Sound.play(pos, "step_dirt");
+        if (Sound.has("step_" + ground)) Sound.play(map, pos, "step_" + ground);
+        else Sound.play(map, pos, "step_dirt");
     }
 
     public void attackSound(){
-        Sound.play(pos, "swing_normal");
+        Sound.play(map, pos, "swing_normal");
     }
 
     @Override
@@ -171,9 +171,17 @@ public class Man extends Unit {
         clip.organs[5].setImage(p);
     }
 
+    public void disconnect(){
+        super.remove();
+        weapon.disconnect();
+    }
+
     public void start(){
         super.start();
-        if (!wieldingNone()) weapon.start();
+        if (!wieldingNone()){
+            weapon.map = map;
+            weapon.start();
+        }
     }
 
     @Override

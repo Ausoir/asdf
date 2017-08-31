@@ -77,7 +77,7 @@ public class Health {
 //                +Math.min(4, strain.get('C'))
 //                +Math.min(4, strain.get('V'))
 //                +level+3);
-//        host.get("Strength").setMax((int) Math.ceil((float) strain.get('P')/3) + Math.min(2, strain.get('C')));
+//        host.get("Might").setMax((int) Math.ceil((float) strain.get('P')/3) + Math.min(2, strain.get('C')));
 //        host.get("Agility").setMax(4+Math.min(5, strain.get('V'))+Math.min(5,level));
 //        host.get("Memory").setMax(Math.max(1,strain.get('D')-strain.get('X')));
         host.get("Speed").setMax(20+strain.get('P')/3
