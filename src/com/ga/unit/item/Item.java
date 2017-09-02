@@ -60,73 +60,74 @@ public class Item extends Prop {
         }
     }
     public enum Material{
-        Wooden(.3f,2,32,1,new Color(118, 93, 0,60)),
-        Cloth(.6f,0,12,0),
-        Leather(.3f,1,50,1,new Color(133, 78, 32,140)),
-        Glass(.16f,1,1,7){
+        Wooden(.3f,2,32,1,0,new Color(118, 93, 0,60)),
+        Cloth(.6f,0,12,0,0),
+        Leather(.3f,1,50,1,1500,new Color(133, 78, 32,140)),
+        Glass(.16f,1,1,7,2000){
             public void onSet(Item host){
                 host.tags.add(Tag.Ice);
             }
         },
-        Brass(.36f,5,110,4,new Color(133, 123, 23,120)),
-        Copper(.3f,5,80,3,new Color(133, 92, 38,120)){
+        Brass(.36f,5,110,4,1500,new Color(133, 123, 23,120)),
+        Copper(.3f,5,80,3,1500,new Color(133, 92, 38,120)){
             public void onSet(Item host){
                 host.tags.add(Tag.Electric);
             }
         },
-        Bronze(.24f,5,500,4,new Color(133, 72, 0,200)),
-        Iron(.24f,4,600,5),
-        Silver(.1f,6,140,3){
+        Bronze(.24f,5,500,4,1500,new Color(133, 72, 0,200)),
+        Iron(.24f,4,600,5,2000),
+        Silver(.1f,6,140,3,4000){
             public void onSet(Item host){
                 host.tags.add(Tag.Mutation);
             }
         },
-        Gold(.16f,12,40,2){
+        Gold(.16f,12,40,2,5000){
             public void onSet(Item host){
                 host.tags.add(Tag.Electric);
             }
         },
-        Lead(.2f,7,50,2,new Color(19, 31, 75,180)){
+        Lead(.2f,7,50,2,1500,new Color(19, 31, 75,180)){
             public void onSet(Item host){
                 host.tags.add(Tag.Electric);
             }
         },
-        Steel(.1f,4,8000,6),
-        Titanium(.01f,3,-1,7),
-        Crystal(.04f,8,24,12,new Color(28, 133, 67,120)){
+        Steel(.1f,4,8000,6,8000),
+        Titanium(.01f,3,-1,7,30000),
+        Crystal(.04f,8,24,12,2000,new Color(28, 133, 67,120)){
             public void onSet(Item host){
                 host.tags.add(Tag.Ice);
             }
         },
-        Obsidian(.06f,3,40,4){
+        Obsidian(.06f,3,40,4,8000){
             public void onSet(Item host){
                 host.tags.add(Tag.Shadow);
                 host.tags.add(Tag.Fire);
             }
         },
-        Bone(.16f,1,80,3){
+        Bone(.16f,1,80,3,3000){
             public void onSet(Item host){
                 host.tags.add(Tag.Conjuration);
             }
         },
-        Other(0,0,10,0),
-        Flesh(.05f,0,-1,0){
+        Other(0,0,10,0,0),
+        Flesh(.05f,0,-1,0,0){
             public void onSet(Item host){
                 host.tags.add(Tag.Mutation);
             }
         },
-        Stone(.1f,6,5,5,new Color(107, 107, 107,255));
-        int weight, durability, hardness;
+        Stone(.1f,6,5,5,0,new Color(107, 107, 107,255));
+        int weight, durability, hardness, value;
         Color color;
         float prevalence;
-        Material(float prevalence, int weight, int durability, int hardness){
+        Material(float prevalence, int weight, int durability, int hardness, int value){
             this.prevalence = prevalence;
             this.weight = weight;
             this.durability = durability;
             this.hardness = hardness;
+            this.value = value;
         }
-        Material(float prevalence, int weight, int durability, int hardness, Color color){
-            this(prevalence, weight,durability,hardness);
+        Material(float prevalence, int weight, int durability, int hardness, int value, Color color){
+            this(prevalence, weight,durability,hardness, value);
             this.color = color;
         }
         void onSet(Item host){}
@@ -272,6 +273,7 @@ public class Item extends Prop {
         setType(type);
         material = Material.get(rand, materials);
         setMaterial(material);
+        value += material.value;
         cdTime = new int[]{Global.time};
         final Item me = this;
         onInteract = new Interactive(){
@@ -285,6 +287,7 @@ public class Item extends Prop {
         randomSize(new P(.2f,.2f));
         range = getSize()-8;
     }
+    public void onField(){}
     protected void imbueMeta(boolean canSmod, boolean canAdmod, float emodProb){
         pmod = PrefixMod.get(rand);
         if (canSmod) smod = SpecialtyMod.get(rand);
@@ -431,7 +434,7 @@ public class Item extends Prop {
             r = Math.max(1,r-1000)*.7f;
         } else if (special) r += (r*adverb);
         if (emod != null){
-            r *= emod.value;
+            r += emod.value;
         }
         return (int) r;
     }

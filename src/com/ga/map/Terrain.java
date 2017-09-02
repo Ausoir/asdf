@@ -91,6 +91,12 @@ public class Terrain extends ShadedPicture implements Drawable{
 //            for (Line i : lines) g.drawLine((int)(t.x+i.pt.x),(int)(t.y+i.pt.y),(int)(t.x+i.ptd.x),(int)(t.y+i.ptd.y));
         }
     }
+    public void draw(Graphics2D g, P offset){
+        if (visible) {
+            g.drawImage(image,(int)(pos.x+Global.rel.x+offset.x), (int) (pos.y+Global.rel.y+offset.y),finalSize.x(),finalSize.y(),null);
+//            for (Line i : lines) g.drawLine((int)(t.x+i.pt.x),(int)(t.y+i.pt.y),(int)(t.x+i.ptd.x),(int)(t.y+i.ptd.y));
+        }
+    }
 
     @Override
     public int getDepth() {

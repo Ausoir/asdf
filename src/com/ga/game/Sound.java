@@ -7,6 +7,7 @@ import com.ga.tool.P;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -62,6 +63,9 @@ public class Sound {
             }
             Clip clip = AudioSystem.getClip(null);
             clip.open(ais);
+            FloatControl gainControl =
+                    (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+            gainControl.setValue(Settings.volumn);
             return clip;
         } catch (Exception e) {
             e.printStackTrace();

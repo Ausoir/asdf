@@ -178,7 +178,7 @@ public class Body {
     }
 
     private int getHeight(){
-        return legNum==0?0:localAnimation[0][getLeg()][1];
+        return legNum==0?0:localAnimation[0][getLeg()][1]-4;
     }
 
     P randomPoint(){

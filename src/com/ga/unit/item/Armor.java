@@ -16,7 +16,7 @@ public class Armor extends Item {
     public Armor(Map map, String name, int seed, int piece, int encumbrance, int pockets, Material[] materials) {
         super(map, name, seed, materials, ItemType.Armor);
         this.encumbrance = encumbrance;
-        value = 1000;
+        value = value*2 + 500;
         this.pocket = pockets;
         this.piece = piece;
         delay = 80;

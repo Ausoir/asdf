@@ -2,6 +2,7 @@ package com.ga.unit;
 
 import com.ga.game.FileManager;
 import com.ga.game.Sound;
+import com.ga.map.Building;
 import com.ga.map.Creation;
 import com.ga.map.Global;
 import com.ga.map.Map;
@@ -145,6 +146,11 @@ public enum Stock {
     Player{ Prop make(Map map, int id, int seed){
         if (id == 1) return new MainPlayer(map, seed);
         return new Player(map, seed);
+    }},
+    Construct{ Prop make(Map map, int id, int seed){
+        Building product = new Building(map, id+"", 0);
+        product.subId = id;
+        return product;
     }},
     Manual{ Prop make(Map map, int id, int seed){
         Item product = new Item(map, getName(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Scroll){
@@ -317,16 +323,18 @@ public enum Stock {
                 }
                 return false;
             }
-            public void onCreate(){
+            private void makeSpell(){
                 ArrayList<Actions> list = Actions.getLearnables();
                 spell = list.get(rand.nextInt(list.size()));
                 range = spell.getRange(null);
+                value = 100 + 100*(spell.getDifficulty() * spell.getTrainers().size());
+            }
+            public void onCreate(){
+                makeSpell();
             }
             public String[] load(String p){
                 String[] r = super.load(p);
-                ArrayList<Actions> list = Actions.getLearnables();
-                spell = list.get(rand.nextInt(list.size()));
-                range = spell.getRange(null);
+                makeSpell();
                 return r;
             }
             public String getName(){
@@ -334,7 +342,6 @@ public enum Stock {
                 return super.getName()+" of "+spell.getName();
             }
         };
-        product.value = 16;
         product.probability = 1;
         product.delay = 30;
         return product;

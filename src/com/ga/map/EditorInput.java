@@ -1,10 +1,12 @@
 package com.ga.map;
 
-import com.ga.game.*;
+import com.ga.game.FileManager;
+import com.ga.game.Input;
+import com.ga.game.Processes;
+import com.ga.game.Settings;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
-import com.ga.unit.AI;
 import com.ga.unit.Prop;
 import com.ga.unit.Stock;
 import com.ga.unit.Unit;
@@ -48,6 +50,7 @@ public class EditorInput implements Input, Updatable, Drawable {
         init();
         Processes.editorMode();
         currentO = new Prop(map, "Error", 0);
+        Global.updates.time = -1;
     }
 
     private void init(){
@@ -205,6 +208,10 @@ public class EditorInput implements Input, Updatable, Drawable {
         } else if (p.startsWith("smooth")){
             smooth = Integer.parseInt(p.substring(7));
             message("Select a land to smooth");
+        } else if (p.startsWith("clean")){
+            map.clean();
+        } else if (p.startsWith("normalize")){
+            map.normalize(4,4);
         } else if (p.startsWith("gen land")){
             int depth = Integer.parseInt(p.substring(9));
             Creation.prepareRandom(-(int) (Math.random()*1000));
@@ -237,10 +244,15 @@ public class EditorInput implements Input, Updatable, Drawable {
             save("map/"+p.substring(5));
         } else if (p.startsWith("load")){
             Global.maps.clear();
-            Global.player.changeMap(p.substring(5));
+            Global.player.changeMap(p.substring(5)+"@0");
+            map = Global.player.map;
             init();
         } else if (p.equals("exit")){
             System.exit(0);
+        } else if (p.startsWith("build")){
+            Prop t = Stock.Construct.create(map, Integer.parseInt(p.substring(6)), -1);
+            t.pos.set(x,y);
+            t.start();
         } else if (p.startsWith("o")){
             try {
                 selectTool(Tool.OBJECT);
@@ -580,6 +592,7 @@ public class EditorInput implements Input, Updatable, Drawable {
         }
     }
     private Prop make(String name, P p){
+        if (name == null) return new Prop(map, "Error", 0);
         int seed = -1;
         if (name.contains(":")){
             seed = Integer.parseInt(name.split(":")[1]);
@@ -650,6 +663,7 @@ public class EditorInput implements Input, Updatable, Drawable {
     private void save(String p){
         currentO.remove();
         message("Saved ("+p+")");
+        map.clean();
         FileManager.saveMap(p);
         FileManager.saveWorld();
     }

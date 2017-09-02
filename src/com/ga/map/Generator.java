@@ -191,7 +191,7 @@ class Generator {
         door.pos.set(doorPos);
 //        Stock.Exit.create(map, returnDoorSeed).pos.set(doorPos.x,doorPos.y);
         Stock.Spawn.create(map, -1,returnDoorSeed).pos.set(doorPos.x,doorPos.y);
-        normalize(800,400);
+        map.normalize(800,400);
         generateBlocker(2,trail.terrain);
     }
     void generateLand(int depth, P mapSize){
@@ -311,25 +311,6 @@ class Generator {
             }
         }
         generateBlocker(startDepth+2,trail.terrain);
-    }
-    void normalize(int marginX, int marginY){
-        P high = new P(), low = new P();
-        for (Line i : map.land){
-            low.x = Math.min(Math.min(low.x,i.pt.x),i.ptd.x);
-            low.y = Math.min(Math.min(low.y,i.pt.y),i.ptd.y);
-            high.x = Math.max(Math.max(high.x,i.pt.x),i.ptd.x);
-            high.y = Math.max(Math.max(high.y,i.pt.y),i.ptd.y);
-        }
-        P margin = new P(marginX, marginY);
-        int maxDiffX = (int) (high.x-low.x)+margin.x();
-        int maxDiffY = (int) (high.y-low.y)+margin.y();
-        map.size = new P(maxDiffX, maxDiffY);
-        P adjustment = new P(0,low.y*-1+margin.y);
-        for (Line i : map.land) {
-            i.pt = i.pt.getAdd(adjustment);
-            i.ptd = i.ptd.getAdd(adjustment);
-        }
-        map.updater.normalize(adjustment);
     }
     void generateFloor(int depth, P mapSize, int randomness, int varianceY, String[] texture){
         float horizon = mapSize.y-600;

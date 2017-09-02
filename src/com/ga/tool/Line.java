@@ -58,6 +58,9 @@ public class Line {
     public boolean clockwise(){
         return pt.x <= ptd.x;
     }
+    public boolean vertical(){
+        return pt.x == ptd.x;
+    }
     public float getAtan(){
         return (float) Math.atan2(ptd.y-pt.y,ptd.x-pt.x);
     }

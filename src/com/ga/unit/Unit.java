@@ -52,7 +52,7 @@ public class Unit extends Prop {
         map = Global.getMap(sections[6]);
         clip.load(sections[7]);
         faction = Faction.valueOf(sections[9]);
-        brain = Intelligence.get(sections[10], this);
+        Intelligence.get(sections[10], this);
         stats.load(sections[8]);
         String[] movesets = sections[11].split(",");
         moveset = new Actions[movesets.length];
@@ -240,7 +240,7 @@ public class Unit extends Prop {
         super.collide();
         if (!jump) {
             jumpAcross++;
-            if (jumpAcross > 5) lastLand = new Line();
+            if (jumpAcross == 6) lastLand = new Line();
         } else jumpAcross = 0;
     }
 

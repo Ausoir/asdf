@@ -1,9 +1,7 @@
 package com.ga.map;
 
-import com.ga.game.FileManager;
 import com.ga.game.Observer;
 import com.ga.tool.P;
-import com.ga.tool.Performer;
 import com.ga.unit.*;
 import com.ga.unit.skill.Actions;
 
@@ -96,7 +94,7 @@ public class Updater {
         map.weather.draw(g2);
     }
     public void remove(Observer p){
-        removeQueue.add(p);
+        if (!addQueue.remove(p)) removeQueue.add(p);
     }
     public void resetDepth(Drawable p){
         if (drawee.remove(p)) addDrawee(p);
@@ -122,7 +120,7 @@ public class Updater {
         return result;
     }
     public static String toActorString(){
-        String result = "";
+        String result = Global.player.toStringMain()+"\n";
         ArrayList<Map> maps = (ArrayList<Map>) Global.maps.clone();
         for (Map map : maps) {
             for (Unit i : map.updater.unitsLoaded) {
@@ -284,7 +282,7 @@ public class Updater {
         }
     }
 
-    void normalize(P adjustment) {
+    void adjust(P adjustment) {
         for (Observer i : addQueue){
             if (i instanceof Prop){
                 ((Prop)i).pos = ((Prop)i).pos.getAdd(adjustment);

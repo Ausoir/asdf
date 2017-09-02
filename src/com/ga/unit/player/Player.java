@@ -41,6 +41,7 @@ public class Player extends Man {
         inventory = new Inventory(this);
         crafting = new Crafts(this);
         health = new Health(this);
+        tags.add(Tag.Unarmed);
         tags.add(Tag.Athletics);
         tags.add(Tag.Might);
         tags.add(Tag.Agility);
@@ -290,7 +291,7 @@ public class Player extends Man {
         r.append(crafting.toString()).append("\n");
         return r.toString();
     }
-    public void loadTraits(String p){
+    private void loadTraits(String p){
         String[] traits = p.split(";");
         for (String i : traits){
             if (!i.equals("")){

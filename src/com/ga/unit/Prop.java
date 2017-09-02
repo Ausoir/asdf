@@ -68,21 +68,7 @@ public class Prop extends Thing {
                         float slope = land.getSlope();
                         boolean cw = land.clockwise();
                         float lineY = land.getCrossPointY(pos.x);
-                        boolean touching = cw && lineY >= pos.y;
-                        if (touching && lastLand.depth == -1) {
-                            Line testt = new Line(pos.x, pos.y - 9999, pos.x, pos.y);
-                            int cws = 0, ccs = 0; //check if landsite is overlapped behind a higher depth polygon
-                            boolean overlapped = false;
-                            for (Line ii : map.landRaw) {
-                                if (ii.depth > land.depth && ii.lineCross(testt)) {
-                                    overlapped = true;
-                                    if (ii.clockwise()) cws++;
-                                    else ccs++;
-                                }
-                            }
-                            if (overlapped && cws > ccs) touching = false;
-                        }
-                        if (touching) {
+                        if (cw && lineY >= pos.y) {
                             onCollide(land);
                             float atan = (float) Math.atan(slope);
                             if (vel.x > 0 != atan > 0) vel.x = vel.x * Global.cos(atan);

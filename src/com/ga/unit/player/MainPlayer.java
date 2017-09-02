@@ -20,6 +20,7 @@ public class MainPlayer extends Player {
     public MainPlayer(Map map, int seed) {
         super(map, seed);
         Global.player = this;
+        save = false;
     }
     @Override
     public void say(String p){
@@ -185,6 +186,13 @@ public class MainPlayer extends Player {
         super.start();
         indicater = new Indicater(this);
         indicater.setMeasuree(get("Stamina"));
+    }
+    public String toStringMain(){
+        boolean save = this.save;
+        this.save = true;
+        String r = super.toString();
+        this.save = save;
+        return r;
     }
     public String toCharacterString() {
         return super.toCharacterString()+input.toString()+"\n";

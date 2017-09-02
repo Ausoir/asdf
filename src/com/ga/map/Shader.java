@@ -203,18 +203,24 @@ public enum Shader{
     }),
     Grass(new ShaderRenderer(){
         protected BufferedImage render(BufferedImage image, int x1, int x2, int y1, float slope){
+            int[] targetC = new int[]{10,95,10};
             int y2 = image.getHeight()-1;
             for (int ix = x1; ix < x2; ix++) {
                 int ty = y1 + (int) ((ix - x1) * slope);
-                for (int iy = -1; iy < 50; iy++) {
+                for (int iy = -20; iy < 50; iy++) {
                     int y = Math.min(ty+iy,y2);
                     if (y >= 0) {
                         int rgb = image.getRGB(ix, y);
-                        int shadeMag = -(150 - (iy * 3));
                         int alpha = (rgb & 0xff000000) >>> 24;
-                        int red = Math.max(((rgb & 0xff0000) >>> 16) + shadeMag, 0);
-                        int green = Math.max(((rgb & 0xff00) >>> 8), 0);
-                        int blue = Math.max(((rgb & 0xff)) + shadeMag, 0);
+                        int red = ((rgb & 0xff0000) >>> 16);
+                        int green = ((rgb & 0xff00) >>> 8);
+                        int blue = ((rgb & 0xff));
+                        int ny = 70-(iy+20);
+                        red = (int) Global.clamp(((targetC[0] - red)/70f * ny)+red+Global.r.nextInt(16)-8,0,255);
+                        green = (int) Global.clamp(((targetC[1] - green)/70f * ny)+green+Global.r.nextInt(16)-8,0,255);
+                        blue = (int) Global.clamp(((targetC[2] - blue)/70f * ny)+blue+Global.r.nextInt(16)-8,0,255);
+                        float sin = (float) (Math.sin(ix*.05f) + Math.cos(ix*.01f) - Math.sin(ix*.5f)*.05f);
+                        if (sin < .4f && sin+iy*.5f < .5f) alpha = 0;
                         image.setRGB(ix, y, new Color(red, green, blue, alpha).getRGB());
                     }
                 }

@@ -17,6 +17,7 @@ public class Settings {
     static int spu;
     static int spc;
     static int spo;
+    static int volumn;
     static void init(){
         String[] lines = FileManager.read("Data/raw/Settings.txt").split("%");
         for (String i : lines){
@@ -57,6 +58,9 @@ public class Settings {
                     break;
                 case "spo":
                     spo = value;
+                    break;
+                case "volumn":
+                    volumn = value;
                     break;
             }
         }

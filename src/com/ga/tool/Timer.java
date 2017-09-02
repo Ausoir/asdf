@@ -7,9 +7,6 @@ public class Timer {
     public int max;
     public int time;
     private boolean repeat = false;
-    public Timer(String p){
-        load(p);
-    }
     public Timer(int time, boolean repeat){
         set(time, repeat);
     }
@@ -26,9 +23,6 @@ public class Timer {
     }
     public void reset(){
         time = max;
-    }
-    public float getPercentage(){
-        return (10-(int)((time/(float)max)*10))/10f;
     }
     public boolean over(){
         return time == 0;

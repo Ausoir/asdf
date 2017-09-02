@@ -335,6 +335,7 @@ public enum Intelligence {
     public static AI get(String p, Unit host){
         String[] data = p.split("/");
         AI r = values()[Integer.parseInt(data[0])].make(host);
+        host.brain = r;
         r.load(p);
         return r;
     }

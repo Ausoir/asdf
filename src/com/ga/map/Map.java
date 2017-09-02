@@ -21,7 +21,7 @@ public class Map {
     public Weather weather = new Weather();
     public ArrayList<Line> land = new ArrayList<>();
     public ArrayList<Line> landRaw = new ArrayList<>();
-    HashMap<Integer, String> formTextures = new HashMap<>();
+    public HashMap<Integer, String> formTextures = new HashMap<>();
     public HashMap<Integer, Terrain> terrains = new HashMap<>();
     private static HashMap<String, String> defaultProps = new HashMap<String, String>(){{
         put("grass","Rock=.1,Bush=.2,Weed=1");
@@ -309,5 +309,43 @@ public class Map {
         if (size.x > Settings.screenX && size.y > Settings.screenY)
             p.set(Global.clamp(p.x, Settings.centerX+margin, size.x-Settings.centerX-margin),
                     Global.clamp(p.y, Settings.centerY+40+margin, size.y-Settings.centerY-margin-margin));
+    }
+
+    void clean(){
+        Iterator it = formTextures.entrySet().iterator();
+        while (it.hasNext()){
+            boolean check = false;
+            java.util.Map.Entry pair = (java.util.Map.Entry) it.next();
+            int key = (int) pair.getKey();
+            for (Line i : landRaw){
+                if (i.next == key){
+                    check = true;
+                    break;
+                }
+            }
+            if (!check){
+                it.remove();
+            }
+        }
+    }
+
+    void normalize(int marginX, int marginY){
+        P high = new P(), low = size.getAdd(0,0);
+        for (Line i : landRaw){
+            low.x = Math.min(Math.min(low.x,i.pt.x),i.ptd.x);
+            low.y = Math.min(Math.min(low.y,i.pt.y),i.ptd.y);
+            high.x = Math.max(Math.max(high.x,i.pt.x),i.ptd.x);
+            high.y = Math.max(Math.max(high.y,i.pt.y),i.ptd.y);
+        }
+        P margin = new P(marginX, marginY);
+        int maxDiffX = (int) (high.x-low.x)+margin.x();
+        int maxDiffY = (int) (high.y-low.y)+margin.y();
+        size = new P(maxDiffX, maxDiffY);
+        P adjustment = new P(-low.x+marginX/2,-low.y+marginY/2);
+            for (Line i : landRaw) {
+            i.pt = i.pt.getAdd(adjustment);
+            i.ptd = i.ptd.getAdd(adjustment);
+        }
+        if (updater != null) updater.adjust(adjustment);
     }
 }
