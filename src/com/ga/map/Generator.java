@@ -68,7 +68,7 @@ class Generator {
         generateFloor(max+1, mapSize, Creation.r.nextInt(4) + 7, 20, new String[]{landTexture[Creation.r.nextInt(landTexture.length)]});
         for (int i=0;i<map.land.size();i++){
             Line l = map.land.get(i);
-            if (l.next >= 0 && l.clockwise() && Math.abs(l.getSlope()) < .1f) {
+            if (l.tid >= 0 && l.clockwise() && Math.abs(l.getSlope()) < .1f) {
                 if (Math.abs(l.getSlope()) < .01f) map.placeProp(l, "SteamHouse=.1,TowerHouse=1", -1);
                 else map.placeProp(l, "SteamHouse=1", -1);
                 for (int ii=0;ii<Creation.r.nextInt(9);ii++) map.placeProp(l,"Stack=.2,Barrel=.5,Crate=1", -1);
@@ -92,7 +92,7 @@ class Generator {
         baseline.finish("0&steel&road");
         ArrayList<TerrainTrail> alltrails = new ArrayList<>();
         for (Line l : map.land){
-            if (l.next == -1 && Creation.r.nextInt(3)!=0){
+            if (l.tid == -1 && Creation.r.nextInt(3)!=0){
                 Line next;
                 boolean right = Creation.r.nextBoolean();
                 if (right) next = new Line(l.ptd.x+fragment-8,l.ptd.y-500,l.ptd.x+fragment-8,l.ptd.y+500);
@@ -101,7 +101,7 @@ class Generator {
                     if (l2.lineCross(next)){
                         TerrainTrail trail;
                         int margin = 16;
-                        if (l2.next != -1) margin += Creation.r.nextInt((int) (l.ptd.x-l.pt.x-32));
+                        if (l2.tid != -1) margin += Creation.r.nextInt((int) (l.ptd.x-l.pt.x-32));
                         if (right) {
                             trail = new TerrainTrail(map, l.ptd.getAdd(-20, 0));
                             trail.add(l2.pt.getAdd(margin-4, 0));
@@ -297,7 +297,7 @@ class Generator {
             for (int i=0;i<mapSize.x/spacing;i++) {
                 int cx = spacing*i;
                 for (Line l : map.land) {
-                    if (l.next >= 0 && l.clockwise() && l.getSlope() == 0 && cx-l.pt.x>spacing/2-10 && l.ptd.x-cx>spacing/2-10 && Global.r.nextInt(3)!=0) {
+                    if (l.tid >= 0 && l.clockwise() && l.getSlope() == 0 && cx-l.pt.x>spacing/2-10 && l.ptd.x-cx>spacing/2-10 && Global.r.nextInt(3)!=0) {
                         float y = l.getCrossPointY(cx);
                         if (merchantType == 1 || merchantType == 2) {
                             Stock.getByName(map, "Shorttable", -1).pos.set(cx, y - 1);
@@ -331,7 +331,7 @@ class Generator {
         float highX = 0;
         Line high = null;
         for (final Line i : map.landRaw) {
-            if (i.next == p) {
+            if (i.tid == p) {
                 if (i.pt.x > highX) {
                     highX = i.pt.x;
                     high = i;
@@ -340,7 +340,7 @@ class Generator {
         }
         TerrainTrail blocker = null;
         for (final Line i : map.landRaw) {
-            if (i.next == high.next){
+            if (i.tid == high.tid){
                 if (blocker == null) blocker = new TerrainTrail(map, new P(i.pt));
                 else blocker.add(i.pt.x, i.pt.y);
                 if (i == high){
@@ -359,7 +359,7 @@ class Generator {
         Line i;
         while (it.hasNext()) {
             i = (Line) it.next();
-            if (i.next == p) it.remove();
+            if (i.tid == p) it.remove();
         }
         map.landRaw.add(new Line(-64,map.size.y+64, -64,-64, p,0));
         map.landRaw.add(new Line(-64,-64, map.size.x+64,-64, p,0));

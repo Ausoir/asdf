@@ -1,6 +1,7 @@
 package com.ga.map;
 
 import com.ga.game.Observer;
+import com.ga.tool.Grapher;
 import com.ga.tool.P;
 import com.ga.unit.*;
 import com.ga.unit.skill.Actions;
@@ -14,8 +15,8 @@ import java.util.ArrayList;
 public class Updater {
     public static boolean editor = false;
     private Map map;
-    private ArrayList<Drawable> drawee = new ArrayList<>();
-    private ArrayList<Effect> effects = new ArrayList<>();
+    private Drawable drawee;
+    private ArrayList<Particle> effects = new ArrayList<>();
     private ArrayList<Updatable> updatee = new ArrayList<>();
     ArrayList<Prop> props = new ArrayList<>();
     ArrayList<AI> controllee = new ArrayList<>();
@@ -25,9 +26,10 @@ public class Updater {
 
     public Updater(Map map){
         this.map = map;
+        drawee = new Drawable() {};
     }
     void clear(){
-        drawee.clear();
+        drawee = new Drawable() {};
         effects.clear();
         addQueue.clear();
         removeQueue.clear();
@@ -45,6 +47,7 @@ public class Updater {
     public void update(){
         while (addQueue.size() > 0){
             Observer p = addQueue.remove(0);
+            if (p instanceof Drawable) drawee.add((Drawable) p);
             if (p instanceof Unit){
                 Unit unit = (Unit)p;
                 if (((Unit)p).map == map){
@@ -59,13 +62,12 @@ public class Updater {
                 props.add(obj);
                 (obj).onField();
             }
-            if (p instanceof Effect) effects.add((Effect) p);
+            if (p instanceof Particle) effects.add((Particle) p);
             if (p instanceof AI) controllee.add((AI) p);
-            if (p instanceof Drawable) addDrawee((Drawable) p);
         }
         while (removeQueue.size() > 0){
             Observer p = removeQueue.remove(0);
-            drawee.remove(p);
+//            drawee.remove((Drawable) p);
             props.remove(p);
             unitsLoaded.remove(p);
             controllee.remove(p);
@@ -77,39 +79,34 @@ public class Updater {
             for (Unit i : unitsLoaded) i.update();
         }
         for (int i = 0; i < effects.size(); i++) {
-            Effect t = effects.get(i);
+            Particle t = effects.get(i);
             if (t.over()){
-                drawee.remove(t);
+                t.remove();
                 effects.remove(t);
             }
         }
     }
     public void draw(Graphics2D g2){
-        ArrayList<Drawable> draweeTest = (ArrayList<Drawable>) drawee.clone();
         Global.setRel();
-        for (Drawable i : draweeTest){
-            i.draw(g2);
+        Drawable t = drawee;
+        while (t != null){
+           t.draw(g2);
+            t = t.next;
         }
 //        Grapher.draw(g2);
-        map.weather.draw(g2);
+//        printDraw();
+    }
+    private ArrayList<Drawable> printDraw(){
+        ArrayList<Drawable> stack = new ArrayList<>();
+        Drawable t = drawee;
+        while (t.next != null){
+            stack.add(t);
+            t = t.next;
+        }
+        return stack;
     }
     public void remove(Observer p){
         if (!addQueue.remove(p)) removeQueue.add(p);
-    }
-    public void resetDepth(Drawable p){
-        if (drawee.remove(p)) addDrawee(p);
-    }
-    private void addDrawee(Drawable p){
-        int size = drawee.size();
-        if (size > 0) {
-            for (int i = 0; i < size; i++) {
-                if (drawee.get(i).getDepth() >= p.getDepth()){
-                    drawee.add(i, p);
-                    return;
-                }
-            }
-        }
-        drawee.add(p);
     }
     public String toString(){
         String result = "";
@@ -119,13 +116,18 @@ public class Updater {
         if (result.length() > 0) result = result.substring(0,result.length()-1);
         return result;
     }
-    public static String toActorString(){
-        String result = Global.player.toStringMain()+"\n";
+    public String toActorString(){
+        String result = "";
+        for (Unit i : map.updater.unitsLoaded) {
+            if (i.save) result += i.toString() + "\n";
+        }
+        return result;
+    }
+    public static String toAllActorString(){
+        String result = "";
         ArrayList<Map> maps = (ArrayList<Map>) Global.maps.clone();
         for (Map map : maps) {
-            for (Unit i : map.updater.unitsLoaded) {
-                if (i.save) result += i.toString() + "\n";
-            }
+            result += map.updater.toActorString();
         }
         return result;
     }
@@ -274,12 +276,6 @@ public class Updater {
             }
         }
         return new P();
-    }
-
-    void unrender() {
-        for (Observer i : drawee){
-            if (i instanceof Terrain) remove(i);
-        }
     }
 
     void adjust(P adjustment) {

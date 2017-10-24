@@ -10,7 +10,7 @@ import java.awt.*;
 /**
  * Created by ga on 4/23/17. asd
  */
-public class Indicater implements Drawable {
+public class Indicater extends Drawable {
     private Player host;
     private Color bg = new Color(58, 60, 60,0);
     private Color fg = new Color(2, 196, 0, 0);
@@ -29,6 +29,7 @@ public class Indicater implements Drawable {
             bgFade[i] = new Color(58, 60, 60, i * 17);
             fgFade[i] = new Color(19, 86, 43, i * 15);
         }
+        setDepth(15);
     }
     void remove(){
         host.map.updater.remove(this);
@@ -50,10 +51,6 @@ public class Indicater implements Drawable {
             g.setColor(sg);
             g.drawString(cd+"",x-29,y+25);
         }
-    }
-    @Override
-    public int getDepth() {
-        return 150;
     }
     void show(float strength){
         fade = strength;

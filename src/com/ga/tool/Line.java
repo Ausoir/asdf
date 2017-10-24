@@ -11,9 +11,10 @@ public class Line {
     public static float MAXSLOPE = 1.5f;
     public P pt;
     public P ptd;
-    public int next = -1;
+    public int tid = -1;
     public int opt = 0; //0:normal,1:intangible
-    public int depth = -1;
+    public float depth = -1;
+
     public Line(String p){
         load(p);
     }
@@ -23,7 +24,7 @@ public class Line {
         for (int i=0;i<data.length;i++) intdata[i] = Float.parseFloat(data[i]);
         pt = new P(new P(intdata[0], intdata[1]));
         ptd = new P(new P(intdata[2], intdata[3]));
-        next = (int) intdata[4];
+        tid = (int) intdata[4];
         opt = (int) intdata[5];
     }
     public Line(){
@@ -34,22 +35,22 @@ public class Line {
         pt = new P(x,y);
         ptd = new P(x1,y1);
     }
-    public Line(float x, float y, float x1, float y1, int next, int opt){
+    public Line(float x, float y, float x1, float y1, int tid, int opt){
         this(x,y,x1,y1);
-        this.next = next;
+        this.tid = tid;
         this.opt = opt;
     }
-    public Line(float x, float y, float x1, float y1, int next, int opt, int depth){
-        this(x,y,x1,y1,next,opt);
+    public Line(float x, float y, float x1, float y1, int tid, int opt, float depth){
+        this(x,y,x1,y1, tid,opt);
         this.depth = depth;
     }
     public Line(P p1, P p2){
         pt = p1;
         ptd = p2;
     }
-    public Line(P p1, P p2, int next, int opt){
+    public Line(P p1, P p2, int tid, int opt){
         this(p1, p2);
-        this.next = next;
+        this.tid = tid;
         this.opt = opt;
     }
     public Line getAdd(P p){
@@ -95,6 +96,10 @@ public class Line {
         g.drawLine((int) (offset.x+pt.x+x), (int) (offset.y+pt.y+y), (int) (offset.x+ptd.x+x), (int) (offset.y+ptd.y+y));
     }
     public String toString(){
-        return pt + "," + ptd + "," + next + "," + opt;
+        return pt + "," + ptd + "," + tid + "," + opt;
+    }
+
+    public P getMidpoint() {
+        return new P(Math.abs(ptd.x-pt.x)/2+pt.x,Math.abs(ptd.y-pt.y)/2+pt.y);
     }
 }

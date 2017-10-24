@@ -7,7 +7,7 @@ import java.awt.*;
 /**
  * Created by Ga on 9/2/2016. asd
  */
-public class Weather implements Drawable{
+public class Weather extends Drawable{
     private static int[][] colors = new int[][]{
             new int[]{120,40,220,50},
             new int[]{150,0,150,100},
@@ -22,9 +22,14 @@ public class Weather implements Drawable{
             new int[]{0,0,0,70},
             new int[]{0,0,0,70}
     };
+    private Map map;
     private float fade = 0;
     private static Color color = new Color(0,0,0,0);
     private static int[] fromColor=new int[]{0,0,0,0}, toColor=new int[]{0,0,0,0};
+
+    Weather(Map map){
+        this.map = map;
+    }
     private static Color addition(int[] a, int[] b, float rate){
         return new Color((int) Global.clamp(a[0]+((b[0]-a[0])*rate),0,255),
                 (int) Global.clamp(a[1]+((b[1]-a[1])*rate),0,255),
@@ -53,6 +58,9 @@ public class Weather implements Drawable{
     boolean isNight(){
         return Global.getHour() % colors.length >= 8;
     }
+    public void start(){
+        map.updater.addQueue.add(this);
+    }
     @Override
     public void draw(Graphics2D g) {
         if (fade < 1){
@@ -61,10 +69,11 @@ public class Weather implements Drawable{
         }
         g.setColor(color);
         g.fillRect(0, 0, Settings.screenX, Settings.screenY);
+        super.draw(g);
     }
 
     @Override
-    public int getDepth() {
-        return 31;
+    public float getDepth() {
+        return 14;
     }
 }

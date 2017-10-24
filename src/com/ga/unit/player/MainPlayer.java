@@ -15,12 +15,10 @@ import static com.ga.unit.BodyHumanoid.BODY;
  * Created by Ga on 12/29/2016. asd
  */
 public class MainPlayer extends Player {
-    public PlayerInput input;
     private Indicater indicater;
     public MainPlayer(Map map, int seed) {
         super(map, seed);
         Global.player = this;
-        save = false;
     }
     @Override
     public void say(String p){
@@ -36,7 +34,6 @@ public class MainPlayer extends Player {
                 && this.delay.time > 32 && hasSkill(Actions.Airstrike)) stateSet(Actions.Airstrike);
         else if (state == Actions.Jump && this.state == Actions.Rest) state = Actions.Leap;
         else if (state == Actions.Discard && this.state == Actions.Rest) state = Actions.Throw;
-        else if (state == Actions.Grab && this.state == Actions.Rest) state = Actions.Use2;
         else if (state == Actions.Rest && this.state == Actions.Walk){
             if (vel.x != 0) target.x = dir;
             state = Actions.Sprint;
@@ -45,14 +42,6 @@ public class MainPlayer extends Player {
         if (r == 2) indicater.show(1);
         else if (r == 3) indicater.showCd(getCooldown(state)[0]);
         return r;
-    }
-    @Override
-    public void stateSet(Actions state){
-        super.stateSet(state);
-        if (state != Actions.Idle){
-            input.cameraMode = false;
-            if (state == Actions.Walk) face(input.moving, true);
-        }
     }
     public float getShopPrice(){
         float r = 1;
@@ -104,12 +93,12 @@ public class MainPlayer extends Player {
         exp.add(p, true);
         if (exp.isFull()){
             Sound.play(map, pos, "heal");
-            Particle.holyExplosion(map, pos.getAdd(clip.organs[BODY].ptd), getDepth()-1);
+            Particle.holyExplosion(map, pos.getAdd(clip.organs[BODY].ptd), getDepth());
             level.setMax(level.getMax()+1);
             int residue = exp.get() - exp.getMax();
             exp.setMax(10*level.getMax());
             exp.set(residue, true);
-            get("Endurance").setMax(1000+level.getMax()*50);
+            get("Endurance").setMax(500+level.getMax()*50);
             int prev = 1;
             int current = 1;
             boolean pass = true;
@@ -158,25 +147,15 @@ public class MainPlayer extends Player {
         super.revive();
         map.weather.fadeIn();
     }
-    protected void stateDone(){
-        super.stateDone();
-        if (input.moving != 0 && state != Actions.Sprint) setState(Actions.Walk);
-    }
     protected void stateUpdate(){
         super.stateUpdate();
-        if (state == Actions.Walk && input.moving == 0) setState(Actions.Idle);
-        else if (state == Actions.Rest) indicater.show(1);
+        if (state == Actions.Rest) indicater.show(1);
     }
     public void update(){
         super.update();
-        if (input.cameraMode) map.mapEdgeCenter(Global.cameraTo = Global.cameraTo.getAdd(input.movement));
-        else map.mapEdgeCenter(Global.cameraTo = pos.getAdd(0,0));
         if (!get("Stamina").isFull()) indicater.show(.5f);
         indicater.update();
-    }
-    public String[] load(String p){
-        String[] r = super.load(p);
-        return r;
+        map.mapEdgeCenter(Global.cameraTo = pos.getAdd(0,0));
     }
     public void disconnect(){
         super.disconnect();
@@ -186,24 +165,5 @@ public class MainPlayer extends Player {
         super.start();
         indicater = new Indicater(this);
         indicater.setMeasuree(get("Stamina"));
-    }
-    public String toStringMain(){
-        boolean save = this.save;
-        this.save = true;
-        String r = super.toString();
-        this.save = save;
-        return r;
-    }
-    public String toCharacterString() {
-        return super.toCharacterString()+input.toString()+"\n";
-    }
-    public boolean changeMap(String p){
-        if (super.changeMap(p)) {
-            map.setTexture();
-            map.mapEdgeCenter(Global.camera = map.size.getMult(.5f, .5f));
-            map.onTimeChange();
-            return true;
-        }
-        return false;
     }
 }

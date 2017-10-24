@@ -4,9 +4,10 @@ package com.ga.game;
  * Created by Ga on 7/26/2016.
  */
 public class Settings {
-    static int receiverPort;
-    static int senderPort;
-    public static int tcpPort;
+    public static int receiverPort;
+    public static int senderPort;
+    public static int tcpDownloadPort;
+    public static int tcpUploadPort;
     public static int screenX;
     public static int screenY;
     public static int centerX;
@@ -30,8 +31,11 @@ public class Settings {
                 case "senderPort":
                     senderPort = value;
                     break;
-                case "tcpPort":
-                    tcpPort = value;
+                case "tcpDownloadPort":
+                    tcpDownloadPort = value;
+                    break;
+                case "tcpUploadPort":
+                    tcpUploadPort = value;
                     break;
                 case "screenX":
                     screenX = value;

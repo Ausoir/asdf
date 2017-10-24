@@ -22,13 +22,6 @@ public class BodyHumanoid extends Body {
                 localAnimation[15][BODY][0] = (int) Global.clamp(localAnimation[15][BODY][0],-15,15);
                 localAnimation[15][BODY][1] = Math.min(5,localAnimation[15][BODY][1]);
                 break;
-            case "Grab":
-                rotateAppendage(FIST, 15, 0);
-                rotateAppendage(OFIST, 15, 0);
-                rotateAppendage(BODY, 15, 0);
-                localAnimation[15][BODY][0] = (int) Global.clamp(localAnimation[15][BODY][0],-15,15);
-                localAnimation[15][BODY][1] = Math.min(5,localAnimation[15][BODY][1]);
-                break;
             case "Cast":
                 rotateAppendage(OFIST, 11, 0);
                 rotateAppendage(FIST, 11, 0);

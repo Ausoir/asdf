@@ -19,7 +19,7 @@ public class Creation {
 
     public static void create(){
         FileManager.loadGame();
-        if (!FileManager.isFile("Data/map/World.txt")) {
+        if (!FileManager.isFile("Data/map/World.map")) {
             seed = (int) (Math.random()*1000000);
 //            world = WorldCreation.create(16,16);
             world = new char[][]{new char[]{'6','-','-','-','-','-','-','-','-','-','-','-','-','-','-','4'}};

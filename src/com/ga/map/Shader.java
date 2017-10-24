@@ -212,16 +212,18 @@ public enum Shader{
                     if (y >= 0) {
                         int rgb = image.getRGB(ix, y);
                         int alpha = (rgb & 0xff000000) >>> 24;
-                        int red = ((rgb & 0xff0000) >>> 16);
-                        int green = ((rgb & 0xff00) >>> 8);
-                        int blue = ((rgb & 0xff));
-                        int ny = 70-(iy+20);
-                        red = (int) Global.clamp(((targetC[0] - red)/70f * ny)+red+Global.r.nextInt(16)-8,0,255);
-                        green = (int) Global.clamp(((targetC[1] - green)/70f * ny)+green+Global.r.nextInt(16)-8,0,255);
-                        blue = (int) Global.clamp(((targetC[2] - blue)/70f * ny)+blue+Global.r.nextInt(16)-8,0,255);
-                        float sin = (float) (Math.sin(ix*.05f) + Math.cos(ix*.01f) - Math.sin(ix*.5f)*.05f);
-                        if (sin < .4f && sin+iy*.5f < .5f) alpha = 0;
-                        image.setRGB(ix, y, new Color(red, green, blue, alpha).getRGB());
+                        if (alpha > 0) {
+                            int red = ((rgb & 0xff0000) >>> 16);
+                            int green = ((rgb & 0xff00) >>> 8);
+                            int blue = ((rgb & 0xff));
+                            int ny = 70 - (iy + 20);
+                            red = (int) Global.clamp(((targetC[0] - red) / 70f * ny) + red + Global.r.nextInt(16) - 8, 0, 255);
+                            green = (int) Global.clamp(((targetC[1] - green) / 70f * ny) + green + Global.r.nextInt(16) - 8, 0, 255);
+                            blue = (int) Global.clamp(((targetC[2] - blue) / 70f * ny) + blue + Global.r.nextInt(16) - 8, 0, 255);
+                            float sin = (float) (Math.sin(ix * .05f) + Math.cos(ix * .01f) - Math.sin(ix * .5f) * .05f);
+                            if (sin < .4f && sin + iy * .8f < .5f) alpha = 0;
+                            image.setRGB(ix, y, new Color(red, green, blue, alpha).getRGB());
+                        }
                     }
                 }
             }
@@ -230,21 +232,27 @@ public enum Shader{
     }),
     Sand(new ShaderRenderer(){
         protected BufferedImage render(BufferedImage image, int x1, int x2, int y1, float slope){
+            int[] targetC = new int[]{185,185,120};
             int y2 = image.getHeight()-1;
             for (int ix = x1; ix < x2; ix++) {
                 int ty = y1 + (int) ((ix - x1) * slope);
-                for (int iy = -1; iy < 75; iy++) {
+                for (int iy = -20; iy < 50; iy++) {
                     int y = Math.min(ty+iy,y2);
                     if (y >= 0) {
                         int rgb = image.getRGB(ix, y);
-                        int shadeMag = (225 - (iy * 3));
                         int alpha = (rgb & 0xff000000) >>> 24;
-                        int randMax = Global.r.nextInt(20);
-                        int red = (int) Global.clamp(((rgb & 0xff0000) >>> 16) + shadeMag, 0, 225 + randMax);
-                        int green = (int) Global.clamp(((rgb & 0xff00) >>> 8) + shadeMag, 0, 210 + randMax);
-                        int blue = (int) Global.clamp(((rgb & 0xff)) + shadeMag, 0, 60 + randMax);
-                        image.setRGB(ix, y, new Color(red, green, blue, alpha).getRGB());
-                        new Color(235, 224, 60,100);
+                        if (alpha > 0) {
+                            int red = ((rgb & 0xff0000) >>> 16);
+                            int green = ((rgb & 0xff00) >>> 8);
+                            int blue = ((rgb & 0xff));
+                            int ny = 70 - (iy + 20);
+                            red = (int) Global.clamp(((targetC[0] - red) / 70f * ny) + red + Global.r.nextInt(16) - 8, 0, 255);
+                            green = (int) Global.clamp(((targetC[1] - green) / 70f * ny) + green + Global.r.nextInt(16) - 8, 0, 255);
+                            blue = (int) Global.clamp(((targetC[2] - blue) / 70f * ny) + blue + Global.r.nextInt(16) - 8, 0, 255);
+                            float sin = (float) (Math.sin(ix * .05f)*.2f + Math.cos(ix * .01f)*.2f - Math.sin(ix * .5f) * .1f);
+                            if (sin < .4f && sin + iy * .5f < .3f) alpha = 0;
+                            image.setRGB(ix, y, new Color(red, green, blue, alpha).getRGB());
+                        }
                     }
                 }
             }

@@ -35,7 +35,7 @@ class TerrainTrail {
         return r;
     }
     void add(Line p){
-        p.next = terrain;
+        p.tid = terrain;
         p.opt = 0;
         lines.add(p);
         last = p.ptd;

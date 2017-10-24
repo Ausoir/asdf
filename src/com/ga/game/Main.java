@@ -6,8 +6,6 @@ public class Main {
         int x = 0, y = 0;
         for (String i : args){
             if (i.equals("-editor")) editor = true;
-            if (i.startsWith("-hostPort")) Settings.receiverPort = Integer.parseInt(i.substring(i.indexOf('=')+1));
-            if (i.startsWith("-senderPort")) Settings.senderPort = Integer.parseInt(i.substring(i.indexOf('=')+1));
             if (i.startsWith("-screenX")) x = Integer.parseInt(i.substring(i.indexOf('=')+1));
             if (i.startsWith("-screenY")) y = Integer.parseInt(i.substring(i.indexOf('=')+1));
         }

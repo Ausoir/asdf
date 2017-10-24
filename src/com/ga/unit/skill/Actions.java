@@ -13,8 +13,6 @@ import com.ga.tool.Performer;
 import com.ga.unit.*;
 import com.ga.unit.item.Item;
 import com.ga.unit.item.Projectile;
-import com.ga.unit.item.Weapon;
-import com.ga.unit.player.Player;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -32,7 +30,17 @@ public enum Actions {
         public void update(Unit p){
             if (Math.abs(p.vel.x) < 1f) p.vel.x = 0;
         }
+    }, WalkL{
+        public void onSet(Unit p){
+            p.face(-1, false);
+        }
+        public void update(Unit p){
+            p.vel.x += p.getSpeed()*p.dir;
+        }
     }, Walk{
+        public void onSet(Unit p){
+            p.face(1, false);
+        }
         public void update(Unit p){
             p.vel.x += p.getSpeed()*p.dir;
         }
@@ -40,7 +48,7 @@ public enum Actions {
         public void onSet(Unit host){
             host.attackSpeed = -1;
             if (host.lastLand.opt != 2 && host.map.checkLand(new Line(host.pos.getAdd(0,4), host.pos.getAdd(0,600)), host.lastLand.depth) != null){
-                host.setDepth(host.lastLand.depth+1);
+                host.setDepth(host.lastLand.depth-.001f);
                 host.pos.y+=4;
             }
         }
@@ -94,17 +102,9 @@ public enum Actions {
             t.stateSet(Idle);
             t.weapon.use(t);
         }
-    }, Use2{
-        public void onFinish(Unit p){
-            Player t = (Player)p;
-            t.stateSet(Idle);
-            if (!(t.offhand instanceof Weapon)) t.offhand.use(t);
-        }
-    }, WalkL{
     }, Consume(8){
     }, Exhausted{
     }, Interact(8){
-    }, Grab(8){
     }, Discard(8){
     }, Swap(4){
     }, Sprint(15,0,5,0,new Tags(){{
@@ -718,6 +718,7 @@ public enum Actions {
             }
             rock.addPoint(lastX, origin.y);
             rock.render();
+            rock.start();
         }
     },
     Shock(2,4,7,1,new Tags(){{
@@ -762,6 +763,7 @@ public enum Actions {
                         lightning.addPoint(origin.x + points[i].x, origin.y + points[i].y);
                     }
                     lightning.render();
+                    lightning.start();
                 }
                 Particle.explode(host.map, "Glare",target.getDepth(),targetPos,new P(0,-1),20,20,12,true,7);
                 target.buff(Buffs.Shock, host.stateLevel);
@@ -798,7 +800,7 @@ public enum Actions {
                 float atan = host.target.getAdd(host.pos.getSubtract(origin)).getAtan();
                 P[] points = new P[num * 2 - 2];
                 for (int ii=0;ii<2;ii++) {
-                    Terrain lightning = new Terrain(host.map, "_255,255,0,255", Shader.None, host.getDepth()+1) {
+                    Terrain lightning = new Terrain(host.map, "_255,255,0,255", Shader.None, 400) {
                         public void draw(Graphics2D g) {
                             super.draw(g);
                             host.map.updater.remove(this);
@@ -856,6 +858,7 @@ public enum Actions {
                 host.map.land.add(lines[i]);
             }
             r.render();
+            r.start();
             Global.timers.add(new EventTimer(4+host.stateLevel*4,false,new Performer(){
                 public void perform(){
                     Particle.holyExplosion(host.map, target, lines[0].depth);
@@ -1053,7 +1056,7 @@ public enum Actions {
                     public void onAttack(Unit p) {
                         p.buff(Buffs.Burn, level);
                     }
-                    public int getDepth(){
+                    public float getDepth(){
                         return host.getDepth();
                     }
                 };
@@ -1098,7 +1101,7 @@ public enum Actions {
                         tick--;
                         if (tick == 0) remove();
                     }
-                    public int getDepth(){
+                    public float getDepth(){
                         return host.getDepth();
                     }
                 };
@@ -1186,7 +1189,7 @@ public enum Actions {
                 void attackHitSound(){
                     Sound.play(host.map, host.pos, "explosion_small");
                 }
-                public int getDepth(){
+                public float getDepth(){
                     return host.getDepth();
                 }
             };

@@ -6,6 +6,7 @@ import com.ga.game.Keybinding;
 import com.ga.map.Global;
 import com.ga.tool.P;
 import com.ga.unit.player.MainPlayer;
+import com.ga.unit.player.Player;
 import com.ga.unit.skill.Actions;
 
 import java.awt.event.KeyEvent;
@@ -20,10 +21,6 @@ public class PlayerInput implements Input {
     private HashMap<Integer, String> keyMap = new HashMap<Integer, String>(){{
         put(-Keybinding.get("A"), Actions.Idle.getName());
         put(-Keybinding.get("D"), Actions.Idle.getName());
-        put(-Keybinding.get("UP"), Actions.Idle.getName());
-        put(-Keybinding.get("DOWN"), Actions.Idle.getName());
-        put(-Keybinding.get("LEFT"), Actions.Idle.getName());
-        put(-Keybinding.get("RIGHT"), Actions.Idle.getName());
         put(Keybinding.get("W"), Actions.Jump.getName());
         put(Keybinding.get("A"), Actions.WalkL.getName());
         put(Keybinding.get("S"), Actions.Drop.getName());
@@ -33,16 +30,12 @@ public class PlayerInput implements Input {
         put(Keybinding.get("R"), Actions.Wield.getName());
         put(Keybinding.get("M1"), Actions.Use.getName());
         put(Keybinding.get("M2"), Actions.Discard.getName());
-        put(Keybinding.get("M3"), Actions.Grab.getName());
         put(Keybinding.get("Q"), Actions.Throw.getName());
         put(Keybinding.get("GRAVE"), "_Recall");
         put(Keybinding.get(","), "_Rest");
     }};
-    public P movement = new P();
-    public MainPlayer host;
-    public int moving = 0;
-    public boolean cameraMode = false;
-    public PlayerInput(MainPlayer unit){
+    public Player host;
+    public PlayerInput(Player unit){
         host = unit;
         unit.input = this;
     }
@@ -77,32 +70,21 @@ public class PlayerInput implements Input {
         }
         return r;
     }
-    private void moveCamera(float x, float y){
-        cameraMode = true;
-        movement.set(x, y);
-    }
     public void input(int mode, int x, int y){
-        x = (int) (x-host.pos.x);
-        y = (int) (y-host.pos.y);
         if (mode == 0) inputDirect(null,x,y); //mousemove for better targetting
-        else if (mode == Keybinding.get("ENTER")) Global.display.chatbox.requestFocus();
-        else if (mode == Keybinding.get("TAB")) Global.display.menu.showMenu();
-        else if (mode == Keybinding.get("UP")) moveCamera(0,-80);
-        else if (mode == Keybinding.get("RIGHT")) moveCamera(80,0);
-        else if (mode == Keybinding.get("LEFT")) moveCamera(-80,0);
-        else if (mode == Keybinding.get("DOWN")) moveCamera(0,80);
         else if (mode == Keybinding.get(",")) host.map.updater.sleep(50);
         else if (keyMap.containsKey(mode)){
             inputDirect(keyMap.get(mode),x,y);
         } else if (mode >= 49 && mode < 55) {
             inputDirect("_0"+(mode-49),x,y);
-        } else if (mode > 9) inputDirect("_"+mode+"", x, y);
+        } else if (mode > 9) inputDirect("_"+mode, x, y);
         //Global.server.sendFromLocal("IN>"+p + "@" + tx + "@" + ty);
     }
     public void inputDirect(String p, int x, int y){
+        x = (int) (x-host.pos.x);
+        y = (int) (y-host.pos.y);
         if (host.delay.over()) host.target.set(x,y);
         if (p != null) {
-            movement.set(0,0);
             if (p.startsWith("_")) {
                 String t = p.substring(1);
                 if (Character.digit(t.charAt(0),10) >= 0) {
@@ -113,14 +95,7 @@ public class PlayerInput implements Input {
                 }
             } else {
                 Actions move = Actions.getByName(p);
-                if (move == Actions.Idle){
-                    moving = 0;
-                    if (host.state != Actions.Walk) return;
-                } else if (move == Actions.WalkL) {
-                    moving = -1;
-                    move = Actions.Walk;
-                } else if (move == Actions.Walk) moving = 1;
-                else if (move == Actions.Wield) host.selectingItem = -1;
+                if (move == Actions.Wield) host.selectingItem = -1;
                 if (move != null){
                     host.setState(move);
                 }

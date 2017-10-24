@@ -304,7 +304,7 @@ public enum Buffs {
             private void freeze(){
                 frozen = true;
                 int size = host.getSize();
-                ice = new Terrain(host.map, "_130,180,255,140", Shader.None, host.getDepth()+1);
+                ice = new Terrain(host.map, "_130,180,255,140", Shader.None, 500);
                 int num = Global.r.nextInt(3)+5;
                 P[] points = new P[num];
                 float gap = 6.28f/num;
@@ -327,6 +327,7 @@ public enum Buffs {
                 host.mobile = false;
                 host.tangible = false;
                 ice.render();
+                ice.start();
                 time = Global.time + freezeThreshold + Global.r.nextInt(freezeThreshold) + (freezeThreshold/2);
             }
             private void melt(){

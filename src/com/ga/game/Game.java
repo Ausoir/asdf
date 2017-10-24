@@ -20,22 +20,22 @@ class Game extends JFrame {
         if (x == 0 && y == 0) {
             x = screen.width;
             y = screen.height;
+            setExtendedState( getExtendedState()|JFrame.MAXIMIZED_BOTH );
         }
         Settings.setScreenSize(x, y);
-//        setSize(Settings.screenX, Settings.screenY);
+        setSize(Settings.screenX, Settings.screenY);
         FileManager.init();
         Dialog.init();
         Clips.init();
         Picture.init();
         Sound.init();
         Stock.init();
-        JPanel display = new Display();
+        Display display = new Display();
         Creation.create();
         Global.cprocess = new Processes();
         if (editor) new EditorInput();
         add(display);
         setVisible(true);
-        setExtendedState( getExtendedState()|JFrame.MAXIMIZED_BOTH );
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 }

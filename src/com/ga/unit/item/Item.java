@@ -268,7 +268,7 @@ public class Item extends Prop {
     public int value = 100;
     Man owner;
     public Item(Map map, String name, int seed, Material[] materials, ItemType type) {
-        super(map, name, seed);
+        super(map, name, seed, 7);
         gravity = true;
         setType(type);
         material = Material.get(rand, materials);
@@ -287,7 +287,6 @@ public class Item extends Prop {
         randomSize(new P(.2f,.2f));
         range = getSize()-8;
     }
-    public void onField(){}
     protected void imbueMeta(boolean canSmod, boolean canAdmod, float emodProb){
         pmod = PrefixMod.get(rand);
         if (canSmod) smod = SpecialtyMod.get(rand);
@@ -571,6 +570,10 @@ public class Item extends Prop {
     }
     private boolean isInfinite(){
         return durability == -1;
+    }
+    public float getDepth(){
+        if (owner != null) return owner.getDepth()-.001f;
+        else return super.getDepth();
     }
     @Override
     public String toString(){

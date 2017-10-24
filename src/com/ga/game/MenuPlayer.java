@@ -148,13 +148,6 @@ public class MenuPlayer extends Panel {
             b.setTitle(Dialog.get("wielded"));
             ((JPanel) panel.getComponent(0)).setBorder(b);
 
-            grid.gridy++;
-            Item offhand = Global.player.offhand;
-            makeSlot(-2, offhand);
-            b = BorderFactory.createTitledBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Panel.forecolor));
-            b.setTitle(Dialog.get("offhand"));
-            ((JPanel) panel.getComponent(1)).setBorder(b);
-
             for (int i=0;i<3;i++) {
                 if (!Global.player.armor.isBare(i)) {
                     grid.gridy++;
@@ -186,14 +179,6 @@ public class MenuPlayer extends Panel {
                     @Override
                     public void mouseClicked(MouseEvent e) {
                         Global.player.input.inputDirect("_Wield", 0, 0);
-                        Global.display.menu.showMenu();
-                    }
-                });
-            } else if (type == -2){
-                if (Global.player.offhandNone()) panel.setVisible(false);
-                result.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
                         Global.display.menu.showMenu();
                     }
                 });

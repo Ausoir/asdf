@@ -2,7 +2,6 @@ package com.ga.game;
 
 import com.ga.map.Global;
 import com.ga.map.Updater;
-import com.ga.unit.Speech;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,6 +22,7 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
     Display() {
         Global.display = this;
         setLayout(null);
+        setIgnoreRepaint(true);
         addKeyListener(this);
         addMouseListener(this);
         addMouseMotionListener(this);
@@ -58,7 +58,7 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
 
     public void removeSpeech(){
         for (Component i : getComponents()){
-            if (i instanceof Speech) remove(i);
+            if (i instanceof JTextArea) remove(i);
         }
     }
 
@@ -91,6 +91,8 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
     @Override
     public void keyPressed(KeyEvent e) {
         input(e.getKeyCode());
+        if (mode == Keybinding.get("ENTER")) chatbox.requestFocus();
+        else if (mode == Keybinding.get("TAB")) menu.showMenu();
     }
 
     @Override

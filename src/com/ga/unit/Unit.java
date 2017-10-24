@@ -40,7 +40,7 @@ public class Unit extends Prop {
     private boolean moveTriggered = false;
 
     public Unit(Map map, String name, int seed) {
-        super(map, null,seed);
+        super(map, null, seed, 8);
         this.name = name;
         gravity = true;
     }
@@ -80,12 +80,13 @@ public class Unit extends Prop {
     }
 
     String getConversation(){
-        return speech.getText();
+        return speech.getTextarea().getText();
     }
     void hear(Prop pos, String p){
-        if (!speech.isVisible()) brain.hear(pos, p);
+        if (!speech.getTextarea().isVisible()) brain.hear(pos, p);
     }
     public P getHand(){
+        if (clip.getHand() == -1) return pos.getAdd(0,-clip.getHeight());
         return pos.getAdd(clip.organs[clip.getHand()].ptd);
     }
     public float getReach(){
@@ -165,6 +166,11 @@ public class Unit extends Prop {
         stats.addEffect(buff, level);
     }
 
+    @Override
+    public boolean hittable(Faction faction){
+        return super.hittable(faction) && state != Actions.Dead;
+    }
+
     public void hit(int dir, float knockback) {
         delay.performer = null;
         jump = false;
@@ -182,11 +188,6 @@ public class Unit extends Prop {
             }
         }
         brain.onHit();
-    }
-
-    @Override
-    public boolean hittable(Faction faction){
-        return super.hittable(faction) && state != Actions.Dead;
     }
 
     public void checkHit(P hitPoint, int damage){
@@ -208,6 +209,13 @@ public class Unit extends Prop {
                 r = true;
             }
         }
+        if (!r){
+            P mid = hitBox.getMidpoint();
+            float radius = hitBox.getLength()/2;
+            if (mid.getSubtract(pos.getAdd(0,-clip.getHeight())).getDist() < radius + getSize()){
+                checkHit(hitBox.pt, damage);
+            }
+        }
         return r;
     }
 
@@ -224,12 +232,12 @@ public class Unit extends Prop {
         }
     }
 
-    public void disconnect(){
+    public void disconnect(){ //do not use remove() - calls overriden method
         super.remove();
         speech.remove();
     }
 
-    public void remove(){
+    public void remove(){ //do not use disconnect()
         super.remove();
         speech.remove();
     }
@@ -249,7 +257,7 @@ public class Unit extends Prop {
         super.onCollide(l);
         if (!jump) {
             jump = true;
-            if (l.clockwise()) setDepth(l.depth-1);
+            if (l.clockwise()) setDepth(l.depth-.001f);
             int mag = (int) (vel.y - Settings.gravityMax);
             if (vel.y > Settings.gravity*4) Sound.play(map, pos, "land");
             if (mag >= 0 && hittable(Faction.Destructive)) {
@@ -335,7 +343,7 @@ public class Unit extends Prop {
 
     public void revive() {
         stats.clearBuffs();
-        Particle.holyExplosion(map, pos,getDepth());
+        Particle.holyExplosion(map, pos, getDepth());
         state = Actions.Idle;
         stateSet(Actions.Down);
         delay.set(50);
@@ -346,17 +354,7 @@ public class Unit extends Prop {
         clip.updateStatus();
     }
 
-    public boolean changeMap(String p){
-        Map map = Global.getMap(p.split("@")[0]);
-        if (this.map != map) {
-            String[] mapData = p.split("@");
-            map.terrains.clear();
-            disconnect();
-            this.map = map;
-            pos.set(map.updater.getEntrancePos(Integer.parseInt(mapData[1])));
-            start();
-            return true;
-        }
-        return false;
+    public void changeMap(String p){
+        Global.server.requestChangeMap(p, this);
     }
 }

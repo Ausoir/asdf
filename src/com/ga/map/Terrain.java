@@ -11,9 +11,9 @@ import java.util.ArrayList;
 /**
  * Created by Ga on 1/10/2017. xhfsdxghf
  */
-public class Terrain extends ShadedPicture implements Drawable{
+public class Terrain extends Drawable {
     private static final float ZOOM = 1.5f;
-    private int depth;
+    private ShadedPicture image;
     private Polygon polygon;
     private TexturePaint imageTexture;
     private Color color;
@@ -21,22 +21,34 @@ public class Terrain extends ShadedPicture implements Drawable{
     protected P pos;
     private int length = 0; //polygon size is always multiples of 4
     private P finalSize;
-    private Map map;
+    Map map;
     public Terrain(Map map, String texture, Shader shader, int depth){
-        super(null, texture.startsWith("_")?null:texture, shader);
+        image = new ShadedPicture(null, texture.startsWith("_")?null:texture, shader){
+            @Override
+            public void shade(int p){
+                if (shader != null) {
+                    for (Line i : lines) {
+                        int origX = (int) ((i.pt.x - pos.x)/ZOOM);
+                        int origY = (int) ((i.pt.y - pos.y)/ZOOM);
+                        int x2 = (int) ((i.ptd.x - pos.x)/ZOOM);
+                        int y2 = (int) ((i.ptd.y - pos.y)/ZOOM);
+                        shader.render(image, origX, x2, origY, y2, i.getSlope());
+                    }
+                }
+            }
+        };
         this.map = map;
-        setDepth(depth);
+        setDepth(3+(depth*.01f));
         polygon = new Polygon();
-        map.updater.addQueue.add(this);
-        if (image == null){
+        if (image.image == null){
             String[] data = texture.substring(1).split(",");
             this.color = new Color(Integer.parseInt(data[0]),Integer.parseInt(data[1]),Integer.parseInt(data[2]),Integer.parseInt(data[3]));
         } else {
-            imageTexture = new TexturePaint(image, new Rectangle2D.Double(0, 0, getSize().x, getSize().y));
+            imageTexture = new TexturePaint(image.image, new Rectangle2D.Double(0, 0, image.getSize().x, image.getSize().y));
         }
     }
-    static int toTerrainDepth(int depth){
-        return 10+(depth*3);
+    public void start(){
+        map.updater.addQueue.add(this);
     }
     void addLine(Line p){
         lines.add(p);
@@ -45,18 +57,6 @@ public class Terrain extends ShadedPicture implements Drawable{
     public void addPoint(float x, float y){
         polygon.addPoint((int)(x/ZOOM), (int)(y/ZOOM));
         length++;
-    }
-    @Override
-    public void shade(int param){
-        if (shader != null) {
-            for (Line i : lines) {
-                int origX = (int) ((i.pt.x - pos.x)/ZOOM);
-                int origY = (int) ((i.pt.y - pos.y)/ZOOM);
-                int x2 = (int) ((i.ptd.x - pos.x)/ZOOM);
-                int y2 = (int) ((i.ptd.y - pos.y)/ZOOM);
-                shader.render(image, origX, x2, origY, y2, i.getSlope());
-            }
-        }
     }
     public void render(){
         int lowX = polygon.xpoints[0], lowY = polygon.ypoints[0], highX = polygon.xpoints[0], highY = polygon.ypoints[0];
@@ -73,39 +73,33 @@ public class Terrain extends ShadedPicture implements Drawable{
         setSize(highX-lowX, highY-lowY);
         pos = new P(lowX, lowY);
         pos.mult(ZOOM);
-        P size = getSize();
-        image = new BufferedImage((int)size.x, (int)size.y, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = image.createGraphics();
+        P size = image.getSize();
+        image.image = new BufferedImage((int)size.x, (int)size.y, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = image.image.createGraphics();
         if (imageTexture != null) g.setPaint(imageTexture);
         else g.setColor(color);
         g.fill(polygon);
-        shade(0);
+        image.shade(0);
     }
     public void setSize(float x, float y){
-        super.setSize(x, y);
+        image.setSize(x, y);
         finalSize = new P(x*ZOOM, y*ZOOM);
     }
     public void draw(Graphics2D g){
-        if (visible) {
-            g.drawImage(image,(int)(pos.x+Global.rel.x), (int) (pos.y+Global.rel.y),finalSize.x(),finalSize.y(),null);
+        if (image.visible) {
+            g.drawImage(image.image,(int)(pos.x+Global.rel.x), (int) (pos.y+Global.rel.y),finalSize.x(),finalSize.y(),null);
 //            for (Line i : lines) g.drawLine((int)(t.x+i.pt.x),(int)(t.y+i.pt.y),(int)(t.x+i.ptd.x),(int)(t.y+i.ptd.y));
         }
     }
     public void draw(Graphics2D g, P offset){
-        if (visible) {
-            g.drawImage(image,(int)(pos.x+Global.rel.x+offset.x), (int) (pos.y+Global.rel.y+offset.y),finalSize.x(),finalSize.y(),null);
+        if (image.visible) {
+            g.drawImage(image.image,(int)(pos.x+Global.rel.x+offset.x), (int) (pos.y+Global.rel.y+offset.y),finalSize.x(),finalSize.y(),null);
 //            for (Line i : lines) g.drawLine((int)(t.x+i.pt.x),(int)(t.y+i.pt.y),(int)(t.x+i.ptd.x),(int)(t.y+i.ptd.y));
         }
     }
 
-    @Override
-    public int getDepth() {
-        return depth;
-    }
-
-    public void setDepth(int depth) {
-        this.depth = depth;
-        map.updater.resetDepth(this);
+    public void setDepth(float depth) {
+        super.setDepth(depth);
         for (Line i : lines) i.depth = depth;
     }
 }

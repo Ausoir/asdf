@@ -22,8 +22,11 @@ public class Prop extends Thing {
     public Line lastLand = new Line();
     public Tags tags = new Tags();
     boolean manualDepth = false;
+    public Prop(Map map, String name, int seed, int depth) {
+        super(map, name, seed, depth);
+    }
     public Prop(Map map, String name, int seed) {
-        super(map, name, seed, 1);
+        this(map, name, seed, 4);
     }
     public int getDamage(){
         return 0;
@@ -43,7 +46,7 @@ public class Prop extends Thing {
         Line closest = map.checkLand(new Line(pos.getAdd(0,-4), new P(pos.x, pos.y+600)));
         if (closest != null) {
             lastLand = closest;
-            setDepth(closest.depth - 2);
+            setDepth(closest.depth - .001f);
         }
     }
     public int getSize(){
@@ -63,23 +66,21 @@ public class Prop extends Thing {
             pp = new Line(pos,vp);
             for (int i=0;i<map.land.size();i++) {
                 Line land = map.land.get(i);
-                if (land.depth >= lastLand.depth) {
-                    if (land.lineCross(pp)) {
-                        float slope = land.getSlope();
-                        boolean cw = land.clockwise();
-                        float lineY = land.getCrossPointY(pos.x);
-                        if (cw && lineY >= pos.y) {
-                            onCollide(land);
-                            float atan = (float) Math.atan(slope);
-                            if (vel.x > 0 != atan > 0) vel.x = vel.x * Global.cos(atan);
-                            if (!Double.isInfinite(slope))
-                                vel.y += land.getCrossPointY(pos.x+vel.x) - (pos.y + vel.y) - 1;
-                            lastLand = land;
-                            collided = true;
-                        } else if (!cw && lineY <= pos.y) {
-                            vel.set(0, 0);
-                            return;
-                        }
+                if (land.depth >= lastLand.depth && land.lineCross(pp)) {
+                    float slope = land.getSlope();
+                    boolean cw = land.clockwise();
+                    float lineY = land.getCrossPointY(pos.x);
+                    onCollide(land);
+                    if (cw && lineY >= pos.y) {
+                        float atan = (float) Math.atan(slope);
+                        if (vel.x > 0 != atan > 0) vel.x = vel.x * Global.cos(atan);
+                        if (!Double.isInfinite(slope))
+                            vel.y += land.getCrossPointY(pos.x+vel.x) - (pos.y + vel.y) - 1;
+                        lastLand = land;
+                        collided = true;
+                    } else if (!cw && lineY <= pos.y) {
+                        vel.set(0, 0);
+                        return;
                     }
                 }
             }
@@ -117,7 +118,6 @@ public class Prop extends Thing {
 
     @Override
     public String toString(){
-        if (!save) return "";
         return (factoryId==-1?name:""+factoryId) + "@" + subId + "@" + seed + "@" + pos
                 + "@" + String.format(java.util.Locale.US,"%.2f", rotation);
     }

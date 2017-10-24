@@ -2,6 +2,7 @@ package com.ga.game;
 
 import com.ga.map.*;
 import com.ga.tool.Line;
+import com.ga.unit.PlayerInput;
 import com.ga.unit.Prop;
 import com.ga.unit.Stock;
 import com.ga.unit.Unit;
@@ -62,14 +63,16 @@ public class Command {
                 else if (p.equals("render")){
                     for (Object terrain : Global.player.map.terrains.entrySet()) ((Terrain)terrain).render();
                 }
+                else if (p.equals("test")){
+                    Player unit = (Player) Stock.Player.create(Global.player.map,0,0);
+                    unit.pos.set(Global.player.pos);
+                    unit.save = false;
+                    new PlayerInput(unit);
+                    unit.start();
+                }
                 else if (p.equals("editor")){
                     Updater.editor = true;
                     Global.display.input = new EditorInput();
-                } else if (p.equals("online")) {
-//                    Global.server.online();
-                } else if (p.startsWith("cellcall")) {
-//                    Global.server.online();
-//                    Global.server.requestConnection(p.substring(9));
                 }
             }
         } catch (Exception e){

@@ -1,4 +1,5 @@
 Dummy;punk;Stamina:3&Speed:12&Attack:0&Level:1;Evil;0;Idle;Man;None;None;None; //Humanoids-Name,Speech Type,Stat,Faction,AI Type,Moveset,Face,Weapons,Armors,Headgears
+Player;player;Speed:23,23&Progress:0,0&Dexterity:7,7&Channeling:0,400&Memory:1,1&Electric:0,400&Shadow:0,400&Ice:700,700&Attack:0,0&Air:0,400&Stamina:3,8&Unarmed:800,800&Experience:89,90&Athletics:0,400&Motivation:100,100&Conjuration:1200,1200&Fire:1100,1100&Agility:1,1&Might:2,2&Endurance:388,1450&Level:8,9&Mutation:0,400;Player;0;Idle;Man;None;None;None;
 Resident;resident;Stamina:12&Attack:0&Speed:20&Level:1;Neutral;1;Sprint;Man;None,None,None,None,None,None,None,None,None,Potion,Stick;Comfortwear,Dustset,Toughwear,Comfortwear,Comfortwear,Suit,Robe,Comfortwear;None;
 Merchant;merchant;Stamina:10&Attack:0&Speed:12&Level:1;Neutral;3;Sprint;Man;None;Suit;None;
 Punk;punk;Stamina:7&Speed:24&Attack:1&Level:1;Punk;2;Use,Lunge,Underhand,Dash;Man;Dagger,Axe,Pickaxe;None,Comfortwear,Dustset,Toughwear;None,Bandana;

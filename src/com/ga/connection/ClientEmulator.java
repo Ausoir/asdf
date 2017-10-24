@@ -8,7 +8,9 @@ import java.net.DatagramPacket;
 public class ClientEmulator extends UDPClient {
     private String message;
     private boolean on = true;
-    public ClientEmulator() {}
+    public ClientEmulator() {
+        super();
+    }
     public String receive(){
         try {
             while (on) {

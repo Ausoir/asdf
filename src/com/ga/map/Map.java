@@ -18,7 +18,7 @@ import java.util.Iterator;
  */
 public class Map {
     int margin = 0;
-    public Weather weather = new Weather();
+    public Weather weather = new Weather(this);
     public ArrayList<Line> land = new ArrayList<>();
     public ArrayList<Line> landRaw = new ArrayList<>();
     public HashMap<Integer, String> formTextures = new HashMap<>();
@@ -42,6 +42,7 @@ public class Map {
         updater = new Updater(this);
         onTimeChange();
         load(name);
+        weather.start();
     }
 
     public void load(String dir){
@@ -125,11 +126,10 @@ public class Map {
     void render(int target){
         String texture = formTextures.get(target);
         String[] formName = texture.split("&");
-        int terrainDepth = Terrain.toTerrainDepth(Integer.parseInt(formName[0]));
-        Terrain terrain = new Terrain(this, formName[1], Shader.getByName(formName[2]), terrainDepth);
+        Terrain terrain = new Terrain(this, formName[1], Shader.getByName(formName[2]), Integer.parseInt(formName[0]));
         terrains.put(target, terrain);
         for (final Line i : landRaw){
-            if (i.next == target){
+            if (i.tid == target){
                 terrain.addLine(i);
                 terrain.addPoint(i.pt.x, i.pt.y);
             }
@@ -139,26 +139,29 @@ public class Map {
 
     public void setTexture(){
         for (final Line i : landRaw){
-            if (i.next >= 0){
-                Terrain terrain = terrains.get(i.next);
+            if (i.tid >= 0){
+                Terrain terrain = terrains.get(i.tid);
                 if (terrain == null){
-                    String formTexture = formTextures.get(i.next);
+                    String formTexture = formTextures.get(i.tid);
                     if (formTexture == null) continue;
                     else {
                         String[] formName = formTexture.split("&");
-                        int terrainDepth = Terrain.toTerrainDepth(Integer.parseInt(formName[0]));
-                        terrain = new Terrain(this, formName[1], Shader.getByName(formName[2]), terrainDepth);
+                        terrain = new Terrain(this, formName[1], Shader.getByName(formName[2]), Integer.parseInt(formName[0]));
                     }
-                    terrains.put(i.next, terrain);
+                    terrains.put(i.tid, terrain);
+                    terrain.start();
                 }
                 terrain.addLine(i);
                 terrain.addPoint(i.pt.x, i.pt.y);
             } else {
-                String depth = formTextures.get(i.next);
-                if (depth != null) i.depth = Terrain.toTerrainDepth(Integer.parseInt(formTextures.get(i.next)));
-                else i.depth = Terrain.toTerrainDepth(0);
+                String depth = formTextures.get(i.tid);
+                if (depth != null) i.depth = Integer.parseInt(formTextures.get(i.tid));
+                else i.depth = 0;
             }
         }
+    }
+
+    public void render(){
         for (Object o : terrains.entrySet()) {
             java.util.Map.Entry pair = (java.util.Map.Entry) o;
             Terrain terrain = (Terrain) pair.getValue();
@@ -173,9 +176,9 @@ public class Map {
                         && (l.pt.y < size.y || l.ptd.y < size.y) && (l.pt.x < size.x || l.ptd.x < size.x)
                         && (l.pt.y > 0 || l.ptd.y > 0) && (l.pt.x > 0 || l.ptd.x > 0)) {
                     if (Math.abs(l.getSlope()) < .5f) {
-                        String texture = formTextures.get(l.next);
+                        String texture = formTextures.get(l.tid);
                         if (texture != null) {
-                            String[] formProps = formTextures.get(l.next).split("&");
+                            String[] formProps = formTextures.get(l.tid).split("&");
                             int size = (int) (Math.abs(l.ptd.x - l.pt.x) * .02f);
                             for (int ii = 0; ii < size; ii++) {
                                 String prop = null;
@@ -233,7 +236,7 @@ public class Map {
         return "none";
     }
 
-    public Line checkLand(Line p, int depth){
+    public Line checkLand(Line p, float depth){
         ArrayList<Line> list = new ArrayList<>();
         for (Line i : land){
             if (i.clockwise() && i.depth >= depth && i.lineCross(p)){
@@ -282,20 +285,6 @@ public class Map {
 //        }
     }
 
-//    @Override
-//    public void draw(Graphics2D g) {
-//        if (image.visible) {
-//            P t = new P(Global.rel.x + pos.x, Global.rel.y + pos.y).mult(.1f);
-//            P size = image.getSize();
-//            t.x = Global.clamp(t.x, -size.x + Settings.screenX, 0);
-//            t.y = Global.clamp(t.y, -size.y + Settings.screenY, 0);
-//            g.drawImage(image.getImage(), (int) (t.x), (int) (t.y), (int) size.x, (int) size.y, null);
-//        } else {
-//            g.setColor(Color.black);
-//            g.fillRect(0,0, Settings.screenX, Settings.screenY);
-//        }
-//    }
-
     public int mapEdge(P p){
         int result = 0;
         if (p.x < 0) result = 4;
@@ -318,7 +307,7 @@ public class Map {
             java.util.Map.Entry pair = (java.util.Map.Entry) it.next();
             int key = (int) pair.getKey();
             for (Line i : landRaw){
-                if (i.next == key){
+                if (i.tid == key){
                     check = true;
                     break;
                 }
@@ -342,10 +331,13 @@ public class Map {
         int maxDiffY = (int) (high.y-low.y)+margin.y();
         size = new P(maxDiffX, maxDiffY);
         P adjustment = new P(-low.x+marginX/2,-low.y+marginY/2);
-            for (Line i : landRaw) {
-            i.pt = i.pt.getAdd(adjustment);
-            i.ptd = i.ptd.getAdd(adjustment);
-        }
+        adjust(adjustment);
         if (updater != null) updater.adjust(adjustment);
+    }
+    void adjust(P p){
+        for (Line i : landRaw) {
+            i.pt = i.pt.getAdd(p);
+            i.ptd = i.ptd.getAdd(p);
+        }
     }
 }

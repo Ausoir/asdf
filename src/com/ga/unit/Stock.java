@@ -145,7 +145,8 @@ public enum Stock {
     }},
     Player{ Prop make(Map map, int id, int seed){
         if (id == 1) return new MainPlayer(map, seed);
-        return new Player(map, seed);
+        Player product = new Player(map, seed);
+        return product;
     }},
     Construct{ Prop make(Map map, int id, int seed){
         Building product = new Building(map, id+"", 0);
@@ -367,7 +368,7 @@ public enum Stock {
         product.image.setCenterType(3);
         return product;
     }},
-    Phone_Booth{ Prop make(Map map, int id, int seed){
+    Booth{ Prop make(Map map, int id, int seed){
         Prop product = new Prop(map, getName(), seed);
         product.onInteract = new Interactive(){
             public void interact(Man p){
@@ -810,8 +811,8 @@ public enum Stock {
                                     P from = host.getHand().add(Global.rel);
                                     g.drawLine(from.x(), from.y(), (int) (pos.x+Global.rel.x), (int) (pos.y+Global.rel.y));
                                 }
-                                public int getDepth(){
-                                    return host.getDepth()+1;
+                                public float getDepth(){
+                                    return host.getDepth();
                                 }
                             };
                             p.faction = host.faction;

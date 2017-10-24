@@ -1,6 +1,7 @@
 receiverPort:1992
 senderPort:1992
-tcpPort:2016
+tcpDownloadPort:2016
+tcpUploadPort:2017
 screenX:1024
 screenY:720
 gravity:4

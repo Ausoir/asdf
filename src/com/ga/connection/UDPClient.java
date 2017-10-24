@@ -13,8 +13,8 @@ public class UDPClient {
     private DatagramPacket receiver;
     private DatagramPacket sender;
     private static String host;
-    public UDPClient(){}
-    public UDPClient(int receiverPort){
+    UDPClient(){}
+    UDPClient(int receiverPort){
         length = 4096; //32 mapsize
         receiver = new DatagramPacket(new byte[length], length);
         try{
@@ -33,10 +33,25 @@ public class UDPClient {
         clientSocket.close();
     }
 
+    public void set(String ip, int port) throws Exception {
+        byte[] hello = stringToByte("");
+        sender = new DatagramPacket(hello, hello.length, InetAddress.getByName(ip), port);
+    }
+
     public void send(String msg, String ip, int port) throws Exception {
         byte[] hello = stringToByte(msg);
         sender = new DatagramPacket(hello, hello.length, InetAddress.getByName(ip), port);
         clientSocket.send(sender);
+    }
+
+    public void send(String p) throws Exception {
+        sender.setData(stringToByte(p));
+        clientSocket.send(sender);
+    }
+
+    public void send(DatagramPacket packet, String p) throws Exception {
+        packet.setData(stringToByte(p));
+        clientSocket.send(packet);
     }
 
     public static DatagramPacket getAckPacket(String ip, int port) {
@@ -50,18 +65,8 @@ public class UDPClient {
         return packet;
     }
 
-    public void send(String p) throws Exception {
-        sender.setData(stringToByte(p));
-        clientSocket.send(sender);
-    }
-
-    public void send(DatagramPacket packet, String p) throws Exception {
-        packet.setData(stringToByte(p));
-        clientSocket.send(packet);
-    }
-
     private static byte[] stringToByte(String p){
-        String t = p + "%";
+        String t = p + "]";
         byte[] sendData = new byte[length];
         sendData = (byteConcat(t.getBytes(), t.getBytes())); //Concats or data corrupts?
         return sendData;

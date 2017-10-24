@@ -38,6 +38,7 @@ public class Global {
     public static int controlId;
 
     public static void init(){
+        server = new Server();
         for (int i=0;i<360;i++){
             sinv[i] = (float)((int)(Math.sin(Math.toRadians(i))*10000))/10000;
             cosv[i] = (float)((int)(Math.cos(Math.toRadians(i))*10000))/10000;
@@ -96,6 +97,7 @@ public class Global {
     static int getHour(){
         return time/HOUR;
     }
+
     public static Map getMap(String name){
         for (Map i : maps){
             if (i.name.equals(name)) return i;

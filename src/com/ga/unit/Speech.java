@@ -15,36 +15,38 @@ import java.util.HashMap;
 /**
  * Created by Ga on 7/31/2016. asd
  */
-public class Speech extends JTextArea implements Drawable {
+public class Speech extends Drawable {
     private Unit host;
     private ArrayList<String> msg = new ArrayList<>();
     private Timer timer = new Timer(-1,false);
     private String recent = "";
     private Color color = new Color(255,255,255,150);
+    private JTextArea textarea;
     Speech(Unit host){
-        super();
         this.host = host;
         host.map.updater.addQueue.add(this);
-        setFont(Global.font);
-        setBackground(color);
-        setLineWrap(true);
-        setWrapStyleWord(true);
-        Global.display.add(this);
-        setMargin(new Insets(10,10,10,10));
-        setEditable(false);
-        setVisible(false);
+        textarea = new JTextArea();
+        textarea.setFont(Global.font);
+        textarea.setBackground(color);
+        textarea.setLineWrap(true);
+        textarea.setWrapStyleWord(true);
+        Global.display.add(textarea);
+        textarea.setMargin(new Insets(10,10,10,10));
+        textarea.setEditable(false);
+        textarea.setVisible(false);
+        setDepth(15);
     }
     public void remove(){
         host.map.updater.remove(this);
-        Global.display.remove(this);
+        Global.display.remove(textarea);
     }
     public void draw(Graphics2D g){
-        if (isVisible()) {
+        if (textarea.isVisible()) {
             P t = host.pos.getAdd(0,-150);
-            int width = Math.min(g.getFontMetrics(Global.font).stringWidth(getText()) + 30, 240);
-            int height = (int) getPreferredSize().getHeight();
+            int width = Math.min(g.getFontMetrics(Global.font).stringWidth(textarea.getText()) + 30, 240);
+            int height = (int) textarea.getPreferredSize().getHeight();
             float rx = Global.rel.x, ry = Global.rel.y;
-            setBounds((int) (t.x - (width / 2) + rx), (int) (t.y - height + ry), width, height);
+            textarea.setBounds((int) (t.x - (width / 2) + rx), (int) (t.y - height + ry), width, height);
             g.setColor(color);
             int[] xp = new int[]{
                     (int) (-10 + t.x + rx), (int) (10 + t.x + rx), (int) (0 + t.x + rx)
@@ -55,10 +57,6 @@ public class Speech extends JTextArea implements Drawable {
             g.fillPolygon(xp, yp, xp.length);
         }
     }
-    @Override
-    public int getDepth() {
-        return 99;
-    }
     public void say(String p){
         String t;
         if (p.startsWith("@")) t = getRandom(p.substring(1));
@@ -67,9 +65,9 @@ public class Speech extends JTextArea implements Drawable {
             if (!recent.equals(p)) {
                 recent = p;
                 msg.clear();
-                setVisible(true);
+                textarea.setVisible(true);
                 msg.add(t);
-                setText(t);
+                textarea.setText(t);
             }
             timer.set(120 + t.length());
 
@@ -92,11 +90,15 @@ public class Speech extends JTextArea implements Drawable {
         return results.get(Global.r.nextInt(results.size()));
     }
 
+    public JTextArea getTextarea() {
+        return textarea;
+    }
+
     public void update() {
         if (msg.size() > 0) {
             if (timer.update()) {
                 msg.remove(0);
-                setVisible(false);
+                textarea.setVisible(false);
                 recent = "";
             }
         }

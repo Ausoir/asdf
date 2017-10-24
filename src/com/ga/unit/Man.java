@@ -37,11 +37,6 @@ public class Man extends Unit {
         weapon.dir = dir;
     }
 
-    public void setDepth(int depth){
-        super.setDepth(depth);
-        weapon.setDepth(depth);
-    }
-
     public boolean wieldingNone(){ return weapon == null || weapon == fist; }
 
     @Override
@@ -56,7 +51,7 @@ public class Man extends Unit {
     }
 
     void stepSound(){
-        String ground = map.getLand(lastLand.next);
+        String ground = map.getLand(lastLand.tid);
         if (Sound.has("step_" + ground)) Sound.play(map, pos, "step_" + ground);
         else Sound.play(map, pos, "step_dirt");
     }
@@ -209,8 +204,7 @@ public class Man extends Unit {
 
     @Override
     public String toString(){
-        String r = super.toString();
-        if (!r.equals("")) r += "#"+face+"#"+weapon.forceToString()+"#"+armor.toString();
+        String r = super.toString() + "#"+face+"#"+weapon.forceToString()+"#"+armor.toString();
         return r;
     }
 }

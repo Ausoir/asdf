@@ -8,7 +8,7 @@ public class Test {
 //        UDPClient udp = new UDPClient(19191);
 //        final TCPClient t = new TCPClient();
 //        try {
-//            udp.send("HI@127.0.0.1","127.0.0.1",1992);
+//            udp.upload("HI@127.0.0.1","127.0.0.1",1992);
 ////            t.download("127.0.0.1",new String[]{"Data/output.txt"});
 //        } catch (Exception e) {
 //            e.printStackTrace();

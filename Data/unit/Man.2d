@@ -70,7 +70,7 @@
 
 Idle@0
 Look@0,-1
-WalkL@4,3,2,1
+WalkL@1,2,3,4
 Walk@1,2,3,4
 Jump@54,55,56,57
 Sprint@58,59,60,61
@@ -92,7 +92,6 @@ Consume@25,-1
 Exhausted@26,27
 Dart@28,29,-1
 Interact@15,-1
-Grab@15,-1
 Aim@47,48,48,49,-1
 Stab@9,10,11,12,-1
 Dash@32,33,-1

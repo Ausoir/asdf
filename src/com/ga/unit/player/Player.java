@@ -5,10 +5,7 @@ import com.ga.map.Global;
 import com.ga.map.Map;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
-import com.ga.unit.Man;
-import com.ga.unit.Prop;
-import com.ga.unit.Tag;
-import com.ga.unit.Tags;
+import com.ga.unit.*;
 import com.ga.unit.item.Crafts;
 import com.ga.unit.item.Item;
 import com.ga.unit.skill.Actions;
@@ -18,12 +15,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import static com.ga.unit.BodyHumanoid.FIST;
-import static com.ga.unit.BodyHumanoid.OFIST;
 
 /**
  * Created by Ga on 7/30/2016. asd
  */
 public class Player extends Man {
+    public PlayerInput input;
     public String memorized = "";
     public int gold;
     public Inventory inventory;
@@ -31,11 +28,11 @@ public class Player extends Man {
     public int selectingItem = -1;
     public Health health;
     public Actions learning;
-    public Item offhand;
-    private boolean leftHandMode = false;
     private ArrayList<Trait> traits = new ArrayList<>();
     public Player(Map map, int seed) {
         super(map, null, seed);
+        input = new PlayerInput(this);
+        save = false;
         name = "Player";
         speechType = "p";
         inventory = new Inventory(this);
@@ -50,23 +47,14 @@ public class Player extends Man {
     public void onField(){
     }
     public void setWeapon(Item p){
-        if (!leftHandMode){
-            if (p != null) {
-                if (sheathe()) {
-                    Sound.play(map, pos, "wield");
-                } else {
-                    dropItem(weapon);
-                }
+        if (p != null) {
+            if (sheathe()) {
+                Sound.play(map, pos, "wield");
+            } else {
+                dropItem(weapon);
             }
-            super.setWeapon(p);
-        } else {
-            if (p == null) p = fist;
-            offhand.onUnequip(this);
-            offhand = p;
-            offhand.onEquip(this);
-            offhand.setDepth(getDepth()+1);
-            offhand.dir = dir;
         }
+        super.setWeapon(p);
     }
     private boolean sheathe() {
         if (wieldingNone()) return true;
@@ -76,9 +64,6 @@ public class Player extends Man {
             return true;
         }
         return false;
-    }
-    public boolean offhandNone(){
-        return offhand == fist;
     }
     private void dropItem(Item p) {
         Item t = inventory.remove(p);
@@ -115,10 +100,11 @@ public class Player extends Man {
         if (end.get() > end.getMax()) penalty += (end.get()-end.getMax())/10;
         attackSpeed -= penalty;
         if (state.getCost() >= 0){
-            end.add(state.getCost(), true);
+            int difficulty = state.getDifficulty();
+            end.add(state.getCost()*difficulty*difficulty, true);
             get("Stamina").add(-penalty/10, false);
-            if (getVacancy() < state.getDifficulty()){
-                if (state.getDifficulty() > 0) say("Too encumbering! This action requires "+state.getDifficulty()+" extra encumbrance.");
+            if (getVacancy() < difficulty){
+                if (difficulty > 0) say("Too encumbering! This action requires "+state.getDifficulty()+" extra Dexterity.");
                 else say("Too encumbering!");
                 state = Actions.Hit;
             }
@@ -158,29 +144,6 @@ public class Player extends Man {
             case Discard:
                 setWeapon(null);
                 stateSet(Actions.Idle);
-                break;
-            case Grab:
-                if (offhand == fist) {
-                    delay.performer = new Performer() {
-                        public void perform() {
-                            P reach = pos.getAdd(clip.organs[OFIST].ptd);
-                            ArrayList<Prop> obj = map.updater.collideInteractive(reach);
-                            for (Prop i : obj) {
-                                if (i != weapon && i != offhand && i.onInteract != null) {
-                                    leftHandMode = true;
-                                    i.onInteract.interact(me);
-                                    leftHandMode = false;
-                                    break;
-                                }
-                            }
-                        }
-                    };
-                } else {
-                    leftHandMode = true;
-                    setWeapon(null);
-                    leftHandMode = false;
-                    stateSet(Actions.Idle);
-                }
                 break;
             case Wield:
                 delay.performer = new Performer() {
@@ -226,7 +189,7 @@ public class Player extends Man {
         return Math.max(0,power+1-difficulty);
     }
     public int getWeight(){
-        return inventory.weight+armor.getWeight()+weapon.weight+offhand.weight;
+        return inventory.weight+armor.getWeight()+weapon.weight;
     }
     public float getSpeed() {
         float speed = get("Speed").get()*clip.getLegStatus();
@@ -262,33 +225,15 @@ public class Player extends Man {
         if (dex == null) return 99;
         return dex.get() - armor.getEncumbrance() - weapon.encumbrance;
     }
-    public void die(){
-        super.die();
-        save = true;
-    }
-    public void update(){
-        super.update();
-        offhand.pos.set(pos.x + clip.organs[OFIST].ptd.x, pos.y + clip.organs[OFIST].ptd.y);
-    }
-    public void disconnect(){
-        super.disconnect();
-        offhand.disconnect();
-    }
-    public void start(){
-        super.start();
-        if (offhand != null){
-            offhand.map = map;
-            offhand.start();
-        }
-    }
     public String toCharacterString(){
-        StringBuilder r = new StringBuilder();
+        StringBuilder r = new StringBuilder(toString()).append("\n");
         r.append(gold).append(";").append(memorized).append(";").append(learning).append("\n");
         r.append(health.toString()).append("\n;");
         for (Trait i : traits) r.append(i.name()).append(";");
         r.append("\n");
         r.append(inventory.toString()).append("\n");
         r.append(crafting.toString()).append("\n");
+        r.append(input.toString()).append("\n");
         return r.toString();
     }
     private void loadTraits(String p){
@@ -302,15 +247,16 @@ public class Player extends Man {
         }
     }
     public void loadPlayer(String[] line){
-        offhand = fist;
-        String[] other = line[0].split(";");
+        super.load(line[0]);
+        String[] other = line[1].split(";");
         gold = Integer.parseInt(other[0]);
         memorized = other[1];
         learning = Actions.getByName(other[2]);
-        inventory.load(line[3]);
-        crafting.load(line[4]);
-        health.load(line[1]);
-        loadTraits(line[2]);
+        inventory.load(line[4]);
+        crafting.load(line[5]);
+        health.load(line[2]);
+        loadTraits(line[3]);
+        input.load(line[6]);
         armor.onChange = new Performer(){
             public void perform(){
                 inventory.setMaxSize(armor.getPockets());
@@ -318,14 +264,5 @@ public class Player extends Man {
         };
         inventory.setMaxSize(armor.getPockets());
         health.record("");
-        final Player me = this;
-        clip.organs[OFIST].onAmputate = new Performer(){
-            public void perform(){
-                offhand.drop(me);
-                leftHandMode = true;
-                setWeapon(fist);
-                leftHandMode = false;
-            }
-        };
     }
 }

@@ -2,7 +2,6 @@ package com.ga.game;
 
 import com.ga.map.Creation;
 import com.ga.map.Global;
-import com.ga.map.Map;
 import com.ga.map.Updater;
 import com.ga.tool.Line;
 import com.ga.unit.Clip;
@@ -60,7 +59,7 @@ public class FileManager {
     }
     public static void saveCharacter(){
         if (Global.player.state != Actions.Dead) {
-            saveMap("map/"+Global.player.map.name);
+            if (Global.server.isHost()) saveMap("map/"+Global.player.map.name);
             save("map/Player.user", Global.player.toCharacterString());
             saveWorld();
         }
@@ -73,13 +72,16 @@ public class FileManager {
         String result = null;
         try {
             try (BufferedReader br = new BufferedReader(new FileReader(dir))) {
-                String line = br.readLine().split(" //")[0];
-                result = line + "%";
-                while (line != null) {
-                    line = br.readLine();
-                    if (line != null) result += line.split(" //")[0] + "%";
+                String newline = br.readLine();
+                if (newline != null) {
+                    String line = newline.split(" //")[0];
+                    result = line + "%";
+                    while (line != null) {
+                        line = br.readLine();
+                        if (line != null) result += line.split(" //")[0] + "%";
+                    }
+                    result = result.substring(0, result.length() - 1);
                 }
-                result = result.substring(0, result.length() - 1);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -87,31 +89,28 @@ public class FileManager {
         return result;
     }
     public static void loadGame(){
-        loadActors();
-        loadPlayer(1);
+        loadActors("Actors.map");
+        loadPlayer();
     }
-    public static void loadPlayer(int id){
+    public static void loadPlayer(){
         String[] data = read("Data/map/Player.user").split("%");
         PlayerInput pi;
-        if (id == 1) {
-            pi = new PlayerInput((MainPlayer) Updater.getUnloadedActor(1));
-            Global.display.input = pi;
-            pi.load(data[5]);
-            Command.host = pi.host;
-        } else {
-            pi = new PlayerInput((MainPlayer) Updater.getUnloadedActor(id));
-        }
+        pi = ((MainPlayer) Stock.Player.create(null, 1, 0)).input;
+        Global.display.input = pi;
         pi.host.loadPlayer(data);
+        Command.host = pi.host;
         pi.host.lastLand = new Line();
         Global.camera.set(pi.host.pos);
         pi.host.map.setTexture();
+        pi.host.map.render();
         pi.host.map.mapEdgeCenter(Global.camera = pi.host.map.size.getMult(.5f, .5f));
         pi.host.map.onTimeChange();
+        pi.host.start();
     }
 
-    public static void loadActors(){
-        String data = read("Data/map/Actors.map");
-        if (data.length() > 0) {
+    public static void loadActors(String p){
+        String data = read("Data/map/"+p);
+        if (data != null) {
             String[] actors = data.split("%");
             for (String i : actors) {
                 Stock.get(null, i).start();
@@ -225,7 +224,7 @@ public class FileManager {
 
     public static void readWorld(){
         char[][] world;
-        String data = read("Data/map/World.txt");
+        String data = read("Data/map/World.map");
         String[] lines = data.split("%");
         world = new char[lines.length-1][lines[1].length()];
         for (int y=1;y<lines.length;y++){
@@ -249,7 +248,7 @@ public class FileManager {
             }
             r.append("\n");
         }
-        save("map/World.txt", r.toString());
-        save("map/Actors.map", Updater.toActorString());
+        save("map/World.map", r.toString());
+        save("map/Actors.map", Updater.toAllActorString());
     }
 }
