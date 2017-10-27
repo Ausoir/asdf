@@ -268,7 +268,7 @@ public class Server {
                         tcpDownloader.download(udp.getClientIP(), "Data/map/multiplayer/serverWorld.map");
                         tcpDownloader.download(udp.getClientIP(), "Data/map/multiplayer/serverMap.map");
                         tcpDownloader.download(udp.getClientIP(), "Data/map/multiplayer/serverActors.map");
-                        tcpDownloader.download(udp.getClientIP(), "Data/map/multiplayer/serverPlayer.map");
+                        tcpDownloader.download(udp.getClientIP(), "Data/map/multiplayer/serverPlayer.user");
                         output = null;
                     } catch (IOException e) {
                         e.printStackTrace();

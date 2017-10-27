@@ -373,12 +373,12 @@ public enum Stock {
         product.onInteract = new Interactive(){
             public void interact(Man p){
                 String t = p.getConversation();
-                if (t.equals("")){
-                    Global.server.startServer();
-                    p.say("Waiting for a call...");
-                } else if (t.toLowerCase().startsWith("call")) {
+                if (t.toLowerCase().startsWith("call")) {
                     Global.server.startClient(p.getConversation().substring(5));
                     p.say("Connecting...");
+                } else if (t.equals("")) {
+                    Global.server.startServer();
+                    p.say("Waiting for a call...");
                 }
                 p.setState(Actions.Hit);
             }

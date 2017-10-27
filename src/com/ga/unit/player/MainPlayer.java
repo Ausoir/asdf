@@ -23,7 +23,7 @@ public class MainPlayer extends Player {
     @Override
     public void say(String p){
         if (p.startsWith("'") && p.endsWith("'")){
-            memorized = p.substring(1,p.length()-1);
+            memorized = p.substring(1,p.length()-1).replace(';', '_');
             p = "Memorized "+p;
         }
         speech.say(p);
