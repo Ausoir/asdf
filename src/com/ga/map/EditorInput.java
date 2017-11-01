@@ -22,7 +22,6 @@ public class EditorInput extends Drawable implements Input, Updatable {
         NONE, REPOSITION, MODIFY, LINE, RECTANGLE, DELETE,
         SELECT, OBJECT, REMOVE
     }
-    private Drawable next;
     private final int SNAP = 24;
     private final int SCROLLSPEED = 50;
     private Stroke basicStroke = new BasicStroke(10);

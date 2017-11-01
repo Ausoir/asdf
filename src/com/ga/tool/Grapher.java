@@ -1,5 +1,6 @@
 package com.ga.tool;
 
+import com.ga.game.Settings;
 import com.ga.map.Global;
 import com.ga.map.Updater;
 import com.ga.unit.Man;
@@ -25,6 +26,7 @@ public class Grapher {
                 test = test.getAdd(Global.rel);
                 g.drawLine(test.pt.x(),test.pt.y(),test.ptd.x(), test.ptd.y());
             }
+            g.fillOval(unit.target.x()-8+ Settings.centerX, unit.target.y()-8+Settings.centerY, 16, 16);
         }
     }
 }

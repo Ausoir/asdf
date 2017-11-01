@@ -34,7 +34,7 @@ class Game extends JFrame {
         Creation.create();
         Global.cprocess = new Processes();
         if (editor) new EditorInput();
-        add(display);
+        getContentPane().add(display);
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }

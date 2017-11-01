@@ -36,6 +36,7 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
         });
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
+        setIgnoreRepaint(true);
         setDoubleBuffered(true);
 
         chatbox = new JTextField();
@@ -72,6 +73,7 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
 
     public void paintComponent(Graphics g) {
         Global.player.map.updater.draw((Graphics2D) g.create());
+        g.fillOval(mX-8, mY, 16, 16);
     }
 
     private void input(int mode){

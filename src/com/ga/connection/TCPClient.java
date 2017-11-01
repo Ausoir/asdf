@@ -38,7 +38,7 @@ class TCPClient {
                     bos.write(one);
                     bytesRead = input.read(one);
                 }
-                bos.write((char)28);
+//                bos.write((char)28);
                 bos.flush();
 //                bos.close();
             } catch (Exception e) {
