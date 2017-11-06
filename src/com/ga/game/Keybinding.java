@@ -15,6 +15,8 @@ public class Keybinding {
         }
     }
     public static Integer get(String p){
-        return map.get(p);
+        Integer r = map.get(p);
+        if (r == null) return -2;
+        return r;
     }
 }

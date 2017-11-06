@@ -6,24 +6,22 @@ import com.ga.unit.Stock;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 /**
  * Created by Ga on 8/6/2016. asd
  */
-class Game extends JFrame {
+class Game {
     Game(boolean editor, int x, int y){
         Settings.init();
         Keybinding.init();
         Global.init();
         Updater.editor = editor;
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-        if (x == 0 && y == 0) {
-            x = screen.width;
-            y = screen.height;
-            setExtendedState( getExtendedState()|JFrame.MAXIMIZED_BOTH );
-        }
-        Settings.setScreenSize(x, y);
-        setSize(Settings.screenX, Settings.screenY);
+        JFrame gamewindow = new JFrame();
+        gamewindow.setVisible(true);
+        gamewindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         FileManager.init();
         Dialog.init();
         Clips.init();
@@ -31,11 +29,19 @@ class Game extends JFrame {
         Sound.init();
         Stock.init();
         Display display = new Display();
+        gamewindow.setContentPane(display);
         Creation.create();
+        if (x == 0 && y == 0) {
+            x = screen.width;
+            y = screen.height;
+            gamewindow.setExtendedState( gamewindow.getExtendedState()|JFrame.MAXIMIZED_BOTH );
+        } else {
+            gamewindow.getContentPane().setPreferredSize(new Dimension(x, y));
+            gamewindow.pack();
+        }
+        Settings.setScreenSize(x, y);
         Global.cprocess = new Processes();
         if (editor) new EditorInput();
-        getContentPane().add(display);
-        setVisible(true);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        display.requestFocus();
     }
 }

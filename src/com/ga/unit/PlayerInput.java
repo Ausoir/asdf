@@ -3,9 +3,6 @@ package com.ga.unit;
 import com.ga.game.Command;
 import com.ga.game.Input;
 import com.ga.game.Keybinding;
-import com.ga.map.Global;
-import com.ga.tool.P;
-import com.ga.unit.player.MainPlayer;
 import com.ga.unit.player.Player;
 import com.ga.unit.skill.Actions;
 
@@ -18,22 +15,7 @@ import java.util.Map;
  * Created by Ga on 7/25/2016. asd
  */
 public class PlayerInput implements Input {
-    private HashMap<Integer, String> keyMap = new HashMap<Integer, String>(){{
-        put(-Keybinding.get("A"), Actions.Idle.getName());
-        put(-Keybinding.get("D"), Actions.Idle.getName());
-        put(Keybinding.get("W"), Actions.Jump.getName());
-        put(Keybinding.get("A"), Actions.WalkL.getName());
-        put(Keybinding.get("S"), Actions.Drop.getName());
-        put(Keybinding.get("D"), Actions.Walk.getName());
-        put(Keybinding.get("SHIFT"), Actions.Rest.getName());
-        put(Keybinding.get("SPACE"), Actions.Kick.getName());
-        put(Keybinding.get("R"), Actions.Wield.getName());
-        put(Keybinding.get("M1"), Actions.Use.getName());
-        put(Keybinding.get("M2"), Actions.Discard.getName());
-        put(Keybinding.get("Q"), Actions.Throw.getName());
-        put(Keybinding.get("GRAVE"), "_Recall");
-        put(Keybinding.get(","), "_Rest");
-    }};
+    private HashMap<Integer, String> keyActionMap = new HashMap();
     public Player host;
     public PlayerInput(Player unit){
         host = unit;
@@ -49,17 +31,17 @@ public class PlayerInput implements Input {
         }
     }
     public void changeMapping(int key, Actions event){
-        keyMap.remove(key);
-        Iterator i = keyMap.entrySet().iterator();
+        keyActionMap.remove(key);
+        Iterator i = keyActionMap.entrySet().iterator();
         while (i.hasNext()) {
             Map.Entry e = (Map.Entry) i.next();
             if (e.getValue().equals(event.getName())) i.remove();
         }
-        keyMap.put(key, event.getName());
+        keyActionMap.put(key, event.getName());
     }
     public String getMapping(Actions move){
         String r = null;
-        for (Map.Entry<Integer, String> i : keyMap.entrySet()) {
+        for (Map.Entry<Integer, String> i : keyActionMap.entrySet()) {
             if (i.getValue().equals(move.getName())){
                 int key = i.getKey();
                 String keyname = KeyEvent.getKeyText(key);
@@ -73,8 +55,8 @@ public class PlayerInput implements Input {
     public void input(int mode, int x, int y){
         if (mode == 0) inputDirect(null,x,y); //mousemove for better targetting
         else if (mode == Keybinding.get(",")) host.map.updater.sleep(50);
-        else if (keyMap.containsKey(mode)){
-            inputDirect(keyMap.get(mode),x,y);
+        else if (keyActionMap.containsKey(mode)){
+            inputDirect(keyActionMap.get(mode),x,y);
         } else if (mode >= 49 && mode < 55) {
             inputDirect("_0"+(mode-49),x,y);
         } else if (mode > 9) inputDirect("_"+mode, x, y);
@@ -108,14 +90,14 @@ public class PlayerInput implements Input {
             for (String i : data) {
                 String[] pair = i.split(":");
                 Actions move = Actions.getByName(pair[1]);
-                if (host.hasSkill(move)) keyMap.put(Integer.parseInt(pair[0]), move.getName());
+                if (move != null) keyActionMap.put(Integer.parseInt(pair[0]), move.getName());
             }
         }
     }
     @Override
     public String toString(){
         String r = ";";
-        for (Map.Entry<Integer, String> i : keyMap.entrySet()){
+        for (Map.Entry<Integer, String> i : keyActionMap.entrySet()){
             r += i.getKey()+":"+i.getValue()+";";
         }
         return r;

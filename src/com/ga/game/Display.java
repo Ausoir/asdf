@@ -10,7 +10,7 @@ import java.awt.event.*;
 /**
  * Created by Ga on 5/6/2016. asd
  */
-public class Display extends JPanel implements KeyListener, MouseListener, MouseMotionListener {
+public class Display extends JPanel {
     public JTextField chatbox;
     public Input input;
     public Menu menu;
@@ -21,11 +21,9 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
     private String lastChat = "";
     Display() {
         Global.display = this;
-        setLayout(null);
-        setIgnoreRepaint(true);
-        addKeyListener(this);
-        addMouseListener(this);
-        addMouseMotionListener(this);
+        setFocusable(true);
+        setFocusTraversalKeysEnabled(false);
+        setDoubleBuffered(true);
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
@@ -34,10 +32,58 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
                 chatbox.setBounds(0,Settings.screenY-40,500,40);
             }
         });
-        setFocusable(true);
-        setFocusTraversalKeysEnabled(false);
-        setIgnoreRepaint(true);
-        setDoubleBuffered(true);
+        MouseAdapter mouseAdapter = new MouseAdapter() {
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent e) {
+                mX = e.getX();
+                mY = e.getY();
+                input(e.getButton());
+            }
+
+            @Override
+            public void mouseReleased(java.awt.event.MouseEvent e) {
+                mX = e.getX();
+                mY = e.getY();
+                if (Updater.editor) input(-e.getButton());
+                else if (mode == e.getButton()) mode = -1;
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                mX = e.getX();
+                mY = e.getY();
+            }
+
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                mX = e.getX();
+                mY = e.getY();
+                if (Updater.editor) input(0);
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                mX = e.getX();
+                mY = e.getY();
+                input(0);
+            }
+        };
+        addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                int keycode = e.getKeyCode();
+                if (keycode == Keybinding.get("ENTER")) chatbox.requestFocus();
+                else if (keycode == Keybinding.get("TAB")) menu.showMenu();
+                else input(keycode);
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                input(-e.getKeyCode());
+            }
+        });
+        addMouseListener(mouseAdapter);
+        addMouseMotionListener(mouseAdapter);
 
         chatbox = new JTextField();
         chatbox.setFont(new Font("Ariel", Font.PLAIN, 18));
@@ -57,6 +103,11 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
         add(menu);
     }
 
+    @Override
+    public Dimension getPreferredSize() {
+        return new Dimension(Settings.screenX, Settings.screenY);
+    }
+
     public void removeSpeech(){
         for (Component i : getComponents()){
             if (i instanceof JTextArea) remove(i);
@@ -72,78 +123,20 @@ public class Display extends JPanel implements KeyListener, MouseListener, Mouse
     }
 
     public void paintComponent(Graphics g) {
-        Global.player.map.updater.draw((Graphics2D) g.create());
-        g.fillOval(mX-8, mY, 16, 16);
+        super.paintComponent(g);
+        Graphics2D g2d = (Graphics2D) g.create();
+        g2d.addRenderingHints(new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY));
+        Global.player.map.updater.draw(g2d);
+        g2d.setColor(Color.BLACK);
+        g2d.fillRect(mX, mY, 12, 12);
     }
 
     private void input(int mode){
-        if (focus) {
-            if (this.mode != mode || mode <= 0 || Updater.editor) {
-                this.mode = mode;
-                if (input != null)
-                    input.input(mode, (int) (mX - Settings.centerX + Global.camera.x), (int) (mY - Settings.centerY + Global.camera.y));
+        if (this.mode != mode || mode <= 0 || Updater.editor) {
+            this.mode = mode;
+            if (input != null) {
+                input.input(mode, (int) (mX - Settings.centerX + Global.camera.x), (int) (mY - Settings.centerY + Global.camera.y));
             }
         }
-    }
-
-    @Override
-    public void keyTyped(KeyEvent e) {
-    }
-
-    @Override
-    public void keyPressed(KeyEvent e) {
-        input(e.getKeyCode());
-        if (mode == Keybinding.get("ENTER")) chatbox.requestFocus();
-        else if (mode == Keybinding.get("TAB")) menu.showMenu();
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-        input(-e.getKeyCode());
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mousePressed(java.awt.event.MouseEvent e) {
-        mX = e.getX();
-        mY = e.getY();
-        input(e.getButton());
-    }
-
-    @Override
-    public void mouseReleased(java.awt.event.MouseEvent e) {
-        mX = e.getX();
-        mY = e.getY();
-        if (Updater.editor) input(-e.getButton());
-        else if (mode == e.getButton()) mode = -1;
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-        mX = e.getX();
-        mY = e.getY();
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent e) {
-        mX = e.getX();
-        mY = e.getY();
-        if (Updater.editor) input(0);
-    }
-
-    @Override
-    public void mouseMoved(MouseEvent e) {
-        mX = e.getX();
-        mY = e.getY();
-        input(0);
     }
 }

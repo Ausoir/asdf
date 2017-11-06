@@ -26,7 +26,7 @@ public class Menu extends JPanel implements Updatable {
         current = p;
         add(p);
     }
-    public void showMenu(){
+    void showMenu(){
         if (current.getClass() != MenuPlayer.class){
             select(menu);
             menu.setVisible(false);
@@ -52,7 +52,7 @@ public class Menu extends JPanel implements Updatable {
         ((MenuContainer) current).show(title, wares, actions);
     }
     void resize(){
-        setBounds(0,0, Settings.screenX,Settings.screenY);
+        setBounds(0,0, Settings.screenX, Settings.screenY);
         current.resize();
     }
     void onExit(){
