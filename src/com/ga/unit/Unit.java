@@ -275,10 +275,6 @@ public class Unit extends Prop {
         stateDuration++;
     }
 
-    protected void stateDone(){
-        state.onFinish(this);
-    }
-
     protected void moveTriggered(int p){
         if (lastState != state) {
             moveTriggered = true;
@@ -305,7 +301,7 @@ public class Unit extends Prop {
             stats.update();
             if (delay.update() && delay.performer == null){
                 if (!moveTriggered) moveTriggered(0);
-                stateDone();
+                state.onFinish(this);
             }
             stateUpdate();
         }

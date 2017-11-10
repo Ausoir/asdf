@@ -55,26 +55,20 @@ public class MenuPlayer extends Panel {
                 button.setIcon(iconDescribe);
                 final Performer perf = new Performer() {
                     public void perform() {
-                        Global.player.get("Level").add(-1, true);
-                        Global.player.get(stats[var]).setMax(Global.player.get(stats[var]).getMax() + 1);
+                        if (Global.player.get("Level").require(1))
+                            Global.player.get(stats[var]).setMax(Global.player.get(stats[var]).getMax() + 1);
                     }
                 };
-                statButtons[var].addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        perf.perform();
-                        refresh();
-                    }
+                statButtons[var].addActionListener(e -> {
+                    perf.perform();
+                    refresh();
                 });
-                button.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        if (Global.player.get("Level").get() > 0) {
-                            Global.display.menu.showDialog(stats[var], Dialog.get(stats[var] + "Dsc"),
-                                    new String[]{"Increase Stat"}, new Performer[]{perf});
-                            refresh();
-                        } else Global.display.menu.showDialog(stats[var], Dialog.get(stats[var] + "Dsc"));
-                    }
+                button.addActionListener(e -> {
+                    if (Global.player.get("Level").get() > 0) {
+                        Global.display.menu.showDialog(stats[var], Dialog.get(stats[var] + "Dsc"),
+                                new String[]{"Increase Stat"}, new Performer[]{perf});
+                        refresh();
+                    } else Global.display.menu.showDialog(stats[var], Dialog.get(stats[var] + "Dsc"));
                 });
             }
         }

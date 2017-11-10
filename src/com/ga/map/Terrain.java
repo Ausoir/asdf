@@ -22,7 +22,7 @@ public class Terrain extends Drawable {
     private int length = 0; //polygon size is always multiples of 4
     private P finalSize;
     Map map;
-    public Terrain(Map map, String texture, Shader shader, int depth){
+    public Terrain(Map map, String texture, Shader shader, float depth){
         image = new ShadedPicture(null, texture.startsWith("_")?null:texture, shader){
             @Override
             public void shade(int p){

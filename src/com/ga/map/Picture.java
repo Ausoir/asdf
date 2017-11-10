@@ -97,8 +97,8 @@ public class Picture {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else {
-            System.out.println("Can't read file ["+dir + "]");
+        } else if (dir != null) {
+            System.out.println("Can't read picture file ["+dir + "]");
             try {
                 image = ImageIO.read(new File("Data/Error.png"));
             } catch (IOException e) {
@@ -118,7 +118,7 @@ public class Picture {
                 e.printStackTrace();
             }
             cache.put(dir, image);
-        } else System.out.println("Can't read file ["+dir + "]");
+        } else if (dir != null) System.out.println("Can't read picture cache ["+dir + "]");
         return toCompatibleImage(image);
     }
     static BufferedImage toCompatibleImage(BufferedImage image)

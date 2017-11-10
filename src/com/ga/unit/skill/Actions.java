@@ -48,7 +48,7 @@ public enum Actions {
         public void onSet(Unit host){
             host.attackSpeed = -1;
             if (host.lastLand.opt != 2 && host.map.checkLand(new Line(host.pos.getAdd(0,4), host.pos.getAdd(0,600)), host.lastLand.depth) != null){
-                host.setDepth(host.lastLand.depth-.001f);
+                host.setDepth(host.lastLand.depth+.001f);
                 host.pos.y+=4;
             }
         }
@@ -196,7 +196,8 @@ public enum Actions {
                 Item item = ((Man)p).weapon;
                 int del = 25 - p.delay.time;
                 if (p.delay.time == 13) p.attackSound();
-                float rot = -((item.dir * 10) + del * del * .03f * -item.dir);
+                float test = p.target.getMult(p.dir, p.dir).getAtan();
+                float rot = test -((item.dir * 10) + del * del * .03f * -item.dir);
                 if (Math.abs(rot) < 8){
                     float rot1 = rot;
                     float rot2 = item.rotation;

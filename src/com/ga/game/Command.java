@@ -48,14 +48,7 @@ public class Command {
                 }
                 else if (cmd[0].equals("tpto")) host.pos.set(Integer.parseInt(cmd[1].split(",")[0]),Integer.parseInt(cmd[1].split(",")[1]));
                 else if (cmd[0].equals("act")) host.setState(Actions.valueOf(cmd[1]));
-                else if (cmd[0].equals("level")){
-                    Unit victim = new Unit(host.map, "",-1);
-                    Global.player.map.updater.remove(victim);
-                    victim.pos.set(Global.player.pos);
-                    victim.stats.load("Level:10,10");
-                    Global.player.witnessDeath(victim);
-                    victim.remove();
-                }
+                else if (cmd[0].equals("level")) Global.player.witnessDeath(Global.player);
                 else if (cmd[0].equals("learn")) Global.player.learnSkill(Actions.valueOf(cmd[1]));
                 else if (cmd[0].equals("recipe")) host.crafting.knowledge.add(cmd[1]);
                 else if (cmd[0].equals("sound")) Sound.play(Global.player.map, Global.camera, cmd[1]);

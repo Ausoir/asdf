@@ -27,7 +27,7 @@ public abstract class Drawable implements Observer {
     public float getDepth(){
         return depth;
     }
-    void reverseAdd(Drawable p){
+    private void reverseAdd(Drawable p){
         if (prev == null) p.setNext(this);
         else {
             if (prev.getDepth() <= p.getDepth()) {
@@ -49,15 +49,9 @@ public abstract class Drawable implements Observer {
             next.add(p);
         }
     }
-    void setNext(Drawable p){
+    private void setNext(Drawable p){
         next = p;
         next.prev = this;
-    }
-    void removeThis(Drawable p){
-        if (next != null) {
-            if (this == p) removeThis();
-            else next.removeThis(p);
-        }
     }
     protected void removeThis(){
         if (prev != null) prev.next = next;

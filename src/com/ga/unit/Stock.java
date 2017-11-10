@@ -149,7 +149,7 @@ public enum Stock {
         return product;
     }},
     Construct{ Prop make(Map map, int id, int seed){
-        Building product = new Building(map, id+"", 0);
+        Building product = new Building(map, id+"", seed);
         product.subId = id;
         return product;
     }},

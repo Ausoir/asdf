@@ -146,7 +146,7 @@ public class Map {
                     if (formTexture == null) continue;
                     else {
                         String[] formName = formTexture.split("&");
-                        terrain = new Terrain(this, formName[1], Shader.getByName(formName[2]), Integer.parseInt(formName[0]));
+                        terrain = new Terrain(this, formName[1], Shader.getByName(formName[2]), Float.parseFloat(formName[0]));
                     }
                     terrains.put(i.tid, terrain);
                     terrain.start();

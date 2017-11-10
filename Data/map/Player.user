@@ -1,7 +1,7 @@
-9@1@0@2926,2303@0.00@7@1@111111@Speed:23,23&Progress:0,0&Dexterity:1,1&Channeling:0,400&Memory:1,1&Electric:0,400&Shadow:0,400&Ice:0,400&Attack:0,0&Air:0,400&Stamina:2,3&Unarmed:0,400&Experience:8,10&Athletics:0,400&Motivation:100,100&Conjuration:0,400&Fire:0,400&Agility:1,1&Might:1,1&Endurance:157,1000&Level:1,1&Mutation:0,400@Player@0/0&1@Use,Rest,Sidekick#Player##None&None&None
+9@1@0@5006,1302@0.00@7@1@111111@Speed:23,23&Progress:0,0&Dexterity:5,5&Channeling:0,400&Memory:1,1&Electric:0,400&Shadow:0,400&Ice:0,400&Attack:0,0&Air:0,400&Stamina:4,4&Unarmed:0,400&Experience:5,60&Athletics:0,400&Motivation:100,100&Conjuration:0,400&Fire:0,400&Agility:6,6&Might:1,1&Endurance:-43,800&Level:0,6&Mutation:0,400@Player@0/4&0,0&1@Use,Rest,Sidekick,Thrust,Windwalk,Dart#Player#6@6@6719@5006,1267@-0.18@16@11581@2_0_0__0#None&None&None
 21204;call 127.0.0.1;null
 ;OXOPCCPPXOPCCPPXOPCCPPXOPCPXP;
 ;Enchanter;
 ;
 ;
-;-65:Idle;32:Sidekick;16:Rest;65:WalkL;1:Use;81:Throw;2:Discard;82:Wield;-68:Idle;83:Drop;68:Walk;87:Jump;
+;-65:Idle;32:Sidekick;65:WalkL;1:Use;2:Discard;-68:Idle;68:Walk;16:Rest;81:Throw;82:Wield;83:Drop;86:Windwalk;87:Jump;

@@ -21,6 +21,7 @@ public class Display extends JPanel {
     private String lastChat = "";
     Display() {
         Global.display = this;
+        setLayout(null);
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
         setDoubleBuffered(true);
@@ -128,7 +129,6 @@ public class Display extends JPanel {
         g2d.addRenderingHints(new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY));
         Global.player.map.updater.draw(g2d);
         g2d.setColor(Color.BLACK);
-        g2d.fillRect(mX, mY, 12, 12);
     }
 
     private void input(int mode){

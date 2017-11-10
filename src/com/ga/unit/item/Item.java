@@ -467,7 +467,6 @@ public class Item extends Prop {
     }
     public void onEquip(Man host){
         owner = host;
-        setDepth(host.getDepth());
         lastLand = host.lastLand;
         save = false;
         mobile = false;
@@ -572,7 +571,7 @@ public class Item extends Prop {
         return durability == -1;
     }
     public float getDepth(){
-        if (owner != null) return owner.getDepth()-.001f;
+        if (owner != null) return owner.getDepth();
         else return super.getDepth();
     }
     @Override
