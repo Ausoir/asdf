@@ -46,7 +46,7 @@ public class Prop extends Thing {
         Line closest = map.checkLand(new Line(pos.getAdd(0,-4), new P(pos.x, pos.y+600)));
         if (closest != null) {
             lastLand = closest;
-            setDepth(closest.depth - .001f);
+            setDepth(closest.depth - .002f);
         }
     }
     public int getSize(){

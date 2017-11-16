@@ -141,6 +141,12 @@ public class Man extends Unit {
     }
 
     @Override
+    public void setDepth(float p){
+        super.setDepth(p);
+        if (weapon != null) weapon.setDepth(p-.0001f);
+    }
+
+    @Override
     public void draw(Graphics2D g) {
         super.draw(g);
         armor.armor[0].pos.set(pos.getAdd(clip.organs[5].pt));

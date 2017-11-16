@@ -1,6 +1,7 @@
 package com.ga.game;
 
 import com.ga.map.Global;
+import com.ga.map.Picture;
 import com.ga.map.Updater;
 
 import javax.swing.*;
@@ -68,12 +69,19 @@ public class Display extends JPanel {
                 mY = e.getY();
                 input(0);
             }
+
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                int notches = e.getWheelRotation();
+                Global.scale += notches*.1f;
+            }
         };
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
                 int keycode = e.getKeyCode();
-                if (keycode == Keybinding.get("ENTER")) chatbox.requestFocus();
+                if (keycode == Keybinding.get("ESC")) System.exit(1);
+                else if (keycode == Keybinding.get("ENTER")) chatbox.requestFocus();
                 else if (keycode == Keybinding.get("TAB")) menu.showMenu();
                 else input(keycode);
             }
@@ -85,6 +93,7 @@ public class Display extends JPanel {
         });
         addMouseListener(mouseAdapter);
         addMouseMotionListener(mouseAdapter);
+        addMouseWheelListener(mouseAdapter);
 
         chatbox = new JTextField();
         chatbox.setFont(new Font("Ariel", Font.PLAIN, 18));

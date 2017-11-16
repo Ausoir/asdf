@@ -36,6 +36,7 @@ public class Global {
     public static ArrayList<EventTimer> timers = new ArrayList<>();
     public static Font font = new Font("Helvetica",Font.PLAIN,18);
     public static int controlId;
+    public static float scale = 1;
 
     public static void init(){
         server = new Server();

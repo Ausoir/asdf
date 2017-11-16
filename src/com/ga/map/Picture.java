@@ -177,7 +177,7 @@ public class Picture {
             x = rx - xMid;
             y = ry - yMid;
             g.rotate(rot, rx, ry);
-            drawImage(g, (int) x, (int) y, (int) sizeX*dir, (int) sizeY);
+            drawImage(g, (int) x, (int) y, (int) (sizeX*dir), (int) (sizeY));
             g.rotate(-rot, rx, ry);
         }
     }

@@ -151,6 +151,10 @@ public class MainPlayer extends Player {
         super.stateUpdate();
         if (state == Actions.Rest) indicater.show(1);
     }
+    protected void stateFinish(){
+        super.stateFinish();
+        input.update();
+    }
     public void update(){
         super.update();
         if (!get("Stamina").isFull()) indicater.show(.5f);

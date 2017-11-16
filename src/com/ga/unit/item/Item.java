@@ -570,10 +570,6 @@ public class Item extends Prop {
     private boolean isInfinite(){
         return durability == -1;
     }
-    public float getDepth(){
-        if (owner != null) return owner.getDepth();
-        else return super.getDepth();
-    }
     @Override
     public String toString(){
         String t = super.toString();
