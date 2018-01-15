@@ -14,7 +14,7 @@ import java.util.Map;
 public class Stats {
     private ArrayList<Buff> effects = new ArrayList<>();
     private HashMap<String, Stat> stats = new HashMap<>();
-    private Timer timer = new Timer(40, true);
+    private Timer timer = new Timer(60, true);
     private Unit host;
     public Stats(Unit host){
         this.host = host;

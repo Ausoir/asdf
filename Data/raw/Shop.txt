@@ -1,9 +1,9 @@
 Meal;Drumstick;Porkchop;Burger;Sandwich
-Katana;Broadsword;Lancesword;Cutlass;Claymore;Mace;Spear;Halberd;Bow;Pistol;Revolver;Dagger;Tanto;Bandana;Scroll;Potion;Fireball;Adventurewear_Legging;Adventurewear_Torso;Throwing_Knife;Fireball;Ration
-Chainmail_Torso;Chainmail_Legging;Lace_Helm;Legion_Helm;Platemail_Torso;Platemail_Legging;Battlewear_Torso;Battlewear_Legging
-Comfortwear_Torso;Comfortwear_Legging;Toughwear_Torso;Toughwear_Legging;Dustset_Torso;Dustset_Legging;Adventurewear_Torso;Adventurewear_Legging;Suit_Torso;Suit_Legging
+Katana;Broadsword;Lancesword;Cutlass;Claymore;Mace;Spear;Halberd;Bow;Pistol;Revolver;Dagger;Tanto;Bandana;Scroll;Potion;Fireball;Adventurewear_Pants;Adventurewear_Torso;Throwing_Knife;Fireball;Ration
+Chainmail_Torso;Chainmail_Pants;Lace_Helm;Legion_Helm;Platemail_Torso;Platemail_Pants;Battlewear_Torso;Battlewear_Pants
+Comfortwear_Torso;Comfortwear_Pants;Toughwear_Torso;Toughwear_Pants;Dustset_Torso;Dustset_Pants;Adventurewear_Torso;Adventurewear_Pants;Suit_Torso;Suit_Pants
 Manual;Textbook
-Scroll;Potion;Battery;Threadball;Meat;Textbook;Comfortwear_Torso;Comfortwear_Legging
+Scroll;Potion;Battery;Threadball;Meat;Textbook;Comfortwear_Torso;Comfortwear_Pants
 Scroll;Potion;Fireball;Throwing_Knife
 Battery;Agent;Rock;Grass;Shell;Meat
 Ration

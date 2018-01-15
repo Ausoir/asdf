@@ -11,6 +11,7 @@ import com.ga.tool.P;
  * Created by Ga on 3/13/2017. asd
  */
 public class Prop extends Thing {
+    static final float OFFSET_PROP = .0002f;
     public int factoryId = -1;
     public int subId = -1;
     public Interactive onInteract = null;
@@ -21,7 +22,7 @@ public class Prop extends Thing {
     public boolean tangible = true;
     public Line lastLand = new Line();
     public Tags tags = new Tags();
-    boolean manualDepth = false;
+    public boolean manualDepth = true;
     public Prop(Map map, String name, int seed, int depth) {
         super(map, name, seed, depth);
     }
@@ -46,8 +47,14 @@ public class Prop extends Thing {
         Line closest = map.checkLand(new Line(pos.getAdd(0,-4), new P(pos.x, pos.y+600)));
         if (closest != null) {
             lastLand = closest;
-            setDepth(closest.depth - .002f);
+            setDepth(closest.depth - OFFSET_PROP);
         }
+    }
+    public Line getPosLine(){
+        return new Line(pos, pos.getAdd(0,-1));
+    }
+    Line getFaceLine(){
+        return new Line(pos, pos.getAdd(dir,0));
     }
     public int getSize(){
         return image.sizeRadius;
@@ -59,7 +66,7 @@ public class Prop extends Thing {
         P vp;
         Line pp;
         boolean collided = true;
-        int timeout = 8;
+        int timeout = 4;
         while (collided) {
             collided = false;
             vp = pos.getAdd(vel);
@@ -70,17 +77,30 @@ public class Prop extends Thing {
                     float slope = land.getSlope();
                     boolean cw = land.clockwise();
                     float lineY = land.getCrossPointY(pos.x);
-                    onCollide(land);
-                    if (cw && lineY >= pos.y) {
-                        float atan = (float) Math.atan(slope);
-                        if (vel.x > 0 != atan > 0) vel.x = vel.x * Global.cos(atan);
-                        if (!Double.isInfinite(slope))
-                            vel.y += land.getCrossPointY(pos.x+vel.x) - (pos.y + vel.y) - 1;
-                        lastLand = land;
-                        collided = true;
-                    } else if (!cw && lineY <= pos.y) {
-                        vel.set(0, 0);
-                        return;
+                    Line testt = new Line(pos.x, pos.y - 9999, pos.x, pos.y+2);
+                    int cws = 0, ccs = 0; //check if landsite is overlapped behind a higher depth polygon
+                    boolean overlapped = false;
+                    for (Line ii : map.landRaw) {
+                        if (ii.depth > land.depth && ii.opt != -1 && ii.lineCross(testt)) {
+                            overlapped = true;
+                            if (ii.clockwise()) cws++;
+                            else ccs++;
+                        }
+                    }
+                    if (!overlapped || cws <= ccs) {
+                        onCollide(land);
+                        if (cw && lineY >= pos.y) {
+                            float atan = (float) Math.atan(slope);
+                            if (vel.x > 0 != atan > 0) vel.x = vel.x * Global.cos(atan);
+                            if (!land.vertical()) {
+                                vel.y += land.getCrossPointY(pos.x + vel.x) - (pos.y + vel.y) - 1;
+                                lastLand = land;
+                            }// else vel.x += land.getCrossPointX(pos.y + vel.y) - (pos.x + vel.x);
+                            collided = true;
+                        } else if (!cw && lineY <= pos.y) {
+                            vel.set(0, 0);
+                            return;
+                        }
                     }
                 }
             }
@@ -93,12 +113,15 @@ public class Prop extends Thing {
     }
     public void onCollide(Line l){
     }
+    protected void onMapEdge(int dir){
+        vel.x = 0;
+    }
     public void update(){
         if (mobile) {
             collide();
             int edge = map.mapEdge(pos.getAdd(vel));
             if (edge > 0) {
-                if (Math.abs(edge-5) == 1) vel.x = 0;
+                if (Math.abs(edge-5) == 1) onMapEdge(edge-5);
                 else if (edge == 2) remove();
             }
             pos.add(vel);
@@ -122,4 +145,3 @@ public class Prop extends Thing {
                 + "@" + String.format(java.util.Locale.US,"%.2f", rotation);
     }
 }
-

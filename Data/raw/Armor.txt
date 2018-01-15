@@ -1,27 +1,27 @@
 Comfortwear_Torso;2;0;0;Cloth //Armor, Type, Encumbrance, Pockets, Materials
-Comfortwear_Legging;1;0;0;Cloth //Armor, Type, Encumbrance, Pockets, Materials
+Comfortwear_Pants;1;0;0;Cloth //Armor, Type, Encumbrance, Pockets, Materials
 Dustset_Torso;2;1;0;Cloth,Leather
-Dustset_Legging;1;1;1;Cloth,Leather
+Dustset_Pants;1;1;1;Cloth,Leather
 Toughwear_Torso;2;2;0;Cloth,Leather
-Toughwear_Legging;1;2;1;Cloth,Leather
+Toughwear_Pants;1;2;1;Cloth,Leather
 Suit_Torso;2;1;1;Cloth
-Suit_Legging;1;1;2;Cloth
+Suit_Pants;1;1;2;Cloth
 Robe_Torso;2;0;1;Cloth
-Robe_Legging;1;0;0;Cloth
-Adventurewear_Torso;2;3;2;Cloth,Leather
-Adventurewear_Legging;1;3;3;Cloth,Leather
-Chainmail_Torso;2;4;0;Copper,Bronze,Iron,Silver,Steel,Lead
-Chainmail_Legging;1;4;2;Copper,Bronze,Iron,Silver,Steel,Lead
-Platemail_Torso;2;5;0;Stone,Copper,Bronze,Iron,Steel,Crystal,Bone
-Platemail_Legging;1;5;3;Stone,Copper,Bronze,Iron,Steel,Crystal,Bone
-Battlewear_Torso;2;5;2;Brass,Silver,Steel,Titanium
-Battlewear_Legging;1;5;4;Brass,Silver,Steel,Titanium
+Robe_Pants;1;0;0;Cloth
+Adventurewear_Torso;2;1;2;Cloth,Leather
+Adventurewear_Pants;1;1;3;Cloth,Leather
+Chainmail_Torso;2;2;0;Copper,Bronze,Iron,Silver,Steel,Lead
+Chainmail_Pants;1;2;2;Copper,Bronze,Iron,Silver,Steel,Lead
+Platemail_Torso;2;3;0;Stone,Copper,Bronze,Iron,Steel,Crystal,Bone
+Platemail_Pants;1;3;3;Stone,Copper,Bronze,Iron,Steel,Crystal,Bone
+Battlewear_Torso;2;3;2;Brass,Silver,Steel,Titanium
+Battlewear_Pants;1;3;4;Brass,Silver,Steel,Titanium
 Shadowrobe_Torso;2;1;3;Cloth
-Shadowrobe_Legging;1;2;3;Cloth
+Shadowrobe_Pants;1;2;3;Cloth
 Skeleton_Torso;1;2;3;Bone
-Skeleton_Legging;1;2;3;Bone
-Bandana;0;3;0;Cloth
-Mask;0;3;0;Cloth,Leather
-Lace_Helm;0;4;0;Copper,Bronze,Iron
-Full_Helm;0;5;0;Copper,Bronze,Iron
-Legion_Helm;0;5;0;Copper,Bronze,Iron
+Skeleton_Pants;1;2;3;Bone
+Bandana;0;1;0;Cloth
+Mask;0;1;0;Cloth,Leather
+Lace_Helm;0;2;0;Copper,Bronze,Iron
+Full_Helm;0;3;0;Copper,Bronze,Iron
+Legion_Helm;0;3;0;Copper,Bronze,Iron

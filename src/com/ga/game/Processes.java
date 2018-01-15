@@ -20,7 +20,7 @@ public class Processes {
         display.cancel();
         controllers.cancel();
     }
-    private static void resume(){
+    public static void resume(){
         display = new Timer();
         update = new Timer();
         controllers = new Timer();

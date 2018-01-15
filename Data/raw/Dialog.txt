@@ -12,7 +12,7 @@ wielded:Wielded
 offhand:Offhand
 equipped:Equipped
 btorso:Torso
-bleg:Legging
+bleg:Pants
 bhead:Head
 mem:Memory
 MightDsc:Decreases weight penalties by 1, which reduces slow effects from heavy equipment. Also increases potency of all skills involving might.
@@ -28,9 +28,8 @@ EnergyDsc:Increases potency of all elemental spells.
 ChannelingDsc:Decreases stamina cost of maintaining channels.
 mvsRemap:Select a skill to re-map its keybinding.
 mvsTrain:Select a skill/spell to train.
-itemDsc:a $. Weighs $ and has $ uses left. The encumbrance rating of this item is $.
 itemEncDsc:This $ item is magically enchanted with $. This item's cooldown is $ seconds.
-itemEncRdy:Currently the item is ready to usable.
+itemEncRdy:Currently the item is ready to use.
 itemEncNRdy:Currently the item needs $ more seconds to recharge.
 item1:Common
 item2:Fine

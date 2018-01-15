@@ -37,10 +37,10 @@ public class Armor extends Item {
     }
     protected void setModifier(PrefixMod mod){
         super.setModifier(mod);
-        if (mod == PrefixMod.Awful) armorMod = -2;
-        else if (mod == PrefixMod.Old) armorMod = -1;
-        else if (mod == PrefixMod.Fine) armorMod = 1;
-        else if (mod == PrefixMod.Mastercraft) armorMod = 2;
+        if (mod == PrefixMod.Awful) armorMod = -1;
+        else if (mod == PrefixMod.None) armorMod = 1;
+        else if (mod == PrefixMod.Fine) armorMod = 2;
+        else if (mod == PrefixMod.Mastercraft) armorMod = 3;
     }
     protected void setModifier(SpecialtyMod mod){
         if (mod == SpecialtyMod.Tough) armorMod += admod.magnitude;
@@ -50,12 +50,13 @@ public class Armor extends Item {
         if (owner != null) owner.armor.remove(this);
         super.remove();
     }
-    public int onHit(int damage){ //damage reduction
+    public boolean checkBreak(int damage){ //damage reduction
         int r = (int) Math.max(0, damage - getArmor());
         if (usable(r)){
             if (owner != null) trigger(owner);
+            return false;
         }
-        return r;
+        return true;
     }
     @Override
     public boolean use(final Man host){
@@ -80,7 +81,7 @@ public class Armor extends Item {
     @Override
     public String getName(){
         String r = material.name() + " " + super.getName();
-        if (piece == 1) r+=" Leggings";
+        if (piece == 1) r+=" Pants";
         else if (piece == 2) r+=" Armor";
         return r;
     }

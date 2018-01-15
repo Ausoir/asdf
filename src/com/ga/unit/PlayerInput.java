@@ -16,7 +16,9 @@ import java.util.Map;
  * Created by Ga on 7/25/2016. asd
  */
 public class PlayerInput implements Input {
-    private HashMap<Integer, String> keyActionMap = new HashMap<>();
+    private HashMap<Integer, String> keyActionMap = new HashMap<Integer, String>(){{
+        put(-1,"Idle");
+    }};
     private ArrayList<Integer> pressed = new ArrayList<>();
     public Player host;
     public PlayerInput(Player unit){
@@ -74,7 +76,7 @@ public class PlayerInput implements Input {
         if (x != -1 || y != -1) inputCoord(x,y);
         if (p.startsWith("_")) {
             if (p.startsWith("_WI")) {
-                host.selectingItem = Integer.parseInt(p.substring(4));
+                host.selectingItem = Integer.parseInt(p.substring(3));
                 host.setState(Actions.Wield);
             } else if (p.equals("Recall")) host.say(host.memorized);
         } else {
@@ -96,8 +98,12 @@ public class PlayerInput implements Input {
         }
     }
     public void update(){
-        for (Integer i : pressed){
-            input(i,-1,-1);
+        if (pressed.size() == 0) input(-1, -1, -1);
+        else {
+            ArrayList<Integer> presseds = (ArrayList<Integer>) pressed.clone();
+            for (Integer i : presseds) {
+                input(i, -1, -1);
+            }
         }
     }
     @Override

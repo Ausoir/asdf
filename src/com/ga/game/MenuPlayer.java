@@ -172,7 +172,7 @@ public class MenuPlayer extends Panel {
                 result.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        Global.player.input.inputDirect("_Wield", 0, 0);
+                        Global.player.input.inputDirect("Wield", 0, 0);
                         Global.display.menu.showMenu();
                     }
                 });
@@ -180,7 +180,7 @@ public class MenuPlayer extends Panel {
                 result.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        Global.player.input.inputDirect("_1"+type,0,0);
+                        Global.player.input.inputDirect("_WI1"+type,0,0);
                         Global.display.menu.showMenu();
                     }
                 });
@@ -255,7 +255,7 @@ public class MenuPlayer extends Panel {
             result.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Global.player.input.inputDirect("_"+index,0,0);
+                    Global.player.input.inputDirect("_WI"+index,0,0);
                     Global.display.menu.showMenu();
                 }
             });
@@ -562,7 +562,7 @@ public class MenuPlayer extends Panel {
     }
 
     private class CraftPanel extends JPanel{
-        private ArrayList<String> items;
+        private ArrayList<String> items, props;
         private JPanel panel;
         private JPanel other;
         CraftPanel(){
@@ -577,12 +577,18 @@ public class MenuPlayer extends Panel {
         void refresh() {
             ArrayList<String> craftables = new ArrayList<>();
             items = new ArrayList<>();
+            props = new ArrayList<>();
             for (Prop i : Global.player.getAvailableItems()){
                 items.add(i.name);
                 for (Tag ii : i.tags) items.add(ii.name());
             }
+            for (Prop i : Global.player.getAvailableProps()){
+                props.add(i.name);
+                for (Tag ii : i.tags) props.add(ii.name());
+            }
             panel.removeAll();
             panel.add(makeOption("[Available Items]","?","Show all items available for crafting."));
+            panel.add(makeOption("[Available Structures]","?s","Show all structures available for crafting."));
             for (String i : Global.player.crafting.knowledge){
                 ArrayList<String> recipe = new ArrayList<>();
                 ArrayList<String> origRecipe = Crafts.recipes.get(i);
@@ -656,13 +662,20 @@ public class MenuPlayer extends Panel {
         }
         private void command(String p){
             Global.display.menu.showMenu();
-            if (p.equals("?")){
+            if (p.equals("?")) {
                 String t = "";
-                for (String i : items){
+                for (String i : items) {
                     if (!i.equals("Time") && !i.equals("Fist")) t += i + ", ";
                 }
-                String result = t.equals("")?"None":t.substring(0,t.length()-2);
-                Global.display.menu.showDialog("Available Items",result);
+                String result = t.equals("") ? "None" : t.substring(0, t.length() - 2);
+                Global.display.menu.showDialog("Available Items", result);
+            } else if (p.equals("?s")){
+                String t = "";
+                for (String i : props) {
+                    t += i + ", ";
+                }
+                String result = t.equals("") ? "None" : t.substring(0, t.length() - 2);
+                Global.display.menu.showDialog("Available Structures", result);
             } else {
                 Command.order("crft@"+p);
             }

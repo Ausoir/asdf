@@ -41,6 +41,7 @@ public class Command {
                     item.start();
                     host.setWeapon(item);
                 }
+                else if (cmd[0].equals("build")) new Generator(Global.player.map, 99).generateBuilding(cmd[1], Global.player.pos, 1);
                 else if (cmd[0].equals("tp")) host.pos.add(Integer.parseInt(cmd[1].split(",")[0]),Integer.parseInt(cmd[1].split(",")[1]));
                 else if (cmd[0].equals("to")){
                     host.lastLand = new Line();
@@ -52,6 +53,7 @@ public class Command {
                 else if (cmd[0].equals("learn")) Global.player.learnSkill(Actions.valueOf(cmd[1]));
                 else if (cmd[0].equals("recipe")) host.crafting.knowledge.add(cmd[1]);
                 else if (cmd[0].equals("sound")) Sound.play(Global.player.map, Global.camera, cmd[1]);
+                else if (cmd[0].equals("depth")) host.say("Me: "+host.getDepth()+" Line: "+host.lastLand.depth+", Terrain: "+host.map.terrains.get(host.lastLand.tid).getDepth());
                 else if (p.equals("revive")) host.revive();
                 else if (p.equals("render")){
                     for (Object terrain : Global.player.map.terrains.entrySet()) ((Terrain)terrain).render();
@@ -64,7 +66,6 @@ public class Command {
                     unit.start();
                 }
                 else if (p.equals("editor")){
-                    Updater.editor = true;
                     Global.display.input = new EditorInput();
                 }
             }

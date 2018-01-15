@@ -47,7 +47,7 @@ public class Body {
         int hpPool = 0;
         for (Organ organ : organs) hpPool += organ.health;
 //        int mod = host.get("Stamina").getMax()*organs.length;
-        int mod = 1;
+        int mod = 100;
         for (Organ organ : organs) {
             organ.health = (int) (((float) organ.health / hpPool) * mod);
         }
@@ -180,7 +180,7 @@ public class Body {
     int getHeight(){
         int leg = getLeg();
         if (leg == -1) return 0;
-        return localAnimation[0][leg][1]-2;
+        return localAnimation[0][leg][1];
     }
 
     P randomPoint(){
@@ -226,7 +226,7 @@ public class Body {
 
     void rotateAppendage(int organ, int frame, float offset){
         int length = Math.abs(clip.clip[frame][organ][0])+Math.abs(clip.clip[frame][organ][1]);
-        float atan = host.target.getAdd(localAnimation[frame][organ][0]*host.dir, localAnimation[frame][organ][1]).getAtan();
+        float atan = host.target.getAdd(localAnimation[frame][organ][0]*host.dir, localAnimation[frame][organ][1]+getHeight()).getAtan();
         atan += offset;
         localAnimation[frame][organ][0] = (int) (length*Global.cos(atan))*host.dir;
         localAnimation[frame][organ][1] = (int) (length*Global.sin(atan));
@@ -268,6 +268,7 @@ public class Body {
                 }
             }
         }
+        if (legCurrent > 0) host.tags.add(Tag.Legs);
         resetHeight();
     }
 

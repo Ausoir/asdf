@@ -38,7 +38,6 @@ public class Player extends Man {
         inventory = new Inventory(this);
         crafting = new Crafts(this);
         health = new Health(this);
-        tags.add(Tag.Unarmed);
         tags.add(Tag.Athletics);
         tags.add(Tag.Might);
         tags.add(Tag.Agility);
@@ -78,7 +77,11 @@ public class Player extends Man {
     @Override
     public boolean tagCapable(Tags p){
         if (p.size() > 0) {
-            if (!tags.has(p) && !armor.tags.has(p) && !weapon.tags.has(p)) return false;
+            Tags t = new Tags();
+            t.addAll(tags);
+            t.addAll(armor.tags);
+            t.addAll(weapon.tags);
+            if (!t.containsAll(p)) return false;
         }
         return true;
     }
@@ -95,7 +98,7 @@ public class Player extends Man {
         return r;
     }
     public void stateSet(Actions state){
-        int penalty = Math.max(0, armor.armor[state.isLeg()?1:2].weight - get("Might").get())*10;
+        int penalty = Math.max(0, (state.isLeg()?(armor.armor[1].weight):(armor.armor[2].weight+weapon.weight)) - get("Might").get())*3;
         Stat end = get("Endurance");
         if (end.get() > end.getMax()) penalty += (end.get()-end.getMax())/10;
         attackSpeed -= penalty;
@@ -110,10 +113,6 @@ public class Player extends Man {
             }
         }
         super.stateSet(state);
-        if (state.getCooldown() > 0){
-            int[] t = cooldown.get(state);
-            if (t != null) cooldown.put(state, new int[]{t[0] + penalty});
-        }
         final Player me = this;
         switch (state) {
             case Idle:
@@ -174,7 +173,7 @@ public class Player extends Man {
         int power = 0;
         int num = 0;
         for (Tag i : state.getTrainers()){
-            if (i == Tag.Agility) power += get(i.toString()).get() * 100;
+            if (i == Tag.Agility || i == Tag.Might) power += get(i.toString()).get() * 100;
             else power += get(i.toString()).get();
             num++;
         }
@@ -196,7 +195,7 @@ public class Player extends Man {
         float penalty = Math.max(0,getWeight()-get("Might").get()*2);
         return Math.max(0,speed-penalty)*.01f;
     }
-    public boolean hasSkill(Actions move){
+    boolean hasSkill(Actions move){
         for (Actions i : moveset){
             if (i == move) return true;
         }
@@ -213,11 +212,14 @@ public class Player extends Man {
     }
     public ArrayList<Prop> getAvailableItems(){
         ArrayList<Prop> items = map.updater.collideProp(pos,100);
-        Iterator it = items.iterator();
-        while (it.hasNext()){
-            if (!(it.next() instanceof Item)) it.remove();
-        }
+        items.removeIf(o -> !(o instanceof Item));
         items.addAll(inventory.getItems());
+        return items;
+    }
+    public ArrayList<Prop> getAvailableProps() {
+        ArrayList<Prop> items = map.updater.collideProp(pos,120);
+        items.removeIf(o -> (o instanceof Item));
+//        items.removeIf(o -> !o.image.visible);
         return items;
     }
     public int getVacancy(){
@@ -242,6 +244,7 @@ public class Player extends Man {
             if (!i.equals("")){
                 Trait trait = Trait.getByName(i);
                 this.traits.add(trait);
+                assert trait != null;
                 trait.onSet(this);
             }
         }

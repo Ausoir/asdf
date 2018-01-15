@@ -29,7 +29,7 @@ class TerrainTrail {
         return add(last.x+x,last.y+y);
     }
     Line add(P p){
-        Line r = new Line(last, p, terrain, 0);
+        Line r = new Line(last, p, terrain, 1, -1);
         lines.add(r);
         last = p;
         return r;
@@ -45,7 +45,8 @@ class TerrainTrail {
     }
     void climbable(){
         for (Line i : lines) {
-            if (i.opt != 2 && !i.clockwise()) i.opt = -1;
+            if (!i.clockwise()) i.opt = 0;
+            else i.opt = 1;
         }
     }
     void switchSides(float x2){
@@ -65,6 +66,9 @@ class TerrainTrail {
     }
     private void setTexture(String p){
         map.formTextures.put(terrain, p);
+        for (Line i : lines){
+            i.depth = Float.parseFloat(p.split("&")[0]);
+        }
     }
     void finish(String p){
         if (lines.size() > 0) {

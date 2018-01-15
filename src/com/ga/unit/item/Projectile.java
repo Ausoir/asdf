@@ -55,7 +55,7 @@ public class Projectile extends Prop {
         rotation+=rotSpeed*vel.x;
         if (tangible) {
             for (Unit i : map.updater.collideUnit(pos, getCollisionSize(), faction)){
-                if (i.checkHit(new Line(pos,pos.getAdd(vel)),damage,blunt)) onAttack(i);
+                if (i.hit(new Line(pos,pos.getAdd(vel)),damage,blunt)) onAttack(i);
             }
         }
         super.update();

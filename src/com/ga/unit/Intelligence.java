@@ -275,13 +275,13 @@ public enum Intelligence {
                     for (int i=0;i<destinations.size();i++){
                         final int destination = destinations.get(i);
                         final int price = prices.get(i);
-                        options[i] = FileManager.read("Data/map/"+destination+".map").split("%")[0]
+                        options[i] = FileManager.read("map/"+destination+".map").split("%")[0]
                                 .split(";")[0] + " - "+Dialog.money(price);
                         performers[i] = new Performer(){
                             public void perform(){
                                 if (Global.player.gold >= price) {
                                     Global.player.gold -= price;
-                                    host.changeMap(destination+"@-1");
+                                    Global.server.requestChangeMap(destination+"@-1");
                                 } else {
                                     Global.player.say("Not enough money..");
                                 }

@@ -61,7 +61,7 @@ public enum Behavior {
 
             private boolean moveToward(String from, String to){
                 if (from.equals(to)) return true;
-                String[] objects = FileManager.read("Data/map/"+from+".map").split("%")[3].split(";");
+                String[] objects = FileManager.read("map/"+from+".map").split("%")[3].split(";");
                 for (String i : objects){
                     String[] sections = i.split("@");
                     if (Integer.parseInt(sections[0]) == Stock.Travel.ordinal() && !routesContains(sections[1])){
@@ -83,7 +83,7 @@ public enum Behavior {
                         host.setState(Actions.Walk);
                         if (host.pos.getSubtract(target).getDist() <= host.getSpeed() * 400) {
                             routes.remove(0);
-                            host.changeMap(data[0] + "@" + data[1]);
+                            Global.server.requestChangeMap(data[0] + "@" + data[1]);
                         }
                         return false;
                     }

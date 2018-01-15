@@ -10,13 +10,13 @@ import com.ga.unit.*;
 public class ArmorSet {
     private static Armor[] bare = new Armor[]{
             new Armor(null, "Head", 0,0,0,0,new Item.Material[]{Item.Material.Flesh}){
-                public int onHit(int d){ return d; }
+                public boolean checkBreak(int d){ return true; }
             },
             new Armor(null, "Underwear", 0,1,0,0,new Item.Material[]{Item.Material.Flesh}){
-                public int onHit(int d){ return d; }
+                public boolean checkBreak(int d){ return true; }
             },
-            new Armor(null, "Underwear", 0,1,0,0,new Item.Material[]{Item.Material.Flesh}){
-                public int onHit(int d){ return d; }
+            new Armor(null, "Underwear", 0,2,0,0,new Item.Material[]{Item.Material.Flesh}){
+                public boolean checkBreak(int d){ return true; }
             }
     };
     public Armor[] armor;

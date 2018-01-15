@@ -253,7 +253,7 @@ public enum Buffs {
             public boolean update() {
                 if (var % 10 == 0 && Global.r.nextBoolean()) {
                     if (var % 50 == 0){
-                        host.checkHit(host.pos, level);
+                        host.hit(host.getPosLine(), level, true);
                         if (host.stats.getEffectLevel(Bleed) > 2){
                             host.stats.getEffect(Bleed).time += Global.r.nextInt(100);
                         }

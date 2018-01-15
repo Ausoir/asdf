@@ -19,8 +19,9 @@ import java.util.HashMap;
  * Created by Ga on 5/7/2016. asd
  */
 public class Unit extends Prop {
+    private static final float OFFSET_UNIT = .0001f;
     public Actions[] moveset;
-    protected HashMap<Actions, int[]> cooldown = new HashMap<>();
+    HashMap<Actions, int[]> cooldown = new HashMap<>();
     public int controlId;
     public Body clip;
     public Actions state = Actions.Idle;
@@ -61,9 +62,11 @@ public class Unit extends Prop {
         return sections;
     }
 
-    public void start(){
+    @Override
+    public Unit start(){
         speech = new Speech(this);
         super.start();
+        return this;
     }
 
     public P getRandomPoint(){
@@ -90,7 +93,9 @@ public class Unit extends Prop {
         return pos.getAdd(clip.organs[clip.getHand()].ptd);
     }
     public float getReach(){
-        return getSize()+36;
+        Stat reach = get("Reach");
+        if (reach == null) return getSize();
+        return reach.get();
     }
     protected int[] getCooldown(Actions state) {
         int[] r = cooldown.get(state);
@@ -158,8 +163,8 @@ public class Unit extends Prop {
         return (int) (rand.nextInt(get("Level").get()+2)*damageMod);
     }
 
-    protected int processDamage(int organ, int damage){
-        return damage;
+    protected boolean processDamage(int organ, int damage){
+        return true;
     }
 
     public void buff(Buffs buff, int level){
@@ -171,52 +176,44 @@ public class Unit extends Prop {
         return super.hittable(faction) && state != Actions.Dead;
     }
 
-    public void hit(int dir, float knockback) {
-        delay.performer = null;
-        jump = false;
-        if (state == Actions.Rest) knockback += .5f;
-        vel.x = knockback * 8 * dir;
-        vel.y += -knockback * 2;
-        if (knockback > 0){
-            if (state == Actions.Down) die();
-            else {
-                buff(Buffs.Bleed, 1);
-                if (stats.triggerEffect(Buffs.Mark) || knockback > .5f+Global.r.nextFloat()*.5f) {
-                    stateSet(Actions.Down);
-                    delay.time *= 1+stats.getEffectLevel(Buffs.Bleed)*.2f;
-                } else stateSet(Actions.Hit);
+    public boolean hit(Line hitBox, int damage, boolean blunt){
+        if (state == Actions.Down){
+            die();
+            return true;
+        } else {
+            boolean ko = stats.triggerEffect(Buffs.Mark) || get("Toughness").get() - (damage + stats.getEffectLevel(Buffs.Bleed)) <= 0;
+            //Organ amputate
+            for (int i = 0; i < clip.organs.length; i++) {
+                if (clip.organs[i].checkHit(hitBox)) {
+                    P t = new P(pos.x, hitBox.ptd.y);
+                    Particle.explode(map, "Blood", getDepth(), t, t.getSubtract(hitBox.pt), 3, 3, 12, true, 5);
+                    if (!blunt && ko && processDamage(i, damage)) clip.organs[i].amputate(hitBox, damage);
+                    else clip.organs[i].hit(hitBox);
+                    return true;
+                }
             }
-        }
-        brain.onHit();
-    }
-
-    public void checkHit(P hitPoint, int damage){
-        float total = (stats.getEffectLevel(Buffs.Bleed)*.5f + 1) * damage;
-        hit(Float.compare(pos.x, hitPoint.x), total / get("Stamina").getMax());
-    }
-
-    public boolean checkHit(Line hitBox, int damage, boolean blunt){
-        boolean r = false;
-        for (int i = 0; i < clip.organs.length; i++) {
-            if (clip.organs[i].checkHit(hitBox)) {
-                if (!r) checkHit(hitBox.pt, damage);
-                P t = new P(pos.x, hitBox.ptd.y);
-                Particle.explode(map, "Blood", getDepth(),t, t.getSubtract(hitBox.pt), 3, 3, 12, true, 5);
-                int dam;
-                if (!blunt) dam = processDamage(i, damage);
-                else dam = damage;
-                if (clip.organs[i].hit(hitBox, dam)) Sound.play(map, pos, "hit_bloody");
-                r = true;
-            }
-        }
-        if (!r){
+            //Knockdown
             P mid = hitBox.getMidpoint();
-            float radius = hitBox.getLength()/2;
-            if (mid.getSubtract(pos.getAdd(0,-clip.getHeight())).getDist() < radius + getSize()){
-                checkHit(hitBox.pt, damage);
+            float radius = hitBox.getLength() / 2;
+            if (mid.getSubtract(pos.getAdd(0, -clip.getHeight())).getDist() < radius + getSize()) {
+                float knockback = damage / get("Toughness").get();
+                delay.performer = null;
+                jump = false;
+                if (state == Actions.Rest) knockback += .5f;
+                vel.x = (knockback * 8 + 5) * Float.compare(pos.x, hitBox.pt.x);
+                vel.y += -5 - knockback * 2;
+                if (damage > 0) {
+                    buff(Buffs.Bleed, 1);
+                    if (ko) {
+                        stateSet(Actions.Down);
+                        delay.time *= 1 + stats.getEffectLevel(Buffs.Bleed) * .2f;
+                    } else stateSet(Actions.Hit);
+                }
+                brain.onHit();
+                return true;
             }
         }
-        return r;
+        return false;
     }
 
     public Stat get(String p){
@@ -246,9 +243,9 @@ public class Unit extends Prop {
     public void collide(){
         jump = false;
         super.collide();
-        if (!jump) {
+        if (!jump && vel.y > 0) {
             jumpAcross++;
-            if (jumpAcross == 6) lastLand = new Line();
+            if (jumpAcross == 3) lastLand = new Line();
         } else jumpAcross = 0;
     }
 
@@ -257,7 +254,7 @@ public class Unit extends Prop {
         super.onCollide(l);
         if (!jump) {
             jump = true;
-            if (l.clockwise()) setDepth(l.depth-.001f);
+            if (l.clockwise() && !l.vertical()) setDepth(l.depth-OFFSET_UNIT);
             int mag = (int) (vel.y - Settings.gravityMax);
             if (vel.y > Settings.gravity*4) Sound.play(map, pos, "land");
             if (mag >= 0 && hittable(Faction.Destructive)) {
@@ -290,7 +287,7 @@ public class Unit extends Prop {
     public Unit attack(){
         P hand = getHand();
         for (Unit i : map.updater.collideUnit(hand, (int) getReach(), faction)){
-            i.checkHit(hand, getDamage());
+            i.hit(new Line(hand, hand.getAdd(dir*5,0)), getDamage(), true);
             onAttack(i);
             if (!stats.triggerEffect(Buffs.Cleave)) return i;
         }
@@ -345,16 +342,12 @@ public class Unit extends Prop {
         stats.clearBuffs();
         Particle.holyExplosion(map, pos, getDepth());
         state = Actions.Idle;
-        stateSet(Actions.Down);
         delay.set(50);
         for (Organ i : clip.organs){
             i.stitch();
         }
         clip.setOrganHealth();
         clip.updateStatus();
-    }
-
-    public void changeMap(String p){
-        Global.server.requestChangeMap(p, this);
+        stateSet(Actions.Down);
     }
 }

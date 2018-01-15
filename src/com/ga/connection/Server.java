@@ -2,6 +2,7 @@ package com.ga.connection;
 
 import com.ga.game.FileManager;
 import com.ga.game.Input;
+import com.ga.game.Processes;
 import com.ga.game.Settings;
 import com.ga.map.Global;
 import com.ga.unit.Faction;
@@ -13,6 +14,8 @@ import com.ga.unit.skill.Actions;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by Ga on 12/10/2016. asd
@@ -53,18 +56,15 @@ public class Server {
         udp = new UDPClient(Settings.receiverPort);
         tcpUploader = new TCPClient(Settings.tcpUploadPort);
         tcpDownloader = new TCPClient(Settings.tcpDownloadPort);
-        Thread serverThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (!stop) {
-                    try {
-                        String t = udp.receive();
-                        server.translate(t);
-                        Thread.sleep(10);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        stop = true;
-                    }
+        Thread serverThread = new Thread(() -> {
+            while (!stop) {
+                try {
+                    String t = udp.receive();
+                    server.translate(t);
+                    Thread.sleep(10);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    stop = true;
                 }
             }
         });
@@ -75,42 +75,39 @@ public class Server {
         return server == null || server instanceof HostServer;
     }
 
-    public void requestChangeMap(String map, Unit unit){
-        if (isHost()) changeMap(map, unit);
+    public void requestChangeMap(String map){
+        if (isHost()) changeMap(map);
         else {
-            if (unit == Global.player){
-                String[] mapData = map.split("@");
-                try {
-                    Global.p("Reported map change to client server.");
-                    udp.send("CM}"+mapData[0]+"}"+mapData[1]);
-                    tcpDownloader.download(udp.getClientIP(), "Data/map/multiplayer/serverMap.map");
-                    Global.p("Map downloaded from server.");
-                    Global.maps.clear();
-                    Global.maps.add(Global.player.map);
-                    changeMap("multiplayer/serverMap@"+mapData[1], unit);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            } else unit.remove();
+            String[] mapData = map.split("@");
+            try {
+                Global.p("Reported map change to client server.");
+                udp.send("CM}" + mapData[0] + "}" + mapData[1]);
+                tcpDownloader.download(udp.getClientIP(), "Data/map/multiplayer/serverMap.map");
+                Global.p("Map downloaded from server.");
+                Global.maps.clear();
+                Global.maps.add(Global.player.map);
+                changeMap("multiplayer/serverMap@" + mapData[1]);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    private void changeMap(String p, Unit unit){
-        com.ga.map.Map map = Global.getMap(p.split("@")[0]);
-        if (unit.map != map) {
-            String[] mapData = p.split("@");
-            unit.disconnect();
-            unit.map = map;
-            unit.pos.set(map.updater.getEntrancePos(Integer.parseInt(mapData[1])));
-            unit.start();
-            if (unit == Global.player){
-                map.terrains.clear();
-                map.setTexture();
-                map.render();
-                map.mapEdgeCenter(Global.camera = map.size.getMult(.5f, .5f));
-                map.onTimeChange();
+    private void changeMap(String p){
+        Processes.pause();
+        new Timer().schedule(new TimerTask() {
+            public void run(){
+                String[] mapData = p.split("@");
+                Global.player.map.clear();
+                Global.maps.clear();
+                com.ga.map.Map map = Global.getMap(mapData[0]);
+                Global.player.map = map;
+                Global.player.pos.set(map.updater.getEntrancePos(Integer.parseInt(mapData[1]), map.getFailsafePos()));
+                FileManager.saveCharacter();
+                FileManager.loadPlayer();
+                Processes.resume();
             }
-        }
+        }, 1);
     }
 
     private String[] processMessage(String p){
@@ -185,7 +182,7 @@ public class Server {
                     }
                     Player player = (Player) Stock.Player.create(Global.player.map,0,0);
                     Client newest = new Client(player, udp.getClientPort(), udp.getClientIP());
-                    player.loadPlayer(FileManager.read("Data/map/multiplayer/"+udp.getClientIP()+".user").split("%"));
+                    player.loadPlayer(FileManager.read("map/multiplayer/"+udp.getClientIP()+".user").split("%"));
                     player.map = Global.player.map;
                     player.faction = Faction.Player2;
                     player.controlId = Global.player.controlId + 1;//Global.getControlId();
@@ -274,9 +271,9 @@ public class Server {
                         e.printStackTrace();
                     } finally {
                         if (output == null){
-                            changeMap("multiplayer/serverMap@0", Global.player);
+                            requestChangeMap("multiplayer/serverMap@0");
                             Player player = (Player) Stock.Player.create(Global.player.map,0,0);
-                            player.loadPlayer(FileManager.read("Data/map/multiplayer/serverPlayer.user").split("%"));
+                            player.loadPlayer(FileManager.read("map/multiplayer/serverPlayer.user").split("%"));
                             player.map = Global.player.map;
                             Global.player.controlId = Integer.parseInt(msg[1]);
                             player.faction = Faction.Player2;

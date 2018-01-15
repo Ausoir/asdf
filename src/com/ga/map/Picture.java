@@ -76,7 +76,7 @@ public class Picture {
     public void setCenterType(int p){
         type = p;
         if (type == 1) halfSize = new P(size.x/2, size.y/2);
-        else if (type == 2) halfSize = new P(size.x/2, size.y-4);
+        else if (type == 2) halfSize = new P(size.x/2, size.y-8);
         else if (type == 3) halfSize = new P(8, size.y/2);
     }
     private BufferedImage load(String dir){
@@ -168,8 +168,8 @@ public class Picture {
         return r;
     }
     public void draw(Graphics2D g, float x, float y, float rot, int dir, float sizeX, float sizeY){
-        if (visible && x > Global.camera.x-Settings.centerX && y > Global.camera.y-Settings.centerY
-                && x < Global.camera.x+Settings.centerX && y < Global.camera.y+Settings.centerY) {
+        if (visible && x > Global.camera.x-Settings.centerX-sizeX && y > Global.camera.y-Settings.centerY-sizeY
+                && x < Global.camera.x+Settings.centerX+sizeX && y < Global.camera.y+Settings.centerY+sizeY) {
             float xMid = halfSize.x*dir;
             float yMid = halfSize.y;
             float rx = x + Global.rel.x;

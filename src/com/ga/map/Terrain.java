@@ -38,7 +38,7 @@ public class Terrain extends Drawable {
             }
         };
         this.map = map;
-        setDepth(3+(depth*.01f));
+        setDepth(3+(depth*.1f));
         polygon = new Polygon();
         if (image.image == null){
             String[] data = texture.substring(1).split(",");

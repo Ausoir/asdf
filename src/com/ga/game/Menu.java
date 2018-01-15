@@ -12,13 +12,17 @@ import javax.swing.*;
  */
 public class Menu extends JPanel implements Updatable {
     Performer onUpdate;
-    private Panel current = new Panel();
+    private Panel current;
     private MenuPlayer menu = new MenuPlayer();
     Menu(){
+        init();
         setLayout(null);
         resize();
         setOpaque(false);
         setFocusable(false);
+    }
+    void init(){
+        current = new Panel();
     }
     private void select(Panel p){
         Global.player.map.updater.addUpdatee(this);

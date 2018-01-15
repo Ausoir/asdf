@@ -305,6 +305,7 @@ public enum Shader{
     }),
     Road_Unpaved(new ShaderRenderer(){
         protected BufferedImage render(BufferedImage image, int x1, int x2, int y1, float slope){
+            int[] targetC = new int[]{100, 80, 33};
             int y2 = image.getHeight()-1;
             for (int ix = x1; ix < x2; ix++) {
                 int ty = y1 + (int) ((ix - x1) * slope);
@@ -312,13 +313,17 @@ public enum Shader{
                     int y = Math.min(ty+iy,y2);
                     if (y >= 0) {
                         int rgb = image.getRGB(ix, y);
-                        int shadeMag = (60 - (iy * 3));
                         int alpha = (rgb & 0xff000000) >>> 24;
-                        int randMax = Global.r.nextInt(16);
-                        int red = (int) Global.clamp(((rgb & 0xff0000) >>> 16) + shadeMag, 0, 140 + randMax);
-                        int green = (int) Global.clamp(((rgb & 0xff00) >>> 8) + shadeMag, 0, 90 + randMax);
-                        int blue = (int) Global.clamp(((rgb & 0xff)) + shadeMag, 0, 60 + randMax);
-                        image.setRGB(ix, y, new Color(red, green, blue, alpha).getRGB());
+                        if (alpha > 0) {
+                            int red = ((rgb & 0xff0000) >>> 16);
+                            int green = ((rgb & 0xff00) >>> 8);
+                            int blue = ((rgb & 0xff));
+                            int ny = (60 - (iy * 3));
+                            red = (int) Global.clamp(((targetC[0] - red) / 70f * ny) + red + Global.r.nextInt(16) - 8, 0, 255);
+                            green = (int) Global.clamp(((targetC[1] - green) / 70f * ny) + green + Global.r.nextInt(16) - 8, 0, 255);
+                            blue = (int) Global.clamp(((targetC[2] - blue) / 70f * ny) + blue + Global.r.nextInt(16) - 8, 0, 255);
+                            image.setRGB(ix, y, new Color(red, green, blue, alpha).getRGB());
+                        }
                     }
                 }
             }

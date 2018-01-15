@@ -1,5 +1,5 @@
 1,-1,Slime
-30,30;60;5;1 //linewidth,vital,health
+50;4;1 //linewidth,vital,health
 
 0,-40/8
 0,-50/12

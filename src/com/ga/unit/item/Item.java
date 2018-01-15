@@ -41,8 +41,8 @@ public class Item extends Prop {
         },
         Bashing(Actions.Slash, 1, 2, 2, "swing_silent"),
         Armor(Actions.Rest, 1, 2, 1, "swing_normal"), Scroll(Actions.Guard, 1, 0, .5f, "scroll"),
-        Shooting(Actions.Shoot, 3, .8f, 1, "swing_normal"), Rifle(Actions.Snipe, 3, 1.2f, 1, "swing_normal"),
-        Bow(Actions.Aim, 1, 1, .2f, "swing_silent"), Throwing(Actions.Throw, 3, .2f, 1, "swing_silent"),
+        Shooting(Actions.Shoot_Handgun, 3, .8f, 1, "swing_normal"), Rifle(Actions.Shoot_Rifle, 3, 1.2f, 1, "swing_normal"),
+        Bow(Actions.Shoot_Arrow, 1, 1, .2f, "swing_silent"), Throwing(Actions.Throw, 3, .2f, 1, "swing_silent"),
         Darting(Actions.Dart, 3, .1f, 1, "swing_normal"), Consumable(Actions.Consume, 1, .2f, 1, "drink");
         Actions action;
         String sound;
@@ -60,62 +60,62 @@ public class Item extends Prop {
         }
     }
     public enum Material{
-        Wooden(.3f,2,32,1,0,new Color(118, 93, 0,60)),
-        Cloth(.6f,0,12,0,0),
+        Wooden(.4f,2,32,1,0,new Color(118, 93, 0,60)),
+        Cloth(.5f,0,12,0,0),
         Leather(.3f,1,50,1,1500,new Color(133, 78, 32,140)),
-        Glass(.16f,1,1,7,2000){
+        Glass(.1f,1,1,7,2000){
             public void onSet(Item host){
                 host.tags.add(Tag.Ice);
             }
         },
-        Brass(.36f,5,110,4,1500,new Color(133, 123, 23,120)),
-        Copper(.3f,5,80,3,1500,new Color(133, 92, 38,120)){
+        Brass(.4f,5,110,4,1500,new Color(133, 123, 23,120)),
+        Copper(.4f,5,80,3,1500,new Color(133, 92, 38,120)){
             public void onSet(Item host){
                 host.tags.add(Tag.Electric);
             }
         },
-        Bronze(.24f,5,500,4,1500,new Color(133, 72, 0,200)),
-        Iron(.24f,4,600,5,2000),
-        Silver(.1f,6,140,3,4000){
+        Bronze(.4f,5,500,4,1500,new Color(133, 72, 0,200)),
+        Iron(.4f,4,600,5,2000),
+        Silver(.2f,6,140,3,4000){
             public void onSet(Item host){
                 host.tags.add(Tag.Mutation);
             }
         },
-        Gold(.16f,12,40,2,5000){
+        Gold(.1f,12,40,2,5000){
             public void onSet(Item host){
                 host.tags.add(Tag.Electric);
             }
         },
-        Lead(.2f,7,50,2,1500,new Color(19, 31, 75,180)){
+        Lead(.3f,7,50,2,1500,new Color(19, 31, 75,180)){
             public void onSet(Item host){
                 host.tags.add(Tag.Electric);
             }
         },
-        Steel(.1f,4,8000,6,8000),
-        Titanium(.01f,3,-1,7,30000),
-        Crystal(.04f,8,24,12,2000,new Color(28, 133, 67,120)){
+        Steel(.2f,4,8000,6,8000),
+        Titanium(.1f,3,-1,7,30000),
+        Crystal(.1f,8,24,12,2000,new Color(28, 133, 67,120)){
             public void onSet(Item host){
                 host.tags.add(Tag.Ice);
             }
         },
-        Obsidian(.06f,3,40,4,8000){
+        Obsidian(.1f,3,40,4,8000){
             public void onSet(Item host){
                 host.tags.add(Tag.Shadow);
                 host.tags.add(Tag.Fire);
             }
         },
-        Bone(.16f,1,80,3,3000){
+        Bone(.2f,1,80,3,3000){
             public void onSet(Item host){
                 host.tags.add(Tag.Conjuration);
             }
         },
         Other(0,0,10,0,0),
-        Flesh(.05f,0,-1,0,0){
+        Flesh(.1f,0,-1,0,0){
             public void onSet(Item host){
                 host.tags.add(Tag.Mutation);
             }
         },
-        Stone(.1f,6,5,5,0,new Color(107, 107, 107,255));
+        Stone(.2f,6,5,5,0,new Color(107, 107, 107,255));
         int weight, durability, hardness, value;
         Color color;
         float prevalence;
@@ -224,7 +224,7 @@ public class Item extends Prop {
         }
     }
     public enum AdenchantMod{
-        None(2,.2f), Minor(1,.1f), Major(3,.5f), Greater(4,.7f), Ultimate(5,.95f);
+        None(2,.3f), Minor(1,.1f), Major(3,.6f), Greater(4,.8f), Ultimate(5,1);
         public int level;
         public float magnitude;
         AdenchantMod(int level, float mag){
@@ -233,9 +233,9 @@ public class Item extends Prop {
         }
         public static AdenchantMod get(Random seed){
             int t = seed.nextInt(100);
-            if (t < 1) return Ultimate;
-            else if (t < 5) return Greater;
-            else if (t < 15) return Major;
+            if (t == 0) return Ultimate;
+            else if (t < 8) return Greater;
+            else if (t < 20) return Major;
             else if (t < 50) return Minor;
             else return None;
         }
@@ -527,9 +527,9 @@ public class Item extends Prop {
         rotation = (float)Global.r.nextInt(628)/100;
     }
     public String getDescription() {
-        String r = "";
-        r += Dialog.get("itemDsc",new String[]{getFullName(),weight+"",(isInfinite()?"unlimited":uses+""),encumbrance+""});
-        r += " This item is made of "+material.name()+".";
+        String r = "Weight: "+weight+"\n";
+        r += "Uses: "+uses+"/"+durability+"\n";
+        r += "Material: "+material.name()+"\n";
         if (emod != null){
             String ade = "";
             if (ademod != AdenchantMod.None) ade = "Level "+ademod.level+" ";

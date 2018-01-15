@@ -2,7 +2,6 @@ package com.ga.unit;
 
 import com.ga.game.FileManager;
 import com.ga.game.Sound;
-import com.ga.map.Building;
 import com.ga.map.Creation;
 import com.ga.map.Global;
 import com.ga.map.Map;
@@ -34,16 +33,28 @@ public enum Stock {
         return product;
     }},
     Travel{ Prop make(Map map, final int id, final int seed){
-        Prop product = new Prop(map, getName(), seed);
+        Prop product = new Prop(map, "Travel", seed){
+            public String[] load(String p){
+                String[] r = super.load(p);
+                name = r[5];
+                return r;
+            }
+            public String toString(){
+                return super.toString() + "@" + name;
+            }
+        };
         product.manualDepth = true;
         product.mobile = false;
         product.image.visible = false;
         product.onInteract = new Interactive(){
             public void interact(Man p){
-                p.changeMap(id+"@"+seed);
+                if (p == Global.player) Global.server.requestChangeMap(product.name+"@"+seed);
             }
         };
         return product;
+    }},
+    Entrance{ Prop make(Map map, final int id, final int seed){ //Obsolete
+        return new Prop(map, getName(), seed);
     }},
     Object{ Prop make(Map map, int id, int seed){
         String[] data = FileManager.readText("raw/Object.txt");
@@ -58,7 +69,7 @@ public enum Stock {
                     P top = new P(Math.sin(rotation) * s.y, Math.cos(rotation) * s.y);
                     P width = new P(Math.sin(rotation) * s.x, Math.cos(rotation) * s.x);
                     map.land.add(new Line(pos.x + top.x - width.y, pos.y - top.y - width.x,
-                            pos.x + top.x + width.y, pos.y - top.y + width.x, -1, 0, lastLand.depth - 1) {
+                            pos.x + top.x + width.y, pos.y - top.y + width.x, -1, 0, lastLand.depth - OFFSET_PROP) {
                         public String toString() {
                             return "";
                         }
@@ -79,7 +90,7 @@ public enum Stock {
         String[] unit = units[id].split(";");
         Unit product = new Unit(map, null, Creation.getSeed(seed));
         product.clip = new Body(product, unit[0]);
-        product.load(getUnit(unit[0],product.seed,product.clip.toString(),unit[2], Faction.valueOf(unit[3]), unit[4]+"/1&0", unit[5]));
+        product.load(getUnit(map, unit[0],product.seed,product.clip.toString(),unit[2], Faction.valueOf(unit[3]), unit[4]+"/1&0", unit[5]));
         product.speechType = unit[1];
         product.subId = id;
         return product;
@@ -89,7 +100,7 @@ public enum Stock {
         final String[] unit = units[id].split(";");
         Man product = new Man(map, unit[0], Creation.getSeed(seed)){
             public void onCreate(){
-                String str = getUnit(name,seed,"111111",unit[2],Faction.valueOf(unit[3]),unit[4]+"/1&0",unit[5]);
+                String str = getUnit(map,name,seed,"111111",unit[2],Faction.valueOf(unit[3]),unit[4]+"/1&0",unit[5]);
                 String[] weapon = unit[7].split(",");
                 String[] armor = unit[8].split(",");
                 String[] helms = unit[9].split(",");
@@ -119,8 +130,8 @@ public enum Stock {
         String[] data = FileManager.readText("raw/Weapon.txt");
         final String[] v = data[id].split(";");
         Item product = new Weapon(map, v[0], Creation.getSeed(seed), Item.ItemType.valueOf(v[1]),
-                Integer.parseInt(v[2]), Item.Material.load(v[4].split(",")));
-        int range = Integer.parseInt(v[3]);
+                Integer.parseInt(v[2]), Integer.parseInt(v[3]), Item.Material.load(v[5].split(",")));
+        int range = Integer.parseInt(v[4]);
         if (range != -1) product.range = range;
         product.subId = id;
         return product;
@@ -146,11 +157,6 @@ public enum Stock {
     Player{ Prop make(Map map, int id, int seed){
         if (id == 1) return new MainPlayer(map, seed);
         Player product = new Player(map, seed);
-        return product;
-    }},
-    Construct{ Prop make(Map map, int id, int seed){
-        Building product = new Building(map, id+"", seed);
-        product.subId = id;
         return product;
     }},
     Manual{ Prop make(Map map, int id, int seed){
@@ -348,7 +354,7 @@ public enum Stock {
         return product;
     }},
     Ethersword{ Prop make(Map map, int id, int seed){
-        Weapon product = new Weapon(map, getName(), seed, Item.ItemType.Sword, 0, new Item.Material[]{Item.Material.Crystal}){
+        Weapon product = new Weapon(map, getName(), seed, Item.ItemType.Sword, 0, 0, new Item.Material[]{Item.Material.Crystal}){
             public String toString(){
                 return "";
             }
@@ -394,7 +400,7 @@ public enum Stock {
         return product;
     }},
     Fist{ Prop make(Map map, int id, int seed){
-        Item product = new Weapon(map, getName(),0, Item.ItemType.Bashing, 0, new Item.Material[]{Item.Material.Flesh}){
+        Item product = new Weapon(map, getName(),0, Item.ItemType.Bashing, 0, 0, new Item.Material[]{Item.Material.Flesh}){
             public boolean use(final Man host) {
                 host.setState(Actions.Interact);
                 return true;
@@ -410,6 +416,7 @@ public enum Stock {
         product.range = -1;
         product.image.setCenterType(3);
         product.onInteract = null;
+        product.save = false;
         return product;
     }},
     Dungeon{ Prop make(Map map, int id, final int seed){
@@ -631,11 +638,11 @@ public enum Stock {
         final Prop product = new Prop(map, getName(), seed){
             public void onField(){
                 super.onField();
-                P s = image.getSize().getMult(.5f, 1).add(0,-4);
+                P s = image.getSize().getMult(.5f, 1).add(0,-8);
                 P top = new P(Math.sin(rotation)*s.y, Math.cos(rotation)*s.y);
                 P width = new P(Math.sin(rotation)*s.x, Math.cos(rotation)*s.x);
                 map.land.add(new Line(pos.x+top.x-width.y, pos.y-top.y-width.x,
-                        pos.x+top.x+width.y, pos.y-top.y+width.x, -1, 0, lastLand.depth-1){
+                        pos.x+top.x+width.y, pos.y-top.y+width.x, -1, 0, lastLand.depth - OFFSET_PROP){
                     public String toString(){
                         return "";
                     }
@@ -733,7 +740,7 @@ public enum Stock {
                                     Particle.explosion(map, pos, getDepth());
                                     ArrayList<Unit> t = map.updater.collideUnit(pos,96,Faction.Destructive);
                                     for (Unit i : t){
-                                        i.checkHit(pos, getDamage());
+                                        i.hit(getPosLine(), getDamage(), true);
                                     }
                                     remove();
                                 }
@@ -795,7 +802,7 @@ public enum Stock {
                                     if (!tangible) {
                                         if (host.pos.getSubtract(pos).getDist() < 16){
                                             host.lastLand = new Line();
-                                            host.pos = pos.getAdd(0,0);
+                                            host.pos = pos.getAdd(0,-24);
                                             host.stateSet(Actions.Jump);
                                             host.vel.set(0,0);
                                             host.mobile = true;
@@ -859,7 +866,7 @@ public enum Stock {
                 ArrayList<Unit> t = map.updater.collideUnit(pos,48,faction);
                 if (t.size() > 0){
                     Unit i = t.get(0);
-                    i.checkHit(pos, getDamage());
+                    i.hit(getFaceLine(), getDamage(), true);
                     vel.x *= -.7f;
                     stateSet(Actions.Idle);
                     return i;
@@ -871,7 +878,7 @@ public enum Stock {
                 if (state == Actions.Melee) attack();
             }
             public void onCreate(){
-                load(getUnit(name,seed,clip.toString(),"Stamina:3&Speed:12&Attack:0&Level:3",Faction.Predator,"3/1&0","Melee"));
+                load(getUnit(map,name,seed,clip.toString(),"Stamina:3&Speed:12&Attack:0&Level:3",Faction.Predator,"3/1&0","Melee"));
             }
         };
         product.clip = new Body(product, getName());
@@ -891,7 +898,7 @@ public enum Stock {
                     Particle.explode(map, "Poison",getDepth(),pos,new P(),8,8,0,false,4);
                     ArrayList<Unit> t = map.updater.collideUnit(pos, (int) getReach(), Faction.Destructive);
                     for (Unit i : t){
-                        i.checkHit(pos, getDamage());
+                        i.hit(getFaceLine(), getDamage(), true);
                         i.buff(Buffs.Poison, 1);
                         i.vel.x = (i.pos.x > i.pos.x ? -1 : 1)*6;
                         i.vel.y -= 16;
@@ -905,14 +912,15 @@ public enum Stock {
                 super.buff(buff, level);
             }
             public void onCreate(){
-                load(getUnit(getName(),seed,clip.toString(),"Stamina:7&Speed:6&Attack:0&Level:1",Faction.Predator,"3/1&0","Melee"));
+                load(getUnit(map,getName(),seed,clip.toString(),"Stamina:7&Toughness:"+rand.nextInt(4)+"&Speed:6&Attack:0&Level:1"
+                        ,Faction.Predator,"2/1&0","Melee"));
             }
             public void die(){
                 Threadball.create(map, -1, -1).pos.set(pos);
             }
         };
         product.clip = new Body(product, getName());
-        product.clip.organs[0].setSize((int) product.clip.organs[0].getImage().getSize().x);
+        product.clip.organs[0].setSize((int) (product.clip.organs[0].getImage().getSize().x * (product.rand.nextFloat()*.5f+.75f)));
         return product;
     }},
     Bird { Prop make(Map map, int id, int seed) {
@@ -945,7 +953,7 @@ public enum Stock {
                 super.buff(buff, level);
             }
             public void onCreate(){
-                load(getUnit(getName(),seed,clip.toString(),"Stamina:14&Speed:12&Attack:0&Level:2",Faction.Predator,"3/1&0","Shock,Jump"));
+                load(getUnit(map,getName(),seed,clip.toString(),"Stamina:14&Speed:12&Attack:0&Level:2",Faction.Predator,"2/1&0","Shock,Jump"));
             }
         };
         product.clip = new Body(product, getName());
@@ -980,7 +988,7 @@ public enum Stock {
                 String moves;
                 if (seed % 2 == 1) moves = "Flameroll,Fireball";
                 else moves = "Fireblast";
-                load(getUnit(getName(),seed,clip.toString(),"Stamina:30&Speed:10&Attack:0&Level:7",Faction.Predator,"3/1&0",moves));
+                load(getUnit(map,getName(),seed,clip.toString(),"Stamina:30&Speed:10&Attack:0&Level:7",Faction.Predator,"3/1&0",moves));
             }
         };
         product.gravity = false;
@@ -989,11 +997,11 @@ public enum Stock {
     }},
     Golem { Prop make(Map map, int id, int seed) {
         Unit product = new Unit(map, getName(), seed){
-            public int processDamage(int p, int damage){
-                return Math.max(0,damage-5);
+            public boolean processDamage(int p, int damage){
+                return false;
             }
             public void onCreate(){
-                load(getUnit(getName(),seed,clip.toString(),"Stamina:30&Speed:10&Attack:0&Level:12",Faction.Predator,"3/1&0","Melee"));
+                load(getUnit(map,getName(),seed,clip.toString(),"Stamina:30&Speed:10&Attack:0&Level:12",Faction.Predator,"3/1&0","Melee"));
             }
         };
         product.gravity = false;
@@ -1002,11 +1010,8 @@ public enum Stock {
     }},
     Wyvern { Prop make(Map map, int id, int seed) {
         Unit product = new Unit(map, getName(), seed){
-            public int processDamage(int p, int damage){
-                return Math.max(0,damage-4);
-            }
             public void onCreate(){
-                load(getUnit(getName(),seed,clip.toString(),"Stamina:30&Speed:30&Attack:0&Level:16",Faction.Predator,"3/1&0","Melee"));
+                load(getUnit(map,getName(),seed,clip.toString(),"Stamina:30&Speed:30&Attack:0&Level:16",Faction.Predator,"3/1&0","Melee"));
             }
         };
         product.gravity = false;
@@ -1020,8 +1025,10 @@ public enum Stock {
                 return super.getDescription()+" Something is odd about this helmet.";
             }
         };
+        product.tags.add(Tag.Electric);
         product.tags.add(Tag.Shadow);
         product.tags.add(Tag.Fire);
+        product.tags.add(Tag.Buff);
         product.tags.add(Tag.Air);
         return product;
     }};
@@ -1033,6 +1040,7 @@ public enum Stock {
         int seed = Creation.getSeed(Integer.parseInt(sections[2]));
         int index = Integer.parseInt(sections[0]);
         t = values()[index].make(map, subId, seed);
+        t.manualDepth = false;
         t.factoryId = index;
         t.subId = subId;
         t.load(p);
@@ -1075,7 +1083,6 @@ public enum Stock {
         return makeAddon(new Prop(map, name,rand.nextInt(9999)));
     }
     Prop makeAddon(Prop p){
-        p.manualDepth = true;
         p.save = false;
         isFurniture(p);
         return p;
@@ -1083,8 +1090,8 @@ public enum Stock {
     static void randomSide(Prop p){
         p.dir = p.seed % 2 == 0 ? 1 : -1;
     }
-    static String getUnit(String name, int seed, String clip, String stat, Faction faction, String intel, String moves){
-        return name+"@-1@"+seed+"@0,0@0@"+Global.getControlId()+"@"+Global.player.map.name+"@"+clip+"@"+stat+"@"+faction.name()+"@"+intel+"@"+moves;
+    static String getUnit(Map map, String name, int seed, String clip, String stat, Faction faction, String intel, String moves){
+        return name+"@-1@"+seed+"@0,0@0@"+Global.getControlId()+"@"+map.name+"@"+clip+"@"+stat+"@"+faction.name()+"@"+intel+"@"+moves;
     }
     private static String getItem(Map map, String p, int piece){
         if (p == null || p.equals("None")){
@@ -1092,7 +1099,7 @@ public enum Stock {
             else return "None";
         }
         String pieceName = "";
-        if (piece == 1) pieceName = "_Legging";
+        if (piece == 1) pieceName = "_Pants";
         else if (piece == 2) pieceName = "_Torso";
         Prop product = Stock.getByName(map, p+pieceName,-1);
         if (product instanceof Item) {

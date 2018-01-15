@@ -33,6 +33,7 @@ public enum Actions {
     }, WalkL{
         public void onSet(Unit p){
             p.face(-1, false);
+            p.attackSpeed = -1;
         }
         public void update(Unit p){
             p.vel.x += p.getSpeed()*p.dir;
@@ -40,6 +41,7 @@ public enum Actions {
     }, Walk{
         public void onSet(Unit p){
             p.face(1, false);
+            p.attackSpeed = -1;
         }
         public void update(Unit p){
             p.vel.x += p.getSpeed()*p.dir;
@@ -115,7 +117,7 @@ public enum Actions {
             host.attackSpeed = -1;
         }
         public void update(Unit host){
-            host.vel.x += host.getSpeed() * 2 * host.dir;
+            host.vel.x += host.getSpeed() * 2.5f * host.dir;
             if (host.stateDuration % (20+host.stateLevel*4) == 0 && !host.get("Stamina").require(1))
                 host.setState(Actions.Walk);
         }
@@ -135,11 +137,11 @@ public enum Actions {
         add(Tag.Channeling);
     }}){
         public void onSet(Unit host){
-            host.get("Stamina").add(-3, false);
+            if (!host.get("Stamina").isFull()) host.get("Stamina").add(-2, false);
         }
         public void update(Unit host) {
-            host.stats.rest(4+host.stateLevel);
             if (host.get("Stamina").isFull()) host.stateSet(Idle);
+            else host.stats.rest(4+host.stateLevel);
         }
     },
     Melee(24,-1,0,0,new Tags(){{
@@ -199,19 +201,8 @@ public enum Actions {
                 float test = p.target.getMult(p.dir, p.dir).getAtan();
                 float rot = test -((item.dir * 10) + del * del * .03f * -item.dir);
                 if (Math.abs(rot) < 8){
-                    float rot1 = rot;
-                    float rot2 = item.rotation;
-                    if (rot1 > rot2){
-                        float t = rot1;
-                        rot1 = rot2;
-                        rot2 = t;
-                    }
-                    for (float i=rot1;i<rot2;i+=.2f){
-                        item.rotation = i;
-                        if (p.attack() != null) {
-                            p.damageMod = 0;
-                            break;
-                        }
+                    if (p.attack() != null) {
+                        p.damageMod = 0;
                     }
                 }
                 item.rotation = rot;
@@ -219,7 +210,7 @@ public enum Actions {
         }
     },
     Kick(3,-1,2,1,new Tags(){{
-        add(Tag.Unarmed);
+        add(Tag.Might);
         add(Tag.Legs);
     }}){
         public void trigger(Unit host){
@@ -227,7 +218,7 @@ public enum Actions {
             Man t = (Man)host;
             Line hitbox = t.clip.organs[1].getAdd(t.pos);
             for (Unit i : host.map.updater.collideUnit(t.pos, (int) hitbox.getLength()+64, t.faction)) {
-                if (i.state != Actions.Down && i.checkHit(hitbox, 0, true)) {
+                if (i.state != Actions.Down && i.hit(hitbox, 0, true)) {
                     i.stateSet(Actions.Hit);
                     Sound.play(host.map, host.pos, "hit_whip");
                     new Thing(host.map, "hit_0", -1, 150) {
@@ -248,7 +239,7 @@ public enum Actions {
         }
     },
     Sidekick(18,1,6,1,new Tags(){{
-        add(Tag.Unarmed);
+        add(Tag.Agility);
         add(Tag.Might);
         add(Tag.Legs);
     }}){
@@ -260,7 +251,7 @@ public enum Actions {
             Line hitbox = t.clip.organs[2].getAdd(t.pos.getAdd(t.vel));
             int damage = (int)(t.armor.armor[1].getDamage()+host.stateLevel*.5f)+1;
             for (Unit i : host.map.updater.collideUnit(t.pos, (int) hitbox.getLength()+64, t.faction)) {
-                if (i.checkHit(hitbox, damage, true)) {
+                if (i.hit(hitbox, damage, true)) {
                     Sound.play(host.map, host.pos, "hit_bash");
                     new Thing(host.map, "hit_1", -1, 150) {
                         private int n = 0;
@@ -279,7 +270,6 @@ public enum Actions {
         }
     },
     Punch(12,1,0,1,new Tags(){{
-        add(Tag.Unarmed);
         add(Tag.Agility);
     }}){
         public String getClipName(){
@@ -291,9 +281,9 @@ public enum Actions {
             Line hitbox = t.clip.organs[0].getAdd(t.pos);
             int damage = Global.r.nextInt((int) (t.armor.armor[2].getDamage()+host.stateLevel*.5f)+1);
             for (Unit i : host.map.updater.collideUnit(hitbox.ptd, (int) hitbox.getLength()+64, t.faction)) {
-                if (i.checkHit(hitbox, damage, true)) {
+                if (i.hit(hitbox, damage, true)) {
                     Sound.play(host.map, host.pos, "hit_punch");
-                    new Thing(host.map, "hit_1", -1, 150) {
+                    Thing thing = new Thing(host.map, "hit_1", -1, 150) {
                         private int n = 0;
                         public void draw(Graphics2D g) {
                             if (n <= 7) {
@@ -302,7 +292,9 @@ public enum Actions {
                                 if (n > 7) remove();
                             }
                         }
-                    }.pos = hitbox.ptd;
+                    };
+                    thing.pos = hitbox.ptd;
+                    thing.start();
                     break;
                 }
             }
@@ -438,7 +430,7 @@ public enum Actions {
                 int damage = 0;
                 int str = t.get("Might").get();
                 if (t.weapon.weight != 0 && t.get("Stamina").require(Math.max(0,t.weapon.weight-str))){
-                    speed = 20+(16*Math.max(1,str-t.weapon.weight))+host.stateLevel*4;
+                    speed = Math.min(60, 10+(10*Math.max(1,str-t.weapon.weight))+host.stateLevel*2);
                     damage = (int) (t.rand.nextInt(t.getDamage()+t.weapon.weight)*(.4f+host.stateLevel*.2f));
                 }
                 Projectile pj = new Projectile(host.map, null, t.pos.getAdd(t.clip.organs[OFIST].ptd), t.pos.getAdd(t.target), speed) {
@@ -451,7 +443,7 @@ public enum Actions {
                         remove();
                     }
                     public void onAttack(Unit p) {
-                        if (p.checkHit(new Line(pos,pos.getAdd(vel)),damage, true)){
+                        if (p.hit(new Line(pos,pos.getAdd(vel)),damage, true)){
                             if (wpn.usable(1)) wpn.trigger(p);
                             Sound.play(host.map, host.pos, "hit_bash");
                         }
@@ -461,6 +453,7 @@ public enum Actions {
                         wpn.rotation = rotation;
                     }
                 };
+                pj.setDepth(host.getDepth());
                 pj.gravity = true;
                 pj.rotSpeed = .03f;
                 pj.faction = t.faction;
@@ -475,7 +468,7 @@ public enum Actions {
     Dart(12,0,2,4,new Tags(){{
         add(Tag.Agility);
     }}),
-    Aim(120,2,0,3,new Tags(){{
+    Shoot_Arrow(120,2,0,3,new Tags(){{
         add(Tag.Agility);
     }}){
         public void onSet(Unit p){
@@ -486,9 +479,8 @@ public enum Actions {
             Man t = (Man)host;
             P tip = t.weapon.getLine().ptd;
             final Item wpn = t.weapon;
-            float flytime = t.target.getDist() / 100;
-            int speed = (int) (36 + (host.get("Might").get() * 12) - (t.rand.nextFloat() * (60 / host.stateLevel)));
-            float calcY = Math.abs(t.target.x / speed) * Settings.gravity * Settings.gravity;
+            int speed = (int) (36 + (Math.min(6,host.get("Might").get()) * 10) - (t.rand.nextFloat() * (60 / host.stateLevel)));
+            float calcY = Math.abs(t.target.x / speed) * Settings.gravity;
             final Projectile pj = new Projectile(host.map, "Arrow", tip, t.pos.getAdd(t.target).add(0, -calcY), speed) {
                 public void onField() {
                 }
@@ -500,7 +492,7 @@ public enum Actions {
                 }
 
                 public void collide() {
-                    if (damage > 0) super.collide();
+                    super.collide();
                 }
 
                 public void update() {
@@ -513,18 +505,13 @@ public enum Actions {
             pj.rotation = pj.vel.getAtan();
             pj.gravity = true;
             pj.faction = t.faction;
-            pj.delay.set((int) flytime);
             final int damage = (int) ((t.weapon.getDamage() * 2) * (speed * .1f));
-            pj.delay.performer = new Performer() {
-                public void perform() {
-                    pj.damage = damage;
-                }
-            };
+            pj.damage = damage;
             t.weapon.rotation += t.dir * .3f;
             host.stateSet(Actions.Idle);
         }
     },
-    Shoot(27,-1,2,5,new Tags(){{
+    Shoot_Handgun(27,-1,2,5,new Tags(){{
         add(Tag.Agility);
     }}){
         public void onSet(Unit p){
@@ -556,7 +543,7 @@ public enum Actions {
             t.weapon.rotation += t.dir * -.3f;
         }
     },
-    Snipe(27,-1,0,6,new Tags(){{
+    Shoot_Rifle(27,-1,0,6,new Tags(){{
         add(Tag.Agility);
     }}){
         public void onSet(Unit p){
@@ -613,7 +600,7 @@ public enum Actions {
         }
     },
     Evade(40,4,27,2,new Tags(){{
-        add(Tag.Unarmed);
+        add(Tag.Agility);
     }}){
         public void onSet(Unit p){
             p.buff(Buffs.Evade,1+p.stateLevel);
@@ -822,6 +809,7 @@ public enum Actions {
                         lightning.addPoint(origin.x + points[i].x, origin.y + points[i].y);
                     }
                     lightning.render();
+                    lightning.start();
                 }
                 if (host.stateDuration % Math.max(1,4-host.stateLevel) == 0) target.buff(Buffs.Shock, 1);
             }
@@ -873,7 +861,7 @@ public enum Actions {
     },
     Focus(1, -1, 13, 1, new Tags(){{
         add(Tag.Buff);
-        add(Tag.Unarmed);
+        add(Tag.Agility);
     }}){
         public String getClipName(){
             return "Conjure";
@@ -901,6 +889,7 @@ public enum Actions {
     },
     Frenzy(40, -1, 3, 1, new Tags(){{
         add(Tag.Buff);
+        add(Tag.Mutation);
         add(Tag.Electric);
     }}){
         public String getClipName(){
@@ -1135,7 +1124,7 @@ public enum Actions {
                     Particle.smoke(host.map, pos, host.getDepth());
                     ArrayList<Unit> t = host.map.updater.collideUnit(pos,48+level*16,Faction.Destructive);
                     for (Unit i : t){
-                        if (i != host) i.checkHit(pos, getDamage());
+                        if (i != host) i.hit(getPosLine(), getDamage(), true);
                     }
                     remove();
                     host.setVisible(true);
@@ -1178,7 +1167,7 @@ public enum Actions {
                     Particle.smoke(host.map, pos, getDepth());
                     ArrayList<Unit> t = host.map.updater.collideUnit(pos,128+level*8,Faction.Destructive);
                     for (Unit i : t){
-                        i.checkHit(pos, getDamage());
+                        i.hit(getPosLine(), getDamage(), true);
                     }
                     remove();
                 }
@@ -1226,7 +1215,7 @@ public enum Actions {
                     Particle.explode(host.map, "Ice",getDepth(),pos,new P(), 30, 20, 0, false, 1);
                     ArrayList<Unit> t = host.map.updater.collideUnit(pos,96,host.faction);
                     for (Unit i : t){
-                        i.checkHit(host.pos, getDamage());
+                        i.hit(host.getPosLine(), getDamage(), true);
                         i.buff(Buffs.Freeze, 16+Global.r.nextInt(16));
                     }
                     remove();

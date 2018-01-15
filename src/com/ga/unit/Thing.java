@@ -31,8 +31,9 @@ public class Thing extends Drawable {
         setDepth(depth);
         if (name != null) setImage(name);
     }
-    public void start(){
+    public Thing start(){
         map.updater.addQueue.add(this);
+        return this;
     }
     public void setImage(String p){
         image.set(p);

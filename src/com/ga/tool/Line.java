@@ -35,23 +35,21 @@ public class Line {
         pt = new P(x,y);
         ptd = new P(x1,y1);
     }
-    public Line(float x, float y, float x1, float y1, int tid, int opt){
+    public Line(float x, float y, float x1, float y1, int tid, int opt, float depth){
         this(x,y,x1,y1);
         this.tid = tid;
         this.opt = opt;
-    }
-    public Line(float x, float y, float x1, float y1, int tid, int opt, float depth){
-        this(x,y,x1,y1, tid,opt);
         this.depth = depth;
     }
     public Line(P p1, P p2){
         pt = p1;
         ptd = p2;
     }
-    public Line(P p1, P p2, int tid, int opt){
+    public Line(P p1, P p2, int tid, int opt, float depth){
         this(p1, p2);
         this.tid = tid;
         this.opt = opt;
+        this.depth = depth;
     }
     public Line getAdd(P p){
         return new Line(pt.getAdd(p), ptd.getAdd(p));
@@ -71,6 +69,9 @@ public class Line {
     }
     public float getLength(){
         return ptd.getSubtract(pt).getDist();
+    }
+    public float getWidth(){
+        return Math.abs(ptd.x-pt.x);
     }
     public float getCrossPointX(float y){
         return (y-pt.y)/getSlope()+pt.x;

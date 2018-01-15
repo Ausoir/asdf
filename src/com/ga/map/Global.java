@@ -75,9 +75,9 @@ public class Global {
         System.out.println(p);
     }
     public static void update(){
-        if (updates.update()) {
+        if (updates.update() && !Updater.editor) {
             timePass(1);
-            FileManager.saveCharacter();
+            if (time % 10 == 0) FileManager.saveCharacter();
         }
     }
     public static int getControlId(){
@@ -105,6 +105,7 @@ public class Global {
         }
         Map r = new Map(name);
         maps.add(r);
+        r.start();
         return r;
     }
 }

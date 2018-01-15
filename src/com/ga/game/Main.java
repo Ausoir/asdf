@@ -20,7 +20,6 @@ public class Main {
         Settings.init();
         Keybinding.init();
         Global.init();
-        Updater.editor = editor;
         JFrame gamewindow = new JFrame();
         gamewindow.setUndecorated(true);
         gamewindow.setVisible(true);

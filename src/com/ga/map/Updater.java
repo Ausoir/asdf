@@ -44,10 +44,10 @@ public class Updater {
     public void addUpdatee(Updatable p){
         updatee.add(p);
     }
-    public void update(){
+    public void processQueue(){
         while (addQueue.size() > 0){
             Observer p = addQueue.remove(0);
-            if (p instanceof Drawable) drawee.add((Drawable) p);
+            if (p instanceof Drawable) drawee.add((Drawable) p, (Drawable) p);
             if (p instanceof Unit){
                 Unit unit = (Unit)p;
                 if (((Unit)p).map == map){
@@ -72,6 +72,9 @@ public class Updater {
             unitsLoaded.remove(p);
             controllee.remove(p);
         }
+    }
+    public void update(){
+        processQueue();
         Global.camera.add(Global.cameraTo.getSubtract(Global.camera.getAdd(0,40)).mult(.2f,.2f));
         for (Updatable i : updatee) i.update();
         if (!editor){
@@ -258,7 +261,7 @@ public class Updater {
         }
         return null;
     }
-    public P getEntrancePos(int p) {
+    public P getEntrancePos(int p, P failsafe) {
         if (props.size() == 0) {
             for (Observer i : addQueue) {
                 if (i instanceof Prop) {
@@ -275,7 +278,7 @@ public class Updater {
                 }
             }
         }
-        return new P();
+        return failsafe;
     }
 
     void adjust(P adjustment) {

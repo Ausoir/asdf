@@ -16,6 +16,8 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class EditorInput extends Drawable implements Input, Updatable {
     private enum Tool {
@@ -48,14 +50,15 @@ public class EditorInput extends Drawable implements Input, Updatable {
     private int smooth = 0;
 
     public EditorInput() {
-        map = Global.player.map;
         init();
-        Processes.editorMode();
         currentO = new Prop(map, "Error", 0);
         Global.updates.time = -1;
+        lastSaved = map.name;
     }
 
     private void init(){
+        Updater.editor = true;
+        map = Global.player.map;
         map.updater.addUpdatee(this);
         Global.display.input = this;
         map.updater.addQueue.add(this);
@@ -71,6 +74,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
         }
         for (Unit i : map.updater.unitsLoaded) i.say(i.name);
         map.updater.controllee.clear();
+        Processes.editorMode();
     }
 
     @Override
@@ -84,7 +88,9 @@ public class EditorInput extends Drawable implements Input, Updatable {
         command(p, x, y);
     }
     private void command(String p, int x, int y){
-        if (p.equals("size")) {
+        if (p.equals("mapname")) {
+            message(lastSaved);
+        } else if (p.equals("size")) {
             message(map.size.toString());
         } else if (p.startsWith("size")){
             String[] size = p.substring(5).split(",");
@@ -116,7 +122,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
         } else if (p.startsWith("spawn")) {
             int to = Integer.parseInt(p.substring(6));
             selectTool(Tool.OBJECT);
-            currentO = Stock.Spawn.create(map, -1,to);
+            currentO = Stock.Spawn.create(map, -1, to);
             make(currentO);
             message("Spawn id ["+to+"] spawned at ["+x+", "+y+"]");
         } else if (p.equals("travel")) {
@@ -192,8 +198,9 @@ public class EditorInput extends Drawable implements Input, Updatable {
             message("Depth: "+txDepth+", Texture: "+txTexture+", Shader: "+txShader);
         } else if (p.equals("climb")) {
             for (Line l : map.landRaw){
-                if (l.tid == lastSelected && !l.clockwise()){
-                    l.opt = 1;
+                if (l.tid == lastSelected){
+                    if (l.vertical() || !l.clockwise()) l.opt = 0;
+                    else l.opt = 1;
                     message("Climbable");
                 }
             }
@@ -215,18 +222,24 @@ public class EditorInput extends Drawable implements Input, Updatable {
         } else if (p.startsWith("clean")){
             map.clean();
         } else if (p.startsWith("normalize")){
-            map.normalize(4,4);
+            int marginX = 4, marginY = 4;
+            String[] margins = p.substring(10).split(",");
+            if (margins.length > 1){
+                marginX = Integer.parseInt(margins[0]);
+                marginY = Integer.parseInt(margins[1]);
+            }
+            map.normalize(marginX, marginY);
         } else if (p.startsWith("gen land")){
             int depth = Integer.parseInt(p.substring(9));
             Creation.prepareRandom(-(int) (Math.random()*1000));
-            Generator gen = new Generator(map, getNextTerrain());
+            Generator gen = new Generator(map, map.getNextTerrain());
             gen.generateLand(depth, map.size);
         } else if (p.startsWith("gen town")){
             Creation.prepareRandom(-(int) (Math.random()*1000));
-            Generator gen = new Generator(map, getNextTerrain());
-            gen.generateTown(map.size);
+            Generator gen = new Generator(map, map.getNextTerrain());
+            gen.generateTown();
         } else if (p.startsWith("blocker")){
-            Generator gen = new Generator(map, getNextTerrain());
+            Generator gen = new Generator(map, map.getNextTerrain());
             gen.generateBlocker(Integer.parseInt(p.substring(8)), lastSelected);
         } else if (p.startsWith("move")){
             P m = new P(p.substring(5));
@@ -247,19 +260,20 @@ public class EditorInput extends Drawable implements Input, Updatable {
             map.render();
         } else if (p.startsWith("save")){
             lastSaved = p.substring(5);
-            save("map/"+lastSaved);
+            save(lastSaved);
         } else if (p.startsWith("load")){
-            Global.maps.clear();
-            Global.player.changeMap(p.substring(5)+"@0");
-            map = Global.player.map;
-            init();
+            Updater.editor = false;
+            Global.server.requestChangeMap(p.substring(5)+"@0");
+            lastSaved = p.substring(5);
+            new Timer().schedule(new TimerTask() {
+                public void run() {
+                    Global.display.input = new EditorInput();
+                }
+            },100);
         } else if (p.equals("exit")){
             System.exit(0);
         } else if (p.startsWith("build")){
-            Prop t = Stock.Construct.create(map, Integer.parseInt(p.substring(6)), -1);
-            t.pos.set(x,y);
-            alignObject(x,y,t,24);
-            t.start();
+            new Generator(Global.player.map, map.getNextTerrain()).generateBuilding(p.substring(6), new P(x, y), 1);
         } else if (p.startsWith("o")){
             try {
                 selectTool(Tool.OBJECT);
@@ -286,7 +300,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
     }
 
     private void alignObject(int x, int y, Prop obj, int offset){
-        Line check = new Line(x,y,x,y+64);
+        Line check = new Line(x,y,x,y+128);
         for (Line i : map.landRaw) {
             if (check.lineCross(i)) {
                 obj.pos.set(x, i.getCrossPointY(x)+offset);
@@ -296,20 +310,8 @@ public class EditorInput extends Drawable implements Input, Updatable {
         }
     }
 
-    private int getNextTerrain(){
-        int high = -1;
-        int nextPolygon = 0;
-        for (Line i : map.landRaw){
-            if (i.tid > high){
-                high = i.tid;
-                nextPolygon = i.tid +1;
-            }
-        }
-        return nextPolygon;
-    }
-
     private void makePolygon(Line p) {
-        int nextPolygon = getNextTerrain();
+        int nextPolygon = map.getNextTerrain();
         if (p.ptd.is(history.get(0).pt)) {
             for (Line i : history) {
                 i.tid = nextPolygon;
@@ -559,7 +561,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
                 break;
             case KeyEvent.VK_S:
                 setSpeed(0,1);
-                if (control) save("map/"+map.name);
+                if (control) save(lastSaved);
                 break;
             case KeyEvent.VK_A:
                 setSpeed(-1,0);
@@ -585,6 +587,9 @@ public class EditorInput extends Drawable implements Input, Updatable {
             case KeyEvent.VK_RIGHT:
                 currentO.pos.add(1,0);
                 break;
+            case KeyEvent.VK_Z:
+                if (control) command("load "+lastSaved, 0, 0);
+                break;
             case KeyEvent.VK_SPACE:
                 command(lastCommand, Global.camera.x(), Global.camera.y());
                 break;
@@ -602,13 +607,9 @@ public class EditorInput extends Drawable implements Input, Updatable {
                 break;
             case KeyEvent.VK_INSERT:
                 Global.player.pos.set(Global.cameraTo);
-                Updater.editor = false;
                 map = null;
                 FileManager.loadPlayer();
-                Global.player.changeMap(map.name+"@0");
-                break;
-            case KeyEvent.VK_F2:
-                Updater.editor = !Updater.editor;
+                Global.server.requestChangeMap(map.name+"@0");
                 break;
         }
     }
@@ -686,7 +687,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
         currentO.remove();
         message("Saved ("+p+")");
         map.clean();
-        FileManager.saveMap(p);
+        FileManager.saveMap(p, map);
         FileManager.saveWorld();
     }
 }

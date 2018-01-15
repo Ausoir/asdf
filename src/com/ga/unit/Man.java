@@ -87,8 +87,8 @@ public class Man extends Unit {
     }
 
     @Override
-    protected int processDamage(int organ, int damage){
-        return armor.getOrganArmor(organ).onHit(damage);
+    protected boolean processDamage(int organ, int damage){
+        return armor.getOrganArmor(organ).checkBreak(damage);
     }
 
     public int getVacancy(){
@@ -117,7 +117,7 @@ public class Man extends Unit {
         Line hitbox = weapon.getLine();
         Unit target = null;
         for (Unit i : map.updater.collideUnit(pos, (int) hitbox.getLength()+20, faction)){
-            if (i.checkHit(hitbox,getDamage(),weapon.type.isBlunt())){
+            if (i.hit(hitbox,getDamage(),weapon.type.isBlunt())){
                 target = i;
                 if (!cleave) break;
             }
@@ -143,7 +143,7 @@ public class Man extends Unit {
     @Override
     public void setDepth(float p){
         super.setDepth(p);
-        if (weapon != null) weapon.setDepth(p-.0001f);
+        if (weapon != null) weapon.setDepth(p-.000001f);
     }
 
     @Override
@@ -172,17 +172,14 @@ public class Man extends Unit {
         clip.organs[5].setImage(p);
     }
 
-    public void disconnect(){
-        super.remove();
-        weapon.disconnect();
-    }
-
-    public void start(){
+    @Override
+    public Man start(){
         super.start();
         if (!wieldingNone()){
             weapon.map = map;
             weapon.start();
         }
+        return this;
     }
 
     @Override

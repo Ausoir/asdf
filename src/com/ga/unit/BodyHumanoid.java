@@ -29,15 +29,15 @@ public class BodyHumanoid extends Body {
             case "Conjure":
                 rotateAppendage(FIST, 20, 0);
                 break;
-            case "Aim":
+            case "Shoot_Arrow":
                 rotateAppendage(HEAD, 47, -1.6f*host.dir);
                 rotateAppendage(FIST, 48, 0);
                 rotateAppendage(OFIST, 48, 0);
                 break;
-            case "Shoot":
+            case "Shoot_Handgun":
                 rotateAppendage(FIST, 39, 0);
                 break;
-            case "Snipe":
+            case "Shoot_Rifle":
                 rotateAppendage(OFIST, 41, 0);
                 rotateAppendage(OFIST, 42, 0);
                 break;
@@ -51,7 +51,7 @@ public class BodyHumanoid extends Body {
                 rotateAppendage(FIST, 7, 0);
                 break;
             case "Slash":
-                rotateAppendage(FIST, 7, host.dir);
+                rotateAppendage(FIST, 7, 0);
                 break;
             case "Kick":
                 rotateAppendage(LLEG, 5, 0);

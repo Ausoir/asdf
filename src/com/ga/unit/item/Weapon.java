@@ -8,9 +8,10 @@ import com.ga.map.Map;
  */
 public class Weapon extends Item {
     private int damageMod = 0;
-    public Weapon(Map map, String name, int seed, ItemType type, int encumbrance, Material[] materials) {
+    public Weapon(Map map, String name, int seed, ItemType type, int damage, int encumbrance, Material[] materials) {
         super(map, name, seed, materials, type);
         this.encumbrance = encumbrance;
+        this.damageMod += damage;
         value = value*2 + 1000;
         cooldown = 0;
         rotation = 35;
@@ -26,12 +27,12 @@ public class Weapon extends Item {
     protected void setModifier(PrefixMod mod){
         super.setModifier(mod);
         if (mod == PrefixMod.Mastercraft){
-            damageMod = 1;
+            damageMod += 1;
         }
     }
     protected void setModifier(SpecialtyMod mod){
         if (mod == SpecialtyMod.Feather){
-            damageMod = -1;
+            damageMod -= 1;
             this.weight = Math.max(0,this.weight-(2*admod.magnitude));
         }
         else if (mod == SpecialtyMod.Sharp) damageMod += (1*admod.magnitude)/2;
@@ -55,7 +56,7 @@ public class Weapon extends Item {
         String r = super.getDescription();
         r = r.replace(" uses "," durability ");
         if (emod != null){
-            r += " This weapon has "+(int)(probability*100)+"% chance of activating its enchantment every hit.";
+            r += " This weapon has "+(int)(probability*100)+"% chance of activating its enchantment every checkAmputate.";
         }
         String damageType = type.isBlunt() ? "Blunt" : "Cutting";
         return r + " This weapon deals upto "+getMaxDamage()+" + "+damageMod+" "+damageType+" damage.";

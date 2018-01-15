@@ -5,7 +5,7 @@ package com.ga.unit;
  */
 public enum Tag {
     Buff, Debuff, Channeling, Electric, Air, Mutation, Ice, Fire, Conjuration,
-    Might, Agility, Shadow, Athletics, Unarmed,
+    Might, Agility, Shadow, Athletics,
     Hideable, Sharp, Fiber, Leather, Metal,
     Legs
 }

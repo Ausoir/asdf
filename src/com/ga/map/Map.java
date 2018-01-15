@@ -41,17 +41,45 @@ public class Map {
         this.name = name;
         updater = new Updater(this);
         onTimeChange();
-        load(name);
+    }
+
+    public void start(){
+        if (name.startsWith("_") && !FileManager.isFile("Data/map/" + name + ".map")) make(name);
+        else load(name);
         weather.start();
     }
 
+    private void make(String dir){
+        callname = "Field";
+        Generator gen = new Generator(this, 0);
+        if (dir.startsWith("_M")){
+            gen.generateTown();
+            panorama = new Thing(this, "Bg_Desert", 0, 0) {
+                @Override
+                public void draw(Graphics2D g) {
+                    P t = new P(Global.rel.x + pos.x, Global.rel.y + pos.y).mult(.1f);
+                    P size = image.getSize();
+                    t.x = Global.clamp(t.x, -size.x + Settings.screenX, 0);
+                    t.y = Global.clamp(t.y, -size.y + Settings.screenY, 0);
+                    g.drawImage(image.getImage(), (int) (t.x), (int) (t.y), (int) size.x, (int) size.y, null);
+                }
+            };
+        }
+        panorama.start();
+        panorama.image.getSize().mult(magnify);
+        for (Line i : landRaw){
+            if (i.opt > 0) land.add(i);
+        }
+        generateProps();
+    }
+
     public void load(String dir){
-        String data = FileManager.read("Data/map/" + dir + ".map");
+        String data = FileManager.read("map/" + dir + ".map");
         String[] line = data.split("%");
         String[] names = line[0].split(";");
         callname = names[0];
         if (names[1].equals("")){
-            panorama = new Thing(this, names[1], 0, 0){
+            panorama = new Thing(this, "", 0, 0) {
                 @Override
                 public void draw(Graphics2D g) {
                     g.setColor(Color.black);
@@ -84,7 +112,9 @@ public class Map {
                 for (String section1 : sections) {
                     Line surface = new Line(section1);
                     landRaw.add(surface);
-                    if (surface.opt != 1) land.add(surface);
+                    //set depth here so next block prop spawns auto adjust to correct land depth
+                    surface.depth = Float.parseFloat(formTextures.get(surface.tid).split("&")[0])*.1f+3;
+                    if (surface.opt > 0) land.add(surface);
                 }
                 if (line.length > 3 && !line[3].equals(";")) {
                     sections = line[3].split(";");
@@ -96,6 +126,18 @@ public class Map {
                 }
             }
         }
+    }
+
+    int getNextTerrain(){
+        int high = -1;
+        int nextPolygon = 0;
+        for (Line i : landRaw){
+            if (i.tid > high){
+                high = i.tid;
+                nextPolygon = i.tid +1;
+            }
+        }
+        return nextPolygon;
     }
 
     public String toString(){
@@ -115,7 +157,7 @@ public class Map {
         return result.toString();
     }
 
-    void clear(){
+    public void clear(){
         updater.clear();
         land.clear();
         landRaw.clear();
@@ -126,7 +168,7 @@ public class Map {
     void render(int target){
         String texture = formTextures.get(target);
         String[] formName = texture.split("&");
-        Terrain terrain = new Terrain(this, formName[1], Shader.getByName(formName[2]), Integer.parseInt(formName[0]));
+        Terrain terrain = new Terrain(this, formName[1], Shader.getByName(formName[2]), Float.parseFloat(formName[0]));
         terrains.put(target, terrain);
         for (final Line i : landRaw){
             if (i.tid == target){
@@ -140,14 +182,12 @@ public class Map {
     public void setTexture(){
         for (final Line i : landRaw){
             if (i.tid >= 0){
+                String formTexture = formTextures.get(i.tid);
+                String[] formName = formTexture.split("&");
+                float depth = Float.parseFloat(formName[0]);
                 Terrain terrain = terrains.get(i.tid);
                 if (terrain == null){
-                    String formTexture = formTextures.get(i.tid);
-                    if (formTexture == null) continue;
-                    else {
-                        String[] formName = formTexture.split("&");
-                        terrain = new Terrain(this, formName[1], Shader.getByName(formName[2]), Float.parseFloat(formName[0]));
-                    }
+                    terrain = new Terrain(this, formName[1], Shader.getByName(formName[2]), depth);
                     terrains.put(i.tid, terrain);
                     terrain.start();
                 }
@@ -213,6 +253,7 @@ public class Map {
         if (prop != null) {
             float landSize = Math.abs(l.ptd.x-l.pt.x);
             Prop t = Stock.getByName(this, prop, seed);
+            t.manualDepth = false;
             P size = t.image.getSize();
             if (landSize >= size.x) {
                 float halfSizeX = size.x/2;
@@ -220,10 +261,15 @@ public class Map {
                 tx = (int) Global.clamp(tx, halfSizeX, (l.ptd.x - l.pt.x) - halfSizeX);
                 t.pos = new P(l.pt.x + tx, (int) l.getCrossPointY(l.pt.x + tx));
                 t.rotation = l.getAtan();
+                t.start();
                 return t;
-            } else t.remove();
+            }
         }
         return null;
+    }
+
+    void placeBuilding(int p){
+
     }
 
     public String getLand(int p){
@@ -238,7 +284,7 @@ public class Map {
 
     public Line checkLand(Line p, float depth){
         ArrayList<Line> list = new ArrayList<>();
-        for (Line i : land){
+        for (Line i : landRaw){
             if (i.clockwise() && i.depth >= depth && i.lineCross(p)){
                 list.add(i);
             }
@@ -257,7 +303,7 @@ public class Map {
 
     public Line checkLand(Line p){
         ArrayList<Line> list = new ArrayList<>();
-        for (Line i : land){
+        for (Line i : landRaw){
             if (i.clockwise() && i.lineCross(p)){
                 list.add(i);
             }
@@ -275,6 +321,10 @@ public class Map {
             }
             return closest;
         }
+    }
+
+    public P getFailsafePos(){
+        return new P(size.x/2,36);
     }
 
     public void onTimeChange() {

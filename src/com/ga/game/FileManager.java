@@ -2,6 +2,7 @@ package com.ga.game;
 
 import com.ga.map.Creation;
 import com.ga.map.Global;
+import com.ga.map.Map;
 import com.ga.map.Updater;
 import com.ga.tool.Line;
 import com.ga.unit.Clip;
@@ -59,19 +60,20 @@ public class FileManager {
     }
     public static void saveCharacter(){
         if (Global.player.state != Actions.Dead) {
-            if (Global.server.isHost()) saveMap("map/"+Global.player.map.name);
+            if (Global.server.isHost()) saveMap(Global.player.map.name, Global.player.map);
             save("map/Player.user", Global.player.toCharacterString());
             saveWorld();
         }
     }
-    public static void saveMap(String name){
-        String result = Global.player.map.toString();
-        save(name+".map", result);
+    public static void saveMap(String name, Map map){
+        map.updater.processQueue();
+        String result = map.toString();
+        save("map/"+name+".map", result);
     }
     public static String read(String dir) {
         String result = null;
         try {
-            try (BufferedReader br = new BufferedReader(new FileReader(dir))) {
+            try (BufferedReader br = new BufferedReader(new FileReader("Data/" + dir))) {
                 String newline = br.readLine();
                 if (newline != null) {
                     String line = newline.split(" //")[0];
@@ -93,7 +95,7 @@ public class FileManager {
         loadPlayer();
     }
     public static void loadPlayer(){
-        String[] data = read("Data/map/Player.user").split("%");
+        String[] data = read("map/Player.user").split("%");
         PlayerInput pi;
         pi = ((MainPlayer) Stock.Player.create(null, 1, 0)).input;
         Global.display.input = pi;
@@ -106,10 +108,11 @@ public class FileManager {
         pi.host.map.mapEdgeCenter(Global.camera = pi.host.map.size.getMult(.5f, .5f));
         pi.host.map.onTimeChange();
         pi.host.start();
+        Global.display.menu.init();
     }
 
     public static void loadActors(String p){
-        String data = read("Data/map/"+p);
+        String data = read("map/"+p);
         if (data != null) {
             String[] actors = data.split("%");
             for (String i : actors) {
@@ -194,12 +197,12 @@ public class FileManager {
     }
 
     public static Clip readClip(String dir) {
-        String[] data = read(dir).split("%%");
+        String[] data = read(dir.replace("Data/","")).split("%%");
         return new Clip(readModelProperty(data), readModel(data), readAnimation(data), readClipFrames(data), readMoveset(data));
     }
 
     public static HashMap<String, ArrayList<String>> readDialogue(String dir){
-        String data = read("Data/"+dir);
+        String data = read(dir);
         String[] lines = data.split("%");
         HashMap<String,ArrayList<String>> result = new HashMap<>();
         for (String line1 : lines) {
@@ -213,7 +216,7 @@ public class FileManager {
     }
 
     public static String[] readText(String dir){
-        String data = read("Data/"+dir);
+        String data = read(dir);
         return data.split("%");
     }
 
@@ -223,31 +226,15 @@ public class FileManager {
     }
 
     public static void readWorld(){
-        char[][] world;
-        String data = read("Data/map/World.map");
-        String[] lines = data.split("%");
-        world = new char[lines.length-1][lines[1].length()];
-        for (int y=1;y<lines.length;y++){
-            for (int x=0;x<lines[y].toCharArray().length;x++){
-                char node = lines[y].charAt(x);
-                world[y-1][x] = node;
-            }
-        }
-        String[] meta = lines[0].split(",");
+        String data = read("map/World.map");
+        String[] meta = data.split(",");
         Creation.seed = Integer.parseInt(meta[0]);
         Global.time = Integer.parseInt(meta[1]);
         Global.controlId = Integer.parseInt(meta[2]);
-        Creation.world = world;
     }
 
     public static void saveWorld(){
-        StringBuilder r = new StringBuilder(Creation.seed+","+Global.time+","+Global.controlId+"\n");
-        for (char[] y : Creation.world){
-            for (char x : y){
-                r.append(x);
-            }
-            r.append("\n");
-        }
+        StringBuilder r = new StringBuilder(Creation.seed+","+Global.time+","+Global.controlId);
         save("map/World.map", r.toString());
         save("map/Actors.map", Updater.toAllActorString());
     }

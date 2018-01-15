@@ -18,9 +18,10 @@ public abstract class Drawable implements Observer {
         } else if (this.depth != depth){
             this.depth = depth;
             if (prev != null) { //not added in yet
+                Drawable newprev = prev;
                 removeThis();
-                if (prev.getDepth() > depth) prev.reverseAdd(this);
-                else prev.add(this);
+                if (newprev.getDepth() > depth) newprev.reverseAdd(this);
+                else newprev.add(this, this);
             }
         }
     }
@@ -28,8 +29,10 @@ public abstract class Drawable implements Observer {
         return depth;
     }
     private void reverseAdd(Drawable p){
-        if (prev == null) p.setNext(this);
-        else {
+        if (prev == null){
+            p.setNext(this);
+            p.prev = null;
+        } else {
             if (prev.getDepth() <= p.getDepth()) {
                 Drawable origPrev = prev;
                 p.setNext(this);
@@ -39,19 +42,30 @@ public abstract class Drawable implements Observer {
             }
         }
     }
-    void add(Drawable p){
-        if (next == null){
+    void add(Drawable p, Drawable failsafe){
+        if (next == failsafe){
+            new Exception().printStackTrace();
             setNext(p);
+            next.next = null;
+        } else if (next == null){
+            setNext(p);
+            next.next = null;
         } else if (next.getDepth() > p.getDepth()){
             p.setNext(next);
             setNext(p);
         } else {
-            next.add(p);
+            next.add(p, failsafe);
         }
     }
     private void setNext(Drawable p){
         next = p;
         next.prev = this;
+    }
+    void remove(Drawable p){
+        if (next != null) {
+            if (this == p) removeThis();
+            else next.remove(p);
+        }
     }
     protected void removeThis(){
         if (prev != null) prev.next = next;

@@ -1,5 +1,6 @@
 package com.ga.unit;
 
+import com.ga.game.Sound;
 import com.ga.map.Global;
 import com.ga.map.Picture;
 import com.ga.map.ShadedPicture;
@@ -23,11 +24,11 @@ public class Organ extends Line {
     private Organ parent;
     private ArrayList<Organ> children = new ArrayList<>();
     int type;
-    public int health = 1;
+    public int health;
     private int maxLength = 80;
     boolean vital = false;
     boolean leg = false, hand = false;
-    public Performer onAmputate = new Performer();
+    Performer onAmputate = new Performer();
 
     Organ(Organ p, boolean tip){
         parent = p;
@@ -64,47 +65,45 @@ public class Organ extends Line {
     void setMaxLength(int p){
         maxLength = p;
     }
-    protected boolean hit(Line p, int damage){
-        boolean pierce = damage > 0 && Global.r.nextInt(damage) > health;
-        if (pierce) {
-            if (image != null) {
-                final Projectile flyingOrgan = new Projectile(host.map, null, new P(host.pos), p.ptd.getAdd(Global.r.nextInt(24)-12,-Global.r.nextInt(12)), 32+damage*8) {
-                    private final int length = (int) getLength();
-                    public void update() {
-                        if (tangible) {
-                            Particle.explode(host.map, "Blood", host.getDepth(), pos, new P(0, -15), 4, 5, 5, true, 5);
-                        }
-                        super.update();
+    void hit(Line p){
+        ptd.set(p.getAtan(maxLength));
+    }
+    void amputate(Line p, int damage){
+        Sound.play(host.map, host.pos, "hit_bloody");
+        int intensity = 32+damage*8;
+        if (image != null) {
+            final Projectile flyingOrgan = new Projectile(host.map, null, new P(host.pos), p.ptd.getAdd(Global.r.nextInt(24)-12,-Global.r.nextInt(12)), intensity) {
+                private final int length = (int) getLength();
+                public void update() {
+                    if (tangible) {
+                        Particle.explode(host.map, "Blood", host.getDepth(), pos, new P(0, -15), 4, 5, 5, true, 5);
                     }
-                    public void draw(Graphics2D g){
-                        if (type == 0) super.draw(g);
-                        else image.draw(g, pos.x, pos.y, rotation, dir, strokeSize, length+3);
-                    }
-                };
-                flyingOrgan.image = image.copy();
-                flyingOrgan.rotation = getAtan()-1.57f;
-                flyingOrgan.dir = host.dir;
-                flyingOrgan.setDepth(host.getDepth());
-                flyingOrgan.gravity = true;
-                flyingOrgan.delay.set(999);
-                flyingOrgan.delay.performer = new Performer(){
-                    @Override
-                    public void perform(){
-                        flyingOrgan.remove();
-                    }
-                };
-                image.visible = false;
-            }
-            Particle.explode(host.map, "Blood", host.getDepth(), p.ptd, new P(), 5, 40, 0, true, 2);
-            amputated = true;
-            for (Organ i : children) i.hit(p, 9999);
-            onAmputate.perform();
-            host.clip.updateStatus();
-            return true;
-        } else {
-            ptd.set(p.getAtan(maxLength));
+                    super.update();
+                }
+                public void draw(Graphics2D g){
+                    if (type == 0) super.draw(g);
+                    else image.draw(g, pos.x, pos.y, rotation, dir, strokeSize, length+3);
+                }
+            };
+            flyingOrgan.image = image.copy();
+            flyingOrgan.rotation = getAtan()-1.57f;
+            flyingOrgan.dir = host.dir;
+            flyingOrgan.setDepth(host.getDepth());
+            flyingOrgan.gravity = true;
+            flyingOrgan.delay.set(999);
+            flyingOrgan.delay.performer = new Performer(){
+                @Override
+                public void perform(){
+                    flyingOrgan.remove();
+                }
+            };
+            image.visible = false;
         }
-        return false;
+        Particle.explode(host.map, "Blood", host.getDepth(), p.ptd, new P(), 5, 40, 0, true, 2);
+        amputated = true;
+        for (Organ i : children) i.amputate(p, intensity);
+        onAmputate.perform();
+        host.clip.updateStatus();
     }
     boolean checkHit(Line p){
         if (!amputated) {
