@@ -4,7 +4,6 @@ stats:Stats
 equip:Equipment
 inv:Inventory
 mvs:Skills
-train:Training
 act:Actions
 crft:Craft
 gold:$
@@ -14,12 +13,12 @@ equipped:Equipped
 btorso:Torso
 bleg:Pants
 bhead:Head
-mem:Memory
-MightDsc:Decreases weight penalties by 1, which reduces slow effects from heavy equipment. Also increases potency of all skills involving might.
+mem:Intelligence
+StrengthDsc:Decreases weight penalties by 1, which reduces slow effects from heavy equipment. Also increases potency of all skills involving Strength.
 DexterityDsc:Increases maximum encumbrance by 1.
 AgilityDsc:Increases damage and potency of all skills involving agility.
 StaminaDsc:Increases maximum Stamina by 1. Stamina recovers usually by resting.
-MemoryDsc:Increases memory capacity by 1, which lets you progress in 1 extra expertise level from textbooks and learn 1 additional skill from manuals.
+IntelligenceDsc:Increases Intelligence capacity by 1, which lets you progress in 1 extra expertise level from textbooks and learn 1 additional skill from manuals.
 AthleticsDsc:Increases speed and decreases stamina cost of skills related to running.
 JumpingDsc:Increases jump range for all skills involving jump.
 SwingingDsc:Increases potency of all physical actions.
@@ -27,15 +26,9 @@ MartialDsc:Increases damage of all martial skills.
 EnergyDsc:Increases potency of all elemental spells.
 ChannelingDsc:Decreases stamina cost of maintaining channels.
 mvsRemap:Select a skill to re-map its keybinding.
-mvsTrain:Select a skill/spell to train.
 itemEncDsc:This $ item is magically enchanted with $. This item's cooldown is $ seconds.
 itemEncRdy:Currently the item is ready to use.
 itemEncNRdy:Currently the item needs $ more seconds to recharge.
-item1:Common
-item2:Fine
-item3:Rare
-item4:Ludicrous
-item5:Legendary
 reqInput:Press a key
 mvsInteract:Interact
 mvsSprint:Sprint
@@ -46,6 +39,7 @@ mvsSwing:Swing
 mvsKick:Kick
 mvsSidekick:Sidekick
 mvsWhirlwind:Whirlwind
+mvsPunch:Punch
 mvsStab:Stab
 mvsUse:Use
 mvsDash:Dash

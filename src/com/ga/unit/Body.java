@@ -22,11 +22,11 @@ public class Body {
     private int[] nextAnimation = animation.get("Idle")[0];
     private int nextTrigger = -2;
     public Organ[] organs;
-    Timer frame;
+    protected Timer frame;
     private int[][] nextClip;
-    int[][][] localAnimation;
+    protected int[][][] localAnimation;
     private int[] localFrames;
-    int current = 0;
+    protected int current = 0;
     protected String state = "Idle";
     public int BODY;
     private int legNum = 0, legCurrent = 0;
@@ -34,7 +34,7 @@ public class Body {
     private float appendageSize = 1;
     protected int size = 0;
 
-    Body(Unit host, String current) {
+    protected Body(Unit host, String current) {
         this.host = host;
         this.clip = Clips.clip.get(current);
         set(clip);
@@ -214,7 +214,7 @@ public class Body {
         for (int i : t) localFrames[i] = Math.max(1, clip.frames[i]-p);
     }
 
-    void setClip() {
+    public void setClip() {
         if (current >= nextAnimation.length) current = 0;
         if (nextAnimation[current] == -1) {
             current--;
@@ -224,7 +224,7 @@ public class Body {
         frame.set(localFrames[nextAnimation[current]]);
     }
 
-    void rotateAppendage(int organ, int frame, float offset){
+    protected void rotateAppendage(int organ, int frame, float offset){
         int length = Math.abs(clip.clip[frame][organ][0])+Math.abs(clip.clip[frame][organ][1]);
         float atan = host.target.getAdd(localAnimation[frame][organ][0]*host.dir, localAnimation[frame][organ][1]+getHeight()).getAtan();
         atan += offset;

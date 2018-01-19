@@ -34,7 +34,7 @@ public class Stats {
             origBuff.onStack(level);
         }
     }
-    Buff getEffect(Buffs p){
+    public Buff getEffect(Buffs p){
         for (Buff i : effects){
             if (i.buff == p) return i;
         }
@@ -89,9 +89,6 @@ public class Stats {
             }
         }
     }
-    public int getEffectsSize(){
-        return effects.size();
-    }
     public String getEffectsList(){
         if (effects.size() == 0) return "None";
         String r = "";
@@ -112,7 +109,15 @@ public class Stats {
         }
         return result.substring(0,result.length()-1);
     }
-
+    public void endBuff(Buffs p){
+        for (int i=0;i<effects.size();i++) {
+            Buff effect = effects.get(i);
+            if (effect.buff == p){
+                effects.remove(i);
+                effect.onFinish();
+            }
+        }
+    }
     public void clearBuffs() {
         for (int i=0;i<effects.size();i++) {
             Buff effect = effects.remove(0);

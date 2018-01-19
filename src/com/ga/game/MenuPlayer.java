@@ -8,8 +8,8 @@ import com.ga.unit.Tag;
 import com.ga.unit.Tags;
 import com.ga.unit.item.Crafts;
 import com.ga.unit.item.Item;
-import com.ga.unit.player.Inventory;
-import com.ga.unit.player.Player;
+import com.ga.unit.man.Inventory;
+import com.ga.unit.man.Player;
 import com.ga.unit.skill.Actions;
 
 import javax.swing.*;
@@ -28,7 +28,7 @@ public class MenuPlayer extends Panel {
     private class StatPanel extends JPanel{
         private GridBagConstraints statgrid = new GridBagConstraints();
         private String[] stats = new String[]{
-                "Stamina", "Might", "Dexterity", "Agility", "Memory"
+                "Strength", "Dexterity", "Stamina", "Intelligence", "Wisdom"
         };
         private JButton[] statButtons = new JButton[stats.length];
         private JLabel level = new JLabel();
@@ -132,7 +132,7 @@ public class MenuPlayer extends Panel {
             int maxEncumbrance = Global.player.get("Dexterity").get();
             gold.setText("Cash: "+Dialog.money(Global.player.gold) +
                     "                 Encumbrance:"+(maxEncumbrance-Global.player.getVacancy())+"/"+maxEncumbrance+
-                    "                 Weight:"+Global.player.getWeight()+"/"+Global.player.get("Might").get()*2);
+                    "                 Weight:"+Global.player.getWeight()+"/"+Global.player.get("Strength").get()*2);
             panel.removeAll();
 
             grid.gridy = 0;
@@ -232,7 +232,7 @@ public class MenuPlayer extends Panel {
         }
         void refresh(){
             gold.setText("Cash: "+Dialog.money(Global.player.gold)+
-                    "                 Weight:"+Global.player.getWeight()+"/"+Global.player.get("Might").get()*2);
+                    "                 Weight:"+Global.player.getWeight()+"/"+Global.player.get("Strength").get()*2);
             panel.removeAll();
             Inventory inv = Global.player.inventory;
             int itemsize = inv.getItemSize();
@@ -307,7 +307,7 @@ public class MenuPlayer extends Panel {
             panel.add(new JLabel(Dialog.get("mvsRemap")));
             panel.add(Box.createRigidArea(new Dimension(0,12)));
             for (Actions i : Global.player.moveset) makeSlot(i);
-            int points = Global.player.get("Memory").get();
+            int points = Global.player.get("Intelligence").get();
             skillpoints.setText(Dialog.get("mem")+": "+points);
         }
         void makeSlot(final Actions move){
@@ -380,7 +380,8 @@ public class MenuPlayer extends Panel {
         }
         void refresh() {
             panel.removeAll();
-            panel.add(makeOption("Inspect Self","stat","Check current status, stats, and injuries."));
+            panel.add(makeOption("Current Status","stat","Check current status, stats, and injuries."));
+            panel.add(makeOption("Inspect Self","dsc","Your general description."));
             panel.add(makeOption("Rest","h","Rest for an hour, removing curable debuffs and consuming available food. Shortcut is ',' key."));
             panel.add(makeOption("Sleep","zzz","Sleep for six hours."));
             TitledBorder b = BorderFactory.createTitledBorder(BorderFactory.createMatteBorder(2,2,2,2,Panel.forecolor));
@@ -442,15 +443,21 @@ public class MenuPlayer extends Panel {
                 case "h":
                     Global.player.map.updater.sleep(100);
                     break;
+                case "dsc":
+                    Global.display.menu.onUpdate = new Performer(){
+                        public void perform(){
+                            Global.display.menu.showDialog("My Description", Global.player.getDescription());
+                        }
+                    };
+                    Global.display.menu.onUpdate.perform();
+                    break;
                 case "stat":
                     Global.display.menu.onUpdate = new Performer(){
                         public void perform(){
-                            Player player = Global.player;
-                            String statusDsc = "Stamina:" + player.get("Stamina") +
-                                    "\nMetabolism:" + player.health.getStatusDescription() +
-                                    "\nTiredness:" + player.get("Endurance") +
-                                    "\nMotivation:" + player.get("Motivation")+"\n";
-                            statusDsc += "\nCurrent Status Effects:\n" + player.stats.getEffectsList();
+                            String statusDsc = "Stamina:" + Global.player.get("Stamina") +
+                                    "\nTiredness:" + Global.player.get("Endurance") +
+                                    "\nMotivation:" + Global.player.get("Motivation")+"\n";
+                            statusDsc += "\nCurrent Status Effects:\n" + Global.player.stats.getEffectsList();
                             Global.display.menu.showDialog("Current Status", statusDsc);
                         }
                     };
@@ -460,104 +467,6 @@ public class MenuPlayer extends Panel {
                     Global.display.menu.showDialog("Options", "apparently none.");
                     break;
             }
-        }
-    }
-
-    private class TrainingPanel extends JPanel{
-        private GridBagConstraints statgrid = new GridBagConstraints();
-        private String[][] stats;
-        private JPanel panel;
-        private JPanel learning;
-        private JScrollPane scroll;
-        private JButton learningButton;
-        private JProgressBar learningProgress;
-        private JButton[] statButtons;
-        TrainingPanel(){
-            setOpaque(false);
-            setLayout(new BoxLayout(this,BoxLayout.PAGE_AXIS));
-            stats = new String[Tags.trainers.length][2];
-            for (int i=0;i<Tags.trainers.length;i++){
-                stats[i] = new String[]{Tags.trainers[i].name(), Dialog.get(Tags.trainers[i].name()+"Dsc")};
-            }
-            panel = new JPanel();
-            panel.setOpaque(false);
-            panel.setLayout(new GridBagLayout());
-            panel.setBackground(Panel.forecolor2);
-            statgrid.anchor = GridBagConstraints.LINE_START;
-            statgrid.fill = GridBagConstraints.BOTH;
-            statgrid.ipadx = 120;
-            statgrid.ipady = 20;
-            statgrid.gridx = 0;
-            statgrid.gridy = 0;
-            statgrid.gridwidth = 2;
-            learning = new JPanel();
-            learning.setOpaque(false);
-            panel.add(learning,statgrid);
-            statgrid.gridwidth = 1;
-            statgrid.gridy = 1;
-            statButtons = new JButton[Tags.trainers.length];
-            for (int i=0;i<stats.length;i++) statButtons[i] = makeStatButton(panel,stats[i][0],null);
-            statgrid.gridx = 1;
-            statgrid.gridy = 1;
-            for (String[] i : stats){
-                makeStatButton(panel,"", "menuDialog@"+i[0]+"@"+i[1]).setIcon(iconDescribe);
-            }
-            scroll = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-            scroll.getVerticalScrollBar().setUI(new ScrollBar());
-            scroll.getVerticalScrollBar().setOpaque(false);
-            scroll.getVerticalScrollBar().setUnitIncrement(24);
-            scroll.getViewport().setOpaque(false);
-            scroll.setBorder(null);
-            scroll.setOpaque(false);
-            add(scroll);
-        }
-        void refresh(){
-            learning.removeAll();
-            if (Global.player.learning != null) {
-                TitledBorder b = BorderFactory.createTitledBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Panel.forecolor));
-                b.setTitle("Currently Learning");
-                learning.setBorder(b);
-                String title = Global.player.learning.toString();
-                learningButton = makeStatButton(learning, title, "menuDialog@"+title+"@"+Global.player.learning.getDescription());
-                learningButton.setIcon(iconDescribe);
-                learningProgress = new JProgressBar(0,Global.player.get("Progress").getMax());
-                learningProgress.setBackground(Panel.fontcolor);
-                learningProgress.setValue(Global.player.get("Progress").get());
-                learningProgress.setStringPainted(true);
-                learning.add(learningProgress);
-            }
-            for (int i=0;i<stats.length;i++){
-                String v = "Level " + (Global.player.get(stats[i][0]).get()/100)+" / "+(Global.player.get(stats[i][0]).get()%100)+"%";
-                statButtons[i].setText(stats[i][0]+" - "+v);
-            }
-        }
-        JButton makeStatButton(JPanel panel, String p, final String cmd){
-            final JButton button = new JButton(p);
-            button.setFont(Panel.font);
-            button.setForeground(Panel.fontcolor);
-            button.setBorder(null);
-            button.setContentAreaFilled(false);
-            button.setFocusable(false);
-            button.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mousePressed(MouseEvent e) {
-                    button.setForeground(Color.CYAN);
-                }
-                @Override
-                public void mouseReleased(MouseEvent e) {
-                    button.setForeground(Panel.fontcolor);
-                }
-            });
-            button.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    Command.order(cmd);
-                    refresh();
-                }
-            });
-            panel.add(button, statgrid);
-            statgrid.gridy++;
-            return button;
         }
     }
 
@@ -690,7 +599,6 @@ public class MenuPlayer extends Panel {
     private EquipmentPanel equipmentPanel = new EquipmentPanel();
     private InventoryPanel inventorypanel = new InventoryPanel();
     private SkillPanel skillpanel = new SkillPanel();
-    private TrainingPanel trainpanel = new TrainingPanel();
     private CraftPanel craftpanel = new CraftPanel();
     MenuPlayer() {
         targetSizeX = 764;
@@ -710,7 +618,6 @@ public class MenuPlayer extends Panel {
         add(equipmentPanel,grid);
         add(inventorypanel,grid);
         add(skillpanel,grid);
-        add(trainpanel,grid);
         add(craftpanel,grid);
         command("");
 
@@ -732,7 +639,6 @@ public class MenuPlayer extends Panel {
         mainpanel.add(makeOption(Dialog.get("equip"), "equip"));
         mainpanel.add(makeOption(Dialog.get("inv"), "inventory"));
         mainpanel.add(makeOption(Dialog.get("mvs"), "spell"));
-        mainpanel.add(makeOption(Dialog.get("train"), "train"));
         mainpanel.add(makeOption(Dialog.get("crft"), "craft"));
         grid.gridx = 0;
         add(mainpanel,grid);
@@ -782,7 +688,6 @@ public class MenuPlayer extends Panel {
         inventorypanel.setVisible(false);
         skillpanel.setVisible(false);
         actionpanel.setVisible(false);
-        trainpanel.setVisible(false);
         craftpanel.setVisible(false);
         switch (p) {
             case "act":
@@ -799,9 +704,6 @@ public class MenuPlayer extends Panel {
                 break;
             case "spell":
                 skillpanel.setVisible(true);
-                break;
-            case "train":
-                trainpanel.setVisible(true);
                 break;
             case "craft":
                 craftpanel.setVisible(true);
@@ -829,7 +731,6 @@ public class MenuPlayer extends Panel {
             inventorypanel.refresh();
             skillpanel.refresh();
             equipmentPanel.refresh();
-            trainpanel.refresh();
             craftpanel.refresh();
         }
     }

@@ -3,7 +3,7 @@ package com.ga.game;
 import com.ga.map.Global;
 import com.ga.map.Picture;
 import com.ga.tool.Performer;
-import com.ga.unit.player.Player;
+import com.ga.unit.man.Player;
 import com.ga.unit.item.Item;
 
 import javax.swing.*;

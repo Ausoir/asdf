@@ -14,8 +14,8 @@ public enum Faction {
     Evil(3),
     Predator(4),
     Rogue(5),
-    Temporary(0),
-    Destructive(-1);
+    Curse(9),
+    Destructive(0);
     private int side;
     Faction(int side) {
         this.side = side;

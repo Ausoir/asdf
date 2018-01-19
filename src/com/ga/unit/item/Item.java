@@ -10,6 +10,7 @@ import com.ga.tool.Interactive;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.unit.*;
+import com.ga.unit.man.Man;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Buffs;
 
@@ -22,112 +23,100 @@ import java.util.Random;
  */
 public class Item extends Prop {
     public enum ItemType {
-        Sword(Actions.Slash, 3, 1.3f, .7f, "swing_knife"){
-            public boolean isBlunt(){
-                return false;
-            }
-        }, Spear(Actions.Thrust, 1, 1, .4f, "swing_silent"){
-            public boolean isBlunt(){
-                return false;
-            }
-        }, Knife(Actions.Slash, 3, .3f, .4f, "swing_knife") {
-            public boolean isBlunt() {
-                return false;
-            }
-        }, Swinging(Actions.Slash, 3, 2, 2, "swing_silent"){
-            public boolean isBlunt() {
-                return false;
-            }
-        },
-        Bashing(Actions.Slash, 1, 2, 2, "swing_silent"),
-        Armor(Actions.Rest, 1, 2, 1, "swing_normal"), Scroll(Actions.Guard, 1, 0, .5f, "scroll"),
-        Shooting(Actions.Shoot_Handgun, 3, .8f, 1, "swing_normal"), Rifle(Actions.Shoot_Rifle, 3, 1.2f, 1, "swing_normal"),
-        Bow(Actions.Shoot_Arrow, 1, 1, .2f, "swing_silent"), Throwing(Actions.Throw, 3, .2f, 1, "swing_silent"),
-        Darting(Actions.Dart, 3, .1f, 1, "swing_normal"), Consumable(Actions.Consume, 1, .2f, 1, "drink");
+        Sword(Actions.Slash, 3, 1.3f, 4, "swing_knife"),
+        Spear(Actions.Thrust, 1, 1, 0, "swing_silent"),
+        Knife(Actions.Slash, 3, .3f, 2, "swing_knife"),
+        Swinging(Actions.Slash, 3, 2, 10, "swing_silent"),
+        Bashing(Actions.Slash, 1, 2, 10, "swing_silent"),
+        Armor(Actions.Rest, 1, 2, 10, "swing_normal"), Scroll(Actions.Guard, 1, 0, 0, "scroll"),
+        Shooting(Actions.Shoot_Handgun, 3, .8f, 0, "swing_normal"), Rifle(Actions.Shoot_Rifle, 3, 1.2f, 0, "swing_normal"),
+        Bow(Actions.Shoot_Arrow, 1, 1, 0, "swing_silent"), Throwing(Actions.Throw, 3, .2f, 0, "swing_silent"),
+        Darting(Actions.Dart, 3, .1f, 0, "swing_normal"), Consumable(Actions.Consume, 1, .2f, 0, "drink");
         Actions action;
         String sound;
         int centerType;
-        float weightMultiplier, durabilityMultiplier;
-        ItemType(Actions p, int centerType, float mass, float sturdiness, String sound){
+        float weightMultiplier, durabilityAddition;
+        ItemType(Actions p, int centerType, float weightMod, int durabilityMod, String sound){
             action = p;
             this.centerType = centerType;
-            this.weightMultiplier = mass;
-            this.durabilityMultiplier = sturdiness;
+            this.weightMultiplier = weightMod;
+            this.durabilityAddition = durabilityMod;
             this.sound = sound;
-        }
-        public boolean isBlunt(){
-            return true;
         }
     }
     public enum Material{
-        Wooden(.4f,2,32,1,0,new Color(118, 93, 0,60)),
-        Cloth(.5f,0,12,0,0),
-        Leather(.3f,1,50,1,1500,new Color(133, 78, 32,140)),
-        Glass(.1f,1,1,7,2000){
+        Wooden(.4f,2,1,1,0,new Color(118, 93, 0,60)),
+        Cloth(.5f,0,0,.9f,200),
+        Silk(.1f,2,1,.8f,2500),
+        Nylon(.2f,1,0,.6f,2000){
+            public void onSet(Item host){
+                host.tags.add(Tag.Athletics);
+            }
+        },
+        Leather(.3f,1,1,1,1500,new Color(133, 78, 32,140)),
+        Glass(.1f,1,7,.5f,2000){
             public void onSet(Item host){
                 host.tags.add(Tag.Ice);
             }
         },
-        Brass(.4f,5,110,4,1500,new Color(133, 123, 23,120)),
-        Copper(.4f,5,80,3,1500,new Color(133, 92, 38,120)){
+        Brass(.4f,7,4,.7f,1500,new Color(133, 123, 23,120)),
+        Copper(.4f,5,3,1f,1500,new Color(133, 92, 38,120)){
             public void onSet(Item host){
                 host.tags.add(Tag.Electric);
             }
         },
-        Bronze(.4f,5,500,4,1500,new Color(133, 72, 0,200)),
-        Iron(.4f,4,600,5,2000),
-        Silver(.2f,6,140,3,4000){
+        Bronze(.4f,5,4,1.2f,1500,new Color(133, 72, 0,200)),
+        Iron(.4f,4,5,1.5f,2000),
+        Silver(.2f,10,7,.8f,9000),
+        Gold(.1f,10,9,.5f,16000){
             public void onSet(Item host){
+                host.tags.add(Tag.Electric);
+                host.tags.add(Tag.Enchant);
+            }
+        },
+        Lead(.3f,9,2,1.6f,1500,new Color(19, 31, 75,180)){
+            public void onSet(Item host){
+                host.tags.add(Tag.Electric);
                 host.tags.add(Tag.Mutation);
             }
         },
-        Gold(.1f,12,40,2,5000){
-            public void onSet(Item host){
-                host.tags.add(Tag.Electric);
-            }
-        },
-        Lead(.3f,7,50,2,1500,new Color(19, 31, 75,180)){
-            public void onSet(Item host){
-                host.tags.add(Tag.Electric);
-            }
-        },
-        Steel(.2f,4,8000,6,8000),
-        Titanium(.1f,3,-1,7,30000),
-        Crystal(.1f,8,24,12,2000,new Color(28, 133, 67,120)){
+        Steel(.2f,4,6,4,8000),
+        Titanium(.1f,3,7,5,30000),
+        Crystal(.1f,8,9,.3f,2000,new Color(28, 133, 67,120)){
             public void onSet(Item host){
                 host.tags.add(Tag.Ice);
             }
         },
-        Obsidian(.1f,3,40,4,8000){
+        Obsidian(.1f,3,4,.7f,8000){
             public void onSet(Item host){
                 host.tags.add(Tag.Shadow);
                 host.tags.add(Tag.Fire);
             }
         },
-        Bone(.2f,1,80,3,3000){
+        Bone(.2f,1,3,.8f,3000){
             public void onSet(Item host){
                 host.tags.add(Tag.Conjuration);
             }
         },
-        Other(0,0,10,0,0),
-        Flesh(.1f,0,-1,0,0){
+        Other(0,0,0,1,0),
+        Flesh(.1f,0,0,1,0){
             public void onSet(Item host){
                 host.tags.add(Tag.Mutation);
             }
         },
-        Stone(.2f,6,5,5,0,new Color(107, 107, 107,255));
-        int weight, durability, hardness, value;
+        Stone(.2f,6,5,1.2f,0,new Color(107, 107, 107,255));
+        int weight, hardness, value;
         Color color;
-        float prevalence;
-        Material(float prevalence, int weight, int durability, int hardness, int value){
+        float durabilityMod, prevalence;
+        Material(float prevalence, int weight, int hardness, float durabilityMod, int value){
             this.prevalence = prevalence;
             this.weight = weight;
-            this.durability = durability;
             this.hardness = hardness;
+            this.durabilityMod = durabilityMod;
             this.value = value;
         }
-        Material(float prevalence, int weight, int durability, int hardness, int value, Color color){
-            this(prevalence, weight,durability,hardness, value);
+        Material(float prevalence, int weight, int hardness, float durabilityMod, int value, Color color){
+            this(prevalence, weight, hardness, durabilityMod, value);
             this.color = color;
         }
         void onSet(Item host){}
@@ -155,43 +144,13 @@ public class Item extends Prop {
         }
     }
     enum SpecialtyMod{
-        None, Light, Heavy, Feather, Sharp, Dull, Hasty, Lazy, Durable, Tough, Runic, Instant, Cursed, Conscious;
+        None, Light, Heavy, Feather, Sharp, Dull, Hasty, Lazy, Durable, Tough, Runic, Instant, Cursed, Athletic, Strengthening, Glowing, Quality, Unwieldy;
         static SpecialtyMod get(Random seed){
-            if (seed.nextGaussian() > 1) return values()[seed.nextInt(values().length)];
+            if (seed.nextInt(4) == 0) return values()[seed.nextInt(values().length)];
             return None;
         }
         static SpecialtyMod load(String p){
             for (SpecialtyMod i : values()){
-                if ((""+i.ordinal()).equals(p)) return i;
-            }
-            return None;
-        }
-        public String toString() {
-            return ""+ordinal();
-        }
-    }
-    enum PrefixMod{
-        None(160), Awful(30), Old(40), Fine(16), Mastercraft(1);
-        static int pool;
-        int weight;
-        PrefixMod(int weight){
-            expandPool(weight);
-            this.weight = weight;
-        }
-        void expandPool(int weight){
-            pool += weight;
-        }
-        static PrefixMod get(Random seed){
-            int r = seed.nextInt(pool);
-            int t = 0;
-            for (PrefixMod i : values()){
-                t+=i.weight;
-                if (t >= r) return i;
-            }
-            return None;
-        }
-        static PrefixMod load(String p){
-            for (PrefixMod i : values()){
                 if ((""+i.ordinal()).equals(p)) return i;
             }
             return None;
@@ -213,7 +172,7 @@ public class Item extends Prop {
             return None;
         }
         static AdverbMod get(Random seed){
-            int r = seed.nextInt(100);
+            int r = seed.nextInt(10);
             if (r < 1) return Ultra;
             else if (r < 3) return Super;
             else if (r < 8) return Very;
@@ -250,9 +209,8 @@ public class Item extends Prop {
         }
     }
     AdverbMod admod = AdverbMod.None;
-    protected AdenchantMod ademod = AdenchantMod.None;
     private SpecialtyMod smod = SpecialtyMod.None;
-    private PrefixMod pmod = PrefixMod.None;
+    protected AdenchantMod ademod = AdenchantMod.None;
     protected Buffs emod = null;
     Material material;
     public int weight, range;
@@ -262,14 +220,16 @@ public class Item extends Prop {
     public int delay = 0;
     public float probability;
     private int[] cdTime;
-    int durability = 1;
-    int uses = 1;
+    private int durability = 1;
+    private int uses = 1;
     public ItemType type = ItemType.Throwing;
     public int value = 100;
     Man owner;
-    public Item(Map map, String name, int seed, Material[] materials, ItemType type) {
+    public Item(Map map, String name, int seed, Material[] materials, ItemType type, int durability) {
         super(map, name, seed, 7);
         gravity = true;
+        this.durability = durability;
+        this.uses = durability;
         setType(type);
         material = Material.get(rand, materials);
         setMaterial(material);
@@ -288,37 +248,31 @@ public class Item extends Prop {
         range = getSize()-8;
     }
     protected void imbueMeta(boolean canSmod, boolean canAdmod, float emodProb){
-        pmod = PrefixMod.get(rand);
         if (canSmod) smod = SpecialtyMod.get(rand);
-        if (canAdmod) admod = AdverbMod.get(rand);
+        if (canAdmod && smod != SpecialtyMod.None) admod = AdverbMod.get(rand);
         if (rand.nextFloat() < emodProb) {
             emod = Buffs.values()[rand.nextInt(Buffs.values().length)];
             ademod = AdenchantMod.get(rand);
             probability = ademod.magnitude;
         }
-        setModifier(pmod);
         setModifier(smod);
         applyMetaShade();
         uses = durability;
     }
     private void loadMeta(String p){
         String[] metadata = p.split("_");
-        pmod = PrefixMod.load(metadata[0]);
-        smod = SpecialtyMod.load(metadata[1]);
-        admod = AdverbMod.load(metadata[2]);
-        if (!metadata[3].equals("")){
-            emod = Buffs.values()[Integer.parseInt(metadata[3])];
-            ademod = AdenchantMod.load(metadata[4]);
+        smod = SpecialtyMod.load(metadata[0]);
+        admod = AdverbMod.load(metadata[1]);
+        if (!metadata[2].equals("")){
+            emod = Buffs.values()[Integer.parseInt(metadata[2])];
+            ademod = AdenchantMod.load(metadata[3]);
             probability = ademod.magnitude;
         }
-        setModifier(pmod);
         setModifier(smod);
         applyMetaShade();
     }
     private void applyMetaShade(){
-        if (pmod.ordinal() >= 3){
-            shade(new Color(255, 255, 255, 140).getRGB());
-        } else if (emod != null){
+        if (emod != null){
             int intensity = ademod.level * 30;
             shade(new Color(48, 156, 200, intensity).getRGB());
         }
@@ -332,31 +286,17 @@ public class Item extends Prop {
     private void setType(ItemType p){
         this.type = p;
         image.setCenterType(type.centerType);
-//        this.type.onSet(this);
+        if (durability != -1) {
+            durability += p.durabilityAddition;
+            uses += p.durabilityAddition;
+        }
     }
     public void setMaterial(Material mat){
         this.material = mat;
         mat.onSet(this);
         if (mat.color != null) shade(mat.color.getRGB());
         this.weight = (int) (material.weight * type.weightMultiplier);
-        this.durability = (int) (material.durability * type.durabilityMultiplier);
-        this.uses = durability;
-        setModifier(pmod);
         setModifier(smod);
-    }
-    protected void setModifier(PrefixMod mod){
-        if (mod == PrefixMod.Awful){
-            weight += 2;
-        } else if (mod == PrefixMod.Old){
-            durability = (int) (durability*.5f);
-        } else if (mod == PrefixMod.Fine){
-            probability += .1f;
-            durability = (int) (durability*1.5f);
-        } else if (mod == PrefixMod.Mastercraft){
-            weight = Math.max(0, weight-1);
-            probability += .2f;
-            durability = (int) (durability*2f);
-        }
     }
     protected void setModifier(SpecialtyMod mod){
         if (mod == SpecialtyMod.None) admod = AdverbMod.None;
@@ -368,19 +308,23 @@ public class Item extends Prop {
         else if (mod == SpecialtyMod.Feather) this.weight /= 2*admod.magnitude;
         else if (mod == SpecialtyMod.Hasty) cooldown *= 1-(.2f*admod.magnitude);
         else if (mod == SpecialtyMod.Lazy) cooldown *= 1+(.2f*admod.magnitude);
-        else if (mod == SpecialtyMod.Durable) durability *= 2;
-        else if (mod == SpecialtyMod.Runic) probability += .2f;
+        else if (mod == SpecialtyMod.Durable) durability *= 8;
+        else if (mod == SpecialtyMod.Runic) probability += .2f*admod.magnitude;
         else if (mod == SpecialtyMod.Instant) delay = 1;
-        else if (mod == SpecialtyMod.Conscious){
-            cooldown = cooldown*2+40;
-            if (ademod != AdenchantMod.None){
-                if (ademod.level > 3) durability = -1;
-                else durability += ademod.level * 100;
-            } else durability += 100;
+        else if (mod == SpecialtyMod.Athletic){
+            tags.add(Tag.Athletics);
+            tags.add(Tag.Athletics);
+            tags.add(Tag.Athletics);
+        }
+        else if (mod == SpecialtyMod.Strengthening) tags.add(Tag.Strength);
+        else if (mod == SpecialtyMod.Quality) encumbrance = Math.max(0,encumbrance-1);
+        else if (mod == SpecialtyMod.Unwieldy) encumbrance++;
+        else if (mod == SpecialtyMod.Glowing) {
+            tags.add(Tags.trainers[seed % Tags.trainers.length]);
         }
     }
     private int getRarity(){
-        return pmod.ordinal()+(smod != SpecialtyMod.None?10:0)+(emod != null?100:0);
+        return 1+(smod == SpecialtyMod.None?0:1)+(emod == null?0:1);
     }
     public Color getRarityColor(){
         int rarity = getRarity();
@@ -390,60 +334,39 @@ public class Item extends Prop {
                 result = Color.LIGHT_GRAY;
                 break;
             case 2:
-                result = Color.WHITE;
-                break;
-            case 3:
                 result = Color.GREEN;
                 break;
-            case 4:
-                return Color.CYAN;
-            case 5:
+            case 3:
                 return Color.MAGENTA;
-        }
-        if (rarity >= 100){
-            result = Color.BLUE;
         }
         return result;
     }
     public int getValue(){
         float r = value;
-        int adverb = admod.ordinal()+1;
+        int adverb = admod.ordinal();
         boolean special = smod != SpecialtyMod.None;
-        switch (pmod.ordinal()){
-            case 0:
-                r *= 1;
-                break;
-            case 1:
-                r *= .8f;
-                break;
-            case 2:
-                r *= .9f;
-                break;
-            case 3:
-                r *= 5;
-                break;
-            case 4:
-                r *= 15;
-                break;
-            default:
-                r *= 100;
-                break;
+        if (special && smod != SpecialtyMod.Cursed) r += 2000 + 1000*adverb;
+        if (emod != null && !isCursed()){
+            r += emod.value*2000*ademod.level;
         }
-        if (smod == SpecialtyMod.Cursed){
-            r = Math.max(1,r-1000)*.7f;
-        } else if (special) r += (r*adverb);
-        if (emod != null){
-            r += emod.value;
-        }
+        if (isCursed() || smod == SpecialtyMod.Cursed) r = Math.max(100,r-500);
         return (int) r;
     }
+    boolean isCursed(){
+        return false;
+    }
     private String getRarityDescription(){
-        String r = Dialog.get("item1");
-        int rare = getRarity();
-        if (rare >= 10) r = Dialog.get("item2");
-        if (rare >= 100) r = Dialog.get("item3");
-        if (rare % 5 == 4) r = Dialog.get("item4");
-        else if (rare % 5 == 5) r = Dialog.get("item5");
+        String r = "";
+        switch (getRarity()){
+            case 1:
+                r = "Common";
+                break;
+            case 2:
+                r = "Fine";
+                break;
+            case 3:
+                r = "Extraordinary";
+        }
         return r;
     }
     public String getName(){
@@ -451,9 +374,8 @@ public class Item extends Prop {
     }
     public String getFullName(){
         String r = "";
-        if (admod != AdverbMod.None) r+=admod.name();
+        if (admod != AdverbMod.None) r+=admod.name()+" ";
         if (smod != SpecialtyMod.None) r+=smod.name();
-        if (pmod != PrefixMod.None) r+=pmod.name();
         r += " " + getName();
         if (emod != null){
             r+=" of ";
@@ -462,7 +384,6 @@ public class Item extends Prop {
             }
             r+=emod.name();
         }
-        r = r.replace("_"," ");
         return r;
     }
     public void onEquip(Man host){
@@ -478,12 +399,9 @@ public class Item extends Prop {
         pos = pos.getAdd(0,0);
         mobile = true;
         if (smod == SpecialtyMod.Cursed){
-            ArrayList<Buffs> list = Buffs.getByTag(Tag.Debuff);
+            ArrayList<Buffs> list = Buffs.getByTag(Tag.Curse);
             host.buff(list.get(rand.nextInt(list.size())),rand.nextInt(9)+1);
         }
-    }
-    public void disconnect(){
-        super.remove();
     }
     public void remove(){
         if (owner != null && owner.weapon == this) owner.setWeapon(null);
@@ -506,7 +424,7 @@ public class Item extends Prop {
         return false;
     }
     public boolean use(Man host){ //return: is host in a state capable of using item
-        if (host.setState(type.action) == 0){
+        if (host.get("Strength").get() >= weight && host.setState(type.action) == 0){
             cdTime[0] = Global.time+cooldown;
             playSound();
             return true;
@@ -543,7 +461,7 @@ public class Item extends Prop {
         return r;
     }
     public int getDamage() {
-        return Global.r.nextInt(Math.max(1,weight));
+        return weight;
     }
     public Line getLine(){
         float len = image.getSize().x * dir + 4;
@@ -573,7 +491,7 @@ public class Item extends Prop {
     @Override
     public String toString(){
         String t = super.toString();
-        String meta = pmod+"_"+smod+"_"+admod+"_"+(emod==null?"":emod.ordinal())+"_"+ademod;
+        String meta = smod+"_"+admod+"_"+(emod==null?"":emod.ordinal())+"_"+ademod;
         if (!t.equals("")) t += "@"+uses+"@"+cdTime[0]+"@"+meta;
         return t;
     }

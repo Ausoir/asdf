@@ -5,6 +5,7 @@ import com.ga.game.FileManager;
 import com.ga.map.Global;
 import com.ga.tool.*;
 import com.ga.unit.item.Item;
+import com.ga.unit.man.Man;
 import com.ga.unit.skill.Actions;
 
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ public enum Intelligence {
                 } else if (p instanceof Man) {
                     if (target != p) {
                         target = (Man) p;
-                        setState(Actions.Idle);
+                        host.setState(Actions.Idle);
                         if (advertise.over() && host.getConversation().equals("")){
                             if (host.rand.nextFloat() < .5f) host.say("@c");
                             else host.say(ad);
@@ -63,17 +64,9 @@ public enum Intelligence {
     }, Hunter{
         public AI make(Unit host){ return process(new AI(host){
             private final int range = 160;
-            void onAttack(){
+            public void onAttack(){
                 if (target != null) {
                     host.say("@atk tgt");
-                }
-            }
-            void setState(Actions state){
-                if (target != null) {
-                    P p = target.pos.getSubtract(host.pos).add(0,-target.getSize()/2);
-                    host.target = p;
-                    if (host instanceof Man) ((Man)host).weapon.rotateTo(p.getMult(host.dir,host.dir));
-                    if (target.state == Actions.Dead) target = null;
                 }
             }
             boolean blocked(int dir){
@@ -109,7 +102,7 @@ public enum Intelligence {
                         if (u instanceof Man) {
                             if (u.isFacing(host.pos) && Math.abs(u.pos.x - host.pos.x) < 240) {
                                 host.face(dir, false);
-                                setState(Actions.Idle);
+                                host.setState(Actions.Idle);
                             }
                         }
                     } else {

@@ -2,8 +2,7 @@ package com.ga.tool;
 
 import com.ga.game.Settings;
 import com.ga.map.Global;
-import com.ga.map.Updater;
-import com.ga.unit.Man;
+import com.ga.unit.man.Man;
 import com.ga.unit.Organ;
 import com.ga.unit.Unit;
 

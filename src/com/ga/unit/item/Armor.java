@@ -4,7 +4,9 @@ import com.ga.game.Sound;
 import com.ga.map.Map;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
-import com.ga.unit.Man;
+import com.ga.unit.Tag;
+import com.ga.unit.man.Man;
+import com.ga.unit.skill.Actions;
 
 /**
  * Created by Ga on 8/9/2016. asd
@@ -13,8 +15,8 @@ public class Armor extends Item {
     private int piece = 0;
     private int armorMod = 0;
     int pocket = 0;
-    public Armor(Map map, String name, int seed, int piece, int encumbrance, int pockets, Material[] materials) {
-        super(map, name, seed, materials, ItemType.Armor);
+    public Armor(Map map, String name, int seed, int piece, int encumbrance, int pockets, Material[] materials, int durability) {
+        super(map, name, seed, materials, ItemType.Armor, durability);
         this.encumbrance = encumbrance;
         value = value*2 + 500;
         this.pocket = pockets;
@@ -24,23 +26,20 @@ public class Armor extends Item {
     }
     void shade(int color){}
     public void onCreate(){
-        imbueMeta(true, true, .03f);
-        if (emod != null && !emod.tags.contains(com.ga.unit.Tag.Buff)){
+        imbueMeta(true, true, .5f);
+        if (emod != null && !emod.tags.contains(Tag.Enchant) && rand.nextFloat() > .1f){
             emod = null;
             ademod = AdenchantMod.None;
         }
+    }
+    @Override
+    boolean isCursed() {
+        return emod != null && emod.tags.contains(Tag.Curse) || super.isCursed();
     }
     public void randomSize(P sizeVariance) {
     }
     float getArmor(){
         return Math.max(0,material.hardness + armorMod);
-    }
-    protected void setModifier(PrefixMod mod){
-        super.setModifier(mod);
-        if (mod == PrefixMod.Awful) armorMod = -1;
-        else if (mod == PrefixMod.None) armorMod = 1;
-        else if (mod == PrefixMod.Fine) armorMod = 2;
-        else if (mod == PrefixMod.Mastercraft) armorMod = 3;
     }
     protected void setModifier(SpecialtyMod mod){
         if (mod == SpecialtyMod.Tough) armorMod += admod.magnitude;
@@ -51,7 +50,7 @@ public class Armor extends Item {
         super.remove();
     }
     public boolean checkBreak(int damage){ //damage reduction
-        int r = (int) Math.max(0, damage - getArmor());
+        int r = (int) Math.max(1, damage - getArmor());
         if (usable(r)){
             if (owner != null) trigger(owner);
             return false;
@@ -65,13 +64,17 @@ public class Armor extends Item {
             final Armor me = this;
             host.delay.performer = new Performer() {
                 public void perform() {
-                    if (host.armor.isBare(piece)) {
-                        Sound.play(host.map, host.pos, "wear");
-                        host.map.updater.remove(me);
-                        host.setWeapon(null);
-                        host.armor.set(me, piece);
-                        owner = host;
-                    }
+                    if (host.get("Strength").get() >= weight) {
+                        if (host.armor.isBare(piece)) {
+                            Sound.play(host.map, host.pos, "wear");
+                            me.remove();
+                            host.setWeapon(null);
+                            host.armor.set(me, piece);
+                            owner = host;
+                        } else {
+                            host.setState(Actions.Wield);
+                        }
+                    } else host.say("Too heavy!");
                 }
             };
             return true;

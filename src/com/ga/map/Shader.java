@@ -221,7 +221,7 @@ public enum Shader{
                             green = (int) Global.clamp(((targetC[1] - green) / 70f * ny) + green + Global.r.nextInt(16) - 8, 0, 255);
                             blue = (int) Global.clamp(((targetC[2] - blue) / 70f * ny) + blue + Global.r.nextInt(16) - 8, 0, 255);
                             float sin = (float) (Math.sin(ix * .05f) + Math.cos(ix * .01f) - Math.sin(ix * .5f) * .05f);
-                            if (sin < .4f && sin + iy * .8f < .5f) alpha = 0;
+                            if (sin + iy < -2) alpha = 0;
                             image.setRGB(ix, y, new Color(red, green, blue, alpha).getRGB());
                         }
                     }

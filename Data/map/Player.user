@@ -1,7 +1,1 @@
-10@1@0@8399,1331@0.00@7@_M1@111111@Speed:23,23&Progress:0,0&Dexterity:16,16&Channeling:403,403&Memory:0,1&Electric:404,404&Shadow:0,400&Ice:0,400&Attack:0,0&Air:304,304&Stamina:0,7&Unarmed:404,404&Toughness:5,5&Experience:160,310&Athletics:0,400&Motivation:100,100&Conjuration:0,400&Fire:0,400&Agility:6,6&Might:4,4&Endurance:214,2050&Level:2,2&Mutation:0,400/8&3&9672&0@Player@0/4&0,0&1@Use,Rest,Sidekick,Thrust,Windwalk,Dart,Punch,Lightning,Mark,Leap,Throw#Player##None&None&None
-21204;call 127.0.0.1;null
-;OXOPCCPPXOPCCPPXOPCCPPXOPCPXP
-;Enchanter;
-;
-;
-;-1:Idle;-65:Idle;32:Sidekick;65:WalkL;1:Use;2:Discard;-68:Idle;67:Lightning;68:Walk;70:Punch;16:Rest;81:Throw;82:Wield;83:Drop;86:Windwalk;87:Jump;88:Mark;90:Leap;
+10@1@0@3632,1276@0.00@7@_M1@111111@Speed:23,23&Dexterity:14,14&Experience:6,40&Wisdom:1,1&Motivation:62,100&Intelligence:1,1&Endurance:-1132,700&Level:2,4&Attack:0,0&Strength:11,11&Stamina:7,7@Player@0/4&0,0&1@Use,Rest,Sidekick,Thrust,Windwalk,Dart,Punch,Lightning,Mark,Leap,Throw,Kick@2@21204@call 127.0.0.1@Battery@;#Player;7@7@67175@3632,1239@6.13@34@23715@0_0__0@0;8@24@32747@3632,1207@-0.00@19@23303@0_0__0;8@11@88691@4463,1369@0.00@14@23138@0_0_6_0;8@10@39322@3752,1239@0.00@42@23711@0_0__0;

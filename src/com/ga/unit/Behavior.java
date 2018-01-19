@@ -4,6 +4,7 @@ import com.ga.game.FileManager;
 import com.ga.map.Global;
 import com.ga.map.Updater;
 import com.ga.tool.P;
+import com.ga.unit.man.Man;
 import com.ga.unit.skill.Actions;
 
 import java.util.ArrayList;
@@ -164,36 +165,45 @@ public enum Behavior {
                     if (host.map == target.map) {
                         int x = (int) ((target.pos.x + target.vel.x) - (host.pos.x + host.vel.x));
                         int y = (int) (target.pos.y - host.pos.y);
-                        host.face(target.pos.x > host.pos.x ? 1 : -1, false);
+                        host.target = new P(x,y);
+                        if (host instanceof Man) ((Man)host).weapon.rotateTo(host.target.getMult(host.dir,host.dir));
                         float dist = (float) Math.abs(Math.sqrt(x * x + y * y) - host.getReach());
                         Actions action = Actions.Idle;
                         float lowest = 1000;
                         float current;
-                        for (Actions act : host.moveset) {
-                            current = act.getRange(host) - dist;
-                            if (current >= 0) {
-                                if (current < lowest || (current == lowest && Math.random() < .5f)) {
-                                    lowest = current;
-                                    action = act;
+                        if (host.get("Stamina").get() <= 1) action = Actions.Rest;
+                        else {
+                            for (Actions act : host.moveset) {
+                                current = act.getRange(host) - dist;
+                                if (current >= 0) {
+                                    if (current <= lowest) {
+                                        lowest = current;
+                                        action = act;
+                                    }
                                 }
                             }
                         }
-                        if (dist > action.getRange(host)) move(host);
+                        if (dist > action.getRange(host)) move(host, dist);
                         else {
-                            if (Math.random() > host.get("Stamina").getPercentage()) {
+                            int fb = host.setState(action);
+                            host.say(host.get("Stamina").toString() + " " + action.name()+" "+fb);
+                            if (fb == 0) {
+                                host.delay.set(40);
+                            } else if (fb == 2) {
                                 host.setState(Actions.Rest);
                                 host.delay.time += 40;
-                            } else if (host.setState(action) != 0) {
-                                move(host);
+                            } else {
+                                move(host, dist);
                             }
                             if (host.state.getTags().contains(Tag.Channeling)) {
-                                host.delay.set(60 + Global.r.nextInt(80));
+                                host.delay.set(80);
                             }
                         }
                     } else {
                         host.brain.setTask(Travel);
                         host.brain.tasks.peek().load(Integer.parseInt(target.map.name));
                     }
+                    if (target.state == Actions.Dead) host.brain.target = null;
                 }
                 return false;
             }
@@ -228,8 +238,10 @@ class Task {
     void blocked(Unit host, boolean fall){
 
     }
-    void move(Unit host){
-        if (host.setState(Actions.Sprint) != 0) host.setState(Actions.Walk);
+    void move(Unit host, float dist){
+        if (dist > 100){
+            if (host.setState(Actions.Sprint) != 0) host.setState(Actions.Walk);
+        } else host.setState(Actions.Walk);
     }
     public String toString(){
         return id+"&"+getVar();

@@ -30,6 +30,7 @@ public class Unit extends Prop {
     public EventTimer delay = new EventTimer(5, false, null);
     public P target = new P();
     public Stats stats = new Stats(this);
+    public Traits traits = new Traits();
     public float damageMod = 1;
     protected String speechType;
     protected Speech speech;
@@ -44,7 +45,10 @@ public class Unit extends Prop {
         super(map, null, seed, 8);
         this.name = name;
         gravity = true;
+        init();
     }
+
+    protected void init(){}
 
     @Override
     public String[] load(String p){
@@ -59,6 +63,7 @@ public class Unit extends Prop {
         moveset = new Actions[movesets.length];
         for (int i=0;i<movesets.length;i++) moveset[i] = Actions.getByName(movesets[i]);
         clip.setOrganHealth();
+        traits.load(sections[12]);
         return sections;
     }
 
@@ -82,15 +87,16 @@ public class Unit extends Prop {
         speech.say(p);
     }
 
-    String getConversation(){
+    protected String getConversation(){
         return speech.getTextarea().getText();
     }
     void hear(Prop pos, String p){
         if (!speech.getTextarea().isVisible()) brain.hear(pos, p);
     }
     public P getHand(){
-        if (clip.getHand() == -1) return pos.getAdd(0,-clip.getHeight());
-        return pos.getAdd(clip.organs[clip.getHand()].ptd);
+        int hand = clip.getHand();
+        if (hand == -1) return pos.getAdd(0,-clip.getHeight());
+        return pos.getAdd(clip.organs[hand].ptd);
     }
     public float getReach(){
         Stat reach = get("Reach");
@@ -102,11 +108,8 @@ public class Unit extends Prop {
         if (r == null) r = new int[]{Global.time};
         return r;
     }
-    protected boolean tagCapable(Tags p){
-        return true;
-    }
     public int setState(Actions state) {
-        if (delay.over() && jump && this.state != state && tagCapable(state.getTags())) {
+        if (delay.over() && jump && this.state != state) {
             lastState = null;
             face(target.x > 0 ? 1 : -1, true);
             if (Global.time >= getCooldown(state)[0]) {
@@ -131,8 +134,15 @@ public class Unit extends Prop {
     public void attackSound(){
         Sound.play(map, pos, "swing_normal");
     }
+    protected Tags getTags(){
+        return tags;
+    }
     public int getStateLevel(Actions state){
-        return get("Level").get();
+        int r = 0;
+        for (Tag i : getTags()){
+            if (state.getTags().contains(i)) r++;
+        }
+        return Math.max(0, r+1-state.getDifficulty());
     }
     public void stateSet(Actions state){
         if (this.state != Actions.Dead) {
@@ -140,7 +150,6 @@ public class Unit extends Prop {
             delay.set(state.getDel());
             this.state = state;
             clip.setState(state.getClipName());
-            brain.setState(state);
             damageMod = 1;
             stateDuration = 0;
             this.state.onSet(this);
@@ -163,7 +172,7 @@ public class Unit extends Prop {
         return (int) (rand.nextInt(get("Level").get()+2)*damageMod);
     }
 
-    protected boolean processDamage(int organ, int damage){
+    protected boolean damageBreakthrough(int organ, int damage){
         return true;
     }
 
@@ -176,40 +185,39 @@ public class Unit extends Prop {
         return super.hittable(faction) && state != Actions.Dead;
     }
 
-    public boolean hit(Line hitBox, int damage, boolean blunt){
-        if (state == Actions.Down){
-            die();
-            return true;
-        } else {
-            boolean ko = stats.triggerEffect(Buffs.Mark) || get("Toughness").get() - (damage + stats.getEffectLevel(Buffs.Bleed)) <= 0;
-            //Organ amputate
-            for (int i = 0; i < clip.organs.length; i++) {
-                if (clip.organs[i].checkHit(hitBox)) {
-                    P t = new P(pos.x, hitBox.ptd.y);
-                    Particle.explode(map, "Blood", getDepth(), t, t.getSubtract(hitBox.pt), 3, 3, 12, true, 5);
-                    if (!blunt && ko && processDamage(i, damage)) clip.organs[i].amputate(hitBox, damage);
-                    else clip.organs[i].hit(hitBox);
-                    return true;
+    public boolean hit(Line hitBox, int damage){
+        //Organ amputate
+        for (int i = 0; i < clip.organs.length; i++) {
+            if (clip.organs[i].checkHit(hitBox)) {
+                P t = new P(pos.x, hitBox.ptd.y);
+                Particle.explode(map, "Blood", getDepth(), t, t.getSubtract(hitBox.pt), 3, 3, 12, true, 5);
+                if (state == Actions.Down){
+                    if (clip.organs[i].vital) buff(Buffs.Bleed, 1);
+                    else clip.organs[i].amputate(hitBox, damage);
+                } else if (damageBreakthrough(i, damage)){
+                    if (traits.has(Traits.Trait.Tough)){
+                        if (stats.getEffectLevel(Buffs.Bleed) < 3) buff(Buffs.Bleed, 1);
+                        else die();
+                    } else clip.organs[i].amputate(hitBox, damage);
+                } else if (damage < get("Stamina").get()+4) clip.organs[i].hit(hitBox);
+                else {
+                    P mid = hitBox.getMidpoint();
+                    float radius = hitBox.getLength() / 2;
+                    if (mid.getSubtract(pos.getAdd(0, -clip.getHeight())).getDist() < radius + getSize()) {
+                        delay.performer = null;
+                        jump = false;
+                        vel.x = (damage + 5) * Float.compare(pos.x, hitBox.pt.x);
+                        vel.y += -5 - damage;
+                        buff(Buffs.Bleed, 1);
+                        int blood = stats.getEffectLevel(Buffs.Bleed);
+                        if (blood > 2) {
+                            stateSet(Actions.Down);
+                            delay.time *= 1 + stats.getEffectLevel(Buffs.Bleed) * .2f;
+                        } else stateSet(Actions.Hit);
+                        brain.onHit();
+                        return true;
+                    }
                 }
-            }
-            //Knockdown
-            P mid = hitBox.getMidpoint();
-            float radius = hitBox.getLength() / 2;
-            if (mid.getSubtract(pos.getAdd(0, -clip.getHeight())).getDist() < radius + getSize()) {
-                float knockback = damage / get("Toughness").get();
-                delay.performer = null;
-                jump = false;
-                if (state == Actions.Rest) knockback += .5f;
-                vel.x = (knockback * 8 + 5) * Float.compare(pos.x, hitBox.pt.x);
-                vel.y += -5 - knockback * 2;
-                if (damage > 0) {
-                    buff(Buffs.Bleed, 1);
-                    if (ko) {
-                        stateSet(Actions.Down);
-                        delay.time *= 1 + stats.getEffectLevel(Buffs.Bleed) * .2f;
-                    } else stateSet(Actions.Hit);
-                }
-                brain.onHit();
                 return true;
             }
         }
@@ -255,9 +263,9 @@ public class Unit extends Prop {
         if (!jump) {
             jump = true;
             if (l.clockwise() && !l.vertical()) setDepth(l.depth-OFFSET_UNIT);
-            int mag = (int) (vel.y - Settings.gravityMax);
+            float mag = Math.abs(vel.x)+Math.abs(vel.y);
             if (vel.y > Settings.gravity*4) Sound.play(map, pos, "land");
-            if (mag >= 0 && hittable(Faction.Destructive)) {
+            if (mag >= Settings.gravityMax && hittable(Faction.Destructive) && !traits.has(Traits.Trait.Lander)) {
                 buff(Buffs.Bleed, Global.r.nextInt(3));
                 stateSet(Actions.Down);
             } else if (state == Actions.Jump && vel.y > 0) {
@@ -287,7 +295,7 @@ public class Unit extends Prop {
     public Unit attack(){
         P hand = getHand();
         for (Unit i : map.updater.collideUnit(hand, (int) getReach(), faction)){
-            i.hit(new Line(hand, hand.getAdd(dir*5,0)), getDamage(), true);
+            i.hit(new Line(hand, hand.getAdd(dir*5,0)), getDamage());
             onAttack(i);
             if (!stats.triggerEffect(Buffs.Cleave)) return i;
         }
@@ -327,14 +335,15 @@ public class Unit extends Prop {
         StringBuilder r = new StringBuilder(super.toString());
         r.append("@").append(controlId).append("@").append(map.name).append("@").append(clip.toString()).append("@").append(stats.toString()).append("@").append(faction.name()).append("@").append(brain.toString()).append("@");
         for (Actions i : moveset) r.append(i.getName()).append(",");
-        return r.deleteCharAt(r.length()-1).toString();
+        return r.deleteCharAt(r.length()-1).append("@").append(traits.toString()).toString();
     }
 
     public String getDescription(){
         String r = name + " [Genetic Code:"+seed+"]\n";
         r += "*Faction - "+faction.name()+"\n";
         r += "*Stats - \n"+stats.toString().split("/")[0].replace("&"," ")+"\n";
-        r += "*Effects - "+stats.getEffectsList();
+        r += "*Effects - "+stats.getEffectsList()+"\n";
+        r += "*Traits - "+traits.toString()+"\n";
         return r;
     }
 
@@ -349,5 +358,6 @@ public class Unit extends Prop {
         clip.setOrganHealth();
         clip.updateStatus();
         stateSet(Actions.Down);
+        init();
     }
 }

@@ -1,8 +1,7 @@
-package com.ga.unit.player;
+package com.ga.unit.man;
 
 import com.ga.map.Drawable;
 import com.ga.map.Global;
-import com.ga.map.Updater;
 import com.ga.unit.skill.Stat;
 
 import java.awt.*;

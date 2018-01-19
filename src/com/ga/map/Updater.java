@@ -1,9 +1,9 @@
 package com.ga.map;
 
 import com.ga.game.Observer;
-import com.ga.tool.Grapher;
 import com.ga.tool.P;
 import com.ga.unit.*;
+import com.ga.unit.man.Man;
 import com.ga.unit.skill.Actions;
 
 import java.awt.*;

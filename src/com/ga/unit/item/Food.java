@@ -4,40 +4,51 @@ import com.ga.map.Global;
 import com.ga.map.Map;
 import com.ga.map.ShadedPicture;
 import com.ga.map.Shader;
-import com.ga.unit.Man;
-import com.ga.unit.player.Health;
-import com.ga.unit.player.Player;
+import com.ga.unit.man.Man;
 import com.ga.unit.skill.Buffs;
 import com.ga.unit.skill.Stat;
 
 import java.awt.*;
-import java.util.HashMap;
 
 /**
  * Created by Ga on 2/17/2017. asd
  */
 public class Food extends Item {
-    private static HashMap<Character, Integer> valueMap = new HashMap<Character, Integer>(){{
-        put('P',2);
-        put('C',2);
-        put('V',3);
-        put('D',3);
-        put('O',1);
-        put('X',0);
-    }};
-    private String nutrition;
+    public enum Material{
+        Raw(0,0),White(500,3),Red(800,3),Fish(600,3),Vegetable(100,10),Grain(200,8),Fruit(300,5),Boiled(200,-3),Fried(400,2),Roasted(300,0),Smoked(300,10),Dried(100,10);
+        int value, perish;
+        Material(int value, int perish){
+            this.value = value;
+            this.perish = perish;
+        }
+    }
+    public class Type{
+        Material[] materials;
+        int getValue(){
+            int result = 0;
+            for (Material i : materials) result += i.value;
+            return result;
+        }
+        void load(String p){
+            String[] mats = p.split(",");
+            materials = new Material[mats.length];
+            for (int i=0;i<mats.length;i++){
+                materials[i] = Material.valueOf(mats[i]);
+            }
+        }
+        String getDescription(){
+            String result = "";
+            for (Material i : materials) result += i+", ";
+            return result.substring(0,result.length()-2);
+        }
+    }
     private int perish;
-    private int happy = 0;
-
-    public Food(Map map, String name, int seed, int weight, int uses, String nutrition, int perish, int happy) {
-        super(map, name, seed, new Item.Material[]{Item.Material.Flesh}, ItemType.Consumable);
-        this.weight = weight;
-        this.durability = uses;
-        this.uses = uses;
-        this.nutrition = nutrition;
+    private Type type = new Type();
+    public Food(Map map, String name, int seed, int size, String materials) {
+        super(map, name, seed, new Item.Material[]{Item.Material.Flesh}, ItemType.Consumable, size);
+        type.load(materials);
+        this.weight = 1;
         this.perish = Global.time + perish;
-        this.happy = happy;
-        shuffleNutrition();
         int toxicity = getPoisonChance();
         if (toxicity > 0) {
             image = new ShadedPicture(rand, name, Shader.Color);
@@ -45,44 +56,30 @@ public class Food extends Item {
         }
     }
     public int getValue(){
-        int r = happy/5 + perish/100;
-        for (char i : nutrition.toCharArray()){
-            r += valueMap.get(i);
-        }
-        return r;
-    }
-    private void shuffleNutrition(){
-        char[] data = nutrition.toCharArray();
-        for (int i = 0; i < data.length; i++) {
-            if (rand.nextInt(3+(data.length/4)) == 0){
-                data[i] = Health.mutate(data[i],rand.nextFloat());
-            } else {
-                int r = (int) (rand.nextFloat() * data.length);
-                char t = data[i];
-                data[i] = data[r];
-                data[r] = t;
-            }
-        }
-        nutrition = new String(data);
+        return type.getValue();
     }
     @Override
     public boolean use(Man p){
         if (usable(1) && super.use(p)) {
             int perishTime = perish - Global.time;
-            if (p instanceof Player){
-                Stat motivation = p.get("Motivation");
-                if (perishTime <= 0 && rand.nextInt(10) < getPoisonChance()){
-                    int severity = perishTime / 100;
-                    p.buff(Buffs.Poison, severity);
-                    p.say("Gawrrrr! That didn't taste good...");
-                    for (int i=0;i<severity;i++) nutrition = Health.mutate(nutrition);
-                    motivation.add(-severity, false);
-                } else {
-                    motivation.add(happy, false);
+            Stat motivation = p.get("Motivation");
+            if (perishTime <= 0 && rand.nextInt(10) < getPoisonChance()){
+                int severity = perishTime / 100;
+                p.buff(Buffs.Poison, severity);
+                p.say("Gawrrrr! That didn't taste good...");
+                motivation.add(-severity, false);
+            } else {
+                int likes = 0;
+                for (Material i : type.materials){
+                    for (Material ii : p.favorites){
+                        if (i == ii) likes++;
+                    }
                 }
-                ((Player) p).health.record(nutrition);
-                return true;
+                motivation.add(type.getValue()/100 + likes*6, false);
+                p.stats.endBuff(Buffs.Hunger);
+                p.stats.endBuff(Buffs.Starvation);
             }
+            return true;
         }
         return false;
     }
@@ -96,7 +93,7 @@ public class Food extends Item {
         r = r.replace(" uses "," servings ");
         if (perishTime <= 0) r += " This food has "+getPoisonChance()+"0% chance of causing food poisoning.";
         else r += " This food will go bad in "+perishTime+" seconds.";
-        r += "\nNutrition Facts:\n"+ Health.getDescription(nutrition);
+        r += "\nDetail:\n" + type.getDescription();
         return r;
     }
     public String[] load(String p){

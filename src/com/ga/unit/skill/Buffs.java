@@ -7,7 +7,8 @@ import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.unit.*;
 import com.ga.unit.item.Projectile;
-import com.ga.unit.player.MainPlayer;
+import com.ga.unit.man.MainPlayer;
+import com.ga.unit.man.Man;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,8 +17,8 @@ import java.util.Arrays;
  * Created by Ga on 9/1/2016. asd
  */
 public enum Buffs {
-    Banishment(10, new Tags(){{
-        add(Tag.Debuff);
+    Banishment(10,new Tags(){{
+        add(Tag.Curse);
         add(Tag.Shadow);
     }}){ Buff makeLocal() {
         return new Buff(4) {
@@ -37,8 +38,8 @@ public enum Buffs {
             }
         };
     }},
-    Shadowcurse(100,new Tags(){{
-        add(Tag.Debuff);
+    Shadowcurse(4,new Tags(){{
+        add(Tag.Curse);
         add(Tag.Shadow);
         add(Tag.Conjuration);
     }}){ Buff makeLocal() {
@@ -46,18 +47,16 @@ public enum Buffs {
             private Man unit;
             public void onSet() {
                 unit = (Man) Stock.getByName(host.map, "Phantom",-1);
-                unit.weapon.remove();
+                unit.start();
+                unit.brain.target = host;
+                unit.brain.setTask(Behavior.Hunt);
                 unit.pos.set(host.pos.x, host.pos.y);
-            }
-
-            public boolean update() {
-                unit.remove();
-                return super.update();
+                unit.buff(Banishment, level);
             }
         };
     }},
     Alert(1,new Tags(){{
-        add(Tag.Debuff);
+        add(Tag.Curse);
         add(Tag.Air);
     }}){ Buff makeLocal() {
         return new Buff(1) {
@@ -76,7 +75,7 @@ public enum Buffs {
         };
     }},
     Haste(5,new Tags(){{
-        add(Tag.Buff);
+        add(Tag.Enchant);
         add(Tag.Air);
     }}){ Buff makeLocal() {
         return new Buff(15) {
@@ -99,8 +98,8 @@ public enum Buffs {
         };
     }},
     Frenzy(5,new Tags(){{
-        add(Tag.Buff);
-        add(Tag.Might);
+        add(Tag.Enchant);
+        add(Tag.Strength);
     }}){ Buff makeLocal() {
         return new Buff(10) {
             public void onSet() {
@@ -120,7 +119,7 @@ public enum Buffs {
         };
     }},
     Rejuvenate(5,new Tags(){{
-        add(Tag.Buff);
+        add(Tag.Enchant);
         add(Tag.Mutation);
     }}){ Buff makeLocal(){
         return new Buff(20){
@@ -136,8 +135,8 @@ public enum Buffs {
         };
     }},
     Cleave(5,new Tags(){{
-        add(Tag.Buff);
-        add(Tag.Might);
+        add(Tag.Enchant);
+        add(Tag.Strength);
     }}){ Buff makeLocal(){
         return new Buff(40) {
             public void onSet() {
@@ -149,18 +148,43 @@ public enum Buffs {
             }
         };
     }},
-    Metabolism(2,new Tags(){{
+    Starvation(2,new Tags(){{
     }}){ Buff makeLocal(){
-        return new Buff(100) {
-            public void onStack(int level){
-                this.level+= level;
+        return new Buff(1000) {
+            public void onFinish(){
+                host.buff(Metabolism,1);
+            }
+            public boolean update() {
+                if (super.update()) host.die();
+                return super.update();
+            }
+        };
+    }},
+    Hunger(2,new Tags(){{
+    }}){ Buff makeLocal(){
+        return new Buff(1000) {
+            public void onFinish(){
+                host.buff(Metabolism,1);
             }
             public boolean update() {
                 if (super.update()) {
                     host.stats.triggerEffect(Bleed);
                     if (host instanceof MainPlayer){
-                        time += level * 10;
-                        Global.player.metabolise();
+                        host.buff(Starvation,1);
+                    }
+                }
+                return super.update();
+            }
+        };
+    }},
+    Metabolism(0,new Tags(){{
+    }}){ Buff makeLocal(){
+        return new Buff(500) {
+            public boolean update() {
+                if (super.update()) {
+                    host.stats.triggerEffect(Bleed);
+                    if (host instanceof MainPlayer){
+                        host.buff(Hunger,1);
                     }
                 }
                 return super.update();
@@ -168,7 +192,7 @@ public enum Buffs {
         };
     }},
     Bleed(5,new Tags(){{
-        add(Tag.Debuff);
+        add(Tag.Curse);
     }}){ Buff makeLocal(){
         return new Buff(800) {
             private int tick = 0;
@@ -190,7 +214,7 @@ public enum Buffs {
         };
     }},
     Evade(5,new Tags(){{
-        add(Tag.Buff);
+        add(Tag.Enchant);
         add(Tag.Shadow);
     }}){ Buff makeLocal(){
         return new Buff(2) {
@@ -215,7 +239,7 @@ public enum Buffs {
         };
     }},
     Shock(1,new Tags(){{
-        add(Tag.Debuff);
+        add(Tag.Curse);
         add(Tag.Air);
     }}){ Buff makeLocal(){
         return new Buff(7) {
@@ -242,7 +266,7 @@ public enum Buffs {
         };
     }},
     Burn(3,new Tags(){{
-        add(Tag.Debuff);
+        add(Tag.Curse);
         add(Tag.Fire);
     }}){ Buff makeLocal(){
         return new Buff(5) {
@@ -253,7 +277,7 @@ public enum Buffs {
             public boolean update() {
                 if (var % 10 == 0 && Global.r.nextBoolean()) {
                     if (var % 50 == 0){
-                        host.hit(host.getPosLine(), level, true);
+                        host.hit(host.getPosLine(), level);
                         if (host.stats.getEffectLevel(Bleed) > 2){
                             host.stats.getEffect(Bleed).time += Global.r.nextInt(100);
                         }
@@ -272,8 +296,8 @@ public enum Buffs {
         };
     }},
     Freeze(3,new Tags(){{
-        add(Tag.Buff);
-        add(Tag.Debuff);
+        add(Tag.Enchant);
+        add(Tag.Curse);
         add(Tag.Ice);
     }}){ Buff makeLocal(){
         return new Buff(0) {
@@ -360,7 +384,7 @@ public enum Buffs {
         };
     }},
     Mark(7,new Tags(){{
-        add(Tag.Debuff);
+        add(Tag.Curse);
         add(Tag.Shadow);
     }}){ Buff makeLocal(){
         return new Buff(4) {
@@ -389,7 +413,7 @@ public enum Buffs {
         };
     }},
     Poison(7,new Tags(){{
-        add(Tag.Debuff);
+        add(Tag.Curse);
         add(Tag.Mutation);
     }}){ Buff makeLocal(){
         return new Buff(100) {
@@ -420,7 +444,7 @@ public enum Buffs {
         };
     }},
     Glacialwalk(5,new Tags(){{
-        add(Tag.Buff);
+        add(Tag.Enchant);
         add(Tag.Ice);
     }}){ Buff makeLocal(){
         return new Buff(4) {
@@ -469,8 +493,8 @@ public enum Buffs {
         };
     }},
     Stun(8,new Tags(){{
-        add(Tag.Debuff);
-        add(Tag.Agility);
+        add(Tag.Curse);
+        add(Tag.Dexterity);
     }}){ Buff makeLocal(){
         return new Buff(3) {
             public void onSet() {

@@ -1,8 +1,8 @@
-Meat;1;1;PCOXX;100;-10;400 //Name, Weight, Uses, Nutrition, Perish, Motivation, Value
-Drumstick;3;3;PPO;400;40;800
-Porkchop;1;1;PPOO;400;40;800
-Meal;6;1;PPCCCV;200;40;1500
-Burger;2;1;PPCCO;200;40;1000
-Sandwich;1;1;CCO;200;10;700
-Ration;1;1;PC;8000;0;2000
-Fruit;1;1;CC;100;16;400
+Meat;1;Red,Raw //Name, Weight, Size, Materials
+Drumstick;3;White,Fried
+Porkchop;1;Red,Roasted
+Meal;1;Grain,Vegetable,Fish,Raw
+Burger;1;Red,Vegetable,Grain,Roasted
+Sandwich;1;Vegetable,Grain,Raw
+Ration;1;
+Fruit;1;Fruit,Raw

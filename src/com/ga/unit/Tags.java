@@ -7,7 +7,7 @@ import java.util.ArrayList;
  */
 public class Tags extends ArrayList<Tag> {
     public static final Tag[] trainers = new Tag[]{
-        Tag.Agility, Tag.Might, Tag.Athletics, Tag.Electric, Tag.Channeling, Tag.Shadow, Tag.Fire, Tag.Ice, Tag.Air, Tag.Mutation, Tag.Conjuration
+        Tag.Dexterity, Tag.Strength, Tag.Athletics, Tag.Electric, Tag.Channeling, Tag.Shadow, Tag.Fire, Tag.Ice, Tag.Air, Tag.Mutation, Tag.Conjuration
     };
 
     @Override

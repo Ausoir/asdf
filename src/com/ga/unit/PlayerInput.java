@@ -2,8 +2,7 @@ package com.ga.unit;
 
 import com.ga.game.Command;
 import com.ga.game.Input;
-import com.ga.game.Keybinding;
-import com.ga.unit.player.Player;
+import com.ga.unit.man.Player;
 import com.ga.unit.skill.Actions;
 
 import java.awt.event.KeyEvent;
@@ -78,7 +77,7 @@ public class PlayerInput implements Input {
             if (p.startsWith("_WI")) {
                 host.selectingItem = Integer.parseInt(p.substring(3));
                 host.setState(Actions.Wield);
-            } else if (p.equals("Recall")) host.say(host.memorized);
+            } else if (p.equals("_Recall")) host.say(host.memorized);
         } else {
             Actions move = Actions.getByName(p);
             if (move == Actions.Wield) host.selectingItem = -1;

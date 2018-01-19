@@ -8,7 +8,7 @@ import com.ga.game.Settings;
 import com.ga.tool.EventTimer;
 import com.ga.tool.P;
 import com.ga.tool.Timer;
-import com.ga.unit.player.MainPlayer;
+import com.ga.unit.man.MainPlayer;
 
 import java.awt.*;
 import java.util.ArrayList;

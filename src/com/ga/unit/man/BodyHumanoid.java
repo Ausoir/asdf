@@ -1,6 +1,9 @@
-package com.ga.unit;
+package com.ga.unit.man;
 
 import com.ga.map.Global;
+import com.ga.unit.Body;
+import com.ga.unit.Unit;
+import com.ga.unit.man.Man;
 import com.ga.unit.skill.Actions;
 
 /**
@@ -48,10 +51,13 @@ public class BodyHumanoid extends Body {
                 rotateAppendage(FIST, 23, 0);
                 break;
             case "Thrust":
+                rotateAppendage(OFIST, 7, 0);
+            case "Punch":
                 rotateAppendage(FIST, 7, 0);
                 break;
             case "Slash":
-                rotateAppendage(FIST, 7, 0);
+                rotateAppendage(FIST, 7, host.dir);
+                rotateAppendage(OFIST, 7, host.dir*1.1f);
                 break;
             case "Kick":
                 rotateAppendage(LLEG, 5, 0);

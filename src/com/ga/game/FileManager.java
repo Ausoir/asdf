@@ -6,9 +6,8 @@ import com.ga.map.Map;
 import com.ga.map.Updater;
 import com.ga.tool.Line;
 import com.ga.unit.Clip;
-import com.ga.unit.PlayerInput;
 import com.ga.unit.Stock;
-import com.ga.unit.player.MainPlayer;
+import com.ga.unit.man.MainPlayer;
 import com.ga.unit.skill.Actions;
 
 import java.io.*;
@@ -61,7 +60,8 @@ public class FileManager {
     public static void saveCharacter(){
         if (Global.player.state != Actions.Dead) {
             if (Global.server.isHost()) saveMap(Global.player.map.name, Global.player.map);
-            save("map/Player.user", Global.player.toCharacterString());
+            save("map/Player.user", Global.player.toString());
+            save("Keymap.txt", Global.player.input.toString());
             saveWorld();
         }
     }
@@ -91,23 +91,24 @@ public class FileManager {
         return result;
     }
     public static void loadGame(){
-        loadActors("Actors.map");
         loadPlayer();
+        loadActors("Actors.map");
     }
     public static void loadPlayer(){
-        String[] data = read("map/Player.user").split("%");
-        PlayerInput pi;
-        pi = ((MainPlayer) Stock.Player.create(null, 1, 0)).input;
-        Global.display.input = pi;
-        pi.host.loadPlayer(data);
-        Command.host = pi.host;
-        pi.host.lastLand = new Line();
-        Global.camera.set(pi.host.pos);
-        pi.host.map.setTexture();
-        pi.host.map.render();
-        pi.host.map.mapEdgeCenter(Global.camera = pi.host.map.size.getMult(.5f, .5f));
-        pi.host.map.onTimeChange();
-        pi.host.start();
+        String data = read("map/Player.user");
+        String keymap = read("Keymap.txt");
+        MainPlayer player = ((MainPlayer) Stock.Player.create(null, 1, 0));
+        Global.display.input = player.input;
+        player.load(data);
+        player.input.load(keymap);
+        Command.host = player;
+        player.lastLand = new Line();
+        Global.camera.set(player.pos);
+        player.map.setTexture();
+        player.map.render();
+        player.map.mapEdgeCenter(Global.camera = player.map.size.getMult(.5f, .5f));
+        player.map.onTimeChange();
+        player.start();
         Global.display.menu.init();
     }
 

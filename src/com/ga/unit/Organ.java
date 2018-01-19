@@ -19,7 +19,7 @@ import java.util.ArrayList;
 public class Organ extends Line {
     int strokeSize = 10;
     protected ShadedPicture image;
-    boolean amputated = false;
+    public boolean amputated = false;
     public Unit host;
     private Organ parent;
     private ArrayList<Organ> children = new ArrayList<>();
@@ -28,7 +28,7 @@ public class Organ extends Line {
     private int maxLength = 80;
     boolean vital = false;
     boolean leg = false, hand = false;
-    Performer onAmputate = new Performer();
+    public Performer onAmputate = new Performer();
 
     Organ(Organ p, boolean tip){
         parent = p;
@@ -70,7 +70,7 @@ public class Organ extends Line {
     }
     void amputate(Line p, int damage){
         Sound.play(host.map, host.pos, "hit_bloody");
-        int intensity = 32+damage*8;
+        int intensity = 22 + damage;
         if (image != null) {
             final Projectile flyingOrgan = new Projectile(host.map, null, new P(host.pos), p.ptd.getAdd(Global.r.nextInt(24)-12,-Global.r.nextInt(12)), intensity) {
                 private final int length = (int) getLength();

@@ -1,11 +1,10 @@
 package com.ga.unit.item;
 
 import com.ga.game.FileManager;
-import com.ga.map.Updater;
-import com.ga.unit.Tag;
-import com.ga.unit.player.Player;
 import com.ga.unit.Prop;
 import com.ga.unit.Stock;
+import com.ga.unit.Tag;
+import com.ga.unit.man.Man;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,8 +16,8 @@ import java.util.HashMap;
 public class Crafts {
     public static final HashMap<String,ArrayList<String>> recipes = FileManager.readDialogue("raw/Recipe.txt");
     public ArrayList<String> knowledge = new ArrayList<>();
-    private Player host;
-    public Crafts(Player player) {
+    private Man host;
+    public Crafts(Man player) {
         host = player;
     }
 
@@ -37,8 +36,7 @@ public class Crafts {
                     index = ingredients.indexOf(tag.name());
                     if (index != -1) break;
                 }
-            }
-            if (index != -1){
+            } else {
                 ingredients.remove(index);
                 String use = usage.remove(index);
                 if (use.equals("*")) i.remove();
@@ -56,16 +54,17 @@ public class Crafts {
     }
 
     public void load(String p) {
-        if (p.equals(";")) return;
-        String[] data = p.substring(1).split(";");
+        if (p.equals("")) return;
+        String[] data = p.split(",");
         Collections.addAll(knowledge, data);
     }
 
     public String toString(){
-        String r = ";";
+        if (knowledge.size() == 0) return "";
+        String r = "";
         for (String aKnowledge : knowledge) {
-            r += aKnowledge + ";";
+            r += aKnowledge + ",";
         }
-        return r;
+        return r.substring(0,r.length()-1);
     }
 }

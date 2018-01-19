@@ -1,4 +1,4 @@
-package com.ga.map;
+ package com.ga.map;
 
 import com.ga.tool.Line;
 import com.ga.tool.P;
@@ -20,6 +20,7 @@ public class Terrain extends Drawable {
     private ArrayList<Line> lines = new ArrayList<>();
     protected P pos;
     private int length = 0; //polygon size is always multiples of 4
+    private int offset = 0;
     private P finalSize;
     Map map;
     public Terrain(Map map, String texture, Shader shader, float depth){
@@ -46,6 +47,7 @@ public class Terrain extends Drawable {
         } else {
             imageTexture = new TexturePaint(image.image, new Rectangle2D.Double(0, 0, image.getSize().x, image.getSize().y));
         }
+        if (shader == Shader.Grass) offset = -2;
     }
     public void start(){
         map.updater.addQueue.add(this);
@@ -61,6 +63,7 @@ public class Terrain extends Drawable {
     public void render(){
         int lowX = polygon.xpoints[0], lowY = polygon.ypoints[0], highX = polygon.xpoints[0], highY = polygon.ypoints[0];
         for (int i=0;i<length;i++){
+            polygon.ypoints[i] += offset;
             if (polygon.xpoints[i] < lowX) lowX = polygon.xpoints[i];
             if (polygon.ypoints[i] < lowY) lowY = polygon.ypoints[i];
             if (polygon.xpoints[i] > highX) highX = polygon.xpoints[i];

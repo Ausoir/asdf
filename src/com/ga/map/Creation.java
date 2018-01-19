@@ -1,12 +1,7 @@
 package com.ga.map;
 
 import com.ga.game.FileManager;
-import com.ga.unit.player.MainPlayer;
-import com.ga.unit.player.Trait;
-import com.ga.unit.skill.Buffs;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Random;
 
 /**

@@ -1,4 +1,4 @@
-package com.ga.unit.player;
+package com.ga.unit.man;
 
 import com.ga.game.Sound;
 import com.ga.map.Global;
@@ -6,10 +6,9 @@ import com.ga.map.Map;
 import com.ga.tool.Line;
 import com.ga.unit.*;
 import com.ga.unit.skill.Actions;
-import com.ga.unit.skill.Buffs;
 import com.ga.unit.skill.Stat;
 
-import static com.ga.unit.BodyHumanoid.BODY;
+import static com.ga.unit.man.BodyHumanoid.BODY;
 
 /**
  * Created by Ga on 12/29/2016. asd
@@ -25,7 +24,7 @@ public class MainPlayer extends Player {
     @Override
     public void say(String p) {
         if (p.startsWith("'") && p.endsWith("'")) {
-            memorized = p.substring(1, p.length() - 1).replace(';', '_');
+            memorized = p.substring(1, p.length() - 1).replace("@;#", "");
             p = "Memorized " + p;
         }
         speech.say(p);
@@ -51,20 +50,19 @@ public class MainPlayer extends Player {
 
     public float getShopPrice() {
         float r = 1;
-        if (hasTrait(Trait.Dull)) r = 1.1f;
-        else if (hasTrait(Trait.Sharp)) r = .9f;
+        if (traits.has(Traits.Trait.Haggler)) r = .7f;
         return r;
     }
 
-    public boolean hit(Line hitBox, int damage, boolean blunt) {
+    public boolean hit(Line hitBox, int damage) {
         int before = get("Stamina").get();
-        boolean r = super.hit(hitBox, damage, blunt);
+        boolean r = super.hit(hitBox, damage);
         if (r) indicater.show(before / Math.max(1, get("Stamina").get()));
         return r;
     }
 
     public boolean learnable() {
-        return getTotalExpertise() < get("Memory").getMax();
+        return getTotalExpertise() < get("Intelligence").getMax();
     }
 
     private int getTotalExpertise() {
@@ -78,78 +76,41 @@ public class MainPlayer extends Player {
     public void witnessDeath(Unit p) {
         if (p.faction.canAttack(faction) && p.pos.getSubtract(pos).inOval(900, 500)) {
             int exp = Math.max(0, p.get("Level").get() * 3 - get("Level").get());
-            if (exp > 0) {
-                if (learning != null) {
-                    boolean fast = hasTrait(Trait.Fast_Learner) && get("Motivation").require(3);
-                    if (fast || get("Motivation").require(1)) {
-                        Stat progress = get("Progress");
-                        progress.add(exp * (fast ? 2 : 1), true);
-                        if (progress.isFull()) {
-                            learnSkill(learning);
-                            exp = Math.max(0, progress.get() - progress.getMax()); //residue exp
-                            progress.setMax(0);
-                            progress.set(0, true);
-                            learning = null;
-                        } else exp = 0;
-                    }
-                }
-                level(exp);
-            }
+            if (exp > 0) level(exp);
         }
     }
 
     private void level(int p) {
+        boolean fast = traits.has(Traits.Trait.Fast_Learner) && get("Motivation").require(3);
         Stat exp = get("Experience");
         Stat level = get("Level");
-        exp.add(p, true);
-        if (exp.isFull()) {
-            Sound.play(map, pos, "heal");
-            Particle.holyExplosion(map, pos.getAdd(clip.organs[BODY].ptd), getDepth());
-            level.setMax(level.getMax() + 1);
-            int residue = exp.get() - exp.getMax();
-            exp.setMax(10 * level.getMax());
-            exp.set(residue, true);
-            get("Endurance").setMax(500 + level.getMax() * 50);
-            int prev = 1;
-            int current = 1;
-            boolean pass = true;
-            while (pass) {
-                int pprev = prev;
-                prev = current;
-                current += pprev;
-                if (level.getMax() > 30 || 30 - current == level.getMax()) { //decay
-                    String[] stats = new String[]{
-                            "Stamina", "Might", "Dexterity", "Agility", "Memory"
-                    };
-                    get(stats[Global.r.nextInt(5)]).add(-1, true);
-                    pass = false;
-                } else if (30 - current < level.getMax()) pass = false;
+        if (fast || get("Motivation").require(1)) {
+            exp.add(p * (fast ? 2 : 1), true);
+            if (exp.isFull()) {
+                Sound.play(map, pos, "heal");
+                Particle.holyExplosion(map, pos.getAdd(clip.organs[BODY].ptd), getDepth());
+                level.setMax(level.getMax() + 1);
+                int residue = exp.get() - exp.getMax();
+                exp.setMax(10 * level.getMax());
+                exp.set(residue, true);
+                get("Endurance").setMax(500 + level.getMax() * 50);
+                int prev = 1;
+                int current = 1;
+                boolean pass = true;
+                while (pass) {
+                    int pprev = prev;
+                    prev = current;
+                    current += pprev;
+                    if (level.getMax() > 30 || 30 - current == level.getMax()) { //decay
+                        String[] stats = new String[]{
+                                "Stamina", "Strength", "Dexterity", "Intelligence", "Wisdom"
+                        };
+                        get(stats[Global.r.nextInt(5)]).add(-1, true);
+                        pass = false;
+                    } else if (30 - current < level.getMax()) pass = false;
+                }
             }
         }
-    }
-
-    public void metabolise() {
-        if (!Stock.getFactoryName(armor.armor[0].factoryId).equals("Stomach Full Helm")) {
-            health.starve(1);
-            int status = health.getStatus();
-            if (status == 0) { //normal
-                int normalLevel = Global.player.hasTrait(Trait.Fast_Metabolism) ? 7 : 10;
-                buff(Buffs.Metabolism, normalLevel - stats.getEffectLevel(Buffs.Metabolism));
-            } else if (status == 1) {
-                say("Food...");
-                die();
-            } else if (status == 2) {
-                say("I'm starving!");
-                health.record("0");
-                buff(Buffs.Metabolism, 6);
-            } else if (status == 3) say("I don't feel so good...");
-            else if (status == 4) {
-                say("I'm hungry!");
-                buff(Buffs.Metabolism, 2);
-            }
-        }
-        if (hasTrait(Trait.Optimistic)) get("Motivation").add(1, false);
-        else if (hasTrait(Trait.Pessimistic)) get("Motivation").add(-1, false);
     }
 
     public void die() {

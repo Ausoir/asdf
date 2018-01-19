@@ -8,7 +8,7 @@ import com.ga.map.Global;
 import com.ga.unit.Faction;
 import com.ga.unit.Stock;
 import com.ga.unit.Unit;
-import com.ga.unit.player.Player;
+import com.ga.unit.man.Player;
 import com.ga.unit.skill.Actions;
 
 import java.io.IOException;
@@ -182,7 +182,7 @@ public class Server {
                     }
                     Player player = (Player) Stock.Player.create(Global.player.map,0,0);
                     Client newest = new Client(player, udp.getClientPort(), udp.getClientIP());
-                    player.loadPlayer(FileManager.read("map/multiplayer/"+udp.getClientIP()+".user").split("%"));
+                    player.load(FileManager.read("map/multiplayer/"+udp.getClientIP()+".user"));
                     player.map = Global.player.map;
                     player.faction = Faction.Player2;
                     player.controlId = Global.player.controlId + 1;//Global.getControlId();
@@ -273,7 +273,7 @@ public class Server {
                         if (output == null){
                             requestChangeMap("multiplayer/serverMap@0");
                             Player player = (Player) Stock.Player.create(Global.player.map,0,0);
-                            player.loadPlayer(FileManager.read("map/multiplayer/serverPlayer.user").split("%"));
+                            player.load(FileManager.read("map/multiplayer/serverPlayer.user"));
                             player.map = Global.player.map;
                             Global.player.controlId = Integer.parseInt(msg[1]);
                             player.faction = Faction.Player2;

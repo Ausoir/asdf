@@ -5,9 +5,8 @@ import com.ga.tool.Line;
 import com.ga.unit.PlayerInput;
 import com.ga.unit.Prop;
 import com.ga.unit.Stock;
-import com.ga.unit.Unit;
 import com.ga.unit.item.Item;
-import com.ga.unit.player.Player;
+import com.ga.unit.man.Player;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Buffs;
 
@@ -23,13 +22,13 @@ public class Command {
                 String[] cmd = i.split("@");
                 if (cmd[0].equals("say")) host.say(cmd[1]);
                 else if (cmd[0].equals("menuDialog")) Global.display.menu.showDialog(cmd[1],cmd[2]);
-                else if (cmd[0].equals("die")) Global.player.die();
-                else if (cmd[0].equals("crft")) Global.player.crafting.craft(cmd[1]);
-                else if (cmd[0].equals("buff")) Global.player.buff(Buffs.valueOf(cmd[1]), Integer.parseInt(cmd[2]));
+                else if (cmd[0].equals("die")) host.die();
+                else if (cmd[0].equals("crft")) host.crafting.craft(cmd[1]);
+                else if (cmd[0].equals("buff")) host.buff(Buffs.valueOf(cmd[1]), Integer.parseInt(cmd[2]));
                 else if (cmd[0].equals("seed")) host.weapon.seed = Integer.parseInt(cmd[1]);
                 else if (cmd[0].equals("time")) Global.time += Integer.parseInt(cmd[1]);
                 else if (cmd[0].equals("stat")) host.get(cmd[1]).addTotal(Integer.parseInt(cmd[2]));
-                else if (cmd[0].equals("gold")) Global.player.gold = Integer.parseInt(cmd[1]);
+                else if (cmd[0].equals("gold")) host.gold = Integer.parseInt(cmd[1]);
                 else if (cmd[0].equals("unit")){
                     Prop unit = Stock.getByName(host.map, cmd[1], -1);
                     unit.start();
@@ -41,7 +40,7 @@ public class Command {
                     item.start();
                     host.setWeapon(item);
                 }
-                else if (cmd[0].equals("build")) new Generator(Global.player.map, 99).generateBuilding(cmd[1], Global.player.pos, 1);
+                else if (cmd[0].equals("build")) new Generator(host.map, 99).generateBuilding(cmd[1], host.pos, 1);
                 else if (cmd[0].equals("tp")) host.pos.add(Integer.parseInt(cmd[1].split(",")[0]),Integer.parseInt(cmd[1].split(",")[1]));
                 else if (cmd[0].equals("to")){
                     host.lastLand = new Line();
@@ -49,18 +48,18 @@ public class Command {
                 }
                 else if (cmd[0].equals("tpto")) host.pos.set(Integer.parseInt(cmd[1].split(",")[0]),Integer.parseInt(cmd[1].split(",")[1]));
                 else if (cmd[0].equals("act")) host.setState(Actions.valueOf(cmd[1]));
-                else if (cmd[0].equals("level")) Global.player.witnessDeath(Global.player);
-                else if (cmd[0].equals("learn")) Global.player.learnSkill(Actions.valueOf(cmd[1]));
+                else if (cmd[0].equals("level")) Global.player.witnessDeath(host);
+                else if (cmd[0].equals("learn")) host.learnSkill(Actions.valueOf(cmd[1]));
                 else if (cmd[0].equals("recipe")) host.crafting.knowledge.add(cmd[1]);
-                else if (cmd[0].equals("sound")) Sound.play(Global.player.map, Global.camera, cmd[1]);
+                else if (cmd[0].equals("sound")) Sound.play(host.map, Global.camera, cmd[1]);
                 else if (cmd[0].equals("depth")) host.say("Me: "+host.getDepth()+" Line: "+host.lastLand.depth+", Terrain: "+host.map.terrains.get(host.lastLand.tid).getDepth());
                 else if (p.equals("revive")) host.revive();
                 else if (p.equals("render")){
-                    for (Object terrain : Global.player.map.terrains.entrySet()) ((Terrain)terrain).render();
+                    for (Object terrain : host.map.terrains.entrySet()) ((Terrain)terrain).render();
                 }
                 else if (p.equals("test")){
-                    Player unit = (Player) Stock.Player.create(Global.player.map,0,0);
-                    unit.pos.set(Global.player.pos);
+                    Player unit = (Player) Stock.Player.create(host.map,0,0);
+                    unit.pos.set(host.pos);
                     unit.save = false;
                     new PlayerInput(unit);
                     unit.start();

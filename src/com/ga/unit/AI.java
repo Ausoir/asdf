@@ -4,6 +4,7 @@ import com.ga.game.Observer;
 import com.ga.map.Global;
 import com.ga.tool.Interactive;
 import com.ga.tool.Timer;
+import com.ga.unit.man.Man;
 import com.ga.unit.skill.Actions;
 
 import java.util.ArrayList;
@@ -36,13 +37,12 @@ public abstract class AI implements Observer {
     public void setTask(Behavior p){
         tasks.push(p.get(host));
     }
-    void onAttack(){}
+    public void onAttack(){}
     public void onHit(){
         if (tasks.peek().alertness < 1){
             setTask(Behavior.Search);
         }
     }
-    void setState(Actions state){}
     boolean blocked(int dir){
         return false;
     }
@@ -99,7 +99,7 @@ class NeutralAI extends AI{
         } else if (p instanceof Man) {
             if (target != p) {
                 target = (Man) p;
-                setState(Actions.Idle);
+                host.setState(Actions.Idle);
                 if (advertise.over() && host.getConversation().equals("")){
                     if (host.rand.nextFloat() < .5f) host.say("@c");
                     else host.say(ad);
