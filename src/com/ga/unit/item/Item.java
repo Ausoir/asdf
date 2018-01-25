@@ -23,15 +23,15 @@ import java.util.Random;
  */
 public class Item extends Prop {
     public enum ItemType {
-        Sword(Actions.Slash, 3, 1.3f, 4, "swing_knife"),
-        Spear(Actions.Thrust, 1, 1, 0, "swing_silent"),
+        Sword(Actions.Slash, 3, .8f, 4, "swing_knife"),
+        Spear(Actions.Thrust, 1, .6f, 0, "swing_silent"),
         Knife(Actions.Slash, 3, .3f, 2, "swing_knife"),
-        Swinging(Actions.Slash, 3, 2, 10, "swing_silent"),
-        Bashing(Actions.Slash, 1, 2, 10, "swing_silent"),
-        Armor(Actions.Rest, 1, 2, 10, "swing_normal"), Scroll(Actions.Guard, 1, 0, 0, "scroll"),
-        Shooting(Actions.Shoot_Handgun, 3, .8f, 0, "swing_normal"), Rifle(Actions.Shoot_Rifle, 3, 1.2f, 0, "swing_normal"),
-        Bow(Actions.Shoot_Arrow, 1, 1, 0, "swing_silent"), Throwing(Actions.Throw, 3, .2f, 0, "swing_silent"),
-        Darting(Actions.Dart, 3, .1f, 0, "swing_normal"), Consumable(Actions.Consume, 1, .2f, 0, "drink");
+        Swinging(Actions.Slash, 3, 1, 10, "swing_silent"),
+        Bashing(Actions.Slash, 1, 1, 10, "swing_silent"),
+        Armor(Actions.Rest, 1, 1, 10, "swing_normal"), Scroll(Actions.Guard, 1, 0, 0, "scroll"),
+        Shooting(Actions.Shoot_Handgun, 3, .5f, 0, "swing_normal"), Rifle(Actions.Shoot_Rifle, 3, 1f, 0, "swing_normal"),
+        Bow(Actions.Shoot_Arrow, 1, 1, 0, "swing_silent"), Throwing(Actions.Throw, 3, .1f, 0, "swing_silent"),
+        Darting(Actions.Dart, 3, .1f, 0, "swing_normal"), Consumable(Actions.Consume, 1, .1f, 0, "drink");
         Actions action;
         String sound;
         int centerType;
@@ -45,7 +45,13 @@ public class Item extends Prop {
         }
     }
     public enum Material{
-        Wooden(.4f,2,1,1,0,new Color(118, 93, 0,60)),
+        Wooden(.4f,2,1,1,0,new Color(118, 93, 0,60)){
+            public void onSet(Item host){
+                host.tags.add(Tag.Curse);
+                host.tags.add(Tag.Mutation);
+                host.tags.add(Tag.Fire);
+            }
+        },
         Cloth(.5f,0,0,.9f,200),
         Silk(.1f,2,1,.8f,2500),
         Nylon(.2f,1,0,.6f,2000){
@@ -65,7 +71,7 @@ public class Item extends Prop {
                 host.tags.add(Tag.Electric);
             }
         },
-        Bronze(.4f,5,4,1.2f,1500,new Color(133, 72, 0,200)),
+        Bronze(.4f,5,4,1.2f,1500,new Color(133, 72, 0,180)),
         Iron(.4f,4,5,1.5f,2000),
         Silver(.2f,10,7,.8f,9000),
         Gold(.1f,10,9,.5f,16000){
@@ -74,7 +80,7 @@ public class Item extends Prop {
                 host.tags.add(Tag.Enchant);
             }
         },
-        Lead(.3f,9,2,1.6f,1500,new Color(19, 31, 75,180)){
+        Lead(.3f,9,2,1.6f,1500,new Color(19, 31, 75,120)){
             public void onSet(Item host){
                 host.tags.add(Tag.Electric);
                 host.tags.add(Tag.Mutation);
@@ -82,14 +88,16 @@ public class Item extends Prop {
         },
         Steel(.2f,4,6,4,8000),
         Titanium(.1f,3,7,5,30000),
-        Crystal(.1f,8,9,.3f,2000,new Color(28, 133, 67,120)){
+        Crystal(.1f,3,9,.3f,2000,new Color(28, 133, 67,180)){
             public void onSet(Item host){
                 host.tags.add(Tag.Ice);
             }
         },
         Obsidian(.1f,3,4,.7f,8000){
             public void onSet(Item host){
-                host.tags.add(Tag.Shadow);
+                host.tags.add(Tag.Curse);
+                host.tags.add(Tag.Curse);
+                host.tags.add(Tag.Fire);
                 host.tags.add(Tag.Fire);
             }
         },
@@ -101,10 +109,11 @@ public class Item extends Prop {
         Other(0,0,0,1,0),
         Flesh(.1f,0,0,1,0){
             public void onSet(Item host){
+                host.tags.add(Tag.Curse);
                 host.tags.add(Tag.Mutation);
             }
         },
-        Stone(.2f,6,5,1.2f,0,new Color(107, 107, 107,255));
+        Stone(.3f,6,5,1.2f,0,new Color(107, 107, 107,255));
         int weight, hardness, value;
         Color color;
         float durabilityMod, prevalence;
@@ -144,7 +153,7 @@ public class Item extends Prop {
         }
     }
     enum SpecialtyMod{
-        None, Light, Heavy, Feather, Sharp, Dull, Hasty, Lazy, Durable, Tough, Runic, Instant, Cursed, Athletic, Strengthening, Glowing, Quality, Unwieldy;
+        None, Light, Heavy, Feather, Sharp, Dull, Durable, Tough, Runic, Instant, Cursed, Athletic, Strengthening, Glowing, Unwieldy;
         static SpecialtyMod get(Random seed){
             if (seed.nextInt(4) == 0) return values()[seed.nextInt(values().length)];
             return None;
@@ -216,12 +225,13 @@ public class Item extends Prop {
     public int weight, range;
     public int volume = 1;
     public int encumbrance = 0;
-    int cooldown = 0;
+    int cooldown = 4;
     public int delay = 0;
     public float probability;
     private int[] cdTime;
     private int durability = 1;
     private int uses = 1;
+    public boolean disposable = true;
     public ItemType type = ItemType.Throwing;
     public int value = 100;
     Man owner;
@@ -306,8 +316,6 @@ public class Item extends Prop {
         else if (mod == SpecialtyMod.Heavy) this.weight += admod.magnitude;
         else if (mod == SpecialtyMod.Light) this.weight = Math.max(0, this.weight + (-1 * admod.magnitude));
         else if (mod == SpecialtyMod.Feather) this.weight /= 2*admod.magnitude;
-        else if (mod == SpecialtyMod.Hasty) cooldown *= 1-(.2f*admod.magnitude);
-        else if (mod == SpecialtyMod.Lazy) cooldown *= 1+(.2f*admod.magnitude);
         else if (mod == SpecialtyMod.Durable) durability *= 8;
         else if (mod == SpecialtyMod.Runic) probability += .2f*admod.magnitude;
         else if (mod == SpecialtyMod.Instant) delay = 1;
@@ -317,8 +325,7 @@ public class Item extends Prop {
             tags.add(Tag.Athletics);
         }
         else if (mod == SpecialtyMod.Strengthening) tags.add(Tag.Strength);
-        else if (mod == SpecialtyMod.Quality) encumbrance = Math.max(0,encumbrance-1);
-        else if (mod == SpecialtyMod.Unwieldy) encumbrance++;
+        else if (mod == SpecialtyMod.Unwieldy) encumbrance+=admod.magnitude;
         else if (mod == SpecialtyMod.Glowing) {
             tags.add(Tags.trainers[seed % Tags.trainers.length]);
         }
@@ -386,6 +393,9 @@ public class Item extends Prop {
         }
         return r;
     }
+    protected void recharge(int p){
+        if (!isInfinite()) uses = Math.min(durability, uses+p);
+    }
     public void onEquip(Man host){
         owner = host;
         lastLand = host.lastLand;
@@ -410,29 +420,34 @@ public class Item extends Prop {
     private void playSound(){
         Sound.play(map, pos, type.sound);
     }
-    public boolean usable(int p){ //return: is item in usable state
-        if ((isInfinite() || uses >= p) && Global.time >= cdTime[0]){
+    public boolean isUsable(int p){ //return: is item in isUsable state
+        if (isInfinite() || uses >= p){
             if (!isInfinite()){
                 uses -= p;
                 if (uses == 0){
                     Particle.groundSlam(map, pos, getDepth());
-                    remove();
+                    if (disposable) remove();
                 }
             }
             return true;
         }
         return false;
     }
-    public boolean use(Man host){ //return: is host in a state capable of using item
-        if (host.get("Strength").get() >= weight && host.setState(type.action) == 0){
-            cdTime[0] = Global.time+cooldown;
-            playSound();
-            return true;
-        }
+    public int getUses(){
+        return uses;
+    }
+    public boolean use(Man host){
+        if (host.get("Strength").get() >= weight) {
+            if (host.setState(type.action) == 0) {
+                playSound();
+                return true;
+            }
+        } else host.setState(Actions.Throw);
         return false;
     }
     public void trigger(Unit target){
-        if (emod != null && rand.nextFloat() < probability){
+        if (emod != null && Global.time >= cdTime[0] && rand.nextFloat() < probability){
+            cdTime[0] = Global.time+cooldown;
             target.buff(emod, ademod.level);
         }
     }
@@ -448,6 +463,7 @@ public class Item extends Prop {
         String r = "Weight: "+weight+"\n";
         r += "Uses: "+uses+"/"+durability+"\n";
         r += "Material: "+material.name()+"\n";
+        if (tags.size() > 0) r += "Catalyzers: "+tags.toString()+"\n";
         if (emod != null){
             String ade = "";
             if (ademod != AdenchantMod.None) ade = "Level "+ademod.level+" ";

@@ -19,21 +19,19 @@ import java.util.ArrayList;
 public class Organ extends Line {
     int strokeSize = 10;
     protected ShadedPicture image;
-    public boolean amputated = false;
+    boolean amputated = false;
     public Unit host;
-    private Organ parent;
     private ArrayList<Organ> children = new ArrayList<>();
     int type;
-    public int health;
+    int health;
     private int maxLength = 80;
     boolean vital = false;
     boolean leg = false, hand = false;
     public Performer onAmputate = new Performer();
 
     Organ(Organ p, boolean tip){
-        parent = p;
-        if (parent != null) parent.children.add(this);
         if (p != null) {
+            p.children.add(this);
             if (tip) pt = p.ptd;
             else pt = p.pt;
         } else pt = new P();
@@ -66,7 +64,7 @@ public class Organ extends Line {
         maxLength = p;
     }
     void hit(Line p){
-        ptd.set(p.getAtan(maxLength));
+        ptd.set(pt.getAdd(p.getAtan(maxLength)));
     }
     void amputate(Line p, int damage){
         Sound.play(host.map, host.pos, "hit_bloody");

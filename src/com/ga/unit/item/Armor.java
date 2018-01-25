@@ -15,18 +15,18 @@ public class Armor extends Item {
     private int piece = 0;
     private int armorMod = 0;
     int pocket = 0;
-    public Armor(Map map, String name, int seed, int piece, int encumbrance, int pockets, Material[] materials, int durability) {
+    public Armor(Map map, String name, int seed, Material[] materials, int piece, int encumbrance, int pockets, int durability) {
         super(map, name, seed, materials, ItemType.Armor, durability);
         this.encumbrance = encumbrance;
         value = value*2 + 500;
         this.pocket = pockets;
         this.piece = piece;
         delay = 80;
-        if (piece != 0) image.set(name, piece);
+        if (piece == 1 || piece == 2) image.set(name, piece);
     }
     void shade(int color){}
     public void onCreate(){
-        imbueMeta(true, true, .5f);
+        imbueMeta(true, true, .3f);
         if (emod != null && !emod.tags.contains(Tag.Enchant) && rand.nextFloat() > .1f){
             emod = null;
             ademod = AdenchantMod.None;
@@ -38,7 +38,7 @@ public class Armor extends Item {
     }
     public void randomSize(P sizeVariance) {
     }
-    float getArmor(){
+    private float getArmor(){
         return Math.max(0,material.hardness + armorMod);
     }
     protected void setModifier(SpecialtyMod mod){
@@ -51,7 +51,7 @@ public class Armor extends Item {
     }
     public boolean checkBreak(int damage){ //damage reduction
         int r = (int) Math.max(1, damage - getArmor());
-        if (usable(r)){
+        if (isUsable(r)){
             if (owner != null) trigger(owner);
             return false;
         }
@@ -86,15 +86,15 @@ public class Armor extends Item {
         String r = material.name() + " " + super.getName();
         if (piece == 1) r+=" Pants";
         else if (piece == 2) r+=" Armor";
+        else if (piece == 3) r+=" Trinket";
         return r;
     }
     public String getDescription(){
         String r = super.getDescription();
         r = r.replace(" uses "," durability ");
-        if (emod != null){
-            r += " This armor has "+probability*100+"% chance of activating its enchantment on being hit.";
-        }
-        return r + " This armor decreases damage by "+getArmor()+" points." +
-                " It has "+pocket+" pockets.";
+        if (emod != null) r += " This armor has "+probability*100+"% chance of activating its enchantment on being hit.";
+        if (getArmor() > 0) r += " This armor decreases damage by "+getArmor()+" points.";
+        if (pocket > 0) r += " It has "+pocket+" pockets.";
+        return r;
     }
 }

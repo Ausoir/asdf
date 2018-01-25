@@ -87,6 +87,11 @@ public class EditorInput extends Drawable implements Input, Updatable {
         lastCommand = p;
         command(p, x, y);
     }
+
+    @Override
+    public void onFocus(boolean focus) {
+    }
+
     private void command(String p, int x, int y){
         if (p.equals("mapname")) {
             message(lastSaved);
@@ -670,7 +675,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
     public void draw(Graphics2D g) {
         g.setColor(landColor);
         g.setStroke(basicStroke);
-        for (Line i : map.landRaw) i.draw(g, P.zero);
+        for (Line i : map.landRaw) i.draw(g, P.blank);
         g.setColor(Color.GREEN);
         g.setStroke(new BasicStroke(2));
         g.drawLine(Global.rel.x(), Global.rel.y(), (int) (map.size.x+Global.rel.x), Global.rel.y());

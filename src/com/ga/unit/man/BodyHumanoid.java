@@ -3,7 +3,6 @@ package com.ga.unit.man;
 import com.ga.map.Global;
 import com.ga.unit.Body;
 import com.ga.unit.Unit;
-import com.ga.unit.man.Man;
 import com.ga.unit.skill.Actions;
 
 /**
@@ -52,8 +51,10 @@ public class BodyHumanoid extends Body {
                 break;
             case "Thrust":
                 rotateAppendage(OFIST, 7, 0);
-            case "Punch":
                 rotateAppendage(FIST, 7, 0);
+                break;
+            case "Punch":
+                rotateAppendage(FIST, 67, 0);
                 break;
             case "Slash":
                 rotateAppendage(FIST, 7, host.dir);
@@ -69,6 +70,9 @@ public class BodyHumanoid extends Body {
                 rotateAppendage(OFIST, 11, 0);
                 rotateAppendage(FIST, 11, 0);
                 break;
+            case "Mark":
+                rotateAppendage(FIST, 65, 0);
+                break;
         }
     }
 
@@ -79,7 +83,7 @@ public class BodyHumanoid extends Body {
     }
 
     public boolean update() {
-        if (host.state == Actions.Walk)
+        if (host.state == Actions.Right)
             if ((current == 0 || current == 2) && frame.over()) ((Man)host).stepSound();
         else if (host.state == Actions.Sprint)
             if ((current == 1 || current == 3) && frame.over()) ((Man)host).stepSound();

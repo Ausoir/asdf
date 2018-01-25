@@ -77,7 +77,7 @@ public class Global {
     public static void update(){
         if (updates.update() && !Updater.editor) {
             timePass(1);
-            if (time % 10 == 0) FileManager.saveCharacter();
+            FileManager.saveCharacter();
         }
     }
     public static int getControlId(){

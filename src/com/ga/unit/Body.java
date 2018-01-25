@@ -210,7 +210,7 @@ public class Body {
         return total;
     }
     public void setMoveSpeed(int p){
-        int[] t = animation.get("Walk")[0];
+        int[] t = animation.get("Left")[0];
         for (int i : t) localFrames[i] = Math.max(1, clip.frames[i]-p);
     }
 

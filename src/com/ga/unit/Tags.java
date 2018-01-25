@@ -6,8 +6,9 @@ import java.util.ArrayList;
  * Created by Ga on 4/5/2017. aaa
  */
 public class Tags extends ArrayList<Tag> {
+    public static final Tags blank = new Tags();
     public static final Tag[] trainers = new Tag[]{
-        Tag.Dexterity, Tag.Strength, Tag.Athletics, Tag.Electric, Tag.Channeling, Tag.Shadow, Tag.Fire, Tag.Ice, Tag.Air, Tag.Mutation, Tag.Conjuration
+        Tag.Dexterity, Tag.Strength, Tag.Athletics, Tag.Electric, Tag.Channeling, Tag.Fire, Tag.Air, Tag.Mutation, Tag.Conjuration
     };
 
     @Override

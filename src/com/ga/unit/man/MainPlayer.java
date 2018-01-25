@@ -6,6 +6,7 @@ import com.ga.map.Map;
 import com.ga.tool.Line;
 import com.ga.unit.*;
 import com.ga.unit.skill.Actions;
+import com.ga.unit.skill.Buffs;
 import com.ga.unit.skill.Stat;
 
 import static com.ga.unit.man.BodyHumanoid.BODY;
@@ -33,14 +34,13 @@ public class MainPlayer extends Player {
     @Override
     public int setState(Actions state) {
         if (state == Actions.Use && this.state == Actions.Jump && getStateLevel(Actions.Airstrike) > 0
-                && this.delay.time > 32 && hasSkill(Actions.Airstrike)) stateSet(Actions.Airstrike);
+                && this.delay.time > 32 && moveset.contains(Actions.Airstrike)) stateSet(Actions.Airstrike);
         else if (state == Actions.Jump && this.state == Actions.Rest) state = Actions.Leap;
-        else if (state == Actions.Discard && this.state == Actions.Rest) state = Actions.Throw;
-        else if (state == Actions.Rest && (this.state == Actions.Walk || this.state == Actions.WalkL)) {
+        else if (state == Actions.Rest && (this.state == Actions.Right || this.state == Actions.Left)) {
             if (vel.x != 0) target.x = dir;
             state = Actions.Sprint;
         } else if (this.state == Actions.Sprint){
-            if (state == Actions.Rest || state == Actions.Walk || state == Actions.WalkL) return 6;
+            if (state == Actions.Rest || state == Actions.Right || state == Actions.Left) return 6;
         }
         int r = super.setState(state);
         if (r == 2) indicater.show(1);
@@ -74,8 +74,8 @@ public class MainPlayer extends Player {
     }
 
     public void witnessDeath(Unit p) {
-        if (p.faction.canAttack(faction) && p.pos.getSubtract(pos).inOval(900, 500)) {
-            int exp = Math.max(0, p.get("Level").get() * 3 - get("Level").get());
+        if (p.faction.canAttack(faction) && p.stats.getEffectLevel(Buffs.Banishment)==0 && p.pos.getSubtract(pos).inOval(900, 500)) {
+            int exp = Math.max(0, p.get("Level").get() - get("Level").get());
             if (exp > 0) level(exp);
         }
     }
@@ -134,7 +134,7 @@ public class MainPlayer extends Player {
     }
 
     protected void onMapEdge(int dir){
-        if (map.name.startsWith("_M")) Global.server.requestChangeMap("_M"+(Integer.parseInt(map.name.substring(1))+dir)+"@"+(dir<0?0:1));
+        if (map.name.startsWith("_M")) Global.server.requestChangeMap("_M"+(Integer.parseInt(map.name.substring(2))+dir)+"@"+(dir<0?0:1));
         else super.onMapEdge(dir);
     }
 

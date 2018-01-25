@@ -1,16 +1,16 @@
-Dummy;punk;Strength:5&Stamina:3&Speed:12&Attack:0&Level:1;Evil;0;Idle;Man;None;Toughwear;Mask; //Humanoids-Name,Speech Type,Stat,Faction,AI Type,Moveset,Face,Weapons,Armors,Headgears
-Player;player;Strength:5&Speed:23,23&Dexterity:7,7&Intelligence:1,1&Attack:0,0&Stamina:8,8&Experience:89,90&Motivation:100,100&Endurance:388,1450&Level:8,9;Player;0;Idle;Man;None;None;None;
-Resident;resident;Strength:5&Stamina:12&Attack:0&Speed:20&Level:1;Neutral;1;Sprint;Man;None,None,None,None,None,None,None,None,None,Potion,Stick;Comfortwear,Dustset,Toughwear,Comfortwear,Comfortwear,Suit,Robe,Comfortwear;None;
-Merchant;merchant;Strength:5&Stamina:10&Attack:0&Speed:12&Level:1;Neutral;3;Sprint;Man;None;Suit;None;
-Looter;punk;Strength:8&Dexterity:8&Stamina:5&Speed:17&Attack:-4&Level:1;Punk;2;Use,Rest,Lunge,Underhand;Man;Stick,None;None,Comfortwear,Toughwear;None,Bandana;
-Punk;punk;Strength:9&Dexterity:9&Stamina:9&Speed:24&Attack:1&Level:1;Punk;2;Use,Rest,Lunge,Sidekick,Punch,Dash;Man;Dagger,Axe,Pickaxe;None,Comfortwear,Dustset,Toughwear;None,Bandana;
-Yeller;punk;Strength:10&Dexterity:10&Stamina:4&Speed:20&Attack:1&Level:2;Punk;2;Use,Rest,Backstep,Calling;Man;Dagger,Axe,Pickaxe;None,Comfortwear,Dustset,Toughwear;None,Bandana;
-Phantom;;Strength:18&Dexterity:18&Stamina:24&Speed:26&Attack:4&Level:8;Curse;2;Use,Rest,Dash,Flameroll,Fireblast,Shadowstep,Blizzard;Phantom;Greatsword,Halberd,Warhammer;Shadowrobe;None;
-Monk;punk;Strength:8&Dexterity:16&Stamina:12&Speed:26&Attack:4&Level:3;Punk;2;Backstep,Use,Rest,Punch,Kick,Sidekick,Dash,Leap;Man;None,Fireball,Threadball,Throwing Knife,Scroll,Potion;Robe;None;
-Guard;soldier;Strength:15&Dexterity:15&Stamina:30&Speed:27&Attack:1&Level:5;Neutral;2;Use,Rest,Sidekick,Underhand,Dash,Whirlwind;Man;Broadsword,Spear,Mace;Chainmail,Platemail;Lace_Helm,Legion_Helm;
-Archer;soldier;Strength:10&Dexterity:14&Stamina:24&Speed:26&Attack:0&Level:6;Punk;2;Punch,Kick,Use,Rest,Backstep;Man;Bow;Chainmail,Platemail,Dustset;Lace_Helm;
-Undead;undead;Strength:16&Dexterity:10&Stamina:99&Speed:14&Attack:-16&Level:9;Evil;2;Use,Rest,Thrust,Underhand,Lunge,Mark;Skull;Broadsword,Mace;Skeleton;Lace_Helm,Legion_Helm;
-Hunter;soldier;Strength:10&Dexterity:10&Stamina:16&Speed:32&Attack:2&Level:6;Evil;2;Backstep,Kick,Dash,Blink,Use,Rest;Man;Revolver,Rifle,Pistol;Suit,Dustset;None;
-Pawnbroker;seafood;Strength:10&Dexterity:10&Stamina:3&Speed:12&Attack:0&Level:1;Neutral;4;Sprint;Man;None;Suit;None;
-Transporter;merchant;Strength:10&Dexterity:10&Stamina:3&Speed:12&Attack:0&Level:1;Neutral;5;Sprint;Man;None;Adventurewear;None;
-Innkeep;merchant;Strength:10&Dexterity:10&Stamina:3&Speed:12&Attack:0&Level:1;Neutral;6;Sprint;Man;None;Suit;None;
+Dummy;punk;1;Evil;0;Idle;Man;;Toughwear;Mask; //Humanoids-Name,Speech Type,Level,Faction,AI Type,Moveset,Face,Weapons,Armors,Headgears
+Player;player;1;Player;0;Idle;Man;;;;
+Resident;resident;1;Neutral;1;Sprint;Man;,,,,,,,,,Potion,Stick;Comfortwear,Dustset,Toughwear,Comfortwear,Comfortwear,Suit,Robe,Comfortwear;;
+Merchant;merchant;1;Neutral;3;Sprint;Man;;Suit;;
+Looter;punk;1;Punk;2;Use,Rest,Lunge,Underhand;Man;Stick,;,Comfortwear,Toughwear;,Bandana;
+Punk;punk;1;Punk;2;Use,Rest,Lunge,Sidekick,Dash;Man;Dagger,Axe,Pickaxe;,Comfortwear,Dustset,Toughwear;,Bandana;
+Yeller;punk;2;Punk;2;Use,Rest,Backstep,Calling;Man;Dagger,Axe,Pickaxe;,Comfortwear,Dustset,Toughwear;,Bandana;
+Phantom;;8;Curse;2;Use,Rest,Dash,Flameroll,Fireblast,Shadowstep,Blizzard;Phantom;Greatsword,Halberd,Warhammer;Shadowrobe;;
+Monk;punk;3;Punk;2;Backstep,Use,Rest,Punch,Kick,Sidekick,Dash,Leap;Man;,Fireball,Threadball,Throwing Knife,Scroll,Potion;Robe;;
+Guard;soldier;5;Neutral;2;Use,Rest,Sidekick,Underhand,Dash,Whirlwind;Man;Broadsword,Spear,Mace;Chainmail,Platemail;Lace_Helm,Legion_Helm;
+Archer;soldier;6;Punk;2;Punch,Kick,Use,Rest,Backstep;Man;Bow;Chainmail,Platemail,Dustset;Lace_Helm;
+Undead;undead;9;Evil;2;Use,Rest,Thrust,Underhand,Lunge,Mark;Skull;Broadsword,Mace;Skeleton;Lace_Helm,Legion_Helm;
+Hunter;soldier;6;Evil;2;Backstep,Kick,Dash,Blink,Use,Rest;Man;Revolver,Rifle,Pistol;Suit,Dustset;;
+Pawnbroker;seafood;1;Neutral;4;Sprint;Man;;Suit;;
+Transporter;merchant;1;Neutral;5;Sprint;Man;;Adventurewear;;
+Innkeep;merchant;1;Neutral;6;Sprint;Man;;Suit;;

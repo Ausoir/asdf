@@ -10,27 +10,30 @@ import com.ga.unit.man.Man;
  */
 public class ArmorSet {
     private static Armor[] bare = new Armor[]{
-            new Armor(null, "Head", 0,0,0,0,new Item.Material[]{Item.Material.Flesh}, -1){
+            new Armor(null, "Head", 0,new Item.Material[]{Item.Material.Flesh},0,0,0, -1){
                 public boolean checkBreak(int d){ return true; }
             },
-            new Armor(null, "Underwear", 0,1,0,0,new Item.Material[]{Item.Material.Flesh}, -1){
+            new Armor(null, "Underwear", 0,new Item.Material[]{Item.Material.Flesh},1,0,0, -1){
                 public boolean checkBreak(int d){ return true; }
             },
-            new Armor(null, "Underwear", 0,2,0,0,new Item.Material[]{Item.Material.Flesh}, -1){
+            new Armor(null, "Underwear", 0,new Item.Material[]{Item.Material.Flesh},2,0,0, -1){
                 public boolean checkBreak(int d){ return true; }
-            }
+            },
+            new Armor(null, "Underwear", 0,new Item.Material[]{Item.Material.Flesh},3,0,0, -1){
+                public boolean checkBreak(int d){ return true; }
+            },
     };
     public Armor[] armor;
     private Organ[] organs;
     public Tags tags = new Tags();
     private Man host;
-    public ArmorSet(Man host, String head, String body, String legs){
+    public ArmorSet(Man host, String head, String body, String legs, String etc){
         this.host = host;
         organs = host.clip.organs;
-        armor = new Armor[3];
-        String[] armors = new String[]{head,body,legs};
+        armor = new Armor[4];
+        String[] armors = new String[]{head,body,legs,etc};
         for (int i=0;i<armor.length;i++){
-            if (armors[i].equals("None")) armor[i] = bare[i];
+            if (armors[i].equals("")) armor[i] = bare[i];
             else armor[i] = (Armor) Stock.get(host.map, armors[i]);
             armor[i].owner = host;
         }
@@ -114,7 +117,7 @@ public class ArmorSet {
         String r = "";
         for (int i=0;i<armor.length;i++){
             if (armor[i] != bare[i]) r += armor[i].toString()+";";
-            else r += "None;";
+            else r += ";";
         }
         return r.substring(0,r.length()-1);
     }

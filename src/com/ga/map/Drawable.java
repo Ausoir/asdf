@@ -67,7 +67,7 @@ public abstract class Drawable implements Observer {
             else next.remove(p);
         }
     }
-    protected void removeThis(){
+    public void removeThis(){
         if (prev != null) prev.next = next;
         if (next != null) next.prev = prev;
     }

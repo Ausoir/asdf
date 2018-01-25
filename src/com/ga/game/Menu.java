@@ -61,6 +61,7 @@ public class Menu extends JPanel implements Updatable {
     }
     void onExit(){
         if (!current.isVisible()) onUpdate = null;
+        Global.display.requestFocus();
     }
     @Override
     public void update() {

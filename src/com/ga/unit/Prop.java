@@ -133,7 +133,7 @@ public class Prop extends Thing {
         }
     }
     public String[] load(String p) {
-        String[] ps = p.split("@");
+        String[] ps = p.split("@",-1);
         pos.load(ps[3]);
         rotation = Float.parseFloat(ps[4]);
         return ps;

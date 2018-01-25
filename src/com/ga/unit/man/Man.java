@@ -17,6 +17,7 @@ import com.ga.unit.skill.Stat;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import static com.ga.unit.man.BodyHumanoid.FIST;
 import static com.ga.unit.man.BodyHumanoid.HEAD;
@@ -25,9 +26,9 @@ import static com.ga.unit.man.BodyHumanoid.HEAD;
  * Created by Ga on 5/7/2016. asd
  */
 public class Man extends Unit {
-    private String face;
-    private Item fist;
+    private static Item fist = ((Item) Stock.Fist.create(null, -1,0));
     public Item weapon = fist;
+    private String face;
     public ArmorSet armor;
     public int selectingItem = -1;
     public String memorized = "";
@@ -47,23 +48,59 @@ public class Man extends Unit {
     }
     @Override
     protected void init(){
-        tags.add(Tag.Strength);
-        tags.add(Tag.Dexterity);
         tags.add(Tag.Athletics);
     }
-    public void onField(){
-    }
-    boolean hasSkill(Actions move){
-        for (Actions i : moveset){
-            if (i == move) return true;
+    @Override
+    public Man start(){
+        super.start();
+        if (!wieldingNone()){
+            weapon.map = map;
+            weapon.start();
         }
-        return false;
+        return this;
     }
-    public void learnSkill(Actions move){
-        Actions[] newset = new Actions[moveset.length+1];
-        System.arraycopy(moveset, 0, newset, 0, moveset.length);
-        newset[newset.length-1] = move;
-        moveset = newset;
+    @Override
+    public String[] load(String p){
+        String[] t = p.split("#");
+        String[] lines = super.load(t[0]);
+
+        gold = Integer.parseInt(lines[13]);
+        memorized = lines[14];
+        crafting.load(lines[15]);
+
+        String[] items = t[1].split(";",-1);
+        setFace(items[0]);
+        if (!items[1].equals("")) setWeapon((Item) Stock.get(map, items[1]));
+        armor = new ArmorSet(this, items[2],items[3],items[4],items[5]);
+        if (items.length > 6){
+            for (int i=6;i<items.length;i++){
+                Item item = (Item) Stock.get(map, items[i]);
+                inventory.addItem(item);
+            }
+        }
+        final Man me = this;
+        clip.organs[FIST].onAmputate = new Performer(){
+            public void perform(){
+                weapon.drop(me);
+            }
+        };
+        clip.organs[HEAD].onAmputate = new Performer(){
+            public void perform(){
+                armor.set(null, 0);
+            }
+        };
+        return t;
+    }
+    @Override
+    public String toString(){
+        StringBuilder r = new StringBuilder();
+        r.append(super.toString()).append("@").append(gold).append("@").append(memorized);
+        r.append("@").append(crafting.toString()).append("@;");
+        r.append("#").append(face).append(";").append(weapon.forceToString()).append(";").append(armor.toString());
+        if (inventory.getItemSize() != 0) r.append(";").append(inventory.toString());
+        return r.toString();
+    }
+    public void onField(){
     }
     public void setWeapon(Item p){
         if (p == null) p = fist;
@@ -83,7 +120,7 @@ public class Man extends Unit {
 
     public boolean wieldingNone(){ return weapon == null || weapon == fist; }
 
-    private boolean sheathe() {
+    public boolean sheathe() {
         if (wieldingNone()) return true;
         if (inventory.addItem(weapon)){
             weapon.remove();
@@ -112,57 +149,38 @@ public class Man extends Unit {
     public void stateSet(Actions state){
         attackSpeed -= weapon.weight;
         super.stateSet(state);
-        final Man me = this;
         switch (state) {
             case Idle:
                 if (!get("Stamina").isFull()) clip.setState(Actions.Exhausted.getClipName());
                 break;
             case Sprint:
-            case Walk:
+            case Right:
                 float speed = getSpeed();
                 if (speed <= 0) clip.setState(Actions.Exhausted.getClipName());
                 else clip.setMoveSpeed((int) Global.clamp(speed-1,-20,4));
                 break;
-            case Interact:
-                delay.performer = new Performer() {
-                    public void perform() {
-                        P reach = pos.getAdd(clip.organs[FIST].ptd);
-                        ArrayList<Prop> obj = map.updater.collideInteractive(reach);
-                        if (obj.size() != 0) {
-                            for (Prop i : obj) {
-                                if (i.onInteract != null) {
-                                    i.onInteract.interact(me);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                };
-                break;
-            case Discard:
-                setWeapon(null);
-                stateSet(Actions.Idle);
-                break;
-            case Wield:
-                if (selectingItem == -1) {
-                    sheathe();
-                } else if (selectingItem < inventory.getItemSize()) {
-                    Item item = inventory.getItem(selectingItem);
-                    setWeapon(item);
-                    inventory.remove(item);
-                    item.start();
-                    selectingItem = -1;
-                } else if (selectingItem >= 10 && selectingItem <= 16) {
-                    Sound.play(map, pos, "unwear");
-                    int piece = selectingItem - 10;
-                    if (sheathe() && !armor.isBare(piece)) {
-                        setWeapon(armor.armor[piece]);
-                        armor.armor[piece].start();
-                        armor.set(null, piece);
-                    }
-                }
-                break;
         }
+    }
+    protected void stateOnSet(){
+        state.onSet(this);
+    }
+    protected void stateUpdate(){
+        state.update(this); //calls Man version
+        stateDuration++;
+    }
+    protected void stateInterrupt(){
+        state.onInterrupt(this);
+    }
+    protected void stateFinish(){
+        state.onFinish(this);
+    }
+    protected void stateTrigger(){
+        state.trigger(this);
+    }
+    @Override
+    protected void moveTriggered(int organ){
+        weapon.pos.set(pos.x + clip.organs[FIST].ptd.x, pos.y + clip.organs[FIST].ptd.y);
+        super.moveTriggered(organ);
     }
 
     @Override
@@ -210,6 +228,14 @@ public class Man extends Unit {
         return armor.getOrganArmor(organ).checkBreak(damage);
     }
 
+    @Override
+    protected int getStatePower(Actions state){
+        int r = super.getStatePower(state);
+        if (state.getTrainers().contains(Tag.Dexterity)) r += get("Dexterity").get();
+        if (state.getTrainers().contains(Tag.Strength)) r += get("Strength").get();
+        return r;
+    }
+
     public int getVacancy(){
         Stat dex = get("Dexterity");
         return dex.get() - armor.getEncumbrance() - weapon.encumbrance;
@@ -217,6 +243,21 @@ public class Man extends Unit {
 
     public Stat get(String p){
         return stats.getStat(p);
+    }
+
+    public boolean requireMana(int p){
+        ArrayList<Item> items = new ArrayList<>();
+        items.addAll(inventory.getItems());
+        items.add(weapon);
+        Collections.addAll(items, armor.armor);
+        for (Item i : items){
+            if (i.tags.contains(Tag.Mana)){
+                int mana = Math.min(i.getUses(), p);
+                if (i.isUsable(mana)) p -= mana;
+                if (p == 0) return true;
+            }
+        }
+        return false;
     }
 
     public void die() {
@@ -227,7 +268,7 @@ public class Man extends Unit {
     }
 
     public void onAttack(Unit p){
-        if (weapon.usable(2)) weapon.trigger(p);
+        if (weapon.isUsable(2)) weapon.trigger(p);
         brain.onAttack();
     }
 
@@ -247,12 +288,6 @@ public class Man extends Unit {
             return target;
         }
         return null;
-    }
-
-    @Override
-    protected void moveTriggered(int organ){
-        weapon.pos.set(pos.x + clip.organs[FIST].ptd.x, pos.y + clip.organs[FIST].ptd.y);
-        super.moveTriggered(organ);
     }
 
     public void setVisible(boolean p) {
@@ -299,12 +334,13 @@ public class Man extends Unit {
         ArrayList<Prop> items = map.updater.collideProp(pos,100);
         items.removeIf(o -> !(o instanceof Item));
         items.addAll(inventory.getItems());
+        if (!wieldingNone()) items.add(weapon);
         return items;
     }
     public ArrayList<Prop> getAvailableProps() {
         ArrayList<Prop> items = map.updater.collideProp(pos,120);
         items.removeIf(o -> (o instanceof Item));
-//        items.removeIf(o -> !o.image.visible);
+        items.removeIf(o -> !o.image.visible);
         return items;
     }
 
@@ -315,59 +351,5 @@ public class Man extends Unit {
         r.addAll(armor.tags);
         r.addAll(weapon.tags);
         return r;
-    }
-
-    @Override
-    public Man start(){
-        super.start();
-        if (!wieldingNone()){
-            weapon.map = map;
-            weapon.start();
-        }
-        return this;
-    }
-
-    @Override
-    public String[] load(String p){
-        String[] t = p.split("#");
-        String[] lines = super.load(t[0]);
-
-        gold = Integer.parseInt(lines[13]);
-        memorized = lines[14];
-        crafting.load(lines[15]);
-
-        String[] items = t[1].split(";");
-        setFace(items[0]);
-        weapon = fist = ((Item) Stock.Fist.create(map, -1,0));
-        if (!items[1].equals("")) setWeapon((Item) Stock.get(map, items[1]));
-        armor = new ArmorSet(this, items[2],items[3],items[4]);
-        if (items.length > 5){
-            for (int i=5;i<items.length;i++){
-                Item item = (Item) Stock.get(map, items[i]);
-                inventory.addItem(item);
-            }
-        }
-        final Man me = this;
-        clip.organs[FIST].onAmputate = new Performer(){
-            public void perform(){
-                weapon.drop(me);
-                setWeapon(null);
-            }
-        };
-        clip.organs[HEAD].onAmputate = new Performer(){
-            public void perform(){
-                armor.set(null, 0);
-            }
-        };
-        return t;
-    }
-
-    @Override
-    public String toString(){
-        StringBuilder r = new StringBuilder();
-        r.append(super.toString()).append("@").append(gold).append("@").append(memorized);
-        r.append("@").append(crafting.toString()).append("@;");
-        r.append("#").append(face).append(";").append(weapon.forceToString()).append(";").append(armor.toString()).append(";").append(inventory.toString());
-        return r.toString();
     }
 }

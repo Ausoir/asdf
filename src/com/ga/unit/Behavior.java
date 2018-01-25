@@ -25,13 +25,13 @@ public enum Behavior {
         return new Task(0) {
             public void blocked(Unit host, boolean fall) {
                 host.face(-host.dir, true);
-                host.setState(Actions.Walk);
+                host.setState(Actions.Right);
             }
 
             boolean update(Unit host) {
                 if (Global.r.nextInt(16) == 0) {
                     int dir = Global.r.nextInt(3);
-                    if (dir == 1) host.setState(Actions.Walk);
+                    if (dir == 1) host.setState(Actions.Right);
                     else {
                         host.face(dir - 1, false);
                         host.setState(Actions.Idle);
@@ -81,7 +81,7 @@ public enum Behavior {
                     if (!host.map.name.equals(data[1])) {
                         P target = new P(data[2]);
                         host.face(host.pos.x > target.x ? -1 : 1, false);
-                        host.setState(Actions.Walk);
+                        host.setState(Actions.Right);
                         if (host.pos.getSubtract(target).getDist() <= host.getSpeed() * 400) {
                             routes.remove(0);
                             Global.server.requestChangeMap(data[0] + "@" + data[1]);
@@ -114,7 +114,7 @@ public enum Behavior {
                     int absX = Math.abs(x);
                     if (absX > 160) {
                         host.face(x > 0 ? 1 : -1, false);
-                        host.setState(Actions.Walk);
+                        host.setState(Actions.Right);
                     } else if (absX < 40) host.setState(Actions.Idle);
                     return false;
                 }
@@ -154,7 +154,7 @@ public enum Behavior {
             }
 
             int getVar(){
-                return host.brain.target.controlId;
+                return host.brain.target == null ? -1 : host.brain.target.controlId;
             }
 
             boolean update(Unit host) {
@@ -191,7 +191,7 @@ public enum Behavior {
                                 host.delay.set(40);
                             } else if (fb == 2) {
                                 host.setState(Actions.Rest);
-                                host.delay.time += 40;
+                                host.delay.time = (12-host.stateLevel*2)*host.get("Stamina").getMax();
                             } else {
                                 move(host, dist);
                             }
@@ -240,8 +240,8 @@ class Task {
     }
     void move(Unit host, float dist){
         if (dist > 100){
-            if (host.setState(Actions.Sprint) != 0) host.setState(Actions.Walk);
-        } else host.setState(Actions.Walk);
+            if (host.setState(Actions.Sprint) != 0) host.setState(Actions.Right);
+        } else host.setState(Actions.Right);
     }
     public String toString(){
         return id+"&"+getVar();

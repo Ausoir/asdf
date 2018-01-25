@@ -1,1 +1,1 @@
-;-1:Idle;-65:Idle;32:Kick;1:Use;65:WalkL;2:Discard;-68:Idle;68:Walk;70:Punch;71:Sidekick;16:Rest;81:Throw;82:Wield;83:Drop;86:Windwalk;87:Jump;88:Mark;90:Leap;
+16:Rest

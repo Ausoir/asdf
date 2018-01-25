@@ -80,9 +80,7 @@ class TerrainTrail {
     void reverse() {
         for (Line i : lines){
             if (i.opt == 0) {
-                P t = i.pt;
-                i.pt = i.ptd;
-                i.ptd = t;
+                i.reverse();
             }
         }
     }

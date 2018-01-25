@@ -1,8 +1,7 @@
-Meat;1;Red,Raw //Name, Weight, Size, Materials
+Fruit;1;Fruit //Name, Weight, Size, Materials
 Drumstick;3;White,Fried
 Porkchop;1;Red,Roasted
-Meal;1;Grain,Vegetable,Fish,Raw
+Meal;1;Grain,Vegetable,Fish
 Burger;1;Red,Vegetable,Grain,Roasted
-Sandwich;1;Vegetable,Grain,Raw
-Ration;1;
-Fruit;1;Fruit,Raw
+Sandwich;1;Vegetable,Grain
+Ration;1;Dried

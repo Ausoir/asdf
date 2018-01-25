@@ -7,8 +7,8 @@ import com.ga.unit.Tag;
  * Created by Ga on 8/1/2016. asd
  */
 public class Weapon extends Item {
-    private int quality = 0;
-    public Weapon(Map map, String name, int seed, ItemType type, int encumbrance, Material[] materials, int durability) {
+    protected int quality = 0;
+    public Weapon(Map map, String name, int seed, Material[] materials, ItemType type, int durability, int encumbrance) {
         super(map, name, seed, materials, type, durability);
         this.encumbrance = encumbrance;
         value = value*2 + 1000;
@@ -17,7 +17,7 @@ public class Weapon extends Item {
         delay = 0;
     }
     public void onCreate(){
-        imbueMeta(true, true, .5f);
+        imbueMeta(true, true, .3f);
         if (emod != null && !emod.tags.contains(Tag.Curse) && rand.nextFloat() > .1f){
             emod = null;
             ademod = AdenchantMod.None;
@@ -29,7 +29,16 @@ public class Weapon extends Item {
         else if (mod == SpecialtyMod.Dull) quality += (-1*admod.magnitude)/2;
         else super.setModifier(mod);
     }
-    boolean isEnhanceable(){
+    public int getQuality(){
+        return quality;
+    }
+    public void enhance(){
+        if (isEnhanceable()){
+            quality++;
+            disposable = false;
+        }
+    }
+    private boolean isEnhanceable(){
         return quality < material.hardness;
     }
     @Override
@@ -61,9 +70,10 @@ public class Weapon extends Item {
     public String[] load(String p){
         String[] r = super.load(p);
         quality = Integer.parseInt(r[8]);
+        if (quality > 0) disposable = false;
         return r;
     }
     public String toString(){
-        return super.toString()+"@"+ quality;
+        return super.toString()+"@"+quality;
     }
 }

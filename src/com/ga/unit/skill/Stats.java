@@ -118,10 +118,12 @@ public class Stats {
             }
         }
     }
-    public void clearBuffs() {
+    public void clearBuffs(boolean force) {
         for (int i=0;i<effects.size();i++) {
-            Buff effect = effects.remove(0);
-            effect.onFinish();
+            if (force || effects.get(i).buff != Buffs.Banishment) {
+                Buff effect = effects.remove(0);
+                effect.onFinish();
+            }
         }
     }
 }

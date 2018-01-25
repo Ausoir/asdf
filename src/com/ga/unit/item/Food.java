@@ -15,7 +15,7 @@ import java.awt.*;
  */
 public class Food extends Item {
     public enum Material{
-        Raw(0,0),White(500,3),Red(800,3),Fish(600,3),Vegetable(100,10),Grain(200,8),Fruit(300,5),Boiled(200,-3),Fried(400,2),Roasted(300,0),Smoked(300,10),Dried(100,10);
+        White(500,3),Red(800,3),Fish(600,3),Vegetable(100,10),Grain(200,8),Fruit(300,5),Boiled(200,-3),Fried(400,2),Roasted(300,0),Smoked(300,10),Dried(1000,10);
         int value, perish;
         Material(int value, int perish){
             this.value = value;
@@ -60,7 +60,7 @@ public class Food extends Item {
     }
     @Override
     public boolean use(Man p){
-        if (usable(1) && super.use(p)) {
+        if (isUsable(1) && super.use(p)) {
             int perishTime = perish - Global.time;
             Stat motivation = p.get("Motivation");
             if (perishTime <= 0 && rand.nextInt(10) < getPoisonChance()){
@@ -75,7 +75,7 @@ public class Food extends Item {
                         if (i == ii) likes++;
                     }
                 }
-                motivation.add(type.getValue()/100 + likes*6, false);
+                motivation.add(Math.max(0, type.getValue()/100-perish) + likes*4, false);
                 p.stats.endBuff(Buffs.Hunger);
                 p.stats.endBuff(Buffs.Starvation);
             }

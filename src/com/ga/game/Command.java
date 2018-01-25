@@ -5,6 +5,7 @@ import com.ga.tool.Line;
 import com.ga.unit.PlayerInput;
 import com.ga.unit.Prop;
 import com.ga.unit.Stock;
+import com.ga.unit.Traits;
 import com.ga.unit.item.Item;
 import com.ga.unit.man.Player;
 import com.ga.unit.skill.Actions;
@@ -50,6 +51,7 @@ public class Command {
                 else if (cmd[0].equals("act")) host.setState(Actions.valueOf(cmd[1]));
                 else if (cmd[0].equals("level")) Global.player.witnessDeath(host);
                 else if (cmd[0].equals("learn")) host.learnSkill(Actions.valueOf(cmd[1]));
+                else if (cmd[0].equals("trait")) host.learnTrait(Traits.Trait.valueOf(cmd[1]));
                 else if (cmd[0].equals("recipe")) host.crafting.knowledge.add(cmd[1]);
                 else if (cmd[0].equals("sound")) Sound.play(host.map, Global.camera, cmd[1]);
                 else if (cmd[0].equals("depth")) host.say("Me: "+host.getDepth()+" Line: "+host.lastLand.depth+", Terrain: "+host.map.terrains.get(host.lastLand.tid).getDepth());

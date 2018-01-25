@@ -40,7 +40,7 @@ public class Crafts {
                 ingredients.remove(index);
                 String use = usage.remove(index);
                 if (use.equals("*")) i.remove();
-                else if (!use.equals("0") && i instanceof Item) ((Item) i).usable(Integer.parseInt(use));
+                else if (!use.equals("0") && i instanceof Item) ((Item) i).isUsable(Integer.parseInt(use));
             }
         }
         if (ingredients.size() == 1){

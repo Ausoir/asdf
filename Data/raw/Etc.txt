@@ -13,3 +13,4 @@ Jug;2;4;1;Glass
 Stool;2;6;1000;Wooden,Other
 Candle;2;0;200;Other
 Bone;1;1;0;Bone
+Meat;1;1;0;Flesh

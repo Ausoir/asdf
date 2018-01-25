@@ -25,3 +25,5 @@ Mask;0;1;0;Cloth,Leather;14
 Lace_Helm;0;2;0;Copper,Bronze,Iron;24
 Full_Helm;0;3;0;Copper,Bronze,Iron;36
 Legion_Helm;0;3;0;Copper,Bronze,Iron;48
+Fannypack;3;0;1;Cloth,Silk,Nylon;8
+Fancy_Necklace;3;0;0;Silver,Gold,Crystal;100

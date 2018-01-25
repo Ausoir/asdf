@@ -46,14 +46,11 @@ public class Projectile extends Prop {
         gravity = true;
         tangible = false;
     }
-    public int getCollisionSize(){
-        return (int) vel.getDist()*2;
-    }
     @Override
     public void update(){
         rotation+=rotSpeed*vel.x;
         if (tangible) {
-            for (Unit i : map.updater.collideUnit(pos, getCollisionSize(), faction)){
+            for (Unit i : map.updater.unitsLoaded){
                 if (i.hit(new Line(pos,pos.getAdd(vel)),damage)) onAttack(i);
             }
         }

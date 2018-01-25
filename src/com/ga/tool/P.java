@@ -6,7 +6,7 @@ import com.ga.map.Global;
  * Created by Ga on 5/6/2016. asd
  */
 public class P {
-    public static final P zero = new P();
+    public static final P blank = new P();
     public float x, y;
     public P(String p){
         load(p);
@@ -84,6 +84,12 @@ public class P {
     }
     public P getMult(float x, float y){
         return new P(this.x*x,this.y*y);
+    }
+    public P disperse(int x, int y) {
+        int dX = 0, dY = 0;
+        if (x > 0) dX = Global.r.nextInt(x) - (x / 2);
+        if (y > 0) dY = Global.r.nextInt(y) - (y / 2);
+        return getAdd(dX, dY);
     }
     public String toString(){
         return ((int)x) + "," + ((int)y);

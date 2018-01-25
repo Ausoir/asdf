@@ -222,6 +222,11 @@ public class Server {
                 client.message("C}"+Global.player.controlId+"}"+p);
             }
         }
+
+        @Override
+        public void onFocus(boolean focus) {
+
+        }
     }
 
     class ClientServer implements ListenServer, Input {
@@ -305,6 +310,11 @@ public class Server {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+
+        @Override
+        public void onFocus(boolean focus) {
+
         }
     }
 }

@@ -71,18 +71,20 @@ public class MenuDialog extends Panel {
         optPanel.removeAll();
         JLabel[] options1 = new JLabel[options.length];
         for (int i = 0; i < options.length; i++) {
-            options1[i] = new JLabel(">"+options[i]);
-            final int ii = i;
-            options1[i].addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    setVisible(false);
-                    if (actions[ii] != null) actions[ii].perform();
-                }
-            });
-            options1[i].setFont(new Font("Helvetica",Font.ITALIC,14));
-            options1[i].setForeground(new Color(200, 200, 200, 200));
-            optPanel.add(options1[i]);
+            if (options[i] != null) {
+                options1[i] = new JLabel(">" + options[i]);
+                final int ii = i;
+                options1[i].addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        setVisible(false);
+                        if (actions[ii] != null) actions[ii].perform();
+                    }
+                });
+                options1[i].setFont(new Font("Helvetica", Font.ITALIC, 14));
+                options1[i].setForeground(new Color(200, 200, 200, 200));
+                optPanel.add(options1[i]);
+            }
         }
     }
 }

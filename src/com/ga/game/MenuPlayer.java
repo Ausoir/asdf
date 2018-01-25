@@ -3,6 +3,7 @@ package com.ga.game;
 import com.ga.map.Global;
 import com.ga.map.Picture;
 import com.ga.tool.Performer;
+import com.ga.unit.PlayerInput;
 import com.ga.unit.Prop;
 import com.ga.unit.Tag;
 import com.ga.unit.Tags;
@@ -142,7 +143,7 @@ public class MenuPlayer extends Panel {
             b.setTitle(Dialog.get("wielded"));
             ((JPanel) panel.getComponent(0)).setBorder(b);
 
-            for (int i=0;i<3;i++) {
+            for (int i=0;i<4;i++) {
                 if (!Global.player.armor.isBare(i)) {
                     grid.gridy++;
                     Item equipped = Global.player.armor.armor[i];
@@ -152,6 +153,7 @@ public class MenuPlayer extends Panel {
                     if (i == 0) title += " - "+Dialog.get("bhead");
                     else if (i == 1) title += " - "+Dialog.get("bleg");
                     else if (i == 2) title += " - "+Dialog.get("btorso");
+                    else title += " - Trinket";
                     b.setTitle(title);
                     panel.setBorder(b);
                 }
@@ -255,7 +257,7 @@ public class MenuPlayer extends Panel {
             result.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Global.player.input.inputDirect("_WI"+index,0,0);
+                    Global.player.input.inputDirect("_WI"+(10+index),0,0);
                     Global.display.menu.showMenu();
                 }
             });
@@ -306,6 +308,9 @@ public class MenuPlayer extends Panel {
             panel.removeAll();
             panel.add(new JLabel(Dialog.get("mvsRemap")));
             panel.add(Box.createRigidArea(new Dimension(0,12)));
+            for (Actions i : PlayerInput.basicMoves){
+                if (i != Actions.Idle) makeSlot(i);
+            }
             for (Actions i : Global.player.moveset) makeSlot(i);
             int points = Global.player.get("Intelligence").get();
             skillpoints.setText(Dialog.get("mem")+": "+points);
@@ -710,14 +715,10 @@ public class MenuPlayer extends Panel {
                 break;
         }
     }
-    @Override
-    public void setVisible(boolean p){
-        super.setVisible(p);
-        Global.display.focus = true;
-    }
     void toggle(){
-        if (isVisible()) setVisible(false);
-        else{
+        if (isVisible()){
+            setVisible(false);
+        } else {
             display();
         }
     }

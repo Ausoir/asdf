@@ -19,7 +19,7 @@ public class Speech extends Drawable {
     private Unit host;
     private ArrayList<String> msg = new ArrayList<>();
     private Timer timer = new Timer(-1,false);
-    private String recent = "";
+    String recent = "";
     private Color color = new Color(255,255,255,150);
     private JTextArea textarea;
     Speech(Unit host){

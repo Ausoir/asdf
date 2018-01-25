@@ -8,6 +8,7 @@ import java.awt.*;
  * Created by Ga on 7/26/2016. asd
  */
 public class Line {
+    public static final Line blank = new Line();
     public static float MAXSLOPE = 1.5f;
     public P pt;
     public P ptd;
@@ -78,6 +79,11 @@ public class Line {
     }
     public float getCrossPointY(float x){
         return (x-pt.x)*getSlope()+pt.y;
+    }
+    public void reverse(){
+        P t = pt;
+        pt = ptd;
+        ptd = t;
     }
     public boolean lineCross(Line i2){
         boolean a = i2.pt.x-pt.x >= 0, b = i2.pt.x-ptd.x > 0, c = i2.ptd.x-pt.x >= 0, d = i2.ptd.x-ptd.x > 0,

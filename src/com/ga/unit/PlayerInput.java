@@ -4,6 +4,7 @@ import com.ga.game.Command;
 import com.ga.game.Input;
 import com.ga.unit.man.Player;
 import com.ga.unit.skill.Actions;
+import com.sun.istack.internal.NotNull;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -17,6 +18,15 @@ import java.util.Map;
 public class PlayerInput implements Input {
     private HashMap<Integer, String> keyActionMap = new HashMap<Integer, String>(){{
         put(-1,"Idle");
+    }};
+    public static ArrayList<Actions> basicMoves = new ArrayList<Actions>(){{
+        add(Actions.Idle);
+        add(Actions.Use);
+        add(Actions.Left);
+        add(Actions.Right);
+        add(Actions.Rest);
+        add(Actions.Jump);
+        add(Actions.Wield);
     }};
     private ArrayList<Integer> pressed = new ArrayList<>();
     public Player host;
@@ -33,14 +43,30 @@ public class PlayerInput implements Input {
             host.say(p);
         }
     }
+
+    @Override
+    public void onFocus(boolean focus) {
+        if (!focus) pressed.clear();
+    }
+
     public void changeMapping(int key, Actions event){
         keyActionMap.remove(key);
         Iterator i = keyActionMap.entrySet().iterator();
+        int oldkey = -1;
         while (i.hasNext()) {
             Map.Entry e = (Map.Entry) i.next();
-            if (e.getValue().equals(event.getName())) i.remove();
+            if (event != Actions.Idle && e.getValue().equals(event.getName())){
+                i.remove();
+                oldkey = (int) e.getKey();
+                break;
+            }
         }
         keyActionMap.put(key, event.getName());
+        if (event == Actions.Left || event == Actions.Right){
+            if (oldkey != -1) keyActionMap.remove(-oldkey);
+            keyActionMap.remove(-key);
+            keyActionMap.put(-key, "Idle");
+        }
     }
     public String getMapping(Actions move){
         String r = null;
@@ -82,17 +108,9 @@ public class PlayerInput implements Input {
             Actions move = Actions.getByName(p);
             if (move == Actions.Wield) host.selectingItem = -1;
             if (move != null){
-                host.setState(move);
-            }
-        }
-    }
-    public void load(String p){
-        if (p.length() > 1) {
-            String[] data = p.substring(1).split(";");
-            for (String i : data) {
-                String[] pair = i.split(":");
-                Actions move = Actions.getByName(pair[1]);
-                if (move != null) keyActionMap.put(Integer.parseInt(pair[0]), move.getName());
+                if (basicMoves.contains(move) || host.moveset.contains(move)) {
+                    host.setState(move);
+                }
             }
         }
     }
@@ -105,12 +123,28 @@ public class PlayerInput implements Input {
             }
         }
     }
+    public void load(String p){
+        if (p.length() > 1) {
+            String[] data = p.split(";",-1);
+            for (String i : data) {
+                String[] pair = i.split(":");
+                Actions move = Actions.getByName(pair[1]);
+                if (move != null){
+                    changeMapping(Integer.parseInt(pair[0]), move);
+                }
+            }
+        }
+    }
     @Override
     public String toString(){
-        String r = ";";
+        if (keyActionMap.size() == 0) return "";
+        String r = "";
         for (Map.Entry<Integer, String> i : keyActionMap.entrySet()){
-            r += i.getKey()+":"+i.getValue()+";";
+            if (!i.getValue().equals("Idle")) {
+                r += i.getKey() + ":" + i.getValue() + ";";
+                break;
+            }
         }
-        return r;
+        return r.substring(0,r.length()-1);
     }
 }

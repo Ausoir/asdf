@@ -6,7 +6,7 @@ package com.ga.unit.skill;
 public class Stat {
     private int max;
     protected int current;
-    public Stat(String p){
+    Stat(String p){
         String[] t = p.split(",");
         if (t.length == 1){
             setTotal(Integer.parseInt(p));
@@ -18,11 +18,7 @@ public class Stat {
     public Stat(int p){
         setTotal(p);
     }
-    public Stat(int p, int max){
-        setTotal(max);
-        current = p;
-    }
-    public void setTotal(int p){
+    private void setTotal(int p){
         max = p;
         current = p;
     }

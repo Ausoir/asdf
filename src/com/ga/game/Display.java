@@ -11,7 +11,7 @@ import java.awt.event.*;
 /**
  * Created by Ga on 5/6/2016. asd
  */
-public class Display extends JPanel {
+public class Display extends JPanel implements FocusListener {
     public JTextField chatbox;
     public Input input;
     public Menu menu;
@@ -39,14 +39,14 @@ public class Display extends JPanel {
             public void mousePressed(java.awt.event.MouseEvent e) {
                 mX = e.getX();
                 mY = e.getY();
-                input(e.getButton());
+                mouseInput(e.getButton());
             }
 
             @Override
             public void mouseReleased(java.awt.event.MouseEvent e) {
                 mX = e.getX();
                 mY = e.getY();
-                if (Updater.editor) input(-e.getButton());
+                if (Updater.editor) mouseInput(-e.getButton());
                 else if (mode == e.getButton()) mode = -1;
             }
 
@@ -60,14 +60,14 @@ public class Display extends JPanel {
             public void mouseDragged(MouseEvent e) {
                 mX = e.getX();
                 mY = e.getY();
-                if (Updater.editor) input(0);
+                if (Updater.editor) mouseInput(0);
             }
 
             @Override
             public void mouseMoved(MouseEvent e) {
                 mX = e.getX();
                 mY = e.getY();
-                input(0);
+                mouseInput(0);
             }
 
             @Override
@@ -140,6 +140,9 @@ public class Display extends JPanel {
         g2d.setColor(Color.BLACK);
     }
 
+    private void mouseInput(int mode){
+        if (focus) input(mode);
+    }
     private void input(int mode){
         if (this.mode != mode || mode <= 0 || Updater.editor) {
             this.mode = mode;
@@ -147,5 +150,15 @@ public class Display extends JPanel {
                 input.input(mode, (int) (mX - Settings.centerX + Global.camera.x), (int) (mY - Settings.centerY + Global.camera.y));
             }
         }
+    }
+
+    @Override
+    public void focusGained(FocusEvent e) {
+        input.onFocus(true);
+    }
+
+    @Override
+    public void focusLost(FocusEvent e) {
+        input.onFocus(false);
     }
 }
