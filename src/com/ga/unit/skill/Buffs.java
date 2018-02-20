@@ -1,7 +1,9 @@
 package com.ga.unit.skill;
 
 import com.ga.game.Sound;
-import com.ga.map.*;
+import com.ga.map.Global;
+import com.ga.map.Shader;
+import com.ga.map.Terrain;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
@@ -17,7 +19,7 @@ import java.util.Arrays;
  * Created by Ga on 9/1/2016. asd
  */
 public enum Buffs {
-    Banishment(10,new Tags(){{
+    Banishment(5,new Tags(){{
         add(Tag.Curse);
     }}){ Buff makeLocal() {
         return new Buff(4) {
@@ -72,7 +74,7 @@ public enum Buffs {
             }
         };
     }},
-    Windwalk(5,new Tags(){{
+    Windwalk(2,new Tags(){{
         add(Tag.Enchant);
         add(Tag.Air);
     }}){ Buff makeLocal() {
@@ -95,7 +97,7 @@ public enum Buffs {
             }
         };
     }},
-    Frenzy(5,new Tags(){{
+    Haste(3,new Tags(){{
         add(Tag.Enchant);
         add(Tag.Strength);
     }}){ Buff makeLocal() {
@@ -116,15 +118,15 @@ public enum Buffs {
             }
         };
     }},
-    Rejuvenate(5,new Tags(){{
+    Rejuvenate(2,new Tags(){{
         add(Tag.Enchant);
         add(Tag.Mutation);
     }}){ Buff makeLocal(){
-        return new Buff(20){
+        return new Buff(10){
             private int tick = 0;
             public void onSet(){
                 time += level*2;
-                var = Math.max(1,10-level);
+                var = Math.max(1,100/level);
             }
             public boolean update(){
                 if (tick++ % var == 0) host.get("Stamina").add(1, false);
@@ -132,7 +134,7 @@ public enum Buffs {
             }
         };
     }},
-    Cleave(5,new Tags(){{
+    Cleave(1,new Tags(){{
         add(Tag.Enchant);
         add(Tag.Strength);
     }}){ Buff makeLocal(){
@@ -167,7 +169,7 @@ public enum Buffs {
             }
         };
     }},
-    Hunger(2,new Tags(){{
+    Hunger(1,new Tags(){{
     }}){ Buff makeLocal(){
         return new Buff(125) {
             public void onFinish(){
@@ -203,7 +205,7 @@ public enum Buffs {
             }
         };
     }},
-    Bleed(5,new Tags(){{
+    Bleed(1,new Tags(){{
         add(Tag.Curse);
     }}){ Buff makeLocal(){
         return new Buff(300) {
@@ -225,9 +227,9 @@ public enum Buffs {
             }
         };
     }},
-    Evade(5,new Tags(){{
+    Evade(2,new Tags(){{
         add(Tag.Enchant);
-        add(Tag.Dexterity);
+        add(Tag.Strength);
     }}){ Buff makeLocal(){
         return new Buff(2) {
             public void onSet() {
@@ -273,12 +275,15 @@ public enum Buffs {
             }
             public boolean update() {
                 Particle.sparkle(host.map, "Glare", host.getDepth(),host.getRandomPoint(),20+host.getSize(),4);
-                if (var++ % 40 == 0) host.get("Stamina").add(-1,false);
+                if (var++ % (Math.max(1, 8-level)*10) == 0){
+                    host.stateSet(Actions.Hit);
+                    host.get("Stamina").add(-1,false);
+                }
                 return super.update();
             }
         };
     }},
-    Burn(3,new Tags(){{
+    Burn(1,new Tags(){{
         add(Tag.Curse);
         add(Tag.Fire);
     }}){ Buff makeLocal(){
@@ -308,8 +313,7 @@ public enum Buffs {
             }
         };
     }},
-    Freeze(3,new Tags(){{
-        add(Tag.Enchant);
+    Freeze(1,new Tags(){{
         add(Tag.Curse);
         add(Tag.Ice);
     }}){ Buff makeLocal(){
@@ -398,7 +402,7 @@ public enum Buffs {
             }
         };
     }},
-    Mark(7,new Tags(){{
+    Mark(2,new Tags(){{
         add(Tag.Curse);
     }}){ Buff makeLocal(){
         return new Buff(4) {
@@ -428,7 +432,7 @@ public enum Buffs {
             }
         };
     }},
-    Poison(7,new Tags(){{
+    Poison(3,new Tags(){{
         add(Tag.Curse);
         add(Tag.Mutation);
     }}){ Buff makeLocal(){
@@ -459,7 +463,7 @@ public enum Buffs {
             }
         };
     }},
-    Glacialwalk(5,new Tags(){{
+    Glacialwalk(2,new Tags(){{
         add(Tag.Enchant);
         add(Tag.Ice);
     }}){ Buff makeLocal(){
@@ -503,9 +507,9 @@ public enum Buffs {
             }
         };
     }},
-    Stun(8,new Tags(){{
+    Stun(3,new Tags(){{
         add(Tag.Curse);
-        add(Tag.Dexterity);
+        add(Tag.Strength);
     }}){ Buff makeLocal(){
         return new Buff(3) {
             public void onSet() {
@@ -527,7 +531,7 @@ public enum Buffs {
             }
         };
     }},
-    Slowfall(2,new Tags(){{
+    Slowfall(1,new Tags(){{
         add(Tag.Enchant);
     }}){ Buff makeLocal(){
         return new Buff(4) {

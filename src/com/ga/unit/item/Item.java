@@ -23,9 +23,12 @@ import java.util.Random;
  */
 public class Item extends Prop {
     public enum ItemType {
-        Sword(Actions.Slash, 3, .8f, 4, "swing_knife"),
-        Spear(Actions.Thrust, 1, .6f, 0, "swing_silent"),
-        Knife(Actions.Slash, 3, .3f, 2, "swing_knife"),
+        Sword(Actions.Slash, 3, .8f, 4, "swing_knife"){
+            public boolean isBlunt(){return false;}},
+        Spear(Actions.Thrust, 1, .6f, 0, "swing_silent"){
+            public boolean isBlunt(){return false;}},
+        Knife(Actions.Slash, 3, .3f, 2, "swing_knife"){
+            public boolean isBlunt(){return false;}},
         Swinging(Actions.Slash, 3, 1, 10, "swing_silent"),
         Bashing(Actions.Slash, 1, 1, 10, "swing_silent"),
         Armor(Actions.Rest, 1, 1, 10, "swing_normal"), Scroll(Actions.Guard, 1, 0, 0, "scroll"),
@@ -42,6 +45,9 @@ public class Item extends Prop {
             this.weightMultiplier = weightMod;
             this.durabilityAddition = durabilityMod;
             this.sound = sound;
+        }
+        public boolean isBlunt(){
+            return true;
         }
     }
     public enum Material{
@@ -107,12 +113,7 @@ public class Item extends Prop {
             }
         },
         Other(0,0,0,1,0),
-        Flesh(.1f,0,0,1,0){
-            public void onSet(Item host){
-                host.tags.add(Tag.Curse);
-                host.tags.add(Tag.Mutation);
-            }
-        },
+        Flesh(.1f,0,0,1,0),
         Stone(.3f,6,5,1.2f,0,new Color(107, 107, 107,255));
         int weight, hardness, value;
         Color color;
@@ -354,7 +355,7 @@ public class Item extends Prop {
         boolean special = smod != SpecialtyMod.None;
         if (special && smod != SpecialtyMod.Cursed) r += 2000 + 1000*adverb;
         if (emod != null && !isCursed()){
-            r += emod.value*2000*ademod.level;
+            r += Math.pow(2,emod.value)*800*ademod.level;
         }
         if (isCursed() || smod == SpecialtyMod.Cursed) r = Math.max(100,r-500);
         return (int) r;
@@ -433,6 +434,9 @@ public class Item extends Prop {
         }
         return false;
     }
+    public int getDurability(){
+        return durability;
+    }
     public int getUses(){
         return uses;
     }
@@ -461,6 +465,7 @@ public class Item extends Prop {
     }
     public String getDescription() {
         String r = "Weight: "+weight+"\n";
+        if (encumbrance > 0) r += "Encumberance: "+encumbrance+"\n";
         r += "Uses: "+uses+"/"+durability+"\n";
         r += "Material: "+material.name()+"\n";
         if (tags.size() > 0) r += "Catalyzers: "+tags.toString()+"\n";
@@ -477,7 +482,7 @@ public class Item extends Prop {
         return r;
     }
     public int getDamage() {
-        return weight;
+        return type.isBlunt()?weight:weight*2;
     }
     public Line getLine(){
         float len = image.getSize().x * dir + 4;

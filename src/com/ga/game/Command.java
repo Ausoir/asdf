@@ -29,7 +29,6 @@ public class Command {
                 else if (cmd[0].equals("seed")) host.weapon.seed = Integer.parseInt(cmd[1]);
                 else if (cmd[0].equals("time")) Global.time += Integer.parseInt(cmd[1]);
                 else if (cmd[0].equals("stat")) host.get(cmd[1]).addTotal(Integer.parseInt(cmd[2]));
-                else if (cmd[0].equals("gold")) host.gold = Integer.parseInt(cmd[1]);
                 else if (cmd[0].equals("unit")){
                     Prop unit = Stock.getByName(host.map, cmd[1], -1);
                     unit.start();
@@ -41,7 +40,7 @@ public class Command {
                     item.start();
                     host.setWeapon(item);
                 }
-                else if (cmd[0].equals("build")) new Generator(host.map, 99).generateBuilding(cmd[1], host.pos, 1);
+                else if (cmd[0].equals("build")) new Generator(host.map, 99).generateBuilding(cmd[1], host.pos.getAdd(host.target), 1);
                 else if (cmd[0].equals("tp")) host.pos.add(Integer.parseInt(cmd[1].split(",")[0]),Integer.parseInt(cmd[1].split(",")[1]));
                 else if (cmd[0].equals("to")){
                     host.lastLand = new Line();
@@ -60,11 +59,6 @@ public class Command {
                     for (Object terrain : host.map.terrains.entrySet()) ((Terrain)terrain).render();
                 }
                 else if (p.equals("test")){
-                    Player unit = (Player) Stock.Player.create(host.map,0,0);
-                    unit.pos.set(host.pos);
-                    unit.save = false;
-                    new PlayerInput(unit);
-                    unit.start();
                 }
                 else if (p.equals("editor")){
                     Global.display.input = new EditorInput();

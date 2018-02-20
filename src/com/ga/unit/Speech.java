@@ -1,13 +1,12 @@
 package com.ga.unit;
 
 import com.ga.game.FileManager;
+import com.ga.game.Panel;
 import com.ga.map.Drawable;
 import com.ga.map.Global;
-import com.ga.map.Updater;
 import com.ga.tool.P;
 import com.ga.tool.Timer;
 
-import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,45 +15,36 @@ import java.util.HashMap;
  * Created by Ga on 7/31/2016. asd
  */
 public class Speech extends Drawable {
+    static Color forecolor = new Color(0,0,0,255);
     private Unit host;
     private ArrayList<String> msg = new ArrayList<>();
     private Timer timer = new Timer(-1,false);
-    String recent = "";
     private Color color = new Color(255,255,255,150);
-    private JTextArea textarea;
+    boolean visible = false;
+    String text = "";
     Speech(Unit host){
         this.host = host;
         host.map.updater.addQueue.add(this);
-        textarea = new JTextArea();
-        textarea.setFont(Global.font);
-        textarea.setBackground(color);
-        textarea.setLineWrap(true);
-        textarea.setWrapStyleWord(true);
-        Global.display.add(textarea);
-        textarea.setMargin(new Insets(10,10,10,10));
-        textarea.setEditable(false);
-        textarea.setVisible(false);
         setDepth(15);
     }
     public void remove(){
         host.map.updater.remove(this);
-        Global.display.remove(textarea);
     }
     public void draw(Graphics2D g){
-        if (textarea.isVisible()) {
-            P t = host.pos.getAdd(0,-150);
-            int width = Math.min(g.getFontMetrics(Global.font).stringWidth(textarea.getText()) + 30, 240);
-            int height = (int) textarea.getPreferredSize().getHeight();
-            float rx = Global.rel.x, ry = Global.rel.y;
-            textarea.setBounds((int) (t.x - (width / 2) + rx), (int) (t.y - height + ry), width, height);
-            g.setColor(color);
+        if (visible) {
+            int width = g.getFontMetrics(Global.font).stringWidth(text);
+            int x = host.pos.x()+Global.rel.x(), y = host.pos.y()+Global.rel.y()-150;
             int[] xp = new int[]{
-                    (int) (-10 + t.x + rx), (int) (10 + t.x + rx), (int) (0 + t.x + rx)
+                    10 + x, x, -10 + x, x-width/2-10, x-width/2-10, x+width/2+10, x+width/2+10
             };
             int[] yp = new int[]{
-                    (int) (t.y + ry), (int) (t.y + ry), (int) (t.y + ry) + 40
+                    y, y + 40, y, y, y-40, y-40, y
             };
+            g.setColor(color);
             g.fillPolygon(xp, yp, xp.length);
+            g.setColor(forecolor);
+            g.setFont(Global.font);
+            g.drawString(text, x-width/2, y-15);
         }
     }
     public void say(String p){
@@ -62,18 +52,18 @@ public class Speech extends Drawable {
         if (p.startsWith("@")) t = getRandom(p.substring(1));
         else t = p;
         if (!t.equals("")) {
-            if (!recent.equals(p)) {
-                recent = p;
+            if (!text.equals(p)) {
+                text = p;
                 msg.clear();
-                textarea.setVisible(true);
                 msg.add(t);
-                textarea.setText(t);
+                visible = true;
             }
             timer.set(120 + t.length());
 
+            int range = p.endsWith("!!")?2400:600;
             for (Unit i : host.map.updater.unitsLoaded){
                 if (i != host && i.faction != host.faction) {
-                    if (Math.abs(i.pos.x - host.pos.x) < 600 && Math.abs(i.pos.y - host.pos.y) < 200) {
+                    if (Math.abs(i.pos.x - host.pos.x) < range && Math.abs(i.pos.y - host.pos.y) < range/3) {
                         i.hear(host, p.toLowerCase());
                     }
                 }
@@ -90,16 +80,12 @@ public class Speech extends Drawable {
         return results.get(Global.r.nextInt(results.size()));
     }
 
-    public JTextArea getTextarea() {
-        return textarea;
-    }
-
     public void update() {
         if (msg.size() > 0) {
             if (timer.update()) {
                 msg.remove(0);
-                textarea.setVisible(false);
-                recent = "";
+                visible = false;
+                text = "";
             }
         }
     }

@@ -15,7 +15,7 @@ bleg:Pants
 bhead:Head
 mem:Intelligence
 StrengthDsc:Decreases weight penalties by 1, which reduces slow effects from heavy equipment. Also increases potency of all skills involving Strength.
-DexterityDsc:Increases maximum encumbrance by 1.
+AgilityDsc:Increases maximum encumbrance by 1.
 AgilityDsc:Increases damage and potency of all skills involving agility.
 StaminaDsc:Increases maximum Stamina by 1. Stamina recovers usually by resting.
 IntelligenceDsc:Increases Intelligence capacity by 1, which lets you progress in 1 extra expertise level from textbooks and learn 1 additional skill from manuals.

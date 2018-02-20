@@ -1,7 +1,6 @@
 package com.ga.game;
 
 import com.ga.map.Global;
-import com.ga.map.Picture;
 import com.ga.map.Updater;
 
 import javax.swing.*;
@@ -79,11 +78,7 @@ public class Display extends JPanel implements FocusListener {
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                int keycode = e.getKeyCode();
-                if (keycode == Keybinding.get("ESC")) System.exit(1);
-                else if (keycode == Keybinding.get("ENTER")) chatbox.requestFocus();
-                else if (keycode == Keybinding.get("TAB")) menu.showMenu();
-                else input(keycode);
+                input(e.getKeyCode());
             }
 
             @Override
@@ -104,8 +99,15 @@ public class Display extends JPanel implements FocusListener {
         chatbox.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == Keybinding.get("ENTER")) chat();
-                else if (e.getKeyCode() == Keybinding.get("UP")) chatbox.setText(lastChat);
+                String key = input.getKeyMap(e.getKeyCode());
+                if (key != null) {
+                    if (key.equals("_SAY")) chat();
+                    else if (key.equals("_CTRL")) chatbox.setText(lastChat);
+                    else if (key.equals("_EXIT")){
+                        chatbox.setText("");
+                        chat();
+                    }
+                }
             }
         });
         add(chatbox);
@@ -136,6 +138,7 @@ public class Display extends JPanel implements FocusListener {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g.create();
         g2d.addRenderingHints(new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY));
+        g2d.addRenderingHints(new RenderingHints(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_GASP));
         Global.player.map.updater.draw(g2d);
         g2d.setColor(Color.BLACK);
     }

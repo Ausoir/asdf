@@ -7,4 +7,5 @@ public interface Input {
     void input(int mode, int x, int y);
     void chat(String p, int x, int y);
     void onFocus(boolean focus);
+    String getKeyMap(int p);
 }

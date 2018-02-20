@@ -83,7 +83,7 @@ public class BodyHumanoid extends Body {
     }
 
     public boolean update() {
-        if (host.state == Actions.Right)
+        if (host.state == Actions.Right || host.state == Actions.Left)
             if ((current == 0 || current == 2) && frame.over()) ((Man)host).stepSound();
         else if (host.state == Actions.Sprint)
             if ((current == 1 || current == 3) && frame.over()) ((Man)host).stepSound();

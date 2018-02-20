@@ -9,57 +9,113 @@ import com.ga.unit.Prop;
 import com.ga.unit.Stock;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 
 /**
  * Created by ga on 5/28/17. asd
  */
 public class Generator {
+    private static HashMap<String, Integer> buildings = new HashMap<>();
     private Map map;
     public Generator(Map map, int next){
         this.map = map;
         if (next != -1) TerrainTrail.id = next;
     }
-    private void generateFoundation(int id, P mapSize, P point, float lastY, String[] texture){
-        int width = (int) Global.clamp((float) Math.abs(mapSize.x*(Creation.r.nextGaussian()*.4f)),100,mapSize.x*(7f/8));
-        P pt1 = new P(Math.max(600+Creation.r.nextInt(300), point.x-width),point.y);
-        P pt2 = new P(Math.min(mapSize.x-600-Creation.r.nextInt(300), point.x+width),point.y);
-        int finalWidth = (int) (pt2.x-pt1.x);
-        if (finalWidth <= 0) return;
-        P pt3 = new P(pt2.x,mapSize.y-500);
-        P pt4 = new P(pt1.x,mapSize.y-500);
-        int midWidth = (int) ((lastY-point.y)*(Creation.r.nextFloat()*.3f+.5f))*2;
-        if (finalWidth-midWidth*2 > 150 && Creation.r.nextInt(5) != 0){
-            int mid = Creation.r.nextInt(finalWidth-midWidth*2)+midWidth;
-            P pt11 = new P(pt1.x+(mid-midWidth),point.y);
-            P pt12 = new P(pt1.x+(mid+midWidth),point.y);
-            float drop = lastY-point.y;
-            if (Creation.r.nextBoolean()){
-                pt11.y += drop;
-                pt1.y += drop;
-            } else {
-                pt12.y += drop;
-                pt2.y += drop;
+    public static void init(){
+        for (String[] i : FileManager.fileCache.get("map")){
+            if (i[1].startsWith("Data/map/building")) {
+                buildings.put(i[0], Integer.valueOf(FileManager.read(i[1].substring(5)).split("%")[0].split(";",-1)[2].split(",")[0]));
             }
-            map.landRaw.add(new Line(pt1, pt11, id, 1, id));
-            map.landRaw.add(new Line(pt11, pt12, id, 1, id));
-            map.landRaw.add(new Line(pt12, pt2, id, 1, id));
-        } else map.landRaw.add(new Line(pt1, pt2, id, 1, id));
-        map.landRaw.add(new Line(pt2, pt3, id, 0, id));
-        map.landRaw.add(new Line(pt3, pt4, id, 0, id));
-        map.landRaw.add(new Line(pt4, pt1, id, 0, id));
-        map.formTextures.put(id, id+"&"+texture[Creation.r.nextInt(texture.length)]);
+        }
     }
-    public void generateBuilding(String p, P pos, int bid){
-        Map blueprint = new Map("building/"+p);
+    private void generateFoundations(int max, P mapSize, float maxY, String texture){
+        float lastY = maxY;
+        for (int i=0;i<max;i++) {
+            int yRise = Creation.r.nextInt(400)+240;
+            P point = new P(Creation.r.nextInt((int) (map.size.x*(3f/5)))+(map.size.x*(1f/5)),lastY-yRise);
+            int width = (int) Global.clamp((float) Math.abs(mapSize.x * (Creation.r.nextGaussian() * .4f)), 120, mapSize.x * (7f / 8));
+            P pt1 = new P(Math.max(0, point.x - width), point.y);
+            P pt2 = new P(Math.min(mapSize.x, point.x + width), point.y);
+            int finalWidth = (int) (pt2.x - pt1.x);
+            if (finalWidth <= 360) {
+                pt1.x = Math.max(pt1.x-360, 0);
+                pt2.x = Math.min(pt2.x+360,mapSize.x-360);
+            }
+            int midWidth = (int) (yRise * .2f);
+            int mid = (int) (pt1.x + finalWidth/2 + Creation.r.nextInt(midWidth*2) - midWidth);
+            P pt11 = new P(mid-midWidth, point.y);
+            P pt12 = new P(mid+midWidth, point.y);
+            P lowPt1, lowPt2;
+            if (Creation.r.nextBoolean()) {
+                lowPt1 = pt1;
+                lowPt2 = pt11;
+            } else {
+                lowPt1 = pt12;
+                lowPt2 = pt2;
+            }
+            lowPt1.y += yRise/2;
+            lowPt2.y += yRise/2;
+            int id = max-i;
+            int ladderX = Creation.r.nextInt(lowPt2.x()-lowPt1.x()-80)+lowPt1.x()+40;
+            float ladderDepth = id+.01f;
+            Line ground = map.checkLand(new Line(new P(ladderX, lowPt1.y), new P(ladderX, lowPt1.y+1200)), id);
+            if (ground != null) {
+                for (int y = lowPt1.y()+40; y < (int) ground.getCrossPointY(ladderX); y += 40) {
+                    TerrainTrail ladder = new TerrainTrail(map, new P(ladderX - 40, y-20));
+                    ladder.move(80, 0);
+                    ladder.move(0, 20);
+                    ladder.move(-80, 0);
+                    ladder.finish(ladderDepth + "&" + texture);
+                    ladder.climbable();
+                    ladderDepth += .01f;
+                }
+            }
+            TerrainTrail foundation = new TerrainTrail(map, pt1);
+            foundation.add(pt11);
+            foundation.add(pt12);
+            foundation.add(pt2);
+            foundation.add(new P(pt2.x, maxY));
+            foundation.add(new P(pt1.x, maxY));
+            foundation.finish(id+"&"+texture);
+            lastY = point.y()-yRise;
+        }
+    }
+    private int generateBuildings(String[] p, Line land, int bid) {
+        int estate = land.ptd.x() - land.pt.x();
+        ArrayList<String[]> possibleBuildings = new ArrayList<>();
+        ArrayList<String[]> resultBuildings = new ArrayList<>();
+        for (String i : p) {
+            int size = buildings.get(i);
+            if (size <= estate) possibleBuildings.add(new String[]{i, size + ""});
+        }
+        if (possibleBuildings.size() > 0) {
+            while (true) {
+                String[] building = possibleBuildings.get(Creation.r.nextInt(possibleBuildings.size()));
+                if (estate < Integer.parseInt(building[1])) break;
+                estate -= Integer.parseInt(building[1]);
+                resultBuildings.add(building);
+            }
+            int gap = estate / resultBuildings.size();
+            int cPosX = land.pt.x();
+            for (String[] i : resultBuildings) {
+                cPosX += Creation.r.nextInt(gap) + Integer.parseInt(i[1])/2;
+                bid = generateBuilding(i[0], new P(cPosX, land.getCrossPointY(cPosX)), bid) + 1;
+                cPosX += Integer.parseInt(i[1])/2;
+            }
+        }
+        return bid;
+    }
+    public int generateBuilding(String building, P pos, int bid){
+        Map blueprint = new Map("building/" + building);
         blueprint.start();
 
-        float depth = map.checkLand(new Line(pos.x, pos.y-4, pos.x, pos.y+600)).depth;
-        P offset = new P(-blueprint.size.x/2, -blueprint.size.y+24);
+        float depth = map.checkLand(new Line(pos.x, pos.y - 4, pos.x, pos.y + 600)).depth;
+        P offset = new P(-blueprint.size.x / 2, -blueprint.size.y + 24);
         blueprint.adjust(offset.getAdd(pos));
         blueprint.setTexture();
         int next = map.getNextTerrain();
-        for (Line i : blueprint.landRaw){
+        for (Line i : blueprint.landRaw) {
             i.tid += next;
             i.depth = depth - .1f + i.depth * .01f + .001f;
             map.landRaw.add(i);
@@ -71,7 +127,7 @@ public class Generator {
             String newTexture = (String) pair.getValue();
             float newDepth = Float.parseFloat(newTexture.substring(0, newTexture.indexOf("&")));
             newTexture = (depth - .1f + newDepth * .01f) + newTexture.substring(newTexture.indexOf("&"));
-            map.formTextures.put(((int) pair.getKey())+next, newTexture);
+            map.formTextures.put(((int) pair.getKey()) + next, newTexture);
         }
         for (java.util.Map.Entry pair : blueprint.terrains.entrySet()) {
             Terrain terrain = (Terrain) pair.getValue();
@@ -81,74 +137,74 @@ public class Generator {
             terrain.start();
         }
         blueprint.updater.adjust(offset.getAdd(pos));
-        for (Observer i : blueprint.updater.addQueue){
-            if (i instanceof Prop){
+        int highestBid = bid;
+        for (Observer i : blueprint.updater.addQueue) {
+            if (i instanceof Prop) {
                 Prop prop = (Prop) i;
                 prop.manualDepth = true;
                 prop.map = map;
                 prop.start();
-                Line closest = blueprint.checkLand(new Line(prop.pos.getAdd(0,-4), new P(prop.pos.x, prop.pos.y+600)));
+                Line closest = blueprint.checkLand(new Line(prop.pos.getAdd(0, -4), new P(prop.pos.x, prop.pos.y + 600)));
                 if (closest != null) {
                     prop.lastLand = closest;
                     prop.setDepth(depth - .1f + closest.depth * .01f);
                 }
-                if (((Prop) i).factoryId == Stock.Spawn.ordinal()){
-                    ((Prop) i).subId = 2;
-                    ((Prop) i).seed = bid;
-                } else if (((Prop) i).factoryId == Stock.Travel.ordinal()){
-                    ((Prop) i).name = "B"+map.name+"-"+bid;
-                    ((Prop) i).seed = 1;
-                    Map house = new Map("building/In_"+p);
+                if (prop.factoryId == Stock.Spawn.ordinal()) {
+                    prop.subId = 2;
+                    prop.seed = bid+prop.seed-1;
+                    highestBid = Math.max(highestBid, prop.seed);
+                } else if (prop.factoryId == Stock.Travel.ordinal()) {
+                    prop.name = "B" + map.name + "-" + bid;
+                    Map house = new Map("building/In_" + building);
                     house.start();
                     house.updater.processQueue();
-                    for (Prop ob : house.updater.props){
-                        if (ob.factoryId == Stock.Travel.ordinal()){
+                    for (Prop ob : house.updater.props) {
+                        if (ob.factoryId == Stock.Travel.ordinal()) {
                             ob.name = map.name;
-                            ob.seed = bid;
+                            ob.seed = bid+ob.seed-1;
                         }
                     }
-                    FileManager.saveMap("B"+map.name+"-"+bid, house);
+                    FileManager.saveMap("B" + map.name + "-" + bid, house);
                 }
             }
         }
         blueprint.updater.addQueue.clear();
+        return highestBid;
+    }
+    private float lowestY(){
+        float r = 0;
+        for (Line i : map.landRaw) {
+            if (i.clockwise() && i.pt.y > r && !i.vertical()) r = i.pt.y;
+        }
+        return r;
     }
     void generateTown(){
-        map.size = new P(Creation.r.nextInt(10000)+5000, Creation.r.nextInt(4500)+1500);
+        map.size = new P(Creation.r.nextInt(4000)+8000, Creation.r.nextInt(4500)+1500);
         String[] landTexture = new String[][]{
                 new String[]{"dirt&grass","dirt&road_unpaved","dirt&road_normal","dirt&road_highway"},
                 new String[]{"dirt&grass","dirt&road_unpaved","dirt&road_normal","dirt&road_highway"}}[Creation.r.nextInt(2)];
-        String[] foundationTexture = new String[][]{
-                new String[]{landTexture[0], landTexture[1], "brick&basic"},
-                new String[]{landTexture[0], landTexture[1], "concrete&basic"},
-                new String[]{landTexture[0], landTexture[1], "steel&road_unpaved", "concrete&road_unpaved"}
-        }[Creation.r.nextInt(3)];
-        float lastY = map.size.y-700-Creation.r.nextInt(160);
-        int max = Creation.r.nextInt(4)+1;
-        for (int i=0;i<max;i++){
-            P pos = new P(Creation.r.nextInt((int) (map.size.x*(4f/5)))+(map.size.x*(1f/5)),lastY-(Creation.r.nextInt(360)+80));
-            generateFoundation(max-i, map.size, pos, lastY, foundationTexture);
-            lastY = pos.y;
-        }
-        map.normalize(800,1200);
-        map.adjust(new P(0,400));
-        generateFloor(max+1, map.size, Creation.r.nextInt(5) + 1, 20, new String[]{landTexture[Creation.r.nextInt(landTexture.length)]});
+        String foundationTexture = new String[]{"brick&basic", "whitebrick&basic", "concrete&basic", "concrete&road_unpaved", "brick&road_unpaved", "whitebrick&road_unpaved"}
+            [Creation.r.nextInt(6)];
+        int max = Creation.r.nextInt(4)+2;
+        generateFloor(max+1, map.size, Creation.r.nextInt(12)*200+200, 16, new String[]{landTexture[Creation.r.nextInt(landTexture.length)]});
+        makeEdgeSpawns(map.size);
+        generateFoundations(max, map.size, lowestY()+24, foundationTexture);
+        map.normalize(0,1600);
+        map.size.y -= 800;
         int bid=1;
-        for (int i=0;i<map.landRaw.size();i++){
-            Line l = map.landRaw.get(i);
+        ArrayList<Line> beforeBuilding = (ArrayList<Line>) map.landRaw.clone();
+        for (Line l : beforeBuilding) {
             if (l.opt > 0 && l.tid >= 0 && l.clockwise() && Math.abs(l.getSlope()) < .1f) {
                 P mid = l.getMidpoint();
-                if (map.checkLand(new Line(mid.x, 0, mid.x, mid.y-1), l.depth) == null) {
+                if (map.checkLand(new Line(mid.x, 0, mid.x, mid.y - 1), l.depth) == null) {
                     if (Creation.r.nextInt(3) == 0) {
                         for (int ii = 0; ii < Creation.r.nextInt(9); ii++) map.placeProp(l, "Barrel=.5,Crate=1", -1);
                         for (int ii = 0; ii < Creation.r.nextInt(9); ii++) {
 //                          map.placeProp(l, "Resident=.4", -1);
                         }
                     }
-                    if (l.getSlope() == 0 && l.getWidth() > 1600) {
-                        generateBuilding("Restaurant", mid, bid);
-                        bid++;
-                        System.out.println("Generated");
+                    if (l.getSlope() < .01f) {
+                        bid = generateBuildings(new String[]{"Restaurant","Inn","Shop","Insurance","Armory","Hospital","Clothier","Safehouse","School"}, l, bid) + 1;
                     }
                 }
             }
@@ -209,26 +265,28 @@ public class Generator {
         door.pos.set(doorPos);
 //        Stock.Exit.create(map, returnDoorSeed).pos.set(doorPos.x,doorPos.y);
         Stock.Spawn.create(map, -1,returnDoorSeed).start().pos.set(doorPos.x,doorPos.y);
-        map.normalize(800,400);
+        map.normalize(800,800);
         generateBlocker(2,trail.terrain);
     }
     private void makeEdgeSpawns(P mapSize){
         Line leftSpawn = map.checkLand(new Line(mapSize.x-24,0,mapSize.x-24,mapSize.y));
-        Stock.Spawn.create(map, -1, 0).start().pos.set(mapSize.x-24,leftSpawn.getCrossPointY(leftSpawn.ptd.x-24)-Math.abs(leftSpawn.getSlope())-Settings.gravity*2-1);
+        Stock.Spawn.create(map, -1, 0).start().pos.set(mapSize.x-24,leftSpawn.getCrossPointY(leftSpawn.ptd.x-24)-Math.abs(leftSpawn.getSlope())-Settings.gravity*2-8);
         Line rightSpawn = map.checkLand(new Line(24,0,24,mapSize.y));
-        Stock.Spawn.create(map, -1, 1).start().pos.set(24,rightSpawn.getCrossPointY(24)-Math.abs(rightSpawn.getSlope())-Settings.gravity*2-1);
+        Stock.Spawn.create(map, -1, 1).start().pos.set(24,rightSpawn.getCrossPointY(24)-Math.abs(rightSpawn.getSlope())-Settings.gravity*2-8);
     }
-    void generateLand(int depth, P mapSize){
-        P start = new P(-64, Creation.r.nextInt(mapSize.y()-128)+64);
-        P end = new P(mapSize.x+64, Creation.r.nextInt(mapSize.y()-128)+64);
+    void generateLand(){
+        map.size = new P(Creation.r.nextInt(4000)+2000, Creation.r.nextInt(4000)+2000);
+        int depth = 4;
+        P start = new P(-64, Creation.r.nextInt(map.size.y()-128)+64);
+        P end = new P(map.size.x+64, Creation.r.nextInt(map.size.y()-128)+64);
         TerrainTrail trail = new TerrainTrail(map, start);
-        int preX = Creation.r.nextInt((int) (mapSize.x/8))+300;
-        int postX = Creation.r.nextInt((int) (mapSize.x/8))+300;
+        int preX = Creation.r.nextInt((int) (map.size.x/8))+300;
+        int postX = Creation.r.nextInt((int) (map.size.x/8))+300;
         trail.move(preX,0);
         Line first = new Line(trail.last, end.getAdd(-postX,0));
         ArrayList<Line> total = new ArrayList<>();
         total.add(first);
-        divideLand(total, 0, 7);
+        divideLand(total, 0, 8);
         float highestY = 0;
         for (Line i : total){
             trail.add(i);
@@ -236,10 +294,13 @@ public class Generator {
             if (i.ptd.y > highestY) highestY = i.ptd.y;
         }
         trail.move(postX,0);
-        trail.add(new P(trail.last.x, Math.max(highestY+64, mapSize.y+64)));
-        trail.add(new P(start.x, Math.max(highestY+64, mapSize.y+64)));
+        trail.add(new P(trail.last.x, highestY+400));
+        trail.add(new P(start.x, highestY+400));
+        trail.setOpt(1);
         trail.finish(depth+"&dirt&grass"+(Creation.r.nextBoolean()?"&Rock=.1,Bush=.2,Weed=.4,Tree=1":""));
-        makeEdgeSpawns(mapSize);
+        makeEdgeSpawns(map.size);
+        map.normalize(0,800);
+        map.size.y -= 400;
     }
     void divideLand(ArrayList<Line> total, int current, int max){
         if (current >= max) return;
@@ -250,7 +311,7 @@ public class Generator {
         Line two = new Line(mid, last.ptd);
         float shortest = last.getLength()/(8*(current+1));
         float atan = last.getAtan()+1.57f;
-        float rand = Global.rng(1);
+        float rand = Global.clamp((float) Creation.r.nextGaussian()/2,-1,1);
         mid.add(Global.cos(atan)*shortest*rand, Global.sin(atan)*shortest*rand);
         total.add(one);
         divideLand(total, ++current, max);
@@ -265,7 +326,7 @@ public class Generator {
             int randX = (Creation.r.nextInt(240) + 20) * (Creation.r.nextInt(randomness)+1);
             int randY = (Creation.r.nextInt(varianceY) - (varianceY/2)) * Creation.r.nextInt(randomness);
             trail.add(trail.last.x+randX, horizon+randY);
-            if (trail.last.x+(200*randomness*.5f) > mapSize.x) trail.last.x = mapSize.x;
+            if (trail.last.x+randomness > mapSize.x) trail.last.x = mapSize.x;
         }
         trail.last.y = horizon;
         trail.add(trail.last.x, mapSize.y);
@@ -306,9 +367,9 @@ public class Generator {
             i = (Line) it.next();
             if (i.tid == p) it.remove();
         }
-        map.landRaw.add(new Line(-64,map.size.y+64, -64,-64, p, 1, depth));
-        map.landRaw.add(new Line(-64,-64, map.size.x+64,-64, p, 1, depth));
-        map.landRaw.add(new Line(map.size.x+64,-64, map.size.x+64,map.size.y+64, p, 1, depth));
-        map.landRaw.add(new Line(map.size.x+64,map.size.y+64, -64,map.size.y+64, p, 1, depth));
+        map.landRaw.add(new Line(-64,map.size.y+64, -64,-64, p, 0, depth));
+        map.landRaw.add(new Line(-64,-64, map.size.x+64,-64, p, 0, depth));
+        map.landRaw.add(new Line(map.size.x+64,-64, map.size.x+64,map.size.y+64, p, 0, depth));
+        map.landRaw.add(new Line(map.size.x+64,map.size.y+64, -64,map.size.y+64, p, 0, depth));
     }
 }

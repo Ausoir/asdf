@@ -1,14 +1,18 @@
 package com.ga.map;
 
+import com.ga.tool.Line;
+import com.ga.tool.P;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 /**
  * Created by Ga on 1/14/2017. asd
  */
 public enum Shader{
     None(new ShaderRenderer(){
-        void postRender(BufferedImage image, int x1, int x2, int y1, int y2, float slope){}
+        public void postRender(BufferedImage image, int x1, int x2, int y1, int y2, float slope){}
     }),
     XYLinearGradient(new ShaderRenderer(){
         protected BufferedImage render(BufferedImage image, int param){
@@ -185,15 +189,15 @@ public enum Shader{
             int y2 = image.getHeight()-1;
             for (int ix = x1; ix < x2; ix++) {
                 int ty = y1 + (int) ((ix - x1) * slope);
-                for (int iy = -1; iy < 16; iy++) {
+                for (int iy = -1; iy < 12; iy++) {
                     int y = Math.min(ty+iy,y2);
                     if (y >= 0) {
                         int rgb = image.getRGB(ix, y);
-                        int shadeMag = y - 16;
+                        float shadeMag = ((iy+16)/28f);
                         int alpha = (rgb & 0xff000000) >>> 24;
-                        int red = (int) Global.clamp(((rgb & 0xff0000) >>> 16) + shadeMag, 0, 255);
-                        int green = (int) Global.clamp(((rgb & 0xff00) >>> 8) + shadeMag, 0, 255);
-                        int blue = (int) Global.clamp(((rgb & 0xff)) + shadeMag, 0, 255);
+                        int red = (int) Global.clamp(((rgb & 0xff0000) >>> 16) * shadeMag, 0, 255);
+                        int green = (int) Global.clamp(((rgb & 0xff00) >>> 8) * shadeMag, 0, 255);
+                        int blue = (int) Global.clamp(((rgb & 0xff)) * shadeMag, 0, 255);
                         image.setRGB(ix, y, new Color(red, green, blue, alpha).getRGB());
                     }
                 }
@@ -393,6 +397,43 @@ public enum Shader{
     Shader(ShaderRenderer p){
         shader = p;
     }
+    protected void renderLines(ArrayList<Line> lines, P pos, float zoom, BufferedImage image){ //unused
+        int[][][] shades = new int[lines.size()][][];
+        for (int i=0;i<lines.size();i++) {
+            Line line = lines.get(i);
+            int origX = (int) ((line.pt.x - pos.x)/zoom);
+            int origY = (int) ((line.pt.y - pos.y)/zoom);
+            int x2 = (int) ((line.ptd.x - pos.x)/zoom);
+            int y2 = (int) ((line.ptd.y - pos.y)/zoom);
+            render(image, origX, x2, origY, y2, line.getSlope());
+            shades[i] = shader.postRender2(image, origX, x2, origY, y2, line.getSlope());
+        }
+        int width = image.getWidth(), height = image.getHeight();
+        int[][] test = new int[width][height];
+        for (int[][] shade : shades) {
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    if (test[x][y] != 0) test[x][y] = Math.max(test[x][y], shade[x][y]);
+                    else test[x][y] = shade[x][y];
+                }
+            }
+        }
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                if (test[x][y] != 0) {
+                    int rgb = image.getRGB(x, y);
+                    int alpha = (rgb & 0xff000000) >>> 24;
+                    if (alpha > 0) {
+                        int shadeMag = Math.max(rgb, test[x][y]);
+                        int red = (int) Global.clamp(((rgb & 0xff0000) >>> 16) - shadeMag, 0, 255);
+                        int green = (int) Global.clamp(((rgb & 0xff00) >>> 8) - shadeMag, 0, 255);
+                        int blue = (int) Global.clamp(((rgb & 0xff)) - shadeMag, 0, 255);
+                        image.setRGB(x, y, new Color(red, green, blue, alpha).getRGB());
+                    }
+                }
+            }
+        }
+    }
     protected void render(BufferedImage image, int x1, int x2, int y1, int y2, float slope){
         shader.render(image, x1, x2, y1, slope);
         shader.postRender(image, x1, x2, y1, y2, slope);
@@ -419,7 +460,7 @@ class ShaderRenderer {
     protected BufferedImage render(BufferedImage image, int param){
         return null;
     }
-    void postRender(BufferedImage image, int x1, int x2, int y1, int y2, float slope){ //add textures to edges in terrain
+    void postRender(BufferedImage image, int x1, int x2, int y1, int y2, float slope){
         int height = image.getHeight()-1;
         if (x2 < x1) {
             for (int ix = x2; ix < x1; ix++) {
@@ -443,12 +484,12 @@ class ShaderRenderer {
                 y1 = y2;
                 y2 = t;
             }
-            int width = Math.min(image.getWidth(), x1+12);
+            int width = Math.min(image.getWidth(), x1+6);
             for (int ix = x1; ix < width; ix++) {
                 for (int iy = y1; iy < y2; iy++) {
                     int y = (int) Global.clamp(iy,0,height);
                     int rgb = image.getRGB(ix, y);
-                    int shadeMag = 12 - (ix - x1);
+                    int shadeMag = (6 - (ix - x1))*3;
                     int alpha = (rgb & 0xff000000) >>> 24;
                     int red = (int) Global.clamp(((rgb & 0xff0000) >>> 16) - shadeMag, 0, 255);
                     int green = (int) Global.clamp(((rgb & 0xff00) >>> 8) - shadeMag, 0, 255);
@@ -456,12 +497,12 @@ class ShaderRenderer {
                     image.setRGB(ix, y, new Color(red,green,blue,alpha).getRGB());
                 }
             }
-            width = Math.max(0, x1-12);
+            width = Math.max(0, x1-6);
             for (int ix = width; ix < x1; ix++) {
                 for (int iy = y1; iy < y2; iy++) {
                     int y = (int) Global.clamp(iy,0,height);
                     int rgb = image.getRGB(ix, y);
-                    int shadeMag = 12 + (ix - x1);
+                    int shadeMag = (6 + (ix - x1))*3;
                     int alpha = (rgb & 0xff000000) >>> 24;
                     int red = (int) Global.clamp(((rgb & 0xff0000) >>> 16) - shadeMag, 0, 255);
                     int green = (int) Global.clamp(((rgb & 0xff00) >>> 8) - shadeMag, 0, 255);
@@ -470,5 +511,42 @@ class ShaderRenderer {
                 }
             }
         }
+    }
+    int[][] postRender2(BufferedImage image, int x1, int x2, int y1, int y2, float slope){ //Smooth edge but performance drop
+        int width = image.getWidth(), height = image.getHeight();
+        int[][] colors = new int[width+Math.max(x1,x2)][height+Math.max(y1,y2)];
+        for (int x=0;x<colors.length;x++){
+            for (int y=0;y<colors[0].length;y++){
+                colors[x][y] = 0;
+            }
+        }
+        if (x2 < x1) {
+            for (int ix = x2; ix < x1; ix++) {
+                int ty = y1 + (int) ((ix - x1) * slope);
+                for (int iy = ty - 24; iy <= ty; iy++) {
+                    int y = (int) Global.clamp(iy,0,height);
+                    colors[ix][Math.max(0,iy)] = Math.max(0, (24 + y - ty)*2);
+                }
+            }
+        } else if (x1 == x2){
+            if (y1 > y2){
+                int t = y1;
+                y1 = y2;
+                y2 = t;
+            }
+            int tx = Math.min(image.getWidth(), x1+6);
+            for (int ix = x1; ix < tx; ix++) {
+                for (int iy = y1; iy < y2; iy++) {
+                    colors[ix][iy] = (6 - (ix - x1))*4;
+                }
+            }
+            tx = Math.max(0, x1-6);
+            for (int ix = tx; ix < x1; ix++) {
+                for (int iy = y1; iy < y2; iy++) {
+                    colors[ix][iy] = (6 + (ix - x1))*4;
+                }
+            }
+        }
+        return colors;
     }
 }

@@ -7,6 +7,7 @@ import com.ga.map.Map;
 import com.ga.tool.EventTimer;
 import com.ga.tool.Line;
 import com.ga.tool.P;
+import com.ga.tool.SyncRand;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Buffs;
 import com.ga.unit.skill.Stat;
@@ -73,19 +74,18 @@ public class Unit extends Prop {
         return super.toString() + "@" + controlId + "@" + map.name + "@" + clip.toString() + "@" + stats.toString() + "@" + faction.name() +
                 "@" + brain.toString() + "@" + moveset.toString() + "@" + traits.toString();
     }
+    private int getMemorySize(){
+        return moveset.size()-1+traits.trait.size();
+    }
     public boolean learnSkill(Actions move){
-        if (moveset.size()-1 < get("Intelligence").get()){
+        if (!moveset.contains(move) && getMemorySize() < get("Intelligence").get()){
             moveset.add(move);
             return true;
         }
         return false;
     }
     public boolean learnTrait(Traits.Trait p) {
-        if (traits.isLearnable(p) && traits.traits.size() < get("Wisdom").get()) {
-            traits.traits.add(p);
-            return true;
-        }
-        return false;
+        return getMemorySize() < get("Intelligence").get() && traits.learn(p);
     }
 
     public P getRandomPoint(){
@@ -102,10 +102,10 @@ public class Unit extends Prop {
     }
 
     public String getConversation(){
-        return speech.recent;
+        return speech.text;
     }
     void hear(Prop pos, String p){
-        if (!speech.getTextarea().isVisible()) brain.hear(pos, p);
+        if (!speech.visible) brain.hear(pos, p);
     }
     public P getHand(){
         int hand = clip.getHand();
@@ -168,7 +168,7 @@ public class Unit extends Prop {
             clip.setState(state.getClipName());
             damageMod = 1;
             stateDuration = 0;
-            stateOnSet();
+            stateOnSet(state);
             int asmod = get("Attack").get();
             int clipspeed = clip.setSpeed(attackSpeed + asmod);
             if (delay.max != 0) delay.set(Math.max(clipspeed, delay.time - attackSpeed - asmod));
@@ -188,7 +188,7 @@ public class Unit extends Prop {
         return (int) (rand.nextInt(get("Level").get()+1)*damageMod);
     }
 
-    protected boolean damageBreakthrough(int organ, int damage){
+    protected boolean damageBreakthrough(int organ, boolean blunt, int damage){
         return true;
     }
 
@@ -202,38 +202,39 @@ public class Unit extends Prop {
     }
 
     public boolean hit(Line hitBox, int damage){
+        return hit(hitBox, true, damage);
+    }
+    public boolean hit(Line hitBox, boolean blunt, int damage){
         //Organ amputate
         for (int i = clip.organs.length-1; i >= 0; i--) {
             if (clip.organs[i].checkHit(hitBox)) {
                 if (damage > 0) {
                     P t = new P(pos.x, hitBox.ptd.y);
                     Particle.explode(map, "Blood", getDepth(), t, t.getSubtract(hitBox.pt), 3, 3, 12, true, 5);
-                    if (state == Actions.Down) {
-                        if (clip.organs[i].vital && stats.getEffectLevel(Buffs.Bleed) < 3) buff(Buffs.Bleed, 1);
-                        else clip.organs[i].amputate(hitBox, damage);
-                    } else if (damageBreakthrough(i, damage)) {
+                    if (damageBreakthrough(i, blunt, damage)) {
                         if (traits.has(Traits.Trait.Tough)) {
                             if (stats.getEffectLevel(Buffs.Bleed) < 3) buff(Buffs.Bleed, 1);
                             else die();
                         } else clip.organs[i].amputate(hitBox, damage);
-                    } else if (damage < get("Stamina").get() + 2) {
-                        clip.organs[i].hit(hitBox);
                     } else {
-                        P mid = hitBox.getMidpoint();
-                        float radius = hitBox.getLength() / 2;
-                        if (mid.getSubtract(pos.getAdd(0, -clip.getHeight())).getDist() < radius + getSize()) {
-                            delay.performer = null;
-                            jump = false;
-                            if (stats.getEffectLevel(Buffs.Stun) < 1) {
-                                vel.x = (damage + 5) * Float.compare(pos.x, hitBox.pt.x);
-                                vel.y += -5 - damage;
+                        if (get("Stamina").require(SyncRand.r.nextInt(damage+1))) clip.organs[i].hit(hitBox);
+                        else {
+                            P mid = hitBox.getMidpoint();
+                            float radius = hitBox.getLength() / 2;
+                            if (mid.getSubtract(pos.getAdd(0, -clip.getHeight())).getDist() < radius + getSize()) {
+                                delay.performer = null;
+                                jump = false;
+                                if (stats.getEffectLevel(Buffs.Stun) < 1) {
+                                    vel.x = (damage + 5) * Float.compare(pos.x, hitBox.pt.x);
+                                    vel.y += -5 - damage;
+                                }
+                                buff(Buffs.Bleed, 1);
+                                int blood = stats.getEffectLevel(Buffs.Bleed);
+                                if (blood > 2) stateSet(Actions.Down);
+                                else stateSet(Actions.Hit);
+                                brain.onHit();
+                                return true;
                             }
-                            buff(Buffs.Bleed, 1);
-                            int blood = stats.getEffectLevel(Buffs.Bleed);
-                            if (blood > 2) stateSet(Actions.Down);
-                            else stateSet(Actions.Hit);
-                            brain.onHit();
-                            return true;
                         }
                     }
                 } else if (rand.nextBoolean()){
@@ -274,7 +275,9 @@ public class Unit extends Prop {
         super.collide();
         if (!jump && vel.y > 0) {
             jumpAcross++;
-            if (jumpAcross == 4) lastLand = Line.blank;
+            if (jumpAcross == 4){
+                lastLand = Line.blank;
+            }
         } else jumpAcross = 0;
     }
 
@@ -287,16 +290,14 @@ public class Unit extends Prop {
             if (vel.y > Settings.gravity*4) Sound.play(map, pos, "land");
             if (vel.y >= Settings.gravityMax && hittable(Faction.Destructive)) {
                 stateSet(Actions.Down);
-                delay.time = 200;
-                if (!traits.has(Traits.Trait.Lander)) buff(Buffs.Bleed, Global.r.nextInt(3));
-                else delay.time = (int) Math.max(1,delay.time + Math.log(1 + get("Stamina").get())/Math.log(.5f)*75);
+                delay.time = (int) (800f/Global.clamp(get("Agility").get(),1,100));
             } else if (state == Actions.Jump && vel.y > 0) {
                 stateSet(Actions.Hit);
                 delay.set(4);
             }
         }
     }
-    protected void stateOnSet(){
+    protected void stateOnSet(Actions state){
         state.onSet(this);
     }
     protected void stateUpdate(){

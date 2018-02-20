@@ -30,7 +30,7 @@ public class Menu extends JPanel implements Updatable {
         current = p;
         add(p);
     }
-    void showMenu(){
+    public void showMenu(){
         if (current.getClass() != MenuPlayer.class){
             select(menu);
             menu.setVisible(false);

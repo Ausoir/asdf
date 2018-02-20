@@ -234,7 +234,7 @@ public enum Intelligence {
                             action[i] = new Performer() {
                                 public void perform() {
                                     item.remove();
-                                    Global.player.gold += price;
+                                    Global.player.obtainGold(price);
                                     host.say("@sold");
                                 }
                             };
@@ -272,8 +272,7 @@ public enum Intelligence {
                                 .split(";")[0] + " - "+Dialog.money(price);
                         performers[i] = new Performer(){
                             public void perform(){
-                                if (Global.player.gold >= price) {
-                                    Global.player.gold -= price;
+                                if (Global.player.requireGold(price)) {
                                     Global.server.requestChangeMap(destination+"@-1");
                                 } else {
                                     Global.player.say("Not enough money..");
@@ -306,9 +305,8 @@ public enum Intelligence {
                             new Performer[]{
                                     new Performer(){
                                         public void perform(){
-                                            if (Global.player.gold >= price) {
-                                                Global.player.gold -= price;
-                                                Global.player.get("Endurance").add(
+                                            if (Global.player.requireGold(price)) {
+                                                Global.player.get("Tiredness").add(
                                                         -Global.player.map.updater.sleep(600), false);
                                             } else {
                                                 Global.player.say("Not enough money..");

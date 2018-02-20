@@ -7,7 +7,7 @@ import com.ga.game.FileManager;
  */
 public class Test {
     public static void main(String[] args){
-        String target = "Western";
+        String target = "In_Shop";
         String[] lines = FileManager.read("map/building/"+target+".map").split("%");
         String[] lands = lines[2].split(";");
         StringBuilder r = new StringBuilder();

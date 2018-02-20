@@ -13,7 +13,7 @@ public class Line {
     public P pt;
     public P ptd;
     public int tid = -1;
-    public int opt = 0; //0:normal,1:intangible
+    public int opt = 0; //0:normal,1:intangible,-1:lights
     public float depth = -1;
 
     public Line(String p){

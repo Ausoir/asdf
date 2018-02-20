@@ -81,7 +81,7 @@ public class Prop extends Thing {
                     int cws = 0, ccs = 0; //check if landsite is overlapped behind a higher depth polygon
                     boolean overlapped = false;
                     for (Line ii : map.landRaw) {
-                        if (ii.depth > land.depth && ii.opt != -1 && ii.lineCross(testt)) {
+                        if (ii.depth > land.depth && ii.opt > 0 && ii.lineCross(testt)) {
                             overlapped = true;
                             if (ii.clockwise()) cws++;
                             else ccs++;

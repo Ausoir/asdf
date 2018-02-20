@@ -24,7 +24,7 @@ import java.util.Random;
  */
 public enum Stock {
     Spawn{ protected Prop make(Map map, int id, int seed){
-        Prop product = new Prop(map, getName(), seed);
+        Prop product = new Prop(map, name(), seed);
         product.manualDepth = true;
         product.mobile = false;
         product.image.visible = false;
@@ -52,7 +52,7 @@ public enum Stock {
         return product;
     }},
     Entrance{ Prop make(Map map, final int id, final int seed){ //Obsolete
-        return new Prop(map, getName(), seed);
+        return new Prop(map, name(), seed);
     }},
     Object{ Prop make(Map map, int id, int seed){
         String[] data = FileManager.readText("raw/Object.txt");
@@ -103,7 +103,7 @@ public enum Stock {
         com.ga.unit.man.Man product = new Man(map, unit[0], Creation.getSeed(seed)){
             public void onCreate(){
                 String str = getUnit(map,name,seed,"111111",makeStat(rand,Integer.parseInt(unit[2])),Faction.valueOf(unit[3]),unit[4]+"/1&0",unit[5],"");
-                str += "@"+rand.nextInt(2000)+"@@Battery@;";
+                str += "@Battery@;";
                 String[] weapon = unit[7].split(",");
                 String[] armor = unit[8].split(",");
                 String[] helms = unit[9].split(",");
@@ -161,7 +161,7 @@ public enum Stock {
         return new Player(map, seed);
     }},
     Rover{ Prop make(Map map, int id, int seed) {
-        Unit product = new Unit(map, getName(), seed){
+        Unit product = new Unit(map, name(), seed){
             public float getReach(){
                 return 240;
             }
@@ -193,11 +193,11 @@ public enum Stock {
                 load(getUnit(map,name,seed,clip.toString(),makeStat(rand, 3),Faction.Predator,"2/1&0","Melee",""));
             }
         };
-        product.clip = new Body(product, getName());
+        product.clip = new Body(product, name());
         return product;
     }},
     Slime { Prop make(Map map, int id, int seed) {
-        Unit product = new Unit(map, getName(), seed){
+        Unit product = new Unit(map, name(), seed){
             public void stateSet(Actions state) {
                 super.stateSet(state);
                 if (state == Actions.Melee) {
@@ -224,19 +224,19 @@ public enum Stock {
                 super.buff(buff, level);
             }
             public void onCreate(){
-                load(getUnit(map,getName(),seed,clip.toString(),"Stamina:7&Toughness:"+rand.nextInt(4)+"&Speed:6&Attack:0&Level:1"
+                load(getUnit(map,name(),seed,clip.toString(),"Stamina:7&Toughness:"+rand.nextInt(4)+"&Speed:6&Attack:0&Level:1"
                         ,Faction.Predator,"2/1&0","Melee",""));
             }
             public void die(){
                 Threadball.create(map, -1, -1).pos.set(pos);
             }
         };
-        product.clip = new Body(product, getName());
+        product.clip = new Body(product, name());
         product.clip.organs[0].setSize((int) (product.clip.organs[0].getImage().getSize().x * (product.rand.nextFloat()*.5f+.75f)));
         return product;
     }},
     Bird { Prop make(Map map, int id, int seed) {
-        Unit product = new Unit(map, getName(), seed){
+        Unit product = new Unit(map, name(), seed){
             public void collide(){
                 super.collide();
                 jump = true;
@@ -265,15 +265,15 @@ public enum Stock {
                 super.buff(buff, level);
             }
             public void onCreate(){
-                load(getUnit(map,getName(),seed,clip.toString(),"Stamina:14&Speed:12&Attack:0&Level:2",Faction.Predator,"2/1&0","Shock,Jump",""));
+                load(getUnit(map,name(),seed,clip.toString(),"Stamina:14&Speed:12&Attack:0&Level:2",Faction.Predator,"2/1&0","Shock,Jump",""));
             }
         };
-        product.clip = new Body(product, getName());
+        product.clip = new Body(product, name());
         product.clip.organs[0].setSize((int) product.clip.organs[0].getImage().getSize().x);
         return product;
     }},
     Beholder { Prop make(Map map, int id, int seed) {
-        Unit product = new Unit(map, getName(), seed){
+        Unit product = new Unit(map, name(), seed){
             public void collide(){
                 super.collide();
                 jump = true;
@@ -300,38 +300,74 @@ public enum Stock {
                 String moves;
                 if (seed % 2 == 1) moves = "Flameroll,Fireball";
                 else moves = "Fireblast";
-                load(getUnit(map,getName(),seed,clip.toString(),"Stamina:30&Speed:10&Attack:0&Level:7",Faction.Predator,"3/1&0",moves,""));
+                load(getUnit(map,name(),seed,clip.toString(),"Stamina:30&Speed:10&Attack:0&Level:7",Faction.Predator,"3/1&0",moves,""));
             }
         };
         product.gravity = false;
-        product.clip = new Body(product, getName());
+        product.clip = new Body(product, name());
         return product;
     }},
     Golem { Prop make(Map map, int id, int seed) {
-        Unit product = new Unit(map, getName(), seed){
+        Unit product = new Unit(map, name(), seed){
             public boolean damageBreakthrough(int p, int damage){
                 return false;
             }
             public void onCreate(){
-                load(getUnit(map,getName(),seed,clip.toString(),"Stamina:30&Speed:10&Attack:0&Level:12",Faction.Predator,"3/1&0","Melee",""));
+                load(getUnit(map,name(),seed,clip.toString(),"Stamina:30&Speed:10&Attack:0&Level:12",Faction.Predator,"3/1&0","Melee",""));
             }
         };
         product.gravity = false;
-        product.clip = new Body(product, getName());
+        product.clip = new Body(product, name());
         return product;
     }},
     Wyvern { Prop make(Map map, int id, int seed) {
-        Unit product = new Unit(map, getName(), seed){
+        Unit product = new Unit(map, name(), seed){
             public void onCreate(){
-                load(getUnit(map,getName(),seed,clip.toString(),"Stamina:30&Speed:30&Attack:0&Level:16",Faction.Predator,"3/1&0","Melee",""));
+                load(getUnit(map,name(),seed,clip.toString(),"Stamina:30&Speed:30&Attack:0&Level:16",Faction.Predator,"3/1&0","Melee",""));
             }
         };
         product.gravity = false;
-        product.clip = new Body(product, getName());
+        product.clip = new Body(product, name());
+        return product;
+    }},
+    Fist{ Prop make(Map map, int id, int seed){
+        Item product = new Weapon(map, name(),0, new Item.Material[]{Item.Material.Flesh}, Item.ItemType.Bashing, -1, 0){
+            public boolean use(final com.ga.unit.man.Man host) {
+                host.setState(Actions.Interact);
+                return true;
+            }
+            public String getFullName(){
+                return "Fist";
+            }
+            public String forceToString() {
+                return "";
+            }
+            public void drop(com.ga.unit.man.Man host) {}
+            public void onUnequip(com.ga.unit.man.Man host){}
+            public void onCreate(){}
+            public void remove(){}
+        };
+        product.range = -1;
+        product.image.setCenterType(3);
+        product.onInteract = null;
+        product.save = false;
+        return product;
+    }},
+    Goldbag{ Prop make(Map map, int id, int seed){
+        Item product = new Item(map, name(),0, new Item.Material[]{Item.Material.Gold}, Item.ItemType.Bashing, 200){
+            public boolean use(final com.ga.unit.man.Man host) {
+                host.setState(Actions.Interact);
+                return true;
+            }
+            public void onCreate(){
+                isUsable(100);
+            }
+        };
+        product.tags.add(Tag.Currency);
         return product;
     }},
     Manual{ Prop make(Map map, int id, int seed){
-        Item product = new Item(map, getName(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Scroll, 1){
+        Item product = new Item(map, name(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Scroll, 1){
             private Actions skill;
             public void onCreate(){
                 super.onCreate();
@@ -376,7 +412,7 @@ public enum Stock {
         return product;
     }},
     Textbook{ Prop make(Map map, final int id, int seed){
-        Item product = new Item(map, getName(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Scroll, -1){
+        Item product = new Item(map, name(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Scroll, -1){
             private String stat;
             public void onCreate(){
                 super.onCreate();
@@ -443,7 +479,7 @@ public enum Stock {
         return product;
     }},
     Bandage{ Prop make(Map map, int id, int seed){
-        Item product = new Item(map, getName(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Consumable, 4) {
+        Item product = new Item(map, name(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Consumable, 4) {
             public boolean use(com.ga.unit.man.Man host) {
                 if (isUsable(1) && super.use(host)){
                     host.stats.triggerEffect(Buffs.Bleed);
@@ -459,7 +495,7 @@ public enum Stock {
         return product;
     }},
     Potion{ Prop make(Map map, int id, int seed){
-        Item product = new Item(map, getName(), seed, new Item.Material[]{Item.Material.Glass}, Item.ItemType.Consumable, 1) {
+        Item product = new Item(map, name(), seed, new Item.Material[]{Item.Material.Glass}, Item.ItemType.Consumable, 1) {
             public void onCreate() {
                 if (seed != 0) imbueMeta(false, false, 1);
             }
@@ -480,7 +516,7 @@ public enum Stock {
         return product;
     }},
     Scroll{ Prop make(Map map, int id, int seed){
-        Item product = new Item(map, getName(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Scroll, 1){
+        Item product = new Item(map, name(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Scroll, 1){
             Actions spell;
             @Override
             public boolean use(com.ga.unit.man.Man host){
@@ -517,7 +553,7 @@ public enum Stock {
         return product;
     }},
     Ethersword{ Prop make(Map map, int id, int seed){
-        Weapon product = new Weapon(map, getName(), seed, new Item.Material[]{Item.Material.Crystal}, Item.ItemType.Sword, -1, 0){
+        Weapon product = new Weapon(map, name(), seed, new Item.Material[]{Item.Material.Crystal}, Item.ItemType.Sword, -1, 0){
             public String toString(){
                 return "";
             }
@@ -538,7 +574,7 @@ public enum Stock {
         return product;
     }},
     Booth{ Prop make(Map map, int id, int seed){
-        Prop product = new Prop(map, getName(), seed);
+        Prop product = new Prop(map, name(), seed);
         product.onInteract = new Interactive(){
             public void interact(com.ga.unit.man.Man p){
                 String t = p.getConversation();
@@ -555,39 +591,16 @@ public enum Stock {
         return product;
     }},
     Map{ Prop make(Map map, int id, int seed){ //unused
-        Prop product = new Prop(map, getName(), seed);
+        Prop product = new Prop(map, name(), seed);
         product.onInteract = new Interactive(){
             public void interact(com.ga.unit.man.Man p){
             }
         };
         return product;
     }},
-    Fist{ Prop make(Map map, int id, int seed){
-        Item product = new Weapon(map, getName(),0, new Item.Material[]{Item.Material.Flesh}, Item.ItemType.Bashing, -1, 0){
-            public boolean use(final com.ga.unit.man.Man host) {
-                host.setState(Actions.Interact);
-                return true;
-            }
-            public String getFullName(){
-                return "Fist";
-            }
-            public String forceToString() {
-                return "";
-            }
-            public void drop(com.ga.unit.man.Man host) {}
-            public void onUnequip(com.ga.unit.man.Man host){}
-            public void onCreate(){}
-            public void remove(){}
-        };
-        product.range = -1;
-        product.image.setCenterType(3);
-        product.onInteract = null;
-        product.save = false;
-        return product;
-    }},
     Dungeon{ Prop make(Map map, int id, final int seed){
         final Prop entrance = Stock.Spawn.create(map, -1, 0);
-        final Prop product = new Prop(map, getName(), seed){
+        final Prop product = new Prop(map, name(), seed){
             public void onField(){
                 super.onField();
                 entrance.pos.add(pos.x, pos.y);
@@ -607,7 +620,7 @@ public enum Stock {
         return product;
     }},
     Spawner{ Prop make(Map map, final int id, int seed) {
-        Prop product = new Prop(map, getName(), seed){
+        Prop product = new Prop(map, name(), seed){
             public void onField(){
                 super.onField();
                 rotation = Math.min(Global.time, rotation);
@@ -634,7 +647,7 @@ public enum Stock {
     }},
     Crate{ Prop make(final Map map, int id, int seed){
         if (seed < 100000) seed *= 100000;
-        final Prop product = new Prop(map, getName(), seed){
+        final Prop product = new Prop(map, name(), seed){
             public void onField(){
                 super.onField();
                 P s = image.getSize().getMult(.5f, 1).add(0,-8);
@@ -725,7 +738,7 @@ public enum Stock {
         return product;
     }},
     Fireball{ Prop make(Map map, int id, int seed){
-        Item product = new Item(map, getName(), seed, new Item.Material[]{Item.Material.Stone}, Item.ItemType.Throwing, 1) {
+        Item product = new Item(map, name(), seed, new Item.Material[]{Item.Material.Stone}, Item.ItemType.Throwing, 1) {
             @Override
             public boolean use(final com.ga.unit.man.Man host) {
                 if (isUsable(1) && super.use(host)) {
@@ -773,7 +786,7 @@ public enum Stock {
         return product;
     }},
     Threadball{ Prop make(Map map, int id, int seed){
-        Item product = new Item(map, getName(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Throwing, 5) {
+        Item product = new Item(map, name(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Throwing, 5) {
             @Override
             public boolean use(final com.ga.unit.man.Man host) {
                 if (isUsable(1) && super.use(host)) {
@@ -837,7 +850,7 @@ public enum Stock {
         return product;
     }},
     Book{ Prop make(Map map, int id, int seed){
-        Item product = new Item(map, getName(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Scroll, -1){
+        Item product = new Item(map, name(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Scroll, -1){
             @Override
             public boolean use(com.ga.unit.man.Man host){
                 if (super.use(host)){
@@ -850,14 +863,28 @@ public enum Stock {
         product.delay = 45;
         return product;
     }},
+    Runnerkit{ Prop make(Map map, int id, int seed){
+        Armor product = new Armor(map, name(),seed,Item.Material.values()
+                ,3,0,0,8){
+        };
+        product.disposable = false;
+        product.weight = 1;
+        product.tags.add(new Tag[]{Tag.Strength,Tag.Athletics}[product.rand.nextInt(2)]);
+        return product;
+    }},
+    Jewelry{ Prop make(Map map, int id, int seed){
+        Armor product = new Armor(map, "Battery",seed,Item.Material.values()
+                ,3,0,0,1000){
+        };
+        product.name = "Jewelry";
+        product.disposable = false;
+        return product;
+    }},
     Manastone_Necklace{ Prop make(Map map, int id, int seed){
         Armor product = new Armor(map, "Battery",seed,new Item.Material[]{Item.Material.Stone, Item.Material.Glass, Item.Material.Crystal, Item.Material.Obsidian}
                 ,3,0,0,1000){
             public String getDescription(){
                 return super.getDescription()+"\nThis item is used to store mana for magical applications.";
-            }
-            public void onCreate(){
-                super.onCreate();
             }
         };
         product.name = "Manastone_Necklace";
@@ -868,7 +895,7 @@ public enum Stock {
     }},
     Manastone{ Prop make(Map map, int id, int seed){
         Item product = new Item(map, "Battery",seed,new Item.Material[]{Item.Material.Stone, Item.Material.Glass, Item.Material.Crystal, Item.Material.Obsidian}
-            ,Item.ItemType.Consumable,1000){
+            ,Item.ItemType.Consumable,2400){
             public String getDescription(){
                 return super.getDescription()+"\nThis item is used to store mana for magical applications.";
             }
@@ -941,7 +968,7 @@ public enum Stock {
                                 collectBlood(host);
                             }
                         };
-                        int power = host.get("Wisdom").get()+bloodQuality; //not max
+                        int power = host.get("Intelligence").get()+bloodQuality; //not max
                         if (isUsable(1)) {
                             for (int i = 0; i < listString.length - 1; i++) {
                                 Buffs buff = buffs.get(i);
@@ -952,13 +979,12 @@ public enum Stock {
                                         ArrayList<Unit> t = map.updater.collideUnit(pos, 800, Faction.Destructive);
                                         for (Unit i : t) {
                                             if (i.stats.getEffectLevel(Buffs.Mark) > 0) {
-                                                if (i.get("Wisdom").get()+buff.value < power) {
+                                                if (i.get("Intelligence").get()+buff.value < power) {
                                                     i.buff(buff, bloodQuality);
-                                                    host.say(listString[finalI] + "...");
                                                     isUsable(buff.value);
                                                 } else {
                                                     host.buff(buff, bloodQuality);
-                                                    host.say("Curse backfired!");
+                                                    host.say(listString[finalI]+" backfired!");
                                                 }
                                             }
                                         }
@@ -1022,11 +1048,8 @@ public enum Stock {
         return r;
     }
     abstract Prop make(Map map, int subid, int seed);
-    public String getName(){
-        return name().replace("_"," ");
-    }
     public static String getFactoryName(int id){
-        return id==-1?"":values()[id].getName();
+        return id==-1?"":values()[id].name();
     }
     void isFurniture(Prop product){
         product.image.setCenterType(2);
@@ -1046,11 +1069,12 @@ public enum Stock {
         p.dir = p.seed % 2 == 0 ? 1 : -1;
     }
     static String makeStat(Random rand, int level){
-        int str,dex,sta,wis,spd;
+        int str,dex,sta,wis,intel,spd;
         str = dex = sta = 3+level;
         spd = 18+rand.nextInt(8);
         wis = rand.nextInt(1+level*2);
-        return "Level:"+level+"&Strength:"+str+"&Dexterity:"+dex+"&Stamina:"+sta+"&Wisdom:"+wis+"&Speed:"+spd+"&Attack:0";
+        intel = rand.nextInt(1+level*2);
+        return "Level:"+level+"&Strength:"+str+"&Agility:"+dex+"&Stamina:"+sta+"&Intelligence:"+intel+"&Speed:"+spd+"&Attack:0";
     }
     static String getUnit(Map map, String name, int seed, String clip, String stat, Faction faction, String intel, String moves, String traits){
         return name+"@-1@"+seed+"@0,0@0@"+Global.getControlId()+"@"+map.name+"@"+clip+"@"+stat+"@"+faction.name()+"@"+intel+"@"+moves+"@"+traits;

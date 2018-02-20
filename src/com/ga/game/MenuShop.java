@@ -57,7 +57,7 @@ public class MenuShop extends Panel {
     public void show(String title, Item[] wares, int[] prices, Performer[] actions){
         display();
         titleLabel.setText(title);
-        gold.setText("Cash: " + Global.player.gold+"$");
+        gold.setText("Cash: " + Global.player.getGold()+"$");
         panel.removeAll();
         int itemsize = wares.length;
         for (int i = 0; i < itemsize; i++) {
@@ -105,19 +105,18 @@ public class MenuShop extends Panel {
                 new String[]{"Buy"}, new Performer[]{new Performer(){
                     public void perform(){
                         Player player = Global.player;
-                        if (player.gold >= price) {
-                            if (player.inventory.vacant() || player.wieldingNone()) {
-                                player.gold -= price;
+                        if (player.inventory.vacant() || player.wieldingNone()) {
+                            if (player.requireGold(price)) {
                                 if (player.wieldingNone()) player.setWeapon(item);
                                 else {
                                     item.pos = player.pos.getAdd(0, 0);
                                 }
                                 action.perform();
                             } else {
-                                Global.player.say("Not enough inventory space..");
+                                Global.player.say("Not enough money..");
                             }
                         } else {
-                            Global.player.say("Not enough money..");
+                            Global.player.say("Not enough inventory space..");
                         }
                         setVisible(false);
                     }

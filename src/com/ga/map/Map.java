@@ -44,8 +44,12 @@ public class Map {
     }
 
     public void start(){
-        if (name.startsWith("_") && !FileManager.isFile("Data/map/" + name + ".map")) make(name);
-        else load(name);
+        if (name.startsWith("_") && !FileManager.isFile("Data/map/" + name + ".map")){
+            make(name);
+            FileManager.saveMap(name, this);
+            clear();
+        }
+        load(name);
         weather.start();
     }
 
@@ -54,21 +58,8 @@ public class Map {
         Generator gen = new Generator(this, 0);
         if (dir.startsWith("_M")){
             gen.generateTown();
-            panorama = new Thing(this, "Bg_Desert", 0, 0) {
-                @Override
-                public void draw(Graphics2D g) {
-                    P t = new P(Global.rel.x + pos.x, Global.rel.y + pos.y).mult(.1f);
-                    P size = image.getSize();
-                    t.x = Global.clamp(t.x, -size.x + Settings.screenX, 0);
-                    t.y = Global.clamp(t.y, -size.y + Settings.screenY, 0);
-                    g.drawImage(image.getImage(), (int) (t.x), (int) (t.y), (int) size.x, (int) size.y, null);
-                }
-            };
-        }
-        panorama.start();
-        panorama.image.getSize().mult(magnify);
-        for (Line i : landRaw){
-            if (i.opt > 0) land.add(i);
+//            gen.generateLand();
+            panorama = new Thing(this, "Bg_Desert", 0, 0);
         }
         generateProps();
     }
@@ -149,10 +140,11 @@ public class Map {
             if (it.hasNext()) result.append(";");
         }
         result.append("\n");
-        for (Line i : landRaw){
+        ArrayList<Line> landRawClone = (ArrayList<Line>) landRaw.clone();
+        for (Line i : landRawClone){
             if (!i.toString().equals("")) result.append(i).append(";");
         }
-        if (landRaw.size() > 0) result = new StringBuilder(result.substring(0, result.length() - 1));
+        if (landRawClone.size() > 0) result = new StringBuilder(result.substring(0, result.length() - 1));
         result.append("\n").append(updater.toString());
         return result.toString();
     }
@@ -163,20 +155,6 @@ public class Map {
         landRaw.clear();
         terrains.clear();
         formTextures.clear();
-    }
-
-    void render(int target){
-        String texture = formTextures.get(target);
-        String[] formName = texture.split("&");
-        Terrain terrain = new Terrain(this, formName[1], Shader.getByName(formName[2]), Float.parseFloat(formName[0]));
-        terrains.put(target, terrain);
-        for (final Line i : landRaw){
-            if (i.tid == target){
-                terrain.addLine(i);
-                terrain.addPoint(i.pt.x, i.pt.y);
-            }
-        }
-        terrain.render();
     }
 
     public void setTexture(){
@@ -268,10 +246,6 @@ public class Map {
         return null;
     }
 
-    void placeBuilding(int p){
-
-    }
-
     public String getLand(int p){
         String terrain = formTextures.get(p);
         if (terrain != null) {
@@ -344,10 +318,11 @@ public class Map {
         return result;
     }
 
-    public void mapEdgeCenter(P p){
+    public P mapEdgeCenter(P p){
         if (size.x > Settings.screenX && size.y > Settings.screenY)
-            p.set(Global.clamp(p.x, Settings.centerX+margin, size.x-Settings.centerX-margin),
+            return new P(Global.clamp(p.x, Settings.centerX+margin, size.x-Settings.centerX-margin),
                     Global.clamp(p.y, Settings.centerY+40+margin, size.y-Settings.centerY-margin-margin));
+        return p;
     }
 
     void clean(){

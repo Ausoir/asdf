@@ -29,7 +29,7 @@ public class MenuPlayer extends Panel {
     private class StatPanel extends JPanel{
         private GridBagConstraints statgrid = new GridBagConstraints();
         private String[] stats = new String[]{
-                "Strength", "Dexterity", "Stamina", "Intelligence", "Wisdom"
+                "Strength", "Agility", "Intelligence", "Stamina"
         };
         private JButton[] statButtons = new JButton[stats.length];
         private JLabel level = new JLabel();
@@ -130,9 +130,8 @@ public class MenuPlayer extends Panel {
             add(scroll, BorderLayout.LINE_START);
         }
         void refresh(){
-            int maxEncumbrance = Global.player.get("Dexterity").get();
-            gold.setText("Cash: "+Dialog.money(Global.player.gold) +
-                    "                 Encumbrance:"+(maxEncumbrance-Global.player.getVacancy())+"/"+maxEncumbrance+
+            int maxEncumbrance = Global.player.get("Agility").get();
+            gold.setText("Encumbrance:"+(maxEncumbrance-Global.player.getVacancy())+"/"+maxEncumbrance+
                     "                 Weight:"+Global.player.getWeight()+"/"+Global.player.get("Strength").get()*2);
             panel.removeAll();
 
@@ -182,7 +181,7 @@ public class MenuPlayer extends Panel {
                 result.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        Global.player.input.inputDirect("_WI1"+type,0,0);
+                        Global.player.input.inputDirect("_WI"+type,0,0);
                         Global.display.menu.showMenu();
                     }
                 });
@@ -233,8 +232,7 @@ public class MenuPlayer extends Panel {
             add(scroll, BorderLayout.LINE_START);
         }
         void refresh(){
-            gold.setText("Cash: "+Dialog.money(Global.player.gold)+
-                    "                 Weight:"+Global.player.getWeight()+"/"+Global.player.get("Strength").get()*2);
+            gold.setText("Weight:"+Global.player.getWeight()+"/"+Global.player.get("Strength").get()*2);
             panel.removeAll();
             Inventory inv = Global.player.inventory;
             int itemsize = inv.getItemSize();
@@ -460,7 +458,7 @@ public class MenuPlayer extends Panel {
                     Global.display.menu.onUpdate = new Performer(){
                         public void perform(){
                             String statusDsc = "Stamina:" + Global.player.get("Stamina") +
-                                    "\nTiredness:" + Global.player.get("Endurance") +
+                                    "\nTiredness:" + Global.player.get("Tiredness") +
                                     "\nMotivation:" + Global.player.get("Motivation")+"\n";
                             statusDsc += "\nCurrent Status Effects:\n" + Global.player.stats.getEffectsList();
                             Global.display.menu.showDialog("Current Status", statusDsc);

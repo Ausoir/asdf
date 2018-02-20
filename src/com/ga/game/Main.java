@@ -18,13 +18,13 @@ public class Main {
             if (i.startsWith("-screenY")) y = Integer.parseInt(i.substring(i.indexOf('=')+1));
         }
         Settings.init();
-        Keybinding.init();
         Global.init();
         JFrame gamewindow = new JFrame();
         gamewindow.setUndecorated(true);
         gamewindow.setVisible(true);
         gamewindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         FileManager.init();
+        Generator.init();
         Dialog.init();
         Clips.init();
         Picture.init();

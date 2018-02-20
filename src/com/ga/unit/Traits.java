@@ -1,7 +1,5 @@
 package com.ga.unit;
 
-import com.ga.tool.ToolString;
-
 import java.util.ArrayList;
 
 /**
@@ -9,7 +7,7 @@ import java.util.ArrayList;
  */
 public class Traits {
     public enum Trait {
-        Fast_Learner(2), Haggler(1), Tough(1), Lander(1), Innovation(1), Perception(1),
+        Fast_Learner(2), Haggler(1), Tough(1), Innovation(1), Perception(1),
 
         Lung_Injury,Damaged_Liver,Stomach_Injury,Hearing_Loss,Throat_Injury,Blindness,Brain_Damage,Depression,
         Armless,Left_Arm_Injury,Right_Arm_Injury,Legless,Left_Leg_Injury,Right_Leg_Injury,
@@ -43,29 +41,47 @@ public class Traits {
             return null;
         }
     }
-    ArrayList<Trait> traits = new ArrayList<>();
+    ArrayList<Trait> trait = new ArrayList<>();
+    ArrayList<Integer> level = new ArrayList<>();
 
-    boolean isLearnable(Trait p){
-        if (has(p)) return false;
+    private boolean isLearnable(Trait p){
         if (p.requirements != null) {
             for (Trait i : p.requirements) {
-                if (!traits.contains(i)) return false;
+                if (!trait.contains(i)) return false;
             }
         }
         return true;
     }
+    boolean learn(Trait p){
+        if (isLearnable(p)) {
+            if (has(p)) {
+                int lvl = trait.indexOf(p);
+                level.set(lvl, level.get(lvl) + 1);
+            } else {
+                trait.add(p);
+                level.add(1);
+            }
+            return true;
+        }
+        return false;
+    }
     public boolean has(Trait p){
-        return traits.contains(p);
+        return trait.contains(p);
     }
     void load(Unit host, String p){
         if (!p.equals("")){
             for (String i : p.split(",")){
-                Trait trait = Trait.valueOf(i);
-                host.learnTrait(trait);
+                Trait trait = Trait.valueOf(i.split(":")[0]);
+                for (int lvl=0;lvl<Integer.parseInt(i.split(":")[1]);lvl++) host.learnTrait(trait);
             }
         }
     }
     public String toString(){
-        return ToolString.tosArrayList(traits);
+        if (trait.size() == 0) return "";
+        String r = "";
+        for (int i=0;i<trait.size();i++){
+            r += trait.get(i).toString()+":"+level.get(i)+",";
+        }
+        return r.substring(0,r.length()-1);
     }
 }

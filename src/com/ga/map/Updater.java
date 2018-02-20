@@ -75,7 +75,6 @@ public class Updater {
     }
     public void update(){
         processQueue();
-        Global.camera.add(Global.cameraTo.getSubtract(Global.camera.getAdd(0,40)).mult(.2f,.2f));
         for (Updatable i : updatee) i.update();
         if (!editor){
             for (Prop i : props) i.update();
@@ -90,7 +89,7 @@ public class Updater {
         }
     }
     public void draw(Graphics2D g2){
-        Global.setRel();
+        Global.updateCamera();
         Drawable t = drawee;
         while (t != null){
            t.draw(g2);
@@ -199,7 +198,7 @@ public class Updater {
         for (Unit i : unitsLoaded){
             if (host != i) {
                 float x = Math.abs(i.pos.x-vision.x), y = Math.abs(i.pos.y - vision.y);
-                if (x < r && y < r/2) {
+                if (x < r && y < r/3) {
                     if (x+y < max){
                         max = (int) (x+y);
                         seen.add(0,i);

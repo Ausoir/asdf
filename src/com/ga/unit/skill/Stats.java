@@ -64,7 +64,7 @@ public class Stats {
             Buff effect = effects.get(i);
             if (effect.update()){
                 effect.onFinish();
-                effects.remove(i);
+                effects.remove(i--);
             }
         }
     }
@@ -113,7 +113,7 @@ public class Stats {
         for (int i=0;i<effects.size();i++) {
             Buff effect = effects.get(i);
             if (effect.buff == p){
-                effects.remove(i);
+                effects.remove(i--);
                 effect.onFinish();
             }
         }

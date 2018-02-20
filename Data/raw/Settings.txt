@@ -6,7 +6,7 @@ screenX:1024
 screenY:720
 gravity:4
 gravityMax:64
-spf:17
+spf:25 //camera stutter bug when spf<spu
 spu:25
 spc:360
 volumn:-5 //negative to positive decibels

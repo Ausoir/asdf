@@ -36,15 +36,4 @@ public class Player extends Man {
         }
         return r;
     }
-    public void stateSet(Actions state){
-        if (state.getCost() >= 0){
-            int difficulty = state.getDifficulty();
-            if (getVacancy() < difficulty){
-                if (difficulty > 0) say("Too encumbering! This action requires "+state.getDifficulty()+" unencumbrance.");
-                else say("Too encumbering!");
-                state = Actions.Hit;
-            }
-        }
-        super.stateSet(state);
-    }
 }

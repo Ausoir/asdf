@@ -1,7 +1,6 @@
 package com.ga.unit.man;
 
 import com.ga.game.Sound;
-import com.ga.map.Global;
 import com.ga.map.Map;
 import com.ga.tool.Line;
 import com.ga.tool.P;
@@ -31,8 +30,6 @@ public class Man extends Unit {
     private String face;
     public ArmorSet armor;
     public int selectingItem = -1;
-    public String memorized = "";
-    public int gold;
     public Inventory inventory = new Inventory(this);
     public Crafts crafting = new Crafts(this);
     public Food.Material[] favorites;
@@ -63,11 +60,7 @@ public class Man extends Unit {
     public String[] load(String p){
         String[] t = p.split("#");
         String[] lines = super.load(t[0]);
-
-        gold = Integer.parseInt(lines[13]);
-        memorized = lines[14];
-        crafting.load(lines[15]);
-
+        crafting.load(lines[13]);
         String[] items = t[1].split(";",-1);
         setFace(items[0]);
         if (!items[1].equals("")) setWeapon((Item) Stock.get(map, items[1]));
@@ -94,8 +87,7 @@ public class Man extends Unit {
     @Override
     public String toString(){
         StringBuilder r = new StringBuilder();
-        r.append(super.toString()).append("@").append(gold).append("@").append(memorized);
-        r.append("@").append(crafting.toString()).append("@;");
+        r.append(super.toString()).append("@").append(crafting.toString()).append("@;");
         r.append("#").append(face).append(";").append(weapon.forceToString()).append(";").append(armor.toString());
         if (inventory.getItemSize() != 0) r.append(";").append(inventory.toString());
         return r.toString();
@@ -149,19 +141,8 @@ public class Man extends Unit {
     public void stateSet(Actions state){
         attackSpeed -= weapon.weight;
         super.stateSet(state);
-        switch (state) {
-            case Idle:
-                if (!get("Stamina").isFull()) clip.setState(Actions.Exhausted.getClipName());
-                break;
-            case Sprint:
-            case Right:
-                float speed = getSpeed();
-                if (speed <= 0) clip.setState(Actions.Exhausted.getClipName());
-                else clip.setMoveSpeed((int) Global.clamp(speed-1,-20,4));
-                break;
-        }
     }
-    protected void stateOnSet(){
+    protected void stateOnSet(Actions state){
         state.onSet(this);
     }
     protected void stateUpdate(){
@@ -224,20 +205,23 @@ public class Man extends Unit {
     }
 
     @Override
-    protected boolean damageBreakthrough(int organ, int damage){
-        return armor.getOrganArmor(organ).checkBreak(damage);
+    protected boolean damageBreakthrough(int organ, boolean blunt, int damage){
+        return armor.getOrganArmor(organ).checkBreak(blunt, damage);
     }
 
     @Override
     protected int getStatePower(Actions state){
-        int r = super.getStatePower(state);
-        if (state.getTrainers().contains(Tag.Dexterity)) r += get("Dexterity").get();
+        int r = 0;
+        Tags tags = state.getTags();
+        for (Tag i : getTags()){
+            if (tags.contains(i)) r++;
+        }
         if (state.getTrainers().contains(Tag.Strength)) r += get("Strength").get();
-        return r;
+        return r / Math.max(1,tags.size());
     }
 
     public int getVacancy(){
-        Stat dex = get("Dexterity");
+        Stat dex = get("Agility");
         return dex.get() - armor.getEncumbrance() - weapon.encumbrance;
     }
 
@@ -245,6 +229,51 @@ public class Man extends Unit {
         return stats.getStat(p);
     }
 
+    public int getGold(){
+        ArrayList<Item> items = new ArrayList<>();
+        items.addAll(inventory.getItems());
+        items.add(weapon);
+        Collections.addAll(items, armor.armor);
+        int money = 0;
+        for (Item i : items){
+            if (i.tags.contains(Tag.Currency)){
+                money += i.getUses();
+            }
+        }
+        return money;
+    }
+    public void obtainGold(int p){
+        ArrayList<Item> items = new ArrayList<>();
+        items.addAll(inventory.getItems());
+        items.add(weapon);
+        Collections.addAll(items, armor.armor);
+        for (Item i : items){
+            if (i.tags.contains(Tag.Currency)){
+                int money = Math.min(i.getDurability()-i.getUses(), p);
+                p -= money;
+                i.isUsable(-money);
+            }
+        }
+        if (p > 0){
+            Item newbag = (Item) Stock.Goldbag.create(map, -1, 0).start();
+            setWeapon(newbag);
+            newbag.isUsable(-p);
+        }
+    }
+    public boolean requireGold(int p){
+        ArrayList<Item> items = new ArrayList<>();
+        items.addAll(inventory.getItems());
+        items.add(weapon);
+        Collections.addAll(items, armor.armor);
+        for (Item i : items){
+            if (i.tags.contains(Tag.Currency)){
+                int money = Math.min(i.getUses(), p);
+                if (i.isUsable(money)) p -= money;
+                if (p == 0) return true;
+            }
+        }
+        return false;
+    }
     public boolean requireMana(int p){
         ArrayList<Item> items = new ArrayList<>();
         items.addAll(inventory.getItems());
@@ -278,7 +307,7 @@ public class Man extends Unit {
         Line hitbox = weapon.getLine();
         Unit target = null;
         for (Unit i : map.updater.collideUnit(pos, (int) hitbox.getLength()+20, faction)){
-            if (i.hit(hitbox,getDamage())){
+            if (i.hit(hitbox,weapon.type.isBlunt(),getDamage())){
                 target = i;
                 if (!cleave) break;
             }

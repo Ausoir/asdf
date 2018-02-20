@@ -64,6 +64,11 @@ class TerrainTrail {
     private void connect(){
         if (lines.size() > 1) add(lines.get(0).pt);
     }
+    void setOpt(int p){
+        for (Line i : lines){
+            i.opt = p;
+        }
+    }
     private void setTexture(String p){
         map.formTextures.put(terrain, p);
         for (Line i : lines){
@@ -79,9 +84,7 @@ class TerrainTrail {
     }
     void reverse() {
         for (Line i : lines){
-            if (i.opt == 0) {
-                i.reverse();
-            }
+            i.reverse();
         }
     }
 }

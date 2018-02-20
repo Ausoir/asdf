@@ -19,10 +19,9 @@ import java.util.HashMap;
  * Created by Ga on 7/26/2016. asd
  */
 public class FileManager {
-    public static HashMap<String, ArrayList<String[]>> fileCache;
+    public static final HashMap<String, ArrayList<String[]>> fileCache = new HashMap<>();
 
     public static void init(){
-        fileCache = new HashMap<>();
         searchFiles("Data", fileCache);
     }
     private static void searchFiles(String p, HashMap<String, ArrayList<String[]>> r){
@@ -42,7 +41,7 @@ public class FileManager {
                         ext = "!";
                         name = t;
                     }
-                    if (r.get(ext) == null) r.put(ext,new ArrayList<String[]>());
+                    r.computeIfAbsent(ext, k -> new ArrayList<>());
                     r.get(ext).add(new String[]{name, path});
                 }
             }
@@ -106,7 +105,7 @@ public class FileManager {
         Global.camera.set(player.pos);
         player.map.setTexture();
         player.map.render();
-        player.map.mapEdgeCenter(Global.camera = player.map.size.getMult(.5f, .5f));
+        Global.camera = player.map.mapEdgeCenter(player.map.size.getMult(.5f, .5f));
         player.map.onTimeChange();
         player.start();
         Global.display.menu.init();

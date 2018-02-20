@@ -1,5 +1,6 @@
 package com.ga.unit.man;
 
+import com.ga.game.Settings;
 import com.ga.game.Sound;
 import com.ga.map.Global;
 import com.ga.map.Map;
@@ -20,15 +21,7 @@ public class MainPlayer extends Player {
     public MainPlayer(Map map, int seed) {
         super(map, seed);
         Global.player = this;
-    }
-
-    @Override
-    public void say(String p) {
-        if (p.startsWith("'") && p.endsWith("'")) {
-            memorized = p.substring(1, p.length() - 1).replace("@;#", "");
-            p = "Memorized " + p;
-        }
-        speech.say(p);
+        Global.cameraTo = pos;
     }
 
     @Override
@@ -93,7 +86,7 @@ public class MainPlayer extends Player {
                 int residue = exp.get() - exp.getMax();
                 exp.setMax(10 * level.getMax());
                 exp.set(residue, true);
-                get("Endurance").setMax(500 + level.getMax() * 50);
+                get("Tiredness").setMax(500 + level.getMax() * 50);
                 int prev = 1;
                 int current = 1;
                 boolean pass = true;
@@ -103,9 +96,9 @@ public class MainPlayer extends Player {
                     current += pprev;
                     if (level.getMax() > 30 || 30 - current == level.getMax()) { //decay
                         String[] stats = new String[]{
-                                "Stamina", "Strength", "Dexterity", "Intelligence", "Wisdom"
+                                "Stamina", "Strength", "Agility", "Intelligence"
                         };
-                        get(stats[Global.r.nextInt(5)]).add(-1, true);
+                        get(stats[Global.r.nextInt(stats.length)]).add(-1, true);
                         pass = false;
                     } else if (30 - current < level.getMax()) pass = false;
                 }
@@ -134,7 +127,8 @@ public class MainPlayer extends Player {
     }
 
     protected void onMapEdge(int dir){
-        if (map.name.startsWith("_M")) Global.server.requestChangeMap("_M"+(Integer.parseInt(map.name.substring(2))+dir)+"@"+(dir<0?0:1));
+        if (map.name.startsWith("_M"))
+            Global.server.requestChangeMap("_M"+(Integer.parseInt(map.name.substring(2))+dir)+"@"+(dir<0?0:1));
         else super.onMapEdge(dir);
     }
 
@@ -142,7 +136,8 @@ public class MainPlayer extends Player {
         super.update();
         if (!get("Stamina").isFull()) indicater.show(.5f);
         indicater.update();
-        map.mapEdgeCenter(Global.cameraTo = pos.getAdd(0, 0));
+        if (input.ctrl) Global.cameraTo = pos.getAdd(target.getMult(.5f,.5f));
+        else Global.cameraTo = pos.getAdd(vel.getAdd(0,-Settings.gravity).mult(50,20));
     }
 
     public void remove() {

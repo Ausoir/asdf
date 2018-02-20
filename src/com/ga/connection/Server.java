@@ -227,6 +227,11 @@ public class Server {
         public void onFocus(boolean focus) {
 
         }
+
+        @Override
+        public String getKeyMap(int p) {
+            return null;
+        }
     }
 
     class ClientServer implements ListenServer, Input {
@@ -315,6 +320,11 @@ public class Server {
         @Override
         public void onFocus(boolean focus) {
 
+        }
+
+        @Override
+        public String getKeyMap(int p) {
+            return null;
         }
     }
 }

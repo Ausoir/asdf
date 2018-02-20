@@ -2,9 +2,9 @@ package com.ga.unit;
 
 import com.ga.game.Command;
 import com.ga.game.Input;
+import com.ga.map.Global;
 import com.ga.unit.man.Player;
 import com.ga.unit.skill.Actions;
-import com.sun.istack.internal.NotNull;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -26,10 +26,13 @@ public class PlayerInput implements Input {
         add(Actions.Right);
         add(Actions.Rest);
         add(Actions.Jump);
+        add(Actions.Throw);
         add(Actions.Wield);
+        add(Actions.Drop);
     }};
     private ArrayList<Integer> pressed = new ArrayList<>();
     public Player host;
+    public boolean ctrl = false;
     public PlayerInput(Player unit){
         host = unit;
         unit.input = this;
@@ -47,6 +50,11 @@ public class PlayerInput implements Input {
     @Override
     public void onFocus(boolean focus) {
         if (!focus) pressed.clear();
+    }
+
+    @Override
+    public String getKeyMap(int p) {
+        return keyActionMap.get(p);
     }
 
     public void changeMapping(int key, Actions event){
@@ -87,9 +95,12 @@ public class PlayerInput implements Input {
             if (mode < 0) pressed.remove((Object)(-mode));
             else if (mode > 9){
                 if (!pressed.contains(mode)) pressed.add(mode);
-                inputDirect("_"+mode, x, y);
             }
-            if (keyActionMap.containsKey(mode)) inputDirect(keyActionMap.get(mode),x,y);
+            String action = keyActionMap.get(mode);
+            if (action != null){
+                inputDirect(keyActionMap.get(mode),x,y);
+                if (action.startsWith("_")) pressed.remove((Object)(mode));
+            }
         }
     }
     private void inputCoord(int x, int y){
@@ -100,10 +111,14 @@ public class PlayerInput implements Input {
     public void inputDirect(String p, int x, int y){
         if (x != -1 || y != -1) inputCoord(x,y);
         if (p.startsWith("_")) {
-            if (p.startsWith("_WI")) {
+            if (p.startsWith("_EXIT")) System.exit(1);
+            else if (p.startsWith("_CTRL")) ctrl = !ctrl;
+            else if (p.startsWith("_SAY")) Global.display.chatbox.requestFocus();
+            else if (p.startsWith("_MENU")) Global.display.menu.showMenu();
+            else if (p.startsWith("_WI")) {
                 host.selectingItem = Integer.parseInt(p.substring(3));
                 host.setState(Actions.Wield);
-            } else if (p.equals("_Recall")) host.say(host.memorized);
+            }
         } else {
             Actions move = Actions.getByName(p);
             if (move == Actions.Wield) host.selectingItem = -1;
@@ -128,9 +143,11 @@ public class PlayerInput implements Input {
             String[] data = p.split(";",-1);
             for (String i : data) {
                 String[] pair = i.split(":");
-                Actions move = Actions.getByName(pair[1]);
-                if (move != null){
-                    changeMapping(Integer.parseInt(pair[0]), move);
+                if (pair[1].startsWith("_")){
+                    keyActionMap.put(Integer.parseInt(pair[0]), pair[1]);
+                } else {
+                    Actions move = Actions.getByName(pair[1]);
+                    if (move != null) changeMapping(Integer.parseInt(pair[0]), move);
                 }
             }
         }
@@ -140,10 +157,7 @@ public class PlayerInput implements Input {
         if (keyActionMap.size() == 0) return "";
         String r = "";
         for (Map.Entry<Integer, String> i : keyActionMap.entrySet()){
-            if (!i.getValue().equals("Idle")) {
-                r += i.getKey() + ":" + i.getValue() + ";";
-                break;
-            }
+            if (!i.getValue().equals("Idle")) r += i.getKey() + ":" + i.getValue() + ";";
         }
         return r.substring(0,r.length()-1);
     }

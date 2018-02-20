@@ -28,6 +28,7 @@ public class Terrain extends Drawable {
             @Override
             public void shade(int p){
                 if (shader != null) {
+//                    shader.renderLines(lines, pos, ZOOM, image); //slow
                     for (Line i : lines) {
                         int origX = (int) ((i.pt.x - pos.x)/ZOOM);
                         int origY = (int) ((i.pt.y - pos.y)/ZOOM);

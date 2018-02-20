@@ -23,6 +23,7 @@ public class Armor extends Item {
         this.piece = piece;
         delay = 80;
         if (piece == 1 || piece == 2) image.set(name, piece);
+        else if (piece == 3) weight = 0;
     }
     void shade(int color){}
     public void onCreate(){
@@ -49,8 +50,8 @@ public class Armor extends Item {
         if (owner != null) owner.armor.remove(this);
         super.remove();
     }
-    public boolean checkBreak(int damage){ //damage reduction
-        int r = (int) Math.max(1, damage - getArmor());
+    public boolean checkBreak(boolean blunt, int damage){ //damage reduction
+        int r = (int) Math.max(0, blunt?damage:damage - getArmor());
         if (isUsable(r)){
             if (owner != null) trigger(owner);
             return false;

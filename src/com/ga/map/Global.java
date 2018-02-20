@@ -34,7 +34,7 @@ public class Global {
     public static int time;
     public static Timer updates = new Timer(40,true);
     public static ArrayList<EventTimer> timers = new ArrayList<>();
-    public static Font font = new Font("Helvetica",Font.PLAIN,18);
+    public static Font font = new Font("Helvetica",Font.PLAIN,20);
     public static int controlId;
     public static float scale = 1;
 
@@ -45,7 +45,8 @@ public class Global {
             cosv[i] = (float)((int)(Math.cos(Math.toRadians(i))*10000))/10000;
         }
     }
-    static void setRel(){
+    static void updateCamera(){
+        Global.camera.add(Global.player.map.mapEdgeCenter(Global.cameraTo).getSubtract(Global.camera.getAdd(0,40)).mult(.05f,.05f));
         rel.set(-camera.x+Settings.centerX, -camera.y+Settings.centerY);
     }
     public static float sin(float p){
@@ -68,14 +69,11 @@ public class Global {
     public static int nextGaussian(int p){
         return (int) (r.nextGaussian()*p);
     }
-    static float rng(float max){
-        return clamp((float)r.nextGaussian(),-max,max);
-    }
     public static void p(String p){
         System.out.println(p);
     }
     public static void update(){
-        if (updates.update() && !Updater.editor) {
+        if (updates.update()) {
             timePass(1);
             FileManager.saveCharacter();
         }

@@ -12,15 +12,18 @@ import java.util.TimerTask;
  */
 public class Processes {
     private static Timer display, update, controllers;
+    public static boolean paused = false;
     Processes(){
         resume();
     }
     public static void pause(){
+        paused = true;
         update.cancel();
         display.cancel();
         controllers.cancel();
     }
     public static void resume(){
+        paused = false;
         display = new Timer();
         update = new Timer();
         controllers = new Timer();
