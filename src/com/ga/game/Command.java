@@ -2,7 +2,6 @@ package com.ga.game;
 
 import com.ga.map.*;
 import com.ga.tool.Line;
-import com.ga.unit.PlayerInput;
 import com.ga.unit.Prop;
 import com.ga.unit.Stock;
 import com.ga.unit.Traits;
@@ -47,10 +46,12 @@ public class Command {
                     host.pos.add(host.target);
                 }
                 else if (cmd[0].equals("tpto")) host.pos.set(Integer.parseInt(cmd[1].split(",")[0]),Integer.parseInt(cmd[1].split(",")[1]));
-                else if (cmd[0].equals("act")) host.setState(Actions.valueOf(cmd[1]));
+                else if (cmd[0].equals("act")) host.stateSet(Actions.valueOf(cmd[1]));
                 else if (cmd[0].equals("level")) Global.player.witnessDeath(host);
                 else if (cmd[0].equals("learn")) host.learnSkill(Actions.valueOf(cmd[1]));
                 else if (cmd[0].equals("trait")) host.learnTrait(Traits.Trait.valueOf(cmd[1]));
+                else if (cmd[0].equals("forget")) host.moveset.remove(Actions.valueOf(cmd[1]));
+                else if (cmd[0].equals("lose")) host.traits.forget(Traits.Trait.valueOf(cmd[1]));
                 else if (cmd[0].equals("recipe")) host.crafting.knowledge.add(cmd[1]);
                 else if (cmd[0].equals("sound")) Sound.play(host.map, Global.camera, cmd[1]);
                 else if (cmd[0].equals("depth")) host.say("Me: "+host.getDepth()+" Line: "+host.lastLand.depth+", Terrain: "+host.map.terrains.get(host.lastLand.tid).getDepth());

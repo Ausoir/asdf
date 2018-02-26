@@ -127,8 +127,8 @@ public class MainPlayer extends Player {
     }
 
     protected void onMapEdge(int dir){
-        if (map.name.startsWith("_M"))
-            Global.server.requestChangeMap("_M"+(Integer.parseInt(map.name.substring(2))+dir)+"@"+(dir<0?0:1));
+        if (map.name.startsWith("_"))
+            Global.server.requestChangeMap("_"+map.name.substring(1,2)+(Integer.parseInt(map.name.substring(2))+dir)+"@"+(dir<0?1:2));
         else super.onMapEdge(dir);
     }
 
@@ -137,7 +137,7 @@ public class MainPlayer extends Player {
         if (!get("Stamina").isFull()) indicater.show(.5f);
         indicater.update();
         if (input.ctrl) Global.cameraTo = pos.getAdd(target.getMult(.5f,.5f));
-        else Global.cameraTo = pos.getAdd(vel.getAdd(0,-Settings.gravity).mult(50,20));
+        else Global.cameraTo = pos.getAdd(vel.getAdd(0,-Settings.gravity).mult(50,30));
     }
 
     public void remove() {

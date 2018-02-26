@@ -22,14 +22,14 @@ public class Organ extends Line {
     boolean amputated = false;
     public Unit host;
     private ArrayList<Organ> children = new ArrayList<>();
-    int type;
+    public int type;
     int health;
     private int maxLength = 80;
     boolean vital = false;
     boolean leg = false, hand = false;
     public Performer onAmputate = new Performer();
 
-    Organ(Organ p, boolean tip){
+    public Organ(Organ p, boolean tip){
         if (p != null) {
             p.children.add(this);
             if (tip) pt = p.ptd;
@@ -56,6 +56,9 @@ public class Organ extends Line {
         if (type != 0 && image != null){
             image.setSize(size, image.getSize().y);
         }
+    }
+    public int getSize() {
+        return strokeSize;
     }
     public void draw(Graphics2D g){
         image.draw(g, host.pos.x+pt.x, host.pos.y+pt.y, getAtan()-1.57f, host.dir, strokeSize, getLength()+3);

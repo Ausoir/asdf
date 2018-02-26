@@ -13,6 +13,7 @@ import com.ga.unit.skill.Buffs;
 import com.ga.unit.skill.Stat;
 import com.ga.unit.skill.Stats;
 
+import javax.annotation.processing.SupportedAnnotationTypes;
 import java.awt.*;
 import java.util.HashMap;
 
@@ -34,7 +35,7 @@ public class Unit extends Prop {
     public Traits traits = new Traits();
     public float damageMod = 1;
     protected String speechType;
-    protected Speech speech;
+    protected Speech speech = new Speech(this);
     public int stateLevel = 1;
     public int attackSpeed = 0;
     private Actions lastState = Actions.Idle;
@@ -51,8 +52,8 @@ public class Unit extends Prop {
     protected void init(){}
     @Override
     public Unit start(){
-        speech = new Speech(this);
         super.start();
+        speech.start();
         return this;
     }
     @Override
@@ -123,19 +124,17 @@ public class Unit extends Prop {
     public int setState(Actions state) {
         if (delay.over() && jump && this.state != state) {
             lastState = null;
-            face(target.x > 0 ? 1 : -1, true);
+            face(target.x > 0 ? 1 : -1, false);
             if (Global.time >= getCooldown(state)[0]) {
-                if (get("Stamina").require(state.getCost())) {
-                    if (state != Actions.Idle) delay.performer = null;
-                    stateLevel = getStateLevel(state);
-                    if (stateLevel > 0){
-                        cooldown.put(state, new int[]{Global.time+state.getCooldown()});
+                if (state != Actions.Idle) delay.performer = null;
+                stateLevel = getStateLevel(state);
+                if (stateLevel > 0){
+                    if (get("Stamina").require(state.getCost())) {
+                        cooldown.put(state, new int[]{Global.time + state.getCooldown()});
                         stateSet(state);
                         return 0; //fine
-                    } else return 5; //not enough power
-                } else {
-                    return 2; //no stamina
-                }
+                    } else return 2; //no stamina
+                } else return 5; //not enough power
             } else return 3; //cooldown
         }
         return 1; //delay
@@ -201,6 +200,12 @@ public class Unit extends Prop {
         return super.hittable(faction) && state != Actions.Dead;
     }
 
+    @SuppressWarnings("SuspiciousNameCombination") //Make perpendicular lines
+    public Line getPosLine(){
+        int i = SyncRand.r.nextInt(clip.organs.length);
+        return new Line(pos.getAdd(new P(clip.organs[i].pt.y, clip.organs[i].ptd.x)),
+                pos.getAdd(new P(clip.organs[i].ptd.y, clip.organs[i].pt.x)));
+    }
     public boolean hit(Line hitBox, int damage){
         return hit(hitBox, true, damage);
     }
@@ -212,10 +217,8 @@ public class Unit extends Prop {
                     P t = new P(pos.x, hitBox.ptd.y);
                     Particle.explode(map, "Blood", getDepth(), t, t.getSubtract(hitBox.pt), 3, 3, 12, true, 5);
                     if (damageBreakthrough(i, blunt, damage)) {
-                        if (traits.has(Traits.Trait.Tough)) {
-                            if (stats.getEffectLevel(Buffs.Bleed) < 3) buff(Buffs.Bleed, 1);
-                            else die();
-                        } else clip.organs[i].amputate(hitBox, damage);
+                        if (traits.has(Traits.Trait.Tough)) buff(Buffs.Bleed, 1);
+                        else clip.organs[i].amputate(hitBox, damage);
                     } else {
                         if (get("Stamina").require(SyncRand.r.nextInt(damage+1))) clip.organs[i].hit(hitBox);
                         else {
@@ -260,13 +263,13 @@ public class Unit extends Prop {
     }
 
     public void disconnect(){ //do not use remove() - calls overriden method
-        super.remove();
         speech.remove();
+        super.remove();
     }
 
     public void remove(){ //do not use disconnect()
-        super.remove();
         speech.remove();
+        super.remove();
     }
 
     @Override
@@ -290,7 +293,7 @@ public class Unit extends Prop {
             if (vel.y > Settings.gravity*4) Sound.play(map, pos, "land");
             if (vel.y >= Settings.gravityMax && hittable(Faction.Destructive)) {
                 stateSet(Actions.Down);
-                delay.time = (int) (800f/Global.clamp(get("Agility").get(),1,100));
+                delay.time = (int) (800f/Global.clamp(get("Agility").get(),1,800));
             } else if (state == Actions.Jump && vel.y > 0) {
                 stateSet(Actions.Hit);
                 delay.set(4);

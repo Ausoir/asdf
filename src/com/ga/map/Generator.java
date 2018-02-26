@@ -59,7 +59,7 @@ public class Generator {
             int id = max-i;
             int ladderX = Creation.r.nextInt(lowPt2.x()-lowPt1.x()-80)+lowPt1.x()+40;
             float ladderDepth = id+.01f;
-            Line ground = map.checkLand(new Line(new P(ladderX, lowPt1.y), new P(ladderX, lowPt1.y+1200)), id);
+            Line ground = map.checkLand(new Line(new P(ladderX, lowPt1.y), new P(ladderX, lowPt1.y+99999)), id);
             if (ground != null) {
                 for (int y = lowPt1.y()+40; y < (int) ground.getCrossPointY(ladderX); y += 40) {
                     TerrainTrail ladder = new TerrainTrail(map, new P(ladderX - 40, y-20));
@@ -154,17 +154,19 @@ public class Generator {
                     prop.seed = bid+prop.seed-1;
                     highestBid = Math.max(highestBid, prop.seed);
                 } else if (prop.factoryId == Stock.Travel.ordinal()) {
-                    prop.name = "B" + map.name + "-" + bid;
-                    Map house = new Map("building/In_" + building);
-                    house.start();
-                    house.updater.processQueue();
-                    for (Prop ob : house.updater.props) {
-                        if (ob.factoryId == Stock.Travel.ordinal()) {
-                            ob.name = map.name;
-                            ob.seed = bid+ob.seed-1;
+                    if (prop.subId > 0) {
+                        prop.name = prop.name + (prop.subId==1?map.name:"") + "-" + bid;
+                        Map house = new Map("building/In_" + building);
+                        house.start();
+                        house.updater.processQueue();
+                        for (Prop ob : house.updater.props) {
+                            if (ob.factoryId == Stock.Travel.ordinal() && ob.subId == 1) {
+                                ob.name = map.name;
+                                ob.seed = bid + ob.seed - 1;
+                            }
                         }
+                        FileManager.saveMap("B" + map.name + "-" + bid, house);
                     }
-                    FileManager.saveMap("B" + map.name + "-" + bid, house);
                 }
             }
         }
@@ -179,16 +181,21 @@ public class Generator {
         return r;
     }
     void generateTown(){
-        map.size = new P(Creation.r.nextInt(4000)+8000, Creation.r.nextInt(4500)+1500);
-        String[] landTexture = new String[][]{
-                new String[]{"dirt&grass","dirt&road_unpaved","dirt&road_normal","dirt&road_highway"},
-                new String[]{"dirt&grass","dirt&road_unpaved","dirt&road_normal","dirt&road_highway"}}[Creation.r.nextInt(2)];
-        String foundationTexture = new String[]{"brick&basic", "whitebrick&basic", "concrete&basic", "concrete&road_unpaved", "brick&road_unpaved", "whitebrick&road_unpaved"}
-            [Creation.r.nextInt(6)];
+        int total = Creation.r.nextInt(10000)+6000;
+        float ratio = Creation.r.nextFloat()*.3f+.55f;
+        map.size = new P(total*ratio, total*(1-ratio));
+        String[] landTexture = new String[]{"dirt&grass","dirt&road_unpaved","dirt&road_normal","dirt&road_highway"};
+        String[] foundationTexture = new String[]{"whitebrick&basic", "concrete&basic", "concrete&road_unpaved", "rockwood&basic"};
         int max = Creation.r.nextInt(4)+2;
-        generateFloor(max+1, map.size, Creation.r.nextInt(12)*200+200, 16, new String[]{landTexture[Creation.r.nextInt(landTexture.length)]});
+
+        TerrainTrail trail = new TerrainTrail(map, new P(-40, map.size.y+40));
+        trail.move(0, -640);
+        trail.move(map.size.x+80, 0);
+        trail.move(0, 640);
+        trail.finish((max+1)+"&"+landTexture[Creation.r.nextInt(landTexture.length)]);
+
         makeEdgeSpawns(map.size);
-        generateFoundations(max, map.size, lowestY()+24, foundationTexture);
+        generateFoundations(max, map.size, lowestY()+24, foundationTexture[Creation.r.nextInt(foundationTexture.length)]);
         map.normalize(0,1600);
         map.size.y -= 800;
         int bid=1;
@@ -198,7 +205,9 @@ public class Generator {
                 P mid = l.getMidpoint();
                 if (map.checkLand(new Line(mid.x, 0, mid.x, mid.y - 1), l.depth) == null) {
                     if (Creation.r.nextInt(3) == 0) {
-                        for (int ii = 0; ii < Creation.r.nextInt(9); ii++) map.placeProp(l, "Barrel=.5,Crate=1", -1);
+                        for (int ii = 0; ii < Creation.r.nextInt(9); ii++){
+                            if (l.getWidth() > 200) map.placeProp(l, "Barrel=.5,Crate=1", -1); // if > ladder width 160
+                        }
                         for (int ii = 0; ii < Creation.r.nextInt(9); ii++) {
 //                          map.placeProp(l, "Resident=.4", -1);
                         }
@@ -270,9 +279,19 @@ public class Generator {
     }
     private void makeEdgeSpawns(P mapSize){
         Line leftSpawn = map.checkLand(new Line(mapSize.x-24,0,mapSize.x-24,mapSize.y));
-        Stock.Spawn.create(map, -1, 0).start().pos.set(mapSize.x-24,leftSpawn.getCrossPointY(leftSpawn.ptd.x-24)-Math.abs(leftSpawn.getSlope())-Settings.gravity*2-8);
+        Stock.Spawn.create(map, -1, 1).start().pos.set(mapSize.x-24,leftSpawn.getCrossPointY(leftSpawn.ptd.x-24)-Math.abs(leftSpawn.getSlope())-Settings.gravity*2-8);
         Line rightSpawn = map.checkLand(new Line(24,0,24,mapSize.y));
-        Stock.Spawn.create(map, -1, 1).start().pos.set(24,rightSpawn.getCrossPointY(24)-Math.abs(rightSpawn.getSlope())-Settings.gravity*2-8);
+        Stock.Spawn.create(map, -1, 2).start().pos.set(24,rightSpawn.getCrossPointY(24)-Math.abs(rightSpawn.getSlope())-Settings.gravity*2-8);
+    }
+    void generateForest(){
+        map.size = new P(Creation.r.nextInt(4000)+4000, 4000);
+        TerrainTrail ground = new TerrainTrail(map, new P(-40, map.size.y()+40));
+        ground.move(0, -640);
+        ground.move(map.size.x()+80, 0);
+        ground.move(0, 640);
+        ground.climbable();
+        ground.finish("4&dirt&grass&Tree=1");
+        makeEdgeSpawns(map.size);
     }
     void generateLand(){
         map.size = new P(Creation.r.nextInt(4000)+2000, Creation.r.nextInt(4000)+2000);
@@ -317,21 +336,6 @@ public class Generator {
         divideLand(total, ++current, max);
         total.add(two);
         divideLand(total, ++current, max);
-    }
-    void generateFloor(int depth, P mapSize, int randomness, int varianceY, String[] texture){
-        float horizon = mapSize.y-600;
-        P orig = new P(0, horizon);
-        TerrainTrail trail = new TerrainTrail(map, orig);
-        while (trail.last.x < mapSize.x) {
-            int randX = (Creation.r.nextInt(240) + 20) * (Creation.r.nextInt(randomness)+1);
-            int randY = (Creation.r.nextInt(varianceY) - (varianceY/2)) * Creation.r.nextInt(randomness);
-            trail.add(trail.last.x+randX, horizon+randY);
-            if (trail.last.x+randomness > mapSize.x) trail.last.x = mapSize.x;
-        }
-        trail.last.y = horizon;
-        trail.add(trail.last.x, mapSize.y);
-        trail.add(0, mapSize.y);
-        trail.finish(depth+"&"+texture[Creation.r.nextInt(texture.length)]);
     }
     void generateBlocker(int depth, int p){
         float highX = 0;

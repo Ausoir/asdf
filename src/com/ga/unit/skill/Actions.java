@@ -1,5 +1,6 @@
 package com.ga.unit.skill;
 
+import com.ga.game.Dialog;
 import com.ga.game.Sound;
 import com.ga.map.Global;
 import com.ga.map.ShadedPicture;
@@ -180,8 +181,8 @@ public enum Actions {
         }
         public void update(Unit host){
             float speed = host.getSpeed();
-            host.vel.x += speed * 2 * host.dir * (1 + host.stateLevel*.2f);
-//            if (host.stateDuration % (20+host.stateLevel*4) == 0 && !host.get("Stamina").require(1)) host.setState(Actions.Idle);
+            host.vel.x += speed * 2 * host.dir * (1 + host.stateLevel*.1f);
+            if (host.stateDuration % (12+host.stateLevel*4) == 0 && !host.get("Stamina").require(1)) host.setState(Actions.Idle);
         }
         public void onFinish(Unit host){}
     }, Grab(15,3,12,5,new Tags(){{
@@ -235,15 +236,32 @@ public enum Actions {
         add(Tag.Strength);
         add(Tag.Legs);
     }}){
-        public void onSet(Unit host){
-            host.attackSpeed = -1;
-        }
         public void update(Unit host){
             host.vel.x *= 1.1f;
             ArrayList<Unit> target = host.map.updater.collideUnit(host.getHand(), 64, host.faction);
             if (target != null && target.size() > 0){
                 Sound.play(host.map, host.pos, "hit_bash");
                 target.get(0).stateSet(Down);
+            }
+        }
+    }, Hold(45,3,3,3,new Tags(){{
+        add(Tag.Strength);
+        add(Tag.Legs);
+    }}){
+        public void onFinish(Unit host){}
+        public void onSet(Man host){
+            host.damageMod = 0;
+            host.weapon.rotateTo(host.target.getMult(host.dir, host.dir));
+        }
+        public void update(Man host){
+            if (host.stateDuration > 12) {
+                Unit victim = host.attack();
+                if (victim != null) {
+                    victim.stateSet(Down);
+                    victim.vel.x = -victim.vel.x * 2;
+                    victim.vel.y -= 8;
+                    host.stateSet(Idle);
+                }
             }
         }
     }, Backstep(0,-1,0,0,new Tags(){{
@@ -255,7 +273,7 @@ public enum Actions {
             host.vel.x += host.getSpeed() * -host.dir;
         }
     },
-    Rest(0,-1,0,0,new Tags(){{
+    Rest(0,0,0,0,new Tags(){{
         add(Tag.Athletics);
     }}){
         public int getRange(Unit p){
@@ -266,7 +284,7 @@ public enum Actions {
         }
         public void update(Unit host) {
             if (host.get("Stamina").isFull()) host.stateSet(Idle);
-            else host.stats.rest(4+host.stateLevel);
+            else host.stats.rest(5+host.stateLevel);
         }
     },
     Melee(24,-1,0,0,new Tags(){{
@@ -339,6 +357,7 @@ public enum Actions {
     },
     Kick(3,-1,2,1,new Tags(){{
         add(Tag.Strength);
+        add(Tag.Athletics);
         add(Tag.Legs);
     }}){
         public void trigger(Man host){
@@ -401,12 +420,12 @@ public enum Actions {
             host.say(host.stateDuration+"");
         }
     },
-    Punch(12,0,0,1,new Tags(){{
-        add(Tag.Strength);
+    Punch(12,1,0,1,new Tags(){{
+        add(Tag.Athletics);
     }}){
         public void onSet(Unit host){
             host.attackSpeed = host.stateLevel*3-23;
-            if (Global.r.nextInt(host.stateLevel+1) == 0 && !host.get("Stamina").require(1)) host.stateSet(Hit);
+            if (Global.r.nextInt(host.stateLevel+1) != 0) host.get("Stamina").add(1,false);
         }
         public int getRange(Unit p){
             return 36;
@@ -713,7 +732,7 @@ public enum Actions {
         public void onSet(Unit host){
             host.attackSpeed = -1;
             float x = Math.abs(host.vel.x);
-            float t = Math.max(0, 28 - x) + (float)(Math.log(host.stateLevel*3)/Math.log(2) * 4);
+            float t = Math.max(0, 28 - x) + (float)(Math.log(host.stateLevel*2)/Math.log(2) * 4);
             Sound.play(host.map, host.pos, "jump");
             host.vel.y -= t;
             float speed = host.getSpeed();
@@ -844,7 +863,7 @@ public enum Actions {
                             ((ShadedPicture) t.image).shade(new Color(48, 156, 200, 150).getRGB());
                             t.image.setCenterType(ctype);
                         }
-                        if (!host.traits.has(Traits.Trait.Infusion_Mastery) || host.stateLevel < 3) {
+                        if (host.traits.getTraitLevel(Traits.Trait.Infusion)<3 || host.stateLevel < 3) {
                             t.save = false;
                             Global.timers.add(new EventTimer(2 + host.stateLevel, false, new Performer() {
                                 public void perform() {
@@ -857,7 +876,7 @@ public enum Actions {
                     host.stateSet(Fracture);
                 }
             } else {
-                if (host.weapon instanceof Weapon && host.traits.has(Traits.Trait.Infusion_Mastery) && host.traits.has(Traits.Trait.Enchanting) && host.requireMana(1000)){
+                if (host.weapon instanceof Weapon && host.traits.getTraitLevel(Traits.Trait.Infusion)>2 && host.traits.has(Traits.Trait.Enchanting) && host.requireMana(1000)){
                     int quality = ((Weapon) host.weapon).getQuality();
                     if (Global.r.nextInt(quality+1) == 0){
                         ((Weapon) host.weapon).enhance();
@@ -1068,7 +1087,7 @@ public enum Actions {
             if (host.stateDuration % (9+host.stateLevel*2) == 0) host.buff(Buffs.Shock, 1);
         }
     },
-    Enchant(60,2,12,1,new Tags(){{
+    Enchant(60,2,12,0,new Tags(){{
         add(Tag.Enchant);
     }}){
         public int getRange(Unit host){
@@ -1079,9 +1098,9 @@ public enum Actions {
         }
         public void trigger(Man host){
             Sound.play(host.map, host.pos, "shadowstep");
-            ArrayList<Buffs> buffs = Buffs.getByLevel(host.stateLevel+2);
+            ArrayList<Buffs> buffs = Buffs.getByLevel(host.stateLevel+host.traits.getTraitLevel(Traits.Trait.Enchanting));
             ArrayList<Buffs> curses = (ArrayList<Buffs>) buffs.clone();
-                    Tags holding = new Tags();
+            Tags holding = new Tags();
             holding.addAll(host.weapon.tags);
             holding.addAll(host.armor.armor[3].tags);
             holding.add(Tag.Enchant);
@@ -1093,52 +1112,23 @@ public enum Actions {
                     if (tags.contains(Tag.Curse)) curses.add(buffs.get(i));
                 }
             }
-            Buffs buff = buffs.get(host.get("Stamina").get() % buffs.size());
-            if (SyncRand.r.nextInt(3) < host.stateLevel) {
-                int range = (int) (64+(Math.log(host.stateLevel)/Math.log(.5f)));
-                ArrayList<Unit> t = host.map.updater.collideUnit(host.target.getAdd(host.pos), range,Faction.Destructive);
-                if (t.size() > 0) {
+            if (buffs.size() == 0) return;
+            ArrayList<Unit> t = host.map.updater.collideUnit(host.target.getAdd(host.pos),320,Faction.Destructive);
+            if (t.size() > 0) {
+                boolean fail = SyncRand.r.nextInt(1+host.stateLevel*3)==0;
+                boolean cursed = false;
+                int roulette = fail?0:host.seed+host.weapon.seed;
+                for (Unit aT : t) {
+                    if (aT.stats.getEffectLevel(Buffs.Mark) > 0) {
+                        aT.buff(curses.get(roulette % curses.size()), host.stateLevel);
+                        cursed = true;
+                    }
+                }
+                if (!cursed){
+                    Buffs buff = buffs.get(roulette % buffs.size());
                     t.get(SyncRand.r.nextInt(t.size())).buff(buff, 1 + host.stateLevel);
                 }
-            } else if (curses.size() > 0){
-                host.buff(curses.get(SyncRand.r.nextInt(curses.size())), host.stateLevel);
-            }
-        }
-    },
-    Curse(40,2,12,1,new Tags(){{
-        add(Tag.Curse);
-    }}){
-        public int getRange(Unit host){
-            return 900;
-        }
-        public String getClipName(){
-            return "Mark";
-        }
-        public void trigger(Man host){
-            Sound.play(host.map, host.pos, "shadowstep");
-            final ArrayList<Buffs> buffs = Buffs.getByLevel(host.stateLevel+2);
-            Tags holding = new Tags();
-            holding.addAll(host.weapon.tags);
-            holding.addAll(host.armor.armor[3].tags);
-            holding.add(Tag.Curse);
-            for (int i=0;i<buffs.size();i++){
-                Tags tags = buffs.get(i).tags;
-                if (tags.isEmpty() || !tags.contains(Tag.Enchant) || !tags.containsAny(holding)){
-                    buffs.remove(i--);
-                }
-            }
-            Buffs buff = buffs.get(host.get("Stamina").get() % buffs.size());
-            ArrayList<Unit> t = host.map.updater.collideUnit(host.pos,800,Faction.Destructive);
-            if (t.size() > 0) {
-                for (int i=0;i<t.size();i++) {
-                    if (t.get(i).stats.getEffectLevel(Buffs.Mark) <= 0) t.remove(i--);
-                }
-                t.addAll(host.map.updater.collideUnit(host.target.getAdd(host.pos),64,Faction.Destructive));
-                if (SyncRand.r.nextInt(host.stateLevel*3) != 0) {
-                    t.get(0).buff(buff, 1 + host.stateLevel);
-                } else {
-                    host.buff(buff, 1 + host.stateLevel);
-                }
+                if (fail) host.buff(Buffs.Bleed, 1);
             }
         }
     },
@@ -1359,7 +1349,7 @@ public enum Actions {
                     Particle.smoke(host.map, pos, host.getDepth());
                     ArrayList<Unit> t = host.map.updater.collideUnit(pos,48+level*16,Faction.Destructive);
                     for (Unit i : t){
-                        if (i != host) i.hit(getPosLine(), getDamage());
+                        if (i != host) i.hit(i.getPosLine(), getDamage());
                     }
                     remove();
                     host.setVisible(true);
@@ -1402,7 +1392,7 @@ public enum Actions {
                     Particle.smoke(host.map, pos, getDepth());
                     ArrayList<Unit> t = host.map.updater.collideUnit(pos,128+level*8,Faction.Destructive);
                     for (Unit i : t){
-                        i.hit(getPosLine(), getDamage());
+                        i.hit(i.getPosLine(), getDamage());
                     }
                     remove();
                 }
@@ -1494,7 +1484,7 @@ public enum Actions {
         this.trainers = tags.getTrainers();
     }
     public String getDescription(){
-        String r = name() +
+        String r = Dialog.get("?"+name()) +
                 "\n[Trainers: " + trainers.toString()+" at Difficulty "+getDifficulty()+"]" +
                 "\n[Cost:"+cost+" "+"]";
         if (Global.player.getStateLevel(this) == 0)

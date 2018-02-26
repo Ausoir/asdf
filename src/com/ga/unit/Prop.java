@@ -50,9 +50,6 @@ public class Prop extends Thing {
             setDepth(closest.depth - OFFSET_PROP);
         }
     }
-    public Line getPosLine(){
-        return new Line(pos, pos.getAdd(0,-1));
-    }
     Line getFaceLine(){
         return new Line(pos, pos.getAdd(dir,0));
     }
@@ -77,11 +74,11 @@ public class Prop extends Thing {
                     float slope = land.getSlope();
                     boolean cw = land.clockwise();
                     float lineY = land.getCrossPointY(pos.x);
-                    Line testt = new Line(pos.x, pos.y - 9999, pos.x, pos.y+2);
+                    Line testt = new Line(vp.x, vp.y - 9999, vp.x, vp.y);
                     int cws = 0, ccs = 0; //check if landsite is overlapped behind a higher depth polygon
                     boolean overlapped = false;
                     for (Line ii : map.landRaw) {
-                        if (ii.depth > land.depth && ii.opt > 0 && ii.lineCross(testt)) {
+                        if (ii.depth > land.depth && ii.opt >= 0 && ii.lineCross(testt)) {
                             overlapped = true;
                             if (ii.clockwise()) cws++;
                             else ccs++;

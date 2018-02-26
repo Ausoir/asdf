@@ -17,14 +17,6 @@ public class Player extends Man {
         speechType = "p";
     }
     @Override
-    public boolean learnSkill(Actions move){ //Rest Use Left Right
-        if (moveset.size()-4 < get("Intelligence").get()){
-            moveset.add(move);
-            return true;
-        }
-        return false;
-    }
-    @Override
     public int setState(Actions state){
         int r = super.setState(state);
         if (r != 0){

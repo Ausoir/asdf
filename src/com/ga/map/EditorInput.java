@@ -397,7 +397,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
                         if (Math.abs(current.getSlope()) <= 1.5f) y = (int) current.pt.y;
                         else x = current.pt.x();
                     }
-                } else if (current.opt == 1) {
+                } else if (current.opt > 0) {
                     x = current.pt.x();
                 }
             }
@@ -640,11 +640,18 @@ public class EditorInput extends Drawable implements Input, Updatable {
             case KeyEvent.VK_INSERT:
                 Updater.editor = false;
                 Global.server.requestChangeMap(map.name+"@0");
-                new Timer().schedule(new TimerTask() {
-                    public void run() {
-                        Global.player.pos.set(Global.cameraTo.getAdd(0,-400));
+                final P asdf = Global.camera.getAdd(0,-400);
+                while (true){
+                    try {
+                        Thread.sleep(100);
+                        if (!Processes.paused){
+                            Global.player.pos.set(asdf);
+                            break;
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
-                },501);
+                }
                 break;
         }
     }

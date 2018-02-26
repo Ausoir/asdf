@@ -57,10 +57,12 @@ public class Map {
         callname = "Field";
         Generator gen = new Generator(this, 0);
         if (dir.startsWith("_M")){
-            gen.generateTown();
-//            gen.generateLand();
-            panorama = new Thing(this, "Bg_Desert", 0, 0);
+            if (Creation.getRegionVariable(Integer.parseInt(dir.substring(2))).nextInt(6) == 0) gen.generateTown();
+            else gen.generateLand();
+        } else if (dir.startsWith("_F")){
+            gen.generateForest();
         }
+        panorama = new Thing(this, "Bg_Desert", 0, 0);
         generateProps();
     }
 
@@ -94,18 +96,22 @@ public class Map {
         this.size = new P(names[2]);
         if (line.length > 1) {
             String[] sections = line[1].split(";");
-            for (String section1 : sections) {
-                String values[] = section1.split(":");
-                formTextures.put(Integer.parseInt(values[0]), values[1]);
+            if (!line[1].equals("")) {
+                for (String section1 : sections) {
+                    String values[] = section1.split(":");
+                    formTextures.put(Integer.parseInt(values[0]), values[1]);
+                }
             }
             if (line.length > 2) {
-                sections = line[2].split(";");
-                for (String section1 : sections) {
-                    Line surface = new Line(section1);
-                    landRaw.add(surface);
-                    //set depth here so next block prop spawns auto adjust to correct land depth
-                    surface.depth = Float.parseFloat(formTextures.get(surface.tid).split("&")[0])*.1f+3;
-                    if (surface.opt > 0) land.add(surface);
+                if (!line[2].equals("")) {
+                    sections = line[2].split(";");
+                    for (String section1 : sections) {
+                        Line surface = new Line(section1);
+                        landRaw.add(surface);
+                        //set depth here so next block prop spawns auto adjust to correct land depth
+                        surface.depth = Float.parseFloat(formTextures.get(surface.tid).split("&")[0]) * .1f + 3;
+                        if (surface.opt > 0) land.add(surface);
+                    }
                 }
                 if (line.length > 3 && !line[3].equals(";")) {
                     sections = line[3].split(";");
@@ -188,8 +194,8 @@ public class Map {
     }
 
     void generateProps(){
-        for (Line l : land) {
-            if (l.clockwise()) {
+        for (Line l : landRaw) { //generation happens before loading into land from landRaw
+            if (l.clockwise() && l.opt > 0) {
                 if (Math.abs(l.getSlope()) < Line.MAXSLOPE
                         && (l.pt.y < size.y || l.ptd.y < size.y) && (l.pt.x < size.x || l.ptd.x < size.x)
                         && (l.pt.y > 0 || l.ptd.y > 0) && (l.pt.x > 0 || l.ptd.x > 0)) {

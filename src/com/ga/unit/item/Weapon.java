@@ -17,16 +17,11 @@ public class Weapon extends Item {
         delay = 0;
     }
     public void onCreate(){
-        imbueMeta(true, true, .3f);
-        if (emod != null && !emod.tags.contains(Tag.Curse) && rand.nextFloat() > .1f){
-            emod = null;
-            ademod = AdenchantMod.None;
-        }
+        imbueMeta(true, true, .1f);
     }
     protected void setModifier(SpecialtyMod mod){
-        if (mod == SpecialtyMod.Feather) this.weight = Math.max(0,this.weight-(2*admod.magnitude));
-        else if (mod == SpecialtyMod.Sharp) quality += (admod.magnitude)/2;
-        else if (mod == SpecialtyMod.Dull) quality += (-1*admod.magnitude)/2;
+        if (mod == SpecialtyMod.Sharp) quality += admod.magnitude;
+        else if (mod == SpecialtyMod.Dull) quality -= admod.magnitude;
         else super.setModifier(mod);
     }
     public int getQuality(){

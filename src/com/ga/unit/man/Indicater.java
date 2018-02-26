@@ -45,6 +45,7 @@ public class Indicater extends Drawable {
         g.fillArc(x+2,y+2,32,32,0, (int) (measuree.getPercentage()*360));
         int cd = time-Global.time;
         if (cd >= 0){
+            g.setFont(Global.font);
             g.setColor(sg2);
             g.drawString(cd+"",x-28,y+24);
             g.setColor(sg);

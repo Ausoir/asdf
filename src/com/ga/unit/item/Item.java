@@ -9,6 +9,7 @@ import com.ga.map.Shader;
 import com.ga.tool.Interactive;
 import com.ga.tool.Line;
 import com.ga.tool.P;
+import com.ga.tool.SyncRand;
 import com.ga.unit.*;
 import com.ga.unit.man.Man;
 import com.ga.unit.skill.Actions;
@@ -27,7 +28,7 @@ public class Item extends Prop {
             public boolean isBlunt(){return false;}},
         Spear(Actions.Thrust, 1, .6f, 0, "swing_silent"){
             public boolean isBlunt(){return false;}},
-        Knife(Actions.Slash, 3, .3f, 2, "swing_knife"){
+        Knife(Actions.Thrust, 3, .3f, 2, "swing_knife"){
             public boolean isBlunt(){return false;}},
         Swinging(Actions.Slash, 3, 1, 10, "swing_silent"),
         Bashing(Actions.Slash, 1, 1, 10, "swing_silent"),
@@ -53,7 +54,7 @@ public class Item extends Prop {
     public enum Material{
         Wooden(.4f,2,1,1,0,new Color(118, 93, 0,60)){
             public void onSet(Item host){
-                host.tags.add(Tag.Curse);
+                host.tags.add(Tag.Enchant);
                 host.tags.add(Tag.Mutation);
                 host.tags.add(Tag.Fire);
             }
@@ -101,8 +102,8 @@ public class Item extends Prop {
         },
         Obsidian(.1f,3,4,.7f,8000){
             public void onSet(Item host){
-                host.tags.add(Tag.Curse);
-                host.tags.add(Tag.Curse);
+                host.tags.add(Tag.Enchant);
+                host.tags.add(Tag.Enchant);
                 host.tags.add(Tag.Fire);
                 host.tags.add(Tag.Fire);
             }
@@ -154,9 +155,9 @@ public class Item extends Prop {
         }
     }
     enum SpecialtyMod{
-        None, Light, Heavy, Feather, Sharp, Dull, Durable, Tough, Runic, Instant, Cursed, Athletic, Strengthening, Glowing, Unwieldy;
+        None, Light, Heavy, Sharp, Dull, Tough, Hardened, Runic, Instant, Cursed, Athletic, Strengthening, Branded, Unwieldy;
         static SpecialtyMod get(Random seed){
-            if (seed.nextInt(4) == 0) return values()[seed.nextInt(values().length)];
+            if (seed.nextInt(8) == 0) return values()[seed.nextInt(values().length)];
             return None;
         }
         static SpecialtyMod load(String p){
@@ -182,7 +183,7 @@ public class Item extends Prop {
             return None;
         }
         static AdverbMod get(Random seed){
-            int r = seed.nextInt(10);
+            int r = seed.nextInt(20);
             if (r < 1) return Ultra;
             else if (r < 3) return Super;
             else if (r < 8) return Very;
@@ -226,7 +227,7 @@ public class Item extends Prop {
     public int weight, range;
     public int volume = 1;
     public int encumbrance = 0;
-    int cooldown = 4;
+    int cooldown = 3;
     public int delay = 0;
     public float probability;
     private int[] cdTime;
@@ -313,22 +314,22 @@ public class Item extends Prop {
         if (mod == SpecialtyMod.None) admod = AdverbMod.None;
         else if (mod == SpecialtyMod.Sharp) smod = SpecialtyMod.None;
         else if (mod == SpecialtyMod.Dull) smod = SpecialtyMod.None;
-        else if (mod == SpecialtyMod.Tough) smod = SpecialtyMod.None;
+        else if (mod == SpecialtyMod.Hardened) smod = SpecialtyMod.None;
         else if (mod == SpecialtyMod.Heavy) this.weight += admod.magnitude;
-        else if (mod == SpecialtyMod.Light) this.weight = Math.max(0, this.weight + (-1 * admod.magnitude));
-        else if (mod == SpecialtyMod.Feather) this.weight /= 2*admod.magnitude;
-        else if (mod == SpecialtyMod.Durable) durability *= 8;
+        else if (mod == SpecialtyMod.Light) this.weight = Math.max(0, this.weight - admod.magnitude);
+        else if (mod == SpecialtyMod.Tough) durability *= 2;
         else if (mod == SpecialtyMod.Runic) probability += .2f*admod.magnitude;
-        else if (mod == SpecialtyMod.Instant) delay = 1;
-        else if (mod == SpecialtyMod.Athletic){
-            tags.add(Tag.Athletics);
-            tags.add(Tag.Athletics);
-            tags.add(Tag.Athletics);
-        }
-        else if (mod == SpecialtyMod.Strengthening) tags.add(Tag.Strength);
+        else if (mod == SpecialtyMod.Instant) cooldown = 0;
         else if (mod == SpecialtyMod.Unwieldy) encumbrance+=admod.magnitude;
-        else if (mod == SpecialtyMod.Glowing) {
-            tags.add(Tags.trainers[seed % Tags.trainers.length]);
+        else if (mod == SpecialtyMod.Cursed) tags.add(Tag.Enchant);
+        else if (mod == SpecialtyMod.Athletic){
+            for (int i=0;i<admod.magnitude;i++) tags.add(Tag.Athletics);
+        }
+        else if (mod == SpecialtyMod.Strengthening){
+            for (int i=0;i<admod.magnitude;i++) tags.add(Tag.Strength);
+        }
+        else if (mod == SpecialtyMod.Branded) {
+            for (int i=0;i<admod.magnitude;i++) tags.add(Tags.trainers[seed % Tags.trainers.length]);
         }
     }
     private int getRarity(){
@@ -361,7 +362,7 @@ public class Item extends Prop {
         return (int) r;
     }
     boolean isCursed(){
-        return false;
+        return smod == SpecialtyMod.Cursed;
     }
     private String getRarityDescription(){
         String r = "";
@@ -387,9 +388,7 @@ public class Item extends Prop {
         r += " " + getName();
         if (emod != null){
             r+=" of ";
-            if (ademod != AdenchantMod.None){
-                r += ademod.name()+" ";
-            }
+            if (ademod != AdenchantMod.None) r += ademod.name()+" ";
             r+=emod.name();
         }
         return r;
@@ -411,7 +410,7 @@ public class Item extends Prop {
         mobile = true;
         if (smod == SpecialtyMod.Cursed){
             ArrayList<Buffs> list = Buffs.getByTag(Tag.Curse);
-            host.buff(list.get(rand.nextInt(list.size())),rand.nextInt(9)+1);
+            host.buff(list.get(rand.nextInt(list.size())),rand.nextInt(1+admod.magnitude*2)+1);
         }
     }
     public void remove(){
@@ -450,7 +449,7 @@ public class Item extends Prop {
         return false;
     }
     public void trigger(Unit target){
-        if (emod != null && Global.time >= cdTime[0] && rand.nextFloat() < probability){
+        if (emod != null && Global.time >= cdTime[0] && SyncRand.r.nextFloat() < probability){
             cdTime[0] = Global.time+cooldown;
             target.buff(emod, ademod.level);
         }
@@ -473,7 +472,7 @@ public class Item extends Prop {
             String ade = "";
             if (ademod != AdenchantMod.None) ade = "Level "+ademod.level+" ";
             if (cooldown > 0){
-                r += " "+Dialog.get("itemEncDsc",new String[]{getRarityDescription(), ade+emod.name(), cooldown+""});
+                r += " "+Dialog.get("?itemEnc",new String[]{getRarityDescription(), ade+emod.name(), cooldown+""});
                 int cd = cdTime[0] - Global.time;
                 if (cd <= 0) r += " "+Dialog.get("itemEncRdy");
                 else r += " "+Dialog.get("itemEncNRdy", new String[]{cd+""});
@@ -485,7 +484,7 @@ public class Item extends Prop {
         return type.isBlunt()?weight:weight*2;
     }
     public Line getLine(){
-        float len = image.getSize().x * dir + 4;
+        float len = image.getSize().x * dir * (image.getCenterType()==1?.5f:1) + 2;
         return new Line(pos, pos.getAdd(len*Global.cos(rotation), len*Global.sin(rotation)));
     }
     public String forceToString(){

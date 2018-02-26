@@ -1,16 +1,16 @@
-Dummy;punk;1;Evil;0;Idle;Man;;Toughwear;Mask; //Humanoids-Name,Speech Type,Level,Faction,AI Type,Moveset,Face,Weapons,Armors,Headgears
-Player;player;1;Player;0;Idle;Man;;;;
-Resident;resident;1;Neutral;1;Sprint;Man;,,,,,,,,,Potion,Stick;Comfortwear,Dustset,Toughwear,Comfortwear,Comfortwear,Suit,Robe,Comfortwear;;
-Merchant;merchant;1;Neutral;3;Sprint;Man;;Suit;;
-Looter;punk;1;Punk;2;Use,Rest,Lunge,Underhand;Man;Stick,;,Comfortwear,Toughwear;,Bandana;
-Punk;punk;1;Punk;2;Use,Rest,Lunge,Sidekick,Dash;Man;Dagger,Axe,Pickaxe;,Comfortwear,Dustset,Toughwear;,Bandana;
-Yeller;punk;2;Punk;2;Use,Rest,Backstep,Calling;Man;Dagger,Axe,Pickaxe;,Comfortwear,Dustset,Toughwear;,Bandana;
-Phantom;;8;Curse;2;Use,Rest,Dash,Flameroll,Fireblast,Shadowstep,Blizzard;Phantom;Greatsword,Halberd,Warhammer;Shadowrobe;;
-Monk;punk;3;Punk;2;Backstep,Use,Rest,Punch,Kick,Sidekick,Dash,Leap;Man;,Fireball,Threadball,Throwing Knife,Scroll,Potion;Robe;;
-Guard;soldier;5;Neutral;2;Use,Rest,Sidekick,Underhand,Dash,Whirlwind;Man;Broadsword,Spear,Mace;Chainmail,Platemail;Lace_Helm,Legion_Helm;
-Archer;soldier;6;Punk;2;Punch,Kick,Use,Rest,Backstep;Man;Bow;Chainmail,Platemail,Dustset;Lace_Helm;
-Undead;undead;9;Evil;2;Use,Rest,Thrust,Underhand,Lunge,Mark;Skull;Broadsword,Mace;Skeleton;Lace_Helm,Legion_Helm;
-Hunter;soldier;6;Evil;2;Backstep,Kick,Dash,Blink,Use,Rest;Man;Revolver,Rifle,Pistol;Suit,Dustset;;
-Pawnbroker;seafood;1;Neutral;4;Sprint;Man;;Suit;;
-Transporter;merchant;1;Neutral;5;Sprint;Man;;Adventurewear;;
-Innkeep;merchant;1;Neutral;6;Sprint;Man;;Suit;;
+Dummy;punk;1;Evil;0:0;Idle;Man;0:0;Toughwear;Mask; //Humanoids-Name,Speech Type,Level,Faction,AI Type,Moveset,Face,Weapons,Armors,Headgears
+Player;player;1;Player;0:0;Idle;Man;;;;
+Resident;resident;1;Neutral;1:0;Sprint;Man;,,,,,,,,,Potion,Stick;Comfortwear,Dustset,Toughwear,Comfortwear,Comfortwear,Suit,Robe,Comfortwear;;
+Merchant;merchant;1;Neutral;3:0;Sprint;Man;;Suit;;
+Looter;punk;1;Punk;2:0;Use;Man;Stick,;,Comfortwear,Toughwear;,Bandana;
+Punk;punk;2;Punk;2:0;Use,Lunge,Dash;Man;Dagger,Axe,Pickaxe;,Comfortwear,Dustset,Toughwear;,Bandana;
+Yeller;punk;3;Punk;2:0;Use,Backstep,Calling;Man;Dagger,Axe,Pickaxe;,Comfortwear,Dustset,Toughwear;,Bandana;
+Phantom;;8;Curse;2:0;Use,Dash,Flameroll,Fireblast,Shadowstep,Blizzard;Phantom;Greatsword,Halberd,Warhammer;Shadowrobe;;
+Monk;punk;3;Punk;2:0;Backstep,Use,Punch,Kick,Sidekick,Dash,Leap;Man;,Fireball,Threadball,Throwing Knife,Scroll,Potion;Robe;;
+Guard;soldier;5;Neutral;2:0;Use,Sidekick,Underhand,Dash,Whirlwind;Man;Broadsword,Spear,Mace;Chainmail,Platemail;Lace_Helm,Legion_Helm;
+Archer;soldier;6;Punk;2:0;Punch,Kick,Use,Backstep;Man;Bow;Chainmail,Platemail,Dustset;Lace_Helm;
+Undead;undead;9;Evil;2:0;Use,Thrust,Underhand,Lunge,Mark;Skull;Broadsword,Mace;Skeleton;Lace_Helm,Legion_Helm;
+Hunter;soldier;6;Evil;2:0;Backstep,Kick,Dash,Blink,Use;Man;Revolver,Rifle,Pistol;Suit,Dustset;;
+Pawnbroker;seafood;1;Neutral;4:0;Sprint;Man;;Suit;;
+Transporter;merchant;1;Neutral;5:0;Sprint;Man;;Adventurewear;;
+Innkeep;merchant;1;Neutral;6:0;Sprint;Man;;Suit;;

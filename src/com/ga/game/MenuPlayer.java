@@ -3,10 +3,7 @@ package com.ga.game;
 import com.ga.map.Global;
 import com.ga.map.Picture;
 import com.ga.tool.Performer;
-import com.ga.unit.PlayerInput;
-import com.ga.unit.Prop;
-import com.ga.unit.Tag;
-import com.ga.unit.Tags;
+import com.ga.unit.*;
 import com.ga.unit.item.Crafts;
 import com.ga.unit.item.Item;
 import com.ga.unit.man.Inventory;
@@ -132,7 +129,7 @@ public class MenuPlayer extends Panel {
         void refresh(){
             int maxEncumbrance = Global.player.get("Agility").get();
             gold.setText("Encumbrance:"+(maxEncumbrance-Global.player.getVacancy())+"/"+maxEncumbrance+
-                    "                 Weight:"+Global.player.getWeight()+"/"+Global.player.get("Strength").get()*2);
+                    "                 Weight:"+Global.player.getWeight());
             panel.removeAll();
 
             grid.gridy = 0;
@@ -232,7 +229,7 @@ public class MenuPlayer extends Panel {
             add(scroll, BorderLayout.LINE_START);
         }
         void refresh(){
-            gold.setText("Weight:"+Global.player.getWeight()+"/"+Global.player.get("Strength").get()*2);
+            gold.setText("Weight:"+Global.player.getWeight());
             panel.removeAll();
             Inventory inv = Global.player.inventory;
             int itemsize = inv.getItemSize();
@@ -304,7 +301,7 @@ public class MenuPlayer extends Panel {
         }
         void refresh(){
             panel.removeAll();
-            panel.add(new JLabel(Dialog.get("mvsRemap")));
+            panel.add(new JLabel(Dialog.get("Remap")));
             panel.add(Box.createRigidArea(new Dimension(0,12)));
             for (Actions i : PlayerInput.basicMoves){
                 if (i != Actions.Idle) makeSlot(i);
@@ -314,7 +311,7 @@ public class MenuPlayer extends Panel {
             skillpoints.setText(Dialog.get("mem")+": "+points);
         }
         void makeSlot(final Actions move){
-            final String displayName = Dialog.get("mvs"+move.getName());
+            final String displayName = Dialog.get(move.getName());
             String key = Global.player.input.getMapping(move);
             if (key == null) key = "";
             else key = "["+key+"]";
@@ -330,7 +327,7 @@ public class MenuPlayer extends Panel {
                 }
             });
             int level = Global.player.getStateLevel(move);
-            final JLabel equip = new JLabel(displayName+" "+Dialog.get("pwr")+" "+level);
+            final JLabel equip = new JLabel(displayName+" - "+Dialog.get("pwr")+" "+level);
             final JLabel keyLabel = new JLabel(" "+key+" ");
             keyLabel.setForeground(Color.RED);
             equip.addMouseListener(new MouseAdapter() {
@@ -363,6 +360,56 @@ public class MenuPlayer extends Panel {
             });
             if (!move.getDescription().equals("")) panel.add(describe);
             panel.add(keyLabel);
+            panel.add(equip);
+            this.panel.add(panel);
+            this.panel.add(Box.createRigidArea(new Dimension(0,4)));
+        }
+    }
+
+    private class TraitPanel extends JPanel{
+        private JScrollPane scroll;
+        private JPanel panel;
+        TraitPanel(){
+            setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+            setVisible(false);
+            panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+            panel.setOpaque(false);
+            scroll = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            scroll.getVerticalScrollBar().setUI(new ScrollBar());
+            scroll.getVerticalScrollBar().setOpaque(false);
+            scroll.getVerticalScrollBar().setUnitIncrement(16);
+            scroll.setOpaque(false);
+            scroll.getViewport().setOpaque(false);
+            scroll.setBorder(null);
+            setBackground(Panel.forecolor2);
+            add(scroll, BorderLayout.CENTER);
+        }
+        void refresh(){
+            panel.removeAll();
+            panel.add(Box.createRigidArea(new Dimension(0,12)));
+            for (Traits.Trait i : Global.player.traits.getTraits()){
+                makeSlot(i);
+            }
+        }
+        void makeSlot(final Traits.Trait move){
+            final String displayName = Dialog.get(move.name());
+            JPanel panel = new JPanel();
+            panel.setOpaque(false);
+            panel.setLayout(new BoxLayout(panel,BoxLayout.LINE_AXIS));
+            panel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
+            final JLabel describe = new JLabel(iconDescribe);
+            describe.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    Global.display.menu.showDialog(move.name(), move.getDescription());
+                }
+            });
+            int level = Global.player.traits.getTraitLevel(move);
+            String label = displayName;
+            if (move.type == 3) label += " - "+Dialog.get("pwr")+" "+level+(level==Traits.MAXLEVEL?" [MAX]":"");
+            final JLabel equip = new JLabel(label);
+            if (!move.getDescription().equals("")) panel.add(describe);
             panel.add(equip);
             this.panel.add(panel);
             this.panel.add(Box.createRigidArea(new Dimension(0,4)));
@@ -602,6 +649,7 @@ public class MenuPlayer extends Panel {
     private EquipmentPanel equipmentPanel = new EquipmentPanel();
     private InventoryPanel inventorypanel = new InventoryPanel();
     private SkillPanel skillpanel = new SkillPanel();
+    private TraitPanel traitpanel = new TraitPanel();
     private CraftPanel craftpanel = new CraftPanel();
     MenuPlayer() {
         targetSizeX = 764;
@@ -621,6 +669,7 @@ public class MenuPlayer extends Panel {
         add(equipmentPanel,grid);
         add(inventorypanel,grid);
         add(skillpanel,grid);
+        add(traitpanel,grid);
         add(craftpanel,grid);
         command("");
 
@@ -637,12 +686,13 @@ public class MenuPlayer extends Panel {
         GridLayout gridlayout = new GridLayout(7,1,20,36);
         mainpanel.setOpaque(false);
         mainpanel.setLayout(gridlayout);
-        mainpanel.add(makeOption(Dialog.get("act"), "act"));
-        mainpanel.add(makeOption(Dialog.get("stats"), "stats"));
-        mainpanel.add(makeOption(Dialog.get("equip"), "equip"));
-        mainpanel.add(makeOption(Dialog.get("inv"), "inventory"));
-        mainpanel.add(makeOption(Dialog.get("mvs"), "spell"));
-        mainpanel.add(makeOption(Dialog.get("crft"), "craft"));
+        mainpanel.add(makeOption(Dialog.get("Action"), "act"));
+        mainpanel.add(makeOption(Dialog.get("Stat"), "stats"));
+        mainpanel.add(makeOption(Dialog.get("Equipment"), "equip"));
+        mainpanel.add(makeOption(Dialog.get("Inventory"), "inventory"));
+        mainpanel.add(makeOption(Dialog.get("Skill"), "spell"));
+        mainpanel.add(makeOption(Dialog.get("Trait"), "trait"));
+        mainpanel.add(makeOption(Dialog.get("Craft"), "craft"));
         grid.gridx = 0;
         add(mainpanel,grid);
     }
@@ -677,12 +727,7 @@ public class MenuPlayer extends Panel {
                 button.setBackground(Panel.forecolor);
             }
         });
-        button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                command(cmd);
-            }
-        });
+        button.addActionListener(e -> command(cmd));
         return button;
     }
     private void command(String p){
@@ -690,6 +735,7 @@ public class MenuPlayer extends Panel {
         equipmentPanel.setVisible(false);
         inventorypanel.setVisible(false);
         skillpanel.setVisible(false);
+        traitpanel.setVisible(false);
         actionpanel.setVisible(false);
         craftpanel.setVisible(false);
         switch (p) {
@@ -707,6 +753,9 @@ public class MenuPlayer extends Panel {
                 break;
             case "spell":
                 skillpanel.setVisible(true);
+                break;
+            case "trait":
+                traitpanel.setVisible(true);
                 break;
             case "craft":
                 craftpanel.setVisible(true);
@@ -729,6 +778,7 @@ public class MenuPlayer extends Panel {
             statspanel.refresh();
             inventorypanel.refresh();
             skillpanel.refresh();
+            traitpanel.refresh();
             equipmentPanel.refresh();
             craftpanel.refresh();
         }

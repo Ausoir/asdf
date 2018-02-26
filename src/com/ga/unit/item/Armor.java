@@ -27,11 +27,7 @@ public class Armor extends Item {
     }
     void shade(int color){}
     public void onCreate(){
-        imbueMeta(true, true, .3f);
-        if (emod != null && !emod.tags.contains(Tag.Enchant) && rand.nextFloat() > .1f){
-            emod = null;
-            ademod = AdenchantMod.None;
-        }
+        imbueMeta(true, true, .1f);
     }
     @Override
     boolean isCursed() {
@@ -43,7 +39,7 @@ public class Armor extends Item {
         return Math.max(0,material.hardness + armorMod);
     }
     protected void setModifier(SpecialtyMod mod){
-        if (mod == SpecialtyMod.Tough) armorMod += admod.magnitude;
+        if (mod == SpecialtyMod.Hardened) armorMod += admod.magnitude;
         else super.setModifier(mod);
     }
     public void remove(){

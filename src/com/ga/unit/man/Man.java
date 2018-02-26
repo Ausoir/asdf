@@ -213,11 +213,13 @@ public class Man extends Unit {
     protected int getStatePower(Actions state){
         int r = 0;
         Tags tags = state.getTags();
-        for (Tag i : getTags()){
+        Tags mytags = getTags();
+        for (Tag i : mytags){
             if (tags.contains(i)) r++;
         }
         if (state.getTrainers().contains(Tag.Strength)) r += get("Strength").get();
-        return r / Math.max(1,tags.size());
+        if (state.getTrainers().contains(Tag.Athletics)) r += getVacancy(); //can go negative
+        return Math.max(0,r) / Math.max(1,tags.size());
     }
 
     public int getVacancy(){
@@ -275,6 +277,7 @@ public class Man extends Unit {
         return false;
     }
     public boolean requireMana(int p){
+        if (stats.getEffectLevel(Buffs.Attunement) > 0) return true;
         ArrayList<Item> items = new ArrayList<>();
         items.addAll(inventory.getItems());
         items.add(weapon);
@@ -332,10 +335,10 @@ public class Man extends Unit {
 
     @Override
     public void draw(Graphics2D g) {
-        super.draw(g);
-        armor.armor[0].pos.set(pos.getAdd(clip.organs[5].pt));
-        armor.armor[0].rotation = clip.organs[5].getAtan()+1.57f;
-        armor.armor[0].draw(g);
+        for (int i=0;i<clip.organs.length;i++) {
+            clip.organs[i].draw(g);
+            armor.display[i].draw(g);
+        }
     }
 
     public String getDescription(){

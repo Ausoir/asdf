@@ -51,7 +51,7 @@ class TerrainTrail {
     }
     void switchSides(float x2){
         for (Line i : lines) {
-            if (i.opt == 1){
+            if (i.opt > 0){
                 i.pt = new P(x2-i.pt.x,i.pt.y);
                 i.ptd = new P(x2-i.ptd.x,i.ptd.y);
             } else {

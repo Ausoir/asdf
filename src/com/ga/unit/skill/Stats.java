@@ -14,7 +14,7 @@ import java.util.Map;
 public class Stats {
     private ArrayList<Buff> effects = new ArrayList<>();
     private HashMap<String, Stat> stats = new HashMap<>();
-    private Timer timer = new Timer(60, true);
+    private Timer restTimer = new Timer(100, true);
     private Unit host;
     public Stats(Unit host){
         this.host = host;
@@ -52,7 +52,7 @@ public class Stats {
     }
 
     public boolean rest(int mag){
-        if (timer.update(mag)){
+        if (restTimer.update(mag)){
             Stat stamina = stats.get("Stamina");
             stamina.add(1, false);
             return true;

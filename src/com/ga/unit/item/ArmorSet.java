@@ -1,9 +1,11 @@
 package com.ga.unit.item;
 
-import com.ga.map.Shader;
-import com.ga.unit.*;
-import com.ga.unit.man.BodyHumanoid;
+import com.ga.unit.Organ;
+import com.ga.unit.Stock;
+import com.ga.unit.Tags;
 import com.ga.unit.man.Man;
+
+import java.awt.*;
 
 /**
  * Created by Ga on 1/15/2017. asd
@@ -27,9 +29,27 @@ public class ArmorSet {
     private Organ[] organs;
     public Tags tags = new Tags();
     private Man host;
+    public Organ[] display;
     public ArmorSet(Man host, String head, String body, String legs, String etc){
         this.host = host;
         organs = host.clip.organs;
+        display = new Organ[organs.length];
+        for (int i=0;i<organs.length;i++){
+            if (i == 5){
+                display[i] = new Organ(null, true){
+                    public void draw(Graphics2D g) {
+                        image.draw(g, host.pos.x+pt.x, host.pos.y+pt.y, getAtan()+1.57f, host.dir);
+                    }
+                };
+            } else display[i] = new Organ(null, true);
+            display[i].host = host;
+            display[i].pt = organs[i].pt;
+            display[i].ptd = organs[i].ptd;
+            display[i].setSize(organs[i].getSize());
+            display[i].type = organs[i].type;
+            display[i].setImage(null);
+            display[i].getImage().visible = false;
+        }
         armor = new Armor[4];
         String[] armors = new String[]{head,body,legs,etc};
         for (int i=0;i<armor.length;i++){
@@ -40,25 +60,27 @@ public class ArmorSet {
         for (int i=0;i<armor.length;i++) set(armor[i], i);
     }
     public void set(Armor p, int piece){
-        if (p == null || p == bare[piece]){
-            armor[piece] = bare[piece];
-            if (piece == 1) {
-                organs[BodyHumanoid.LLEG].setImage("Underwear", 1);
-                organs[BodyHumanoid.RLEG].setImage("Underwear", 1);
+        if (p == null) p = bare[piece];
+        armor[piece] = p;
+        if (p == bare[piece]) {
+            if (piece == 0) display[5].getImage().visible = false;
+            else if (piece == 1) {
+                display[1].getImage().visible = false;
+                display[2].getImage().visible = false;
             } else if (piece == 2){
-                organs[BodyHumanoid.FIST].setImage("Underwear", 2);
-                organs[BodyHumanoid.OFIST].setImage("Underwear", 2);
-                organs[BodyHumanoid.BODY].setImage("Underwear", 0, Shader.None);
+                display[0].getImage().visible = false;
+                display[3].getImage().visible = false;
+                display[4].getImage().visible = false;
             }
         } else {
-            armor[piece] = p;
-            if (piece == 1) {
-                organs[BodyHumanoid.LLEG].setImage(p.name, 1);
-                organs[BodyHumanoid.RLEG].setImage(p.name, 1);
+            if (piece == 0) display[5].setImage(p.name);
+            else if (piece == 1) {
+                display[1].setImage(p.name, 1);
+                display[2].setImage(p.name, 1);
             } else if (piece == 2){
-                organs[BodyHumanoid.FIST].setImage(p.name, 2);
-                organs[BodyHumanoid.OFIST].setImage(p.name, 2);
-                organs[BodyHumanoid.BODY].setImage(p.name, 0);
+                display[0].setImage(p.name, 2);
+                display[3].setImage(p.name, 0);
+                display[4].setImage(p.name, 2);
             }
         }
         tags.clear();

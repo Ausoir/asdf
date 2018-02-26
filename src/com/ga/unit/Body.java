@@ -123,15 +123,7 @@ public class Body {
             }
             if (model[p].length > 1){
                 int type = Integer.parseInt(model[p][1]);
-                if (type < 0) organs[p] = new Organ(parent, tip) {
-                                    public void draw(Graphics2D g) {
-//                                        if (type != 0) g.drawLine((int)(host.pos.x+pt.x+Global.rel.x), (int)(host.pos.y+pt.y+Global.rel.y),
-//                                                (int)(host.pos.x+ptd.x+Global.rel.x), (int)(host.pos.y+ptd.y+Global.rel.y));
-                                        image.draw(g, host.pos.x + ptd.x, host.pos.y + ptd.y,
-                                            (float) Math.atan2(pt.y-ptd.y, pt.x-ptd.x)-1.57f, host.dir, strokeSize, getLength()+6);
-                                    }
-                                };
-                else if (type == 0) organs[p] = new Organ(parent, tip) {
+                if (type == 0) organs[p] = new Organ(parent, tip) {
                                         public void draw(Graphics2D g) {
 //                                            g.drawOval((int)(host.pos.x+pt.x-12+Global.rel.x), (int)(host.pos.y+pt.y-24+Global.rel.y), 24, 24);
                                             image.draw(g, host.pos.x+pt.x, host.pos.y+pt.y, getAtan()+1.57f, host.dir);

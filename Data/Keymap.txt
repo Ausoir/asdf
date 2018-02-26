@@ -1,1 +1,1 @@
-32:Kick;65:Left;1:Use;68:Right;71:Punch;9:_MENU;10:_SAY;16:Rest;17:_CTRL;81:Throw;82:Wield;83:Drop;86:Enchant;87:Jump;27:_EXIT
+65:Left;1:Use;67:Hold;68:Right;38:_UP;70:Enchant;71:Punch;9:_MENU;10:_SAY;16:Rest;17:_CTRL;81:Throw;82:Wield;83:Drop;87:Jump;27:_EXIT

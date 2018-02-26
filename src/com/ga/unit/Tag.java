@@ -5,7 +5,7 @@ package com.ga.unit;
  */
 public enum Tag {
     Mana, Enchant, Curse, Channeling, Electric, Air, Mutation, Fire, Conjuration,
-    Strength, Athletics,
+    Strength, Athletics, Weight,
     Ice, Hideable, Sharp, Fiber, Leather, Metal, Currency,
     Legs
 }

@@ -15,8 +15,10 @@ import java.util.Stack;
  */
 public abstract class AI implements Observer {
     int factoryId = -1;
+    int type = 0;
     public Unit host;
-    Stack<Task> tasks = new Stack<>();
+    int taskProgress = 0;
+    Stack<Behavior> tasks = new Stack<>();
     public Unit target;
     AI(Unit host){
         this.host = host;
@@ -28,6 +30,7 @@ public abstract class AI implements Observer {
         perceive(160);
         if (tasks.peek().update(host)){
             tasks.pop();
+            taskProgress = 0;
             if (tasks.empty()) bored();
         }
     }
@@ -35,12 +38,14 @@ public abstract class AI implements Observer {
         setTask(Behavior.Wander);
     }
     public void setTask(Behavior p){
-        tasks.push(p.get(host));
+        tasks.push(p);
     }
     public void onAttack(){}
     public void onHit(){
-        if (tasks.peek().alertness < 1){
-            setTask(Behavior.Search);
+        if (!perceive(400)){
+            if (tasks.peek().getAlertness() < 1){
+                setTask(Behavior.Search);
+            }
         }
     }
     boolean blocked(int dir){
@@ -60,20 +65,20 @@ public abstract class AI implements Observer {
         return false;
     }
     void load(String p) {
-        String[] tasks = p.split("/")[1].split(",");
+        String[] tasks = p.split(",");
         for (int i=tasks.length-1;i>=0;i--) {
-            String[] v = tasks[i].split("&");
+            String[] v = tasks[i].split(":");
             setTask(Behavior.values()[Integer.parseInt(v[0])]);
-            this.tasks.peek().load(Integer.parseInt(v[1]));
+            this.tasks.peek().load(host, Integer.parseInt(v[1]));
         }
     }
     public String toString() {
         String r = "";
         for (int i=tasks.size()-1;i>=0;i--) {
-            r += tasks.get(i).toString()+",";
+            r += tasks.get(i).toString(host)+",";
         }
         if (r.length()>0) r = r.substring(0,r.length()-1);
-        return factoryId+"/"+r;
+        return factoryId+":"+type+"/"+r;
     }
 }
 

@@ -86,9 +86,9 @@ public enum Stock {
     Beast{ Prop make(Map map, int id, int seed) {
         String[] units = FileManager.readText("raw/Beast.txt");
         String[] unit = units[id].split(";");
-        Unit product = new Unit(map, null, Creation.getSeed(seed)){
+        Unit product = new Unit(map, null, seed){
             public void onCreate(){
-                String str = getUnit(map, unit[0],seed,clip.toString(),makeStat(rand,Integer.parseInt(unit[2])),Faction.valueOf(unit[3]),unit[4]+"/1&0", unit[5], "");
+                String str = getUnit(map, unit[0],seed,clip.toString(),makeStat(rand,Integer.parseInt(unit[2])),Faction.valueOf(unit[3]),unit[4]+"/1:0", unit[5], "");
                 load(str);
             }
         };
@@ -100,9 +100,9 @@ public enum Stock {
     Man{ Prop make(Map map, int id, int seed){
         String[] units = FileManager.readText("raw/Man.txt");
         final String[] unit = units[id].split(";",-1);
-        com.ga.unit.man.Man product = new Man(map, unit[0], Creation.getSeed(seed)){
+        com.ga.unit.man.Man product = new Man(map, unit[0], seed){
             public void onCreate(){
-                String str = getUnit(map,name,seed,"111111",makeStat(rand,Integer.parseInt(unit[2])),Faction.valueOf(unit[3]),unit[4]+"/1&0",unit[5],"");
+                String str = getUnit(map,name,seed,"111111",makeStat(rand,Integer.parseInt(unit[2])),Faction.valueOf(unit[3]),unit[4]+"/1:0",unit[5],"");
                 str += "@Battery@;";
                 String[] weapon = unit[7].split(",");
                 String[] armor = unit[8].split(",");
@@ -121,7 +121,7 @@ public enum Stock {
     Etc{ Prop make(Map map, int id, int seed){
         String[] data = FileManager.readText("raw/Etc.txt");
         final String[] v = data[id].split(";");
-        Item product = new Item(map, v[0], Creation.getSeed(seed), Item.Material.load(v[4].split(",")), Item.ItemType.Bashing, 100);
+        Item product = new Item(map, v[0], seed, Item.Material.load(v[4].split(",")), Item.ItemType.Bashing, 100);
         product.weight = Integer.parseInt(v[2]);
         product.value = Integer.parseInt(v[3]);
         product.dir = product.seed % 2 == 0 ? 1 : -1;
@@ -132,7 +132,7 @@ public enum Stock {
     Weapon{ Prop make(Map map, int id, int seed){
         String[] data = FileManager.readText("raw/Weapon.txt");
         final String[] v = data[id].split(";");
-        Item product = new Weapon(map, v[0], Creation.getSeed(seed), Item.Material.load(v[4].split(",")), Item.ItemType.valueOf(v[1]),
+        Item product = new Weapon(map, v[0], seed, Item.Material.load(v[4].split(",")), Item.ItemType.valueOf(v[1]),
                 40, Integer.parseInt(v[2]));
         int range = Integer.parseInt(v[3]);
         if (range != -1) product.range = range;
@@ -144,7 +144,7 @@ public enum Stock {
         final String[] v = data[id].split(";");
         int piece = Integer.parseInt(v[1]);
         if (piece == 1 || piece == 2) v[0] = v[0].substring(0,v[0].indexOf("_"));
-        Prop product = new Armor(map, v[0], Creation.getSeed(seed), Item.Material.load(v[4].split(",")), piece,
+        Prop product = new Armor(map, v[0], seed, Item.Material.load(v[4].split(",")), piece,
                 Integer.parseInt(v[2]), Integer.parseInt(v[3]), Integer.parseInt(v[5]));
         product.subId = id;
         return product;
@@ -152,7 +152,7 @@ public enum Stock {
     Food{ Prop make(Map map, int id, int seed){
         String[] data = FileManager.readText("raw/Food.txt");
         final String[] v = data[id].split(";");
-        Prop product = new Food(map, v[0], Creation.getSeed(seed), Integer.parseInt(v[1]), v[2]);
+        Prop product = new Food(map, v[0], seed, Integer.parseInt(v[1]), v[2]);
         product.subId = id;
         return product;
     }},
@@ -190,7 +190,7 @@ public enum Stock {
                 if (state == Actions.Melee) attack();
             }
             public void onCreate(){
-                load(getUnit(map,name,seed,clip.toString(),makeStat(rand, 3),Faction.Predator,"2/1&0","Melee",""));
+                load(getUnit(map,name,seed,clip.toString(),makeStat(rand, 3),Faction.Predator,"2:0/1:0","Melee",""));
             }
         };
         product.clip = new Body(product, name());
@@ -224,8 +224,7 @@ public enum Stock {
                 super.buff(buff, level);
             }
             public void onCreate(){
-                load(getUnit(map,name(),seed,clip.toString(),"Stamina:7&Toughness:"+rand.nextInt(4)+"&Speed:6&Attack:0&Level:1"
-                        ,Faction.Predator,"2/1&0","Melee",""));
+                load(getUnit(map,name(),seed,clip.toString(),makeStat(rand,1),Faction.Predator,"2:0/1:0","Melee",""));
             }
             public void die(){
                 Threadball.create(map, -1, -1).pos.set(pos);
@@ -265,7 +264,7 @@ public enum Stock {
                 super.buff(buff, level);
             }
             public void onCreate(){
-                load(getUnit(map,name(),seed,clip.toString(),"Stamina:14&Speed:12&Attack:0&Level:2",Faction.Predator,"2/1&0","Shock,Jump",""));
+                load(getUnit(map,name(),seed,clip.toString(),makeStat(rand,2),Faction.Predator,"2:0/1:0","Shock,Jump",""));
             }
         };
         product.clip = new Body(product, name());
@@ -300,7 +299,7 @@ public enum Stock {
                 String moves;
                 if (seed % 2 == 1) moves = "Flameroll,Fireball";
                 else moves = "Fireblast";
-                load(getUnit(map,name(),seed,clip.toString(),"Stamina:30&Speed:10&Attack:0&Level:7",Faction.Predator,"3/1&0",moves,""));
+                load(getUnit(map,name(),seed,clip.toString(),makeStat(rand,7),Faction.Predator,"3/1:0",moves,""));
             }
         };
         product.gravity = false;
@@ -313,7 +312,7 @@ public enum Stock {
                 return false;
             }
             public void onCreate(){
-                load(getUnit(map,name(),seed,clip.toString(),"Stamina:30&Speed:10&Attack:0&Level:12",Faction.Predator,"3/1&0","Melee",""));
+                load(getUnit(map,name(),seed,clip.toString(),makeStat(rand,12),Faction.Predator,"3/1:0","Melee",""));
             }
         };
         product.gravity = false;
@@ -323,7 +322,7 @@ public enum Stock {
     Wyvern { Prop make(Map map, int id, int seed) {
         Unit product = new Unit(map, name(), seed){
             public void onCreate(){
-                load(getUnit(map,name(),seed,clip.toString(),"Stamina:30&Speed:30&Attack:0&Level:16",Faction.Predator,"3/1&0","Melee",""));
+                load(getUnit(map,name(),seed,clip.toString(),makeStat(rand,16),Faction.Predator,"3/1:0","Melee",""));
             }
         };
         product.gravity = false;
@@ -522,6 +521,7 @@ public enum Stock {
             public boolean use(com.ga.unit.man.Man host){
                 if (isUsable(1) && super.use(host)) {
                     if (spell != null){
+                        host.buff(Buffs.Attunement, 1);
                         host.stateLevel = 3;
                         host.stateSet(spell);
                         return true;
@@ -530,7 +530,11 @@ public enum Stock {
                 return false;
             }
             private void makeSpell(){
+                Tags physical = new Tags();
+                physical.add(Tag.Strength);
+                physical.add(Tag.Athletics);
                 ArrayList<Actions> list = Actions.getLearnables();
+                list.removeIf(e -> e.getTags().containsAny(physical));
                 spell = list.get(rand.nextInt(list.size()));
                 range = spell.getRange(null);
                 value = 100 + 100*(spell.getDifficulty() * spell.getTrainers().size());
@@ -752,7 +756,7 @@ public enum Stock {
                                     Particle.explosion(map, pos, getDepth());
                                     ArrayList<Unit> t = map.updater.collideUnit(pos,96,Faction.Destructive);
                                     for (Unit i : t){
-                                        i.hit(getPosLine(), explosionDamage);
+                                        i.hit(i.getPosLine(), explosionDamage);
                                     }
                                     remove();
                                 }

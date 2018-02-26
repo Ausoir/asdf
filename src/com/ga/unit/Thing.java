@@ -18,7 +18,7 @@ public class Thing extends Drawable {
     public Picture image;
     public P pos;
     public String name;
-    public int dir = Math.random()<.5f?1:-1;
+    public int dir = 1;
     public float rotation = 0;
     public boolean save = true;
     public Thing(Map map, String name, int seed, float depth){

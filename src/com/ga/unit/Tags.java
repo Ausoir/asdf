@@ -11,11 +11,6 @@ public class Tags extends ArrayList<Tag> {
         Tag.Strength, Tag.Athletics, Tag.Electric, Tag.Channeling, Tag.Fire, Tag.Air, Tag.Mutation, Tag.Conjuration
     };
 
-    @Override
-    public boolean add(Tag p) {
-        return !contains(p) && super.add(p);
-    }
-
     public boolean containsAny(Tags p){
         for (Tag i : p){
             if (contains(i)) return true;

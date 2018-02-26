@@ -1,5 +1,6 @@
  package com.ga.map;
 
+import com.ga.game.Settings;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 
@@ -85,19 +86,14 @@ public class Terrain extends Drawable {
         g.fill(polygon);
         image.shade(0);
     }
-    public void setSize(float x, float y){
+    private void setSize(float x, float y){
         image.setSize(x, y);
         finalSize = new P(x*ZOOM, y*ZOOM);
     }
     public void draw(Graphics2D g){
-        if (image.visible) {
-            g.drawImage(image.image,(int)(pos.x+Global.rel.x), (int) (pos.y+Global.rel.y),finalSize.x(),finalSize.y(),null);
-//            for (Line i : lines) g.drawLine((int)(t.x+i.pt.x),(int)(t.y+i.pt.y),(int)(t.x+i.ptd.x),(int)(t.y+i.ptd.y));
-        }
-    }
-    public void draw(Graphics2D g, P offset){
-        if (image.visible) {
-            g.drawImage(image.image,(int)(pos.x+Global.rel.x+offset.x), (int) (pos.y+Global.rel.y+offset.y),finalSize.x(),finalSize.y(),null);
+        if (image.visible && pos.x > Global.camera.x-Settings.centerX-finalSize.x && pos.y > Global.camera.y-Settings.centerY-finalSize.y
+                && pos.x < Global.camera.x+Settings.centerX && pos.y < Global.camera.y+Settings.centerY) {
+            g.drawImage(image.image,(int)(pos.x+Global.rel.x),(int) (pos.y+Global.rel.y),finalSize.x(),finalSize.y(),null);
 //            for (Line i : lines) g.drawLine((int)(t.x+i.pt.x),(int)(t.y+i.pt.y),(int)(t.x+i.ptd.x),(int)(t.y+i.ptd.y));
         }
     }

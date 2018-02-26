@@ -102,7 +102,7 @@ public class Display extends JPanel implements FocusListener {
                 String key = input.getKeyMap(e.getKeyCode());
                 if (key != null) {
                     if (key.equals("_SAY")) chat();
-                    else if (key.equals("_CTRL")) chatbox.setText(lastChat);
+                    else if (key.equals("_UP")) chatbox.setText(lastChat);
                     else if (key.equals("_EXIT")){
                         chatbox.setText("");
                         chat();

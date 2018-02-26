@@ -7,32 +7,40 @@ import java.util.ArrayList;
  */
 public class Traits {
     public enum Trait {
-        Fast_Learner(2), Haggler(1), Tough(1), Innovation(1), Perception(1),
+        Fast_Learner(1,"Level twice as fast at the cost of triple motivation cost."), Haggler(1,"Get 30% off shop prices."),
+        Tough(1,"Receive bleeding instead of amputation."), Innovation(1,"Learn random skill."), Perception(1,"Learn to identify others."),
+        Herbalism(1,"Pick materials from bushes and trees."), Rune_Literacy(1,"Identify, use, and create scrolls."),
+        Alchemy(1,"Identify, use, and create potions."),
+        Fire_Brand(1,"Brand yourself to obtain innate Fire catalyst."), Lightning_Brand(1,"Brand yourself to obtain innate Lightning catalyst."),
 
-        Lung_Injury,Damaged_Liver,Stomach_Injury,Hearing_Loss,Throat_Injury,Blindness,Brain_Damage,Depression,
-        Armless,Left_Arm_Injury,Right_Arm_Injury,Legless,Left_Leg_Injury,Right_Leg_Injury,
+        Lung_Injury(2,"Rest time doubled."),Damaged_Liver(2,"Nutrition from food halved. Cannot drink potions."),
+        Hearing_Loss(2,"Cannot talk."),Blindness(2,"Cannot read books or scrolls. Targeting range is gone."),
+        Brain_Damage(2,"Lose access to random traits and skills. Some are permanently lost."),
 
-        Herbalism(null), Rune_Literacy(null), Alchemy(null), Stealth(null),
-        Magic(null), Casting(new Trait[]{Magic}), Attunement(new Trait[]{Magic}), Generation(new Trait[]{Attunement}),
-        Soulbuffer(new Trait[]{Attunement}), Blood_Magic(null), Mastery(null),
+        Stealth(3,"Learn to sneak for few seconds."),
+        Attunement(3,"Utilize innate mana from your body."), Generation(3,"Learn mana generation methods."),
 
-        Fire_Brand(new Trait[]{Rune_Literacy}), Lightning_Brand(new Trait[]{Rune_Literacy}),
-        Pyromancy(new Trait[]{Casting}), Infusion(new Trait[]{Casting}), Wizardry(new Trait[]{Attunement, Casting}),
-        Morphing(new Trait[]{Magic}), Soulbinding(new Trait[]{Magic}), Enchanting(new Trait[]{Blood_Magic}),
-        Infusion_Mastery(new Trait[]{Infusion});
+        Crafter(3,"Craft various items."), Armorsmith(3,"Craft, repair, and modify armor."), Weaponsmith(3,"Craft, repair, and modify weapons."),
 
-        private int type, value;
-        private Trait[] requirements;
-        Trait(){
-            this.type = 2;
+        Pyromancy(3,"Learn the secrets of fire magic."), Infusion(3,"Create and infuse items."),
+        Wizardry(3,"Learn to cast arbitrary magic."), Morphing(3,"Learn to reshape yourself."),
+        Soulbinding(3,"Learn the secrets of controlling others."), Enchanting(3,"Learn to enchant allies and curse enemies.");
+
+        public int type;
+        private String description = "This is a trait.";
+        Trait(int type, String desc){
+            this.type = type;
+            this.description = desc;
         }
-        Trait(int value){
-            this.type = 1;
-            this.value = value;
+        public String getDescription(){
+            return description;
         }
-        Trait(Trait[] requirements){
-            this.type = 3;
-            this.requirements = requirements;
+        public static ArrayList<Trait> getByType(int p){
+            ArrayList<Trait> traits = new ArrayList<>();
+            for (Trait i : values()){
+                if (i.type == p) traits.add(i);
+            }
+            return traits;
         }
         public static Trait getByName(String p){
             for (Trait i : values()){
@@ -41,26 +49,34 @@ public class Traits {
             return null;
         }
     }
+    public static int MAXLEVEL = 3;
     ArrayList<Trait> trait = new ArrayList<>();
     ArrayList<Integer> level = new ArrayList<>();
 
-    private boolean isLearnable(Trait p){
-        if (p.requirements != null) {
-            for (Trait i : p.requirements) {
-                if (!trait.contains(i)) return false;
-            }
+    public ArrayList<Trait> getTraits() {
+        return trait;
+    }
+    boolean learn(Trait p){
+        if (has(p)) {
+            int lvl = trait.indexOf(p);
+            if (level.get(lvl) == MAXLEVEL) return false;
+            level.set(lvl, level.get(lvl) + 1);
+        } else {
+            trait.add(p);
+            level.add(1);
         }
         return true;
     }
-    boolean learn(Trait p){
-        if (isLearnable(p)) {
-            if (has(p)) {
-                int lvl = trait.indexOf(p);
-                level.set(lvl, level.get(lvl) + 1);
-            } else {
-                trait.add(p);
-                level.add(1);
-            }
+    public int getTraitLevel(Trait p){
+        int index = trait.indexOf(p);
+        if (index == -1) return 0;
+        return level.get(index);
+    }
+    public boolean forget(Trait p){
+        if (has(p)){
+            int index = trait.indexOf(p);
+            level.remove(index);
+            trait.remove(index);
             return true;
         }
         return false;

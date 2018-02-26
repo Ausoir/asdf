@@ -14,8 +14,8 @@ import java.util.HashMap;
 /**
  * Created by Ga on 7/31/2016. asd
  */
-public class Speech extends Drawable {
-    static Color forecolor = new Color(0,0,0,255);
+public class Speech extends Thing {
+    static Color forecolor = new Color(30,30,30,255);
     private Unit host;
     private ArrayList<String> msg = new ArrayList<>();
     private Timer timer = new Timer(-1,false);
@@ -23,17 +23,18 @@ public class Speech extends Drawable {
     boolean visible = false;
     String text = "";
     Speech(Unit host){
+        super(null, null, host.seed, 15);
         this.host = host;
-        host.map.updater.addQueue.add(this);
-        setDepth(15);
+        pos = host.pos;
     }
-    public void remove(){
-        host.map.updater.remove(this);
+    public Thing start(){
+        this.map = host.map;
+        return super.start();
     }
     public void draw(Graphics2D g){
         if (visible) {
             int width = g.getFontMetrics(Global.font).stringWidth(text);
-            int x = host.pos.x()+Global.rel.x(), y = host.pos.y()+Global.rel.y()-150;
+            int x = pos.x()+Global.rel.x(), y = pos.y()+Global.rel.y()-150;
             int[] xp = new int[]{
                     10 + x, x, -10 + x, x-width/2-10, x-width/2-10, x+width/2+10, x+width/2+10
             };
@@ -63,7 +64,7 @@ public class Speech extends Drawable {
             int range = p.endsWith("!!")?2400:600;
             for (Unit i : host.map.updater.unitsLoaded){
                 if (i != host && i.faction != host.faction) {
-                    if (Math.abs(i.pos.x - host.pos.x) < range && Math.abs(i.pos.y - host.pos.y) < range/3) {
+                    if (Math.abs(i.pos.x - pos.x) < range && Math.abs(i.pos.y - pos.y) < range/3) {
                         i.hear(host, p.toLowerCase());
                     }
                 }
@@ -77,7 +78,7 @@ public class Speech extends Drawable {
             results = dialog.get(":"+p);
             if (results == null) return "";
         }
-        return results.get(Global.r.nextInt(results.size()));
+        return results.get(rand.nextInt(results.size()));
     }
 
     public void update() {

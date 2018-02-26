@@ -96,7 +96,7 @@ public enum Intelligence {
                 return false;
             }
             void hear(Prop u, String p){
-                if (tasks.peek().alertness < 1) {
+                if (tasks.peek().getAlertness() < 1) {
                     int dir = u.pos.x - host.pos.x > 0 ? 1 : -1;
                     if (!host.faction.canAttack(u.faction)) {
                         if (u instanceof Man) {
@@ -325,9 +325,11 @@ public enum Intelligence {
     }
     public static AI get(String p, Unit host){
         String[] data = p.split("/");
-        AI r = values()[Integer.parseInt(data[0])].make(host);
+        String[] values = data[0].split(":");
+        AI r = values()[Integer.parseInt(values[0])].make(host);
+        r.type = Integer.parseInt(values[1]);
         host.brain = r;
-        r.load(p);
+        r.load(data[1]);
         return r;
     }
 }

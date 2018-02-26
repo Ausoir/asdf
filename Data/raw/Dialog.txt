@@ -1,11 +1,5 @@
 lvl:Level
 pwr:Power
-stats:Stats
-equip:Equipment
-inv:Inventory
-mvs:Skills
-act:Actions
-crft:Craft
 gold:$
 wielded:Wielded
 offhand:Offhand
@@ -14,110 +8,47 @@ btorso:Torso
 bleg:Pants
 bhead:Head
 mem:Intelligence
-StrengthDsc:Decreases weight penalties by 1, which reduces slow effects from heavy equipment. Also increases potency of all skills involving Strength.
-AgilityDsc:Increases maximum encumbrance by 1.
-AgilityDsc:Increases damage and potency of all skills involving agility.
-StaminaDsc:Increases maximum Stamina by 1. Stamina recovers usually by resting.
-IntelligenceDsc:Increases Intelligence capacity by 1, which lets you progress in 1 extra expertise level from textbooks and learn 1 additional skill from manuals.
-AthleticsDsc:Increases speed and decreases stamina cost of skills related to running.
-JumpingDsc:Increases jump range for all skills involving jump.
-SwingingDsc:Increases potency of all physical actions.
-MartialDsc:Increases damage of all martial skills.
-EnergyDsc:Increases potency of all elemental spells.
-ChannelingDsc:Decreases stamina cost of maintaining channels.
-mvsRemap:Select a skill to re-map its keybinding.
-itemEncDsc:This $ item is magically enchanted with $. This item's cooldown is $ seconds.
+?Strength:You can use items with weight lower than or equal to strength.
+?Agility:Increases maximum encumbrance by 1.
+?Stamina:Increases maximum Stamina by 1. Stamina recovers usually by resting.
+?Intelligence:You can learn number of skills and traits up to your intelligence score.
+?Athletics:Increases jump height and sprint speed. Increases Rest efficiency.
+Remap:Select a skill to re-map its keybinding.
+?itemEnc:This $ item is magically enchanted with $. This item's cooldown is $ seconds.
 itemEncRdy:Currently the item is ready to use.
 itemEncNRdy:Currently the item needs $ more seconds to recharge.
 reqInput:Press a key
-mvsInteract:Interact
-mvsSprint:Sprint
-mvsDuck:Duck
-mvsGuard:Guard
-mvsThrust:Thrust
-mvsSwing:Swing
-mvsKick:Kick
-mvsSidekick:Sidekick
-mvsWhirlwind:Whirlwind
-mvsPunch:Punch
-mvsStab:Stab
-mvsUse:Use
-mvsDash:Dash
-mvsRest:Rest
-mvsMark:Mark
-mvsUnderhand:Underhand
-mvsThrow:Throw
-mvsDart:Dart
-mvsShoot:Shoot
-mvsSnipe:Snipe
-mvsJump:Jump into the air.
-mvsAirstrike:Airstrike
-mvsLeap:Leap
-mvsBackstep:Backstep
-mvsFocus:Focus
-mvsHeal:Heal
-mvsFrenzy:Frenzy
-mvsHaste:Haste
-mvsAdrenaline:Adrenaline
-mvsCleave:Cleave
-mvsEmpower:Empower
-mvsEvade:Evade
-mvsGlacialwalk:Glacialwalk
-mvsPoison:Poison
-mvsCalling:Calling
-mvsShadowtwin:Shadowtwin
-mvsShadowstep:Shadowstep
-mvsFireblast:Fireblast
-mvsFreeze:Freeze
-mvsFlameroll:Flameroll
-mvsFireball:Fireball
-mvsBlizzard:Blizzard
-mvsMaterialize:Materialize
-mvsDscUse:Interact with the held item or the environment if unarmed.
-mvsDscSprint:Burst into sprint mode, running twice as fast as long as the skill is active.
-mvsDscDuck:A
-mvsDscGuard:A
-mvsDscThrust:Thrust your weapon in a linear fashion to attack while keeping momentum.
-mvsDscSlash:Swing your weapon from top to bottom, slashing enemies vertically.
-mvsDscKick:A
-mvsDscSidekick:A useful unarmed attack.
-mvsDscWhirlwind:Spin your weapon back and forth to attack multiple enemies multiple times, left and right.
-mvsDscStab:A
-mvsDscDash:A
-mvsDscRest:A
-mvsDscMark:Mark
-mvsDscUnderhand:A
-mvsDscThrow:Throw your weapon away.
-mvsDscDart:A
-mvsDscShoot:A
-mvsDscSnipe:A
-mvsDscJump:A
-mvsDscAirstrike:A
-mvsDscLeap:A
-mvsDscBackstep:A
-mvsDscFocus:A
-mvsDscHeal:A
-mvsDscFrenzy:A
-mvsDscHaste:A
-mvsDscAdrenaline:A
-mvsDscCleave:A
-mvsDscEmpower:A
-mvsDscEvade:A
-mvsDscGlacialwalk:A
-mvsDscPoison:A
-mvsDscCalling:A
-mvsDscShadowtwin:A
-mvsDscShadowstep:A
-mvsDscFireblast:A
-mvsDscFreeze:A
-mvsDscFlameroll:A
-mvsDscFireball:A
-mvsDscBlizzard:A
-mvsDscMaterialize:Materialize energy into a polygon that you can walk on.
-tutorial0:<The pages are blank...>
-tutorial1:Not only can you pick up items, you can also interact with objects using Left Click (while unarmed). Use the Middle Mouse Button to throw away wielded items.
-tutorial2:Press R to put the currently wielded item into your inventory. However, you'll first need clothes with pockets to have any inventory space. Once you do get any clothing, press the TAB key to access the inventory.
-tutorial3:Some actions like jumping takes Stamina. Hold Shift to rest and recover Stamina. Some actions like pushing do not require Stamina. Press F to do a quick push.
-tutorial4:You must learn most of the game systems as you go. You can always check the town libraries for information. Bye!
-tutorialSay1:I probably should take the book with me...
-tutorialSay2:The Guidebook updates itself..
+?Use:Interact with the held item or the environment if unarmed.
+?Sprint:Burst into sprint mode, running twice as fast as long as the skill is active.
+?Thrust:Thrust your weapon in a linear fashion to attack while keeping momentum. Higher speed means more damage.
+?Slash:Swing your weapon from top to bottom.
+?Kick:Kick away enemies. Does not deal damage, but with high strength you can kick them pretty far.
+?Sidekick:Dash to and kick an enemy.
+?Whirlwind:Spin your weapon back and forth to attack multiple enemies multiple times, left and right.
+?Rest:Recover stamina. Speed increases with Athletics catalysts.
+?Stab:Stab for huge damage. Long wind up time.
+?Dash:Dash across, dealing damage to whoever lies in between.
+?Throw:Throw away the item you are holding. Deals damage equal to weight if your strength is enough.
+?Mark:Mark an enemy. Marked enemies will drop prone with any attack.
+?Guard:A
+?Underhand:Dodge an attack, and retaliate for good damage.
+?Dart:Shoot your weapon straight toward your target.
+?Shoot:Shoot your firearm.
+?Snipe:Shoot your firearm.
+?Jump:Jump into the air.
+?Airstrike:Jump+Use to airstrike, damage airborne targets and enemies at landing site.
+?Leap:Leap across the skies.
+?Backstep:Backstep to safety.
+?Focus:Focus to instantly regain lost Stamina.
+?Evade:Evade attacks for few seconds.
+?Glacialwalk:A
+?Poison:A
+?Calling:A
+?Shadowtwin:A
+?Shadowstep:A
+?Fireblast:A
+?Freeze:A
+?Flameroll:A
+?Fireball:A
+?Blizzard:A
+?Materialize:Materialize energy into a polygon that you can walk on.

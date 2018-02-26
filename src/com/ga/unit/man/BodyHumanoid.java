@@ -57,8 +57,8 @@ public class BodyHumanoid extends Body {
                 rotateAppendage(FIST, 67, 0);
                 break;
             case "Slash":
-                rotateAppendage(FIST, 7, host.dir);
-                rotateAppendage(OFIST, 7, host.dir*1.1f);
+                rotateAppendage(FIST, 7, host.dir*.4f);
+                rotateAppendage(OFIST, 7, host.dir*.44f);
                 break;
             case "Kick":
                 rotateAppendage(LLEG, 5, 0);
@@ -71,7 +71,7 @@ public class BodyHumanoid extends Body {
                 rotateAppendage(FIST, 11, 0);
                 break;
             case "Mark":
-                rotateAppendage(FIST, 65, 0);
+                rotateAppendage(OFIST, 65, 0);
                 break;
         }
     }
