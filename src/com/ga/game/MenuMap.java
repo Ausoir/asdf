@@ -45,7 +45,6 @@ public class MenuMap extends Panel {
         add(panel, BorderLayout.CENTER);
         addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
-//                System.out.println(e.getX() + "," + (e.getY()-20));
                 setVisible(false);
             }
         });

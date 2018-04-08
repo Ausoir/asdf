@@ -4,9 +4,9 @@ tcpDownloadPort:2016
 tcpUploadPort:2017
 screenX:1024
 screenY:720
-gravity:4
+gravity:3
 gravityMax:64
 spf:17
-spu:25
+spu:22
 spc:360
 volumn:-5 //negative to positive decibels

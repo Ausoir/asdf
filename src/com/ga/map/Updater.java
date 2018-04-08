@@ -75,6 +75,7 @@ public class Updater {
     }
     public void update(){
         processQueue();
+        Global.updateCamera();
         for (Updatable i : updatee) i.update();
         if (!editor){
             for (Prop i : props) i.update();
@@ -89,11 +90,10 @@ public class Updater {
         }
     }
     public void draw(Graphics2D g2){
-        Global.updateCamera();
         Drawable t = drawee;
         while (t != null){
            t.draw(g2);
-            t = t.next;
+           t = t.next;
         }
 //        Grapher.draw(g2);
 //        printDraw();
@@ -208,57 +208,22 @@ public class Updater {
         }
         return seen;
     }
-    public int sleep(int p){
-        int origTime = Global.time;
-        Unit encounter = getMapEncounter(Global.player.faction, p);
+    public boolean sleep(int p, boolean checkEnemy){
+        if (checkEnemy) {
+            for (Unit i : unitsLoaded) {
+                if (i.map == Global.player.map && i.faction.canAttack(Global.player.faction) && i.brain.target == Global.player) {
+                    Global.player.say("There are enemies on the map!");
+                    return false;
+                }
+            }
+        }
+        if (!Global.player.get("Nutrition").require(p/100)){
+            Global.player.say("I am too hungry!");
+            return false;
+        }
         map.weather.fadeIn();
-        if (encounter != null){
-            int timePassed = Global.time - origTime;
-            if (timePassed > 1) {
-                encounter.pos = Global.player.pos.getAdd(0, 0);
-                Actions.Blink.onSet(encounter);
-            }
-            encounter.brain.target = Global.player;
-            Global.player.say("Interrupted after "+timePassed+" seconds!");
-            return timePassed;
-        } else {
-            if (p % 100 == 0) Global.player.say((p/100)+" hour(s) passed.");
-            Global.player.say(p+" seconds passed.");
-            Global.timePass(p);
-            return p;
-        }
-    }
-    private Unit getMapEncounter(Faction faction, int time){
-        ArrayList<Unit> units = new ArrayList<>();
-        ArrayList<Float> dangers = new ArrayList<>();
-        for (Unit i : unitsLoaded) {
-            if (i.hittable(faction)){
-                boolean sorted = false;
-                float danger = (float) Math.pow(800f/(i.pos.getSubtract(Global.player.pos).getDist()),2);
-                for (int ii=0;ii<dangers.size();ii++){
-                    if (danger > dangers.get(ii)){
-                        sorted = true;
-                        dangers.add(ii, danger);
-                        units.add(ii, i);
-                        break;
-                    }
-                }
-                if (!sorted){
-                    dangers.add(danger);
-                    units.add(i);
-                }
-            }
-        }
-        for (int ii=0;ii<time;ii+=10) {
-            for (int i=0;i<dangers.size();i++) {
-                float rand = Global.r.nextFloat();
-                if (rand < dangers.get(i)) {
-                    Global.timePass(ii);
-                    return units.get(i);
-                }
-            }
-        }
-        return null;
+        Global.timePass(p);
+        return true;
     }
     public P getEntrancePos(int p, P failsafe) {
         if (props.size() == 0) {

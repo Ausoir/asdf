@@ -44,10 +44,6 @@ public class Man extends Unit {
         }
     }
     @Override
-    protected void init(){
-        tags.add(Tag.Athletics);
-    }
-    @Override
     public Man start(){
         super.start();
         if (!wieldingNone()){
@@ -92,8 +88,6 @@ public class Man extends Unit {
         if (inventory.getItemSize() != 0) r.append(";").append(inventory.toString());
         return r.toString();
     }
-    public void onField(){
-    }
     public void setWeapon(Item p){
         if (p == null) p = fist;
         if (p != fist) {
@@ -137,11 +131,6 @@ public class Man extends Unit {
         return inventory.weight+armor.getWeight()+weapon.weight;
     }
 
-    @Override
-    public void stateSet(Actions state){
-        attackSpeed -= weapon.weight;
-        super.stateSet(state);
-    }
     protected void stateOnSet(Actions state){
         state.onSet(this);
     }
@@ -172,7 +161,7 @@ public class Man extends Unit {
     }
 
     public float getReach(){
-        return weapon.getSize();
+        return weapon.getSize()+2;
     }
 
     void stepSound(){
@@ -218,7 +207,7 @@ public class Man extends Unit {
             if (tags.contains(i)) r++;
         }
         if (state.getTrainers().contains(Tag.Strength)) r += get("Strength").get();
-        if (state.getTrainers().contains(Tag.Athletics)) r += getVacancy(); //can go negative
+        if (state.getTrainers().contains(Tag.Athletics)) r += (getVacancy()/get("Agility").get())*5;
         return Math.max(0,r) / Math.max(1,tags.size());
     }
 
@@ -253,13 +242,13 @@ public class Man extends Unit {
             if (i.tags.contains(Tag.Currency)){
                 int money = Math.min(i.getDurability()-i.getUses(), p);
                 p -= money;
-                i.isUsable(-money);
+                i.isUsable(true,-money);
             }
         }
         if (p > 0){
             Item newbag = (Item) Stock.Goldbag.create(map, -1, 0).start();
             setWeapon(newbag);
-            newbag.isUsable(-p);
+            newbag.isUsable(true,-p);
         }
     }
     public boolean requireGold(int p){
@@ -270,14 +259,15 @@ public class Man extends Unit {
         for (Item i : items){
             if (i.tags.contains(Tag.Currency)){
                 int money = Math.min(i.getUses(), p);
-                if (i.isUsable(money)) p -= money;
+                if (i.isUsable(true,money)) p -= money;
                 if (p == 0) return true;
             }
         }
         return false;
     }
     public boolean requireMana(int p){
-        if (stats.getEffectLevel(Buffs.Attunement) > 0) return true;
+        if (stats.triggerEffect(Buffs.Attunement)) return true;
+        if (stats.getEffectLevel(Buffs.Infusion) > p/100) return true;
         ArrayList<Item> items = new ArrayList<>();
         items.addAll(inventory.getItems());
         items.add(weapon);
@@ -285,11 +275,22 @@ public class Man extends Unit {
         for (Item i : items){
             if (i.tags.contains(Tag.Mana)){
                 int mana = Math.min(i.getUses(), p);
-                if (i.isUsable(mana)) p -= mana;
+                if (i.isUsable(true,mana)) p -= mana;
                 if (p == 0) return true;
             }
         }
         return false;
+    }
+
+    public void buff(Buffs buff, int level){
+        super.buff(buff, level);
+        armor.updateStatus();
+    }
+
+    public boolean hit(Line hitBox, boolean blunt, int damage) {
+        boolean r = super.hit(hitBox, blunt, damage);
+        armor.onHit();
+        return r;
     }
 
     public void die() {
@@ -300,7 +301,7 @@ public class Man extends Unit {
     }
 
     public void onAttack(Unit p){
-        if (weapon.isUsable(2)) weapon.trigger(p);
+        if (weapon.isUsable(true,2)) weapon.trigger(p);
         brain.onAttack();
     }
 
@@ -320,6 +321,10 @@ public class Man extends Unit {
             return target;
         }
         return null;
+    }
+
+    public int getWarmth(){
+        return armor.getWarmth();
     }
 
     public void setVisible(boolean p) {

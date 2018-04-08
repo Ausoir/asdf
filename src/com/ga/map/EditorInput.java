@@ -21,7 +21,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
     public class Keybinding {
         private HashMap<Integer, String> map = new HashMap<>();
         Keybinding(){
-            String[] t = FileManager.readText("Keybinding.txt");
+            String[] t = FileManager.readText("Data/Editor_Keymap.txt");
             for (String i : t){
                 String[] mapping = i.split(":");
                 map.put(Integer.parseInt(mapping[0]), mapping[1]);
@@ -31,7 +31,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
             return map.get(p);
         }
     }
-    private final int SNAP = 24;
+    private int SNAP = 24;
     private final int SCROLLSPEED = 50;
     private Keybinding keybinding = new Keybinding();
     private Stroke basicStroke = new BasicStroke(10);
@@ -62,7 +62,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
         init();
         currentO = new Prop(map, "Error", 0);
         Global.updates.time = -1;
-        lastSaved = map.name;
+        lastSaved = map.name.getInstanceName();
     }
 
     private void init(){
@@ -111,6 +111,9 @@ public class EditorInput extends Drawable implements Input, Updatable {
             map.size.set(Integer.parseInt(size[0]), Integer.parseInt(size[1]));
         } else if (p.startsWith("camera")){
             Global.cameraTo.set(new P(p.substring(7)));
+        } else if (p.startsWith("snap")){
+            if (p.equals("snap")) message(SNAP+"");
+            else SNAP = Integer.parseInt(p.substring(5));
         } else if (p.equals("reverse")){
             reverse(lastSelected);
         } else if (p.equals("pink")){
@@ -125,6 +128,9 @@ public class EditorInput extends Drawable implements Input, Updatable {
         } else if (p.equals("margin")) {
             if (map.margin == 0) map.margin = -3600;
             else map.margin = 0;
+        } else if (p.equals("grayterrain")) {
+            int color = Global.r.nextInt(256);
+            command("ctexture _"+color+","+color+","+color+",255",0,0);
         } else if (p.equals("spawn")) {
             String msg = "";
             for (Prop i : map.updater.props){
@@ -161,6 +167,12 @@ public class EditorInput extends Drawable implements Input, Updatable {
             currentO = Stock.Spawner.create(map, Integer.parseInt(to[0]), Integer.parseInt(to[1]));
             make(currentO);
             message("Spawner ["+to[0]+" @ "+to[1]+"] spawned");
+        } else if (p.startsWith("info")) {
+            selectTool(Tool.OBJECT);
+            currentO = Stock.Info.create(map, 1, 1);
+            currentO.name = p.substring(5);
+            make(currentO);
+            message("Info spawned");
         } else if (p.startsWith("prop")) {
             String[] aux = p.substring(5).split("@");
             for (int ii=0;ii<Integer.parseInt(aux[0]);ii++){
@@ -221,7 +233,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
         } else if (p.startsWith("line")) {
             lineChange = p.substring(5);
         } else if (p.startsWith("copt")) {
-            int option = Integer.parseInt(p.substring(4));
+            int option = Integer.parseInt(p.substring(5));
             lastSelectedLine.opt = option;
             message("Option changed to "+option);
         } else if (p.startsWith("opt")) {
@@ -249,12 +261,10 @@ public class EditorInput extends Drawable implements Input, Updatable {
             map.normalize(marginX, marginY);
         } else if (p.startsWith("gen land")){
             Creation.prepareRandom(-(int) (Math.random()*1000));
-            Generator gen = new Generator(map, map.getNextTerrain());
-            gen.generateLand();
+            GenerateGrassland.generate(map);
         } else if (p.startsWith("gen town")){
             Creation.prepareRandom(-(int) (Math.random()*1000));
-            Generator gen = new Generator(map, map.getNextTerrain());
-            gen.generateTown();
+            GenerateTown.generate(map);
         } else if (p.startsWith("blocker")){
             Generator gen = new Generator(map, map.getNextTerrain());
             gen.generateBlocker(Integer.parseInt(p.substring(8)), lastSelected);
@@ -269,7 +279,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
             map.updater.props.clear();
         } else if (p.equals("clear")){
             map.clear();
-            map = new Map(map.name);
+            map = new Map(map.name.toString());
             map.updater.addQueue.add(this);
         } else if (p.equals("refresh")){
 //            map.updater.unrender();
@@ -292,6 +302,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
                     Thread.sleep(100);
                     if (!Processes.paused){
                         Global.display.input = new EditorInput();
+                        message("Loaded "+lastSaved);
                         break;
                     }
                 } catch (InterruptedException e) {
@@ -301,7 +312,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
         } else if (p.equals("exit")){
             System.exit(0);
         } else if (p.startsWith("build")){
-            new Generator(Global.player.map, map.getNextTerrain()).generateBuilding(p.substring(6), new P(x,y), 1);
+            new Generator(Global.player.map, map.getNextTerrain()).generateBuilding(p.substring(6), new P(x,y), 9999);
         } else if (p.startsWith("o")){
             try {
                 selectTool(Tool.OBJECT);
@@ -480,7 +491,8 @@ public class EditorInput extends Drawable implements Input, Updatable {
                     final String[] listString = new String[list.size()];
                     Performer[] performers = new Performer[listString.length];
                     for (int i=0;i<listString.length;i++){
-                        listString[i] = i+" - "+list.get(i).name+" (id:"+list.get(i).subId+", seed:"+list.get(i).seed+")";
+                        Prop prop = list.get(i);
+                        listString[i] = i+" - "+prop.name+" (obj:"+Stock.values()[prop.factoryId].name()+", id:"+prop.subId+", seed:"+prop.seed+")";
                         final int finalI = i;
                         performers[i] = new Performer(){
                             public void perform(){
@@ -530,7 +542,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
                             }
                         }
                         int next = lines.get(0).tid;
-                        new Generator(map,-1).divideLand(lines, 0, smooth);
+//                        new Generator(map,-1).divideLand(lines, 0, smooth);
                         for (Line i : lines) i.tid = next;
                         map.landRaw.addAll(order, lines);
                         smooth = 0;
@@ -559,7 +571,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
                 lmb = false;
                 break;
             case KeyEvent.VK_ENTER:
-                Global.display.chatbox.requestFocus();
+                Global.display.startChat();
                 break;
             case KeyEvent.VK_1:
                 selectTool(Tool.NONE);
@@ -639,7 +651,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
                 break;
             case KeyEvent.VK_INSERT:
                 Updater.editor = false;
-                Global.server.requestChangeMap(map.name+"@0");
+                Global.server.requestChangeMap(map.name.getInstanceName()+"@0");
                 final P asdf = Global.camera.getAdd(0,-400);
                 while (true){
                     try {
@@ -734,7 +746,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
         currentO.remove();
         message("Saved ("+p+")");
         map.clean();
-        FileManager.saveMap(p, map);
+        FileManager.saveMap("instance/"+p, map);
         FileManager.saveWorld();
     }
 }

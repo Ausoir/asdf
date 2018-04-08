@@ -35,13 +35,4 @@ public class Clips {
         System.arraycopy(p, 0, result, 0, p.length);
         return result;
     }
-    public static void print(int[][][] p){
-        for (int[][] i : p){
-            for (int[] ii : i){
-                for (int iii : ii) System.out.print(iii+",");
-                System.out.print(";");
-            }
-            System.out.println("");
-        }
-    }
 }

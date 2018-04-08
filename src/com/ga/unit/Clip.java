@@ -18,15 +18,4 @@ public class Clip {
         this.frames = frames;
         this.moveset = moveset;
     }
-    public void print(){
-        System.out.println("=========");
-        for (int[][] lines : clip){
-            for (int[] sections : lines){
-                for (int value : sections){
-                    System.out.print(value+",");
-                }
-                System.out.println(";");
-            }
-        }
-    }
 }

@@ -256,7 +256,7 @@ public enum Intelligence {
                     ArrayList<Integer> destinations = new ArrayList<>();
                     for (int i=-6;i<=6;i++){
                         if (i != 0 && host.rand.nextInt(6) == 0){
-                            int newmap = Integer.parseInt(host.map.name)+i;
+                            int newmap = host.map.name.getIndex()+i;
                             if (FileManager.isFile("Data/map/"+newmap+".map")){
                                 destinations.add(newmap);
                                 prices.add(Math.abs(i));
@@ -268,7 +268,7 @@ public enum Intelligence {
                     for (int i=0;i<destinations.size();i++){
                         final int destination = destinations.get(i);
                         final int price = prices.get(i);
-                        options[i] = FileManager.read("map/"+destination+".map").split("%")[0]
+                        options[i] = FileManager.read("Data/map/"+destination+".map").split("%")[0]
                                 .split(";")[0] + " - "+Dialog.money(price);
                         performers[i] = new Performer(){
                             public void perform(){
@@ -300,14 +300,15 @@ public enum Intelligence {
 
                 void shop() {
                     Global.display.menu.showDialog("Inn",
-                            "Rest for the night? "+Dialog.money(price)+" for 6 hours.",
+                            "Rest for the night? "+Dialog.money(price)+" for 5 hours.",
                             new String[]{"Yes", "No"},
                             new Performer[]{
                                     new Performer(){
                                         public void perform(){
                                             if (Global.player.requireGold(price)) {
-                                                Global.player.get("Tiredness").add(
-                                                        -Global.player.map.updater.sleep(600), false);
+                                                Global.player.get("Motivation").add(10,false);
+                                                Global.player.map.updater.sleep(500, true);
+                                                Global.player.get("Nutrition").heal();
                                             } else {
                                                 Global.player.say("Not enough money..");
                                             }

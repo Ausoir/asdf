@@ -19,69 +19,13 @@ import java.util.Arrays;
  * Created by Ga on 9/1/2016. asd
  */
 public enum Buffs {
-    Metabolism(0,new Tags(){{
-    }}){ Buff makeLocal(){
-        return new Buff(400) {
-            public boolean update() {
-                boolean r = super.update();
-                if (r) {
-                    host.stats.triggerEffect(Bleed);
-                    if (host instanceof MainPlayer){
-                        host.buff(Hunger,1);
-                    }
-                }
-                return r;
-            }
-        };
-    }},
     Depression(0,new Tags(){{
+        add(Tag.Curse);
     }}){ Buff makeLocal(){
         return new Buff(400) {
             public boolean update() {
                 if (host instanceof MainPlayer) host.get("Motivation").set(0, false);
                 return super.update();
-            }
-        };
-    }},
-    Hunger(1,new Tags(){{
-    }}){ Buff makeLocal(){
-        return new Buff(125) {
-            public void onFinish(){
-                host.buff(Metabolism,1);
-            }
-            public boolean update() {
-                boolean r = super.update();
-                if (r) {
-                    host.stats.triggerEffect(Bleed);
-                    level++;
-                    time += 125;
-                    if (level > 8 && host instanceof MainPlayer){
-                        host.buff(Starvation,1);
-                    } else host.say("I'm hungry!");
-                    return false;
-                }
-                return r;
-            }
-        };
-    }},
-    Starvation(1,new Tags(){{
-    }}){ Buff makeLocal(){
-        return new Buff(100) {
-            public void onSet(){
-                host.say("I'm starving!");
-            }
-            public void onFinish(){
-                host.buff(Metabolism,1);
-            }
-            public boolean update() {
-                boolean r = super.update();
-                if (r){
-                    level++;
-                    time += 100;
-                    if (level > 5 && host instanceof MainPlayer) host.die();
-                    return false;
-                }
-                return r;
             }
         };
     }},
@@ -125,7 +69,7 @@ public enum Buffs {
             private int tick = 0;
             public void onStack(int level){
                 this.level += level;
-                time -= 90;
+                time -= 50;
             }
             public boolean onTrigger(){
                 if (level > 0) level--;
@@ -515,13 +459,35 @@ public enum Buffs {
             }
         };
     }},
-    Attunement(4,new Tags(){{
+    Infusion(4,new Tags(){{
         add(Tag.Enchant);
         add(Tag.Mana);
     }}){ Buff makeLocal() {
         return new Buff(1) {
-            public void onSet() {
+            public void onSet(){
                 time = level*2;
+            }
+        };
+    }},
+    Attunement(4,new Tags(){{
+        add(Tag.Enchant);
+        add(Tag.Mana);
+    }}){ Buff makeLocal() {
+        return new Buff(16) {
+            public void onSet(){
+                if (host.traits.getTraitLevel(Traits.Trait.Attunement) < level){
+                    time = Global.time;
+                    Particle.explode(host.map, "Ice", host.getDepth(), host.pos, new P(0, -20), 30, 30, 5, true, 4);
+                    if (host instanceof Man){
+                        ((Man)host).requireMana(999999);
+                    }
+                    host.stateSet(Actions.Down);
+                }
+            }
+            public boolean onTrigger(){
+                if (level > 1) level--;
+                else time = Global.time;
+                return true;
             }
         };
     }},

@@ -86,7 +86,7 @@ public class Server {
                 Global.p("Map downloaded from server.");
                 Global.maps.clear();
                 Global.maps.add(Global.player.map);
-                changeMap("multiplayer/serverMap@" + mapData[1]);
+                changeMap("Data/multiplayer/serverMap@" + mapData[1]);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -153,7 +153,7 @@ public class Server {
             Global.display.input = this;
         }
         public void translate(String p) {
-//            System.out.println("HOST: "+p);
+//            Global.p("HOST: "+p);
             String[] msg = processMessage(p);
             switch (msg[0]) {
                 case "K":
@@ -182,14 +182,14 @@ public class Server {
                     }
                     Player player = (Player) Stock.Player.create(Global.player.map,0,0);
                     Client newest = new Client(player, udp.getClientPort(), udp.getClientIP());
-                    player.load(FileManager.read("map/multiplayer/"+udp.getClientIP()+".user"));
+                    player.load(FileManager.read("Data/map/multiplayer/"+udp.getClientIP()+".user"));
                     player.map = Global.player.map;
                     player.faction = Faction.Player2;
                     player.controlId = Global.player.controlId + 1;//Global.getControlId();
                     player.start();
                     clients.put(udp.getClientIP(), newest);
                     FileManager.saveCharacter();
-                    FileManager.save("map/multiplayer/serverActors.map", Global.player.map.updater.toActorString());
+                    FileManager.save("Data/map/multiplayer/serverActors.map", Global.player.map.updater.toActorString());
                     Global.p("Connection established with client at "+udp.getClientIP()+"/"+udp.getClientPort());
                     newest.message("START}"+player.controlId);
                     tcpUploader.upload("Data/map/World.map");
@@ -236,7 +236,7 @@ public class Server {
 
     class ClientServer implements ListenServer, Input {
         public void translate(String p){
-//            System.out.println("CLIENT: "+p);
+//            Global.p("CLIENT: "+p);
             String[] msg = processMessage(p);
             switch (msg[0]) {
                 case "U": //update
@@ -249,7 +249,7 @@ public class Server {
                             unit.vel.set(Integer.parseInt(v[4]), Integer.parseInt(v[5]));
                             unit.target.set(Integer.parseInt(v[6]), Integer.parseInt(v[7]));
                         } else { //request unit info to recreate it
-                            System.out.println("Can't find unit "+v[0]+". Requesting...");
+                            Global.p("Can't find unit "+v[0]+". Requesting...");
                             try {
                                 udp.send("RU}"+v[0]);
                             } catch (Exception e) {
@@ -281,16 +281,16 @@ public class Server {
                         e.printStackTrace();
                     } finally {
                         if (output == null){
-                            requestChangeMap("multiplayer/serverMap@0");
+                            requestChangeMap("Data/multiplayer/serverMap@0");
                             Player player = (Player) Stock.Player.create(Global.player.map,0,0);
-                            player.load(FileManager.read("map/multiplayer/serverPlayer.user"));
+                            player.load(FileManager.read("Data/map/multiplayer/serverPlayer.user"));
                             player.map = Global.player.map;
                             Global.player.controlId = Integer.parseInt(msg[1]);
                             player.faction = Faction.Player2;
                             player.start();
-                            System.out.println("Player assigned "+Global.player.controlId);
-                            System.out.println("Host assigned "+player.controlId);
-                            FileManager.loadActors("multiplayer/serverActors.map");
+                            Global.p("Player assigned "+Global.player.controlId);
+                            Global.p("Host assigned "+player.controlId);
+                            FileManager.loadActors("Data/multiplayer/serverActors.map");
                         } else {
                             Global.player.say("Server found, but failed to connect!");
                         }

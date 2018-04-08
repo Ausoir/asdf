@@ -1,5 +1,7 @@
 package com.ga.connection;
 
+import com.ga.map.Global;
+
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -21,7 +23,7 @@ public class UDPClient {
             clientSocket = new DatagramSocket(receiverPort);
             host = InetAddress.getLocalHost().getHostAddress();
         }catch(Exception e){
-            System.out.println("Establishing UDP connection failed");
+            Global.p("Establishing UDP connection failed");
             e.printStackTrace();
         }
     }

@@ -168,11 +168,11 @@ public enum Shader{
             int y2 = image.getHeight()-1;
             for (int ix = x1; ix < x2; ix++) {
                 int ty = y1 + (int) ((ix - x1) * slope);
-                for (int iy = -1; iy < 24; iy++) {
-                    int y = Math.min(ty+iy,y2);
-                    if (y >= 0) {
+                for (int iy = -1; iy < 12; iy++) {
+                    int y = ty + iy;
+                    if (y >= 0 && y < y2) {
                         int rgb = image.getRGB(ix, y);
-                        int shadeMag = 24 - iy;
+                        int shadeMag = 12 - iy;
                         int alpha = (rgb & 0xff000000) >>> 24;
                         int red = Math.min(((rgb & 0xff0000) >>> 16) + shadeMag, 255);
                         int green = Math.min(((rgb & 0xff00) >>> 8) + shadeMag, 255);
@@ -186,14 +186,14 @@ public enum Shader{
     }),
     Emboss(new ShaderRenderer(){
         protected BufferedImage render(BufferedImage image, int x1, int x2, int y1, float slope){
-            int y2 = image.getHeight()-1;
+            int y2 = image.getHeight();
             for (int ix = x1; ix < x2; ix++) {
                 int ty = y1 + (int) ((ix - x1) * slope);
-                for (int iy = -1; iy < 12; iy++) {
-                    int y = Math.min(ty+iy,y2);
-                    if (y >= 0) {
+                for (int iy = 0; iy < 12; iy++) {
+                    int y = ty+iy;
+                    if (y<y2 && y>=0) {
                         int rgb = image.getRGB(ix, y);
-                        float shadeMag = ((iy+16)/28f);
+                        float shadeMag = ((iy + 16f) / 28f);
                         int alpha = (rgb & 0xff000000) >>> 24;
                         int red = (int) Global.clamp(((rgb & 0xff0000) >>> 16) * shadeMag, 0, 255);
                         int green = (int) Global.clamp(((rgb & 0xff00) >>> 8) * shadeMag, 0, 255);
@@ -224,7 +224,7 @@ public enum Shader{
                             red = (int) Global.clamp(((targetC[0] - red) / 70f * ny) + red + Global.r.nextInt(16) - 8, 0, 255);
                             green = (int) Global.clamp(((targetC[1] - green) / 70f * ny) + green + Global.r.nextInt(16) - 8, 0, 255);
                             blue = (int) Global.clamp(((targetC[2] - blue) / 70f * ny) + blue + Global.r.nextInt(16) - 8, 0, 255);
-                            float sin = (float) (Math.sin(ix * .05f) + Math.cos(ix * .01f) - Math.sin(ix * .5f) * .05f);
+                            float sin = (float) (Global.sin(ix * .05f) + Global.cos(ix * .01f) - Global.sin(ix * .5f) * .05f);
                             if (sin + iy < -2) alpha = 0;
                             image.setRGB(ix, y, new Color(red, green, blue, alpha).getRGB());
                         }
@@ -253,7 +253,7 @@ public enum Shader{
                             red = (int) Global.clamp(((targetC[0] - red) / 70f * ny) + red + Global.r.nextInt(16) - 8, 0, 255);
                             green = (int) Global.clamp(((targetC[1] - green) / 70f * ny) + green + Global.r.nextInt(16) - 8, 0, 255);
                             blue = (int) Global.clamp(((targetC[2] - blue) / 70f * ny) + blue + Global.r.nextInt(16) - 8, 0, 255);
-                            float sin = (float) (Math.sin(ix * .05f)*.2f + Math.cos(ix * .01f)*.2f - Math.sin(ix * .5f) * .1f);
+                            float sin = (float) (Global.sin(ix * .05f)*.2f + Global.cos(ix * .01f)*.2f - Global.sin(ix * .5f) * .1f);
                             if (sin < .4f && sin + iy * .5f < .3f) alpha = 0;
                             image.setRGB(ix, y, new Color(red, green, blue, alpha).getRGB());
                         }
@@ -296,7 +296,7 @@ public enum Shader{
                         int rgb = image.getRGB(ix, y);
                         int shadeMag = (90 - (iy * 3));
                         int alpha = (rgb & 0xff000000) >>> 24;
-                        int randMax = (int) (Global.r.nextInt(10) * Math.cos(ix * .2f));
+                        int randMax = (int) (Global.r.nextInt(10) * Global.cos(ix * .2f));
                         int red = (int) Global.clamp(((rgb & 0xff0000) >>> 16) + shadeMag, 0, 140 + randMax);
                         int green = (int) Global.clamp(((rgb & 0xff00) >>> 8) + shadeMag, 0, 90 + randMax);
                         int blue = (int) Global.clamp(((rgb & 0xff)) + shadeMag, 0, 60 + randMax);
@@ -382,7 +382,7 @@ public enum Shader{
                         int rgb = image.getRGB(ix, y);
                         int shadeMag = (225 - (iy * 3));
                         int alpha = (rgb & 0xff000000) >>> 24;
-                        int randMax = (int) (Global.r.nextInt(10) * Math.sin(iy * .2f) * Math.cos(ix * .2f));
+                        int randMax = (int) (Global.r.nextInt(10) * Global.sin(iy * .2f) * Global.cos(ix * .2f));
                         int red = (int) Global.clamp(((rgb & 0xff0000) >>> 16) + shadeMag, 0, 200 + randMax);
                         int green = (int) Global.clamp(((rgb & 0xff00) >>> 8) + shadeMag, 0, 200 + randMax);
                         int blue = (int) Global.clamp(((rgb & 0xff)) + shadeMag, 0, 200 + randMax);
@@ -391,6 +391,26 @@ public enum Shader{
                 }
             }
             return null;
+        }
+    }),
+    //Replacements
+    Tatter(new ShaderRenderer(){
+        protected BufferedImage render(BufferedImage image, int param) {
+            if (param >= 11) return image;
+            int width = image.getWidth();
+            int height = image.getHeight();
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    int rgb = image.getRGB(x, y);
+                    int alpha = (rgb & 0xff000000) >>> 24;
+                    int red = (rgb & 0xff0000) >>> 16;
+                    int green = (rgb & 0xff00) >>> 8;
+                    int blue = (rgb & 0xff);
+                    if ((int)(Global.sin(x)*1000) % param <= 1 && (int)(Global.sin(y)*1000) % param <= 1) alpha = 0;
+                    image.setRGB(x, y, new Color(red, green, blue, alpha).getRGB());
+                }
+            }
+            return image;
         }
     });
     private ShaderRenderer shader;
@@ -465,9 +485,9 @@ class ShaderRenderer {
         if (x2 < x1) {
             for (int ix = x2; ix < x1; ix++) {
                 int ty = y1 + (int) ((ix - x1) * slope);
-                for (int iy = ty - 24; iy <= ty; iy++) {
+                for (int iy = ty - 12; iy <= ty; iy++) {
                     int y = (int) Global.clamp(iy,0,height);
-                    int shadeMag = 24 + y - ty;
+                    int shadeMag = 12 + y - ty;
                     if (shadeMag > 0) {
                         int rgb = image.getRGB(ix, y);
                         int alpha = (rgb & 0xff000000) >>> 24;

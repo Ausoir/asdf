@@ -1,6 +1,8 @@
 package com.ga.unit;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Ga on 4/5/2017. aaa
@@ -33,11 +35,15 @@ public class Tags extends ArrayList<Tag> {
 
     public String toString(){
         String r = "";
-        int length = size();
-        for (int i=0;i<length;i++){
-            r += get(i);
-            if (i < length-1) r += ", ";
+        HashMap<Tag, Integer> map = new HashMap<>();
+        for (Tag tag : this) {
+            map.merge(tag, 1, (a, b) -> a + b);
         }
+        for (Map.Entry pair : map.entrySet()){
+            if ((int) pair.getValue() > 1) r += pair.getKey() + " [" + pair.getValue()+"], ";
+            else r += pair.getKey()+", ";
+        }
+        if (r.length() > 2) return r.substring(0,r.length()-2);
         return r;
     }
 }

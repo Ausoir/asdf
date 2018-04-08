@@ -59,45 +59,57 @@ public class Item extends Prop {
                 host.tags.add(Tag.Fire);
             }
         },
-        Cloth(.5f,0,0,.9f,200),
-        Silk(.1f,2,1,.8f,2500),
+        Cloth(.5f,0,0,.9f,200){
+            public void onSet(Item host){
+                warmth += 2;
+            }
+        },
+        Silk(.2f,2,1,.8f,2500),
         Nylon(.2f,1,0,.6f,2000){
             public void onSet(Item host){
                 host.tags.add(Tag.Athletics);
+                warmth -= 1;
             }
         },
-        Leather(.3f,1,1,1,1500,new Color(133, 78, 32,140)),
+        Leather(.3f,1,1,1,1500,new Color(133, 78, 32,140)){
+            public void onSet(Item host){
+                warmth += 1;
+            }
+        },
         Glass(.1f,1,7,.5f,2000){
             public void onSet(Item host){
                 host.tags.add(Tag.Ice);
+                warmth -= 1;
             }
         },
         Brass(.4f,7,4,.7f,1500,new Color(133, 123, 23,120)),
         Copper(.4f,5,3,1f,1500,new Color(133, 92, 38,120)){
             public void onSet(Item host){
                 host.tags.add(Tag.Electric);
+                warmth -= 1;
             }
         },
         Bronze(.4f,5,4,1.2f,1500,new Color(133, 72, 0,180)),
         Iron(.4f,4,5,1.5f,2000),
         Silver(.2f,10,7,.8f,9000),
-        Gold(.1f,10,9,.5f,16000){
+        Gold(.2f,10,9,.5f,16000){
             public void onSet(Item host){
                 host.tags.add(Tag.Electric);
                 host.tags.add(Tag.Enchant);
             }
         },
-        Lead(.3f,9,2,1.6f,1500,new Color(19, 31, 75,120)){
+        Lead(.4f,9,2,1.6f,1500,new Color(19, 31, 75,120)){
             public void onSet(Item host){
                 host.tags.add(Tag.Electric);
                 host.tags.add(Tag.Mutation);
             }
         },
         Steel(.2f,4,6,4,8000),
-        Titanium(.1f,3,7,5,30000),
-        Crystal(.1f,3,9,.3f,2000,new Color(28, 133, 67,180)){
+        Titanium(.2f,3,7,5,30000),
+        Crystal(.2f,3,9,.3f,2000,new Color(28, 133, 67,180)){
             public void onSet(Item host){
                 host.tags.add(Tag.Ice);
+                warmth -= 1;
             }
         },
         Obsidian(.1f,3,4,.7f,8000){
@@ -106,6 +118,7 @@ public class Item extends Prop {
                 host.tags.add(Tag.Enchant);
                 host.tags.add(Tag.Fire);
                 host.tags.add(Tag.Fire);
+                warmth += 1;
             }
         },
         Bone(.2f,1,3,.8f,3000){
@@ -114,9 +127,9 @@ public class Item extends Prop {
             }
         },
         Other(0,0,0,1,0),
-        Flesh(.1f,0,0,1,0),
+        Flesh(.4f,0,0,1,0),
         Stone(.3f,6,5,1.2f,0,new Color(107, 107, 107,255));
-        int weight, hardness, value;
+        int weight, hardness, value, warmth = 0;
         Color color;
         float durabilityMod, prevalence;
         Material(float prevalence, int weight, int hardness, float durabilityMod, int value){
@@ -155,7 +168,7 @@ public class Item extends Prop {
         }
     }
     enum SpecialtyMod{
-        None, Light, Heavy, Sharp, Dull, Tough, Hardened, Runic, Instant, Cursed, Athletic, Strengthening, Branded, Unwieldy;
+        None, Light, Heavy, Sharp, Dull, Tough, Hardened, Runic, Instant, Cursed, Athletic, Strengthening, Branded, Unwieldy, Quick, Slow;
         static SpecialtyMod get(Random seed){
             if (seed.nextInt(8) == 0) return values()[seed.nextInt(values().length)];
             return None;
@@ -224,15 +237,12 @@ public class Item extends Prop {
     protected AdenchantMod ademod = AdenchantMod.None;
     protected Buffs emod = null;
     Material material;
-    public int weight, range;
-    public int volume = 1;
-    public int encumbrance = 0;
-    int cooldown = 3;
+    public int weight, range, speed;
+    public int volume = 1, encumbrance = 0;
+    Cooldown cooldown = new Cooldown(3);
     public int delay = 0;
     public float probability;
-    private int[] cdTime;
-    private int durability = 1;
-    private int uses = 1;
+    private int durability = 1, uses = 1;
     public boolean disposable = true;
     public ItemType type = ItemType.Throwing;
     public int value = 100;
@@ -245,8 +255,8 @@ public class Item extends Prop {
         setType(type);
         material = Material.get(rand, materials);
         setMaterial(material);
+        speed = weight;
         value += material.value;
-        cdTime = new int[]{Global.time};
         final Item me = this;
         onInteract = new Interactive(){
             public void interact(Man p){
@@ -319,9 +329,11 @@ public class Item extends Prop {
         else if (mod == SpecialtyMod.Light) this.weight = Math.max(0, this.weight - admod.magnitude);
         else if (mod == SpecialtyMod.Tough) durability *= 2;
         else if (mod == SpecialtyMod.Runic) probability += .2f*admod.magnitude;
-        else if (mod == SpecialtyMod.Instant) cooldown = 0;
+        else if (mod == SpecialtyMod.Instant) cooldown.setDuration(0);
         else if (mod == SpecialtyMod.Unwieldy) encumbrance+=admod.magnitude;
         else if (mod == SpecialtyMod.Cursed) tags.add(Tag.Enchant);
+        else if (mod == SpecialtyMod.Quick) this.speed = Math.max(0, this.speed - admod.magnitude);
+        else if (mod == SpecialtyMod.Slow) this.speed += admod.magnitude;
         else if (mod == SpecialtyMod.Athletic){
             for (int i=0;i<admod.magnitude;i++) tags.add(Tag.Athletics);
         }
@@ -420,13 +432,21 @@ public class Item extends Prop {
     private void playSound(){
         Sound.play(map, pos, type.sound);
     }
-    public boolean isUsable(int p){ //return: is item in isUsable state
+    public float getPercentage(){
+        return (float)getUses()/getDurability();
+    }
+    void mend(){
+        if (!isInfinite()) uses = durability;
+    }
+    public boolean isUsable(boolean use, int p){ //return: is item in isUsable state
         if (isInfinite() || uses >= p){
             if (!isInfinite()){
-                uses -= p;
-                if (uses == 0){
-                    Particle.groundSlam(map, pos, getDepth());
-                    if (disposable) remove();
+                if (use){
+                    uses -= p;
+                    if (uses == 0){
+                        Particle.groundSlam(map, pos, getDepth());
+                        if (disposable) remove();
+                    }
                 }
             }
             return true;
@@ -439,9 +459,15 @@ public class Item extends Prop {
     public int getUses(){
         return uses;
     }
+    public int getSpeed(){
+        return speed;
+    }
     public boolean use(Man host){
         if (host.get("Strength").get() >= weight) {
-            if (host.setState(type.action) == 0) {
+            host.get("Attack").add(-getSpeed(), true);
+            int stateResult = host.setState(type.action);
+            host.get("Attack").add(getSpeed(), true);
+            if (stateResult == 0) {
                 playSound();
                 return true;
             }
@@ -449,8 +475,8 @@ public class Item extends Prop {
         return false;
     }
     public void trigger(Unit target){
-        if (emod != null && Global.time >= cdTime[0] && SyncRand.r.nextFloat() < probability){
-            cdTime[0] = Global.time+cooldown;
+        if (emod != null && cooldown.isReady() && SyncRand.r.nextFloat() < probability){
+            cooldown.reset();
             target.buff(emod, ademod.level);
         }
     }
@@ -471,17 +497,16 @@ public class Item extends Prop {
         if (emod != null){
             String ade = "";
             if (ademod != AdenchantMod.None) ade = "Level "+ademod.level+" ";
-            if (cooldown > 0){
+            int cd = cooldown.getCurrentState();
+            if (cd > 0){
                 r += " "+Dialog.get("?itemEnc",new String[]{getRarityDescription(), ade+emod.name(), cooldown+""});
-                int cd = cdTime[0] - Global.time;
-                if (cd <= 0) r += " "+Dialog.get("itemEncRdy");
-                else r += " "+Dialog.get("itemEncNRdy", new String[]{cd+""});
+                r += " "+Dialog.get("itemEncRdy", new String[]{""+cd});
             }
         }
         return r;
     }
     public int getDamage() {
-        return type.isBlunt()?weight:weight*2;
+        return type.isBlunt()?weight:weight+material.hardness;
     }
     public Line getLine(){
         float len = image.getSize().x * dir * (image.getCenterType()==1?.5f:1) + 2;
@@ -501,7 +526,7 @@ public class Item extends Prop {
     public String[] load(String p){
         String[] sections = super.load(p);
         uses = Integer.parseInt(sections[5]);
-        cdTime[0] = Integer.parseInt(sections[6]);
+        cooldown.load(sections[6]);
         loadMeta(sections[7]);
         return sections;
     }
@@ -512,7 +537,7 @@ public class Item extends Prop {
     public String toString(){
         String t = super.toString();
         String meta = smod+"_"+admod+"_"+(emod==null?"":emod.ordinal())+"_"+ademod;
-        if (!t.equals("")) t += "@"+uses+"@"+cdTime[0]+"@"+meta;
+        if (!t.equals("")) t += "@"+uses+"@"+cooldown.toString()+"@"+meta;
         return t;
     }
 }

@@ -43,6 +43,10 @@ public class Terrain extends Drawable {
         this.map = map;
         setDepth(3+(depth*.1f));
         polygon = new Polygon();
+//        int c = Global.r.nextInt(255);
+//        if (image.image == null) this.color = new Color(c,c,c,Integer.parseInt(texture.substring(1).split(",")[3]));
+//        else this.color = new Color(c,c,c,255);
+
         if (image.image == null){
             String[] data = texture.substring(1).split(",");
             this.color = new Color(Integer.parseInt(data[0]),Integer.parseInt(data[1]),Integer.parseInt(data[2]),Integer.parseInt(data[3]));
@@ -79,12 +83,16 @@ public class Terrain extends Drawable {
         pos = new P(lowX, lowY);
         pos.mult(ZOOM);
         P size = image.getSize();
-        image.image = new BufferedImage((int)size.x, (int)size.y, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = image.image.createGraphics();
-        if (imageTexture != null) g.setPaint(imageTexture);
-        else g.setColor(color);
-        g.fill(polygon);
-        image.shade(0);
+        if (size.x > 0 && size.y > 0) {
+            image.image = new BufferedImage((int) size.x, (int) size.y, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = image.image.createGraphics();
+            if (imageTexture != null) g.setPaint(imageTexture);
+            else g.setColor(color);
+            g.fill(polygon);
+            image.shade(0);
+        } else {
+            Global.p("Terrain size violation at "+pos.toString());
+        }
     }
     private void setSize(float x, float y){
         image.setSize(x, y);
@@ -93,11 +101,10 @@ public class Terrain extends Drawable {
     public void draw(Graphics2D g){
         if (image.visible && pos.x > Global.camera.x-Settings.centerX-finalSize.x && pos.y > Global.camera.y-Settings.centerY-finalSize.y
                 && pos.x < Global.camera.x+Settings.centerX && pos.y < Global.camera.y+Settings.centerY) {
-            g.drawImage(image.image,(int)(pos.x+Global.rel.x),(int) (pos.y+Global.rel.y),finalSize.x(),finalSize.y(),null);
+            g.drawImage(image.image,(int)(pos.x+Global.rel.x),(int)(pos.y+Global.rel.y),finalSize.x(),finalSize.y(),null);
 //            for (Line i : lines) g.drawLine((int)(t.x+i.pt.x),(int)(t.y+i.pt.y),(int)(t.x+i.ptd.x),(int)(t.y+i.ptd.y));
         }
     }
-
     public void setDepth(float depth) {
         super.setDepth(depth);
         for (Line i : lines) i.depth = depth;

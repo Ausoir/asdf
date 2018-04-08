@@ -5,6 +5,7 @@ import com.ga.game.Sound;
 import com.ga.map.Creation;
 import com.ga.map.Global;
 import com.ga.map.Map;
+import com.ga.map.Picture;
 import com.ga.tool.Interactive;
 import com.ga.tool.Line;
 import com.ga.tool.P;
@@ -24,14 +25,16 @@ import java.util.Random;
  */
 public enum Stock {
     Spawn{ protected Prop make(Map map, int id, int seed){
-        Prop product = new Prop(map, name(), seed);
+        Prop product = new Prop(map, null, seed);
+        product.name = "Spawn";
         product.manualDepth = true;
         product.mobile = false;
         product.image.visible = false;
+        product.image.set(Picture.loadCache("POI"));
         return product;
     }},
     Travel{ Prop make(Map map, final int id, final int seed){
-        Prop product = new Prop(map, "Travel", seed){
+        Prop product = new Prop(map, null, seed){
             public String[] load(String p){
                 String[] r = super.load(p);
                 name = r[5];
@@ -41,6 +44,8 @@ public enum Stock {
                 return super.toString() + "@" + name;
             }
         };
+        product.name = "Travel";
+        product.image.set(Picture.loadCache("Move"));
         product.manualDepth = true;
         product.mobile = false;
         product.image.visible = false;
@@ -51,11 +56,31 @@ public enum Stock {
         };
         return product;
     }},
-    Entrance{ Prop make(Map map, final int id, final int seed){ //Obsolete
-        return new Prop(map, name(), seed);
+    Info{ Prop make(Map map, final int id, final int seed){
+        Prop product = new Prop(map, null, seed){
+            public String[] load(String p){
+                String[] r = super.load(p);
+                name = r[5];
+                return r;
+            }
+            public String toString(){
+                return super.toString() + "@" + name;
+            }
+        };
+        product.name = "Info";
+        product.image.set(Picture.loadCache("Describe"));
+        product.manualDepth = true;
+        product.mobile = false;
+        product.image.visible = false;
+        product.onInteract = new Interactive(){
+            public void interact(com.ga.unit.man.Man p){
+                if (p == Global.player) Global.display.menu.showDialog("Info", product.name);
+            }
+        };
+        return product;
     }},
     Object{ Prop make(Map map, int id, int seed){
-        String[] data = FileManager.readText("raw/Object.txt");
+        String[] data = FileManager.readText("Data/raw/Object.txt");
         final String[] v = data[id].split(";");
         final Prop product;
         if (!v[6].equals("0")) {
@@ -64,8 +89,8 @@ public enum Stock {
                     super.onField();
                     int offset = -Integer.parseInt(v[6]);
                     P s = image.getSize().getMult(.5f, image.getCenterType() == 1 ? .5f : 1).add(0,offset);
-                    P top = new P(Math.sin(rotation) * s.y, Math.cos(rotation) * s.y);
-                    P width = new P(Math.sin(rotation) * s.x, Math.cos(rotation) * s.x);
+                    P top = new P(Global.sin(rotation) * s.y, Global.cos(rotation) * s.y);
+                    P width = new P(Global.sin(rotation) * s.x, Global.cos(rotation) * s.x);
                     map.land.add(new Line(pos.x + top.x - width.y, pos.y - top.y - width.x,
                             pos.x + top.x + width.y, pos.y - top.y + width.x, -1, 0, lastLand.depth - OFFSET_PROP) {
                         public String toString() {
@@ -84,7 +109,7 @@ public enum Stock {
         return product;
     }},
     Beast{ Prop make(Map map, int id, int seed) {
-        String[] units = FileManager.readText("raw/Beast.txt");
+        String[] units = FileManager.readText("Data/raw/Beast.txt");
         String[] unit = units[id].split(";");
         Unit product = new Unit(map, null, seed){
             public void onCreate(){
@@ -98,7 +123,7 @@ public enum Stock {
         return product;
     }},
     Man{ Prop make(Map map, int id, int seed){
-        String[] units = FileManager.readText("raw/Man.txt");
+        String[] units = FileManager.readText("Data/raw/Man.txt");
         final String[] unit = units[id].split(";",-1);
         com.ga.unit.man.Man product = new Man(map, unit[0], seed){
             public void onCreate(){
@@ -119,9 +144,15 @@ public enum Stock {
         return product;
     }},
     Etc{ Prop make(Map map, int id, int seed){
-        String[] data = FileManager.readText("raw/Etc.txt");
+        String[] data = FileManager.readText("Data/raw/Etc.txt");
         final String[] v = data[id].split(";");
-        Item product = new Item(map, v[0], seed, Item.Material.load(v[4].split(",")), Item.ItemType.Bashing, 100);
+        Item product = new Item(map, v[0], seed, Item.Material.load(v[4].split(",")), Item.ItemType.Bashing, 100){
+            public String getDescription(){
+                String r = super.getDescription();
+                if (v.length > 5) r += v[5];
+                return r;
+            }
+        };
         product.weight = Integer.parseInt(v[2]);
         product.value = Integer.parseInt(v[3]);
         product.dir = product.seed % 2 == 0 ? 1 : -1;
@@ -130,7 +161,7 @@ public enum Stock {
         return product;
     }},
     Weapon{ Prop make(Map map, int id, int seed){
-        String[] data = FileManager.readText("raw/Weapon.txt");
+        String[] data = FileManager.readText("Data/raw/Weapon.txt");
         final String[] v = data[id].split(";");
         Item product = new Weapon(map, v[0], seed, Item.Material.load(v[4].split(",")), Item.ItemType.valueOf(v[1]),
                 40, Integer.parseInt(v[2]));
@@ -140,17 +171,17 @@ public enum Stock {
         return product;
     }},
     Armor{ Prop make(Map map, int id, int seed){
-        String[] data = FileManager.readText("raw/Armor.txt");
+        String[] data = FileManager.readText("Data/raw/Armor.txt");
         final String[] v = data[id].split(";");
         int piece = Integer.parseInt(v[1]);
         if (piece == 1 || piece == 2) v[0] = v[0].substring(0,v[0].indexOf("_"));
         Prop product = new Armor(map, v[0], seed, Item.Material.load(v[4].split(",")), piece,
-                Integer.parseInt(v[2]), Integer.parseInt(v[3]), Integer.parseInt(v[5]));
+                Integer.parseInt(v[2]), Integer.parseInt(v[3]), Integer.parseInt(v[5]), Integer.parseInt(v[6]));
         product.subId = id;
         return product;
     }},
     Food{ Prop make(Map map, int id, int seed){
-        String[] data = FileManager.readText("raw/Food.txt");
+        String[] data = FileManager.readText("Data/raw/Food.txt");
         final String[] v = data[id].split(";");
         Prop product = new Food(map, v[0], seed, Integer.parseInt(v[1]), v[2]);
         product.subId = id;
@@ -171,7 +202,6 @@ public enum Stock {
                     delay.time = 24;
                     vel.x = 32*dir;
                     vel.y -= 20;
-                    cooldown.put(Actions.Melee, new int[]{Global.time+2});
                 }
             }
             public Unit attack(){
@@ -238,7 +268,7 @@ public enum Stock {
         Unit product = new Unit(map, name(), seed){
             public void collide(){
                 super.collide();
-                jump = true;
+                grounded = true;
             }
             public void stateSet(Actions state) {
                 if (state == Actions.Jump){
@@ -275,7 +305,7 @@ public enum Stock {
         Unit product = new Unit(map, name(), seed){
             public void collide(){
                 super.collide();
-                jump = true;
+                grounded = true;
             }
             public P getHand(){
                 return pos.getAdd(0,getReach()+40);
@@ -359,7 +389,7 @@ public enum Stock {
                 return true;
             }
             public void onCreate(){
-                isUsable(100);
+                isUsable(true, 100);
             }
         };
         product.tags.add(Tag.Currency);
@@ -379,14 +409,29 @@ public enum Stock {
                 skill = learnables.get(seed % learnables.size());
                 return r;
             }
+            private boolean checkIngredients(){
+                ArrayList<Prop> t = map.updater.collideProp(pos, 240);
+                Tags r = new Tags();
+                r.addAll(skill.getTrainers());
+                for (Prop i : t) {
+                    if (r.removeAll(i.tags)){
+                        i.remove();
+                    }
+                }
+                return r.size() == 0;
+            }
             @Override
             public boolean use(com.ga.unit.man.Man host){
                 if (host instanceof Player && super.use(host)) {
                     Player player = (Player) host;
                     if (player.getStateLevel(skill) > 0) {
-                        if (map.updater.sleep(100) == 100) {
-                            if (!player.learnSkill(skill)) host.say("Failed to learn "+skill.getName()+".");
-                        }
+                        if (checkIngredients()) {
+                            if (host.get("Motivation").require(100)) {
+                                if (map.updater.sleep(100, true)) {
+                                    if (!player.learnSkill(skill)) host.say("Failed to learn " + skill.getName() + ".");
+                                }
+                            } else host.say("No motivation...");
+                        } else host.say("Catalysts required!");
                     } else host.say("Not skilled enough to learn "+skill.getName()+"!");
                 }
                 return false;
@@ -402,7 +447,7 @@ public enum Stock {
                 req += "x Difficulty "+difficulty+".";
                 req += " Your current level of expertise in this field: "+power+".";
                 if (power > 0) req += " You are capable of performing this action.";
-                else req += " You lack the expertise to perform the technique described in this manual.";
+                else req += " You are incapable of performing this action.";
                 return super.getDescription()+" "+req;
             }
         };
@@ -436,7 +481,7 @@ public enum Stock {
                                 }
                             }
                             if (dummy != null) {
-                                if (map.updater.sleep(100) == 100) {
+                                if (map.updater.sleep(100, true)) {
                                     if (host.get("Motivation").require(10)) {
                                         host.get(stat).add(rand.nextInt((400 - host.get(stat).get()) / 10) + 1, true);
                                         host.say("Trained up " + stat + ".");
@@ -467,7 +512,7 @@ public enum Stock {
                 String req = "This book teaches level "+(subId+1)+" "+stat+".";
                 int understanding = Global.player.get(stat).get()/100;
                 req += " Your current level of understanding of "+stat+": "+understanding+".";
-                if (understanding == subId) req += " You may exploit the contents of this book.";
+                if (understanding == subId) req += " You may learn the contents of this book.";
                 else if (understanding < subId) req += " This book is beyond your understanding.";
                 else if (understanding > subId) req += " You won't learn anything from this book.";
                 return super.getDescription()+" "+req;
@@ -480,7 +525,7 @@ public enum Stock {
     Bandage{ Prop make(Map map, int id, int seed){
         Item product = new Item(map, name(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Consumable, 4) {
             public boolean use(com.ga.unit.man.Man host) {
-                if (isUsable(1) && super.use(host)){
+                if (isUsable(true, 1) && super.use(host)){
                     host.stats.triggerEffect(Buffs.Bleed);
                     return true;
                 }
@@ -499,8 +544,8 @@ public enum Stock {
                 if (seed != 0) imbueMeta(false, false, 1);
             }
             public boolean use(com.ga.unit.man.Man host) {
-                if (isUsable(1) && super.use(host)){
-                    host.buff(emod, ademod.level);
+                if (isUsable(true, 1) && super.use(host)){
+                    host.buff(emod, ademod.level*2);
                     return true;
                 }
                 return false;
@@ -519,9 +564,9 @@ public enum Stock {
             Actions spell;
             @Override
             public boolean use(com.ga.unit.man.Man host){
-                if (isUsable(1) && super.use(host)) {
+                if (isUsable(true, 1) && super.use(host)) {
                     if (spell != null){
-                        host.buff(Buffs.Attunement, 1);
+                        host.buff(Buffs.Infusion, 1);
                         host.stateLevel = 3;
                         host.stateSet(spell);
                         return true;
@@ -553,6 +598,7 @@ public enum Stock {
             }
         };
         product.probability = 1;
+        product.range = 400;
         product.delay = 30;
         return product;
     }},
@@ -602,25 +648,9 @@ public enum Stock {
         };
         return product;
     }},
-    Dungeon{ Prop make(Map map, int id, final int seed){
-        final Prop entrance = Stock.Spawn.create(map, -1, 0);
+    Something{ Prop make(Map map, int id, final int seed){ //unused
         final Prop product = new Prop(map, name(), seed){
-            public void onField(){
-                super.onField();
-                entrance.pos.add(pos.x, pos.y);
-            }
         };
-        entrance.onInteract = new Interactive(){
-            public void interact(com.ga.unit.man.Man p){
-                if (p == Global.player && p.lastLand.depth == product.getDepth()+2){
-//                    Creation.prepareRandom(Integer.parseInt(map.name+""+entrance.seed));
-//                    map.loadMap("D_"+map.name+"_"+entrance.seed+"@"+entrance.seed+"@0");
-                }
-            }
-        };
-        entrance.save = false;
-        entrance.pos.set(0,-product.image.getSize().y/2);
-        isFurniture(product);
         return product;
     }},
     Spawner{ Prop make(Map map, final int id, int seed) {
@@ -655,8 +685,8 @@ public enum Stock {
             public void onField(){
                 super.onField();
                 P s = image.getSize().getMult(.5f, 1).add(0,-8);
-                P top = new P(Math.sin(rotation)*s.y, Math.cos(rotation)*s.y);
-                P width = new P(Math.sin(rotation)*s.x, Math.cos(rotation)*s.x);
+                P top = new P(Global.sin(rotation)*s.y, Global.cos(rotation)*s.y);
+                P width = new P(Global.sin(rotation)*s.x, Global.cos(rotation)*s.x);
                 map.land.add(new Line(pos.x+top.x-width.y, pos.y-top.y-width.x,
                         pos.x+top.x+width.y, pos.y-top.y+width.x, -1, 0, lastLand.depth - OFFSET_PROP){
                     public String toString(){
@@ -705,7 +735,7 @@ public enum Stock {
                 Item.ItemType.Darting, 10){
             @Override
             public boolean use(final com.ga.unit.man.Man host){
-                if (host.clip.getHandStatus() == 1 && isUsable(1) && super.use(host)) {
+                if (host.clip.getHandStatus() == 1 && isUsable(true, 1) && super.use(host)) {
                     host.delay.performer = new Performer() {
                         public void perform() {
                             final Projectile p = new Projectile(map, "Tanto", host.pos.getAdd(host.clip.organs[BodyHumanoid.OFIST].ptd), host.pos.getAdd(host.target), 70) {
@@ -745,7 +775,7 @@ public enum Stock {
         Item product = new Item(map, name(), seed, new Item.Material[]{Item.Material.Stone}, Item.ItemType.Throwing, 1) {
             @Override
             public boolean use(final com.ga.unit.man.Man host) {
-                if (isUsable(1) && super.use(host)) {
+                if (isUsable(true, 1) && super.use(host)) {
                     final int explosionDamage = rand.nextInt(36)+24;
                     host.delay.performer = new Performer() {
                         public void perform() {
@@ -793,7 +823,7 @@ public enum Stock {
         Item product = new Item(map, name(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Throwing, 5) {
             @Override
             public boolean use(final com.ga.unit.man.Man host) {
-                if (isUsable(1) && super.use(host)) {
+                if (isUsable(true, 1) && super.use(host)) {
                     host.stateSet(Actions.Dart);
                     final Item me = this;
                     host.delay.performer = new Performer() {
@@ -869,7 +899,7 @@ public enum Stock {
     }},
     Runnerkit{ Prop make(Map map, int id, int seed){
         Armor product = new Armor(map, name(),seed,Item.Material.values()
-                ,3,0,0,8){
+                ,3,0,0,8, 0){
         };
         product.disposable = false;
         product.weight = 1;
@@ -878,7 +908,7 @@ public enum Stock {
     }},
     Jewelry{ Prop make(Map map, int id, int seed){
         Armor product = new Armor(map, "Battery",seed,Item.Material.values()
-                ,3,0,0,1000){
+                ,3,0,0,1000, 0){
         };
         product.name = "Jewelry";
         product.disposable = false;
@@ -886,7 +916,7 @@ public enum Stock {
     }},
     Manastone_Necklace{ Prop make(Map map, int id, int seed){
         Armor product = new Armor(map, "Battery",seed,new Item.Material[]{Item.Material.Stone, Item.Material.Glass, Item.Material.Crystal, Item.Material.Obsidian}
-                ,3,0,0,1000){
+                ,3,0,0,1000, 0){
             public String getDescription(){
                 return super.getDescription()+"\nThis item is used to store mana for magical applications.";
             }
@@ -911,7 +941,7 @@ public enum Stock {
         return product;
     }},
     Stomach_Full_Helm{ Prop make(Map map, int id, int seed){
-        Armor product = new Armor(map, "Full_Helm",seed,new Item.Material[]{Item.Material.Titanium},0,0,0,-1){
+        Armor product = new Armor(map, "Full_Helm",seed,new Item.Material[]{Item.Material.Titanium},0,0,0,-1, 0){
             public String getDescription(){
                 return super.getDescription()+" Something is odd about this helmet.";
             }
@@ -931,7 +961,7 @@ public enum Stock {
                 return super.getDescription()+"\nThis item is used as a catalyst for curses.";
             }
             public void onCreate(){
-                isUsable(getUses()-1);
+                isUsable(true, getUses()-1);
             }
             private void collectBlood(com.ga.unit.man.Man host){
                 boolean hostSaved = false, collected = false;
@@ -943,7 +973,7 @@ public enum Stock {
                             continue;
                         }
                         host.say("Stained "+getFullName());
-                        isUsable(getUses());
+                        isUsable(true, getUses());
                         recharge(10 + 10*i.rand.nextInt(i.get("Level").get()+1));
                         i.buff(Buffs.Mark,1);
                         i.buff(Buffs.Bleed,7);
@@ -953,7 +983,7 @@ public enum Stock {
                 }
                 if (!collected && hostSaved){
                     host.say("Stained "+getFullName());
-                    isUsable(getUses());
+                    isUsable(true, getUses());
                     recharge(10 + 10*host.rand.nextInt(host.get("Level").get()+1));
                     host.buff(Buffs.Mark,1);
                     host.buff(Buffs.Bleed,1);
@@ -973,7 +1003,7 @@ public enum Stock {
                             }
                         };
                         int power = host.get("Intelligence").get()+bloodQuality; //not max
-                        if (isUsable(1)) {
+                        if (isUsable(true, 1)) {
                             for (int i = 0; i < listString.length - 1; i++) {
                                 Buffs buff = buffs.get(i);
                                 listString[i + 1] = buff.name() + " - Power "+buff.value;
@@ -985,7 +1015,7 @@ public enum Stock {
                                             if (i.stats.getEffectLevel(Buffs.Mark) > 0) {
                                                 if (i.get("Intelligence").get()+buff.value < power) {
                                                     i.buff(buff, bloodQuality);
-                                                    isUsable(buff.value);
+                                                    isUsable(true, buff.value);
                                                 } else {
                                                     host.buff(buff, bloodQuality);
                                                     host.say(listString[finalI]+" backfired!");
@@ -1099,7 +1129,7 @@ public enum Stock {
     }
     public static void init(){
         for (String raw : new String[]{"Object","Etc","Man","Beast","Weapon","Armor","Food"}){
-            String[] data = FileManager.readText("raw/"+raw+".txt");
+            String[] data = FileManager.readText("Data/raw/"+raw+".txt");
             for (int i=0;i<data.length;i++)
                 extRegistry.put(data[i].substring(0,data[i].indexOf(";")), raw+"@"+i);
         }

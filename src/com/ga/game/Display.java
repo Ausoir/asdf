@@ -11,7 +11,7 @@ import java.awt.event.*;
  * Created by Ga on 5/6/2016. asd
  */
 public class Display extends JPanel implements FocusListener {
-    public JTextField chatbox;
+    private JTextField chatbox;
     public Input input;
     public Menu menu;
     private int mode = 0;
@@ -90,29 +90,51 @@ public class Display extends JPanel implements FocusListener {
         addMouseMotionListener(mouseAdapter);
         addMouseWheelListener(mouseAdapter);
 
+        Color chatboxBg = new Color(88,88,0,55);
+        Color chatboxFocusBg = new Color(240,240,180,200);
         chatbox = new JTextField();
         chatbox.setFont(new Font("Ariel", Font.PLAIN, 18));
         chatbox.setBounds(0,Settings.screenY-100,500,40);
         chatbox.setFocusable(true);
         chatbox.setBorder(null);
-        chatbox.setBackground(new Color(88,88,0,55));
+        chatbox.setBackground(chatboxBg);
         chatbox.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
                 String key = input.getKeyMap(e.getKeyCode());
                 if (key != null) {
-                    if (key.equals("_SAY")) chat();
-                    else if (key.equals("_UP")) chatbox.setText(lastChat);
-                    else if (key.equals("_EXIT")){
-                        chatbox.setText("");
-                        chat();
+                    switch (key) {
+                        case "_SAY":
+                            chat();
+                            break;
+                        case "_UP":
+                            chatbox.setText(lastChat);
+                            break;
+                        case "_EXIT":
+                            chatbox.setText("");
+                            chat();
+                            break;
                     }
                 }
+            }
+        });
+        chatbox.addFocusListener(new FocusListener(){
+            @Override
+            public void focusGained(FocusEvent e) {
+                chatbox.setBackground(chatboxFocusBg);
+            }
+            @Override
+            public void focusLost(FocusEvent e) {
+                chatbox.setBackground(chatboxBg);
             }
         });
         add(chatbox);
         menu = new Menu();
         add(menu);
+    }
+
+    public void startChat(){
+        chatbox.requestFocus();
     }
 
     @Override
@@ -138,8 +160,9 @@ public class Display extends JPanel implements FocusListener {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g.create();
         g2d.addRenderingHints(new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY));
+        g2d.addRenderingHints(new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF));
         g2d.addRenderingHints(new RenderingHints(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_GASP));
-        Global.player.map.updater.draw(g2d);
+        if (Global.player.map != null) Global.player.map.updater.draw(g2d);
         g2d.setColor(Color.BLACK);
     }
 

@@ -4,10 +4,14 @@ import com.ga.game.Settings;
 import com.ga.game.Sound;
 import com.ga.map.Global;
 import com.ga.map.Map;
+import com.ga.map.MapName;
 import com.ga.tool.Line;
-import com.ga.unit.*;
+import com.ga.tool.SyncRand;
+import com.ga.unit.Particle;
+import com.ga.unit.Tag;
+import com.ga.unit.Tags;
+import com.ga.unit.Traits;
 import com.ga.unit.skill.Actions;
-import com.ga.unit.skill.Buffs;
 import com.ga.unit.skill.Stat;
 
 import static com.ga.unit.man.BodyHumanoid.BODY;
@@ -16,6 +20,9 @@ import static com.ga.unit.man.BodyHumanoid.BODY;
  * Created by Ga on 12/29/2016. asd
  */
 public class MainPlayer extends Player {
+    public static String[] mainStats = new String[]{
+            "Strength", "Agility", "Intelligence"
+    };
     private Indicater indicater;
 
     public MainPlayer(Map map, int seed) {
@@ -26,9 +33,10 @@ public class MainPlayer extends Player {
 
     @Override
     public int setState(Actions state) {
-        if (state == Actions.Use && this.state == Actions.Jump && getStateLevel(Actions.Airstrike) > 0
-                && this.delay.time > 32 && moveset.contains(Actions.Airstrike)) stateSet(Actions.Airstrike);
-        else if (state == Actions.Jump && this.state == Actions.Rest) state = Actions.Leap;
+        if (state == Actions.Use && !grounded){
+            if (vel.y < 0) setState(Actions.Airstrike);
+            else if (vel.y > 0) setState(Actions.Downstrike);
+        } else if (state == Actions.Jump && this.state == Actions.Rest) state = Actions.Leap;
         else if (state == Actions.Rest && (this.state == Actions.Right || this.state == Actions.Left)) {
             if (vel.x != 0) target.x = dir;
             state = Actions.Sprint;
@@ -36,8 +44,16 @@ public class MainPlayer extends Player {
             if (state == Actions.Rest || state == Actions.Right || state == Actions.Left) return 6;
         }
         int r = super.setState(state);
-        if (r == 2) indicater.show(1);
-        else if (r == 3) indicater.showCd(getCooldown(state)[0]);
+        if (r != 0){
+            if (r == 2) {
+                indicater.show(1);
+                if (state.getCost() > get("Stamina").getMax()) say("Stamina cost is beyond my limit!");
+            } else if (r == 3) {
+                indicater.showCd(getCooldown(state).time);
+            } else if (r == 4) {
+                say("Cannot cast!");
+            } else if (r == 5) say("This action is beyond my abilities!");
+        }
         return r;
     }
 
@@ -66,43 +82,37 @@ public class MainPlayer extends Player {
         return total;
     }
 
-    public void witnessDeath(Unit p) {
-        if (p.faction.canAttack(faction) && p.stats.getEffectLevel(Buffs.Banishment)==0 && p.pos.getSubtract(pos).inOval(900, 500)) {
-            int exp = Math.max(0, p.get("Level").get() - get("Level").get());
-            if (exp > 0) level(exp);
+    public int getLevel(){
+        int level = -8;
+        for (String mainStat : mainStats){
+            level += get(mainStat).getMax();
         }
+        return level;
     }
 
-    private void level(int p) {
-        boolean fast = traits.has(Traits.Trait.Fast_Learner) && get("Motivation").require(3);
-        Stat exp = get("Experience");
-        Stat level = get("Level");
-        if (fast || get("Motivation").require(1)) {
-            exp.add(p * (fast ? 2 : 1), true);
-            if (exp.isFull()) {
-                Sound.play(map, pos, "heal");
-                Particle.holyExplosion(map, pos.getAdd(clip.organs[BODY].ptd), getDepth());
-                level.setMax(level.getMax() + 1);
-                int residue = exp.get() - exp.getMax();
-                exp.setMax(10 * level.getMax());
-                exp.set(residue, true);
-                get("Tiredness").setMax(500 + level.getMax() * 50);
-                int prev = 1;
-                int current = 1;
-                boolean pass = true;
-                while (pass) {
-                    int pprev = prev;
+    private void level(String stat) {
+        int requiredMotivation = traits.has(Traits.Trait.Fast_Learner) ? 60 : 40;
+        int requiredTime = traits.has(Traits.Trait.Fast_Learner) ? 100 : 300;
+        if (map.updater.sleep(requiredTime, true) && get("Motivation").require(requiredMotivation)) {
+            get(stat).addTotal(1);
+            Sound.play(map, pos, "heal");
+            Particle.holyExplosion(map, pos.getAdd(clip.organs[BODY].ptd), getDepth());
+            int level = getLevel();
+            if (level > 1) {
+                int i, current = 1, prev;
+                for (i=1;i<level;i+=prev){
                     prev = current;
-                    current += pprev;
-                    if (level.getMax() > 30 || 30 - current == level.getMax()) { //decay
-                        String[] stats = new String[]{
-                                "Stamina", "Strength", "Agility", "Intelligence"
-                        };
-                        get(stats[Global.r.nextInt(stats.length)]).add(-1, true);
-                        pass = false;
-                    } else if (30 - current < level.getMax()) pass = false;
+                    current = i;
+                }
+                if (i != level) { //not fibo
+                    Stat decay;
+                    do {
+                        decay = get(mainStats[SyncRand.r.nextInt(mainStats.length)]);
+                    } while (decay.getMax() <= 1);
+                    decay.addTotal(-1);
                 }
             }
+            armor.updateStatus();
         }
     }
 
@@ -127,9 +137,16 @@ public class MainPlayer extends Player {
     }
 
     protected void onMapEdge(int dir){
-        if (map.name.startsWith("_"))
-            Global.server.requestChangeMap("_"+map.name.substring(1,2)+(Integer.parseInt(map.name.substring(2))+dir)+"@"+(dir<0?1:2));
-        else super.onMapEdge(dir);
+        if (map.name.isField()){
+            MapName newMapName = map.name.getNext(dir);
+            if (newMapName.isValid() && map.updater.sleep(100, true)) {
+                vel.set(0,0);
+                stateSet(Actions.Idle);
+                delay.time = 200;
+                Global.server.requestChangeMap(newMapName.getInstanceName() +"@"+ (dir<0?1:2));
+            }
+        }
+        super.onMapEdge(dir);
     }
 
     public void update() {
@@ -137,7 +154,7 @@ public class MainPlayer extends Player {
         if (!get("Stamina").isFull()) indicater.show(.5f);
         indicater.update();
         if (input.ctrl) Global.cameraTo = pos.getAdd(target.getMult(.5f,.5f));
-        else Global.cameraTo = pos.getAdd(vel.getAdd(0,-Settings.gravity).mult(50,30));
+        else Global.cameraTo = pos.getAdd(vel.getAdd(0,-Settings.gravity).mult(50,20));
     }
 
     public void remove() {

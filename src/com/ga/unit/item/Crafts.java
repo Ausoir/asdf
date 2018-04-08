@@ -14,7 +14,7 @@ import java.util.HashMap;
  * Created by Ga on 3/26/2017. asd
  */
 public class Crafts {
-    public static final HashMap<String,ArrayList<String>> recipes = FileManager.readDialogue("raw/Recipe.txt");
+    public static final HashMap<String,ArrayList<String>> recipes = FileManager.readDialogue("Data/raw/Recipe.txt");
     public ArrayList<String> knowledge = new ArrayList<>();
     private Man host;
     public Crafts(Man player) {
@@ -40,12 +40,12 @@ public class Crafts {
                 ingredients.remove(index);
                 String use = usage.remove(index);
                 if (use.equals("*")) i.remove();
-                else if (!use.equals("0") && i instanceof Item) ((Item) i).isUsable(Integer.parseInt(use));
+                else if (!use.equals("0") && i instanceof Item) ((Item) i).isUsable(true, Integer.parseInt(use));
             }
         }
         if (ingredients.size() == 1){
             int time = Integer.parseInt(usage.get(0));
-            if (host.map.updater.sleep(time) == time) {
+            if (host.map.updater.sleep(time, true)) {
                 Prop result = Stock.getByName(host.map, p, -1);
                 if (host.wieldingNone()) host.setWeapon((Item) result);
                 else result.pos.set(host.pos);

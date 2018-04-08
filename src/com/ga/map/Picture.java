@@ -26,7 +26,6 @@ public class Picture {
     private P halfSize = new P();
     public Random rand;
     private int type = 1; //1:center,2:bottom
-    public int multiple = 0;
 
     public static void init(){
         for (String[] i : FileManager.fileCache.get("png")){
@@ -42,6 +41,7 @@ public class Picture {
         cache.put("Buy",getTexture(loadCache("Icon"),24,24,1,0));
         cache.put("Describe",getTexture(loadCache("Icon"),24,24,2,0));
         cache.put("POI",getTexture(loadCache("Icon"),24,24,3,0));
+        cache.put("Move",getTexture(loadCache("Icon"),24,24,4,0));
     }
     public Picture(Random rand){
         this.rand = rand;
@@ -86,8 +86,7 @@ public class Picture {
             Integer num = multiples.get(dir);
             if (num != null) {
                 if (rand == null) rand = new Random();
-                multiple = rand.nextInt(num);
-                dir += "-" + multiple;
+                dir += "-" + rand.nextInt(num);
                 file = directory.get(dir);
             }
         }
@@ -98,7 +97,7 @@ public class Picture {
                 e.printStackTrace();
             }
         } else if (dir != null) {
-            System.out.println("Can't read picture file ["+dir + "]");
+            Global.p("Can't read picture file ["+dir + "]");
             try {
                 image = ImageIO.read(new File("Data/Error.png"));
             } catch (IOException e) {
@@ -118,7 +117,7 @@ public class Picture {
                 e.printStackTrace();
             }
             cache.put(dir, image);
-        } else if (dir != null) System.out.println("Can't read picture cache ["+dir + "]");
+        } else if (dir != null) Global.p("Can't read picture cache ["+dir + "]");
         return toCompatibleImage(image);
     }
     static BufferedImage toCompatibleImage(BufferedImage image)
@@ -167,6 +166,10 @@ public class Picture {
         r.set(result);
         return r;
     }
+    public void modify(Shader shader, int p){
+        if (image != null) image = shader.render(image, p);
+        if (image != null) image = toCompatibleImage(image);
+    }
     public void draw(Graphics2D g, float x, float y, float rot, int dir, float sizeX, float sizeY){
         if (visible && x > Global.camera.x-Settings.centerX-sizeX && y > Global.camera.y-Settings.centerY-sizeY
                 && x < Global.camera.x+Settings.centerX+sizeX && y < Global.camera.y+Settings.centerY+sizeY) {
@@ -181,10 +184,10 @@ public class Picture {
             g.rotate(-rot, rx, ry);
         }
     }
-    protected void drawImage(Graphics2D g, int x, int y, int sizeX, int sizeY){
-        g.drawImage(image, x, y, sizeX, sizeY, null);
-    }
     public void draw(Graphics2D g, float x, float y, float rot, int dir){
         draw(g,x,y,rot,dir,size.x,size.y);
+    }
+    protected void drawImage(Graphics2D g, int x, int y, int sizeX, int sizeY){
+        g.drawImage(image, x, y, sizeX, sizeY, null);
     }
 }

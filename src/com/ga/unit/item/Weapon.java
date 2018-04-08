@@ -12,9 +12,10 @@ public class Weapon extends Item {
         super(map, name, seed, materials, type, durability);
         this.encumbrance = encumbrance;
         value = value*2 + 1000;
-        cooldown = 0;
+        cooldown.setDuration(0);
         rotation = 35;
         delay = 0;
+        disposable = false;
     }
     public void onCreate(){
         imbueMeta(true, true, .1f);
@@ -30,7 +31,6 @@ public class Weapon extends Item {
     public void enhance(){
         if (isEnhanceable()){
             quality++;
-            disposable = false;
         }
     }
     private boolean isEnhanceable(){
@@ -46,7 +46,8 @@ public class Weapon extends Item {
     }
     @Override
     public int getDamage() {
-        return Math.max(0,super.getDamage()+quality);
+        int damage = super.getDamage()+quality;
+        return Math.max(0,damage);
     }
     @Override
     public String getFullName() {

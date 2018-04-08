@@ -32,42 +32,48 @@ public class Map {
         put("sand","XBush=.1,Shell=.2,Starfish=.3");
     }};
     public P size;
-    public String name = "0";
-    public String callname = "Somewhere";
+    public MapName name;
+    private String callname = "Somewhere";
     private static final int magnify = 2;
     private Thing panorama;
     public Updater updater;
+
     Map(String name) {
-        this.name = name;
+        this.name = new MapName(name);
         updater = new Updater(this);
         onTimeChange();
     }
 
     public void start(){
-        if (name.startsWith("_") && !FileManager.isFile("Data/map/" + name + ".map")){
+        if (name.isField() && !FileManager.isFile("Data/map/" + name + ".map")){
             make(name);
-            FileManager.saveMap(name, this);
+            FileManager.saveMap(name.toString(), this);
             clear();
         }
-        load(name);
+        load(name.toString());
         weather.start();
     }
 
-    private void make(String dir){
-        callname = "Field";
-        Generator gen = new Generator(this, 0);
-        if (dir.startsWith("_M")){
-            if (Creation.getRegionVariable(Integer.parseInt(dir.substring(2))).nextInt(6) == 0) gen.generateTown();
-            else gen.generateLand();
-        } else if (dir.startsWith("_F")){
-            gen.generateForest();
+    private void make(MapName dir){
+        switch (callname = dir.getBiomeName()){
+            case "Grassland":
+                int var = Creation.getRegionVariable(dir.getIndex()).nextInt(5);
+                if (var == 0) GenerateTown.generate(this);
+                else GenerateGrassland.generate(this);
+                break;
+            case "Forest":
+                GenerateForest.generate(this);
+                break;
+            case "Desert":
+                GenerateDesert.generate(this);
+                break;
         }
-        panorama = new Thing(this, "Bg_Desert", 0, 0);
+        panorama = new Thing(this, "Bg_"+callname, 0, 0);
         generateProps();
     }
 
     public void load(String dir){
-        String data = FileManager.read("map/" + dir + ".map");
+        String data = FileManager.read("Data/map/" + dir + ".map");
         String[] line = data.split("%");
         String[] names = line[0].split(";");
         callname = names[0];
@@ -90,6 +96,7 @@ public class Map {
                     g.drawImage(image.getImage(), (int) (t.x), (int) (t.y), (int) size.x, (int) size.y, null);
                 }
             };
+            panorama.name = names[1];
         }
         panorama.start();
         panorama.image.getSize().mult(magnify);
@@ -137,6 +144,7 @@ public class Map {
         return nextPolygon;
     }
 
+    @Override
     public String toString(){
         StringBuilder result = new StringBuilder(callname + ";" + panorama.name + ";" + size.x() + "," + size.y() + "\n");
         Iterator it = formTextures.entrySet().iterator();
@@ -308,11 +316,11 @@ public class Map {
     }
 
     public void onTimeChange() {
-//        if (image.visible) {
-//            setImage(panorama + (weather.isNight() ? "_Night" : ""));
-//            image.setSize(image.getSize().getMult(magnify, magnify));
+        if (panorama != null && panorama.image != null && panorama.image.visible) {
+            panorama.setImage(panorama.name + (weather.isNight() ? "_Night" : ""));
+            panorama.image.setSize(panorama.image.getSize().getMult(magnify, magnify));
             weather.refreshTimeColor();
-//        }
+        }
     }
 
     public int mapEdge(P p){

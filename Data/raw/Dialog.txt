@@ -9,14 +9,13 @@ bleg:Pants
 bhead:Head
 mem:Intelligence
 ?Strength:You can use items with weight lower than or equal to strength.
-?Agility:Increases maximum encumbrance by 1.
+?Agility:Increases maximum encumbrance by 1. Improves Jump/Sprint/Rest.
 ?Stamina:Increases maximum Stamina by 1. Stamina recovers usually by resting.
 ?Intelligence:You can learn number of skills and traits up to your intelligence score.
 ?Athletics:Increases jump height and sprint speed. Increases Rest efficiency.
 Remap:Select a skill to re-map its keybinding.
 ?itemEnc:This $ item is magically enchanted with $. This item's cooldown is $ seconds.
-itemEncRdy:Currently the item is ready to use.
-itemEncNRdy:Currently the item needs $ more seconds to recharge.
+itemEncRdy:This item needs $ more seconds to recharge.
 reqInput:Press a key
 ?Use:Interact with the held item or the environment if unarmed.
 ?Sprint:Burst into sprint mode, running twice as fast as long as the skill is active.

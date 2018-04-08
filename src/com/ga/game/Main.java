@@ -20,7 +20,7 @@ public class Main {
         Settings.init();
         Global.init();
         JFrame gamewindow = new JFrame();
-        gamewindow.setUndecorated(true);
+//        gamewindow.setUndecorated(true);
         gamewindow.setVisible(true);
         gamewindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         FileManager.init();

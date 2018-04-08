@@ -49,7 +49,7 @@ public class FileManager {
     }
     public static void save(String dir, String input) {
         try {
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter("Data/" + dir))) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(dir))) {
                 writer.write(input);
             }
         } catch (Exception e) {
@@ -58,21 +58,21 @@ public class FileManager {
     }
     public static void saveCharacter(){
         if (Global.player.state != Actions.Dead) {
-            if (Global.server.isHost()) saveMap(Global.player.map.name, Global.player.map);
-            save("map/Player.user", Global.player.toString());
-            save("Keymap.txt", Global.player.input.toString());
+            if (Global.server.isHost()) saveMap(Global.player.map.name.toString(), Global.player.map);
+            save("Data/map/Player.user", Global.player.toString());
+            save("Data/Keymap.txt", Global.player.input.toString());
             saveWorld();
         }
     }
     public static void saveMap(String name, Map map){
         map.updater.processQueue();
         String result = map.toString();
-        save("map/"+name+".map", result);
+        save("Data/map/"+name+".map", result);
     }
     public static String read(String dir) {
         String result = null;
         try {
-            try (BufferedReader br = new BufferedReader(new FileReader("Data/" + dir))) {
+            try (BufferedReader br = new BufferedReader(new FileReader(dir))) {
                 String newline = br.readLine();
                 if (newline != null) {
                     String line = newline.split(" //")[0];
@@ -91,11 +91,11 @@ public class FileManager {
     }
     public static void loadGame(){
         loadPlayer();
-        loadActors("Actors.map");
+        loadActors("Data/map/Actors.map");
     }
     public static void loadPlayer(){
-        String data = read("map/Player.user");
-        String keymap = read("Keymap.txt");
+        String data = read("Data/map/Player.user");
+        String keymap = read("Data/Keymap.txt");
         MainPlayer player = ((MainPlayer) Stock.Player.create(null, 1, 0));
         Global.display.input = player.input;
         player.load(data);
@@ -112,7 +112,7 @@ public class FileManager {
     }
 
     public static void loadActors(String p){
-        String data = read("map/"+p);
+        String data = read(p);
         if (data != null) {
             String[] actors = data.split("%");
             for (String i : actors) {
@@ -197,7 +197,7 @@ public class FileManager {
     }
 
     public static Clip readClip(String dir) {
-        String[] data = read(dir.replace("Data/","")).split("%%");
+        String[] data = read(dir).split("%%");
         return new Clip(readModelProperty(data), readModel(data), readAnimation(data), readClipFrames(data), readMoveset(data));
     }
 
@@ -226,7 +226,7 @@ public class FileManager {
     }
 
     public static void readWorld(){
-        String data = read("map/World.map");
+        String data = read("Data/map/World.map");
         String[] meta = data.split(",");
         Creation.seed = Integer.parseInt(meta[0]);
         Global.time = Integer.parseInt(meta[1]);
@@ -234,8 +234,7 @@ public class FileManager {
     }
 
     public static void saveWorld(){
-        StringBuilder r = new StringBuilder(Creation.seed+","+Global.time+","+Global.controlId);
-        save("map/World.map", r.toString());
-        save("map/Actors.map", Updater.toAllActorString());
+        save("Data/map/World.map", Creation.seed + "," + Global.time + "," + Global.controlId);
+        save("Data/map/Actors.map", Updater.toAllActorString());
     }
 }

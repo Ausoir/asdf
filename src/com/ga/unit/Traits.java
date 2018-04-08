@@ -8,13 +8,13 @@ import java.util.ArrayList;
 public class Traits {
     public enum Trait {
         Fast_Learner(1,"Level twice as fast at the cost of triple motivation cost."), Haggler(1,"Get 30% off shop prices."),
-        Tough(1,"Receive bleeding instead of amputation."), Innovation(1,"Learn random skill."), Perception(1,"Learn to identify others."),
+        Tough(1,"Resist flinching from being hit."), Innovation(1,"Learn random skill every level."), Perception(1,"Learn to identify others."),
         Herbalism(1,"Pick materials from bushes and trees."), Rune_Literacy(1,"Identify, use, and create scrolls."),
         Alchemy(1,"Identify, use, and create potions."),
         Fire_Brand(1,"Brand yourself to obtain innate Fire catalyst."), Lightning_Brand(1,"Brand yourself to obtain innate Lightning catalyst."),
 
-        Lung_Injury(2,"Rest time doubled."),Damaged_Liver(2,"Nutrition from food halved. Cannot drink potions."),
-        Hearing_Loss(2,"Cannot talk."),Blindness(2,"Cannot read books or scrolls. Targeting range is gone."),
+        Lung_Injury(2,"Rest time tripled."), Damaged_Liver(2,"Nutrition from food halved. Cannot drink potions."),
+        Hearing_Loss(2,"Cannot talk."), Blindness(2,"Cannot read books or scrolls. Targeting range is gone."),
         Brain_Damage(2,"Lose access to random traits and skills. Some are permanently lost."),
 
         Stealth(3,"Learn to sneak for few seconds."),
@@ -22,8 +22,7 @@ public class Traits {
 
         Crafter(3,"Craft various items."), Armorsmith(3,"Craft, repair, and modify armor."), Weaponsmith(3,"Craft, repair, and modify weapons."),
 
-        Pyromancy(3,"Learn the secrets of fire magic."), Infusion(3,"Create and infuse items."),
-        Wizardry(3,"Learn to cast arbitrary magic."), Morphing(3,"Learn to reshape yourself."),
+        Pyromancy(3,"Learn the secrets of fire magic."), Infusion(3,"Create and infuse items."), Morphing(3,"Learn to reshape yourself."),
         Soulbinding(3,"Learn the secrets of controlling others."), Enchanting(3,"Learn to enchant allies and curse enemies.");
 
         public int type;
@@ -49,7 +48,7 @@ public class Traits {
             return null;
         }
     }
-    public static int MAXLEVEL = 3;
+    public static int MAXLEVEL = 4;
     ArrayList<Trait> trait = new ArrayList<>();
     ArrayList<Integer> level = new ArrayList<>();
 
@@ -83,6 +82,13 @@ public class Traits {
     }
     public boolean has(Trait p){
         return trait.contains(p);
+    }
+    int getMemorySize(){
+        int r = 0;
+        for (int i=0;i<trait.size();i++){
+            if (trait.get(i).type == 3) r += level.get(i);
+        }
+        return r;
     }
     void load(Unit host, String p){
         if (!p.equals("")){

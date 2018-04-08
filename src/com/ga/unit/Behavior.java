@@ -43,7 +43,7 @@ public enum Behavior {
         public void load(Unit host, int p){
             super.load(host, p);
             routes.add(host.map.name+"@0@0");
-            moveToward(host.map.name, p+"");
+            moveToward(host.map.name.toString(), p+"");
             routes.remove(0);
         }
 
@@ -56,7 +56,7 @@ public enum Behavior {
 
         private boolean moveToward(String from, String to){
             if (from.equals(to)) return true;
-            String[] objects = FileManager.read("map/"+from+".map").split("%")[3].split(";");
+            String[] objects = FileManager.read("Data/map/"+from+".map").split("%")[3].split(";");
             for (String i : objects){
                 String[] sections = i.split("@");
                 if (Integer.parseInt(sections[0]) == Stock.Travel.ordinal() && !routesContains(sections[1])){
@@ -156,7 +156,7 @@ public enum Behavior {
                     Strategy.values()[host.brain.type].update(host);
                 } else {
                     host.brain.setTask(Travel);
-                    host.brain.tasks.peek().load(host, Integer.parseInt(target.map.name));
+                    host.brain.tasks.peek().load(host, target.map.name.getIndex());
                 }
                 if (target.state == Actions.Dead) host.brain.target = null;
             }

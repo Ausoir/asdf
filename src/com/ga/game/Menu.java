@@ -11,7 +11,6 @@ import javax.swing.*;
  * Created by ga on 6/6/17. asd
  */
 public class Menu extends JPanel implements Updatable {
-    Performer onUpdate;
     private Panel current;
     private MenuPlayer menu = new MenuPlayer();
     Menu(){
@@ -60,12 +59,10 @@ public class Menu extends JPanel implements Updatable {
         current.resize();
     }
     void onExit(){
-        if (!current.isVisible()) onUpdate = null;
         Global.display.requestFocus();
     }
     @Override
     public void update() {
         current.update();
-        if (onUpdate != null && Global.updates.over()) onUpdate.perform();
     }
 }

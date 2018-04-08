@@ -46,7 +46,7 @@ public class Global {
         }
     }
     static void updateCamera(){
-        Global.camera.add(Global.player.map.mapEdgeCenter(Global.cameraTo).getSubtract(Global.camera.getAdd(0,40)).mult(.05f,.05f));
+        camera.add(player.map.mapEdgeCenter(cameraTo).getSubtract(camera.getAdd(0,40)).mult(.1f,.1f));
         rel.set(-camera.x+Settings.centerX, -camera.y+Settings.centerY);
     }
     public static float sin(float p){
@@ -81,11 +81,10 @@ public class Global {
     public static int getControlId(){
         return controlId++;
     }
-    static void timePass(int p){
+    public static void timePass(int p){
         time+=p;
-        if (p != 1 || time % HOUR == 0){
+        if ((time-p)/HOUR < getHour()){
             for (Map i : maps) i.onTimeChange();
-            GlobalEvent.onHourChange();
         }
         Iterator it = timers.iterator();
         while (it.hasNext()){

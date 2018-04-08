@@ -20,7 +20,7 @@ public class Settings {
     static int spo;
     static int volumn;
     static void init(){
-        String[] lines = FileManager.read("raw/Settings.txt").split("%");
+        String[] lines = FileManager.read("Data/raw/Settings.txt").split("%");
         for (String i : lines){
             String[] line = i.split(":");
             int value = Integer.parseInt(line[1]);

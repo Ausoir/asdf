@@ -14,13 +14,15 @@ import com.ga.unit.skill.Actions;
 public class Armor extends Item {
     private int piece = 0;
     private int armorMod = 0;
+    private int warmth = 0;
     int pocket = 0;
-    public Armor(Map map, String name, int seed, Material[] materials, int piece, int encumbrance, int pockets, int durability) {
+    public Armor(Map map, String name, int seed, Material[] materials, int piece, int encumbrance, int pockets, int durability, int warmth) {
         super(map, name, seed, materials, ItemType.Armor, durability);
         this.encumbrance = encumbrance;
         value = value*2 + 500;
         this.pocket = pockets;
         this.piece = piece;
+        this.warmth = warmth;
         delay = 80;
         if (piece == 1 || piece == 2) image.set(name, piece);
         else if (piece == 3) weight = 0;
@@ -38,6 +40,9 @@ public class Armor extends Item {
     private float getArmor(){
         return Math.max(0,material.hardness + armorMod);
     }
+    int getWarmth(){
+        return warmth+material.warmth;
+    }
     protected void setModifier(SpecialtyMod mod){
         if (mod == SpecialtyMod.Hardened) armorMod += admod.magnitude;
         else super.setModifier(mod);
@@ -48,7 +53,7 @@ public class Armor extends Item {
     }
     public boolean checkBreak(boolean blunt, int damage){ //damage reduction
         int r = (int) Math.max(0, blunt?damage:damage - getArmor());
-        if (isUsable(r)){
+        if (isUsable(true, r)){
             if (owner != null) trigger(owner);
             return false;
         }

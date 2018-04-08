@@ -60,7 +60,7 @@ public class Food extends Item {
     }
     @Override
     public boolean use(Man p){
-        if (isUsable(1) && super.use(p)) {
+        if (isUsable(true, 1) && super.use(p)) {
             int perishTime = perish - Global.time;
             Stat motivation = p.get("Motivation");
             if (perishTime <= 0 && rand.nextInt(10) < getPoisonChance()){
@@ -76,9 +76,9 @@ public class Food extends Item {
                     }
                 }
                 motivation.add(Math.max(0, type.getValue()/100-perish) + likes*4, false);
-                p.stats.endBuff(Buffs.Hunger);
-                p.stats.endBuff(Buffs.Starvation);
             }
+            Stat hunger = p.get("Nutrition");
+            if (hunger != null) hunger.add(1, false);
             return true;
         }
         return false;
@@ -98,7 +98,7 @@ public class Food extends Item {
     }
     public String[] load(String p){
         String[] r = super.load(p);
-        perish = Integer.parseInt(p.split("@")[7]);
+        perish = Integer.parseInt(p.split("@")[8]);
         return r;
     }
     @Override

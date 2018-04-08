@@ -5,7 +5,7 @@ package com.ga.unit.skill;
  */
 public class Stat {
     private int max;
-    protected int current;
+    private int current;
     Stat(String p){
         String[] t = p.split(",");
         if (t.length == 1){
@@ -19,8 +19,8 @@ public class Stat {
         setTotal(p);
     }
     private void setTotal(int p){
+        current += p-max;
         max = p;
-        current = p;
     }
     public void set(int p, boolean force){
         current = p;

@@ -32,4 +32,6 @@ Refrigerator;2;0;0;.3,.1;1;8
 Lightstand;2;0;0;.2,.2;1;0
 Vent;2;0;0;.2,.2;1;8
 Decoration;1;0;0;.1,.1;1;0
+Warning;1;0;0;.1,.1;1;8
+Dungeon;1;0;0;.2,.2;1;0
 Sign_Food;1;0;0;0,0;1;0

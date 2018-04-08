@@ -19,7 +19,6 @@ public class Processes {
     public static void pause(){
         paused = true;
         update.cancel();
-        display.cancel();
         controllers.cancel();
     }
     public static void resume(){
@@ -42,12 +41,34 @@ public class Processes {
         }, 200, Settings.spf);
         update.scheduleAtFixedRate(new TimerTask() {
             @Override
-            public void run(){
+            public void run(){ //Same speed same thread = no stutter
                 ArrayList<Map> maps = (ArrayList<Map>) Global.maps.clone();
                 for (Map i : maps) i.updater.update();
                 Global.update();
             }
         }, 100, Settings.spu);
+//        new Thread(() -> {
+//            int fps = Settings.spu;
+//            long timeTaken = 0, last_frame_time, current_frame_time = System.currentTimeMillis();
+//            while (!paused)
+//            {
+//                last_frame_time = current_frame_time;
+//                current_frame_time = System.currentTimeMillis();
+//                if (timeTaken >= fps) {
+//                    ArrayList<Map> maps = (ArrayList<Map>) Global.maps.clone();
+//                    for (Map i : maps) i.updater.update();
+//                    Global.update();
+//                    timeTaken = current_frame_time - last_frame_time;
+//                } else {
+//                    try {
+//                        Thread.sleep(fps-timeTaken);
+//                        timeTaken = fps;
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
+//        }).start();
     }
     public static void editorMode(){
         controllers.cancel();

@@ -7,7 +7,7 @@ import com.ga.unit.*;
 import com.ga.unit.item.Crafts;
 import com.ga.unit.item.Item;
 import com.ga.unit.man.Inventory;
-import com.ga.unit.man.Player;
+import com.ga.unit.man.MainPlayer;
 import com.ga.unit.skill.Actions;
 
 import javax.swing.*;
@@ -25,9 +25,7 @@ import java.util.ArrayList;
 public class MenuPlayer extends Panel {
     private class StatPanel extends JPanel{
         private GridBagConstraints statgrid = new GridBagConstraints();
-        private String[] stats = new String[]{
-                "Strength", "Agility", "Intelligence", "Stamina"
-        };
+        private String[] stats = MainPlayer.mainStats;
         private JButton[] statButtons = new JButton[stats.length];
         private JLabel level = new JLabel();
         private JLabel points = new JLabel();
@@ -47,37 +45,19 @@ public class MenuPlayer extends Panel {
             for (int i=0;i<stats.length;i++) statButtons[i] = makeStatButton(stats[i]);
             statgrid.gridx = 1;
             statgrid.gridy = 1;
-            for (int i=0;i<stats.length;i++){
-                final int var = i;
+            for (String stat : stats) {
                 JButton button = makeStatButton("");
                 button.setIcon(iconDescribe);
-                final Performer perf = new Performer() {
-                    public void perform() {
-                        if (Global.player.get("Level").require(1))
-                            Global.player.get(stats[var]).setMax(Global.player.get(stats[var]).getMax() + 1);
-                    }
-                };
-                statButtons[var].addActionListener(e -> {
-                    perf.perform();
-                    refresh();
-                });
-                button.addActionListener(e -> {
-                    if (Global.player.get("Level").get() > 0) {
-                        Global.display.menu.showDialog(stats[var], Dialog.get(stats[var] + "Dsc"),
-                                new String[]{"Increase Stat"}, new Performer[]{perf});
-                        refresh();
-                    } else Global.display.menu.showDialog(stats[var], Dialog.get(stats[var] + "Dsc"));
-                });
             }
         }
         void refresh(){
-            Player player = Global.player;
+            MainPlayer player = Global.player;
             level.setFont(Panel.font);
             level.setForeground(Panel.fontcolor);
-            level.setText("Level "+player.get("Level").getMax() + " ");
+            level.setText("Level "+player.getLevel() + " ");
             points.setFont(Panel.smallfont);
             points.setForeground(Color.RED);
-            points.setText("Available Points "+player.get("Level").get());
+            points.setText("Available Points "+player.getLevel());
             for (int i=0;i<stats.length;i++) statButtons[i].setText(stats[i]+" - "+player.get(stats[i]).getMax());
         }
         JButton makeStatButton(String p){
@@ -194,7 +174,7 @@ public class MenuPlayer extends Panel {
                     Global.display.menu.showDialog(item.getFullName(),item.getDescription());
                 }
             });
-            final JLabel drop = new JLabel(item.getFullName()+"             ");
+            final JLabel drop = new JLabel(item.getFullName()+" ("+Math.round(item.getPercentage()*100)+"%)             ");
             drop.setForeground(item.getRarityColor());
             options.add(describe);
             options.add(drop);
@@ -430,7 +410,6 @@ public class MenuPlayer extends Panel {
         }
         void refresh() {
             panel.removeAll();
-            panel.add(makeOption("Current Status","stat","Check current status, stats, and injuries."));
             panel.add(makeOption("Inspect Self","dsc","Your general description."));
             panel.add(makeOption("Rest","h","Rest for an hour, removing curable debuffs and consuming available food. Shortcut is ',' key."));
             panel.add(makeOption("Sleep","zzz","Sleep for six hours."));
@@ -491,27 +470,10 @@ public class MenuPlayer extends Panel {
         private void command(String p){
             switch (p) {
                 case "h":
-                    Global.player.map.updater.sleep(100);
+                    Global.player.map.updater.sleep(100, true);
                     break;
                 case "dsc":
-                    Global.display.menu.onUpdate = new Performer(){
-                        public void perform(){
-                            Global.display.menu.showDialog("My Description", Global.player.getDescription());
-                        }
-                    };
-                    Global.display.menu.onUpdate.perform();
-                    break;
-                case "stat":
-                    Global.display.menu.onUpdate = new Performer(){
-                        public void perform(){
-                            String statusDsc = "Stamina:" + Global.player.get("Stamina") +
-                                    "\nTiredness:" + Global.player.get("Tiredness") +
-                                    "\nMotivation:" + Global.player.get("Motivation")+"\n";
-                            statusDsc += "\nCurrent Status Effects:\n" + Global.player.stats.getEffectsList();
-                            Global.display.menu.showDialog("Current Status", statusDsc);
-                        }
-                    };
-                    Global.display.menu.onUpdate.perform();
+                    Global.display.menu.showDialog("My Description", Global.player.getDescription());
                     break;
                 case "opt":
                     Global.display.menu.showDialog("Options", "apparently none.");

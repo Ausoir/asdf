@@ -7,6 +7,8 @@ import com.ga.tool.Interactive;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 
+import java.util.ArrayList;
+
 /**
  * Created by Ga on 3/13/2017. asd
  */
@@ -62,49 +64,38 @@ public class Prop extends Thing {
     public void collide(){
         P vp;
         Line pp;
-        boolean collided = true;
-        int timeout = 4;
-        while (collided) {
-            collided = false;
-            vp = pos.getAdd(vel);
-            pp = new Line(pos,vp);
-            for (int i=0;i<map.land.size();i++) {
-                Line land = map.land.get(i);
-                if (land.depth >= lastLand.depth && land.lineCross(pp)) {
-                    float slope = land.getSlope();
-                    boolean cw = land.clockwise();
-                    float lineY = land.getCrossPointY(pos.x);
-                    Line testt = new Line(vp.x, vp.y - 9999, vp.x, vp.y);
-                    int cws = 0, ccs = 0; //check if landsite is overlapped behind a higher depth polygon
-                    boolean overlapped = false;
-                    for (Line ii : map.landRaw) {
-                        if (ii.depth > land.depth && ii.opt >= 0 && ii.lineCross(testt)) {
-                            overlapped = true;
-                            if (ii.clockwise()) cws++;
-                            else ccs++;
-                        }
-                    }
-                    if (!overlapped || cws <= ccs) {
-                        onCollide(land);
-                        if (cw && lineY >= pos.y) {
-                            float atan = (float) Math.atan(slope);
-                            if (vel.x > 0 != atan > 0) vel.x = vel.x * Global.cos(atan);
-                            if (!land.vertical()) {
-                                vel.y += land.getCrossPointY(pos.x + vel.x) - (pos.y + vel.y) - 1;
-                                lastLand = land;
-                            }// else vel.x += land.getCrossPointX(pos.y + vel.y) - (pos.x + vel.x);
-                            collided = true;
-                        } else if (!cw && lineY <= pos.y) {
-                            vel.set(0, 0);
-                            return;
-                        }
+        vp = pos.getAdd(vel);
+        pp = new Line(pos,vp);
+        float lineY, slope;
+        ArrayList<Line> orderedLands = new ArrayList<>();
+        for (int i=0;i<map.land.size();i++) {
+            Line land = map.land.get(i);
+            if (land.depth >= lastLand.depth && land.lineCross(pp)) {
+                boolean added = false;
+                lineY = land.getCrossPointY(pos.x);
+                for (int ii = 0; ii < orderedLands.size(); ii++) {
+                    if (orderedLands.get(ii).getCrossPointY(vp.x) < lineY) {
+                        orderedLands.add(ii, land);
+                        added = true;
+                        break;
                     }
                 }
+                if (!added) orderedLands.add(land);
             }
-            timeout--;
-            if (timeout == 0){
-                System.out.println("Collision timeout pos@"+pos+"; vel@"+vel);
-                return;
+        }
+        for (Line land : orderedLands) {
+            lineY = land.getCrossPointY(pos.x);
+            slope = land.getSlope();
+            boolean cw = land.clockwise();
+            onCollide(land);
+            if (((vel.x < 0 && slope > Line.MAXSLOPE) || (vel.x > 0 && slope < -Line.MAXSLOPE)) || !cw && lineY <= pos.y) {
+                vel.set(0, 0);
+                break;
+            } else if (cw && lineY >= pos.y) {
+                float atan = (float) Math.atan(slope);
+                if (vel.x > 0 != atan > 0) vel.x = vel.x * Global.cos(atan);
+                vel.y += land.getCrossPointY(vp.x) - (vp.y) - 1;
+                lastLand = land;
             }
         }
     }
@@ -123,8 +114,7 @@ public class Prop extends Thing {
             }
             pos.add(vel);
             if (gravity) {
-                vel.y += Settings.gravity;
-                if (vel.y > Settings.gravityMax) vel.y = Settings.gravityMax;
+                vel.y = Math.min(vel.y+Settings.gravity, Settings.gravityMax);
             }
             vel.x *= .94f;
         }

@@ -108,10 +108,13 @@ public class Organ extends Line {
     }
     boolean checkHit(Line p){
         if (!amputated) {
-            Line body = getAdd(host.pos);
-            if (p.lineCross(body)) {
-                return true;
-            }
+            float atan = getAtan()+1.56f;
+            Line left = new Line(pt.x+Global.cos(atan)*strokeSize, pt.y+Global.sin(atan)*strokeSize,
+                    ptd.x+Global.cos(atan)*strokeSize, ptd.y+Global.sin(atan)*strokeSize);
+            Line right = new Line(pt.x-Global.cos(atan)*strokeSize, pt.y-Global.sin(atan)*strokeSize,
+                    ptd.x-Global.cos(atan)*strokeSize, ptd.y-Global.sin(atan)*strokeSize);
+            Line hitbox = p.getAdd(host.pos.getMult(-1,-1));
+            return hitbox.lineCross(left) || hitbox.lineCross(right);
         }
         return false;
     }

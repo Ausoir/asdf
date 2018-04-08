@@ -1,3 +1,0 @@
-Optimizable:
--Load texture once
--Prop collision (with terrain) uses x^2 for x calc

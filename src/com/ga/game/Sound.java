@@ -39,7 +39,7 @@ public class Sound {
                     clip.setFramePosition(0);
                     clip.start();
                 } catch (Exception e) {
-                    System.out.println("Could not play sound [" + p + "]");
+                    Global.p("Could not play sound [" + p + "]");
                     e.printStackTrace();
                 }
             }

@@ -72,7 +72,7 @@ public class Speech extends Thing {
         }
     }
     private String getRandom(String p){
-        HashMap<String,ArrayList<String>> dialog = FileManager.readDialogue("raw/Reaction.txt"); //static cache?
+        HashMap<String,ArrayList<String>> dialog = FileManager.readDialogue("Data/raw/Reaction.txt"); //static cache?
         ArrayList<String> results = dialog.get(host.speechType+":"+p);
         if (results == null){
             results = dialog.get(":"+p);

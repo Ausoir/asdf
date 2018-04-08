@@ -113,7 +113,7 @@ public class PlayerInput implements Input {
         if (p.startsWith("_")) {
             if (p.startsWith("_EXIT")) System.exit(1);
             else if (p.startsWith("_CTRL")) ctrl = !ctrl;
-            else if (p.startsWith("_SAY")) Global.display.chatbox.requestFocus();
+            else if (p.startsWith("_SAY")) Global.display.startChat();
             else if (p.startsWith("_MENU")) Global.display.menu.showMenu();
             else if (p.startsWith("_WI")) {
                 host.selectingItem = Integer.parseInt(p.substring(3));
@@ -130,11 +130,12 @@ public class PlayerInput implements Input {
         }
     }
     public void update(){
-        if (pressed.size() == 0) input(-1, -1, -1);
+        int length = pressed.size();
+        if (length == 0) input(-1, -1, -1);
         else {
-            ArrayList<Integer> presseds = (ArrayList<Integer>) pressed.clone();
-            for (Integer i : presseds) {
-                input(i, -1, -1);
+            for (int i=0;i<length;i++) {
+                input(pressed.get(i), -1, -1);
+                length = pressed.size(); //Removal adjust
             }
         }
     }

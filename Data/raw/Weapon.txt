@@ -10,7 +10,7 @@ Dagger;Knife;1;-1;Glass,Copper,Bronze,Iron,Silver,Steel
 Tanto;Knife;1;-1;Bronze,Iron,Steel,Crystal
 Pickaxe;Sword;5;-1;Copper,Bronze,Iron
 Cleaver;Sword;7;-1;Bronze,Iron,Silver,Steel,Titanium,Lead
-Lancesword;Spear;5;-1;Wooden,Glass,Stone,Copper,Brass,Bronze,Iron,Silver,Steel,Bone,Titanium,Lead,Crystal
+Lancesword;Knife;5;-1;Wooden,Glass,Stone,Copper,Brass,Bronze,Iron,Silver,Steel,Bone,Titanium,Lead,Crystal
 Cutlass;Sword;3;-1;Iron,Silver,Steel
 Claymore;Sword;7;-1;Iron,Silver,Steel
 Halberd;Spear;8;-1;Bronze,Iron,Silver,Steel
@@ -22,4 +22,3 @@ Pistol;Shooting;3;480;Brass,Bronze
 Rifle;Rifle;7;700;Bronze,Iron
 Dart;Darting;0;600;Bronze,Iron,Steel,Silver
 Javelin;Throwing;2;600;Bronze,Iron,Copper,Steel,Silver
-Rune;Bashing;0;-1;Glass,Crystal,Gold,Obsidian,Bone,Silver
