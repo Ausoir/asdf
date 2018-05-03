@@ -8,7 +8,8 @@ import java.awt.*;
  * Created by Ga on 8/12/2016.
  */
 public abstract class Drawable implements Observer {
-    Drawable prev, next;
+    private Drawable prev;
+    Drawable next;
     float depth = -1;
     public void draw(Graphics2D g){
     }
@@ -19,9 +20,12 @@ public abstract class Drawable implements Observer {
             this.depth = depth;
             if (prev != null) { //not added in yet
                 Drawable newprev = prev;
+                Drawable newnext = next;
                 removeThis();
+                prev = newprev;
+                next = newnext;
                 if (newprev.getDepth() > depth) newprev.reverseAdd(this);
-                else newprev.add(this, this);
+                else newprev.add(this);
             }
         }
     }
@@ -42,19 +46,15 @@ public abstract class Drawable implements Observer {
             }
         }
     }
-    void add(Drawable p, Drawable failsafe){
-        if (next == failsafe){
-            new Exception().printStackTrace();
-            setNext(p);
-            next.next = null;
-        } else if (next == null){
+    void add(Drawable p){
+        if (next == null){
             setNext(p);
             next.next = null;
         } else if (next.getDepth() > p.getDepth()){
             p.setNext(next);
             setNext(p);
         } else {
-            next.add(p, failsafe);
+            next.add(p);
         }
     }
     private void setNext(Drawable p){
@@ -62,13 +62,15 @@ public abstract class Drawable implements Observer {
         next.prev = this;
     }
     void remove(Drawable p){
-        if (next != null) {
-            if (this == p) removeThis();
-            else next.remove(p);
+        if (this == p) removeThis();
+        else if (next != null) {
+            next.remove(p);
         }
     }
-    public void removeThis(){
-        if (prev != null) prev.next = next;
+    void removeThis(){
         if (next != null) next.prev = prev;
+        if (prev != null) prev.next = next;
+        next = null;
+        prev = null;
     }
 }

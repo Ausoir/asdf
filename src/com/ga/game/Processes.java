@@ -48,21 +48,25 @@ public class Processes {
             }
         }, 100, Settings.spu);
 //        new Thread(() -> {
-//            int fps = Settings.spu;
+//            int fps = 30;
+//            int spf = (int) ((1f/fps)*1000);
 //            long timeTaken = 0, last_frame_time, current_frame_time = System.currentTimeMillis();
 //            while (!paused)
 //            {
 //                last_frame_time = current_frame_time;
 //                current_frame_time = System.currentTimeMillis();
-//                if (timeTaken >= fps) {
+//                if (timeTaken >= spf) {
 //                    ArrayList<Map> maps = (ArrayList<Map>) Global.maps.clone();
 //                    for (Map i : maps) i.updater.update();
 //                    Global.update();
+//                    Global.display.repaint();
 //                    timeTaken = current_frame_time - last_frame_time;
 //                } else {
 //                    try {
-//                        Thread.sleep(fps-timeTaken);
-//                        timeTaken = fps;
+//                        long reserve = spf-timeTaken;
+//                        Thread.sleep(reserve);
+//                        Global.p(reserve + "");
+//                        timeTaken = spf;
 //                    } catch (InterruptedException e) {
 //                        e.printStackTrace();
 //                    }

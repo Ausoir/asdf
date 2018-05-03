@@ -29,7 +29,6 @@ public class Command {
                 else if (cmd[0].equals("time")) Global.timePass(Integer.parseInt(cmd[1]));
                 else if (cmd[0].equals("stat")){
                     host.get(cmd[1]).setMax(Integer.parseInt(cmd[2]));
-                    host.armor.updateStatus();
                 }
                 else if (cmd[0].equals("unit")){
                     int loop = 1;
@@ -62,7 +61,6 @@ public class Command {
                 else if (cmd[0].equals("sound")) Sound.play(host.map, Global.camera, cmd[1]);
                 else if (cmd[0].equals("depth")) host.say("Me: "+host.getDepth()+" Line: "+host.lastLand.depth+", Terrain: "+host.map.terrains.get(host.lastLand.tid).getDepth());
                 else if (cmd[0].equals("revive")) host.revive();
-                else if (cmd[0].equals("weather")) host.map.weather.removeThis();
                 else if (cmd[0].equals("hit")) host.hit(host.getPosLine(), 0);
                 else if (cmd[0].equals("render")){
                     for (Object terrain : host.map.terrains.entrySet()) ((Terrain)terrain).render();

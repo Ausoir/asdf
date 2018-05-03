@@ -23,7 +23,7 @@ public class MainPlayer extends Player {
     public static String[] mainStats = new String[]{
             "Strength", "Agility", "Intelligence"
     };
-    private Indicater indicater;
+    private Indicator indicator;
 
     public MainPlayer(Map map, int seed) {
         super(map, seed);
@@ -46,10 +46,10 @@ public class MainPlayer extends Player {
         int r = super.setState(state);
         if (r != 0){
             if (r == 2) {
-                indicater.show(1);
-                if (state.getCost() > get("Stamina").getMax()) say("Stamina cost is beyond my limit!");
+                indicator.show(1);
+                if (state.getCost() > get("Strength").getMax()) say("Stamina cost is beyond my limit!");
             } else if (r == 3) {
-                indicater.showCd(getCooldown(state).time);
+                indicator.showCd(getCooldown(state).time);
             } else if (r == 4) {
                 say("Cannot cast!");
             } else if (r == 5) say("This action is beyond my abilities!");
@@ -64,9 +64,9 @@ public class MainPlayer extends Player {
     }
 
     public boolean hit(Line hitBox, int damage) {
-        int before = get("Stamina").get();
+        int before = get("Strength").get();
         boolean r = super.hit(hitBox, damage);
-        if (r) indicater.show(before / Math.max(1, get("Stamina").get()));
+        if (r) indicator.show(before / Math.max(1, get("Strength").get()));
         return r;
     }
 
@@ -112,7 +112,6 @@ public class MainPlayer extends Player {
                     decay.addTotal(-1);
                 }
             }
-            armor.updateStatus();
         }
     }
 
@@ -128,12 +127,13 @@ public class MainPlayer extends Player {
 
     protected void stateUpdate() {
         super.stateUpdate();
-        if (state == Actions.Rest) indicater.show(1);
+        if (state == Actions.Rest) indicator.show(1);
     }
 
-    protected void stateFinish() {
-        super.stateFinish();
-        input.update();
+    protected boolean stateFinish() {
+        boolean r = super.stateFinish();
+        if (r) input.update();
+        return r;
     }
 
     protected void onMapEdge(int dir){
@@ -143,7 +143,7 @@ public class MainPlayer extends Player {
                 vel.set(0,0);
                 stateSet(Actions.Idle);
                 delay.time = 200;
-                Global.server.requestChangeMap(newMapName.getInstanceName() +"@"+ (dir<0?1:2));
+                Global.server.requestChangeMap(newMapName.toString() +"@"+ (dir<0?1:2));
             }
         }
         super.onMapEdge(dir);
@@ -151,21 +151,21 @@ public class MainPlayer extends Player {
 
     public void update() {
         super.update();
-        if (!get("Stamina").isFull()) indicater.show(.5f);
-        indicater.update();
+        if (!get("Strength").isFull()) indicator.show(.5f);
+        indicator.update();
         if (input.ctrl) Global.cameraTo = pos.getAdd(target.getMult(.5f,.5f));
         else Global.cameraTo = pos.getAdd(vel.getAdd(0,-Settings.gravity).mult(50,20));
     }
 
     public void remove() {
         super.remove();
-        indicater.remove();
+        indicator.remove();
     }
 
     public MainPlayer start() {
         super.start();
-        indicater = new Indicater(this);
-        indicater.setMeasuree(get("Stamina"));
+        indicator = new Indicator(this);
+        indicator.setMeasuree(get("Strength"));
         return this;
     }
 }

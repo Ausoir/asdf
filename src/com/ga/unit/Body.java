@@ -46,7 +46,7 @@ public class Body {
     void setOrganHealth(){
         int hpPool = 0;
         for (Organ organ : organs) hpPool += organ.health;
-//        int mod = host.get("Stamina").getMax()*organs.length;
+//        int mod = host.get("Strength").getMax()*organs.length;
         int mod = 100;
         for (Organ organ : organs) {
             organ.health = (int) (((float) organ.health / hpPool) * mod);

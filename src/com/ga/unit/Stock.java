@@ -276,7 +276,7 @@ public enum Stock {
                     vel.x += dir * 4;
                     delay.time = 8;
                     buff(Buffs.Slowfall, 2);
-                    get("Stamina").heal();
+                    get("Strength").heal();
                 } else {
                     super.stateSet(state);
                     if (state == Actions.Shock) {
@@ -1091,9 +1091,6 @@ public enum Stock {
         product.mobile = false;
         randomSide(product);
     }
-    Prop makeAddon(Map map, String name, Random rand){
-        return makeAddon(new Prop(map, name,rand.nextInt(9999)));
-    }
     Prop makeAddon(Prop p){
         p.save = false;
         isFurniture(p);
@@ -1103,12 +1100,11 @@ public enum Stock {
         p.dir = p.seed % 2 == 0 ? 1 : -1;
     }
     static String makeStat(Random rand, int level){
-        int str,dex,sta,wis,intel,spd;
-        str = dex = sta = 3+level;
+        int str,dex,intel,spd;
+        str = dex = 3+level;
         spd = 18+rand.nextInt(8);
-        wis = rand.nextInt(1+level*2);
         intel = rand.nextInt(1+level*2);
-        return "Level:"+level+"&Strength:"+str+"&Agility:"+dex+"&Stamina:"+sta+"&Intelligence:"+intel+"&Speed:"+spd+"&Attack:0";
+        return "Level:"+level+"&Strength:"+str+"&Agility:"+dex+"&Intelligence:"+intel+"&Speed:"+spd+"&Attack:0";
     }
     static String getUnit(Map map, String name, int seed, String clip, String stat, Faction faction, String intel, String moves, String traits){
         return name+"@-1@"+seed+"@0,0@0@"+Global.getControlId()+"@"+map.name+"@"+clip+"@"+stat+"@"+faction.name()+"@"+intel+"@"+moves+"@"+traits;

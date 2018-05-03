@@ -94,7 +94,7 @@ public class Prop extends Thing {
             } else if (cw && lineY >= pos.y) {
                 float atan = (float) Math.atan(slope);
                 if (vel.x > 0 != atan > 0) vel.x = vel.x * Global.cos(atan);
-                vel.y += land.getCrossPointY(vp.x) - (vp.y) - 1;
+                vel.y += land.getCrossPointY(vp.x) - (vp.y);
                 lastLand = land;
             }
         }

@@ -1,1 +1,1 @@
-Mantis;;10;12;2;Evil;2;Melee //Beasts-Name,Speech Type,Stamina,Speed,Level,Faction,AI Type,Moveset
+Mantis;;10;12;2;Evil;2;Melee //Beasts-Name,Speech Type,Strength,Speed,Level,Faction,AI Type,Moveset

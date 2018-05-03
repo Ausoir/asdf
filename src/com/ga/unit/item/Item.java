@@ -236,7 +236,7 @@ public class Item extends Prop {
     private SpecialtyMod smod = SpecialtyMod.None;
     protected AdenchantMod ademod = AdenchantMod.None;
     protected Buffs emod = null;
-    Material material;
+    public Material material;
     public int weight, range, speed;
     public int volume = 1, encumbrance = 0;
     Cooldown cooldown = new Cooldown(3);

@@ -41,7 +41,7 @@ public class Terrain extends Drawable {
             }
         };
         this.map = map;
-        setDepth(3+(depth*.1f));
+        setDepth(depth);
         polygon = new Polygon();
 //        int c = Global.r.nextInt(255);
 //        if (image.image == null) this.color = new Color(c,c,c,Integer.parseInt(texture.substring(1).split(",")[3]));
@@ -108,5 +108,8 @@ public class Terrain extends Drawable {
     public void setDepth(float depth) {
         super.setDepth(depth);
         for (Line i : lines) i.depth = depth;
+    }
+    public void remove(){
+        map.updater.remove(this);
     }
 }

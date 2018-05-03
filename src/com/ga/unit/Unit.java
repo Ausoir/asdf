@@ -45,6 +45,7 @@ public class Unit extends Prop {
         super(map, null, seed, 8);
         this.name = name;
         gravity = true;
+        tags.add(Tag.Athletics);
     }
     @Override
     public Unit start(){
@@ -68,7 +69,7 @@ public class Unit extends Prop {
     }
     @Override
     public String toString(){
-        return super.toString() + "@" + controlId + "@" + map.name.getInstanceName() + "@" + clip.toString() + "@" + stats.toString() + "@" + faction.name() +
+        return super.toString() + "@" + controlId + "@" + map.name.toString() + "@" + clip.toString() + "@" + stats.toString() + "@" + faction.name() +
                 "@" + brain.toString() + "@" + moveset.toString() + "@" + traits.toString();
     }
     @Override
@@ -150,10 +151,10 @@ public class Unit extends Prop {
     }
     public void stateSet(Actions state){
         if (this.state != Actions.Dead) {
+            face(target.x > 0 ? 1 : -1, false);
             clip.setState(state.getClipName());
             if (state != Actions.Idle){
                 getCooldown(state).reset();
-                face(target.x > 0 ? 1 : -1, false);
                 delay.performer = null;
                 stateInterrupt();
                 delay.set(state.getDel());
@@ -305,8 +306,8 @@ public class Unit extends Prop {
     protected void stateInterrupt(){
         state.onInterrupt(this);
     }
-    protected void stateFinish(){
-        state.onFinish(this);
+    protected boolean stateFinish(){
+        return state.onFinish(this);
     }
     protected void stateTrigger(){
         state.trigger(this);

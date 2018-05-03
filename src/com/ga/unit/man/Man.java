@@ -141,8 +141,8 @@ public class Man extends Unit {
     protected void stateInterrupt(){
         state.onInterrupt(this);
     }
-    protected void stateFinish(){
-        state.onFinish(this);
+    protected boolean stateFinish(){
+        return state.onFinish(this);
     }
     protected void stateTrigger(){
         state.trigger(this);
@@ -207,7 +207,6 @@ public class Man extends Unit {
             if (tags.contains(i)) r++;
         }
         if (state.getTrainers().contains(Tag.Strength)) r += get("Strength").get();
-        if (state.getTrainers().contains(Tag.Athletics)) r += (getVacancy()/get("Agility").get())*5;
         return Math.max(0,r) / Math.max(1,tags.size());
     }
 
@@ -280,11 +279,6 @@ public class Man extends Unit {
             }
         }
         return false;
-    }
-
-    public void buff(Buffs buff, int level){
-        super.buff(buff, level);
-        armor.updateStatus();
     }
 
     public boolean hit(Line hitBox, boolean blunt, int damage) {

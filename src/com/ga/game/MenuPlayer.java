@@ -109,7 +109,7 @@ public class MenuPlayer extends Panel {
         void refresh(){
             int maxEncumbrance = Global.player.get("Agility").get();
             gold.setText("Encumbrance:"+(maxEncumbrance-Global.player.getVacancy())+"/"+maxEncumbrance+
-                    "                 Weight:"+Global.player.getWeight());
+                    "                 Warmth:"+Global.player.getWarmth());
             panel.removeAll();
 
             grid.gridy = 0;
@@ -247,7 +247,7 @@ public class MenuPlayer extends Panel {
                     Global.display.menu.showDialog(item.getFullName(),item.getDescription());
                 }
             });
-            final JLabel drop = new JLabel(item.getFullName()+"             ");
+            final JLabel drop = new JLabel(item.getFullName()+" ("+Math.round(item.getPercentage()*100)+"%)             ");
             drop.setForeground(item.getRarityColor());
             options.add(describe);
             options.add(drop);

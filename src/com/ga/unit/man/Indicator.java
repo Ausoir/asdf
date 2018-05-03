@@ -9,7 +9,7 @@ import java.awt.*;
 /**
  * Created by ga on 4/23/17. asd
  */
-public class Indicater extends Drawable {
+public class Indicator extends Drawable {
     private Player host;
     private Color bg = new Color(58, 60, 60,0);
     private Color fg = new Color(2, 196, 0, 0);
@@ -21,7 +21,7 @@ public class Indicater extends Drawable {
     private Color[] bgFade = new Color[15];
     private Color[] fgFade = new Color[15];
     private int time;
-    Indicater(Player host){
+    Indicator(Player host){
         this.host = host;
         host.map.updater.addQueue.add(this);
         for (int i=bgFade.length-1;i>=0;i--){

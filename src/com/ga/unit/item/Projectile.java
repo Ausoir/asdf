@@ -42,7 +42,7 @@ public class Projectile extends Prop {
     @Override
     public void onField(){}
     public void stuck(){
-        vel.set(0,0);
+        vel.x = 0;
         gravity = true;
         tangible = false;
     }

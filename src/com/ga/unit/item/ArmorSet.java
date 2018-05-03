@@ -87,14 +87,11 @@ public class ArmorSet {
         }
         updateStatus();
     }
-    public void updateStatus(){
+    private void updateStatus(){
         tags.clear();
         for (Armor i : armor){
             tags.addAll(i.tags);
         }
-        int agi = host.get("Agility").get();
-        agi = (int) Math.ceil((float) (agi-getEncumbrance())/agi*5);
-        for (int i=0;i<agi;i++) tags.add(Tag.Athletics);
         host.inventory.setMaxSize(getPockets());
     }
     public void onHit(){

@@ -126,22 +126,22 @@ public class Generator {
                                 Prop exit = (Prop) Stock.Travel.create(house, 1, 3).start();
                                 exit.seed = bid + exit.seed - 1;
                                 exit.pos.set(spawnPoint.getAdd(0,-50));
-                                exit.name = map.name.getInstanceName();
+                                exit.name = map.name.toString();
                                 FileManager.saveMap("instance/"+prop.name, house);
                             }
                         }
                     } else if (prop.subId == 2) { //building
-                        prop.name = prop.name + map.name.getInstanceName() + bid;
+                        prop.name = prop.name + map.name.toString() + bid;
                         Map house = new Map("../building/inside/" + building);
                         house.start();
                         house.updater.processQueue();
                         for (Prop ob : house.updater.props) {
                             if (ob.factoryId == Stock.Travel.ordinal() && ob.subId == 3) { //exit
-                                ob.name = map.name.getInstanceName();
+                                ob.name = map.name.toString();
                                 ob.seed = bid + ob.seed - 1;
                             }
                         }
-                        FileManager.saveMap("instance/B" + map.name.getInstanceName() + bid, house);
+                        FileManager.saveMap("instance/B" + map.name.toString() + bid, house);
                     }
                 }
             }

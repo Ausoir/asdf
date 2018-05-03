@@ -53,8 +53,8 @@ public class Speech extends Thing {
         if (p.startsWith("@")) t = getRandom(p.substring(1));
         else t = p;
         if (!t.equals("")) {
-            if (!text.equals(p)) {
-                text = p;
+            if (!text.equals(t)) {
+                text = t;
                 msg.clear();
                 msg.add(t);
                 visible = true;

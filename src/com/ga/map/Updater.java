@@ -24,7 +24,7 @@ public class Updater {
     public ArrayList<Observer> addQueue = new ArrayList<>();
     private ArrayList<Observer> removeQueue = new ArrayList<>();
 
-    public Updater(Map map){
+    Updater(Map map){
         this.map = map;
         drawee = new Drawable() {};
     }
@@ -47,7 +47,7 @@ public class Updater {
     public void processQueue(){
         while (addQueue.size() > 0){
             Observer p = addQueue.remove(0);
-            if (p instanceof Drawable) drawee.add((Drawable) p, (Drawable) p);
+            if (p instanceof Drawable) drawee.add((Drawable) p);
             if (p instanceof Unit){
                 Unit unit = (Unit)p;
                 if (((Unit)p).map == map){
@@ -67,27 +67,20 @@ public class Updater {
         }
         while (removeQueue.size() > 0){
             Observer p = removeQueue.remove(0);
-//            drawee.remove((Drawable) p);
+            ((Drawable) p).removeThis();
             props.remove(p);
             unitsLoaded.remove(p);
             controllee.remove(p);
+            effects.remove(p);
         }
     }
     public void update(){
         processQueue();
         Global.updateCamera();
         for (Updatable i : updatee) i.update();
-        if (!editor){
-            for (Prop i : props) i.update();
-            for (Unit i : unitsLoaded) i.update();
-        }
-        for (int i = 0; i < effects.size(); i++) {
-            Particle t = effects.get(i);
-            if (t.over()){
-                t.remove();
-                effects.remove(t);
-            }
-        }
+        for (Prop i : props) i.update();
+        if (!editor) for (Unit i : unitsLoaded) i.update(); //new class?
+        for (Particle t : effects) t.update();
     }
     public void draw(Graphics2D g2){
         Drawable t = drawee;
@@ -108,7 +101,7 @@ public class Updater {
         return stack;
     }
     public void remove(Observer p){
-        if (!addQueue.remove(p)) removeQueue.add(p);
+        if (p != null && !addQueue.remove(p)) removeQueue.add(p);
     }
     public String toString(){
         String result = "";

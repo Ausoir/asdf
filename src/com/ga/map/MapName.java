@@ -1,21 +1,24 @@
 package com.ga.map;
 
 public class MapName {
-    private String value;
+    public String value;
+    private boolean isInstance;
 
     MapName(String p){
         set(p);
     }
     private void set(String p){
-        if (p.startsWith("../")) value = p.substring(3);
+        isInstance = !p.startsWith("../");
+
+        if (!isInstance) value = p.substring(3);
         else value = "instance/"+p;
     }
 
     private String getBiome(){
-        return getInstanceName().substring(1, 2);
+        return toString().substring(1, 2);
     }
     public int getIndex(){
-        return Integer.parseInt(getInstanceName().substring(2));
+        return Integer.parseInt(toString().substring(2));
     }
     public MapName getNext(int dir){
         return new MapName("_"+getBiome()+(getIndex()+dir));
@@ -39,14 +42,10 @@ public class MapName {
     }
 
     public boolean equals(String p){
-        return value.equals(p);
-    }
-
-    public String getInstanceName(){
-        return value.substring(9); //instance/
+        return toString().equals(p);
     }
 
     public String toString(){
-        return value;
+        return isInstance ? value.substring(9) : value; // "instance/"
     }
 }

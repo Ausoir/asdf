@@ -4,8 +4,6 @@ import com.ga.game.FileManager;
 import com.ga.map.Global;
 import com.ga.map.Updater;
 import com.ga.tool.P;
-import com.ga.tool.SyncRand;
-import com.ga.unit.man.Man;
 import com.ga.unit.skill.Actions;
 
 import java.util.ArrayList;

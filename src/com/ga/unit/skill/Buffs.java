@@ -113,18 +113,18 @@ public enum Buffs {
         add(Tag.Curse);
         add(Tag.Air);
     }}){ Buff makeLocal(){
-        return new Buff(7) {
+        return new Buff(10) {
             public void onSet(){
                 Particle.shock(host.map, host.getRandomPoint(), host.getDepth());
                 spike();
             }
             public void onStack(int level) {
                 Particle.shock(host.map, host.getRandomPoint(), host.getDepth());
-                time = Global.time + 7;
+                time = Global.time + 20;
                 spike();
             }
             private void spike(){
-                if (!host.get("Stamina").require(1)){
+                if (!host.get("Strength").require(1)){
                     Particle.holyExplosion(host.map, host.pos, host.getDepth());
                     host.stateSet(Actions.Down);
                     host.stats.clearBuffs(false);
@@ -134,7 +134,7 @@ public enum Buffs {
                 Particle.sparkle(host.map, "Glare", host.getDepth(),host.getRandomPoint(),20+host.getSize(),4);
                 if (var++ % (Math.max(1, 8-level)*10) == 0){
                     host.stateSet(Actions.Hit);
-                    host.get("Stamina").add(-1,false);
+                    host.get("Strength").add(-1,false);
                 }
                 return super.update();
             }
@@ -229,7 +229,7 @@ public enum Buffs {
                 frozen = false;
                 host.map.land.removeAll(Arrays.asList(lines));
                 host.map.updater.remove(ice);
-                ice.removeThis();
+                ice.remove();
                 time = Global.time + 16;
             }
             public void onFinish() {
@@ -362,7 +362,7 @@ public enum Buffs {
                 var = Math.max(1,100/level);
             }
             public boolean update(){
-                if (tick++ % var == 0) host.get("Stamina").add(1, false);
+                if (tick++ % var == 0) host.get("Strength").add(1, false);
                 return super.update();
             }
         };
@@ -428,7 +428,7 @@ public enum Buffs {
                 Sound.play(host.map, host.pos, "stun");
             }
             public boolean update() {
-                Particle.implode(host.map, "Poison", host.getDepth(), host.pos.getAdd(0, -24), new P(), 1, 10, 1, false, 6);
+                Particle.implode(host.map, "Poison", host.getDepth(), host.pos.getAdd(0, -24), 1, 10, false, 6);
                 if (var++ % 100 == 0) Stock.Bird.create(host.map,-1,-1).start().pos.set(host.pos);
                 return super.update();
             }
@@ -454,7 +454,7 @@ public enum Buffs {
                 host.clip.setSpeed(99);
             }
             public boolean update() {
-                Particle.implode(host.map, "Glare", host.getDepth(), host.pos.getAdd(0, -24), new P(), 1, 10, 1, false, 6);
+                Particle.implode(host.map, "Glare", host.getDepth(), host.pos.getAdd(0, -24), 1, 10, false, 6);
                 return super.update();
             }
         };

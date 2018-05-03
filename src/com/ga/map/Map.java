@@ -23,13 +23,13 @@ public class Map {
     public ArrayList<Line> landRaw = new ArrayList<>();
     public HashMap<Integer, String> formTextures = new HashMap<>();
     public HashMap<Integer, Terrain> terrains = new HashMap<>();
-    private static HashMap<String, String> defaultProps = new HashMap<String, String>(){{
-        put("grass","Rock=.1,Bush=.2,Weed=1");
-        put("dirt","Rock=.2");
-        put("rock","Rock=.2");
-        put("road","Rock=.1");
-        put("snow","Rock=.1,Bush=.1");
-        put("sand","XBush=.1,Shell=.2,Starfish=.3");
+    private static HashMap<String, String> defaultProps = new HashMap<String, String>() {{
+        put("grass", "Rock=.1,Bush=.2,Weed=1");
+        put("dirt", "Rock=.2");
+        put("rock", "Rock=.2");
+        put("road", "Rock=.1");
+        put("snow", "Rock=.1,Bush=.1");
+        put("sand", "XBush=.1,Shell=.2,Starfish=.3");
     }};
     public P size;
     public MapName name;
@@ -44,18 +44,18 @@ public class Map {
         onTimeChange();
     }
 
-    public void start(){
-        if (name.isField() && !FileManager.isFile("Data/map/" + name + ".map")){
+    public void start() {
+        if (name.isField() && !FileManager.isFile("Data/map/" + name + ".map")) {
             make(name);
-            FileManager.saveMap(name.toString(), this);
+            FileManager.saveMap(name.value, this);
             clear();
         }
-        load(name.toString());
+        load(name.value);
         weather.start();
     }
 
-    private void make(MapName dir){
-        switch (callname = dir.getBiomeName()){
+    private void make(MapName dir) {
+        switch (callname = dir.getBiomeName()) {
             case "Grassland":
                 int var = Creation.getRegionVariable(dir.getIndex()).nextInt(5);
                 if (var == 0) GenerateTown.generate(this);
@@ -68,16 +68,16 @@ public class Map {
                 GenerateDesert.generate(this);
                 break;
         }
-        panorama = new Thing(this, "Bg_"+callname, 0, 0);
+        panorama = new Thing(this, "Bg_" + callname, 0, 0);
         generateProps();
     }
 
-    public void load(String dir){
+    public void load(String dir) {
         String data = FileManager.read("Data/map/" + dir + ".map");
         String[] line = data.split("%");
         String[] names = line[0].split(";");
         callname = names[0];
-        if (names[1].equals("")){
+        if (names[1].equals("")) {
             panorama = new Thing(this, "", 0, 0) {
                 @Override
                 public void draw(Graphics2D g) {
@@ -132,30 +132,30 @@ public class Map {
         }
     }
 
-    int getNextTerrain(){
+    int getNextTerrain() {
         int high = -1;
         int nextPolygon = 0;
-        for (Line i : landRaw){
-            if (i.tid > high){
+        for (Line i : landRaw) {
+            if (i.tid > high) {
                 high = i.tid;
-                nextPolygon = i.tid +1;
+                nextPolygon = i.tid + 1;
             }
         }
         return nextPolygon;
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         StringBuilder result = new StringBuilder(callname + ";" + panorama.name + ";" + size.x() + "," + size.y() + "\n");
         Iterator it = formTextures.entrySet().iterator();
-        while (it.hasNext()){
+        while (it.hasNext()) {
             java.util.Map.Entry pair = (java.util.Map.Entry) it.next();
             result.append(pair.getKey()).append(":").append(pair.getValue());
             if (it.hasNext()) result.append(";");
         }
         result.append("\n");
         ArrayList<Line> landRawClone = (ArrayList<Line>) landRaw.clone();
-        for (Line i : landRawClone){
+        for (Line i : landRawClone) {
             if (!i.toString().equals("")) result.append(i).append(";");
         }
         if (landRawClone.size() > 0) result = new StringBuilder(result.substring(0, result.length() - 1));
@@ -163,7 +163,7 @@ public class Map {
         return result.toString();
     }
 
-    public void clear(){
+    public void clear() {
         updater.clear();
         land.clear();
         landRaw.clear();
@@ -171,14 +171,14 @@ public class Map {
         formTextures.clear();
     }
 
-    public void setTexture(){
-        for (final Line i : landRaw){
-            if (i.tid >= 0){
+    public void setTexture() {
+        for (final Line i : landRaw) {
+            if (i.tid >= 0) {
                 String formTexture = formTextures.get(i.tid);
                 String[] formName = formTexture.split("&");
                 float depth = Float.parseFloat(formName[0]);
                 Terrain terrain = terrains.get(i.tid);
-                if (terrain == null){
+                if (terrain == null) {
                     terrain = new Terrain(this, formName[1], Shader.getByName(formName[2]), depth);
                     terrains.put(i.tid, terrain);
                     terrain.start();
@@ -193,7 +193,7 @@ public class Map {
         }
     }
 
-    public void render(){
+    public void render() {
         for (Object o : terrains.entrySet()) {
             java.util.Map.Entry pair = (java.util.Map.Entry) o;
             Terrain terrain = (Terrain) pair.getValue();
@@ -201,7 +201,7 @@ public class Map {
         }
     }
 
-    void generateProps(){
+    void generateProps() {
         for (Line l : landRaw) { //generation happens before loading into land from landRaw
             if (l.clockwise() && l.opt > 0) {
                 if (Math.abs(l.getSlope()) < Line.MAXSLOPE
@@ -228,7 +228,7 @@ public class Map {
         }
     }
 
-    Prop placeProp(Line l, String p, int seed){
+    Prop placeProp(Line l, String p, int seed) {
         String prop = null;
         String[] props = p.split(",");
         float rand = Creation.r.nextFloat();
@@ -243,12 +243,12 @@ public class Map {
             if (rand < Float.parseFloat(p.split("=")[1])) prop = p.split("=")[0];
         }
         if (prop != null) {
-            float landSize = Math.abs(l.ptd.x-l.pt.x);
+            float landSize = Math.abs(l.ptd.x - l.pt.x);
             Prop t = Stock.getByName(this, prop, seed);
             t.manualDepth = false;
             P size = t.image.getSize();
             if (landSize >= size.x) {
-                float halfSizeX = size.x/2;
+                float halfSizeX = size.x / 2;
                 int tx = (int) (Creation.r.nextFloat() * (l.ptd.x - l.pt.x));
                 tx = (int) Global.clamp(tx, halfSizeX, (l.ptd.x - l.pt.x) - halfSizeX);
                 t.pos = new P(l.pt.x + tx, (int) l.getCrossPointY(l.pt.x + tx));
@@ -260,7 +260,7 @@ public class Map {
         return null;
     }
 
-    public String getLand(int p){
+    public String getLand(int p) {
         String terrain = formTextures.get(p);
         if (terrain != null) {
             String t[] = formTextures.get(p).split("&");
@@ -270,18 +270,18 @@ public class Map {
         return "none";
     }
 
-    public Line checkLand(Line p, float depth){
+    public Line checkLand(Line p, float depth) {
         ArrayList<Line> list = new ArrayList<>();
-        for (Line i : landRaw){
-            if (i.clockwise() && i.depth >= depth && i.lineCross(p)){
+        for (Line i : landRaw) {
+            if (i.clockwise() && i.depth >= depth && i.lineCross(p)) {
                 list.add(i);
             }
         }
         if (list.size() == 0) return null;
         else {
             Line highest = null;
-            for (Line i : list){
-                if (highest == null || i.depth > highest.depth){
+            for (Line i : list) {
+                if (highest == null || i.depth > highest.depth) {
                     highest = i;
                 }
             }
@@ -289,10 +289,10 @@ public class Map {
         }
     }
 
-    public Line checkLand(Line p){
+    public Line checkLand(Line p) {
         ArrayList<Line> list = new ArrayList<>();
-        for (Line i : landRaw){
-            if (i.clockwise() && i.lineCross(p)){
+        for (Line i : landRaw) {
+            if (i.clockwise() && i.lineCross(p)) {
                 list.add(i);
             }
         }
@@ -300,9 +300,9 @@ public class Map {
         else {
             Line closest = null;
             float closestY = p.ptd.y;
-            for (Line i : list){
+            for (Line i : list) {
                 float y = i.getCrossPointY(p.pt.x);
-                if (y <= closestY){
+                if (y <= closestY) {
                     closest = i;
                     closestY = y;
                 }
@@ -311,8 +311,8 @@ public class Map {
         }
     }
 
-    public P getFailsafePos(){
-        return new P(size.x/2,36);
+    public P getFailsafePos() {
+        return new P(size.x / 2, 36);
     }
 
     public void onTimeChange() {
@@ -323,7 +323,7 @@ public class Map {
         }
     }
 
-    public int mapEdge(P p){
+    public int mapEdge(P p) {
         int result = 0;
         if (p.x < 0) result = 4;
         else if (p.x > size.x) result = 6;
@@ -332,48 +332,49 @@ public class Map {
         return result;
     }
 
-    public P mapEdgeCenter(P p){
+    public P mapEdgeCenter(P p) {
         if (size.x > Settings.screenX && size.y > Settings.screenY)
-            return new P(Global.clamp(p.x, Settings.centerX+margin, size.x-Settings.centerX-margin),
-                    Global.clamp(p.y, Settings.centerY+40+margin, size.y-Settings.centerY-margin-margin));
+            return new P(Global.clamp(p.x, Settings.centerX + margin, size.x - Settings.centerX - margin),
+                    Global.clamp(p.y, Settings.centerY + 40 + margin, size.y - Settings.centerY - margin - margin));
         return p;
     }
 
-    void clean(){
+    void clean() {
         Iterator it = formTextures.entrySet().iterator();
-        while (it.hasNext()){
+        while (it.hasNext()) {
             boolean check = false;
             java.util.Map.Entry pair = (java.util.Map.Entry) it.next();
             int key = (int) pair.getKey();
-            for (Line i : landRaw){
-                if (i.tid == key){
+            for (Line i : landRaw) {
+                if (i.tid == key) {
                     check = true;
                     break;
                 }
             }
-            if (!check){
+            if (!check) {
                 it.remove();
             }
         }
     }
 
-    void normalize(int marginX, int marginY){
-        P high = new P(), low = size.getAdd(0,0);
-        for (Line i : landRaw){
-            low.x = Math.min(Math.min(low.x,i.pt.x),i.ptd.x);
-            low.y = Math.min(Math.min(low.y,i.pt.y),i.ptd.y);
-            high.x = Math.max(Math.max(high.x,i.pt.x),i.ptd.x);
-            high.y = Math.max(Math.max(high.y,i.pt.y),i.ptd.y);
+    void normalize(int marginX, int marginY) {
+        P high = new P(), low = size.getAdd(0, 0);
+        for (Line i : landRaw) {
+            low.x = Math.min(Math.min(low.x, i.pt.x), i.ptd.x);
+            low.y = Math.min(Math.min(low.y, i.pt.y), i.ptd.y);
+            high.x = Math.max(Math.max(high.x, i.pt.x), i.ptd.x);
+            high.y = Math.max(Math.max(high.y, i.pt.y), i.ptd.y);
         }
         P margin = new P(marginX, marginY);
-        int maxDiffX = (int) (high.x-low.x)+margin.x();
-        int maxDiffY = (int) (high.y-low.y)+margin.y();
+        int maxDiffX = (int) (high.x - low.x) + margin.x();
+        int maxDiffY = (int) (high.y - low.y) + margin.y();
         size = new P(maxDiffX, maxDiffY);
-        P adjustment = new P(-low.x+marginX/2,-low.y+marginY/2);
+        P adjustment = new P(-low.x + marginX / 2, -low.y + marginY / 2);
         adjust(adjustment);
         if (updater != null) updater.adjust(adjustment);
     }
-    void adjust(P p){
+
+    void adjust(P p) {
         for (Line i : landRaw) {
             i.pt = i.pt.getAdd(p);
             i.ptd = i.ptd.getAdd(p);

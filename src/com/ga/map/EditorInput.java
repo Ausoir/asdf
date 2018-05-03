@@ -32,7 +32,6 @@ public class EditorInput extends Drawable implements Input, Updatable {
         }
     }
     private int SNAP = 24;
-    private final int SCROLLSPEED = 50;
     private Keybinding keybinding = new Keybinding();
     private Stroke basicStroke = new BasicStroke(10);
     private String txDepth = "1";
@@ -62,7 +61,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
         init();
         currentO = new Prop(map, "Error", 0);
         Global.updates.time = -1;
-        lastSaved = map.name.getInstanceName();
+        lastSaved = map.name.toString();
     }
 
     private void init(){
@@ -651,7 +650,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
                 break;
             case KeyEvent.VK_INSERT:
                 Updater.editor = false;
-                Global.server.requestChangeMap(map.name.getInstanceName()+"@0");
+                Global.server.requestChangeMap(map.name.toString()+"@0");
                 final P asdf = Global.camera.getAdd(0,-400);
                 while (true){
                     try {
@@ -690,6 +689,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
         return p;
     }
     private void setSpeed(int x, int y){
+        int SCROLLSPEED = 50;
         v.x = x * SCROLLSPEED;
         v.y = y * SCROLLSPEED;
         if (shift) v.mult(10,10);

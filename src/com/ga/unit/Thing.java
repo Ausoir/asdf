@@ -51,7 +51,6 @@ public class Thing extends Drawable {
     }
 
     public void remove(){
-        super.removeThis();
         map.updater.remove(this);
     }
     public String toString(){

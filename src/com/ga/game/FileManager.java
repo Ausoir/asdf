@@ -58,7 +58,7 @@ public class FileManager {
     }
     public static void saveCharacter(){
         if (Global.player.state != Actions.Dead) {
-            if (Global.server.isHost()) saveMap(Global.player.map.name.toString(), Global.player.map);
+            if (Global.server.isHost()) saveMap(Global.player.map.name.value, Global.player.map);
             save("Data/map/Player.user", Global.player.toString());
             save("Data/Keymap.txt", Global.player.input.toString());
             saveWorld();

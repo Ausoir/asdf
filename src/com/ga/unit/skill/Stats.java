@@ -14,7 +14,7 @@ import java.util.Map;
 public class Stats {
     private ArrayList<Buff> effects = new ArrayList<>();
     private HashMap<String, Stat> stats = new HashMap<>();
-    private Timer restTimer = new Timer(100, true);
+    private Timer restTimer = new Timer(800, true);
     private Unit host;
     public Stats(Unit host){
         this.host = host;
@@ -34,7 +34,7 @@ public class Stats {
             origBuff.onStack(level);
         }
     }
-    public Buff getEffect(Buffs p){
+    private Buff getEffect(Buffs p){
         for (Buff i : effects){
             if (i.buff == p) return i;
         }
@@ -53,8 +53,8 @@ public class Stats {
 
     public boolean rest(int mag){
         if (restTimer.update(mag)){
-            Stat stamina = stats.get("Stamina");
-            stamina.add(1, false);
+            Stat stamina = stats.get("Strength");
+            stamina.heal();
             return true;
         }
         return false;

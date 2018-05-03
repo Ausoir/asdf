@@ -12,7 +12,8 @@ public enum Strategy {
     Melee{ //humanoid
         public int micromanage(Unit host, Actions action, float dist){
             if (action == Actions.Use){
-                if (!((Man) host).weapon.isUsable(false, 1)){
+                Man man = (Man) host;
+                if (man.wieldingNone() || !man.weapon.isUsable(false, 1)){
                     action = Actions.Punch;
                 }
             }
@@ -51,7 +52,7 @@ public enum Strategy {
     public int micromanage(Unit host, Actions action, float dist){
         int fb = host.setState(action);
         if (fb == 2) host.setState(Actions.Rest);
-        if (host.state == Actions.Rest) host.delay.time = (12 - host.stateLevel) * host.get("Stamina").getMax();
+        if (host.state == Actions.Rest) host.delay.time = (12 - host.stateLevel) * host.get("Strength").getMax();
         else if (host.state.getTags().contains(Tag.Channeling)) host.delay.set(100);
         return fb;
     }
@@ -60,10 +61,10 @@ public enum Strategy {
         host.face(host.brain.target.pos.x>host.pos.x?1:-1, false);
         Actions action;
         ArrayList<Actions> moves = new ArrayList<>();
-        if (host.get("Stamina").get() == 0) action = Actions.Rest;
+        if (host.get("Strength").get() == 0) action = Actions.Rest;
         else {
             for (Actions act : host.moveset) {
-                if (dist < act.getRange((Man) host)) {
+                if (dist < act.getRange(host)) {
                     moves.add(act);
                 }
             }
@@ -73,6 +74,6 @@ public enum Strategy {
             else action = getMove(host, dist);
         }
         int fb = micromanage(host, action, dist);
-        host.say(host.get("Stamina").toString() + " " + action.name() + " " + fb);
+        host.say(host.get("Strength").toString() + " " + action.name() + " " + fb);
     }
 }

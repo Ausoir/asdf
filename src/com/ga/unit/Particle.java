@@ -12,11 +12,14 @@ import com.ga.tool.Timer;
  * Created by Ga on 8/29/2016. zxc
  */
 public class Particle extends Thing {
+    private static int PARTICLE_NUM = 32;
+    private static Particle[] particles = new Particle[PARTICLE_NUM];
+    private static int index = PARTICLE_NUM;
     private Timer timer = new Timer(4, false);
     private P vel;
     private boolean gravity;
     private Particle(Map map, String name, float depth, P pt, P vel, float rotation, float speed, boolean gravity, int lifetime) {
-        super(map, name, Global.r.nextInt(9999), depth);
+        super(map, name, (int) (Math.random() * 9999), depth);
         pos = pt;
         save = false;
         this.vel = new P(vel);
@@ -25,6 +28,12 @@ public class Particle extends Thing {
         this.rotation = rotation;
         this.timer.set(lifetime);
         start();
+    }
+    private static void create(Map map, String name, float depth, P pt, P vel, float rotation, float speed, boolean gravity, int lifetime) {
+        if (index < PARTICLE_NUM-1) index++;
+        else index = 0;
+        if (particles[index] != null) particles[index].remove();
+        particles[index] = new Particle(map, name, depth, pt, vel, rotation, speed, gravity, lifetime);
     }
     public void setImage(String p){
         image.set(Picture.loadCache(p));
@@ -36,7 +45,7 @@ public class Particle extends Thing {
         for (int i=0;i<times;i++) {
             float x = (float) (Math.random()*radius-radius/2);
             float y = (float) (Math.random()*radius-radius/2);
-            new Particle(map, name, depth, pt.getAdd(x,y), new P(), 0, 3, false, 1);
+            Particle.create(map, name, depth, pt.getAdd(x,y), new P(), 0, 3, false, 1);
         }
     }
     public static void groundSlam(Map map, P pt, float depth){
@@ -64,20 +73,20 @@ public class Particle extends Thing {
     public static void burn(Map map, P pt, float depth){
         Particle.explode(map, "Flame",depth,pt,new P(0, -5), 2, 7, 3, false, 4);
     }
-    public static void implode(Map map, String name, float depth, P pt, P vel, int num, int speed, int velSpeed, boolean gravity, int lifetime){
+    public static void implode(Map map, String name, float depth, P pt, int num, int speed, boolean gravity, int lifetime){
         P t;
         for (int i=0;i<num;i++){
             float rot = Global.r.nextFloat()*6.28f;
             float spd = Global.r.nextFloat()*speed;
             t = new P(pt);
             t.add(Global.cos(rot)*spd*lifetime,Global.sin(rot)*spd*lifetime);
-            new Particle(map, name,depth,t,new P(),rot-3.14f,spd, gravity, lifetime);
+            Particle.create(map, name,depth,t,new P(),rot-3.14f,spd, gravity, lifetime);
         }
     }
     public static void explode(Map map, String name, float depth, P pt, P vel, int num, int speed, int velSpeed, boolean gravity, int lifetime){
         P v = vel.getAtan(velSpeed);
         for (int i=0;i<num;i++){
-            new Particle(map, name,depth,new P(pt),v, Global.r.nextFloat()*6.28f,Global.r.nextFloat()*speed, gravity, lifetime);
+            Particle.create(map, name,depth,new P(pt),v, Global.r.nextFloat()*6.28f,Global.r.nextFloat()*speed, gravity, lifetime);
         }
     }
     private void collide(){
@@ -93,10 +102,10 @@ public class Particle extends Thing {
             }
         }
     }
-    public boolean over() {
+    public void update() {
         if (gravity) vel.y += Settings.gravity;
         collide();
         pos.add(vel);
-        return timer.update();
+        if (timer.update()) remove();
     }
 }
