@@ -1,6 +1,7 @@
 package com.ga.map;
 
 import com.ga.game.*;
+import com.ga.game.Menu;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
@@ -502,7 +503,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
                             }
                         };
                     }
-                    Global.display.menu.showDialog("List of Props","", listString, performers);
+                    Menu.menu.showDialog("List of Props","", listString, performers);
                 }
                 break;
             case -1:

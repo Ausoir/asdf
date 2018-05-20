@@ -11,8 +11,9 @@ import javax.swing.*;
  * Created by ga on 6/6/17. asd
  */
 public class Menu extends JPanel implements Updatable {
+    public static Menu menu = new Menu();
     private Panel current;
-    private MenuPlayer menu = new MenuPlayer();
+    private MenuPlayer menuPlayer = new MenuPlayer();
     Menu(){
         init();
         setLayout(null);
@@ -31,10 +32,10 @@ public class Menu extends JPanel implements Updatable {
     }
     public void showMenu(){
         if (current.getClass() != MenuPlayer.class){
-            select(menu);
-            menu.setVisible(false);
+            select(menuPlayer);
+            menuPlayer.setVisible(false);
         }
-        menu.toggle();
+        menuPlayer.toggle();
     }
     public void showDialog(String title, String message) {
         if (current.getClass() != MenuDialog.class){

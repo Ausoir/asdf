@@ -52,7 +52,7 @@ public class MenuMap extends Panel {
     @Override
     public void paintComponent(Graphics g){
         super.paintComponent(g);
-//        g.drawImage(image,40,0, Global.display.menu.size.width, Global.display.menu.size.height,null);
+//        g.drawImage(image,40,0, Menu.menu.size.width, Menu.menu.size.height,null);
     }
     protected void setColor() {
         setBackground(forecolor);

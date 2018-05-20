@@ -27,11 +27,13 @@ public abstract class AI implements Observer {
         host.map.updater.addQueue.add(this);
     }
     public void update(){
-        perceive(160);
-        if (tasks.peek().update(host)){
-            tasks.pop();
-            taskProgress = 0;
-            if (tasks.empty()) bored();
+        if (host.state != Actions.Dead) {
+            perceive(160);
+            if (tasks.peek().update(host)) {
+                tasks.pop();
+                taskProgress = 0;
+                if (tasks.empty()) bored();
+            }
         }
     }
     void bored(){

@@ -1,5 +1,6 @@
 package com.ga.unit.item;
 
+import com.ga.map.Global;
 import com.ga.map.Shader;
 import com.ga.unit.Organ;
 import com.ga.unit.Stock;
@@ -39,7 +40,9 @@ public class ArmorSet {
             if (i == 5){
                 display[i] = new Organ(null, true){
                     public void draw(Graphics2D g) {
-                        image.draw(g, host.pos.x+pt.x, host.pos.y+pt.y, getAtan()+1.57f, host.dir);
+                        float x = host.pos.x+pt.x, y = host.pos.y+pt.y;
+                        if (image.visible && Global.inCamera(x,y,0,0))
+                            image.draw(g, x, y, getAtan()+1.57f, host.dir);
                     }
                 };
             } else display[i] = new Organ(null, true);
@@ -126,6 +129,9 @@ public class ArmorSet {
         for (int i=0;i<armor.length;i++){
             if (armor[i] == p) set(null, i);
         }
+    }
+    public void setVisible(boolean visible){
+        for (Organ i : display) i.image.visible = visible;
     }
     public int getWeight(){
         int r = 0;

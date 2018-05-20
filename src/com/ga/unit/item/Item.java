@@ -32,7 +32,7 @@ public class Item extends Prop {
             public boolean isBlunt(){return false;}},
         Swinging(Actions.Slash, 3, 1, 10, "swing_silent"),
         Bashing(Actions.Slash, 1, 1, 10, "swing_silent"),
-        Armor(Actions.Rest, 1, 1, 10, "swing_normal"), Scroll(Actions.Guard, 1, 0, 0, "scroll"),
+        Armor(Actions.Rest, 1, 1, 10, "swing_normal"), Scroll(Actions.Mark, 1, 0, 0, "scroll"),
         Shooting(Actions.Shoot_Handgun, 3, .5f, 0, "swing_normal"), Rifle(Actions.Shoot_Rifle, 3, 1f, 0, "swing_normal"),
         Bow(Actions.Shoot_Arrow, 1, 1, 0, "swing_silent"), Throwing(Actions.Throw, 3, .1f, 0, "swing_silent"),
         Darting(Actions.Dart, 3, .1f, 0, "swing_normal"), Consumable(Actions.Consume, 1, .1f, 0, "drink");
@@ -52,13 +52,7 @@ public class Item extends Prop {
         }
     }
     public enum Material{
-        Wooden(.4f,2,1,1,0,new Color(118, 93, 0,60)){
-            public void onSet(Item host){
-                host.tags.add(Tag.Enchant);
-                host.tags.add(Tag.Mutation);
-                host.tags.add(Tag.Fire);
-            }
-        },
+        Wooden(.4f,2,1,1,0,new Color(118, 93, 0,60)),
         Cloth(.5f,0,0,.9f,200){
             public void onSet(Item host){
                 warmth += 2;
@@ -76,54 +70,48 @@ public class Item extends Prop {
                 warmth += 1;
             }
         },
-        Glass(.1f,1,7,.5f,2000){
-            public void onSet(Item host){
-                host.tags.add(Tag.Ice);
-                warmth -= 1;
-            }
-        },
+        Glass(.1f,1,7,.5f,2000),
         Brass(.4f,7,4,.7f,1500,new Color(133, 123, 23,120)),
         Copper(.4f,5,3,1f,1500,new Color(133, 92, 38,120)){
             public void onSet(Item host){
-                host.tags.add(Tag.Electric);
                 warmth -= 1;
             }
         },
-        Bronze(.4f,5,4,1.2f,1500,new Color(133, 72, 0,180)),
+        Bronze(.4f,5,4,1.2f,1500,new Color(133, 72, 0,140)),
         Iron(.4f,4,5,1.5f,2000),
-        Silver(.2f,10,7,.8f,9000),
+        Silver(.2f,10,7,.8f,9000){
+            public void onSet(Item host){
+                host.tags.add(Tag.Mutation);
+            }
+        },
         Gold(.2f,10,9,.5f,16000){
             public void onSet(Item host){
                 host.tags.add(Tag.Electric);
                 host.tags.add(Tag.Enchant);
             }
         },
-        Lead(.4f,9,2,1.6f,1500,new Color(19, 31, 75,120)){
-            public void onSet(Item host){
-                host.tags.add(Tag.Electric);
-                host.tags.add(Tag.Mutation);
-            }
-        },
+        Lead(.4f,9,2,1.6f,1500,new Color(19, 31, 75,120)),
         Steel(.2f,4,6,4,8000),
         Titanium(.2f,3,7,5,30000),
         Crystal(.2f,3,9,.3f,2000,new Color(28, 133, 67,180)){
             public void onSet(Item host){
-                host.tags.add(Tag.Ice);
+                host.tags.add(Tag.Conjuration);
+                host.tags.add(Tag.Channeling);
                 warmth -= 1;
             }
         },
         Obsidian(.1f,3,4,.7f,8000){
             public void onSet(Item host){
-                host.tags.add(Tag.Enchant);
-                host.tags.add(Tag.Enchant);
+                host.tags.add(Tag.Curse);
                 host.tags.add(Tag.Fire);
-                host.tags.add(Tag.Fire);
+                host.tags.add(Tag.Void);
                 warmth += 1;
             }
         },
         Bone(.2f,1,3,.8f,3000){
             public void onSet(Item host){
-                host.tags.add(Tag.Conjuration);
+                host.tags.add(Tag.Curse);
+                host.tags.add(Tag.Mutation);
             }
         },
         Other(0,0,0,1,0),
@@ -267,7 +255,7 @@ public class Item extends Prop {
             }
         };
         randomSize(new P(.2f,.2f));
-        range = getSize()-8;
+        range = Math.max(32, getSize()-8);
     }
     protected void imbueMeta(boolean canSmod, boolean canAdmod, float emodProb){
         if (canSmod) smod = SpecialtyMod.get(rand);
@@ -463,7 +451,7 @@ public class Item extends Prop {
         return speed;
     }
     public boolean use(Man host){
-        if (host.get("Strength").get() >= weight) {
+        if (host.get("Strength").getMax() >= weight) {
             host.get("Attack").add(-getSpeed(), true);
             int stateResult = host.setState(type.action);
             host.get("Attack").add(getSpeed(), true);

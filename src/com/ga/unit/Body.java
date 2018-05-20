@@ -1,9 +1,9 @@
 package com.ga.unit;
 
 import com.ga.map.Global;
-import com.ga.map.Shader;
 import com.ga.tool.Clips;
 import com.ga.tool.P;
+import com.ga.tool.SyncRand;
 import com.ga.tool.Timer;
 
 import java.awt.*;
@@ -165,11 +165,11 @@ public class Body {
     int getHeight(){
         int leg = getLeg();
         if (leg == -1) return 0;
-        return localAnimation[0][leg][1];
+        return Math.max(0, localAnimation[0][leg][1]);
     }
 
     P randomPoint(){
-        return organs[(int) (Math.random()*organs.length)].ptd;
+        return organs[SyncRand.r.nextInt(organs.length)].ptd;
     }
 
     public void setState(String state) {
@@ -253,27 +253,32 @@ public class Body {
                 }
             }
         }
-        if (legCurrent > 0) host.tags.add(Tag.Legs);
         resetHeight();
     }
 
     public void resetHeight(){
-        if (legCurrent == 0) {
-            organs[BODY].pt.y = 0;
-            host.tags.remove(Tag.Athletics);
-        } else organs[BODY].pt.y = -getHeight();
+        if (legCurrent == 0) organs[BODY].pt.y = 0;
+        else organs[BODY].pt.y = -getHeight();
     }
 
-    public float getLegStatus(){
+    float getLegStatus(){
         if (legNum == 0) return 1;
         return (float)legCurrent/legNum;
     }
 
-    float getHandStatus(){
-        if (handNum == 0) return 1;
-        return (float)handCurrent/handNum;
+    public boolean hasOrgans(int[] p){
+        for (int i : p) {
+            if (i < organs.length && organs[i].amputated) return false;
+        }
+        return true;
     }
 
+    public int getHead(){
+        for (int i=0;i<organs.length;i++) {
+            if (organs[i].vital && !organs[i].amputated) return i;
+        }
+        return -1;
+    }
     int getHand(){
         for (int i=0;i<organs.length;i++) {
             if (organs[i].hand && !organs[i].amputated) return i;

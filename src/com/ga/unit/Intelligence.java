@@ -2,6 +2,7 @@ package com.ga.unit;
 
 import com.ga.game.Dialog;
 import com.ga.game.FileManager;
+import com.ga.game.Menu;
 import com.ga.map.Global;
 import com.ga.tool.*;
 import com.ga.unit.item.Item;
@@ -176,7 +177,7 @@ public enum Intelligence {
                     for (int i = 0; i < newPrice.length; i++) {
                         newPrice[i] *= Global.player.getShopPrice();
                     }
-                    Global.display.menu.showShop("Trader's Wares - \"" + host.getConversation() + "\"",
+                    Menu.menu.showShop("Trader's Wares - \"" + host.getConversation() + "\"",
                             products, prices, actions);
                 }
 
@@ -223,7 +224,7 @@ public enum Intelligence {
                             else if (i > 0) list += "or "+wanted[i]+"s.";
                             else list += wanted[i]+"s.";
                         }
-                        Global.display.menu.showDialog("Buyer", list+" Do you need something?");
+                        Menu.menu.showDialog("Buyer", list+" Do you need something?");
                     } else {
                         Performer[] action = new Performer[available.size()];
                         String[] options = new String[action.length];
@@ -239,7 +240,7 @@ public enum Intelligence {
                                 }
                             };
                         }
-                        Global.display.menu.showDialog("Wanted list",
+                        Menu.menu.showDialog("Wanted list",
                                 "What would you like to sell?", options, action);
                     }
                 }
@@ -283,7 +284,7 @@ public enum Intelligence {
                 }
 
                 void shop() {
-                    Global.display.menu.showDialog("Transportation",
+                    Menu.menu.showDialog("Transportation",
                         "Where would you like to go?", options, performers);
                 }
             });
@@ -299,7 +300,7 @@ public enum Intelligence {
                 }
 
                 void shop() {
-                    Global.display.menu.showDialog("Inn",
+                    Menu.menu.showDialog("Inn",
                             "Rest for the night? "+Dialog.money(price)+" for 5 hours.",
                             new String[]{"Yes", "No"},
                             new Performer[]{

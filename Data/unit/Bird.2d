@@ -9,7 +9,8 @@
 40,5;-40,-5/4
 
 Idle@1,2
-Walk@1,2
+Left@1,2
+Right@1,2
 Sprint@1,2
 Hit@2,1,-1
 Dead@4,-1

@@ -39,7 +39,7 @@ public class Map {
     public Updater updater;
 
     Map(String name) {
-        this.name = new MapName(name);
+        this.name = new MapName(name, false);
         updater = new Updater(this);
         onTimeChange();
     }

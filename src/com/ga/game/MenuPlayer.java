@@ -151,7 +151,7 @@ public class MenuPlayer extends Panel {
                     @Override
                     public void mouseClicked(MouseEvent e) {
                         Global.player.input.inputDirect("Wield", 0, 0);
-                        Global.display.menu.showMenu();
+                        Menu.menu.showMenu();
                     }
                 });
             } else { //armor
@@ -159,7 +159,7 @@ public class MenuPlayer extends Panel {
                     @Override
                     public void mouseClicked(MouseEvent e) {
                         Global.player.input.inputDirect("_WI"+type,0,0);
-                        Global.display.menu.showMenu();
+                        Menu.menu.showMenu();
                     }
                 });
             }
@@ -171,7 +171,7 @@ public class MenuPlayer extends Panel {
             describe.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Global.display.menu.showDialog(item.getFullName(),item.getDescription());
+                    Menu.menu.showDialog(item.getFullName(),item.getDescription());
                 }
             });
             final JLabel drop = new JLabel(item.getFullName()+" ("+Math.round(item.getPercentage()*100)+"%)             ");
@@ -233,7 +233,7 @@ public class MenuPlayer extends Panel {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     Global.player.input.inputDirect("_WI"+(10+index),0,0);
-                    Global.display.menu.showMenu();
+                    Menu.menu.showMenu();
                 }
             });
             JPanel options = new JPanel();
@@ -244,7 +244,7 @@ public class MenuPlayer extends Panel {
             describe.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Global.display.menu.showDialog(item.getFullName(),item.getDescription());
+                    Menu.menu.showDialog(item.getFullName(),item.getDescription());
                 }
             });
             final JLabel drop = new JLabel(item.getFullName()+" ("+Math.round(item.getPercentage()*100)+"%)             ");
@@ -303,7 +303,7 @@ public class MenuPlayer extends Panel {
             describe.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Global.display.menu.showDialog(move.getName(), move.getDescription());
+                    Menu.menu.showDialog(move.getName(), move.getDescription());
                 }
             });
             int level = Global.player.getStateLevel(move);
@@ -382,7 +382,7 @@ public class MenuPlayer extends Panel {
             describe.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Global.display.menu.showDialog(move.name(), move.getDescription());
+                    Menu.menu.showDialog(move.name(), move.getDescription());
                 }
             });
             int level = Global.player.traits.getTraitLevel(move);
@@ -458,7 +458,7 @@ public class MenuPlayer extends Panel {
             desc.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Global.display.menu.showDialog(p,description);
+                    Menu.menu.showDialog(p,description);
                 }
             });
             subpanel.setOpaque(false);
@@ -473,10 +473,10 @@ public class MenuPlayer extends Panel {
                     Global.player.map.updater.sleep(100, true);
                     break;
                 case "dsc":
-                    Global.display.menu.showDialog("My Description", Global.player.getDescription());
+                    Menu.menu.showDialog("My Description", Global.player.getDescription());
                     break;
                 case "opt":
-                    Global.display.menu.showDialog("Options", "apparently none.");
+                    Menu.menu.showDialog("Options", "apparently none.");
                     break;
             }
         }
@@ -572,7 +572,7 @@ public class MenuPlayer extends Panel {
             desc.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Global.display.menu.showDialog(p,description);
+                    Menu.menu.showDialog(p,description);
                 }
             });
             subpanel.setOpaque(false);
@@ -582,21 +582,21 @@ public class MenuPlayer extends Panel {
             return subpanel;
         }
         private void command(String p){
-            Global.display.menu.showMenu();
+            Menu.menu.showMenu();
             if (p.equals("?")) {
                 String t = "";
                 for (String i : items) {
                     if (!i.equals("Time") && !i.equals("Fist")) t += i + ", ";
                 }
                 String result = t.equals("") ? "None" : t.substring(0, t.length() - 2);
-                Global.display.menu.showDialog("Available Items", result);
+                Menu.menu.showDialog("Available Items", result);
             } else if (p.equals("?s")){
                 String t = "";
                 for (String i : props) {
                     t += i + ", ";
                 }
                 String result = t.equals("") ? "None" : t.substring(0, t.length() - 2);
-                Global.display.menu.showDialog("Available Structures", result);
+                Menu.menu.showDialog("Available Structures", result);
             } else {
                 Command.order("crft@"+p);
             }

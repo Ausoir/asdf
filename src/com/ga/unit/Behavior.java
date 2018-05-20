@@ -91,7 +91,7 @@ public enum Behavior {
         }
         void load(Unit host, int p){
             if (p > 0){
-                host.brain.target = Updater.getUnloadedActor(p);
+                host.brain.target = Updater.getActor(p);
             }
         }
         int getVar(Unit host){
@@ -139,7 +139,7 @@ public enum Behavior {
         }
         void load(Unit host, int p){
             if (p > 0){
-                host.brain.target = Updater.getUnloadedActor(p);
+                host.brain.target = Updater.getActor(p);
             }
         }
         int getVar(Unit host){

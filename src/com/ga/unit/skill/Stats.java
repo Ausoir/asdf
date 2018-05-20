@@ -14,7 +14,7 @@ import java.util.Map;
 public class Stats {
     private ArrayList<Buff> effects = new ArrayList<>();
     private HashMap<String, Stat> stats = new HashMap<>();
-    private Timer restTimer = new Timer(800, true);
+    public Timer restTimer = new Timer(640, true);
     private Unit host;
     public Stats(Unit host){
         this.host = host;
@@ -53,8 +53,8 @@ public class Stats {
 
     public boolean rest(int mag){
         if (restTimer.update(mag)){
-            Stat stamina = stats.get("Strength");
-            stamina.heal();
+            stats.get("Strength").heal();
+            host.stateSet(Actions.Idle);
             return true;
         }
         return false;
@@ -67,6 +67,7 @@ public class Stats {
                 effects.remove(i--);
             }
         }
+        restTimer.time = Math.min(restTimer.time+1, restTimer.max);
     }
     public void load(String p){
         String[] statOrBuff = p.split("/");
@@ -82,10 +83,10 @@ public class Stats {
                 String[] t = i.split("&");
                 Buffs buffs = Buffs.values()[Integer.parseInt(t[0])];
                 Buff buff = buffs.make(host, Integer.parseInt(t[1]));
-                buff.onLoad();
                 effects.add(buff);
                 effects.get(effects.size()-1).time = Integer.parseInt(t[2]);
                 effects.get(effects.size()-1).var = Integer.parseInt(t[3]);
+                buff.onLoad();
             }
         }
     }

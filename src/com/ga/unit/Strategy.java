@@ -22,10 +22,20 @@ public enum Strategy {
     },
     Ranged{
         public int micromanage(Unit host, Actions action, float dist){
-            if (action == Actions.Use && dist < 40){
+            if (action == Actions.Use && dist < 32){
                 action = Actions.Punch;
             }
             return Melee.micromanage(host, action, dist);
+        }
+    },
+    Archer{
+        public float getDist(Unit host){
+            float r = super.getDist(host);
+            host.target.y -= Math.abs(host.target.x - host.pos.x)/80;
+            return r;
+        }
+        public int micromanage(Unit host, Actions action, float dist){
+            return Ranged.micromanage(host, action, dist);
         }
     },
     Spear{
@@ -39,9 +49,16 @@ public enum Strategy {
         }
     }, Careful, Magic;
     public float getDist(Unit host){
+        int avgX = 0, avgY = 0;
+        for (Organ i : host.brain.target.clip.organs){
+            avgX += i.pt.x + i.ptd.x;
+            avgY += i.pt.y + i.ptd.y;
+        }
+        avgX /= host.brain.target.clip.organs.length*2;
+        avgY /= host.brain.target.clip.organs.length*2;
         int x = (int) ((host.brain.target.pos.x + host.brain.target.vel.x) - (host.pos.x + host.vel.x));
         int y = (int) (host.brain.target.pos.y - host.pos.y);
-        host.target = new P(x,y);
+        host.target = new P(x+avgX,y+avgY);
         if (host instanceof Man) ((Man)host).weapon.rotateTo(host.target.getMult(host.dir,host.dir));
         return (float) Math.abs(Math.sqrt(x * x + y * y) - host.getReach());
     }
@@ -52,7 +69,7 @@ public enum Strategy {
     public int micromanage(Unit host, Actions action, float dist){
         int fb = host.setState(action);
         if (fb == 2) host.setState(Actions.Rest);
-        if (host.state == Actions.Rest) host.delay.time = (12 - host.stateLevel) * host.get("Strength").getMax();
+        if (host.state == Actions.Rest) host.delay.time = 40;
         else if (host.state.getTags().contains(Tag.Channeling)) host.delay.set(100);
         return fb;
     }

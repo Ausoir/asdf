@@ -16,6 +16,7 @@ public class Prop extends Thing {
     static final float OFFSET_PROP = .0002f;
     public int factoryId = -1;
     public int subId = -1;
+    public String loadString;
     public Interactive onInteract = null;
     public boolean gravity = false;
     public boolean mobile = true;
@@ -87,11 +88,12 @@ public class Prop extends Thing {
             lineY = land.getCrossPointY(pos.x);
             slope = land.getSlope();
             boolean cw = land.clockwise();
-            onCollide(land);
             if (((vel.x < 0 && slope > Line.MAXSLOPE) || (vel.x > 0 && slope < -Line.MAXSLOPE)) || !cw && lineY <= pos.y) {
+                onCollide(land);
                 vel.set(0, 0);
                 break;
             } else if (cw && lineY >= pos.y) {
+                onCollide(land);
                 float atan = (float) Math.atan(slope);
                 if (vel.x > 0 != atan > 0) vel.x = vel.x * Global.cos(atan);
                 vel.y += land.getCrossPointY(vp.x) - (vp.y);
@@ -118,6 +120,13 @@ public class Prop extends Thing {
             }
             vel.x *= .94f;
         }
+    }
+    public Thing start(){
+        if (loadString != null){
+            load(loadString);
+            loadString = null;
+        }
+        return super.start();
     }
     public String[] load(String p) {
         String[] ps = p.split("@",-1);

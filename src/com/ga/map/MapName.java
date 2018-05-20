@@ -2,32 +2,28 @@ package com.ga.map;
 
 public class MapName {
     public String value;
-    private boolean isInstance;
 
-    MapName(String p){
-        set(p);
+    public MapName(String p, boolean instance){
+        set(instance?"ins/"+p:p);
     }
     private void set(String p){
-        isInstance = !p.startsWith("../");
-
-        if (!isInstance) value = p.substring(3);
-        else value = "instance/"+p;
+        value = p;
     }
 
     private String getBiome(){
-        return toString().substring(1, 2);
+        return getMapname().substring(1, 2);
     }
     public int getIndex(){
-        return Integer.parseInt(toString().substring(2));
+        return Integer.parseInt(getMapname().substring(2));
     }
     public MapName getNext(int dir){
-        return new MapName("_"+getBiome()+(getIndex()+dir));
+        return new MapName("_"+getBiome()+(getIndex()+dir), true);
     }
     public boolean isValid(){
         return getIndex() > 0;
     }
     public boolean isField(){
-        return value.startsWith("instance/_");
+        return value.startsWith("ins/_");
     }
     String getBiomeName(){
         switch (getBiome()){
@@ -45,7 +41,17 @@ public class MapName {
         return toString().equals(p);
     }
 
+    String getMapname(){
+        return value.substring(value.lastIndexOf("/")+1);
+    }
+    String getDir(){
+        int index = value.lastIndexOf("/");
+        return index == -1 ? "" : value.substring(0, index);
+    }
+    String getModifiedMapname(String p){
+        return getDir()+"/"+p;
+    }
     public String toString(){
-        return isInstance ? value.substring(9) : value; // "instance/"
+        return value;
     }
 }

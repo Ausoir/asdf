@@ -10,10 +10,9 @@ import java.awt.event.*;
 /**
  * Created by Ga on 5/6/2016. asd
  */
-public class Display extends JPanel implements FocusListener {
+public class Display extends JPanel {
     private JTextField chatbox;
     public Input input;
-    public Menu menu;
     private int mode = 0;
     private int mX = 0;
     private int mY = 0;
@@ -29,8 +28,18 @@ public class Display extends JPanel implements FocusListener {
             @Override
             public void componentResized(ComponentEvent e) {
                 Settings.setScreenSize(getWidth(), getHeight());
-                menu.resize();
+                Menu.menu.resize();
                 chatbox.setBounds(0,Settings.screenY-40,500,40);
+            }
+        });
+        addFocusListener(new FocusListener(){
+            @Override
+            public void focusGained(FocusEvent e) {
+                input.onFocus(true);
+            }
+            @Override
+            public void focusLost(FocusEvent e) {
+                input.onFocus(false);
             }
         });
         MouseAdapter mouseAdapter = new MouseAdapter() {
@@ -129,8 +138,7 @@ public class Display extends JPanel implements FocusListener {
             }
         });
         add(chatbox);
-        menu = new Menu();
-        add(menu);
+        add(Menu.menu);
     }
 
     public void startChat(){
@@ -176,15 +184,5 @@ public class Display extends JPanel implements FocusListener {
                 input.input(mode, (int) (mX - Settings.centerX + Global.camera.x), (int) (mY - Settings.centerY + Global.camera.y));
             }
         }
-    }
-
-    @Override
-    public void focusGained(FocusEvent e) {
-        input.onFocus(true);
-    }
-
-    @Override
-    public void focusLost(FocusEvent e) {
-        input.onFocus(false);
     }
 }

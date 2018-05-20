@@ -7,6 +7,7 @@ import com.ga.map.Updater;
 import com.ga.tool.Line;
 import com.ga.unit.Clip;
 import com.ga.unit.Stock;
+import com.ga.unit.Unit;
 import com.ga.unit.man.MainPlayer;
 import com.ga.unit.skill.Actions;
 
@@ -90,8 +91,8 @@ public class FileManager {
         return result;
     }
     public static void loadGame(){
+        loadActors();
         loadPlayer();
-        loadActors("Data/map/Actors.map");
     }
     public static void loadPlayer(){
         String data = read("Data/map/Player.user");
@@ -108,16 +109,18 @@ public class FileManager {
         Global.camera = player.map.mapEdgeCenter(player.map.size.getMult(.5f, .5f));
         player.map.onTimeChange();
         player.start();
-        Global.display.menu.init();
+        Menu.menu.init();
     }
 
-    public static void loadActors(String p){
-        String data = read(p);
+    public static void loadActors(){
+        String data = read("Data/map/Actors.map");
         if (data != null) {
             String[] actors = data.split("%");
+            ArrayList<Unit> units = new ArrayList<>();
             for (String i : actors) {
-                Stock.get(null, i).start();
+                units.add((Unit) Stock.get(null, i));
             }
+            for (Unit i : units) i.start();
         }
     }
 

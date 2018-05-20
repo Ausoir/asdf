@@ -23,7 +23,7 @@ class GenerateTown {
 //        generateFoundations(map, max, generator.lowestY()+24, foundationTexture[Creation.r.nextInt(foundationTexture.length)]);
         map.normalize(0,2400);
         map.size.y -= 1600;
-        int bid=1;
+        int bid=10;
         ArrayList<Line> beforeBuilding = (ArrayList<Line>) map.landRaw.clone();
         for (Line l : beforeBuilding) {
             if (l.opt > 0 && l.tid >= 0 && l.clockwise() && Math.abs(l.getSlope()) < .1f) {

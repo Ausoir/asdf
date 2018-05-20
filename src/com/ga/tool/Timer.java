@@ -37,11 +37,11 @@ public class Timer {
         repeat = t[2].equals("*");
     }
     public boolean update(int p){
+        if (time > 0) time = Math.max(0,time-p);
         if (over()){
             if (repeat) time = max;
             return true;
         }
-        else if (time > 0) time = Math.max(0,time-p);
         return false;
     }
     public boolean update(){

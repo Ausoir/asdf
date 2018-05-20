@@ -5,6 +5,7 @@ import com.ga.game.Input;
 import com.ga.game.Processes;
 import com.ga.game.Settings;
 import com.ga.map.Global;
+import com.ga.map.Updater;
 import com.ga.unit.Faction;
 import com.ga.unit.Stock;
 import com.ga.unit.Unit;
@@ -168,7 +169,7 @@ public class Server {
                     break;
                 case "RU":
                     Client client = clients.get(udp.getClientIP());
-                    Unit target = client.unit.map.updater.getLoadedActor(Integer.parseInt(msg[1]));
+                    Unit target = client.unit.map.updater.getActor(Integer.parseInt(msg[1]));
                     if (target != null) client.message("N}"+msg[1]+"}"+target);
                     break;
                 case "CM":
@@ -242,7 +243,7 @@ public class Server {
                 case "U": //update
                     for (int i=1;i<msg.length;i++) {
                         String[] v = msg[i].split(",");
-                        Unit unit = Global.player.map.updater.getLoadedActor(Integer.parseInt(v[0]));
+                        Unit unit = Updater.getActor(Integer.parseInt(v[0]));
                         if (unit != null) {
                             unit.setState(Actions.values()[Integer.parseInt(v[1])]);
                             unit.pos.set(Integer.parseInt(v[2]), Integer.parseInt(v[3]));
@@ -259,10 +260,10 @@ public class Server {
                     }
                     break;
                 case "C":
-                    Global.player.map.updater.getLoadedActor(Integer.parseInt(msg[1])).say(msg[2]);
+                    Updater.getActor(Integer.parseInt(msg[1])).say(msg[2]);
                     break;
                 case "N":
-                    if (Global.player.map.updater.getLoadedActor(Integer.parseInt(msg[1])) == null)
+                    if (Updater.getActor(Integer.parseInt(msg[1])) == null)
                         Stock.get(null,msg[2]).start();
                     break;
                 case "START":
@@ -290,7 +291,7 @@ public class Server {
                             player.start();
                             Global.p("Player assigned "+Global.player.controlId);
                             Global.p("Host assigned "+player.controlId);
-                            FileManager.loadActors("Data/multiplayer/serverActors.map");
+                            FileManager.loadActors();
                         } else {
                             Global.player.say("Server found, but failed to connect!");
                         }

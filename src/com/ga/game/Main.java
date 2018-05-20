@@ -19,10 +19,7 @@ public class Main {
         }
         Settings.init();
         Global.init();
-        JFrame gamewindow = new JFrame();
-//        gamewindow.setUndecorated(true);
-        gamewindow.setVisible(true);
-        gamewindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        JFrame gamewindow = new Game();
         FileManager.init();
         Generator.init();
         Dialog.init();
@@ -47,5 +44,13 @@ public class Main {
         Global.cprocess = new Processes();
         if (editor) new EditorInput();
         display.requestFocus();
+    }
+}
+
+class Game extends JFrame {
+    Game(){
+        setVisible(true);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+//        setUndecorated(true);
     }
 }

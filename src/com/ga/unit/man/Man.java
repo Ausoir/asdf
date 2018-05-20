@@ -29,19 +29,12 @@ public class Man extends Unit {
     public Item weapon = fist;
     private String face;
     public ArmorSet armor;
-    public int selectingItem = -1;
     public Inventory inventory = new Inventory(this);
     public Crafts crafting = new Crafts(this);
-    public Food.Material[] favorites;
 
     public Man(Map map, String name, int seed) {
         super(map, name, seed);
         clip = new BodyHumanoid(this);
-        int favNum = rand.nextInt(4);
-        favorites = new Food.Material[1+favNum];
-        for (int i=0;i<favNum+1;i++){
-            favorites[i] = Food.Material.values()[Food.Material.values().length-1];
-        }
     }
     @Override
     public Man start(){
@@ -266,7 +259,13 @@ public class Man extends Unit {
     }
     public boolean requireMana(int p){
         if (stats.triggerEffect(Buffs.Attunement)) return true;
-        if (stats.getEffectLevel(Buffs.Infusion) > p/100) return true;
+        int innateLevel = traits.getTraitLevel(Traits.Trait.Attunement);
+        if (innateLevel > 0){
+            int mana = Math.min(get("Intelligence").get()*innateLevel, p);
+            p -= mana;
+            get("Intelligence").add(-mana/innateLevel, false);
+            if (p == 0) return true;
+        }
         ArrayList<Item> items = new ArrayList<>();
         items.addAll(inventory.getItems());
         items.add(weapon);
@@ -323,6 +322,7 @@ public class Man extends Unit {
 
     public void setVisible(boolean p) {
         super.setVisible(p);
+        armor.setVisible(p);
         weapon.image.visible = p;
     }
 
@@ -341,12 +341,9 @@ public class Man extends Unit {
     }
 
     public String getDescription(){
-        String r = super.getDescription()+"\n";
-        if (!wieldingNone()) r += "*Wielding - "+weapon.getFullName()+"\n";
-        r += "*Wearing - "+armor.getDescription()+"\n";
-        r += "*Favorite Foods - ";
-        for (Food.Material i : favorites) r += i.name()+", ";
-        r = r.substring(0,r.length()-2)+"\n";
+        String r = super.getDescription();
+        if (!wieldingNone()) r += "  *** Wielding ***\n"+weapon.getFullName()+"\n";
+        r += "  *** Wearing ***\n"+armor.getDescription()+"\n";
         return r;
     }
 

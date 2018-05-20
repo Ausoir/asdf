@@ -22,7 +22,7 @@ import java.util.HashMap;
 public class Unit extends Prop {
     private static final float OFFSET_UNIT = .0001f;
     public Moveset moveset = new Moveset();
-    HashMap<Actions, Cooldown> cooldown = new HashMap<>();
+    public HashMap<Actions, Cooldown> cooldown = new HashMap<>();
     public int controlId;
     public Body clip;
     public Actions state = Actions.Idle;
@@ -86,7 +86,7 @@ public class Unit extends Prop {
         return false;
     }
     public boolean learnTrait(Traits.Trait p) {
-        return getMemorySize() < get("Intelligence").get() && traits.learn(p);
+        return getMemorySize() < get("Intelligence").get() && traits.learn(this, p);
     }
 
     public P getRandomPoint(){
@@ -124,11 +124,6 @@ public class Unit extends Prop {
         }
         return r;
     }
-    public int setState(Actions state) {
-        int r = state.canSet(this);
-        if (r == 0) stateSet(state);
-        return r;
-    }
     public float getSpeed(){
         return get("Speed").get()*clip.getLegStatus()*.01f;
     }
@@ -145,6 +140,9 @@ public class Unit extends Prop {
             if (tags.contains(i)) r++;
         }
         return r / Math.max(1,tags.size());
+    }
+    public int setState(Actions state) {
+        return state.set(this);
     }
     public int getStateLevel(Actions state){
         return Math.max(0, getStatePower(state)+1-state.getDifficulty());
@@ -249,9 +247,7 @@ public class Unit extends Prop {
     public void die() {
         save = false;
         onInteract = null;
-        if (state != Actions.Dead) {
-            stateSet(Actions.Dead);
-        }
+        if (state != Actions.Dead) stateSet(Actions.Dead);
     }
 
     public void disconnect(){ //do not use remove() - calls overriden method
@@ -346,6 +342,7 @@ public class Unit extends Prop {
     }
 
     public void setVisible(boolean p){
+        image.visible = p;
         for (Organ i : clip.organs) {
             i.image.visible = p;
         }
@@ -359,12 +356,11 @@ public class Unit extends Prop {
     }
 
     public String getDescription(){
-        String r = name + " [Genetic Code:"+seed+"]\n";
-        r += "*Faction - "+faction.name()+"\n";
-        r += "*Stats - \n"+stats.toString().split("/")[0].replace("&"," ")+"\n";
-        r += "*Effects - "+stats.getEffectsList()+"\n";
-        r += "*Traits - "+traits.toString()+"\n";
-        r += "*Capabilities - "+getTags().toString()+"\n";
+        String r = name + " [Genetic Code: "+seed+"] [Faction: "+faction.name()+"]\n";
+        r += "  *** Stats ***\n"+stats.toString().split("/")[0].replace("&"," ")+"\n";
+        r += "  *** Effects ***\n"+stats.getEffectsList()+"\n";
+        r += "  *** Traits ***\n"+traits.toString()+"\n";
+        r += "  *** Capabilities ***\n"+getTags().toString()+"\n";
         return r;
     }
 

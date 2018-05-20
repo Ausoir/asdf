@@ -32,7 +32,7 @@ public class Stat {
     public void setMax(int p){
         int diff = p - max;
         max = p;
-        current += diff;
+        current = Math.max(0, diff);
     }
     public void addTotal(int p){
         setTotal(max + p);
@@ -44,11 +44,13 @@ public class Stat {
         else return p;
     }
     public float getPercentage(){
-        return (float)current/max;
+        return (float)Math.max(0,current)/max;
     }
     public boolean require(int p){
-        if (current >= p){
-            if (p > 0) add(-p, false);
+        if (p <= 0) {
+            return true;
+        } else if (current >= p) {
+            add(-p, false);
             return true;
         }
         return false;

@@ -15,7 +15,7 @@ class GenerateDesert {
         generator.makeEdgeSpawns();
         int feature = Creation.r.nextInt(4);
         for (int i=0;i<feature;i++) {
-            generator.generateBuildings(new String[]{"Tree1"}, map.landRaw.get(1), 1+i);
+            generator.generateBuildings(new String[]{"Tree1"}, map.landRaw.get(1), 10+i);
         }
     }
 }

@@ -2,6 +2,7 @@ package com.ga.unit;
 
 import com.ga.game.Command;
 import com.ga.game.Input;
+import com.ga.game.Menu;
 import com.ga.map.Global;
 import com.ga.unit.man.Player;
 import com.ga.unit.skill.Actions;
@@ -33,6 +34,7 @@ public class PlayerInput implements Input {
     private ArrayList<Integer> pressed = new ArrayList<>();
     public Player host;
     public boolean ctrl = false;
+    public int selectingItem = -1;
     public PlayerInput(Player unit){
         host = unit;
         unit.input = this;
@@ -114,14 +116,14 @@ public class PlayerInput implements Input {
             if (p.startsWith("_EXIT")) System.exit(1);
             else if (p.startsWith("_CTRL")) ctrl = !ctrl;
             else if (p.startsWith("_SAY")) Global.display.startChat();
-            else if (p.startsWith("_MENU")) Global.display.menu.showMenu();
+            else if (p.startsWith("_MENU")) Menu.menu.showMenu();
             else if (p.startsWith("_WI")) {
-                host.selectingItem = Integer.parseInt(p.substring(3));
+                selectingItem = Integer.parseInt(p.substring(3));
                 host.setState(Actions.Wield);
             }
         } else {
             Actions move = Actions.getByName(p);
-            if (move == Actions.Wield) host.selectingItem = -1;
+            if (move == Actions.Wield) selectingItem = -1;
             if (move != null){
                 if (basicMoves.contains(move) || host.moveset.contains(move)) {
                     host.setState(move);

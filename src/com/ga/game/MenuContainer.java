@@ -100,7 +100,7 @@ public class MenuContainer extends Panel {
         this.panel.add(panel);
     }
     private void describe(final Item item, final Performer action){
-        Global.display.menu.showDialog(item.getFullName(),"This is "+item.getDescription(),
+        Menu.menu.showDialog(item.getFullName(),"This is "+item.getDescription(),
                 new String[]{"Take"}, new Performer[]{new Performer(){
                     public void perform(){
                         Player player = Global.player;

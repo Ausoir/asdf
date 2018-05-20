@@ -69,13 +69,7 @@ public class Food extends Item {
                 p.say("Gawrrrr! That didn't taste good...");
                 motivation.add(-severity, false);
             } else {
-                int likes = 0;
-                for (Material i : type.materials){
-                    for (Material ii : p.favorites){
-                        if (i == ii) likes++;
-                    }
-                }
-                motivation.add(Math.max(0, type.getValue()/100-perish) + likes*4, false);
+                motivation.add(Math.max(0, type.getValue()/80-perish), false);
             }
             Stat hunger = p.get("Nutrition");
             if (hunger != null) hunger.add(1, false);

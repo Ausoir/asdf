@@ -1,10 +1,10 @@
 package com.ga.map;
 
 import com.ga.game.Observer;
+import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.unit.*;
 import com.ga.unit.man.Man;
-import com.ga.unit.skill.Actions;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -67,11 +67,13 @@ public class Updater {
         }
         while (removeQueue.size() > 0){
             Observer p = removeQueue.remove(0);
-            ((Drawable) p).removeThis();
-            props.remove(p);
-            unitsLoaded.remove(p);
-            controllee.remove(p);
-            effects.remove(p);
+            if (p != null) { //thread safe
+                ((Drawable) p).removeThis();
+                props.remove(p);
+                unitsLoaded.remove(p);
+                controllee.remove(p);
+                effects.remove(p);
+            }
         }
     }
     public void update(){
@@ -101,7 +103,7 @@ public class Updater {
         return stack;
     }
     public void remove(Observer p){
-        if (p != null && !addQueue.remove(p)) removeQueue.add(p);
+        if (!addQueue.remove(p) && !removeQueue.contains(p)) removeQueue.add(p);
     }
     public String toString(){
         String result = "";
@@ -126,20 +128,14 @@ public class Updater {
         }
         return result;
     }
-    public static Unit getUnloadedActor(int p){
+    public static Unit getActor(int p){
         for (Map map : Global.maps) {
-            for (Observer i : map.updater.addQueue) {
+            for (Observer i : map.updater.addQueue){
                 if (i instanceof Unit && ((Unit) i).controlId == p) return (Unit) i;
             }
             for (Unit i : map.updater.unitsLoaded){
                 if (i.controlId == p) return i;
             }
-        }
-        return null;
-    }
-    public Unit getLoadedActor(int p){
-        for (Unit i : unitsLoaded){
-            if (i.controlId == p) return i;
         }
         return null;
     }
@@ -161,7 +157,7 @@ public class Updater {
         }
         return result;
     }
-    public ArrayList<Prop> collideAll(P p, int r){
+    ArrayList<Prop> collideAll(P p, int r){
         ArrayList<Prop> result = new ArrayList<>();
         for (Prop i : props){
             if (p.getSubtract(i.pos).getDist() <= r+i.getSize()) result.add(i);
@@ -192,10 +188,19 @@ public class Updater {
             if (host != i) {
                 float x = Math.abs(i.pos.x-vision.x), y = Math.abs(i.pos.y - vision.y);
                 if (x < r && y < r/3) {
-                    if (x+y < max){
-                        max = (int) (x+y);
-                        seen.add(0,i);
-                    } else seen.add(i);
+                    int overlap = 0;
+                    P head = i.clip.organs[Math.max(0, i.clip.getHead())].pt.getAdd(i.pos);
+                    for (Line l : host.map.land){
+                        if (l.depth > host.getDepth() && new Line(head, new P(head.x, 0)).lineCross(l)){
+                            overlap++;
+                        }
+                    }
+                    if (overlap % 2 == 0) {
+                        if (x + y < max) {
+                            max = (int) (x + y);
+                            seen.add(0, i);
+                        } else seen.add(i);
+                    }
                 }
             }
         }

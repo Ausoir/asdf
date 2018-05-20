@@ -67,6 +67,11 @@ public class P {
         this.y = t;
         return this;
     }
+    public P clamp(float minX, float minY, float maxX, float maxY){
+        x = Global.clamp(x, minX, maxX);
+        y = Global.clamp(y, minY, maxY);
+        return this;
+    }
     public P getAtan(float mag){
         float r = (float) Math.atan2(y,x);
         return new P(Global.cos(r)*mag,Global.sin(r)*mag);

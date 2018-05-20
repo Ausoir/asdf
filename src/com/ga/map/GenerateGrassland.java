@@ -38,12 +38,12 @@ class GenerateGrassland {
         if (feature == 0) {
             Line l = map.landRaw.get(Creation.r.nextInt(map.landRaw.size()));
             if (l.opt > 0 && l.tid >= 0 && l.clockwise() && Math.abs(l.getSlope()) < .1f) {
-                generator.generateBuildings(new String[]{"To_Forest"}, l, 1);
+                generator.generateBuildings(new String[]{"To_Forest"}, l, 10);
             }
         } else if (feature == 1){
             Line l = map.landRaw.get(Creation.r.nextInt(map.landRaw.size()));
             if (l.opt > 0 && l.tid >= 0 && l.clockwise() && Math.abs(l.getSlope()) < .1f) {
-                generator.generateBuildings(new String[]{"To_Desert"}, l, 1);
+                generator.generateBuildings(new String[]{"To_Desert"}, l, 10);
             }
         }
     }

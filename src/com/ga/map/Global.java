@@ -95,6 +95,10 @@ public class Global {
     static int getHour(){
         return time/HOUR;
     }
+    public static boolean inCamera(float x, float y, float sizeX, float sizeY){
+        return (x > Global.camera.x-Settings.centerX-sizeX && y > Global.camera.y-Settings.centerY-sizeY
+                && x < Global.camera.x+Settings.centerX+sizeX && y < Global.camera.y+Settings.centerY+sizeY);
+    }
 
     public static Map getMap(String name){
         for (Map i : maps){

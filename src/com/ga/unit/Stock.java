@@ -1,15 +1,11 @@
 package com.ga.unit;
 
 import com.ga.game.FileManager;
+import com.ga.game.Settings;
 import com.ga.game.Sound;
-import com.ga.map.Creation;
-import com.ga.map.Global;
-import com.ga.map.Map;
-import com.ga.map.Picture;
-import com.ga.tool.Interactive;
-import com.ga.tool.Line;
-import com.ga.tool.P;
-import com.ga.tool.Performer;
+import com.ga.game.Menu;
+import com.ga.map.*;
+import com.ga.tool.*;
 import com.ga.unit.item.*;
 import com.ga.unit.man.*;
 import com.ga.unit.skill.Actions;
@@ -51,7 +47,7 @@ public enum Stock {
         product.image.visible = false;
         product.onInteract = new Interactive(){
             public void interact(com.ga.unit.man.Man p){
-                if (p == Global.player) Global.server.requestChangeMap(product.name+"@"+seed);
+                if (p == Global.player) Global.server.requestChangeMap(new MapName(product.name, false)+"@"+seed);
             }
         };
         return product;
@@ -74,7 +70,7 @@ public enum Stock {
         product.image.visible = false;
         product.onInteract = new Interactive(){
             public void interact(com.ga.unit.man.Man p){
-                if (p == Global.player) Global.display.menu.showDialog("Info", product.name);
+                if (p == Global.player) Menu.menu.showDialog("Info", product.name);
             }
         };
         return product;
@@ -238,7 +234,7 @@ public enum Stock {
                 super.moveTriggered(p);
                 if (state == Actions.Melee){
                     Particle.explode(map, "Poison",getDepth(),pos,new P(),8,8,0,false,4);
-                    ArrayList<Unit> t = map.updater.collideUnit(pos, (int) getReach(), Faction.Destructive);
+                    ArrayList<Unit> t = map.updater.collideUnit(pos, (int) getReach(), faction);
                     for (Unit i : t){
                         i.hit(getFaceLine(), getDamage());
                         i.buff(Buffs.Poison, 1);
@@ -249,8 +245,7 @@ public enum Stock {
                 }
             }
             public void buff(Buffs buff, int level){
-                if (buff == Buffs.Bleed) return;
-                if (buff.tags.contains(Tag.Ice)) level *= 8;
+                if (buff == Buffs.Bleed || buff == Buffs.Poison) return;
                 super.buff(buff, level);
             }
             public void onCreate(){
@@ -270,31 +265,27 @@ public enum Stock {
                 super.collide();
                 grounded = true;
             }
+            public float getReach(){
+                return 200;
+            }
             public void stateSet(Actions state) {
+                if (SyncRand.r.nextBoolean()) state = Actions.Jump;
                 if (state == Actions.Jump){
-                    vel.y = -80;
+                    vel.y = -Settings.gravity*8;
                     vel.x += dir * 4;
-                    delay.time = 8;
-                    buff(Buffs.Slowfall, 2);
+                    delay.time = 4;
+                    buff(Buffs.Slowfall, 3);
                     get("Strength").heal();
                 } else {
+                    if (state == Actions.Melee) state = Actions.Shock;
                     super.stateSet(state);
-                    if (state == Actions.Shock) {
-                        damageMod = 2;
-                        moveTriggered(0);
-                        delay.time = 2;
-                        if (rand.nextBoolean()) cooldown.remove(Actions.Shock);
-                    }
                 }
             }
             public void buff(Buffs buff, int level){
-                if (buff == Buffs.Bleed) level += 2;
-                if (buff.tags.contains(Tag.Ice)) level *= 8;
-                if (buff.tags.contains(Tag.Fire)) level *= 8;
-                super.buff(buff, level);
+                super.buff(buff, level*2);
             }
             public void onCreate(){
-                load(getUnit(map,name(),seed,clip.toString(),makeStat(rand,2),Faction.Predator,"2:0/1:0","Shock,Jump",""));
+                load(getUnit(map,name(),seed,clip.toString(),makeStat(rand,2),Faction.Predator,"2:0/1:0","Melee,Jump",""));
             }
         };
         product.clip = new Body(product, name());
@@ -327,7 +318,7 @@ public enum Stock {
             }
             public void onCreate(){
                 String moves;
-                if (seed % 2 == 1) moves = "Flameroll,Fireball";
+                if (seed % 2 == 1) moves = "Meteorform,Fireball";
                 else moves = "Fireblast";
                 load(getUnit(map,name(),seed,clip.toString(),makeStat(rand,7),Faction.Predator,"3/1:0",moves,""));
             }
@@ -376,7 +367,7 @@ public enum Stock {
             public void onCreate(){}
             public void remove(){}
         };
-        product.range = -1;
+        product.range = 48;
         product.image.setCenterType(3);
         product.onInteract = null;
         product.save = false;
@@ -566,7 +557,7 @@ public enum Stock {
             public boolean use(com.ga.unit.man.Man host){
                 if (isUsable(true, 1) && super.use(host)) {
                     if (spell != null){
-                        host.buff(Buffs.Infusion, 1);
+                        host.buff(Buffs.Attunement, 1);
                         host.stateLevel = 3;
                         host.stateSet(spell);
                         return true;
@@ -722,7 +713,7 @@ public enum Stock {
                             };
                         }
                     }
-                    Global.display.menu.showContainer("Crate", products, actions);
+                    Menu.menu.showContainer("Crate", products, actions);
                 }
             }
         };
@@ -735,7 +726,7 @@ public enum Stock {
                 Item.ItemType.Darting, 10){
             @Override
             public boolean use(final com.ga.unit.man.Man host){
-                if (host.clip.getHandStatus() == 1 && isUsable(true, 1) && super.use(host)) {
+                if (!host.clip.organs[BodyHumanoid.FIST].amputated && isUsable(true, 1) && super.use(host)) {
                     host.delay.performer = new Performer() {
                         public void perform() {
                             final Projectile p = new Projectile(map, "Tanto", host.pos.getAdd(host.clip.organs[BodyHumanoid.OFIST].ptd), host.pos.getAdd(host.target), 70) {
@@ -888,7 +879,7 @@ public enum Stock {
             @Override
             public boolean use(com.ga.unit.man.Man host){
                 if (super.use(host)){
-                    Global.display.menu.showDialog("Title","Content");
+                    Menu.menu.showDialog("Title","Content");
                     return true;
                 }
                 return false;
@@ -1026,7 +1017,7 @@ public enum Stock {
                                 };
                             }
                         }
-                        Global.display.menu.showDialog("List of Enchantments",
+                        Menu.menu.showDialog("List of Enchantments",
                                 "Blood: " + getUses() + " drops left\nBlood Quality: "+bloodQuality
                                         +"\nCatalyst Level: "+quality+"\nHex Power: "+power, listString, performers);
                         return true;
@@ -1053,7 +1044,7 @@ public enum Stock {
         t.manualDepth = false;
         t.factoryId = index;
         t.subId = subId;
-        t.load(p);
+        t.loadString = p;
         return t;
     }
     public static Prop getByName(Map map, String p, int seed){ // Return to reflection

@@ -57,7 +57,7 @@ public class Generator {
         return bid;
     }
     public int generateBuilding(String building, P pos, int bid){
-        Map blueprint = new Map("../building/" + building);
+        Map blueprint = new Map("building/" + building);
         blueprint.start();
 
         float depth = map.checkLand(new Line(pos.x, pos.y - 4, pos.x, pos.y + 600)).depth;
@@ -105,7 +105,7 @@ public class Generator {
                     highestBid = Math.max(highestBid, prop.seed);
                 } else if (prop.factoryId == Stock.Travel.ordinal()) {
                     if (prop.subId == 1) { //overmap
-                        MapName propDestination = new MapName(prop.name);
+                        MapName propDestination = new MapName(prop.name, true);
                         if (propDestination.isField()){
                             prop.name = prop.name + map.name.getIndex();
                             Map house = new Map(prop.name);
@@ -127,12 +127,12 @@ public class Generator {
                                 exit.seed = bid + exit.seed - 1;
                                 exit.pos.set(spawnPoint.getAdd(0,-50));
                                 exit.name = map.name.toString();
-                                FileManager.saveMap("instance/"+prop.name, house);
+                                FileManager.saveMap("ins/"+prop.name, house);
                             }
                         }
                     } else if (prop.subId == 2) { //building
-                        prop.name = prop.name + map.name.toString() + bid;
-                        Map house = new Map("../building/inside/" + building);
+                        prop.name = map.name.getModifiedMapname(prop.name+map.name.getMapname()) + bid;
+                        Map house = new Map("building/inside/" + building);
                         house.start();
                         house.updater.processQueue();
                         for (Prop ob : house.updater.props) {
@@ -141,7 +141,7 @@ public class Generator {
                                 ob.seed = bid + ob.seed - 1;
                             }
                         }
-                        FileManager.saveMap("instance/B" + map.name.toString() + bid, house);
+                        FileManager.saveMap(map.name.getModifiedMapname("B"+map.name.getMapname()) + bid, house);
                     }
                 }
             }

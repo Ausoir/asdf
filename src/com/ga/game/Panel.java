@@ -39,7 +39,7 @@ public class Panel extends JPanel implements Updatable {
     public void setVisible(boolean p){
         Global.display.focus = !p;
         super.setVisible(p);
-        Global.display.menu.onExit();
+        Menu.menu.onExit();
     }
     @Override
     public void update() {

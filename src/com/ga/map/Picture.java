@@ -171,8 +171,7 @@ public class Picture {
         if (image != null) image = toCompatibleImage(image);
     }
     public void draw(Graphics2D g, float x, float y, float rot, int dir, float sizeX, float sizeY){
-        if (visible && x > Global.camera.x-Settings.centerX-sizeX && y > Global.camera.y-Settings.centerY-sizeY
-                && x < Global.camera.x+Settings.centerX+sizeX && y < Global.camera.y+Settings.centerY+sizeY) {
+        if (visible && Global.inCamera(x,y, sizeX, sizeY)) {
             float xMid = halfSize.x*dir;
             float yMid = halfSize.y;
             float rx = x + Global.rel.x;

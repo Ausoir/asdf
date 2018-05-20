@@ -18,14 +18,14 @@ import java.util.ArrayList;
  */
 public class Organ extends Line {
     int strokeSize = 10;
-    protected ShadedPicture image;
-    boolean amputated = false;
+    public ShadedPicture image;
+    public boolean amputated = false;
     public Unit host;
     private ArrayList<Organ> children = new ArrayList<>();
     public int type;
     int health;
     private int maxLength = 80;
-    boolean vital = false;
+    public boolean vital = false;
     boolean leg = false, hand = false;
     public Performer onAmputate = new Performer();
 
@@ -61,7 +61,9 @@ public class Organ extends Line {
         return strokeSize;
     }
     public void draw(Graphics2D g){
-        image.draw(g, host.pos.x+pt.x, host.pos.y+pt.y, getAtan()-1.57f, host.dir, strokeSize, getLength()+3);
+        float x = host.pos.x+pt.x, y = host.pos.y+pt.y, sizeX = strokeSize, sizeY = getLength()+3;
+        if (image.visible && Global.inCamera(x,y, sizeX, sizeY))
+            image.draw(g, x, y, getAtan()-1.57f, host.dir, sizeX, sizeY);
     }
     void setMaxLength(int p){
         maxLength = p;
@@ -82,8 +84,10 @@ public class Organ extends Line {
                     super.update();
                 }
                 public void draw(Graphics2D g){
-                    if (type == 0) super.draw(g);
-                    else image.draw(g, pos.x, pos.y, rotation, dir, strokeSize, length+3);
+                    if (image.visible && Global.inCamera(pos.x, pos.y, strokeSize, length + 3)) {
+                        if (type == 0) super.draw(g);
+                        else image.draw(g, pos.x, pos.y, rotation, dir, strokeSize, length + 3);
+                    }
                 }
             };
             flyingOrgan.image = image.copy();

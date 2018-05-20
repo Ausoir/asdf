@@ -21,15 +21,13 @@ public class Command {
             for (String i : cmds) {
                 String[] cmd = i.split("@");
                 if (cmd[0].equals("say")) host.say(cmd[1]);
-                else if (cmd[0].equals("menuDialog")) Global.display.menu.showDialog(cmd[1],cmd[2]);
+                else if (cmd[0].equals("menuDialog")) Menu.menu.showDialog(cmd[1],cmd[2]);
                 else if (cmd[0].equals("die")) host.die();
                 else if (cmd[0].equals("crft")) host.crafting.craft(cmd[1]);
                 else if (cmd[0].equals("buff")) host.buff(Buffs.valueOf(cmd[1]), Integer.parseInt(cmd[2]));
                 else if (cmd[0].equals("seed")) host.weapon.seed = Integer.parseInt(cmd[1]);
                 else if (cmd[0].equals("time")) Global.timePass(Integer.parseInt(cmd[1]));
-                else if (cmd[0].equals("stat")){
-                    host.get(cmd[1]).setMax(Integer.parseInt(cmd[2]));
-                }
+                else if (cmd[0].equals("stat")) host.get(cmd[1]).setMax(Integer.parseInt(cmd[2]));
                 else if (cmd[0].equals("unit")){
                     int loop = 1;
                     if (cmd.length>2) loop = Integer.parseInt(cmd[2]);
@@ -56,7 +54,7 @@ public class Command {
                 else if (cmd[0].equals("learn")) host.learnSkill(Actions.valueOf(cmd[1]));
                 else if (cmd[0].equals("trait")) host.learnTrait(Traits.Trait.valueOf(cmd[1]));
                 else if (cmd[0].equals("forget")) host.moveset.remove(Actions.valueOf(cmd[1]));
-                else if (cmd[0].equals("lose")) host.traits.forget(Traits.Trait.valueOf(cmd[1]));
+                else if (cmd[0].equals("lose")) host.traits.forget(host, Traits.Trait.valueOf(cmd[1]));
                 else if (cmd[0].equals("recipe")) host.crafting.knowledge.add(cmd[1]);
                 else if (cmd[0].equals("sound")) Sound.play(host.map, Global.camera, cmd[1]);
                 else if (cmd[0].equals("depth")) host.say("Me: "+host.getDepth()+" Line: "+host.lastLand.depth+", Terrain: "+host.map.terrains.get(host.lastLand.tid).getDepth());

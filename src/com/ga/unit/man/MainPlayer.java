@@ -154,7 +154,7 @@ public class MainPlayer extends Player {
         if (!get("Strength").isFull()) indicator.show(.5f);
         indicator.update();
         if (input.ctrl) Global.cameraTo = pos.getAdd(target.getMult(.5f,.5f));
-        else Global.cameraTo = pos.getAdd(vel.getAdd(0,-Settings.gravity).mult(50,20));
+        else Global.cameraTo = pos.getAdd(vel.getAdd(0,-Settings.gravity).clamp(-10,-10,10,10).mult(50,20));
     }
 
     public void remove() {
