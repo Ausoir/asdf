@@ -47,7 +47,7 @@ public enum Stock {
         product.image.visible = false;
         product.onInteract = new Interactive(){
             public void interact(com.ga.unit.man.Man p){
-                if (p == Global.player) Global.server.requestChangeMap(new MapName(product.name, false)+"@"+seed);
+                if (p == Global.player) Global.server.requestChangeMap(new MapName(product.name)+"@"+seed);
             }
         };
         return product;
@@ -418,7 +418,7 @@ public enum Stock {
                     if (player.getStateLevel(skill) > 0) {
                         if (checkIngredients()) {
                             if (host.get("Motivation").require(100)) {
-                                if (map.updater.sleep(100, true)) {
+                                if (map.updater.sleep(1, true)) {
                                     if (!player.learnSkill(skill)) host.say("Failed to learn " + skill.getName() + ".");
                                 }
                             } else host.say("No motivation...");
@@ -472,7 +472,7 @@ public enum Stock {
                                 }
                             }
                             if (dummy != null) {
-                                if (map.updater.sleep(100, true)) {
+                                if (map.updater.sleep(1, true)) {
                                     if (host.get("Motivation").require(10)) {
                                         host.get(stat).add(rand.nextInt((400 - host.get(stat).get()) / 10) + 1, true);
                                         host.say("Trained up " + stat + ".");

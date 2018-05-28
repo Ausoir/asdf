@@ -83,11 +83,11 @@ public class Server {
             try {
                 Global.p("Reported map change to client server.");
                 udp.send("CM}" + mapData[0] + "}" + mapData[1]);
-                tcpDownloader.download(udp.getClientIP(), "Data/map/multiplayer/serverMap.map");
+                tcpDownloader.download(udp.getClientIP(), FileManager.makeDirectory("Data/map/multiplayer/serverMap.map"));
                 Global.p("Map downloaded from server.");
                 Global.maps.clear();
                 Global.maps.add(Global.player.map);
-                changeMap("Data/multiplayer/serverMap@" + mapData[1]);
+                changeMap(FileManager.makeDirectory("Data/multiplayer/serverMap@" + mapData[1]));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -173,30 +173,30 @@ public class Server {
                     if (target != null) client.message("N}"+msg[1]+"}"+target);
                     break;
                 case "CM":
-                    tcpUploader.upload("Data/map/"+msg[1]+".map");
+                    tcpUploader.upload(FileManager.makeDirectory("Data/map/"+msg[1]+".map"));
                     break;
                 case "CN":
                     try {
-                        tcpDownloader.download(udp.getClientIP(), "Data/map/multiplayer/"+udp.getClientIP()+".user");
+                        tcpDownloader.download(udp.getClientIP(), FileManager.makeDirectory("Data/map/multiplayer/"+udp.getClientIP()+".user"));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                     Player player = (Player) Stock.Player.create(Global.player.map,0,0);
                     Client newest = new Client(player, udp.getClientPort(), udp.getClientIP());
-                    player.load(FileManager.read("Data/map/multiplayer/"+udp.getClientIP()+".user"));
+                    player.load(FileManager.read(FileManager.makeDirectory("Data/map/multiplayer/"+udp.getClientIP()+".user")));
                     player.map = Global.player.map;
                     player.faction = Faction.Player2;
                     player.controlId = Global.player.controlId + 1;//Global.getControlId();
                     player.start();
                     clients.put(udp.getClientIP(), newest);
                     FileManager.saveCharacter();
-                    FileManager.save("Data/map/multiplayer/serverActors.map", Global.player.map.updater.toActorString());
+                    FileManager.save(FileManager.makeDirectory("Data/map/multiplayer/serverActors.map"), Global.player.map.updater.toActorString());
                     Global.p("Connection established with client at "+udp.getClientIP()+"/"+udp.getClientPort());
                     newest.message("START}"+player.controlId);
-                    tcpUploader.upload("Data/map/World.map");
-                    tcpUploader.upload("Data/map/"+Global.player.map.name+".map");
-                    tcpUploader.upload("Data/map/multiplayer/serverActors.map");
-                    tcpUploader.upload("Data/map/Player.user");
+                    tcpUploader.upload(FileManager.makeDirectory("Data/map/World.map"));
+                    tcpUploader.upload(FileManager.makeDirectory("Data/map/"+Global.player.map.name+".map"));
+                    tcpUploader.upload(FileManager.makeDirectory("Data/map/multiplayer/serverActors.map"));
+                    tcpUploader.upload(FileManager.makeDirectory("Data/map/Player.user"));
                     break;
             }
         }
@@ -272,19 +272,20 @@ public class Server {
                             "Data/map/multiplayer/serverWorld.map", "Data/map/multiplayer/serverMap.map",
                             "Data/map/multiplayer/serverActors.map", "Data/map/multiplayer/serverPlayer.user"
                     };
+                    for (String i : output) i = FileManager.makeDirectory(i);
                     try {
-                        tcpDownloader.download(udp.getClientIP(), "Data/map/multiplayer/serverWorld.map");
-                        tcpDownloader.download(udp.getClientIP(), "Data/map/multiplayer/serverMap.map");
-                        tcpDownloader.download(udp.getClientIP(), "Data/map/multiplayer/serverActors.map");
-                        tcpDownloader.download(udp.getClientIP(), "Data/map/multiplayer/serverPlayer.user");
+                        tcpDownloader.download(udp.getClientIP(), FileManager.makeDirectory("Data/map/multiplayer/serverWorld.map"));
+                        tcpDownloader.download(udp.getClientIP(), FileManager.makeDirectory("Data/map/multiplayer/serverMap.map"));
+                        tcpDownloader.download(udp.getClientIP(), FileManager.makeDirectory("Data/map/multiplayer/serverActors.map"));
+                        tcpDownloader.download(udp.getClientIP(), FileManager.makeDirectory("Data/map/multiplayer/serverPlayer.user"));
                         output = null;
                     } catch (IOException e) {
                         e.printStackTrace();
                     } finally {
                         if (output == null){
-                            requestChangeMap("Data/multiplayer/serverMap@0");
+                            requestChangeMap(FileManager.makeDirectory("Data/multiplayer/serverMap@0"));
                             Player player = (Player) Stock.Player.create(Global.player.map,0,0);
-                            player.load(FileManager.read("Data/map/multiplayer/serverPlayer.user"));
+                            player.load(FileManager.read(FileManager.makeDirectory("Data/map/multiplayer/serverPlayer.user")));
                             player.map = Global.player.map;
                             Global.player.controlId = Integer.parseInt(msg[1]);
                             player.faction = Faction.Player2;

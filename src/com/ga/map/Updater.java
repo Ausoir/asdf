@@ -215,12 +215,12 @@ public class Updater {
                 }
             }
         }
-        if (!Global.player.get("Nutrition").require(p/100)){
+        if (!Global.player.get("Nutrition").require(p)){
             Global.player.say("I am too hungry!");
             return false;
         }
         map.weather.fadeIn();
-        Global.timePass(p);
+        Global.hourPass(p);
         return true;
     }
     public P getEntrancePos(int p, P failsafe) {

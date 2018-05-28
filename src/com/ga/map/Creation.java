@@ -12,7 +12,7 @@ public class Creation {
     public static int seed;
 
     public static void create(){
-        if (!FileManager.isFile("Data/map/World.map")) {
+        if (!FileManager.isFile(FileManager.makeDirectory("Data/map/World.map"))) {
             seed = (int) (Math.random()*1000000);
             FileManager.saveWorld();
         } else {

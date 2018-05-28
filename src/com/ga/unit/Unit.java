@@ -282,7 +282,7 @@ public class Unit extends Prop {
                 if (vel.y >= Settings.gravityMax) {
                     if (hittable(Faction.Destructive)) {
                         stateSet(Actions.Down);
-                        delay.time = (int) (800f / Global.clamp(get("Agility").get(), 1, 800));
+                        delay.time = (int) (800f / Global.clamp(get("Agility").getMax(), 1, 800));
                     }
                 } else if (state == Actions.Jump && stateDuration > 1) {
                     Sound.play(map, pos, "land");

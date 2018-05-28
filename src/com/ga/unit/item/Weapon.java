@@ -1,7 +1,9 @@
 package com.ga.unit.item;
 
+import com.ga.game.Sound;
 import com.ga.map.Map;
 import com.ga.unit.Tag;
+import com.ga.unit.Unit;
 
 /**
  * Created by Ga on 8/1/2016. asd
@@ -35,6 +37,20 @@ public class Weapon extends Item {
     }
     private boolean isEnhanceable(){
         return quality < material.hardness;
+    }
+
+    @Override
+    public void trigger(Unit target) {
+        super.trigger(target);
+        if (!type.isBlunt()) Sound.play(map, pos, "hit_cut");
+        else Sound.play(map, pos, "hit_bash");
+    }
+    @Override
+    public void playAttackSound(){
+        Sound.play(map, pos, type.sound);
+    }
+    @Override
+    protected void playSound(){
     }
     @Override
     boolean isCursed() {

@@ -25,6 +25,9 @@ public class FileManager {
     public static void init(){
         searchFiles("Data", fileCache);
     }
+    public static String makeDirectory(String p){
+        return p.replace("/", File.separator);
+    }
     private static void searchFiles(String p, HashMap<String, ArrayList<String[]>> r){
         File[] files = new File(p).listFiles();
         if (files != null) {
@@ -60,15 +63,15 @@ public class FileManager {
     public static void saveCharacter(){
         if (Global.player.state != Actions.Dead) {
             if (Global.server.isHost()) saveMap(Global.player.map.name.value, Global.player.map);
-            save("Data/map/Player.user", Global.player.toString());
-            save("Data/Keymap.txt", Global.player.input.toString());
+            save(FileManager.makeDirectory("Data/map/Player.user"), Global.player.toString());
+            save(FileManager.makeDirectory("Data/Keymap.txt"), Global.player.input.toString());
             saveWorld();
         }
     }
     public static void saveMap(String name, Map map){
         map.updater.processQueue();
         String result = map.toString();
-        save("Data/map/"+name+".map", result);
+        save(FileManager.makeDirectory("Data/map/"+name+".map"), result);
     }
     public static String read(String dir) {
         String result = null;
@@ -237,7 +240,7 @@ public class FileManager {
     }
 
     public static void saveWorld(){
-        save("Data/map/World.map", Creation.seed + "," + Global.time + "," + Global.controlId);
-        save("Data/map/Actors.map", Updater.toAllActorString());
+        save(FileManager.makeDirectory("Data/map/World.map"), Creation.seed + "," + Global.time + "," + Global.controlId);
+        save(FileManager.makeDirectory("Data/map/Actors.map"), Updater.toAllActorString());
     }
 }

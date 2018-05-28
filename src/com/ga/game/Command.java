@@ -27,6 +27,7 @@ public class Command {
                 else if (cmd[0].equals("buff")) host.buff(Buffs.valueOf(cmd[1]), Integer.parseInt(cmd[2]));
                 else if (cmd[0].equals("seed")) host.weapon.seed = Integer.parseInt(cmd[1]);
                 else if (cmd[0].equals("time")) Global.timePass(Integer.parseInt(cmd[1]));
+                else if (cmd[0].equals("hour")) Global.hourPass(Integer.parseInt(cmd[1]));
                 else if (cmd[0].equals("stat")) host.get(cmd[1]).setMax(Integer.parseInt(cmd[2]));
                 else if (cmd[0].equals("unit")){
                     int loop = 1;

@@ -470,7 +470,7 @@ public class MenuPlayer extends Panel {
         private void command(String p){
             switch (p) {
                 case "h":
-                    Global.player.map.updater.sleep(100, true);
+                    Global.player.map.updater.sleep(1, true);
                     break;
                 case "dsc":
                     Menu.menu.showDialog("My Description", Global.player.getDescription());

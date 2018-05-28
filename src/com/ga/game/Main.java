@@ -19,7 +19,7 @@ public class Main {
         }
         Settings.init();
         Global.init();
-        JFrame gamewindow = new Game();
+        Game gamewindow = new Game();
         FileManager.init();
         Generator.init();
         Dialog.init();
@@ -29,6 +29,9 @@ public class Main {
         Stock.init();
         Display display = new Display();
         Creation.create();
+        gamewindow.setContentPane(display);
+        gamewindow.pack();
+        gamewindow.setLocationRelativeTo(null);
         if (x == 0 && y == 0) {
             Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
             x = screen.width-2;
@@ -38,9 +41,6 @@ public class Main {
             display.setPreferredSize(new Dimension(x, y));
         }
         Settings.setScreenSize(x, y);
-        gamewindow.setContentPane(display);
-        gamewindow.pack();
-        gamewindow.setLocationRelativeTo(null);
         Global.cprocess = new Processes();
         if (editor) new EditorInput();
         display.requestFocus();

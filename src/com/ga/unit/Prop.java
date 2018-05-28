@@ -96,7 +96,7 @@ public class Prop extends Thing {
                 onCollide(land);
                 float atan = (float) Math.atan(slope);
                 if (vel.x > 0 != atan > 0) vel.x = vel.x * Global.cos(atan);
-                vel.y += land.getCrossPointY(vp.x) - (vp.y);
+                vel.y += land.getCrossPointY(vp.x) - (vp.y) - 1;
                 lastLand = land;
             }
         }

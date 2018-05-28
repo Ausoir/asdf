@@ -19,7 +19,6 @@ import java.util.Random;
  * Created by Ga on 7/25/2016. asd
  */
 public class Global {
-    private static final int HOUR = 100;
     public static ArrayList<Map> maps = new ArrayList<>();
     public static MainPlayer player;
     public static Server server;
@@ -31,7 +30,7 @@ public class Global {
     public static P rel = new P();
     private static float[] sinv = new float[360];
     private static float[] cosv = new float[360];
-    public static int time;
+    public static int time, hour;
     public static Timer updates = new Timer(40,true);
     public static ArrayList<EventTimer> timers = new ArrayList<>();
     public static Font font = new Font("Helvetica",Font.PLAIN,20);
@@ -76,6 +75,7 @@ public class Global {
         if (updates.update()) {
             timePass(1);
             FileManager.saveCharacter();
+            FileManager.saveWorld();
         }
     }
     public static int getControlId(){
@@ -83,17 +83,16 @@ public class Global {
     }
     public static void timePass(int p){
         time+=p;
-        if ((time-p)/HOUR < getHour()){
-            for (Map i : maps) i.onTimeChange();
-        }
         Iterator it = timers.iterator();
         while (it.hasNext()){
             EventTimer timer = (EventTimer) it.next();
             if (timer.update(p)) it.remove();
         }
     }
-    static int getHour(){
-        return time/HOUR;
+    public static void hourPass(int p){
+        timePass(p*100);
+        hour+=p;
+        for (Map i : maps) i.onTimeChange();
     }
     public static boolean inCamera(float x, float y, float sizeX, float sizeY){
         return (x > Global.camera.x-Settings.centerX-sizeX && y > Global.camera.y-Settings.centerY-sizeY

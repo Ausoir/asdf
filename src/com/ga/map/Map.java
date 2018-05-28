@@ -39,13 +39,13 @@ public class Map {
     public Updater updater;
 
     Map(String name) {
-        this.name = new MapName(name, false);
+        this.name = new MapName(name);
         updater = new Updater(this);
         onTimeChange();
     }
 
     public void start() {
-        if (name.isField() && !FileManager.isFile("Data/map/" + name + ".map")) {
+        if (name.isField() && !FileManager.isFile(FileManager.makeDirectory("Data/map/" + name + ".map"))) {
             make(name);
             FileManager.saveMap(name.value, this);
             clear();

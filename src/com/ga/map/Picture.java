@@ -143,7 +143,7 @@ public class Picture {
         return image.getSubimage(px * sx, py * sy, sx, sy);
     }
     static void newImage(String path, String p, BufferedImage image){
-        String fullPath = path+p+".png";
+        String fullPath = FileManager.makeDirectory(path+p+".png");
         FileManager.save(fullPath,"");
         File output = new File("Data/"+fullPath);
         try {

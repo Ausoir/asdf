@@ -1,10 +1,11 @@
 package com.ga.map;
 
 public class MapName {
+    static final String instance = "ins/";
     public String value;
 
-    public MapName(String p, boolean instance){
-        set(instance?"ins/"+p:p);
+    public MapName(String p){
+        set(p);
     }
     private void set(String p){
         value = p;
@@ -17,7 +18,7 @@ public class MapName {
         return Integer.parseInt(getMapname().substring(2));
     }
     public MapName getNext(int dir){
-        return new MapName("_"+getBiome()+(getIndex()+dir), true);
+        return new MapName(instance+"_"+getBiome()+(getIndex()+dir));
     }
     public boolean isValid(){
         return getIndex() > 0;

@@ -308,7 +308,7 @@ public enum Intelligence {
                                         public void perform(){
                                             if (Global.player.requireGold(price)) {
                                                 Global.player.get("Motivation").add(10,false);
-                                                Global.player.map.updater.sleep(500, true);
+                                                Global.player.map.updater.sleep(5, true);
                                                 Global.player.get("Nutrition").heal();
                                             } else {
                                                 Global.player.say("Not enough money..");

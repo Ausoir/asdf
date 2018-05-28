@@ -25,8 +25,8 @@ public class Generator {
     }
     public static void init(){
         for (String[] i : FileManager.fileCache.get("map")){
-            if (i[1].startsWith("Data/map/building") && !i[1].startsWith("Data/map/building/inside")) {
-                buildings.put(i[0], Integer.valueOf(FileManager.read(i[1]).split("%")[0].split(";",-1)[2].split(",")[0]));
+            if (i[1].startsWith(FileManager.makeDirectory("Data/map/building")) && !i[1].startsWith(FileManager.makeDirectory("Data/map/building/inside"))) {
+                buildings.put(i[0], Integer.valueOf(FileManager.read(FileManager.makeDirectory(i[1])).split("%")[0].split(";",-1)[2].split(",")[0]));
             }
         }
     }
@@ -105,7 +105,7 @@ public class Generator {
                     highestBid = Math.max(highestBid, prop.seed);
                 } else if (prop.factoryId == Stock.Travel.ordinal()) {
                     if (prop.subId == 1) { //overmap
-                        MapName propDestination = new MapName(prop.name, true);
+                        MapName propDestination = new MapName(MapName.instance + prop.name);
                         if (propDestination.isField()){
                             prop.name = prop.name + map.name.getIndex();
                             Map house = new Map(prop.name);

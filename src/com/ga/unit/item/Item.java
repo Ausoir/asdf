@@ -26,15 +26,15 @@ public class Item extends Prop {
     public enum ItemType {
         Sword(Actions.Slash, 3, .8f, 4, "swing_knife"){
             public boolean isBlunt(){return false;}},
-        Spear(Actions.Thrust, 1, .6f, 0, "swing_silent"){
+        Spear(Actions.Thrust, 1, .6f, 0, "swing_normal"){
             public boolean isBlunt(){return false;}},
         Knife(Actions.Thrust, 3, .3f, 2, "swing_knife"){
             public boolean isBlunt(){return false;}},
-        Swinging(Actions.Slash, 3, 1, 10, "swing_silent"),
-        Bashing(Actions.Slash, 1, 1, 10, "swing_silent"),
+        Swinging(Actions.Slash, 3, 1, 10, "swing_normal"),
+        Bashing(Actions.Slash, 1, 1, 10, "swing_normal"),
         Armor(Actions.Rest, 1, 1, 10, "swing_normal"), Scroll(Actions.Mark, 1, 0, 0, "scroll"),
         Shooting(Actions.Shoot_Handgun, 3, .5f, 0, "swing_normal"), Rifle(Actions.Shoot_Rifle, 3, 1f, 0, "swing_normal"),
-        Bow(Actions.Shoot_Arrow, 1, 1, 0, "swing_silent"), Throwing(Actions.Throw, 3, .1f, 0, "swing_silent"),
+        Bow(Actions.Shoot_Arrow, 1, 1, 0, "swing_normal"), Throwing(Actions.Throw, 3, .1f, 0, "swing_normal"),
         Darting(Actions.Dart, 3, .1f, 0, "swing_normal"), Consumable(Actions.Consume, 1, .1f, 0, "drink");
         Actions action;
         String sound;
@@ -417,7 +417,10 @@ public class Item extends Prop {
         if (owner != null && owner.weapon == this) owner.setWeapon(null);
         super.remove();
     }
-    private void playSound(){
+    public void playAttackSound(){
+        Sound.play(map, pos, "swing_normal");
+    }
+    protected void playSound(){
         Sound.play(map, pos, type.sound);
     }
     public float getPercentage(){

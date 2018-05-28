@@ -92,7 +92,7 @@ public class MainPlayer extends Player {
 
     private void level(String stat) {
         int requiredMotivation = traits.has(Traits.Trait.Fast_Learner) ? 60 : 40;
-        int requiredTime = traits.has(Traits.Trait.Fast_Learner) ? 100 : 300;
+        int requiredTime = traits.has(Traits.Trait.Fast_Learner) ? 1 : 3;
         if (map.updater.sleep(requiredTime, true) && get("Motivation").require(requiredMotivation)) {
             get(stat).addTotal(1);
             Sound.play(map, pos, "heal");
@@ -139,7 +139,7 @@ public class MainPlayer extends Player {
     protected void onMapEdge(int dir){
         if (map.name.isField()){
             MapName newMapName = map.name.getNext(dir);
-            if (newMapName.isValid() && map.updater.sleep(100, true)) {
+            if (newMapName.isValid() && map.updater.sleep(1, true)) {
                 vel.set(0,0);
                 stateSet(Actions.Idle);
                 delay.time = 200;

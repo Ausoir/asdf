@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="asdf:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/asdf_jar</output-path>
-    <root id="archive" name="asdf.jar">
-      <element id="module-output" name="asdf" />
-    </root>
-  </artifact>
-</component>

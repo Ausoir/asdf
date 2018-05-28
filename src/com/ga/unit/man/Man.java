@@ -163,8 +163,9 @@ public class Man extends Unit {
         else Sound.play(map, pos, "step_dirt");
     }
 
+    @Override
     public void attackSound(){
-        Sound.play(map, pos, "swing_normal");
+        weapon.playAttackSound();
     }
 
     @Override
@@ -199,13 +200,13 @@ public class Man extends Unit {
         for (Tag i : mytags){
             if (tags.contains(i)) r++;
         }
-        if (state.getTrainers().contains(Tag.Strength)) r += get("Strength").get();
+        if (state.getTrainers().contains(Tag.Strength)) r += get("Strength").getMax();
         return Math.max(0,r) / Math.max(1,tags.size());
     }
 
     public int getVacancy(){
         Stat dex = get("Agility");
-        return dex.get() - armor.getEncumbrance() - weapon.encumbrance;
+        return dex.getMax() - armor.getEncumbrance() - weapon.encumbrance;
     }
 
     public Stat get(String p){
@@ -299,14 +300,13 @@ public class Man extends Unit {
     }
 
     public Unit attack() {
-        boolean cleave = false;
-        if (stats.triggerEffect(Buffs.Cleave)) cleave = true;
+        int cleave = stats.getEffectLevel(Buffs.Cleave);
         Line hitbox = weapon.getLine();
         Unit target = null;
         for (Unit i : map.updater.collideUnit(pos, (int) hitbox.getLength()+20, faction)){
-            if (i.hit(hitbox,weapon.type.isBlunt(),getDamage())){
+            if (i.hit(hitbox,weapon.type.isBlunt(),getDamage()+cleave)){
                 target = i;
-                if (!cleave) break;
+                if (cleave == 0) break;
             }
         }
         if (target != null) {

@@ -22,12 +22,13 @@ import java.util.HashMap;
  * Created by Ga on 9/1/2016. asd
  */
 public enum Buffs {
-    Depression(0,new Tags(){{
+    Corona(0,new Tags(){{
+        add(Tag.Enchant);
         add(Tag.Curse);
     }}){ Buff makeLocal(){
-        return new Buff(400) {
+        return new Buff(10) {
             public boolean update() {
-                if (host instanceof MainPlayer) host.get("Motivation").set(0, false);
+                Particle.sparkle(host.map, "Glare", host.getDepth(), host.getRandomPoint(), 4, 2);
                 return super.update();
             }
         };
@@ -43,6 +44,10 @@ public enum Buffs {
                     i.brain.onHit();
                 }
             }
+            public void onStack(int level){
+                this.level = level;
+                onSet();
+            }
 
             public boolean update() {
                 Particle.sparkle(host.map, "Fire", host.getDepth(), host.getRandomPoint(), 8, 5);
@@ -52,15 +57,18 @@ public enum Buffs {
     }},
     Cleave(1,new Tags(){{
         add(Tag.Enchant);
-        add(Tag.Strength);
     }}){ Buff makeLocal(){
         return new Buff(40) {
-            public void onSet() {
-                time += level*10;
+            public void onSet(){
+                if (!(host instanceof Man)) time = Global.time;
             }
             public boolean update() {
-                Particle.dripHoly(host.map, ((Man) host).weapon.getLine().ptd, host.getDepth());
-                return super.update();
+                boolean r = super.update();
+                if (!r) {
+                    if (((Man) host).wieldingNone()) r = true;
+                    Particle.dripHoly(host.map, ((Man) host).weapon.getLine().ptd, host.getDepth());
+                }
+                return r;
             }
         };
     }},
@@ -85,22 +93,30 @@ public enum Buffs {
     Bleed(1,new Tags(){{
         add(Tag.Curse);
         add(Tag.Mutation);
-    }}){ Buff makeLocal(){
-        return new Buff(300) {
+    }}){
+        final int[] bleedRate = new int[]{999, 80, 24, 8, 2, 2};
+        Buff makeLocal(){
+        return new Buff(100) {
             private int tick = 0;
+            public void onSet(){
+                if (level >= 5) host.die();
+            }
             public void onStack(int level){
                 this.level += level;
-                time -= 50;
+                onSet();
             }
             public boolean onTrigger(){
                 if (level > 0) level--;
                 return true;
             }
             public boolean update() {
-                if (tick++ % (Math.max(1,24-level*4)) == 0) {
+                if (tick++ % bleedRate[(int) Global.clamp(level, 0, 5)] == 0) {
                     Particle.explode(host.map, "Blood", host.getDepth()+.01f, host.getRandomPoint(), new P(), (int) (Math.random() * level + 1), 5, 0, true, 24);
                 }
-                if (super.update()) host.die();
+                if (super.update()){
+                    onTrigger();
+                    time += 100;
+                }
                 return level == 0;
             }
         };
@@ -250,6 +266,36 @@ public enum Buffs {
             }
         };
     }},
+    Mark(1,new Tags(){{
+        add(Tag.Curse);
+    }}){ Buff makeLocal(){
+        return new Buff(4) {
+            private Thing mark;
+            public void onLoad(){
+                mark = new Thing(host.map, "Mark", host.seed, 150);
+                mark.image.setCenterType(2);
+                mark.start();
+                mark.pos = host.pos;
+                mark.save = false;
+            }
+            public void onSet() {
+                time += level*6;
+                Sound.play(host.map, host.pos, "freeze");
+                mark = new Thing(host.map, "Mark", host.seed, 150);
+                mark.image.setCenterType(2);
+                mark.start();
+                mark.pos = host.pos;
+                mark.save = false;
+            }
+            public boolean onTrigger(){
+                time = Global.time;
+                return mark != null;
+            }
+            public void onFinish() {
+                if (mark != null) mark.remove();
+            }
+        };
+    }},
     Glacialwalk(2,new Tags(){{
         add(Tag.Enchant);
         add(Tag.Conjuration);
@@ -291,36 +337,6 @@ public enum Buffs {
                     };
                 }
                 return super.update();
-            }
-        };
-    }},
-    Mark(2,new Tags(){{
-        add(Tag.Curse);
-    }}){ Buff makeLocal(){
-        return new Buff(4) {
-            private Thing mark;
-            public void onLoad(){
-                mark = new Thing(host.map, "Mark", host.seed, 150);
-                mark.image.setCenterType(2);
-                mark.start();
-                mark.pos = host.pos;
-                mark.save = false;
-            }
-            public void onSet() {
-                time += level*6;
-                Sound.play(host.map, host.pos, "freeze");
-                mark = new Thing(host.map, "Mark", host.seed, 150);
-                mark.image.setCenterType(2);
-                mark.start();
-                mark.pos = host.pos;
-                mark.save = false;
-            }
-            public boolean onTrigger(){
-                time = Global.time;
-                return mark != null;
-            }
-            public void onFinish() {
-                if (mark != null) mark.remove();
             }
         };
     }},
@@ -486,25 +502,24 @@ public enum Buffs {
                     onSet();
                 } else time += 20;
             }
-            public void onLoad(){
-                unit = Updater.getActor(var);
-                if (host instanceof Man){
-                    mhost = (Man) host;
-                }
-            }
             public void onFinish(){
                 unit.remove();
                 host.setVisible(true);
             }
             public boolean update() {
+                if (host.stateDuration == 0) { //effectively a late onLoad()
+                    if (host instanceof Man) mhost = (Man) host;
+                    unit = Updater.getActor(var);
+                    if (unit != null){
+                        unit.target = host.target;
+                        Actions state = host.state;
+                        if (state == Actions.Interact) state = Actions.Melee;
+                        unit.setState(state);
+                        host.delay.time = 1;
+                    } else return true;
+                }
                 if (host.image.visible) host.setVisible(false);
                 if (mhost != null) mhost.setWeapon(null);
-                if (host.stateDuration == 0) {
-                    unit.target = host.target;
-                    Actions state = host.state;
-                    if (state == Actions.Interact) state = Actions.Melee;
-                    unit.setState(state);
-                }
                 host.pos.set(unit.pos);
                 return super.update();
             }

@@ -109,7 +109,7 @@ public enum Actions {
             p.clip.resetHeight(); //clip animation too short
             return super.onFinish(p);
         }
-    }, Wield(18){
+    }, Wield(60){
         public boolean onFinish(Man host){
             Player player = (Player)host;
             if (player.input.selectingItem == -1) {
@@ -186,7 +186,53 @@ public enum Actions {
         public boolean onFinish(Unit host){
             return false;
         }
-    }, Grab(15,3,12,5,new Tags(){{
+    },
+    Rest(0,0,0,0,new Tags(){{
+        add(Tag.Athletics);
+    }}){
+        public int getRange(Unit p){
+            return 99999;
+        }
+        public void onSet(Unit host){
+            if (host.get("Strength").isFull()) host.stateSet(Idle);
+//            else host.get("Strength").add(-1, false);
+        }
+        public void update(Unit host) {
+            host.stats.rest(4+host.stateLevel);
+        }
+    },
+    Melee(24,1,0,0,new Tags(){{
+    }}){
+        public int getRange(Unit host){
+            return (int) host.getReach();
+        }
+        public void trigger(Unit host){
+            Sound.play(host.map, host.pos, "swing_normal");
+            host.attack();
+        }
+        public void trigger(Man host){
+            host.attackSound();
+            Line hitbox = host.clip.organs[0].getAdd(host.pos);
+            int damage = Global.r.nextInt(3);
+            for (Unit i : host.map.updater.collideUnit(hitbox.ptd, (int) hitbox.getLength()+64, host.faction)) {
+                if (i.hit(hitbox, damage)) {
+                    Sound.play(host.map, host.pos, "hit_punch");
+                    new Thing(host.map, "hit_1", -1, 150) {
+                        private int n = 0;
+                        public void draw(Graphics2D g) {
+                            if (n <= 7) {
+                                super.draw(g);
+                                setImage("hit_" + (n++) / 2);
+                                if (n > 7) remove();
+                            }
+                        }
+                    }.start().pos.set(hitbox.ptd);
+                    break;
+                }
+            }
+        }
+    },
+    Grab(15,3,12,5,new Tags(){{
         add(Tag.Strength);
     }}){
         public String getClipName(){
@@ -196,7 +242,7 @@ public enum Actions {
             ArrayList<Unit> target = host.map.updater.collideUnit(host.getHand(), 64, host.faction);
             if (target != null && target.size() > 0) {
                 for (Unit victim : target) {
-                    if (victim.state == Down || victim.state == Hit || victim.get("Strength").get() < host.stateLevel+4) {
+                    if (victim.state == Down || victim.state == Hit) { //down or stunned
                         Sound.play(host.map, host.pos, "wear");
                         Weapon holder = new Weapon(host.map, null, 0, new Item.Material[]{Item.Material.Flesh}, Item.ItemType.Bashing, 32, 0) {
                             public String forceToString() {
@@ -234,7 +280,8 @@ public enum Actions {
         public boolean onFinish(Unit host){
             return false;
         }
-    }, Charge(15,3,12,3,new Tags(){{
+    },
+    Charge(15,3,12,3,new Tags(){{
         add(Tag.Strength);
         add(Tag.Athletics);
     }}){
@@ -246,7 +293,8 @@ public enum Actions {
                 target.get(0).stateSet(Down);
             }
         }
-    }, Hold(45,3,3,3,new Tags(){{
+    },
+    Hold(45,3,3,3,new Tags(){{
         add(Tag.Strength);
     }}){
         public boolean onFinish(Unit host){
@@ -266,61 +314,14 @@ public enum Actions {
                 }
             }
         }
-    }, Backstep(0,-1,0,0,new Tags(){{
+    },
+    Backstep(0,-1,0,0,new Tags(){{
     }}){
         public int getRange(Unit host){
             return 60;
         }
         public void update(Unit host){
             host.vel.x += host.getSpeed() * -host.dir;
-        }
-    }, Rest(0,0,0,0,new Tags(){{
-        add(Tag.Athletics);
-    }}){
-        public int getRange(Unit p){
-            return 99999;
-        }
-        public void onSet(Unit host){
-            if (host.get("Strength").isFull()) host.stateSet(Idle);
-        }
-        public void update(Unit host) {
-            host.stats.rest(5+host.stateLevel);
-        }
-    }, Melee(24,1,0,0,new Tags(){{
-    }}){
-        public int getRange(Unit host){
-            return (int) host.getReach();
-        }
-        public void trigger(Unit host){
-            Sound.play(host.map, host.pos, "swing_silent");
-            host.attack();
-        }
-        public void trigger(Man host){
-            host.attackSound();
-            Line hitbox = host.clip.organs[0].getAdd(host.pos);
-            int damage = Global.r.nextInt(3);
-            for (Unit i : host.map.updater.collideUnit(hitbox.ptd, (int) hitbox.getLength()+64, host.faction)) {
-                if (i.hit(hitbox, damage)) {
-                    Sound.play(host.map, host.pos, "hit_punch");
-                    new Thing(host.map, "hit_1", -1, 150) {
-                        private int n = 0;
-                        public void draw(Graphics2D g) {
-                            if (n <= 7) {
-                                super.draw(g);
-                                setImage("hit_" + (n++) / 2);
-                                if (n > 7) remove();
-                            }
-                        }
-                    }.start().pos.set(hitbox.ptd);
-                    break;
-                }
-            }
-        }
-    }, Duck(24,-1,6,0,new Tags(){{
-        add(Tag.Strength);
-    }}){
-        public String getClipName(){
-            return "Conjure";
         }
     },
     Thrust(25,1,0,0,new int[]{FIST}, new Tags(){{
@@ -363,7 +364,7 @@ public enum Actions {
         add(Tag.Strength);
     }}){
         public void trigger(Man host){
-            host.attackSound();
+            Sound.play(host.map, host.pos, "swing_normal");
             Line hitbox = host.clip.organs[1].getAdd(host.pos);
             for (Unit i : host.map.updater.collideUnit(host.pos, (int) hitbox.getLength()+64, host.faction)) {
                 if (i.state != Actions.Down && i.hit(hitbox, 1)) {
@@ -390,9 +391,10 @@ public enum Actions {
         add(Tag.Strength);
     }}){
         public void trigger(Man host){
-            host.attackSound();
-            host.vel.y -= 4+host.stateLevel*4;
-            host.vel.x = (4+host.stateLevel*6) * host.dir;
+            Sound.play(host.map, host.pos, "swing_normal");
+            int power = 20+host.stateLevel*2;
+            host.vel.y += power*Global.sin(host.target.getAtan());
+            host.vel.x += power*Global.cos(host.target.getAtan());
         }
         public void update(Man host){
             if (host.delay.time > 14 && Math.abs(host.vel.x)>2){
@@ -427,7 +429,7 @@ public enum Actions {
             return 36;
         }
         public void trigger(Man host){
-            host.attackSound();
+            Sound.play(host.map, host.pos, "swing_normal");
             Line hitbox = host.clip.organs[0].getAdd(host.pos);
             int damage = Global.r.nextInt(2+host.stateLevel);
             for (Unit i : host.map.updater.collideUnit(hitbox.ptd, (int) hitbox.getLength()+64, host.faction)) {
@@ -647,13 +649,17 @@ public enum Actions {
         }
         public void trigger(Man host){
             P tip = host.weapon.getLine().ptd;
-            final Projectile pj = new Projectile(host.map, "Bullet", tip, host.pos.getAdd(host.target), (int) (150 + (host.rand.nextFloat() * 50))) {
+            P target = host.pos.getAdd(host.target);
+            final Projectile pj = new Projectile(host.map, "Bullet", tip, target, (int) (120 + (host.rand.nextFloat() * 40))) {
                 @Override
                 public void onCollide(Line l) {
+//                    host.say(pos.toString() + "   " + l.getCrossPoint(new Line(pos, pos.getAdd(vel))).toString());
+//                    Particle.smoke(map, new Line(pos, pos.getAdd(vel)).getCrossPoint(l), getDepth());
                     remove();
+                    mobile = false;
                 }
             };
-            pj.delay = new EventTimer(2, false, new Performer() {
+            pj.delay = new EventTimer(3, false, new Performer() {
                 public void perform() {
                     pj.remove();
                 }
@@ -719,18 +725,6 @@ public enum Actions {
             if (t.size() > 0) t.get(0).buff(Buffs.Mark, host.stateLevel);
         }
     },
-    Massmark(80,1,1,2,new Tags(){{
-        add(Tag.Strength);
-        add(Tag.Curse);
-    }}){
-        public String getClipName(){
-            return "Conjure";
-        }
-        public void onSet(Unit host){
-            ArrayList<Unit> t = host.map.updater.collideUnit(host.target.getAdd(host.pos),800,Faction.Destructive);
-            if (t.size() > 0) t.get(0).buff(Buffs.Mark, host.stateLevel);
-        }
-    },
     Warcry(60,3,20,6,new Tags(){{
         add(Tag.Strength);
     }}){
@@ -792,10 +786,7 @@ public enum Actions {
                                 }
                             }
                         }.start().pos = host.weapon.getLine().ptd;
-                        if (host.stateLevel > i.get("Strength").get()){
-                            i.stateSet(Down);
-                            i.delay.time = 40;
-                        }
+                        i.stateSet(Down);
                         Particle.explode(host.map, "Fire", i.getDepth(), host.weapon.getLine().ptd, new P(), 6, 12, 0, false, 4);
                         break;
                     }
@@ -829,7 +820,7 @@ public enum Actions {
         public void update(Man host){
             if (host.grounded){
                 for (Unit i : host.map.updater.collideUnit(host.pos, host.getSize(), host.faction)) {
-                    if (i.hit(i.getPosLine(), Math.max(4,host.getDamage()))) {
+                    if (i.hit(i.getPosLine(), 3)) {
                         i.stateSet(Actions.Down);
                         i.delay.time = 40;
                         Sound.play(host.map, host.pos, "hit_whip");
@@ -1025,7 +1016,7 @@ public enum Actions {
             }
         }
     },
-    Shock(2,4,7,1,new int[]{FIST, OFIST},new Tags(){{
+    Shock(2,0,5,1,new int[]{FIST, OFIST},new Tags(){{
         add(Tag.Electric);
     }}){
         public String getClipName(){
@@ -1131,9 +1122,12 @@ public enum Actions {
             }
         }
     },
-    Enchant(60,1,12,0,new int[]{FIST},new Tags(){{
+    Enchant(60,1,12,1,new int[]{FIST},new Tags(){{
         add(Tag.Enchant);
     }}){
+        public void onSet(Unit host){
+            if (host.stats.getEffectLevel(Buffs.Bleed) > 3) host.stateSet(Idle);
+        }
         public int getRange(Unit host){
             return 900;
         }
@@ -1151,22 +1145,26 @@ public enum Actions {
                 Tags tags = buffs.get(i).tags;
                 if (tags.isEmpty() || !holding.containsAll(tags)) buffs.remove(i--);
             }
-            if (buffs.size() == 0) return;
             ArrayList<Unit> t = host.map.updater.collideUnit(host.target.getAdd(host.pos),64,Faction.Destructive);
             if (t.size() > 0) {
-                String[] buffNames = new String[buffs.size()];
-                Performer[] performers = new Performer[buffs.size()];
-                for (int i = 0; i < buffNames.length - 1; i++) {
-                    Buffs buff = buffs.get(i);
-                    buffNames[i] = buff.name() + " - Power "+buff.value;
-                    performers[i] = new Performer() {
-                        public void perform() {
-                            host.buff(Buffs.Bleed, 1);
-                            t.get(SyncRand.r.nextInt(t.size())).buff(buff, 1);
-                        }
-                    };
+                if (buffs.size() == 1){ //Corona
+                    host.buff(Buffs.Bleed, 1);
+                    t.get(SyncRand.r.nextInt(t.size())).buff(buffs.get(0), host.stateLevel);
+                } else {
+                    String[] buffNames = new String[buffs.size()];
+                    Performer[] performers = new Performer[buffs.size()];
+                    for (int i = 0; i < buffNames.length - 1; i++) {
+                        Buffs buff = buffs.get(i);
+                        buffNames[i] = buff.name() + " - Power " + buff.value;
+                        performers[i] = new Performer() {
+                            public void perform() {
+                                host.buff(Buffs.Bleed, 1);
+                                t.get(SyncRand.r.nextInt(t.size())).buff(buff, host.stateLevel);
+                            }
+                        };
+                    }
+                    Menu.menu.showDialog("Available Enchantments", "", buffNames, performers);
                 }
-                Menu.menu.showDialog("Available Enchantments", "", buffNames, performers);
             }
         }
     },
@@ -1187,10 +1185,54 @@ public enum Actions {
                 p.brain.target = host.brain.target;
                 p.pos.set(host.pos);
                 p.dir = host.dir;
-                p.buff(Buffs.Banishment, 2 + (int) (host.stateLevel * .4f));
+                p.buff(Buffs.Banishment, 2 + host.stateLevel);
                 p.faction = host.faction;
                 p.start();
             }
+        }
+    },
+    Magic_Arrow(40,1,2,1,new Tags(){{
+        add(Tag.Conjuration);
+    }}){
+        public int getRange(Unit host){
+            return 600;
+        }
+        public String getClipName(){
+            return "Shoot_Arrow";
+        }
+        public void trigger(final Man host){
+            P tip = host.weapon.getLine().ptd;
+            final Item wpn = host.weapon;
+            final Projectile pj = new Projectile(host.map, "Arrow", tip, host.pos.getAdd(host.target), 80) {
+                public void onField() {
+                }
+                public void onAttack(Unit p) {
+                    wpn.trigger(p);
+                    Sound.play(host.map, host.pos, "hit_bloody");
+                    remove();
+                }
+                public void collide() {
+                    super.collide();
+                }
+                public void update() {
+                    super.update();
+                    if (tangible || lastLand.depth == 0) rotateTo(vel);
+                }
+            };
+            pj.image = new ShadedPicture(pj.rand, pj.name, Shader.Color);
+            ((ShadedPicture) pj.image).shade(new Color(255,255,255,255).getRGB());
+            pj.setDepth(300);
+            pj.lastLand = host.lastLand;
+            pj.rotSpeed = 0;
+            pj.rotation = pj.vel.getAtan();
+            pj.gravity = true;
+            pj.faction = host.faction;
+            pj.damage = host.stateLevel;
+            host.weapon.rotation += host.dir * .3f;
+            host.stateSet(Actions.Idle);
+        }
+        public void update(Man host){
+            Particle.sparkle(host.map, "Glare", host.getDepth(), host.getHand(), 4, 3);
         }
     },
     Shadowtwin(240,3,30,1,new Tags(){{

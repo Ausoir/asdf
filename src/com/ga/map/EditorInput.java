@@ -22,7 +22,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
     public class Keybinding {
         private HashMap<Integer, String> map = new HashMap<>();
         Keybinding(){
-            String[] t = FileManager.readText("Data/Editor_Keymap.txt");
+            String[] t = FileManager.readText(FileManager.makeDirectory("Data/Editor_Keymap.txt"));
             for (String i : t){
                 String[] mapping = i.split(":");
                 map.put(Integer.parseInt(mapping[0]), mapping[1]);
@@ -287,7 +287,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
             map.render();
         } else if (p.startsWith("new")){
             String newname = p.substring(4);
-            FileManager.save("map/"+newname+".map",newname+";;780,780");
+            FileManager.save(FileManager.makeDirectory("map/"+newname+".map"),newname+";;780,780");
             lastSaved = newname;
             command("load "+lastSaved, 0, 0);
         } else if (p.startsWith("save")){
@@ -295,7 +295,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
             save(lastSaved);
         } else if (p.startsWith("load")){
             Updater.editor = false;
-            Global.server.requestChangeMap(p.substring(5)+"@0");
+            Global.server.requestChangeMap(FileManager.makeDirectory(p.substring(5)+"@0"));
             lastSaved = p.substring(5);
             while (true){
                 try {
@@ -651,7 +651,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
                 break;
             case KeyEvent.VK_INSERT:
                 Updater.editor = false;
-                Global.server.requestChangeMap(map.name.toString()+"@0");
+                Global.server.requestChangeMap(FileManager.makeDirectory(map.name.toString()+"@0"));
                 final P asdf = Global.camera.getAdd(0,-400);
                 while (true){
                     try {
@@ -747,7 +747,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
         currentO.remove();
         message("Saved ("+p+")");
         map.clean();
-        FileManager.saveMap("instance/"+p, map);
+        FileManager.saveMap(FileManager.makeDirectory(p), map);
         FileManager.saveWorld();
     }
 }

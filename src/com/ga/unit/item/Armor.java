@@ -66,7 +66,7 @@ public class Armor extends Item {
             final Armor me = this;
             host.delay.performer = new Performer() {
                 public void perform() {
-                    if (host.get("Strength").get() >= weight) {
+                    if (host.get("Strength").getMax() >= weight) {
                         if (host.armor.isBare(piece)) {
                             Sound.play(host.map, host.pos, "wear");
                             me.remove();

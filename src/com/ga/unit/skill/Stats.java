@@ -14,7 +14,7 @@ import java.util.Map;
 public class Stats {
     private ArrayList<Buff> effects = new ArrayList<>();
     private HashMap<String, Stat> stats = new HashMap<>();
-    public Timer restTimer = new Timer(640, true);
+    public Timer restTimer = new Timer(480, true);
     private Unit host;
     public Stats(Unit host){
         this.host = host;
@@ -67,7 +67,7 @@ public class Stats {
                 effects.remove(i--);
             }
         }
-        restTimer.time = Math.min(restTimer.time+1, restTimer.max);
+        restTimer.time = Math.min(restTimer.time+2, restTimer.max);
     }
     public void load(String p){
         String[] statOrBuff = p.split("/");

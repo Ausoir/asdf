@@ -37,7 +37,7 @@ public class Weather extends Drawable{
                 (int) Global.clamp(a[3]+((b[3]-a[3])*rate),0,255));
     }
     private int[] getCurrentTimeColor(){
-        return colors[Math.abs(Global.getHour()%colors.length)];
+        return colors[Math.abs(Global.hour%colors.length)];
     }
     void refreshTimeColor(){
         int[] t = getCurrentTimeColor();
@@ -56,7 +56,7 @@ public class Weather extends Drawable{
         toColor = new int[]{0,0,0,255};
     }
     boolean isNight(){
-        return Global.getHour() % colors.length >= 8;
+        return Global.hour % colors.length >= 8;
     }
     public void start(){
         map.updater.addQueue.add(this);
