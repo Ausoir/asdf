@@ -18,7 +18,7 @@ public class Updater {
     private Drawable drawee;
     private ArrayList<Particle> effects = new ArrayList<>();
     private ArrayList<Updatable> updatee = new ArrayList<>();
-    ArrayList<Prop> props = new ArrayList<>();
+    public ArrayList<Prop> props = new ArrayList<>();
     ArrayList<AI> controllee = new ArrayList<>();
     public ArrayList<Unit> unitsLoaded = new ArrayList<>();
     public ArrayList<Observer> addQueue = new ArrayList<>();
@@ -113,18 +113,12 @@ public class Updater {
         if (result.length() > 0) result = result.substring(0,result.length()-1);
         return result;
     }
-    public String toActorString(){
+    public static String toActorString(){
         String result = "";
-        for (Unit i : map.updater.unitsLoaded) {
-            if (i.save) result += i.toString() + "\n";
-        }
-        return result;
-    }
-    public static String toAllActorString(){
-        String result = "";
-        ArrayList<Map> maps = (ArrayList<Map>) Global.maps.clone();
-        for (Map map : maps) {
-            result += map.updater.toActorString();
+        for (Map map : Global.maps) {
+            for (Unit i : map.updater.unitsLoaded) {
+                if (i.save) result += i.toString() + "\n";
+            }
         }
         return result;
     }
@@ -133,7 +127,7 @@ public class Updater {
             for (Observer i : map.updater.addQueue){
                 if (i instanceof Unit && ((Unit) i).controlId == p) return (Unit) i;
             }
-            for (Unit i : map.updater.unitsLoaded){
+            for (Unit i : map.updater.unitsLoaded) {
                 if (i.controlId == p) return i;
             }
         }
@@ -188,19 +182,19 @@ public class Updater {
             if (host != i) {
                 float x = Math.abs(i.pos.x-vision.x), y = Math.abs(i.pos.y - vision.y);
                 if (x < r && y < r/3) {
-                    int overlap = 0;
-                    P head = i.clip.organs[Math.max(0, i.clip.getHead())].pt.getAdd(i.pos);
-                    for (Line l : host.map.land){
-                        if (l.depth > host.getDepth() && new Line(head, new P(head.x, 0)).lineCross(l)){
-                            overlap++;
-                        }
-                    }
-                    if (overlap % 2 == 0) {
+//                    int overlap = 0;
+//                    P head = i.clip.organs[Math.max(0, i.clip.getHead())].pt.getAdd(i.pos);
+//                    for (Line l : host.map.land){
+//                        if (l.depth > host.getDepth() && new Line(head, new P(head.x, 0)).lineCross(l)){
+//                            overlap++;
+//                        }
+//                    }
+//                    if (overlap % 2 == 0) {
                         if (x + y < max) {
                             max = (int) (x + y);
                             seen.add(0, i);
                         } else seen.add(i);
-                    }
+//                    }
                 }
             }
         }

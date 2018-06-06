@@ -205,9 +205,9 @@ public class Item extends Prop {
         public static AdenchantMod get(Random seed){
             int t = seed.nextInt(100);
             if (t == 0) return Ultimate;
-            else if (t < 8) return Greater;
-            else if (t < 20) return Major;
-            else if (t < 50) return Minor;
+            else if (t < 5) return Greater;
+            else if (t < 16) return Major;
+            else if (t < 40) return Minor;
             else return None;
         }
         static AdenchantMod load(String p){
@@ -437,7 +437,7 @@ public class Item extends Prop {
                     if (uses == 0){
                         Particle.groundSlam(map, pos, getDepth());
                         if (disposable) remove();
-                    }
+                    } else if (uses > durability) uses = durability;
                 }
             }
             return true;
@@ -465,11 +465,13 @@ public class Item extends Prop {
         } else host.setState(Actions.Throw);
         return false;
     }
-    public void trigger(Unit target){
-        if (emod != null && cooldown.isReady() && SyncRand.r.nextFloat() < probability){
+    public boolean trigger(Unit target){
+        if (isUsable(true, 1) && emod != null && cooldown.isReady() && SyncRand.r.nextFloat() < probability){
             cooldown.reset();
             target.buff(emod, ademod.level);
+            return true;
         }
+        return false;
     }
     public void drop(Man host) {
         if (host.weapon == this){

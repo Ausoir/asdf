@@ -67,20 +67,20 @@ public abstract class AI implements Observer {
         return false;
     }
     void load(String p) {
-        String[] tasks = p.split(",");
+        String[] tasks = p.split("&");
         for (int i=tasks.length-1;i>=0;i--) {
             String[] v = tasks[i].split(":");
             setTask(Behavior.values()[Integer.parseInt(v[0])]);
-            this.tasks.peek().load(host, Integer.parseInt(v[1]));
+            this.tasks.peek().load(host, v[1]);
         }
     }
     public String toString() {
         String r = "";
         for (int i=tasks.size()-1;i>=0;i--) {
-            r += tasks.get(i).toString(host)+",";
+            r += tasks.get(i).toString(host)+"&";
         }
         if (r.length()>0) r = r.substring(0,r.length()-1);
-        return factoryId+":"+type+"/"+r;
+        return factoryId+":"+type+";"+r;
     }
 }
 

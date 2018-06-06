@@ -151,7 +151,7 @@ public enum Intelligence {
                     prices = new int[length];
                     actions = new Performer[length];
                     for (int i = 0; i < length; i++) {
-                        Item item = ((Item) Stock.getByName(host.map, items[i], -1));
+                        Item item = ((Item) Stock.createByName(host.map, items[i], -1));
                         int value = fluctuate(item.getValue());
                         products[i] = item;
                         prices[i] = value;
@@ -326,7 +326,7 @@ public enum Intelligence {
         return p;
     }
     public static AI get(String p, Unit host){
-        String[] data = p.split("/");
+        String[] data = p.split(";");
         String[] values = data[0].split(":");
         AI r = values()[Integer.parseInt(values[0])].make(host);
         r.type = Integer.parseInt(values[1]);

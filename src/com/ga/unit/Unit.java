@@ -213,8 +213,12 @@ public class Unit extends Prop {
                     P t = new P(pos.x, hitBox.ptd.y);
                     Particle.explode(map, "Blood", getDepth(), t, t.getSubtract(hitBox.pt), 3, 3, 12, true, 5);
                     if (damageBreakthrough(i, blunt, damage)) {
-                        if (SyncRand.r.nextBoolean()) buff(Buffs.Bleed, 1);
-                        else clip.organs[i].amputate(hitBox, damage);
+                        if (get("Agility").require(1)) {
+                            Particle.explode(map, "Blood", getDepth()+.01f, getRandomPoint(), new P(), 9, 5, 0, true, 24);
+                        } else {
+                            buff(Buffs.Bleed, 1);
+                            clip.organs[i].amputate(hitBox, damage);
+                        }
                     } else {
                         P mid = hitBox.getMidpoint();
                         float radius = hitBox.getLength() / 2;
@@ -228,7 +232,6 @@ public class Unit extends Prop {
                             if (!traits.has(Traits.Trait.Tough)) stateSet(Actions.Hit);
                             brain.onHit();
                             clip.organs[i].hit(hitBox);
-                            return true;
                         }
                     }
                 } else {

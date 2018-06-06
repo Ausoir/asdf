@@ -13,7 +13,7 @@ public class Player extends Man {
         super(map, null, seed);
         input = new PlayerInput(this);
         save = false;
-        name = "Player";
+        name = "Man";
         speechType = "p";
     }
 }

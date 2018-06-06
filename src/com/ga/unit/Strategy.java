@@ -43,7 +43,7 @@ public enum Strategy {
             int fb;
             if (host.state == Actions.Hold && dist > 300){
                 host.delay.time = -1;
-                fb = host.setState(getMove(host, dist));
+                fb = host.setState(getMove(host, host.brain.target.pos));
             } else fb = super.micromanage(host, action, dist);
             return fb;
         }
@@ -62,8 +62,14 @@ public enum Strategy {
         if (host instanceof Man) ((Man)host).weapon.rotateTo(host.target.getMult(host.dir,host.dir));
         return (float) Math.abs(Math.sqrt(x * x + y * y) - host.getReach());
     }
-    Actions getMove(Unit host, float dist){
-        if (dist > 100 && host.moveset.contains(Actions.Sprint)) return Actions.Sprint;
+    static Actions getMove(Unit host, P target){
+        int x = (int) ((target.x) - (host.pos.x + host.vel.x));
+        int y = (int) (target.y - host.pos.y);
+        if (Math.abs(y) > Math.abs(x)) {
+            if (y > 0) return Actions.Drop;
+            else return Actions.Jump;
+        }
+        if (Math.abs(x) > 100 && host.moveset.contains(Actions.Sprint)) return Actions.Sprint;
         return host.dir == 1 ? Actions.Right : Actions.Left;
     }
     public int micromanage(Unit host, Actions action, float dist){
@@ -88,7 +94,7 @@ public enum Strategy {
             if (moves.size() > 0 && SyncRand.r.nextInt(3) != 0) action = moves.get(0);
             else if (moves.size() > 1 && SyncRand.r.nextInt(3) != 0) action = moves.get(1);
             else if (moves.size() > 2) action = moves.get(SyncRand.r.nextInt(moves.size()));
-            else action = getMove(host, dist);
+            else action = getMove(host, host.brain.target.pos);
         }
         int fb = micromanage(host, action, dist);
         host.say(host.get("Strength").toString() + " " + action.name() + " " + fb);

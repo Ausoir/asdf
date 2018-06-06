@@ -107,7 +107,7 @@ public class MenuPlayer extends Panel {
             add(scroll, BorderLayout.LINE_START);
         }
         void refresh(){
-            int maxEncumbrance = Global.player.get("Agility").get();
+            int maxEncumbrance = Global.player.get("Agility").getMax();
             gold.setText("Encumbrance:"+(maxEncumbrance-Global.player.getVacancy())+"/"+maxEncumbrance+
                     "                 Warmth:"+Global.player.getWarmth());
             panel.removeAll();

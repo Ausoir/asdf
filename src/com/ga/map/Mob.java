@@ -26,7 +26,7 @@ public class Mob {
                     if (land.clockwise()) tx = (int) Global.clamp(tx, 120, (land.ptd.x - land.pt.x) - 120);
                     else tx = (int) Global.clamp(tx, land.ptd.x - land.pt.x + 120, -120);
                     P pos = new P(land.pt.x + tx, (int) land.getCrossPointY(land.pt.x + tx));
-                    Stock.getByName(map, unitProperty[0], -1).pos.set(pos);
+                    Stock.createByName(map, unitProperty[0], -1).pos.set(pos);
                 }
             }
         }

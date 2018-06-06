@@ -65,7 +65,6 @@ public class FileManager {
             if (Global.server.isHost()) saveMap(Global.player.map.name.value, Global.player.map);
             save(FileManager.makeDirectory("Data/map/Player.user"), Global.player.toString());
             save(FileManager.makeDirectory("Data/Keymap.txt"), Global.player.input.toString());
-            saveWorld();
         }
     }
     public static void saveMap(String name, Map map){
@@ -94,8 +93,8 @@ public class FileManager {
         return result;
     }
     public static void loadGame(){
-        loadActors();
         loadPlayer();
+        loadActors();
     }
     public static void loadPlayer(){
         String data = read("Data/map/Player.user");
@@ -231,7 +230,7 @@ public class FileManager {
         return file.isFile() && file.length() > 0;
     }
 
-    public static void readWorld(){
+    public static void loadWorld(){
         String data = read("Data/map/World.map");
         String[] meta = data.split(",");
         Creation.seed = Integer.parseInt(meta[0]);
@@ -241,6 +240,6 @@ public class FileManager {
 
     public static void saveWorld(){
         save(FileManager.makeDirectory("Data/map/World.map"), Creation.seed + "," + Global.time + "," + Global.controlId);
-        save(FileManager.makeDirectory("Data/map/Actors.map"), Updater.toAllActorString());
+        save(FileManager.makeDirectory("Data/map/Actors.map"), Updater.toActorString());
     }
 }

@@ -30,8 +30,20 @@ public class Traits {
             }
         },
 
-        Crafter(3,"Craft various items."), Armorsmith(3,"Craft, repair, and modify armor."), Weaponsmith(3,"Craft, repair, and modify weapons."),
-        Attunement(3,"Utilize innate mana from your body."), Generation(3,"Learn mana generation methods."),
+        Crafter(3,"Craft various items."),
+        Attunement(3,"Utilize innate mana from your body."),
+        Energy(3,"Learn mana generation methods."){
+            Tag tag = Tag.Energy;
+            public void onSet(Unit host){
+                onAdd(host);
+            }
+            public void onAdd(Unit host){
+                host.tags.add(tag);
+            }
+            public void onRemove(Unit host){
+                host.tags.remove(tag);
+            }
+        },
         Pyromancy(3,"Forge mana into roaring flames."){
             Tag tag = Tag.Fire;
             public void onSet(Unit host){

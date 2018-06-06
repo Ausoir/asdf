@@ -99,6 +99,7 @@ public class Server {
         new Timer().schedule(new TimerTask() {
             public void run(){
                 String[] mapData = p.split("@");
+                FileManager.saveWorld();
                 Global.player.map.clear();
                 Global.maps.clear();
                 com.ga.map.Map map = Global.getMap(mapData[0]);
@@ -106,6 +107,8 @@ public class Server {
                 Global.player.pos.set(map.updater.getEntrancePos(Integer.parseInt(mapData[1]), map.getFailsafePos()));
                 FileManager.saveCharacter();
                 FileManager.loadPlayer();
+                FileManager.loadWorld();
+                FileManager.loadActors();
                 Processes.resume();
             }
         }, 1);
@@ -190,6 +193,7 @@ public class Server {
                     player.start();
                     clients.put(udp.getClientIP(), newest);
                     FileManager.saveCharacter();
+                    FileManager.saveWorld();
                     FileManager.save(FileManager.makeDirectory("Data/map/multiplayer/serverActors.map"), Global.player.map.updater.toActorString());
                     Global.p("Connection established with client at "+udp.getClientIP()+"/"+udp.getClientPort());
                     newest.message("START}"+player.controlId);

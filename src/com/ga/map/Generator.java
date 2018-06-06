@@ -121,7 +121,7 @@ public class Generator {
                             if (!exitExists){
                                 float spawnX = house.size.x/2;
                                 P spawnPoint = new P(spawnX, house.checkLand(new Line(spawnX, 0, spawnX, house.size.y)).getCrossPointY(spawnX));
-                                Stock.getByName(house, "Signpost", -1).start().pos.set(spawnPoint);
+                                Stock.createByName(house, "Signpost", -1).start().pos.set(spawnPoint);
                                 Stock.Spawn.create(house, -1, 3).start().pos.set(spawnPoint.getAdd(0,-50));
                                 Prop exit = (Prop) Stock.Travel.create(house, 1, 3).start();
                                 exit.seed = bid + exit.seed - 1;

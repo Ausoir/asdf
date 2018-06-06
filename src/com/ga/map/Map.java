@@ -244,7 +244,7 @@ public class Map {
         }
         if (prop != null) {
             float landSize = Math.abs(l.ptd.x - l.pt.x);
-            Prop t = Stock.getByName(this, prop, seed);
+            Prop t = Stock.createByName(this, prop, seed);
             t.manualDepth = false;
             P size = t.image.getSize();
             if (landSize >= size.x) {

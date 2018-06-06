@@ -1,1 +1,1 @@
-32:Lightning;65:Left;1:Use;67:Hold;3:Downstrike;68:Right;69:Sidekick;38:_UP;70:Enchant;9:_MENU;10:_SAY;16:Rest;17:_CTRL;81:Throw;82:Wield;83:Drop;87:Jump;90:Fireball
+32:Use;65:Left;3:Downstrike;67:Meditate;68:Right;69:Underhand;38:_UP;70:Charge;9:_MENU;10:_SAY;16:Rest;17:_CTRL;81:Throw;82:Wield;83:Drop;87:Jump;90:Fireball

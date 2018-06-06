@@ -33,14 +33,14 @@ public class Command {
                     int loop = 1;
                     if (cmd.length>2) loop = Integer.parseInt(cmd[2]);
                     for (int ii=0;ii<loop;ii++) {
-                        Prop unit = Stock.getByName(host.map, cmd[1], -1);
+                        Prop unit = Stock.createByName(host.map, cmd[1], -1);
                         unit.start();
                         unit.pos.set(host.pos.getAdd(host.target));
                     }
                 }
                 else if (cmd[0].equals("mob")) Mob.spawn(host.map, cmd[1],host.lastLand);
                 else if (cmd[0].equals("item")){
-                    Item item = (Item) Stock.getByName(host.map, cmd[1], -1);
+                    Item item = (Item) Stock.createByName(host.map, cmd[1], -1);
                     item.start();
                     host.setWeapon(item);
                 }
@@ -52,15 +52,15 @@ public class Command {
                 }
                 else if (cmd[0].equals("tpto")) host.pos.set(Integer.parseInt(cmd[1].split(",")[0]),Integer.parseInt(cmd[1].split(",")[1]));
                 else if (cmd[0].equals("act")) host.stateSet(Actions.valueOf(cmd[1]));
-                else if (cmd[0].equals("learn")) host.learnSkill(Actions.valueOf(cmd[1]));
-                else if (cmd[0].equals("trait")) host.learnTrait(Traits.Trait.valueOf(cmd[1]));
-                else if (cmd[0].equals("forget")) host.moveset.remove(Actions.valueOf(cmd[1]));
-                else if (cmd[0].equals("lose")) host.traits.forget(host, Traits.Trait.valueOf(cmd[1]));
+                else if (cmd[0].equals("learnSkill")) host.learnSkill(Actions.valueOf(cmd[1]));
+                else if (cmd[0].equals("learnTrait")) host.learnTrait(Traits.Trait.valueOf(cmd[1]));
+                else if (cmd[0].equals("forgetSkill")) host.moveset.remove(Actions.valueOf(cmd[1]));
+                else if (cmd[0].equals("forgetTrait")) host.traits.forget(host, Traits.Trait.valueOf(cmd[1]));
                 else if (cmd[0].equals("recipe")) host.crafting.knowledge.add(cmd[1]);
                 else if (cmd[0].equals("sound")) Sound.play(host.map, Global.camera, cmd[1]);
                 else if (cmd[0].equals("depth")) host.say("Me: "+host.getDepth()+" Line: "+host.lastLand.depth+", Terrain: "+host.map.terrains.get(host.lastLand.tid).getDepth());
                 else if (cmd[0].equals("revive")) host.revive();
-                else if (cmd[0].equals("hit")) host.hit(host.getPosLine(), 0);
+                else if (cmd[0].equals("hit")) host.hit(host.getPosLine(), Integer.parseInt(cmd[1]));
                 else if (cmd[0].equals("render")){
                     for (Object terrain : host.map.terrains.entrySet()) ((Terrain)terrain).render();
                 }

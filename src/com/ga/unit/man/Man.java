@@ -214,8 +214,7 @@ public class Man extends Unit {
     }
 
     public int getGold(){
-        ArrayList<Item> items = new ArrayList<>();
-        items.addAll(inventory.getItems());
+        ArrayList<Item> items = new ArrayList<>(inventory.getItems());
         items.add(weapon);
         Collections.addAll(items, armor.armor);
         int money = 0;
@@ -227,8 +226,7 @@ public class Man extends Unit {
         return money;
     }
     public void obtainGold(int p){
-        ArrayList<Item> items = new ArrayList<>();
-        items.addAll(inventory.getItems());
+        ArrayList<Item> items = new ArrayList<>(inventory.getItems());
         items.add(weapon);
         Collections.addAll(items, armor.armor);
         for (Item i : items){
@@ -245,8 +243,7 @@ public class Man extends Unit {
         }
     }
     public boolean requireGold(int p){
-        ArrayList<Item> items = new ArrayList<>();
-        items.addAll(inventory.getItems());
+        ArrayList<Item> items = new ArrayList<>(inventory.getItems());
         items.add(weapon);
         Collections.addAll(items, armor.armor);
         for (Item i : items){
@@ -267,8 +264,7 @@ public class Man extends Unit {
             get("Intelligence").add(-mana/innateLevel, false);
             if (p == 0) return true;
         }
-        ArrayList<Item> items = new ArrayList<>();
-        items.addAll(inventory.getItems());
+        ArrayList<Item> items = new ArrayList<>(inventory.getItems());
         items.add(weapon);
         Collections.addAll(items, armor.armor);
         for (Item i : items){
@@ -295,7 +291,7 @@ public class Man extends Unit {
     }
 
     public void onAttack(Unit p){
-        if (weapon.isUsable(true,2)) weapon.trigger(p);
+        weapon.trigger(p);
         brain.onAttack();
     }
 

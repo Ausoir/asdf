@@ -257,6 +257,7 @@ public class Body {
     }
 
     public void resetHeight(){
+        organs[BODY].pt.x = 0;
         if (legCurrent == 0) organs[BODY].pt.y = 0;
         else organs[BODY].pt.y = -getHeight();
     }

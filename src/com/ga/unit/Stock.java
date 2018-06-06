@@ -1,13 +1,19 @@
 package com.ga.unit;
 
 import com.ga.game.FileManager;
+import com.ga.game.Menu;
 import com.ga.game.Settings;
 import com.ga.game.Sound;
-import com.ga.game.Menu;
-import com.ga.map.*;
+import com.ga.map.Creation;
+import com.ga.map.Global;
+import com.ga.map.Map;
+import com.ga.map.Picture;
 import com.ga.tool.*;
 import com.ga.unit.item.*;
-import com.ga.unit.man.*;
+import com.ga.unit.man.BodyHumanoid;
+import com.ga.unit.man.MainPlayer;
+import com.ga.unit.man.Man;
+import com.ga.unit.man.Player;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Buffs;
 
@@ -47,7 +53,7 @@ public enum Stock {
         product.image.visible = false;
         product.onInteract = new Interactive(){
             public void interact(com.ga.unit.man.Man p){
-                if (p == Global.player) Global.server.requestChangeMap(new MapName(product.name)+"@"+seed);
+                if (p == Global.player) Global.server.requestChangeMap(product.name+"@"+seed);
             }
         };
         return product;
@@ -109,7 +115,7 @@ public enum Stock {
         String[] unit = units[id].split(";");
         Unit product = new Unit(map, null, seed){
             public void onCreate(){
-                String str = getUnit(map, unit[0],seed,clip.toString(),makeStat(rand,Integer.parseInt(unit[2])),Faction.valueOf(unit[3]),unit[4]+"/1:0", unit[5], "");
+                String str = getUnit(map, unit[0],seed,clip.toString(),makeStat(rand,Integer.parseInt(unit[2])),Faction.valueOf(unit[3]),unit[4]+";1:0", unit[5], "");
                 load(str);
             }
         };
@@ -123,7 +129,7 @@ public enum Stock {
         final String[] unit = units[id].split(";",-1);
         com.ga.unit.man.Man product = new Man(map, unit[0], seed){
             public void onCreate(){
-                String str = getUnit(map,name,seed,"111111",makeStat(rand,Integer.parseInt(unit[2])),Faction.valueOf(unit[3]),unit[4]+"/1:0",unit[5],"");
+                String str = getUnit(map,name,seed,"111111",makeStat(rand,Integer.parseInt(unit[2])),Faction.valueOf(unit[3]),unit[4]+";1:0",unit[5],"");
                 str += "@Battery@;";
                 String[] weapon = unit[7].split(",");
                 String[] armor = unit[8].split(",");
@@ -160,7 +166,7 @@ public enum Stock {
         String[] data = FileManager.readText("Data/raw/Weapon.txt");
         final String[] v = data[id].split(";");
         Item product = new Weapon(map, v[0], seed, Item.Material.load(v[4].split(",")), Item.ItemType.valueOf(v[1]),
-                40, Integer.parseInt(v[2]));
+                40, Integer.parseInt(v[2]), Integer.parseInt(v[5]), Integer.parseInt(v[6]));
         int range = Integer.parseInt(v[3]);
         if (range != -1) product.range = range;
         product.subId = id;
@@ -216,7 +222,7 @@ public enum Stock {
                 if (state == Actions.Melee) attack();
             }
             public void onCreate(){
-                load(getUnit(map,name,seed,clip.toString(),makeStat(rand, 3),Faction.Predator,"2:0/1:0","Melee",""));
+                load(getUnit(map,name,seed,clip.toString(),makeStat(rand, 3),Faction.Predator,"2:0;1:0","Melee",""));
             }
         };
         product.clip = new Body(product, name());
@@ -249,7 +255,7 @@ public enum Stock {
                 super.buff(buff, level);
             }
             public void onCreate(){
-                load(getUnit(map,name(),seed,clip.toString(),makeStat(rand,1),Faction.Predator,"2:0/1:0","Melee",""));
+                load(getUnit(map,name(),seed,clip.toString(),makeStat(rand,1),Faction.Predator,"2:0;1:0","Melee",""));
             }
             public void die(){
                 Threadball.create(map, -1, -1).pos.set(pos);
@@ -285,7 +291,7 @@ public enum Stock {
                 super.buff(buff, level*2);
             }
             public void onCreate(){
-                load(getUnit(map,name(),seed,clip.toString(),makeStat(rand,2),Faction.Predator,"2:0/1:0","Melee,Jump",""));
+                load(getUnit(map,name(),seed,clip.toString(),makeStat(rand,2),Faction.Predator,"2:0;1:0","Melee,Jump",""));
             }
         };
         product.clip = new Body(product, name());
@@ -351,7 +357,7 @@ public enum Stock {
         return product;
     }},
     Fist{ Prop make(Map map, int id, int seed){
-        Item product = new Weapon(map, name(),0, new Item.Material[]{Item.Material.Flesh}, Item.ItemType.Bashing, -1, 0){
+        Item product = new Weapon(map, name(),0, new Item.Material[]{Item.Material.Flesh}, Item.ItemType.Bashing, -1, 0, 0, 0){
             public boolean use(final com.ga.unit.man.Man host) {
                 host.setState(Actions.Interact);
                 return true;
@@ -594,7 +600,7 @@ public enum Stock {
         return product;
     }},
     Ethersword{ Prop make(Map map, int id, int seed){
-        Weapon product = new Weapon(map, name(), seed, new Item.Material[]{Item.Material.Crystal}, Item.ItemType.Sword, -1, 0){
+        Weapon product = new Weapon(map, name(), seed, new Item.Material[]{Item.Material.Crystal}, Item.ItemType.Sword, -1, 0, 0, 0){
             public String toString(){
                 return "";
             }
@@ -602,9 +608,9 @@ public enum Stock {
                 super.remove();
                 Particle.holyExplosion(map, pos,getDepth());
             }
-            public void trigger(Unit host) {
-                super.trigger(host);
+            public boolean trigger(Unit host) {
                 Particle.holyExplosion(map, pos,getDepth());
+                return super.trigger(host);
             }
             public int getDamage(){
                 return 3;
@@ -702,7 +708,7 @@ public enum Stock {
                         String item = possibleLoot[tRand.nextInt(possibleLoot.length)];
                         int itemSeed = tRand.nextInt(9999);
                         if (finalIndex.charAt(i) != '2') {
-                            products[i] = ((Item) getByName(map, item, itemSeed));
+                            products[i] = ((Item) createByName(map, item, itemSeed));
                             final int current = i;
                             actions[i] = new Performer() {
                                 public void perform() {
@@ -907,7 +913,7 @@ public enum Stock {
     }},
     Manastone_Necklace{ Prop make(Map map, int id, int seed){
         Armor product = new Armor(map, "Battery",seed,new Item.Material[]{Item.Material.Stone, Item.Material.Glass, Item.Material.Crystal, Item.Material.Obsidian}
-                ,3,0,0,1000, 0){
+                ,3,0,0,100, 0){
             public String getDescription(){
                 return super.getDescription()+"\nThis item is used to store mana for magical applications.";
             }
@@ -920,7 +926,7 @@ public enum Stock {
     }},
     Manastone{ Prop make(Map map, int id, int seed){
         Item product = new Item(map, "Battery",seed,new Item.Material[]{Item.Material.Stone, Item.Material.Glass, Item.Material.Crystal, Item.Material.Obsidian}
-            ,Item.ItemType.Consumable,2400){
+            ,Item.ItemType.Consumable,250){
             public String getDescription(){
                 return super.getDescription()+"\nThis item is used to store mana for magical applications.";
             }
@@ -944,94 +950,6 @@ public enum Stock {
         product.tags.add(Tag.Enchant);
         product.tags.add(Tag.Air);
         return product;
-    }},
-    Hexdoll{ Prop make(Map map, int id, int seed){
-        Weapon product = new Weapon(map,name(),seed,new Item.Material[]{Item.Material.Flesh, Item.Material.Bone, Item.Material.Wooden, Item.Material.Cloth}
-            ,Item.ItemType.Consumable, 100, 0){
-            public String getDescription(){
-                return super.getDescription()+"\nThis item is used as a catalyst for curses.";
-            }
-            public void onCreate(){
-                isUsable(true, getUses()-1);
-            }
-            private void collectBlood(com.ga.unit.man.Man host){
-                boolean hostSaved = false, collected = false;
-                ArrayList<Unit> t = map.updater.collideUnit(pos,96,Faction.Destructive);
-                for (Unit i : t){
-                    if (i.state == Actions.Down || i.stats.getEffectLevel(Buffs.Bleed)>0){
-                        if (i == host){
-                            hostSaved = true;
-                            continue;
-                        }
-                        host.say("Stained "+getFullName());
-                        isUsable(true, getUses());
-                        recharge(10 + 10*i.rand.nextInt(i.get("Level").get()+1));
-                        i.buff(Buffs.Mark,1);
-                        i.buff(Buffs.Bleed,7);
-                        collected = true;
-                        break;
-                    }
-                }
-                if (!collected && hostSaved){
-                    host.say("Stained "+getFullName());
-                    isUsable(true, getUses());
-                    recharge(10 + 10*host.rand.nextInt(host.get("Level").get()+1));
-                    host.buff(Buffs.Mark,1);
-                    host.buff(Buffs.Bleed,1);
-                }
-            }
-            public boolean use(com.ga.unit.man.Man host){
-                if (host.traits.has(Traits.Trait.Enchanting)) {
-                    if (super.use(host)) {
-                        int bloodQuality = (getUses()+1)/10;
-                        final ArrayList<Buffs> buffs = Buffs.getByLevel(quality+2);
-                        final String[] listString = new String[buffs.size() + 1];
-                        Performer[] performers = new Performer[listString.length + 1];
-                        listString[0] = "Collect blood";
-                        performers[0] = new Performer() {
-                            public void perform() {
-                                collectBlood(host);
-                            }
-                        };
-                        int power = host.get("Intelligence").get()+bloodQuality; //not max
-                        if (isUsable(true, 1)) {
-                            for (int i = 0; i < listString.length - 1; i++) {
-                                Buffs buff = buffs.get(i);
-                                listString[i + 1] = buff.name() + " - Power "+buff.value;
-                                final int finalI = i + 1;
-                                performers[i + 1] = new Performer() {
-                                    public void perform() {
-                                        ArrayList<Unit> t = map.updater.collideUnit(pos, 800, Faction.Destructive);
-                                        for (Unit i : t) {
-                                            if (i.stats.getEffectLevel(Buffs.Mark) > 0) {
-                                                if (i.get("Intelligence").get()+buff.value < power) {
-                                                    i.buff(buff, bloodQuality);
-                                                    isUsable(true, buff.value);
-                                                } else {
-                                                    host.buff(buff, bloodQuality);
-                                                    host.say(listString[finalI]+" backfired!");
-                                                }
-                                            }
-                                        }
-                                    }
-                                };
-                            }
-                        }
-                        Menu.menu.showDialog("List of Enchantments",
-                                "Blood: " + getUses() + " drops left\nBlood Quality: "+bloodQuality
-                                        +"\nCatalyst Level: "+quality+"\nHex Power: "+power, listString, performers);
-                        return true;
-                    } else {
-                        collectBlood(host);
-                    }
-                }
-                return false;
-            }
-        };
-        product.disposable = false;
-        product.tags.add(Tag.Curse);
-        product.tags.add(Tag.Curse);
-        return product;
     }};
     private static HashMap<String, String> extRegistry = new HashMap<>();
     public static Prop get(com.ga.map.Map map, String p){
@@ -1047,17 +965,17 @@ public enum Stock {
         t.loadString = p;
         return t;
     }
-    public static Prop getByName(Map map, String p, int seed){ // Return to reflection
+    public static Prop createByName(Map map, String p, int seed){ // Return to reflection
         for (Stock i : values()){
             if (i.name().equals(p.replace(" ","_"))){
                 return i.create(map, -1, seed);
             }
         }
-        Prop r = getByNameFromReg(map, p, seed);
+        Prop r = createByNameFromReg(map, p, seed);
         if (r != null) return r;
         return Stock.Object.create(map, 0,0);
     }
-    public static Prop getByNameFromReg(Map map, String p, int seed){
+    public static Prop createByNameFromReg(Map map, String p, int seed){
         String name = extRegistry.get(p);
         if (name != null){
             String[] data = name.split("@");
@@ -1105,7 +1023,7 @@ public enum Stock {
         String pieceName = "";
         if (piece == 1) pieceName = "_Pants";
         else if (piece == 2) pieceName = "_Torso";
-        Prop product = Stock.getByName(map, p+pieceName,-1);
+        Prop product = Stock.createByName(map, p+pieceName,-1);
         if (product instanceof Item) {
             Item r = (Item) product;
             return r.toString();

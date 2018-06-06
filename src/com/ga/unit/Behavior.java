@@ -1,7 +1,8 @@
 package com.ga.unit;
 
-import com.ga.game.FileManager;
+import com.ga.game.Observer;
 import com.ga.map.Global;
+import com.ga.map.Map;
 import com.ga.map.Updater;
 import com.ga.tool.P;
 import com.ga.unit.skill.Actions;
@@ -21,7 +22,6 @@ public enum Behavior {
             host.face(-host.dir, true);
             host.setState(Actions.Right);
         }
-
         boolean update(Unit host) {
             if (Global.r.nextInt(16) == 0) {
                 int dir = Global.r.nextInt(3);
@@ -34,54 +34,60 @@ public enum Behavior {
             return false;
         }
     }, Travel {
-        private ArrayList<String> routes = new ArrayList<>();
+        String destination = "", var = "";
         public void blocked(Unit host, boolean fall) {
         }
-
-        public void load(Unit host, int p){
+        public void load(Unit host, String p){
             super.load(host, p);
-            routes.add(host.map.name+"@0@0");
-            moveToward(host.map.name.toString(), p+"");
-            routes.remove(0);
+            var = p;
+            moveToward(host);
         }
-
-        private boolean routesContains(String p){
-            for (String i : routes){
-                if (i.split("@")[0].equals(p)) return true;
-            }
-            return false;
+        String getVar(Unit host){
+            return var;
         }
-
-        private boolean moveToward(String from, String to){
-            if (from.equals(to)) return true;
-            String[] objects = FileManager.read("Data/map/"+from+".map").split("%")[3].split(";");
-            for (String i : objects){
-                String[] sections = i.split("@");
-                if (Integer.parseInt(sections[0]) == Stock.Travel.ordinal() && !routesContains(sections[1])){
-                    routes.add(sections[1]+"@"+sections[2]+"@"+sections[3]);
-                    if (!moveToward(sections[1], to)){
-                        routes.remove(sections[1]+"@"+sections[2]+"@"+sections[3]);
-                    } else return true;
-                }
-            }
-            return false;
-        }
-
-        boolean update(Unit host) {
-            if (routes.size() > 0) {
-                String[] data = routes.get(0).split("@");
-                if (!host.map.name.equals(data[1])) {
-                    P target = new P(data[2]);
-                    host.face(host.pos.x > target.x ? -1 : 1, false);
-                    host.setState(Actions.Right);
-                    if (host.pos.getSubtract(target).getDist() <= host.getSpeed() * 400) {
-                        routes.remove(0);
-                        Global.server.requestChangeMap(data[0] + "@" + data[1]);
+        private boolean moveToward(Unit host){
+            for (Prop i : host.map.updater.props){
+                if (i.factoryId == Stock.Travel.ordinal()){
+                    if (i.name.equals(var)){
+                        destination = i.pos.toString();
+                        return true;
                     }
-                    return false;
                 }
             }
-            return true;
+            for (Observer i : host.map.updater.addQueue){
+                if (i instanceof Prop) {
+                    Prop prop = (Prop) i;
+                    if (prop.factoryId == Stock.Travel.ordinal()) {
+                        if (prop.name.equals(var)){
+                            destination = prop.pos.toString();
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+        boolean update(Unit host) {
+            P target = new P(destination);
+            host.face(host.pos.x > target.x ? -1 : 1, false);
+            host.setState(Strategy.getMove(host, target));
+            if (host.pos.getSubtract(target).getDist() <= host.getSpeed()*400) {
+                for (Prop i : host.map.updater.props){
+                    if (i.factoryId == Stock.Travel.ordinal() && i.pos.toString().equals(destination)){
+                        host.brain.tasks.pop();
+                        Map oldmap = host.map;
+                        host.map = Global.getMap(i.name);
+                        host.pos.set(host.map.updater.getEntrancePos(i.seed, host.map.getFailsafePos()));
+                        String actor = host.toString();
+                        host.map = oldmap;
+                        host.remove();
+                        Unit unit = (Unit) Stock.get(host.map, actor);
+                        unit.start().controlId = host.controlId;
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
     }, Follow {
         public int getAlertness(){
@@ -89,13 +95,11 @@ public enum Behavior {
         }
         public void blocked(Unit host, boolean fall) {
         }
-        void load(Unit host, int p){
-            if (p > 0){
-                host.brain.target = Updater.getActor(p);
-            }
+        void load(Unit host, String p){
+            if (!p.equals("x")) host.brain.target = Updater.getActor(Integer.parseInt(p));
         }
-        int getVar(Unit host){
-            return host.brain.target.controlId;
+        String getVar(Unit host){
+            return ""+host.brain.target.controlId;
         }
         boolean update(Unit host) {
             if (host.brain.target != null) {
@@ -137,13 +141,11 @@ public enum Behavior {
             host.vel.x = host.getSpeed() * host.dir;
             host.setState(Actions.Jump);
         }
-        void load(Unit host, int p){
-            if (p > 0){
-                host.brain.target = Updater.getActor(p);
-            }
+        void load(Unit host, String p){
+            if (!p.equals("x")) host.brain.target = Updater.getActor(Integer.parseInt(p));
         }
-        int getVar(Unit host){
-            return host.brain.target == null ? -1 : host.brain.target.controlId;
+        String getVar(Unit host){
+            return host.brain.target == null ? "" : ""+host.brain.target.controlId;
         }
         boolean update(Unit host) {
             Unit target = host.brain.target;
@@ -152,9 +154,9 @@ public enum Behavior {
             } else if (host.delay.over()) {
                 if (host.map == target.map) {
                     Strategy.values()[host.brain.type].update(host);
-                } else {
+                } else if (target.map != null) {
                     host.brain.setTask(Travel);
-                    host.brain.tasks.peek().load(host, target.map.name.getIndex());
+                    host.brain.tasks.peek().load(host, target.map.name.toString());
                 }
                 if (target.state == Actions.Dead) host.brain.target = null;
             }
@@ -162,10 +164,10 @@ public enum Behavior {
         }
     };
 
-    void load(Unit host, int p){
+    void load(Unit host, String p){
     }
-    int getVar(Unit host){
-        return 0;
+    String getVar(Unit host){
+        return "x";
     }
     int getAlertness(){
         return 0;

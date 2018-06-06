@@ -451,6 +451,22 @@ public enum Buffs {
             }
         };
     }},
+    Destabilize(2,new Tags(){{
+        add(Tag.Curse);
+        add(Tag.Void);
+    }}){ Buff makeLocal(){
+        return new Buff(8) {
+            private int turn = 0;
+            public void onStack(int level){
+                time++;
+            }
+            public boolean update() {
+                Particle.implode(host.map, "Smoke", host.getDepth(), host.getRandomPoint(), 3, 10, false, 1);
+                if (turn++ % (100/level) == 0) Actions.Blink.onSet(host);
+                return super.update();
+            }
+        };
+    }},
     Stun(2,new Tags(){{
         add(Tag.Curse);
         add(Tag.Electric);
@@ -654,7 +670,7 @@ public enum Buffs {
         return new Buff(1) {
             private Man unit;
             public void onSet() {
-                unit = (Man) Stock.getByName(host.map, "Phantom",-1);
+                unit = (Man) Stock.createByName(host.map, "Phantom",-1);
                 unit.start();
                 unit.brain.target = host;
                 unit.brain.setTask(Behavior.Hunt);

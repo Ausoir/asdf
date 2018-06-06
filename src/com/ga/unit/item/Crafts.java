@@ -46,7 +46,7 @@ public class Crafts {
         if (ingredients.size() == 1){
             int time = Integer.parseInt(usage.get(0));
             if (host.map.updater.sleep(time, true)) {
-                Prop result = Stock.getByName(host.map, p, -1);
+                Prop result = Stock.createByName(host.map, p, -1);
                 if (host.wieldingNone()) host.setWeapon((Item) result);
                 else result.pos.set(host.pos);
             }

@@ -23,7 +23,7 @@ public class MainPlayer extends Player {
     public static String[] mainStats = new String[]{
             "Strength", "Agility", "Intelligence"
     };
-    private Indicator indicator;
+    private Indicator statBar;
 
     public MainPlayer(Map map, int seed) {
         super(map, seed);
@@ -46,10 +46,10 @@ public class MainPlayer extends Player {
         int r = super.setState(state);
         if (r != 0){
             if (r == 2) {
-                indicator.show(1);
+                statBar.show(1, 1);
                 if (state.getCost() > get("Strength").getMax()) say("Stamina cost is beyond my limit!");
             } else if (r == 3) {
-                indicator.showCd(getCooldown(state).time);
+                statBar.showCd(getCooldown(state).time);
             } else if (r == 4) {
                 say("Cannot cast!");
             } else if (r == 5) say("This action is beyond my abilities!");
@@ -63,10 +63,9 @@ public class MainPlayer extends Player {
         return r;
     }
 
-    public boolean hit(Line hitBox, int damage) {
-        int before = get("Strength").get();
-        boolean r = super.hit(hitBox, damage);
-        if (r) indicator.show(before / Math.max(1, get("Strength").get()));
+    public boolean hit(Line hitBox, boolean blunt, int damage) {
+        boolean r = super.hit(hitBox, blunt, damage);
+        if (r) statBar.show(0, 1);
         return r;
     }
 
@@ -125,15 +124,15 @@ public class MainPlayer extends Player {
         map.weather.fadeIn();
     }
 
-    protected void stateUpdate() {
-        super.stateUpdate();
-        if (state == Actions.Rest) indicator.show(1);
-    }
-
     protected boolean stateFinish() {
         boolean r = super.stateFinish();
         if (r) input.update();
         return r;
+    }
+
+    public boolean requireMana(int p) {
+        if (traits.getTraitLevel(Traits.Trait.Attunement) > 0) statBar.show(2, 1);
+        return super.requireMana(p);
     }
 
     protected void onMapEdge(int dir){
@@ -151,21 +150,25 @@ public class MainPlayer extends Player {
 
     public void update() {
         super.update();
-        if (!get("Strength").isFull()) indicator.show(.5f);
-        indicator.update();
+        if (!get("Agility").isFull()) statBar.show(0, .7f);
+        if (!get("Strength").isFull()) statBar.show(1, .7f);
+        if (!get("Intelligence").isFull()) statBar.show(2, .7f);
+        statBar.update();
         if (input.ctrl) Global.cameraTo = pos.getAdd(target.getMult(.5f,.5f));
         else Global.cameraTo = pos.getAdd(vel.getAdd(0,-Settings.gravity).clamp(-10,-10,10,10).mult(50,20));
     }
 
     public void remove() {
         super.remove();
-        indicator.remove();
+        statBar.remove();
     }
 
     public MainPlayer start() {
         super.start();
-        indicator = new Indicator(this);
-        indicator.setMeasuree(get("Strength"));
+        statBar = new Indicator(this);
+        statBar.setMeasuree(0, get("Agility"));
+        statBar.setMeasuree(1, get("Strength"));
+        statBar.setMeasuree(2, get("Intelligence"));
         return this;
     }
 }

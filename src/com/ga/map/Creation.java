@@ -16,7 +16,7 @@ public class Creation {
             seed = (int) (Math.random()*1000000);
             FileManager.saveWorld();
         } else {
-            FileManager.readWorld();
+            FileManager.loadWorld();
         }
         r = new Random(seed);
         FileManager.loadGame();

@@ -674,7 +674,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
             seed = Integer.parseInt(name.split(":")[1]);
             name = name.substring(0,name.indexOf(":"));
         }
-        Prop r = Stock.getByName(map, name, seed);
+        Prop r = Stock.createByName(map, name, seed);
         make(r);
         r.pos = p;
         return r;
