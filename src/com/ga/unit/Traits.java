@@ -138,7 +138,7 @@ public class Traits {
         };
 
         public int type;
-        private String description = "This is a trait.";
+        private String description;
         Trait(int type, String desc){
             this.type = type;
             this.description = desc;

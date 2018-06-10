@@ -111,18 +111,16 @@ public class FileManager {
         Global.camera = player.map.mapEdgeCenter(player.map.size.getMult(.5f, .5f));
         player.map.onTimeChange();
         player.start();
-        Menu.menu.init();
+        Menu.init();
     }
 
     public static void loadActors(){
         String data = read("Data/map/Actors.map");
         if (data != null) {
             String[] actors = data.split("%");
-            ArrayList<Unit> units = new ArrayList<>();
             for (String i : actors) {
-                units.add((Unit) Stock.get(null, i));
+                Stock.get(null, i).start();
             }
-            for (Unit i : units) i.start();
         }
     }
 

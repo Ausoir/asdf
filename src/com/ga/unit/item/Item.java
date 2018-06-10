@@ -462,7 +462,7 @@ public class Item extends Prop {
                 playSound();
                 return true;
             }
-        } else host.setState(Actions.Throw);
+        }
         return false;
     }
     public boolean trigger(Unit target){

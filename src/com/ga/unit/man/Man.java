@@ -258,10 +258,10 @@ public class Man extends Unit {
     public boolean requireMana(int p){
         if (stats.triggerEffect(Buffs.Attunement)) return true;
         int innateLevel = traits.getTraitLevel(Traits.Trait.Attunement);
-        if (innateLevel > 0){
-            int mana = Math.min(get("Intelligence").get()*innateLevel, p);
+        if (innateLevel > 0) {
+            int mana = Math.min(get("Intelligence").get() * innateLevel, p);
             p -= mana;
-            get("Intelligence").add(-mana/innateLevel, false);
+            get("Intelligence").add(-mana / innateLevel, false);
             if (p == 0) return true;
         }
         ArrayList<Item> items = new ArrayList<>(inventory.getItems());
@@ -270,6 +270,26 @@ public class Man extends Unit {
         for (Item i : items){
             if (i.tags.contains(Tag.Mana)){
                 int mana = Math.min(i.getUses(), p);
+                if (i.isUsable(true,mana)) p -= mana;
+                if (p == 0) return true;
+            }
+        }
+        return false;
+    }
+    public boolean rechargeMana(int p){
+        int innateLevel = traits.getTraitLevel(Traits.Trait.Attunement);
+        if (innateLevel > 0) {
+            int vacant = Math.min(p, (get("Intelligence").getMax() - get("Intelligence").get()) * innateLevel);
+            p -= vacant;
+            get("Intelligence").add(vacant / innateLevel, false);
+            if (p == 0) return true;
+        }
+        ArrayList<Item> items = new ArrayList<>(inventory.getItems());
+        items.add(weapon);
+        Collections.addAll(items, armor.armor);
+        for (Item i : items){
+            if (i.tags.contains(Tag.Mana)){
+                int mana = Math.min(i.getDurability() - i.getUses(), p);
                 if (i.isUsable(true,mana)) p -= mana;
                 if (p == 0) return true;
             }
@@ -296,13 +316,12 @@ public class Man extends Unit {
     }
 
     public Unit attack() {
-        int cleave = stats.getEffectLevel(Buffs.Cleave);
         Line hitbox = weapon.getLine();
         Unit target = null;
         for (Unit i : map.updater.collideUnit(pos, (int) hitbox.getLength()+20, faction)){
-            if (i.hit(hitbox,weapon.type.isBlunt(),getDamage()+cleave)){
+            if (i.hit(hitbox,weapon.type.isBlunt(),getDamage())){
                 target = i;
-                if (cleave == 0) break;
+                break;
             }
         }
         if (target != null) {
@@ -349,7 +368,7 @@ public class Man extends Unit {
         weapon.pos.set(pos.x + clip.organs[FIST].ptd.x, pos.y + clip.organs[FIST].ptd.y);
     }
 
-    private void setFace(String p){
+    public void setFace(String p){
         face = p;
         clip.organs[5].setImage(p);
     }

@@ -57,8 +57,7 @@ public class Map {
     private void make(MapName dir) {
         switch (callname = dir.getBiomeName()) {
             case "Grassland":
-                int var = Creation.getRegionVariable(dir.getIndex()).nextInt(5);
-                if (var == 0) GenerateTown.generate(this);
+                if (dir.getIndex() % 3 == 0) GenerateTown.generate(this);
                 else GenerateGrassland.generate(this);
                 break;
             case "Forest":

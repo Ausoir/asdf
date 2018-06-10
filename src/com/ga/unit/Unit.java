@@ -74,19 +74,20 @@ public class Unit extends Prop {
     }
     @Override
     public void onField(){
+        stats.initialize();
     }
     private int getMemorySize(){
         return moveset.size()-1+traits.getMemorySize();
     }
     public boolean learnSkill(Actions move){
-        if (!moveset.contains(move) && getMemorySize() < get("Intelligence").get()){
+        if (!moveset.contains(move) && getMemorySize() < get("Intelligence").getMax()){
             moveset.add(move);
             return true;
         }
         return false;
     }
     public boolean learnTrait(Traits.Trait p) {
-        return getMemorySize() < get("Intelligence").get() && traits.learn(this, p);
+        return getMemorySize() < get("Intelligence").getMax() && traits.learn(this, p);
     }
 
     public P getRandomPoint(){
@@ -156,9 +157,11 @@ public class Unit extends Prop {
                 delay.performer = null;
                 stateInterrupt();
                 delay.set(state.getDel());
-                int attackSpeed = get("Attack").get();
-                int clipspeed = clip.setSpeed(attackSpeed);
-                if (delay.max != 0) delay.set(Math.max(clipspeed, delay.time - attackSpeed));
+                if (delay.max != 0 && state.isDynamicAnimation()){
+                    int attackSpeed = get("Attack").get() - 4;
+                    int clipspeed = clip.setSpeed(attackSpeed);
+                    delay.set(Math.max(clipspeed, delay.time - attackSpeed));
+                }
             }
             this.state = state;
             damageMod = 1;
@@ -177,7 +180,7 @@ public class Unit extends Prop {
 
     @Override
     public int getDamage(){
-        return (int) (rand.nextInt(get("Level").get()+1)*damageMod);
+        return (int) ((get("Level").get()+1)*damageMod);
     }
 
     protected boolean damageBreakthrough(int organ, boolean blunt, int damage){
@@ -368,7 +371,7 @@ public class Unit extends Prop {
     }
 
     public void revive() {
-        stats.clearBuffs(false);
+        stats.clearBuffs();
         Particle.holyExplosion(map, pos, getDepth());
         state = Actions.Idle;
         delay.set(50);

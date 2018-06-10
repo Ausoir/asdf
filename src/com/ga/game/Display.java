@@ -138,7 +138,6 @@ public class Display extends JPanel {
             }
         });
         add(chatbox);
-        add(Menu.menu);
     }
 
     public void startChat(){

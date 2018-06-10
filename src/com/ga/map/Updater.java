@@ -179,7 +179,7 @@ public class Updater {
         ArrayList<Unit> seen = new ArrayList<>();
         int max = r;
         for (Unit i : unitsLoaded){
-            if (host != i) {
+            if (host != i && i.image.visible) {
                 float x = Math.abs(i.pos.x-vision.x), y = Math.abs(i.pos.y - vision.y);
                 if (x < r && y < r/3) {
 //                    int overlap = 0;
@@ -210,7 +210,7 @@ public class Updater {
             }
         }
         if (!Global.player.get("Nutrition").require(p)){
-            Global.player.say("I am too hungry!");
+            Global.player.say("I am too hungry! I need "+p+" nutrition points.");
             return false;
         }
         map.weather.fadeIn();

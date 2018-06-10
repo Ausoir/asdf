@@ -6,8 +6,8 @@ Katana;Sword;2;-1;Bronze,Iron,Steel,Titanium,Crystal;5;-1
 Claw;Knife;1;-1;Copper,Bronze,Iron,Silver,Steel,Bone,Titanium,Crystal;15;2 //Very hard to hit with
 Spear;Spear;2;-1;Copper,Bronze,Iron,Steel,Bone;-10;0
 Axe;Swinging;3;-1;Copper,Bronze,Iron,Steel;-10;2
-Dagger;Knife;1;-1;Glass,Copper,Bronze,Iron,Silver,Steel;11;0
-Tanto;Knife;1;-1;Bronze,Iron,Steel,Crystal;0;2
+Dagger;Knife;1;-1;Glass,Copper,Bronze,Iron,Silver,Steel;24;0
+Tanto;Knife;1;-1;Bronze,Iron,Steel,Crystal;10;0
 Pickaxe;Sword;5;-1;Copper,Bronze,Iron;-13;3
 Cleaver;Sword;7;-1;Bronze,Iron,Silver,Steel,Titanium,Lead;-17;4
 Lancesword;Knife;5;-1;Wooden,Glass,Stone,Copper,Brass,Bronze,Iron,Silver,Steel,Bone,Titanium,Lead,Crystal;2;1

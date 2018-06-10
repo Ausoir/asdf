@@ -33,10 +33,8 @@ public class MainPlayer extends Player {
 
     @Override
     public int setState(Actions state) {
-        if (state == Actions.Use && !grounded){
-            if (vel.y < 0) setState(Actions.Airstrike);
-            else if (vel.y > 0) setState(Actions.Downstrike);
-        } else if (state == Actions.Jump && this.state == Actions.Rest) state = Actions.Leap;
+        if (state == Actions.Use && !grounded) state = Actions.Airstrike;
+        else if (state == Actions.Jump && this.state == Actions.Rest) state = Actions.Leap;
         else if (state == Actions.Rest && (this.state == Actions.Right || this.state == Actions.Left)) {
             if (vel.x != 0) target.x = dir;
             state = Actions.Sprint;
@@ -89,29 +87,48 @@ public class MainPlayer extends Player {
         return level;
     }
 
-    private void level(String stat) {
-        int requiredMotivation = traits.has(Traits.Trait.Fast_Learner) ? 60 : 40;
-        int requiredTime = traits.has(Traits.Trait.Fast_Learner) ? 1 : 3;
-        if (map.updater.sleep(requiredTime, true) && get("Motivation").require(requiredMotivation)) {
-            get(stat).addTotal(1);
-            Sound.play(map, pos, "heal");
-            Particle.holyExplosion(map, pos.getAdd(clip.organs[BODY].ptd), getDepth());
-            int level = getLevel();
-            if (level > 1) {
-                int i, current = 1, prev;
-                for (i=1;i<level;i+=prev){
-                    prev = current;
-                    current = i;
+    public int[] getLevelRequirements(int quality){
+        return new int[][]{
+            new int[]{
+                    traits.has(Traits.Trait.Fast_Learner) ? 100 : 60, //motivation
+                    traits.has(Traits.Trait.Fast_Learner) ? 3 : 5 //time
+            }, new int[]{
+                    traits.has(Traits.Trait.Fast_Learner) ? 60 : 40,
+                    traits.has(Traits.Trait.Fast_Learner) ? 2 : 3
+            }, new int[]{ 0, 0 }
+        }[quality];
+    }
+
+    public void level(String stat, int quality) {
+        int[] requirements = getLevelRequirements(quality);
+        if (get("Motivation").get() >= requirements[0]) {
+            if (map.updater.sleep(requirements[1], true)) {
+                get("Motivation").add(-requirements[0], false);
+                get(stat).addTotal(1);
+                Sound.play(map, pos, "heal");
+                Particle.holyExplosion(map, pos.getAdd(clip.organs[BODY].ptd), getDepth());
+                int level = getLevel();
+                String statChangeNotice = stat+" increased by 1. ";
+                if (level > 1) {
+                    int i, current = 1, prev;
+                    for (i = 1; i < level; i += prev) {
+                        prev = current;
+                        current = i;
+                    }
+                    if (i != level) { //not fibo
+                        Stat decay;
+                        String decayStat;
+                        do {
+                            decayStat = mainStats[SyncRand.r.nextInt(mainStats.length)];
+                            decay = get(decayStat);
+                        } while (decay.getMax() <= 1);
+                        decay.addTotal(-1);
+                        statChangeNotice += decayStat+" decayed by 1.";
+                    }
                 }
-                if (i != level) { //not fibo
-                    Stat decay;
-                    do {
-                        decay = get(mainStats[SyncRand.r.nextInt(mainStats.length)]);
-                    } while (decay.getMax() <= 1);
-                    decay.addTotal(-1);
-                }
+                say("Leveled up! "+statChangeNotice);
             }
-        }
+        } else say("Requires "+requirements[0]+" motivation points!");
     }
 
     public void die() {

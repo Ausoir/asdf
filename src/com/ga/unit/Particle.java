@@ -12,7 +12,7 @@ import com.ga.tool.Timer;
  * Created by Ga on 8/29/2016. zxc
  */
 public class Particle extends Thing {
-    private static int PARTICLE_NUM = 32;
+    private static int PARTICLE_NUM = 48;
     private static Particle[] particles = new Particle[PARTICLE_NUM];
     private static int index = PARTICLE_NUM;
     private Timer timer = new Timer(4, false);
@@ -79,7 +79,7 @@ public class Particle extends Thing {
             float rot = Global.r.nextFloat()*6.28f;
             float spd = Global.r.nextFloat()*speed;
             t = new P(pt);
-            t.add(Global.cos(rot)*spd*lifetime,Global.sin(rot)*spd*lifetime);
+            t.add(Global.cos(rot)*spd*lifetime*.8f,Global.sin(rot)*spd*lifetime*.8f);
             Particle.create(map, name,depth,t,new P(),rot-3.14f,spd, gravity, lifetime);
         }
     }

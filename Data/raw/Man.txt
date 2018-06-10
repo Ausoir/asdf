@@ -2,8 +2,8 @@ Dummy;punk;1;Evil;0:0;Idle;Man;0:0;Toughwear;Mask; //Humanoids-Name,Speech Type,
 Player;player;1;Player;0:0;Idle;Man;;;;
 Resident;resident;1;Neutral;1:0;Sprint;Man;,,,,,,,,,Potion,Stick;Comfortwear,Dustset,Toughwear,Comfortwear,Comfortwear,Suit,Robe,Comfortwear;;
 Merchant;merchant;1;Neutral;3:0;Sprint;Man;;Suit;;
-Looter;punk;1;Punk;2:1;Use;Man;Stick,;,Comfortwear,Toughwear;,Bandana;
-Punk;punk;2;Punk;2:1;Use,Lunge,Dash;Man;Dagger,Axe,Pickaxe;,Comfortwear,Dustset,Toughwear;,Bandana;
+Looter;punk;1;Punk;2:1;Use,Vault;Man;Stick,Bamboo_Spear,;Comfortwear,Toughwear;;
+Punk;punk;2;Punk;2:1;Use,Lunge,Dash;Man;Dagger,Axe,Pickaxe;Comfortwear,Dustset,Toughwear;Mask,Bandana;
 Yeller;punk;3;Punk;2:1;Use,Backstep,Calling;Man;Dagger,Axe,Pickaxe;,Comfortwear,Dustset,Toughwear;,Bandana;
 Phantom;;8;Curse;2:1;Use,Dash,Flameraroll,Fireblast,Shadowstep,Blizzard;Phantom;Greatsword,Halberd,Warhammer;Shadowrobe;;
 Monk;punk;3;Punk;2:1;Backstep,Use,Punch,Kick,Sidekick,Dash,Leap;Man;,Fireball,Threadball,Throwing Knife,Scroll,Potion;Robe;;

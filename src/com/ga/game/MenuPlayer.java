@@ -42,23 +42,29 @@ public class MenuPlayer extends Panel {
             statgrid.gridx = 0;
             add(level, statgrid);
             statgrid.gridy = 1;
-            for (int i=0;i<stats.length;i++) statButtons[i] = makeStatButton(stats[i]);
+            for (int i=0;i<stats.length;i++){
+                final int index = i;
+                statButtons[i] = makeStatButton(stats[i]);
+                final Performer perf = new Performer() {
+                    public void perform() {
+                        Global.player.level(stats[index], 0);
+                        Menu.menu.showMenu();
+                    }
+                };
+                statButtons[i].addActionListener(e -> {
+                    Menu.menu.showDialog(stats[index], getTrainDescription(stats[index]),
+                            new String[]{"Increase Stat"}, new Performer[]{perf});
+                });
+            }
             statgrid.gridx = 1;
             statgrid.gridy = 1;
             for (String stat : stats) {
                 JButton button = makeStatButton("");
                 button.setIcon(iconDescribe);
+                button.addActionListener(e -> {
+                    Menu.menu.showDialog(stat,Dialog.get("?"+stat));
+                });
             }
-        }
-        void refresh(){
-            MainPlayer player = Global.player;
-            level.setFont(Panel.font);
-            level.setForeground(Panel.fontcolor);
-            level.setText("Level "+player.getLevel() + " ");
-            points.setFont(Panel.smallfont);
-            points.setForeground(Color.RED);
-            points.setText("Available Points "+player.getLevel());
-            for (int i=0;i<stats.length;i++) statButtons[i].setText(stats[i]+" - "+player.get(stats[i]).getMax());
         }
         JButton makeStatButton(String p){
             final JButton button = new JButton(p);
@@ -80,6 +86,37 @@ public class MenuPlayer extends Panel {
             add(button, statgrid);
             statgrid.gridy++;
             return button;
+        }
+        private String getTrainDescription(String stat){
+            int[] requirements = Global.player.getLevelRequirements(0);
+            String r = "";
+            switch (stat) {
+                case "Strength":
+                    r += "Do push-ups to increase Strength by 1. ";
+                    break;
+                case "Agility":
+                    r += "Run around to increase Agility by 1. ";
+                    break;
+                case "Intelligence":
+                    r += "Meditate to increase Intelligence by 1. ";
+                    break;
+                default:
+                    r += "Increase "+stat+" by 1. ";
+            }
+            r += "Requires "+requirements[0]+" motivation and "+requirements[1]+" hours.";
+            r += "\nCurrent motivation: "+Global.player.get("Motivation").get();
+            r += "\nCurrent nutrition: "+Global.player.get("Nutrition").get();
+            return r;
+        }
+        void refresh(){
+            MainPlayer player = Global.player;
+            level.setFont(Panel.font);
+            level.setForeground(Panel.fontcolor);
+            level.setText("Level "+player.getLevel());
+            points.setFont(Panel.smallfont);
+            points.setForeground(Color.RED);
+            points.setText("Available Points "+player.getLevel());
+            for (int i=0;i<stats.length;i++) statButtons[i].setText(stats[i]+" - "+player.get(stats[i]).getMax());
         }
     }
 

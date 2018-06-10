@@ -24,6 +24,9 @@ public class Stats {
         if (stat == null) Global.p("Can't find stat "+p);
         return stat;
     }
+    public void addStat(String p, int value){
+        stats.put(p, new Stat(value));
+    }
     public void addEffect(Buffs p, int level){
         Buff origBuff = getEffect(p);
         if (origBuff == null) {
@@ -86,9 +89,11 @@ public class Stats {
                 effects.add(buff);
                 effects.get(effects.size()-1).time = Integer.parseInt(t[2]);
                 effects.get(effects.size()-1).var = Integer.parseInt(t[3]);
-                buff.onLoad();
             }
         }
+    }
+    public void initialize(){
+        for (Buff buff : effects) buff.onLoad();
     }
     public String getEffectsList(){
         if (effects.size() == 0) return "None";
@@ -119,12 +124,10 @@ public class Stats {
             }
         }
     }
-    public void clearBuffs(boolean force) {
+    public void clearBuffs() {
         for (int i=0;i<effects.size();i++) {
-            if (force || effects.get(i).buff != Buffs.Banishment) {
-                Buff effect = effects.remove(0);
-                effect.onFinish();
-            }
+            Buff effect = effects.remove(0);
+            effect.onFinish();
         }
     }
 }

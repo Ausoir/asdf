@@ -16,11 +16,10 @@ public class Prop extends Thing {
     static final float OFFSET_PROP = .0002f;
     public int factoryId = -1;
     public int subId = -1;
-    public String loadString;
     public Interactive onInteract = null;
     public boolean gravity = false;
     public boolean mobile = true;
-    public Faction faction = Faction.Destructive;
+    public Faction faction = Faction.Neutral;
     public P vel = new P(0, 0);
     public boolean tangible = true;
     public Line lastLand = new Line();
@@ -120,13 +119,6 @@ public class Prop extends Thing {
             }
             vel.x *= .94f;
         }
-    }
-    public Thing start(){
-        if (loadString != null){
-            load(loadString);
-            loadString = null;
-        }
-        return super.start();
     }
     public String[] load(String p) {
         String[] ps = p.split("@",-1);

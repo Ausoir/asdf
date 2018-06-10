@@ -90,6 +90,7 @@ public class Global {
         }
     }
     public static void hourPass(int p){
+        Global.player.stats.clearBuffs();
         timePass(p*100);
         hour+=p;
         for (Map i : maps) i.onTimeChange();

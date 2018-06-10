@@ -16,6 +16,7 @@ import com.ga.unit.man.Man;
 import com.ga.unit.man.Player;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Buffs;
+import com.ga.unit.skill.Stats;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -115,8 +116,7 @@ public enum Stock {
         String[] unit = units[id].split(";");
         Unit product = new Unit(map, null, seed){
             public void onCreate(){
-                String str = getUnit(map, unit[0],seed,clip.toString(),makeStat(rand,Integer.parseInt(unit[2])),Faction.valueOf(unit[3]),unit[4]+";1:0", unit[5], "");
-                load(str);
+                UnitFactory unitString = new UnitFactory(this, Faction.valueOf(unit[3]), Integer.parseInt(unit[2]));
             }
         };
         product.clip = new Body(product, unit[0]);
@@ -129,16 +129,10 @@ public enum Stock {
         final String[] unit = units[id].split(";",-1);
         com.ga.unit.man.Man product = new Man(map, unit[0], seed){
             public void onCreate(){
-                String str = getUnit(map,name,seed,"111111",makeStat(rand,Integer.parseInt(unit[2])),Faction.valueOf(unit[3]),unit[4]+";1:0",unit[5],"");
-                str += "@Battery@;";
-                String[] weapon = unit[7].split(",");
-                String[] armor = unit[8].split(",");
-                String[] helms = unit[9].split(",");
-                str += "#"+unit[6]+";"+getItem(map, weapon[seed % weapon.length],-1);
-                String helm = getItem(map, helms[seed % helms.length],0);
-                String arm = armor[seed % armor.length];
-                str += ";"+helm+";"+getItem(map, arm, 2)+";"+getItem(map, arm, 1)+";";
-                load(str);
+                UnitFactory unitString = new UnitFactory(this, Faction.valueOf(unit[3]), Integer.parseInt(unit[2]));
+                unitString.setAI(Integer.parseInt(unit[4].split(":")[0]), Integer.parseInt(unit[4].split(":")[1]));
+                unitString.setMoveset(unit[5]);
+                unitString.setEquipment(unit[6], unit[7].split(","), unit[8].split(","), unit[9].split(","));
             }
         };
         product.speechType = unit[1];
@@ -222,7 +216,7 @@ public enum Stock {
                 if (state == Actions.Melee) attack();
             }
             public void onCreate(){
-                load(getUnit(map,name,seed,clip.toString(),makeStat(rand, 3),Faction.Predator,"2:0;1:0","Melee",""));
+                UnitFactory unitString = new UnitFactory(this, Faction.Predator, 3);
             }
         };
         product.clip = new Body(product, name());
@@ -255,10 +249,12 @@ public enum Stock {
                 super.buff(buff, level);
             }
             public void onCreate(){
-                load(getUnit(map,name(),seed,clip.toString(),makeStat(rand,1),Faction.Predator,"2:0;1:0","Melee",""));
+                UnitFactory unit = new UnitFactory(this, Faction.Predator, 1);
+                unit.setStat("Speed", 12);
             }
             public void die(){
-                Threadball.create(map, -1, -1).pos.set(pos);
+                Threadball.create(map, -1, -1).start().pos.set(pos);
+                super.die();
             }
         };
         product.clip = new Body(product, name());
@@ -291,7 +287,7 @@ public enum Stock {
                 super.buff(buff, level*2);
             }
             public void onCreate(){
-                load(getUnit(map,name(),seed,clip.toString(),makeStat(rand,2),Faction.Predator,"2:0;1:0","Melee,Jump",""));
+                UnitFactory unit = new UnitFactory(this, Faction.Predator, 2);
             }
         };
         product.clip = new Body(product, name());
@@ -326,7 +322,11 @@ public enum Stock {
                 String moves;
                 if (seed % 2 == 1) moves = "Meteorform,Fireball";
                 else moves = "Fireblast";
-                load(getUnit(map,name(),seed,clip.toString(),makeStat(rand,7),Faction.Predator,"3/1:0",moves,""));
+                UnitFactory unit = new UnitFactory(this, Faction.Predator, 5);
+                for (int i=0;i<3;i++) traits.learn(this, Traits.Trait.Attunement);
+                for (int i=0;i<8;i++) traits.learn(this, Traits.Trait.Pyromancy);
+                unit.setStat("Intelligence", 20);
+                unit.setMoveset(moves);
             }
         };
         product.gravity = false;
@@ -335,11 +335,8 @@ public enum Stock {
     }},
     Golem { Prop make(Map map, int id, int seed) {
         Unit product = new Unit(map, name(), seed){
-            public boolean damageBreakthrough(int p, int damage){
-                return false;
-            }
             public void onCreate(){
-                load(getUnit(map,name(),seed,clip.toString(),makeStat(rand,12),Faction.Predator,"3/1:0","Melee",""));
+                UnitFactory unit = new UnitFactory(this, Faction.Predator, 12);
             }
         };
         product.gravity = false;
@@ -349,7 +346,7 @@ public enum Stock {
     Wyvern { Prop make(Map map, int id, int seed) {
         Unit product = new Unit(map, name(), seed){
             public void onCreate(){
-                load(getUnit(map,name(),seed,clip.toString(),makeStat(rand,16),Faction.Predator,"3/1:0","Melee",""));
+                UnitFactory unit = new UnitFactory(this, Faction.Predator, 16);
             }
         };
         product.gravity = false;
@@ -953,6 +950,7 @@ public enum Stock {
     }};
     private static HashMap<String, String> extRegistry = new HashMap<>();
     public static Prop get(com.ga.map.Map map, String p){
+        if (p == null) return null;
         Prop t;
         String[] sections = p.split("@",-1);
         int subId = Integer.parseInt(sections[1]);
@@ -962,7 +960,7 @@ public enum Stock {
         t.manualDepth = false;
         t.factoryId = index;
         t.subId = subId;
-        t.loadString = p;
+        t.load(p);
         return t;
     }
     public static Prop createByName(Map map, String p, int seed){ // Return to reflection
@@ -1008,16 +1006,6 @@ public enum Stock {
     static void randomSide(Prop p){
         p.dir = p.seed % 2 == 0 ? 1 : -1;
     }
-    static String makeStat(Random rand, int level){
-        int str,dex,intel,spd;
-        str = dex = 3+level;
-        spd = 18+rand.nextInt(8);
-        intel = rand.nextInt(1+level*2);
-        return "Level:"+level+"&Strength:"+str+"&Agility:"+dex+"&Intelligence:"+intel+"&Speed:"+spd+"&Attack:0";
-    }
-    static String getUnit(Map map, String name, int seed, String clip, String stat, Faction faction, String intel, String moves, String traits){
-        return name+"@-1@"+seed+"@0,0@0@"+Global.getControlId()+"@"+map.name+"@"+clip+"@"+stat+"@"+faction.name()+"@"+intel+"@"+moves+"@"+traits;
-    }
     private static String getItem(Map map, String p, int piece){
         if (p == null || p.equals("")) return "";
         String pieceName = "";
@@ -1038,5 +1026,54 @@ public enum Stock {
             for (int i=0;i<data.length;i++)
                 extRegistry.put(data[i].substring(0,data[i].indexOf(";")), raw+"@"+i);
         }
+    }
+}
+
+class UnitFactory {
+    Unit host;
+
+    UnitFactory(Unit unit, Faction faction, int level){
+        host = unit;
+        host.faction = faction;
+        unit.stats.addStat("Level", level);
+        unit.stats.addStat("Strength", 3+level);
+        unit.stats.addStat("Agility", 3+level);
+        unit.stats.addStat("Intelligence", 3+level);
+        unit.stats.addStat("Speed", 18+host.rand.nextInt(8));
+        unit.stats.addStat("Attack", host.rand.nextInt(10)-8);
+        setAI(2, 0);
+        setMoveset("Melee");
+    }
+    void setEquipment(String head, String[] weapon, String[] armor, String[] helms){
+        Man man = (Man) host;
+        man.setFace(head);
+        if (weapon != null) man.setWeapon((Item) Stock.createByName(host.map, "Pickaxe", -1));
+        man.armor = new ArmorSet(man, getItem(host.map, helms[host.seed % helms.length],0),
+                getItem(host.map, armor[host.seed % armor.length], 2),
+                getItem(host.map, armor[host.seed % armor.length], 1),
+                getItem(host.map, armor[host.seed % armor.length], 3));
+    }
+    private static String getItem(Map map, String p, int piece){
+        if (p == null || p.equals("")) return "";
+        String pieceName = "";
+        if (piece == 1) pieceName = "_Pants";
+        else if (piece == 2) pieceName = "_Torso";
+        Prop product = Stock.createByName(map, p+pieceName,-1);
+        if (product instanceof Item) {
+            Item r = (Item) product;
+            return r.toString();
+        } else {
+            Global.p("["+p+"] is not an Item");
+            return "";
+        }
+    }
+    void setStat(String stat, int value){
+        host.get(stat).setMax(value);
+    }
+    void setAI(int type, int subType){
+        Intelligence.get(type+":"+subType+";"+"1:0", host);
+    }
+    void setMoveset(String p){
+        host.moveset.load(host, p);
     }
 }

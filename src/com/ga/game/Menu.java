@@ -14,15 +14,14 @@ public class Menu extends JPanel implements Updatable {
     public static Menu menu = new Menu();
     private Panel current;
     private MenuPlayer menuPlayer = new MenuPlayer();
-    Menu(){
-        init();
-        setLayout(null);
-        resize();
-        setOpaque(false);
-        setFocusable(false);
-    }
-    void init(){
-        current = new Panel();
+
+    static void init(){
+        menu.current = new Panel();
+        menu.setLayout(null);
+        menu.resize();
+        menu.setOpaque(false);
+        menu.setFocusable(false);
+        Global.display.add(menu);
     }
     private void select(Panel p){
         Global.player.map.updater.addUpdatee(this);

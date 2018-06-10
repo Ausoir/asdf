@@ -14,7 +14,7 @@ public enum Strategy {
             if (action == Actions.Use){
                 Man man = (Man) host;
                 if (man.wieldingNone() || !man.weapon.isUsable(false, 1)){
-                    action = Actions.Punch;
+                    action = Actions.Throw;
                 }
             }
             return super.micromanage(host, action, dist);

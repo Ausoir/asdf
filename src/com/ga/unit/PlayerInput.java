@@ -17,12 +17,12 @@ import java.util.Map;
  * Created by Ga on 7/25/2016. asd
  */
 public class PlayerInput implements Input {
-    private HashMap<Integer, String> keyActionMap = new HashMap<Integer, String>(){{
-        put(-1,"Idle");
+    private HashMap<Integer, String> keyActionMap = new HashMap<>() {{
+        put(-1, "Idle");
     }};
-    public static ArrayList<Actions> basicMoves = new ArrayList<Actions>(){{
-        add(Actions.Idle);
+    public static ArrayList<Actions> basicMoves = new ArrayList<>() {{
         add(Actions.Use);
+        add(Actions.Idle);
         add(Actions.Left);
         add(Actions.Right);
         add(Actions.Rest);
