@@ -26,7 +26,7 @@ public class FileManager {
         searchFiles("Data", fileCache);
     }
     public static String makeDirectory(String p){
-        return p.replace("/", File.separator);
+        return p.replace("/", File.separator).replace("\\", File.separator);
     }
     private static void searchFiles(String p, HashMap<String, ArrayList<String[]>> r){
         File[] files = new File(p).listFiles();
@@ -73,7 +73,7 @@ public class FileManager {
         save(FileManager.makeDirectory("Data/map/"+name+".map"), result);
     }
     public static String read(String dir) {
-        String result = null;
+        String result = "";
         try {
             try (BufferedReader br = new BufferedReader(new FileReader(dir))) {
                 String newline = br.readLine();
@@ -101,6 +101,10 @@ public class FileManager {
         String keymap = read("Data/Keymap.txt");
         MainPlayer player = ((MainPlayer) Stock.Player.create(null, 1, 0));
         Global.display.input = player.input;
+        if (!data.contains("@")){
+            Global.p("Player gone!");
+            System.exit(1);
+        }
         player.load(data);
         player.input.load(keymap);
         Command.host = player;
@@ -116,7 +120,7 @@ public class FileManager {
 
     public static void loadActors(){
         String data = read("Data/map/Actors.map");
-        if (data != null) {
+        if (!data.isEmpty()) {
             String[] actors = data.split("%");
             for (String i : actors) {
                 Stock.get(null, i).start();

@@ -1,4 +1,4 @@
- package com.ga.map;
+package com.ga.map;
 
 import com.ga.game.Settings;
 import com.ga.tool.Line;

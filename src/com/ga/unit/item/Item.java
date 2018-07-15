@@ -65,19 +65,19 @@ public class Item extends Prop {
                 warmth -= 1;
             }
         },
-        Leather(.3f,1,1,1,1500,new Color(133, 78, 32,140)){
+        Leather(.3f,1,1,1,1500,new Color(133, 78, 32,80)){
             public void onSet(Item host){
                 warmth += 1;
             }
         },
         Glass(.1f,1,7,.5f,2000),
-        Brass(.4f,7,4,.7f,1500,new Color(133, 123, 23,120)),
-        Copper(.4f,5,3,1f,1500,new Color(133, 92, 38,120)){
+        Brass(.4f,7,4,.7f,1500,new Color(133, 123, 23,70)),
+        Copper(.4f,5,3,1f,1500,new Color(133, 92, 38,70)){
             public void onSet(Item host){
                 warmth -= 1;
             }
         },
-        Bronze(.4f,5,4,1.2f,1500,new Color(133, 72, 0,140)),
+        Bronze(.4f,5,4,1.2f,1500,new Color(133, 72, 0,80)),
         Iron(.4f,4,5,1.5f,2000),
         Silver(.2f,10,7,.8f,9000){
             public void onSet(Item host){
@@ -90,10 +90,10 @@ public class Item extends Prop {
                 host.tags.add(Tag.Enchant);
             }
         },
-        Lead(.4f,9,2,1.6f,1500,new Color(19, 31, 75,120)),
+        Lead(.4f,9,2,1.6f,1500,new Color(19, 31, 75,100)),
         Steel(.2f,4,6,4,8000),
         Titanium(.2f,3,7,5,30000),
-        Crystal(.2f,3,9,.3f,2000,new Color(28, 133, 67,180)){
+        Crystal(.2f,3,9,.3f,2000,new Color(28, 133, 67,140)){
             public void onSet(Item host){
                 host.tags.add(Tag.Conjuration);
                 host.tags.add(Tag.Channeling);
@@ -243,13 +243,12 @@ public class Item extends Prop {
         setType(type);
         material = Material.get(rand, materials);
         setMaterial(material);
-        speed = weight;
+        speed = weight*2;
         value += material.value;
         final Item me = this;
         onInteract = new Interactive(){
             public void interact(Man p){
                 if (owner == null){
-                    if (p.getVacancy() < encumbrance) p.say("Too encumbering!");
                     p.setWeapon(me);
                 }
             }
@@ -455,10 +454,7 @@ public class Item extends Prop {
     }
     public boolean use(Man host){
         if (host.get("Strength").getMax() >= weight) {
-            host.get("Attack").add(-getSpeed(), true);
-            int stateResult = host.setState(type.action);
-            host.get("Attack").add(getSpeed(), true);
-            if (stateResult == 0) {
+            if (host.setState(type.action) == 0) {
                 playSound();
                 return true;
             }

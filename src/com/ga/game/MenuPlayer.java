@@ -18,16 +18,18 @@ import javax.swing.plaf.basic.BasicScrollBarUI;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * Created by Ga on 8/6/2016. asd
  */
 public class MenuPlayer extends Panel {
-    private class StatPanel extends JPanel{
+    private class StatPanel extends JPanel {
         private GridBagConstraints statgrid = new GridBagConstraints();
         private String[] stats = MainPlayer.mainStats;
         private JButton[] statButtons = new JButton[stats.length];
         private JLabel level = new JLabel();
+        private JLabel motivation = new JLabel(), nutrition = new JLabel();
         private JLabel points = new JLabel();
         StatPanel(){
             setLayout(new GridBagLayout());
@@ -42,7 +44,7 @@ public class MenuPlayer extends Panel {
             statgrid.gridx = 0;
             add(level, statgrid);
             statgrid.gridy = 1;
-            for (int i=0;i<stats.length;i++){
+            for (int i=0;i<stats.length;i++) {
                 final int index = i;
                 statButtons[i] = makeStatButton(stats[i]);
                 final Performer perf = new Performer() {
@@ -51,20 +53,39 @@ public class MenuPlayer extends Panel {
                         Menu.menu.showMenu();
                     }
                 };
-                statButtons[i].addActionListener(e -> {
-                    Menu.menu.showDialog(stats[index], getTrainDescription(stats[index]),
-                            new String[]{"Increase Stat"}, new Performer[]{perf});
-                });
+                statButtons[i].addActionListener(e -> Menu.menu.showDialog(stats[index], getTrainDescription(stats[index]),
+                        new String[]{"Increase Stat"}, new Performer[]{perf}));
             }
             statgrid.gridx = 1;
             statgrid.gridy = 1;
+            statgrid.ipady = 32;
             for (String stat : stats) {
                 JButton button = makeStatButton("");
                 button.setIcon(iconDescribe);
-                button.addActionListener(e -> {
-                    Menu.menu.showDialog(stat,Dialog.get("?"+stat));
-                });
+                button.addActionListener(e -> Menu.menu.showDialog(stat,Dialog.get("?"+stat)));
             }
+            statgrid.gridx = 0;
+            statgrid.gridy = stats.length+1;
+            statgrid.ipady = 12;
+            add(new JLabel(""), statgrid);
+            statgrid.gridy++;
+            motivation.setIcon(iconDescribe);
+            motivation.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    Menu.menu.showDialog("Motivation", "You need motivation to improve stats.");
+                }
+            });
+            add(motivation, statgrid);
+            statgrid.gridy++;
+            nutrition.setIcon(iconDescribe);
+            nutrition.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    Menu.menu.showDialog("Nutrition", "You require 1 nutrition every hour.");
+                }
+            });
+            add(nutrition, statgrid);
         }
         JButton makeStatButton(String p){
             final JButton button = new JButton(p);
@@ -89,19 +110,19 @@ public class MenuPlayer extends Panel {
         }
         private String getTrainDescription(String stat){
             int[] requirements = Global.player.getLevelRequirements(0);
-            String r = "";
+            String r;
             switch (stat) {
                 case "Strength":
-                    r += "Do push-ups to increase Strength by 1. ";
+                    r = "Do push-ups to increase Strength by 1. ";
                     break;
                 case "Agility":
-                    r += "Run around to increase Agility by 1. ";
+                    r = "Run around to increase Agility by 1. ";
                     break;
                 case "Intelligence":
-                    r += "Meditate to increase Intelligence by 1. ";
+                    r = "Meditate to increase Intelligence by 1. ";
                     break;
                 default:
-                    r += "Increase "+stat+" by 1. ";
+                    r = "Increase "+stat+" by 1. ";
             }
             r += "Requires "+requirements[0]+" motivation and "+requirements[1]+" hours.";
             r += "\nCurrent motivation: "+Global.player.get("Motivation").get();
@@ -113,6 +134,12 @@ public class MenuPlayer extends Panel {
             level.setFont(Panel.font);
             level.setForeground(Panel.fontcolor);
             level.setText("Level "+player.getLevel());
+            motivation.setFont(Panel.smallfont);
+            motivation.setForeground(Panel.fontcolor);
+            motivation.setText("Motivation - "+player.get("Motivation").toString().replace(",", "/"));
+            nutrition.setFont(Panel.smallfont);
+            nutrition.setForeground(Panel.fontcolor);
+            nutrition.setText("Nutrition - "+player.get("Nutrition").toString().replace(",", "/"));
             points.setFont(Panel.smallfont);
             points.setForeground(Color.RED);
             points.setText("Available Points "+player.getLevel());
@@ -328,7 +355,7 @@ public class MenuPlayer extends Panel {
             skillpoints.setText(Dialog.get("mem")+": "+points);
         }
         void makeSlot(final Actions move){
-            final String displayName = Dialog.get(move.getName());
+            final String displayName = Dialog.get(move.name());
             String key = Global.player.input.getMapping(move);
             if (key == null) key = "";
             else key = "["+key+"]";
@@ -340,7 +367,7 @@ public class MenuPlayer extends Panel {
             describe.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Menu.menu.showDialog(move.getName(), move.getDescription());
+                    Menu.menu.showDialog(move.name(), move.getDescription());
                 }
             });
             int level = Global.player.getStateLevel(move);
@@ -547,15 +574,11 @@ public class MenuPlayer extends Panel {
             panel.removeAll();
             panel.add(makeOption("[Available Items]","?","Show all items available for crafting."));
             panel.add(makeOption("[Available Structures]","?s","Show all structures available for crafting."));
-            for (String i : Global.player.crafting.knowledge){
-                ArrayList<String> recipe = new ArrayList<>();
-                ArrayList<String> origRecipe = Crafts.recipes.get(i);
-                for (String ii : origRecipe) recipe.add(ii.split(":")[0]);
-                items.add("Time");
-                if (items.containsAll(recipe)) {
-                    String t = "";
-                    for (String ii : origRecipe) t += ii+", ";
+            for (String i : Global.player.crafting){
+                if (Crafts.canCraft(Global.player, i) >= 0){
+                    StringBuilder t = new StringBuilder();
                     craftables.add(i);
+                    for (String ii : Objects.requireNonNull(Crafts.getRecipe(i))) t.append(ii).append(", ");
                     panel.add(makeOption(i, i, "Craft " + i + " using ["+t.substring(0,t.length()-2)+"]"));
                 }
             }
@@ -565,11 +588,11 @@ public class MenuPlayer extends Panel {
             add(panel, BorderLayout.CENTER);
 
             other.removeAll();
-            for (String i : Global.player.crafting.knowledge){
+            for (String i : Global.player.crafting){
                 if (!craftables.contains(i)) {
-                    String t = "";
-                    for (String ii : Crafts.recipes.get(i)) t += ii + ", ";
-                    other.add(makeOption(i, i, "Crafting "+i+" requires ["+t.substring(0, t.length() - 2)+"]"));
+                    StringBuilder t = new StringBuilder();
+                    for (String ii : Objects.requireNonNull(Crafts.getRecipe(i))) t.append(ii).append(", ");
+                    other.add(makeOption(i, "!", "Crafting "+i+" requires ["+t.substring(0, t.length() - 2)+"]"));
                 }
             }
             b = BorderFactory.createTitledBorder(BorderFactory.createMatteBorder(2,2,2,2,Panel.forecolor));
@@ -620,22 +643,31 @@ public class MenuPlayer extends Panel {
         }
         private void command(String p){
             Menu.menu.showMenu();
-            if (p.equals("?")) {
-                String t = "";
-                for (String i : items) {
-                    if (!i.equals("Time") && !i.equals("Fist")) t += i + ", ";
+            switch (p) {
+                case "!":
+                    Global.player.say("Not enough resources or too hungry!");
+                    break;
+                case "?": {
+                    StringBuilder t = new StringBuilder();
+                    for (String i : items) {
+                        if (!i.equals("Time") && !i.equals("Fist")) t.append(i).append(", ");
+                    }
+                    String result = t.toString().equals("") ? "None" : t.substring(0, t.length() - 2);
+                    Menu.menu.showDialog("Available Items", result);
+                    break;
                 }
-                String result = t.equals("") ? "None" : t.substring(0, t.length() - 2);
-                Menu.menu.showDialog("Available Items", result);
-            } else if (p.equals("?s")){
-                String t = "";
-                for (String i : props) {
-                    t += i + ", ";
+                case "?s": {
+                    StringBuilder t = new StringBuilder();
+                    for (String i : props) {
+                        t.append(i).append(", ");
+                    }
+                    String result = t.toString().equals("") ? "None" : t.substring(0, t.length() - 2);
+                    Menu.menu.showDialog("Available Structures", result);
+                    break;
                 }
-                String result = t.equals("") ? "None" : t.substring(0, t.length() - 2);
-                Menu.menu.showDialog("Available Structures", result);
-            } else {
-                Command.order("crft@"+p);
+                default:
+                    Command.order("crft@" + p);
+                    break;
             }
         }
     }

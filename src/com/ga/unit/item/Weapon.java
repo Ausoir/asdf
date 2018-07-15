@@ -11,16 +11,14 @@ import com.ga.unit.Unit;
 public class Weapon extends Item {
     protected int quality = 0;
     private int damageMod;
-    public Weapon(Map map, String name, int seed, Material[] materials, ItemType type, int durability, int encumbrance, int speedMod, int damageMod) {
+    public Weapon(Map map, String name, int seed, Material[] materials, ItemType type, int durability, int speedMod, int damageMod) {
         super(map, name, seed, materials, type, durability);
-        this.encumbrance = encumbrance;
         this.damageMod = damageMod;
-        speed -= speedMod;
+        speed = weight - speedMod;
         value = value*2 + 1000;
         cooldown.setDuration(0);
         rotation = 35;
         delay = 0;
-        disposable = false;
     }
     public void onCreate(){
         imbueMeta(true, true, .1f);
@@ -65,7 +63,7 @@ public class Weapon extends Item {
     }
     @Override
     public int getDamage() {
-        int damage = super.getDamage()+quality+damageMod;
+        int damage = (super.getDamage()+damageMod+quality)*(1+(int)(quality*.2f));
         return Math.max(0,damage);
     }
     @Override

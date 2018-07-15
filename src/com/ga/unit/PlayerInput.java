@@ -17,9 +17,7 @@ import java.util.Map;
  * Created by Ga on 7/25/2016. asd
  */
 public class PlayerInput implements Input {
-    private HashMap<Integer, String> keyActionMap = new HashMap<>() {{
-        put(-1, "Idle");
-    }};
+    private HashMap<Integer, String> keyActionMap = new HashMap<>();
     public static ArrayList<Actions> basicMoves = new ArrayList<>() {{
         add(Actions.Use);
         add(Actions.Idle);
@@ -65,13 +63,13 @@ public class PlayerInput implements Input {
         int oldkey = -1;
         while (i.hasNext()) {
             Map.Entry e = (Map.Entry) i.next();
-            if (event != Actions.Idle && e.getValue().equals(event.getName())){
+            if (event != Actions.Idle && e.getValue().equals(event.name())){
                 i.remove();
                 oldkey = (int) e.getKey();
                 break;
             }
         }
-        keyActionMap.put(key, event.getName());
+        keyActionMap.put(key, event.name());
         if (event == Actions.Left || event == Actions.Right){
             if (oldkey != -1) keyActionMap.remove(-oldkey);
             keyActionMap.remove(-key);
@@ -81,7 +79,7 @@ public class PlayerInput implements Input {
     public String getMapping(Actions move){
         String r = null;
         for (Map.Entry<Integer, String> i : keyActionMap.entrySet()) {
-            if (i.getValue().equals(move.getName())){
+            if (i.getValue().equals(move.name())){
                 int key = i.getKey();
                 String keyname = KeyEvent.getKeyText(key);
                 if (key == 1) keyname = "LMB";
@@ -94,13 +92,15 @@ public class PlayerInput implements Input {
     public void input(int mode, int x, int y){
         if (mode == 0) inputCoord(x, y); //mousemove for better targeting
         else {
-            if (mode < 0) pressed.remove((Object)(-mode));
-            else if (mode > 9){
+            if (mode < 0) {
+                pressed.remove((Object)(-mode));
+                if (mode == -1) inputDirect("Idle", x, y);
+            } else if (mode > 9){
                 if (!pressed.contains(mode)) pressed.add(mode);
             }
             String action = keyActionMap.get(mode);
             if (action != null){
-                inputDirect(keyActionMap.get(mode),x,y);
+                inputDirect(action, x, y);
                 if (action.startsWith("_")) pressed.remove((Object)(mode));
             }
         }
@@ -142,7 +142,7 @@ public class PlayerInput implements Input {
         }
     }
     public void load(String p){
-        if (p.length() > 1) {
+        if (!p.isEmpty()) {
             String[] data = p.split(";",-1);
             for (String i : data) {
                 String[] pair = i.split(":");
@@ -153,6 +153,19 @@ public class PlayerInput implements Input {
                     if (move != null) changeMapping(Integer.parseInt(pair[0]), move);
                 }
             }
+        } else {
+            keyActionMap.put(32, Actions.Use.name());
+            keyActionMap.put(65, Actions.Left.name());
+            keyActionMap.put(68, Actions.Right.name());
+            keyActionMap.put(16, Actions.Rest.name());
+            keyActionMap.put(87, Actions.Jump.name());
+            keyActionMap.put(83, Actions.Drop.name());
+            keyActionMap.put(81, Actions.Throw.name());
+            keyActionMap.put(82, Actions.Wield.name());
+            keyActionMap.put(17, "_CTRL");
+            keyActionMap.put(10, "_SAY");
+            keyActionMap.put(9, "_MENU");
+            keyActionMap.put(38, "_UP");
         }
     }
     @Override
@@ -160,7 +173,7 @@ public class PlayerInput implements Input {
         if (keyActionMap.size() == 0) return "";
         String r = "";
         for (Map.Entry<Integer, String> i : keyActionMap.entrySet()){
-            if (!i.getValue().equals("Idle")) r += i.getKey() + ":" + i.getValue() + ";";
+            r += i.getKey() + ":" + i.getValue() + ";";
         }
         return r.substring(0,r.length()-1);
     }

@@ -6,7 +6,7 @@ screenX:1024
 screenY:720
 gravity:3
 gravityMax:64
-spf:17
-spu:22
+fps:50
+ups:27
 spc:360
 volumn:-5 //negative to positive decibels

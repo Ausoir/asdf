@@ -16,7 +16,6 @@ import com.ga.unit.man.Man;
 import com.ga.unit.man.Player;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Buffs;
-import com.ga.unit.skill.Stats;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -117,6 +116,7 @@ public enum Stock {
         Unit product = new Unit(map, null, seed){
             public void onCreate(){
                 UnitFactory unitString = new UnitFactory(this, Faction.valueOf(unit[3]), Integer.parseInt(unit[2]));
+                unitString.setMoveset("Melee");
             }
         };
         product.clip = new Body(product, unit[0]);
@@ -133,6 +133,7 @@ public enum Stock {
                 unitString.setAI(Integer.parseInt(unit[4].split(":")[0]), Integer.parseInt(unit[4].split(":")[1]));
                 unitString.setMoveset(unit[5]);
                 unitString.setEquipment(unit[6], unit[7].split(","), unit[8].split(","), unit[9].split(","));
+                traits.load(this, unit[10]);
             }
         };
         product.speechType = unit[1];
@@ -159,9 +160,9 @@ public enum Stock {
     Weapon{ Prop make(Map map, int id, int seed){
         String[] data = FileManager.readText("Data/raw/Weapon.txt");
         final String[] v = data[id].split(";");
-        Item product = new Weapon(map, v[0], seed, Item.Material.load(v[4].split(",")), Item.ItemType.valueOf(v[1]),
-                40, Integer.parseInt(v[2]), Integer.parseInt(v[5]), Integer.parseInt(v[6]));
-        int range = Integer.parseInt(v[3]);
+        Item product = new Weapon(map, v[0], seed, Item.Material.load(v[3].split(",")), Item.ItemType.valueOf(v[1]),
+                40, Integer.parseInt(v[4]), Integer.parseInt(v[5]));
+        int range = Integer.parseInt(v[2]);
         if (range != -1) product.range = range;
         product.subId = id;
         return product;
@@ -217,6 +218,7 @@ public enum Stock {
             }
             public void onCreate(){
                 UnitFactory unitString = new UnitFactory(this, Faction.Predator, 3);
+                unitString.setMoveset("Melee");
             }
         };
         product.clip = new Body(product, name());
@@ -251,6 +253,7 @@ public enum Stock {
             public void onCreate(){
                 UnitFactory unit = new UnitFactory(this, Faction.Predator, 1);
                 unit.setStat("Speed", 12);
+                unit.setMoveset("Melee");
             }
             public void die(){
                 Threadball.create(map, -1, -1).start().pos.set(pos);
@@ -287,7 +290,8 @@ public enum Stock {
                 super.buff(buff, level*2);
             }
             public void onCreate(){
-                UnitFactory unit = new UnitFactory(this, Faction.Predator, 2);
+                UnitFactory unitString = new UnitFactory(this, Faction.Predator, 2);
+                unitString.setMoveset("Melee");
             }
         };
         product.clip = new Body(product, name());
@@ -323,9 +327,9 @@ public enum Stock {
                 if (seed % 2 == 1) moves = "Meteorform,Fireball";
                 else moves = "Fireblast";
                 UnitFactory unit = new UnitFactory(this, Faction.Predator, 5);
-                for (int i=0;i<3;i++) traits.learn(this, Traits.Trait.Attunement);
-                for (int i=0;i<8;i++) traits.learn(this, Traits.Trait.Pyromancy);
                 unit.setStat("Intelligence", 20);
+                for (int i=0;i<8;i++) traits.learn(this, Traits.Trait.Attunement);
+                for (int i=0;i<8;i++) traits.learn(this, Traits.Trait.Pyromancy);
                 unit.setMoveset(moves);
             }
         };
@@ -336,7 +340,8 @@ public enum Stock {
     Golem { Prop make(Map map, int id, int seed) {
         Unit product = new Unit(map, name(), seed){
             public void onCreate(){
-                UnitFactory unit = new UnitFactory(this, Faction.Predator, 12);
+                UnitFactory unitString = new UnitFactory(this, Faction.Predator, 12);
+                unitString.setMoveset("Melee");
             }
         };
         product.gravity = false;
@@ -346,7 +351,8 @@ public enum Stock {
     Wyvern { Prop make(Map map, int id, int seed) {
         Unit product = new Unit(map, name(), seed){
             public void onCreate(){
-                UnitFactory unit = new UnitFactory(this, Faction.Predator, 16);
+                UnitFactory unitString = new UnitFactory(this, Faction.Predator, 16);
+                unitString.setMoveset("Melee");
             }
         };
         product.gravity = false;
@@ -354,7 +360,7 @@ public enum Stock {
         return product;
     }},
     Fist{ Prop make(Map map, int id, int seed){
-        Item product = new Weapon(map, name(),0, new Item.Material[]{Item.Material.Flesh}, Item.ItemType.Bashing, -1, 0, 0, 0){
+        Item product = new Weapon(map, name(),0, new Item.Material[]{Item.Material.Flesh}, Item.ItemType.Bashing, -1, 0, 0){
             public boolean use(final com.ga.unit.man.Man host) {
                 host.setState(Actions.Interact);
                 return true;
@@ -422,16 +428,16 @@ public enum Stock {
                         if (checkIngredients()) {
                             if (host.get("Motivation").require(100)) {
                                 if (map.updater.sleep(1, true)) {
-                                    if (!player.learnSkill(skill)) host.say("Failed to learn " + skill.getName() + ".");
+                                    if (!player.learnSkill(skill)) host.say("Failed to learn " + skill.name() + ".");
                                 }
                             } else host.say("No motivation...");
                         } else host.say("Catalysts required!");
-                    } else host.say("Not skilled enough to learn "+skill.getName()+"!");
+                    } else host.say("Not skilled enough to learn "+skill.name()+"!");
                 }
                 return false;
             }
             public String getName(){
-                return super.getName()+" of "+skill.getName();
+                return super.getName()+" of "+skill.name();
             }
             public String getDescription(){
                 int difficulty = skill.getDifficulty();
@@ -588,7 +594,7 @@ public enum Stock {
             }
             public String getName(){
                 if (!Global.player.traits.has(Traits.Trait.Rune_Literacy)) return super.getName();
-                return super.getName()+" of "+spell.getName();
+                return super.getName()+" of "+spell.name();
             }
         };
         product.probability = 1;
@@ -597,7 +603,7 @@ public enum Stock {
         return product;
     }},
     Ethersword{ Prop make(Map map, int id, int seed){
-        Weapon product = new Weapon(map, name(), seed, new Item.Material[]{Item.Material.Crystal}, Item.ItemType.Sword, -1, 0, 0, 0){
+        Weapon product = new Weapon(map, name(), seed, new Item.Material[]{Item.Material.Crystal}, Item.ItemType.Sword, -1, 0, 0){
             public String toString(){
                 return "";
             }
@@ -910,7 +916,7 @@ public enum Stock {
     }},
     Manastone_Necklace{ Prop make(Map map, int id, int seed){
         Armor product = new Armor(map, "Battery",seed,new Item.Material[]{Item.Material.Stone, Item.Material.Glass, Item.Material.Crystal, Item.Material.Obsidian}
-                ,3,0,0,100, 0){
+                ,3,0,0,40, 0){
             public String getDescription(){
                 return super.getDescription()+"\nThis item is used to store mana for magical applications.";
             }
@@ -923,7 +929,7 @@ public enum Stock {
     }},
     Manastone{ Prop make(Map map, int id, int seed){
         Item product = new Item(map, "Battery",seed,new Item.Material[]{Item.Material.Stone, Item.Material.Glass, Item.Material.Crystal, Item.Material.Obsidian}
-            ,Item.ItemType.Consumable,250){
+            ,Item.ItemType.Consumable,80){
             public String getDescription(){
                 return super.getDescription()+"\nThis item is used to store mana for magical applications.";
             }
@@ -971,7 +977,7 @@ public enum Stock {
         }
         Prop r = createByNameFromReg(map, p, seed);
         if (r != null) return r;
-        return Stock.Object.create(map, 0,0);
+        return null;//Stock.Object.create(map, 0,0);
     }
     public static Prop createByNameFromReg(Map map, String p, int seed){
         String name = extRegistry.get(p);
@@ -1042,12 +1048,11 @@ class UnitFactory {
         unit.stats.addStat("Speed", 18+host.rand.nextInt(8));
         unit.stats.addStat("Attack", host.rand.nextInt(10)-8);
         setAI(2, 0);
-        setMoveset("Melee");
     }
     void setEquipment(String head, String[] weapon, String[] armor, String[] helms){
         Man man = (Man) host;
         man.setFace(head);
-        if (weapon != null) man.setWeapon((Item) Stock.createByName(host.map, "Pickaxe", -1));
+        if (weapon != null && weapon.length > 0) man.setWeapon((Item) Stock.createByName(host.map, weapon[host.seed % weapon.length], -1));
         man.armor = new ArmorSet(man, getItem(host.map, helms[host.seed % helms.length],0),
                 getItem(host.map, armor[host.seed % armor.length], 2),
                 getItem(host.map, armor[host.seed % armor.length], 1),
@@ -1074,6 +1079,6 @@ class UnitFactory {
         Intelligence.get(type+":"+subType+";"+"1:0", host);
     }
     void setMoveset(String p){
-        host.moveset.load(host, p);
+        Actions.load(host, p);
     }
 }

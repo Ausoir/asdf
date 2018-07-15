@@ -11,6 +11,7 @@ import com.ga.unit.Stock;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Objects;
 
 /**
  * Created by ga on 5/28/17. asd
@@ -61,13 +62,15 @@ public class Generator {
         blueprint.start();
 
         float depth = map.checkLand(new Line(pos.x, pos.y - 4, pos.x, pos.y + 600)).depth;
+        float startDepth = depth - .1f;
+        float depthScale = .01f;
         P offset = new P(-blueprint.size.x / 2, -blueprint.size.y + 24);
         blueprint.adjust(offset.getAdd(pos));
         blueprint.setTexture();
         int next = map.getNextTerrain();
         for (Line i : blueprint.landRaw) {
             i.tid += next;
-            i.depth = depth - .1f + i.depth * .01f + .001f;
+            i.depth = startDepth + i.depth * depthScale + (depthScale*.1f);
             map.landRaw.add(i);
             if (!i.vertical() && i.opt > 0) {
                 map.land.add(i);
@@ -76,12 +79,12 @@ public class Generator {
         for (java.util.Map.Entry pair : blueprint.formTextures.entrySet()) {
             String newTexture = (String) pair.getValue();
             float newDepth = Float.parseFloat(newTexture.substring(0, newTexture.indexOf("&")));
-            newTexture = (depth - .1f + newDepth * .01f) + newTexture.substring(newTexture.indexOf("&"));
+            newTexture = (startDepth + newDepth * depthScale) + newTexture.substring(newTexture.indexOf("&"));
             map.formTextures.put(((int) pair.getKey()) + next, newTexture);
         }
         for (java.util.Map.Entry pair : blueprint.terrains.entrySet()) {
             Terrain terrain = (Terrain) pair.getValue();
-            terrain.setDepth(depth - .1f + terrain.depth * .01f);
+            terrain.setDepth(startDepth + terrain.depth * depthScale);
             terrain.map = this.map;
             terrain.render();
             terrain.start();
@@ -97,7 +100,7 @@ public class Generator {
                 Line closest = blueprint.checkLand(new Line(prop.pos.getAdd(0, -4), new P(prop.pos.x, prop.pos.y + 600)));
                 if (closest != null) {
                     prop.lastLand = closest;
-                    prop.setDepth(depth - .1f + closest.depth * .01f);
+                    prop.setDepth(startDepth + closest.depth * depthScale);
                 }
                 if (prop.factoryId == Stock.Spawn.ordinal()) {
                     prop.subId = 2;
@@ -121,7 +124,7 @@ public class Generator {
                             if (!exitExists){
                                 float spawnX = house.size.x/2;
                                 P spawnPoint = new P(spawnX, house.checkLand(new Line(spawnX, 0, spawnX, house.size.y)).getCrossPointY(spawnX));
-                                Stock.createByName(house, "Signpost", -1).start().pos.set(spawnPoint);
+                                Objects.requireNonNull(Stock.createByName(house, "Signpost", -1)).start().pos.set(spawnPoint);
                                 Stock.Spawn.create(house, -1, 3).start().pos.set(spawnPoint.getAdd(0,-50));
                                 Prop exit = (Prop) Stock.Travel.create(house, 1, 3).start();
                                 exit.seed = bid + exit.seed - 1;

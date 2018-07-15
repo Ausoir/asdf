@@ -72,7 +72,7 @@ public class Map {
     }
 
     public void load(String dir) {
-        String data = FileManager.read("Data/map/" + dir + ".map");
+        String data = FileManager.read(FileManager.makeDirectory("Data/map/" + dir + ".map"));
         String[] line = data.split("%");
         String[] names = line[0].split(";");
         callname = names[0];

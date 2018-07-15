@@ -10,7 +10,7 @@ public class Traits {
         Fast_Learner(1,"Level twice as fast at the cost of triple motivation cost."), Haggler(1,"Get 30% off shop prices."),
         Tough(1,"Resist flinching from being hit."), Innovation(1,"Learn random skill every level."), Perception(1,"Learn to identify others."),
         Herbalism(1,"Pick materials from bushes and trees."), Rune_Literacy(1,"Identify, use, and create scrolls."),
-        Alchemy(1,"Identify, use, and create potions."),
+        Alchemy(1,"Identify, use, and create potions."), Meditation(1,"Spend time to remove all buffs"),
 
         Lung_Injury(2,"Rest time quadrupled."){
             public void onSet(Unit host){
@@ -110,7 +110,7 @@ public class Traits {
             public void onRemove(Unit host){
                 host.tags.remove(tag);
             }
-        }, Morphing(3,"Learn to shape one's own body."){
+        }, Morphing(3,"Learn to manipulate flesh."){
             Tag tag = Tag.Mutation;
             public void onSet(Unit host){
                 onAdd(host);

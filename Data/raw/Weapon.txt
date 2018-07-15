@@ -1,24 +1,28 @@
-Stick;Bashing;0;-1;Wooden,Iron;5;0 //Weapon, Type, Encumbrance, Range, Materials, Speed, Damage
-Bamboo_Spear;Spear;1;-1;Wooden;-5;-1
-Broadsword;Sword;4;-1;Copper,Bronze,Iron,Silver,Steel;-3;1
-Mace;Swinging;4;-1;Copper,Bronze,Iron,Silver,Steel;-15;3
-Katana;Sword;2;-1;Bronze,Iron,Steel,Titanium,Crystal;5;-1
-Claw;Knife;1;-1;Copper,Bronze,Iron,Silver,Steel,Bone,Titanium,Crystal;15;2 //Very hard to hit with
-Spear;Spear;2;-1;Copper,Bronze,Iron,Steel,Bone;-10;0
-Axe;Swinging;3;-1;Copper,Bronze,Iron,Steel;-10;2
-Dagger;Knife;1;-1;Glass,Copper,Bronze,Iron,Silver,Steel;24;0
-Tanto;Knife;1;-1;Bronze,Iron,Steel,Crystal;10;0
-Pickaxe;Sword;5;-1;Copper,Bronze,Iron;-13;3
-Cleaver;Sword;7;-1;Bronze,Iron,Silver,Steel,Titanium,Lead;-17;4
-Lancesword;Knife;5;-1;Wooden,Glass,Stone,Copper,Brass,Bronze,Iron,Silver,Steel,Bone,Titanium,Lead,Crystal;2;1
-Cutlass;Sword;3;-1;Iron,Silver,Steel;4;0
-Claymore;Sword;7;-1;Iron,Silver,Steel;-9;4
-Halberd;Spear;8;-1;Bronze,Iron,Silver,Steel;-20;2
-Greatsword;Swinging;9;-1;Stone,Brass,Bronze,Iron,Silver,Steel,Bone,Titanium;-15;5
-Warhammer;Bashing;9;-1;Wooden,Bronze,Iron,Silver,Steel,Titanium,Bone,Lead;-20;6
-Bow;Bow;4;700;Wooden;0;0
-Revolver;Shooting;3;480;Brass,Bronze;0;0
-Pistol;Shooting;3;480;Brass,Bronze;0;0
-Rifle;Rifle;7;700;Bronze,Iron;0;0
-Dart;Darting;0;600;Bronze,Iron,Steel,Silver;0;0
-Javelin;Throwing;2;600;Bronze,Iron,Copper,Steel,Silver;0;0
+Stick;Bashing;-1;Wooden,Iron;5;0 //Weapon, Type, Encumbrance, Range, Materials, Speed, Damage
+Bamboo_Spear;Spear;-1;Wooden;-5;-1
+Broadsword;Sword;-1;Copper,Bronze,Iron,Silver,Steel;-3;1
+Mace;Swinging;-1;Copper,Bronze,Iron,Silver,Steel;-15;3
+Katana;Sword;-1;Bronze,Iron,Steel,Titanium,Crystal;5;-1
+Claw;Knife;-1;Copper,Bronze,Iron,Silver,Steel,Bone,Titanium,Crystal;15;2 //Very hard to hit with
+Spear;Spear;-1;Copper,Bronze,Iron,Steel,Bone;-10;0
+Axe;Swinging;-1;Copper,Bronze,Iron,Steel;-10;2
+Dagger;Knife;-1;Glass,Copper,Bronze,Gold,Iron,Silver,Steel;24;0
+Tanto;Knife;-1;Bronze,Iron,Steel,Crystal;10;0
+Knuckleblade;Knife;-1;Bronze,Iron,Steel,Glass,Crystal;20;1
+Pickaxe;Sword;-1;Copper,Bronze,Iron;-13;3
+Cleaver;Sword;-1;Bronze,Iron,Silver,Steel,Titanium,Lead;-17;4
+Lancesword;Knife;-1;Wooden,Glass,Stone,Copper,Brass,Bronze,Iron,Silver,Steel,Bone,Titanium,Lead,Crystal;2;1
+Cutlass;Sword;-1;Iron,Silver,Steel;4;0
+Claymore;Sword;-1;Iron,Silver,Steel;-9;4
+Striker;Sword;-1;Iron,Silver,Steel,Gold,Titanium;-16;5
+Rapier;Knife;-1;Iron,Glass,Crystal,Gold,Steel;-9;4
+Falchion;Sword;-1;Lead,Copper,Bronze,Iron,Steel;-40;6
+Halberd;Spear;-1;Bronze,Iron,Silver,Steel;-20;2
+Greatsword;Swinging;-1;Stone,Brass,Bronze,Iron,Silver,Steel,Bone,Titanium;-15;5
+Warhammer;Bashing;-1;Wooden,Bronze,Iron,Silver,Steel,Titanium,Bone,Lead;-20;6
+Bow;Bow;700;Wooden;0;0
+Revolver;Shooting;480;Brass,Bronze;0;0
+Pistol;Shooting;480;Brass,Bronze;0;0
+Rifle;Rifle;700;Bronze,Iron;0;0
+Dart;Darting;600;Bronze,Iron,Steel,Silver;0;0
+Javelin;Throwing;600;Bronze,Iron,Copper,Steel,Silver;0;0

@@ -118,7 +118,7 @@ public class Organ extends Line {
             Line right = new Line(pt.x-Global.cos(atan)*strokeSize, pt.y-Global.sin(atan)*strokeSize,
                     ptd.x-Global.cos(atan)*strokeSize, ptd.y-Global.sin(atan)*strokeSize);
             Line hitbox = p.getAdd(host.pos.getMult(-1,-1));
-            return hitbox.lineCross(left) || hitbox.lineCross(right);
+            return lineCross(hitbox) || hitbox.lineCross(left) || hitbox.lineCross(right);
         }
         return false;
     }

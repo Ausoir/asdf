@@ -1,5 +1,7 @@
-Battery@Time:100;Component:1;Grass:1
-Charger@Time:100;Component:1;Shocker:1
-Scroll@Time:200;Grass:*
-Grass@Time:50;Sharp:0
-Training Dummy@Time:100;Fiber:*;Fiber:*;Fiber:*
+Battery@Time:1;Rock:1;Weed:1
+Charger@Time:1;Rock:1;Electric:1
+Scroll@Time:1;Weed:*
+Training_Dummy@Time:3;Fiber:*;Fiber:*;Fiber:*
+Cutlass@Time:2;Rock:0;Broadsword:*
+Seabrew@Time:1;Starfish:*;Salt:1;Pot:0
+Salad@Time:0;Weed:*;Salt:1

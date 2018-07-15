@@ -1,10 +1,14 @@
 package com.ga.map;
 
+import com.ga.game.FileManager;
+
+import java.io.File;
+
 public class MapName {
-    static final String instance = "ins/";
+    static final String instance = FileManager.makeDirectory("ins/");
     public String value;
 
-    public MapName(String p){
+    MapName(String p){
         set(p);
     }
     private void set(String p){
@@ -24,7 +28,7 @@ public class MapName {
         return getIndex() > 0;
     }
     public boolean isField(){
-        return value.startsWith("ins/_");
+        return value.startsWith(FileManager.makeDirectory("ins/_"));
     }
     String getBiomeName(){
         switch (getBiome()){
@@ -43,14 +47,14 @@ public class MapName {
     }
 
     String getMapname(){
-        return value.substring(value.lastIndexOf("/")+1);
+        return value.substring(value.lastIndexOf(File.separator)+1);
     }
     String getDir(){
-        int index = value.lastIndexOf("/");
+        int index = value.lastIndexOf(File.separator);
         return index == -1 ? "" : value.substring(0, index);
     }
     String getModifiedMapname(String p){
-        return getDir()+"/"+p;
+        return getDir()+File.separator+p;
     }
     public String toString(){
         return value;

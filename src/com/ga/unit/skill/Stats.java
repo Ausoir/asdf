@@ -29,7 +29,8 @@ public class Stats {
     }
     public void addEffect(Buffs p, int level){
         Buff origBuff = getEffect(p);
-        if (origBuff == null) {
+        if (origBuff == null)
+        {
             Buff buff = p.make(host, level);
             buff.onSet();
             effects.add(buff);
@@ -53,7 +54,6 @@ public class Stats {
         Buff buff = getEffect(p);
         return buff != null && buff.onTrigger();
     }
-
     public boolean rest(int mag){
         if (restTimer.update(mag)){
             stats.get("Strength").heal();
@@ -70,7 +70,6 @@ public class Stats {
                 effects.remove(i--);
             }
         }
-        restTimer.time = Math.min(restTimer.time+2, restTimer.max);
     }
     public void load(String p){
         String[] statOrBuff = p.split("/");

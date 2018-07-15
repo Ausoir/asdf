@@ -104,7 +104,7 @@ public class P {
         return getAdd(dX, dY);
     }
     public String toString(){
-        return ((int)x) + "," + ((int)y);
+        return x + "," + y;
     }
     public void load(String p){
         String[] t = p.split(",");

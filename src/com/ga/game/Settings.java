@@ -14,8 +14,8 @@ public class Settings {
     public static int centerY;
     public static int gravity;
     public static int gravityMax;
-    static int spf;
-    static int spu;
+    static int fps;
+    static int ups;
     static int spc;
     static int spo;
     static int volumn;
@@ -51,11 +51,11 @@ public class Settings {
                 case "gravityMax":
                     gravityMax = value;
                     break;
-                case "spf":
-                    spf = value;
+                case "fps":
+                    fps = value;
                     break;
-                case "spu":
-                    spu = value;
+                case "ups":
+                    ups = value;
                     break;
                 case "spc":
                     spc = value;

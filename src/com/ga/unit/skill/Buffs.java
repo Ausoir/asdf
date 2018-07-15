@@ -39,17 +39,6 @@ public enum Buffs {
             }
         };
     }},
-    Corona(0,new Tags(){{
-        add(Tag.Enchant);
-        add(Tag.Curse);
-    }}){ Buff makeLocal(){
-        return new Buff(10) {
-            public boolean update() {
-                Particle.sparkle(host.map, "Glare", host.getDepth(), host.getRandomPoint(), 4, 2);
-                return super.update();
-            }
-        };
-    }},
     Alert(1,new Tags(){{
         add(Tag.Curse);
     }}){ Buff makeLocal() {
@@ -255,7 +244,7 @@ public enum Buffs {
     Mark(1,new Tags(){{
         add(Tag.Curse);
     }}){ Buff makeLocal(){
-        return new Buff(4) {
+        return new Buff(3) {
             private Thing mark;
             public void onLoad(){
                 mark = new Thing(host.map, "Mark", host.seed, 150);
@@ -265,7 +254,7 @@ public enum Buffs {
                 mark.save = false;
             }
             public void onSet() {
-                time += level*6;
+                time += level;
                 Sound.play(host.map, host.pos, "freeze");
                 mark = new Thing(host.map, "Mark", host.seed, 150);
                 mark.image.setCenterType(2);
@@ -363,7 +352,7 @@ public enum Buffs {
                 }
             };
         }},
-    Glacialwalk(2,new Tags(){{
+    Icepath(2,new Tags(){{
         add(Tag.Enchant);
         add(Tag.Conjuration);
     }}){ Buff makeLocal(){
@@ -374,29 +363,22 @@ public enum Buffs {
             }
             public boolean update() {
                 tick++;
-                if (tick % 2 == 0) {
+                if (tick % 8 == 0) {
                     final Projectile p = new Projectile(host.map, "Ice", host.pos.getAdd(0, -5), new P(), 0) {
                         @Override
                         public void onAttack(Unit p) {
                             p.buff(Buffs.Freeze, level);
-                            Particle.explode(host.map, "Ice", host.getDepth(), pos, new P(0, -20), 30, 10, 5, true, 10);
+                            Particle.explode(host.map, "Ice", host.getDepth(), pos, new P(0, -20), 6, 10, 5, true, 10);
                             remove();
                         }
-
                         @Override
                         public void stuck() {
                             vel.set(0, 0);
                         }
-
-                        @Override
-                        public void update() {
-                            super.update();
-                            Particle.explode(host.map, "Ice", host.getDepth(), pos, new P(0, -5), 1, 3, 2, false, 6);
-                        }
                     };
                     p.faction = host.faction;
                     p.gravity = true;
-                    p.delay.set(50 + (level * 150));
+                    p.delay.set(50);
                     p.delay.performer = new Performer() {
                         public void perform() {
                             p.remove();

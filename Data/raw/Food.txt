@@ -5,4 +5,6 @@ Meal;3;Grain,Vegetable,Fish
 Burger;1;Red,Vegetable,Grain,Roasted
 Sandwich;1;Vegetable,Grain
 Ration;1;Dried
-Meat;3;Red
+Meat;2;Red
+Seabrew;2;Vegetable,Fish
+Salad;1;Vegetable

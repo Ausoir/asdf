@@ -1,6 +1,7 @@
 package com.ga.unit;
 
 import com.ga.tool.P;
+import com.ga.tool.Performer;
 import com.ga.tool.SyncRand;
 import com.ga.unit.man.Man;
 import com.ga.unit.skill.Actions;
@@ -65,7 +66,7 @@ public enum Strategy {
     static Actions getMove(Unit host, P target){
         int x = (int) ((target.x) - (host.pos.x + host.vel.x));
         int y = (int) (target.y - host.pos.y);
-        if (Math.abs(y) > Math.abs(x)) {
+        if (Math.abs(y*2) > Math.abs(x)) {
             if (y > 0) return Actions.Drop;
             else return Actions.Jump;
         }
@@ -74,8 +75,14 @@ public enum Strategy {
     }
     public int micromanage(Unit host, Actions action, float dist){
         int fb = host.setState(action);
-        if (fb == 2) host.setState(Actions.Rest);
-        if (host.state == Actions.Rest) host.delay.time = 40;
+        if (host.state == Actions.Rest) {
+            host.delay.time = host.stats.restTimer.max/4;
+            host.delay.performer = new Performer(){
+                public void perform(){
+                    host.get("Strength").heal();
+                }
+            };
+        }
         else if (host.state.getTags().contains(Tag.Channeling)) host.delay.set(100);
         return fb;
     }
@@ -84,19 +91,17 @@ public enum Strategy {
         host.face(host.brain.target.pos.x>host.pos.x?1:-1, false);
         Actions action;
         ArrayList<Actions> moves = new ArrayList<>();
-        if (host.get("Strength").get() == 0) action = Actions.Rest;
-        else {
-            for (Actions act : host.moveset) {
-                if (dist < act.getRange(host)) {
-                    moves.add(act);
-                }
+        for (Actions act : host.moveset) {
+            if (dist < act.getRange(host) && host.getCooldown(act).isReady()) {
+                if (host.get("Strength").get() >= act.getCost()) moves.add(act);
+                else moves.add(Actions.Rest);
             }
-            if (moves.size() > 0 && SyncRand.r.nextInt(3) != 0) action = moves.get(0);
-            else if (moves.size() > 1 && SyncRand.r.nextInt(3) != 0) action = moves.get(1);
-            else if (moves.size() > 2) action = moves.get(SyncRand.r.nextInt(moves.size()));
-            else action = getMove(host, host.brain.target.pos);
         }
+        if (moves.size() > 0 && SyncRand.r.nextInt(3) != 0) action = moves.get(0);
+        else if (moves.size() > 1 && SyncRand.r.nextInt(3) != 0) action = moves.get(1);
+        else if (moves.size() > 2) action = moves.get(SyncRand.r.nextInt(moves.size()));
+        else action = getMove(host, host.brain.target.pos);
         int fb = micromanage(host, action, dist);
-        host.say(host.get("Strength").toString() + " " + action.name() + " " + fb);
+//        host.say(host.get("Strength").toString() + " " + action.name() + " " + fb);
     }
 }

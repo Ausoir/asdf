@@ -5,10 +5,10 @@ import com.ga.map.Map;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
+import com.ga.tool.ToolString;
 import com.ga.unit.*;
 import com.ga.unit.item.ArmorSet;
 import com.ga.unit.item.Crafts;
-import com.ga.unit.item.Food;
 import com.ga.unit.item.Item;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Buffs;
@@ -30,7 +30,7 @@ public class Man extends Unit {
     private String face;
     public ArmorSet armor;
     public Inventory inventory = new Inventory(this);
-    public Crafts crafting = new Crafts(this);
+    public ArrayList<String> crafting = new ArrayList<>();
 
     public Man(Map map, String name, int seed) {
         super(map, name, seed);
@@ -49,7 +49,7 @@ public class Man extends Unit {
     public String[] load(String p){
         String[] t = p.split("#");
         String[] lines = super.load(t[0]);
-        crafting.load(lines[13]);
+        Crafts.load(this, lines[13]);
         String[] items = t[1].split(";",-1);
         setFace(items[0]);
         if (!items[1].equals("")) setWeapon((Item) Stock.get(map, items[1]));
@@ -76,7 +76,7 @@ public class Man extends Unit {
     @Override
     public String toString(){
         StringBuilder r = new StringBuilder();
-        r.append(super.toString()).append("@").append(crafting.toString()).append("@;");
+        r.append(super.toString()).append("@").append(ToolString.tosArrayList(crafting)).append("@;");
         r.append("#").append(face).append(";").append(weapon.forceToString()).append(";").append(armor.toString());
         if (inventory.getItemSize() != 0) r.append(";").append(inventory.toString());
         return r.toString();
@@ -123,7 +123,9 @@ public class Man extends Unit {
     public int getWeight(){
         return inventory.weight+armor.getWeight()+weapon.weight;
     }
-
+    protected int getAttackSpeed(){
+        return super.getAttackSpeed()-weapon.getSpeed();
+    }
     protected void stateOnSet(Actions state){
         state.onSet(this);
     }
@@ -255,6 +257,7 @@ public class Man extends Unit {
         }
         return false;
     }
+    @Override
     public boolean requireMana(int p){
         if (stats.triggerEffect(Buffs.Attunement)) return true;
         int innateLevel = traits.getTraitLevel(Traits.Trait.Attunement);

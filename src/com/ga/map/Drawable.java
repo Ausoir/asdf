@@ -11,8 +11,7 @@ public abstract class Drawable implements Observer {
     private Drawable prev;
     Drawable next;
     float depth = -1;
-    public void draw(Graphics2D g){
-    }
+    public void draw(Graphics2D g){}
     public void setDepth(float depth){
         if (this.depth == -1){
             this.depth = depth;

@@ -14,7 +14,7 @@ import java.util.Random;
 public class Thing extends Drawable {
     public Map map;
     public Random rand;
-    public int seed = 0;
+    public int seed;
     public Picture image;
     public P pos;
     public String name;

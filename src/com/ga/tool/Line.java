@@ -85,9 +85,8 @@ public class Line {
         pt = ptd;
         ptd = t;
     }
-    public Line getPerpendicular(){
-        P midpoint = getMidpoint();
-        return new Line(midpoint.add(pt.flip()), midpoint.add(ptd.flip()));
+    public Line getIntersector(){
+        return new Line(ptd.x,pt.y,pt.x,ptd.y);
     }
     public boolean lineCross(Line i2){
         boolean a = i2.pt.x-pt.x >= 0, b = i2.pt.x-ptd.x > 0, c = i2.ptd.x-pt.x >= 0, d = i2.ptd.x-ptd.x > 0,

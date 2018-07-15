@@ -4,16 +4,14 @@ import com.ga.game.Settings;
 import com.ga.game.Sound;
 import com.ga.map.Global;
 import com.ga.map.Map;
-import com.ga.tool.EventTimer;
-import com.ga.tool.Line;
-import com.ga.tool.P;
-import com.ga.tool.SyncRand;
+import com.ga.tool.*;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Buffs;
 import com.ga.unit.skill.Stat;
 import com.ga.unit.skill.Stats;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -21,7 +19,7 @@ import java.util.HashMap;
  */
 public class Unit extends Prop {
     private static final float OFFSET_UNIT = .0001f;
-    public Moveset moveset = new Moveset();
+    public ArrayList<Actions> moveset = new ArrayList<>();
     public HashMap<Actions, Cooldown> cooldown = new HashMap<>();
     public int controlId;
     public Body clip;
@@ -62,7 +60,7 @@ public class Unit extends Prop {
         faction = Faction.valueOf(sections[9]);
         Intelligence.get(sections[10], this);
         stats.load(sections[8]);
-        moveset.load(this,sections[11]);
+        Actions.load(this,sections[11]);
         clip.setOrganHealth();
         traits.load(this,sections[12]);
         return sections;
@@ -70,7 +68,7 @@ public class Unit extends Prop {
     @Override
     public String toString(){
         return super.toString() + "@" + controlId + "@" + map.name.toString() + "@" + clip.toString() + "@" + stats.toString() + "@" + faction.name() +
-                "@" + brain.toString() + "@" + moveset.toString() + "@" + traits.toString();
+                "@" + brain.toString() + "@" + ToolString.tosArrayList(moveset) + "@" + traits.toString();
     }
     @Override
     public void onField(){
@@ -153,12 +151,13 @@ public class Unit extends Prop {
             face(target.x > 0 ? 1 : -1, false);
             clip.setState(state.getClipName());
             if (state != Actions.Idle){
+                stats.restTimer.reset();
                 getCooldown(state).reset();
                 delay.performer = null;
                 stateInterrupt();
                 delay.set(state.getDel());
                 if (delay.max != 0 && state.isDynamicAnimation()){
-                    int attackSpeed = get("Attack").get() - 4;
+                    int attackSpeed = getAttackSpeed();
                     int clipspeed = clip.setSpeed(attackSpeed);
                     delay.set(Math.max(clipspeed, delay.time - attackSpeed));
                 }
@@ -170,12 +169,18 @@ public class Unit extends Prop {
             stateOnSet(state);
         }
     }
+    protected int getAttackSpeed(){
+        return get("Attack").get();
+    }
     public boolean face(int dir, boolean force) {
         if (force || (delay.over() && grounded && this.dir != dir)) {
             this.dir = dir;
             return true;
         }
         return false;
+    }
+    public boolean requireMana(int p) {
+        return true;
     }
 
     @Override
@@ -203,7 +208,7 @@ public class Unit extends Prop {
             timeout++;
             organ = SyncRand.r.nextInt(clip.organs.length);
         } while (timeout < clip.organs.length+3 && clip.organs[organ].amputated);
-        return clip.organs[organ].getPerpendicular().getAdd(pos);
+        return clip.organs[organ].getIntersector().getAdd(pos);
     }
     public boolean hit(Line hitBox, int damage){
         return hit(hitBox, true, damage);
@@ -215,6 +220,21 @@ public class Unit extends Prop {
                 if (damage > 0) {
                     P t = new P(pos.x, hitBox.ptd.y);
                     Particle.explode(map, "Blood", getDepth(), t, t.getSubtract(hitBox.pt), 3, 3, 12, true, 5);
+                    P mid = hitBox.getMidpoint();
+                    float radius = hitBox.getLength() / 2;
+                    if (mid.getSubtract(pos.getAdd(0, -clip.getHeight())).getDist() < radius + getSize()) {
+                        delay.performer = null;
+                        grounded = false;
+                        if (!traits.has(Traits.Trait.Tough)) {
+                            if (stats.getEffectLevel(Buffs.Stun) < 1) {
+                                vel.x = damage * Float.compare(pos.x, hitBox.pt.x);
+                                vel.y += -damage;
+                            }
+                            stateSet(Actions.Hit);
+                        }
+                        brain.onHit();
+                        clip.organs[i].hit(hitBox);
+                    }
                     if (damageBreakthrough(i, blunt, damage)) {
                         if (get("Agility").require(1)) {
                             Particle.explode(map, "Blood", getDepth()+.01f, getRandomPoint(), new P(), 9, 5, 0, true, 24);
@@ -222,21 +242,8 @@ public class Unit extends Prop {
                             buff(Buffs.Bleed, 1);
                             clip.organs[i].amputate(hitBox, damage);
                         }
-                    } else {
-                        P mid = hitBox.getMidpoint();
-                        float radius = hitBox.getLength() / 2;
-                        if (mid.getSubtract(pos.getAdd(0, -clip.getHeight())).getDist() < radius + getSize()) {
-                            delay.performer = null;
-                            grounded = false;
-                            if (stats.getEffectLevel(Buffs.Stun) < 1) {
-                                vel.x = damage * Float.compare(pos.x, hitBox.pt.x);
-                                vel.y += -damage;
-                            }
-                            if (!traits.has(Traits.Trait.Tough)) stateSet(Actions.Hit);
-                            brain.onHit();
-                            clip.organs[i].hit(hitBox);
-                        }
                     }
+                    if (stats.triggerEffect(Buffs.Mark)) clip.organs[i].amputate(hitBox, damage);
                 } else {
                     clip.organs[i].hit(hitBox);
                 }
@@ -256,12 +263,7 @@ public class Unit extends Prop {
         if (state != Actions.Dead) stateSet(Actions.Dead);
     }
 
-    public void disconnect(){ //do not use remove() - calls overriden method
-        speech.remove();
-        super.remove();
-    }
-
-    public void remove(){ //do not use disconnect()
+    public void remove(){
         speech.remove();
         super.remove();
     }

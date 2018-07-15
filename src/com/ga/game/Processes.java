@@ -38,41 +38,38 @@ public class Processes {
             public void run(){
                 Global.display.repaint();
             }
-        }, 200, Settings.spf);
-        update.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run(){ //Same speed same thread = no stutter
-                ArrayList<Map> maps = (ArrayList<Map>) Global.maps.clone();
-                for (Map i : maps) i.updater.update();
-                Global.update();
-            }
-        }, 100, Settings.spu);
-//        new Thread(() -> {
-//            int fps = 30;
-//            int spf = (int) ((1f/fps)*1000);
-//            long timeTaken = 0, last_frame_time, current_frame_time = System.currentTimeMillis();
-//            while (!paused)
-//            {
-//                last_frame_time = current_frame_time;
-//                current_frame_time = System.currentTimeMillis();
-//                if (timeTaken >= spf) {
-//                    ArrayList<Map> maps = (ArrayList<Map>) Global.maps.clone();
-//                    for (Map i : maps) i.updater.update();
-//                    Global.update();
-//                    Global.display.repaint();
-//                    timeTaken = current_frame_time - last_frame_time;
-//                } else {
-//                    try {
-//                        long reserve = spf-timeTaken;
-//                        Thread.sleep(reserve);
-//                        Global.p(reserve + "");
-//                        timeTaken = spf;
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
+        }, 200, (int) ((1f/Settings.fps)*1000));
+//        update.scheduleAtFixedRate(new TimerTask() {
+//            @Override
+//            public void run(){ //Same speed same thread = no stutter
+//                ArrayList<Map> maps = (ArrayList<Map>) Global.maps.clone();
+//                for (Map i : maps) i.updater.update();
+//                Global.update();
 //            }
-//        }).start();
+//        }, 100, (int) ((1f/Settings.ups)*1000));
+        new Thread(() -> {
+            int spf = (int) ((1f/Settings.ups)*1000);
+            long timeTaken = 0, last_frame_time, current_frame_time = System.currentTimeMillis();
+            while (!paused)
+            {
+                last_frame_time = current_frame_time;
+                current_frame_time = System.currentTimeMillis();
+                if (timeTaken >= spf) {
+                    ArrayList<Map> maps = (ArrayList<Map>) Global.maps.clone();
+                    for (Map i : maps) i.updater.update();
+                    Global.update();
+                    timeTaken = current_frame_time - last_frame_time;
+                } else {
+                    try {
+                        long reserve = spf-timeTaken;
+                        Thread.sleep(reserve);
+                        timeTaken = spf;
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
     }
     public static void editorMode(){
         controllers.cancel();
