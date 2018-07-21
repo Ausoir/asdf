@@ -274,6 +274,12 @@ public class Body {
         return true;
     }
 
+    public void setImage(String p){
+        for (Organ i : organs){
+            if (i.type != 0) i.setImage(p,i.type-1);
+        }
+    }
+
     public int getHead(){
         for (int i=0;i<organs.length;i++) {
             if (organs[i].vital && !organs[i].amputated) return i;

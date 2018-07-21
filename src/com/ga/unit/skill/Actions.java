@@ -148,12 +148,16 @@ public enum Actions {
     }, Conjure{
     }, Use{
         public int getRange(Unit host){
-            return ((Man)host).weapon.range;
+            return ((Man) host).weapon.range;
+        }
+        public int canSet(Unit host){
+            int r = super.canSet(host);
+            if (!((Man) host).weapon.isUsable(false, 1)) return 7;
+            return r;
         }
         public void onSet(Man host){
             host.stateSet(Idle);
-            if (host.weapon.isUsable(false, 1)) host.weapon.use(host);
-            else host.stateSet(Throw);
+            host.weapon.use(host);
         }
     }, Consume(8){
     }, Interact(8){
@@ -204,7 +208,7 @@ public enum Actions {
 //            else host.get("Strength").add(-1, false);
         }
         public void update(Unit host) {
-            host.stats.rest(4+host.stateLevel);
+            host.stats.rest(3+host.stateLevel);
         }
     },
     Melee(24,1,0,0,new Tags(){{
@@ -238,7 +242,7 @@ public enum Actions {
             }
         }
     },
-    Throw(12,1,0,0,new int[]{FIST},new Tags(){{
+    Throw(26,1,0,0,new int[]{FIST},new Tags(){{
         add(Tag.Strength);
     }}){
         public String getClipName(){
@@ -297,7 +301,7 @@ public enum Actions {
                 for (Unit victim : target) {
                     if (victim.state == Down || victim.state == Hit) { //down or stunned
                         Sound.play(host.map, host.pos, "wear");
-                        Weapon holder = new Weapon(host.map, null, 0, new Item.Material[]{Item.Material.Flesh}, Item.ItemType.Bashing, 1+(victim.get("Agility").get()*4), -20, 0) {
+                        Weapon holder = new Weapon(host.map, null, 0, new Item.Material[]{Item.Material.Organic}, Item.ItemType.Bashing, 1+(victim.get("Agility").get()*4), -20, 0) {
                             public String forceToString() {
                                 return "";
                             }
@@ -338,8 +342,11 @@ public enum Actions {
         add(Tag.Strength);
         add(Tag.Athletics);
     }}){
+        public int getRange(Unit host){
+            return 180+(host.stateLevel*15);
+        }
         public void onSet(Man host){
-            host.delay.time += host.stateLevel*4;
+            host.delay.time += host.stateLevel*2;
             if (host.dir < 0) host.vel.x = Math.min(-4, host.vel.x);
             else host.vel.x = Math.max(4, host.vel.x);
         }
@@ -644,6 +651,7 @@ public enum Actions {
         add(Tag.Strength);
     }}){
         public void onSet(Man host){
+            super.onSet(host);
             host.damageMod = 0;
         }
         public void trigger(Unit host){
@@ -808,7 +816,7 @@ public enum Actions {
         add(Tag.Strength);
     }}){
         public void trigger(Unit host){
-            ArrayList<Unit> t = host.map.updater.collideUnit(host.target.getAdd(host.pos),64,Faction.Destructive);
+            ArrayList<Unit> t = host.map.updater.collideUnit(host.target.getAdd(host.pos),84,Faction.Destructive);
             if (t.size() > 0) t.get(0).buff(Buffs.Mark, host.stateLevel);
         }
     },
@@ -1714,7 +1722,7 @@ public enum Actions {
                 Particle.implode(host.map, "Smoke", host.getDepth(), host.getHand(), 12, 2, false, 60);
                 P origin = host.getHand();
                 ArrayList<Prop> t = host.map.updater.collideProp(origin, 400);
-                t.removeIf(e -> !(e instanceof Item) || e.tags.contains(Tag.Mana));
+                t.removeIf(e -> !(e instanceof Item) || e.tags.contains(Tag.Energy));
                 int size = t.size();
                 if (size > 0) {
                     Sound.play(host.map, host.pos, "drink");

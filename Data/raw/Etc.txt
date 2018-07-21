@@ -2,7 +2,6 @@ Rock;2;1;0;Stone //Weapon, Image Type, Weight, Value, Materials
 Shell;2;0;250;Bone
 Starfish;2;0;250;Flesh;A cooking ingredient.
 Grass;1;0;0;Cloth
-Battery;1;0;800;Copper,Lead
 Flowerpot;2;1;500;Wooden,Silver,Stone,Glass
 Chair;2;8;1500;Wooden,Silver,Stone,Brass
 Salt;2;0;0;Other;A cooking ingredient.

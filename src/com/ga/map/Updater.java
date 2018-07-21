@@ -13,7 +13,7 @@ import java.util.ArrayList;
  * Created by Ga on 5/6/2016. asd
  */
 public class Updater {
-    public static boolean editor = false;
+    public boolean editor = false;
     private Map map;
     private Drawable drawee;
     private ArrayList<Particle> effects = new ArrayList<>();
@@ -80,8 +80,10 @@ public class Updater {
         processQueue();
         Global.updateCamera();
         for (Updatable i : updatee) i.update();
-        for (Prop i : props) i.update();
-        if (!editor) for (Unit i : unitsLoaded) i.update(); //new class?
+        if (!editor){
+            for (Prop i : props) i.update();
+            for (Unit i : unitsLoaded) i.update(); //new class?
+        }
         for (Particle t : effects) t.update();
     }
     public void draw(Graphics2D g2){
@@ -201,19 +203,23 @@ public class Updater {
         return seen;
     }
     public boolean sleep(int p, boolean checkEnemy){
-        if (checkEnemy) {
-            for (Unit i : unitsLoaded) {
-                if (i.map == Global.player.map && i.faction.canAttack(Global.player.faction) && i.brain.target == Global.player) {
-                    Global.player.say("There are enemies on the map!");
-                    return false;
-                }
+        for (Unit i : unitsLoaded) {
+            if (i.map == Global.player.map && i.faction.canAttack(Global.player.faction) && (checkEnemy || i.brain.target == Global.player)) {
+                Global.player.say("There are enemies on the map!");
+                return false;
             }
         }
+        if (!Global.player.get("Fatigue").require(p)){
+            Global.player.say("I am too tired! I need "+p+" Fatigue points.");
+            return false;
+        }
         if (!Global.player.get("Nutrition").require(p)){
-            Global.player.say("I am too hungry! I need "+p+" nutrition points.");
+            Global.player.get("Fatigue").add(p,false);
+            Global.player.say("I am too hungry! I need "+p+" Nutrition points.");
             return false;
         }
         map.weather.fadeIn();
+        Global.player.stats.clearBuffs();
         Global.hourPass(p);
         return true;
     }

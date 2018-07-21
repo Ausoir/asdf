@@ -12,10 +12,10 @@ import com.ga.unit.skill.Actions;
  * Created by Ga on 8/9/2016. asd
  */
 public class Armor extends Item {
-    private int piece = 0;
+    private int piece;
     private int armorMod = 0;
-    private int warmth = 0;
-    int pocket = 0;
+    private int warmth;
+    int pocket;
     public Armor(Map map, String name, int seed, Material[] materials, int piece, int encumbrance, int pockets, int durability, int warmth) {
         super(map, name, seed, materials, ItemType.Armor, durability);
         this.encumbrance = encumbrance;
@@ -24,7 +24,8 @@ public class Armor extends Item {
         this.piece = piece;
         this.warmth = warmth;
         delay = 80;
-        if (piece == 1 || piece == 2) image.set(name, piece);
+        if (piece == 1) image.set(name, 1);
+        else if (piece == 2) image.set(name, 0);
         else if (piece == 3) weight = 0;
     }
     void shade(int color){}

@@ -30,11 +30,6 @@ public enum Strategy {
         }
     },
     Archer{
-        public float getDist(Unit host){
-            float r = super.getDist(host);
-            host.target.y -= Math.abs(host.target.x - host.pos.x)/80;
-            return r;
-        }
         public int micromanage(Unit host, Actions action, float dist){
             return Ranged.micromanage(host, action, dist);
         }
@@ -57,8 +52,10 @@ public enum Strategy {
         }
         avgX /= host.brain.target.clip.organs.length*2;
         avgY /= host.brain.target.clip.organs.length*2;
-        int x = (int) ((host.brain.target.pos.x + host.brain.target.vel.x) - (host.pos.x + host.vel.x));
-        int y = (int) (host.brain.target.pos.y - host.pos.y);
+        P hostPos = host.getHand();
+        P targetPos = host.brain.target.getHead();
+        int x = (int) ((targetPos.x + host.brain.target.vel.x) - (hostPos.x + host.vel.x));
+        int y = (int) (targetPos.y - hostPos.y);
         host.target = new P(x+avgX,y+avgY);
         if (host instanceof Man) ((Man)host).weapon.rotateTo(host.target.getMult(host.dir,host.dir));
         return (float) Math.abs(Math.sqrt(x * x + y * y) - host.getReach());

@@ -100,14 +100,14 @@ public class Server {
             public void run(){
                 String[] mapData = p.split("@");
                 FileManager.saveWorld();
-                Global.player.map.clear();
-                Global.maps.clear();
                 com.ga.map.Map map = Global.getMap(mapData[0]);
                 Global.player.map = map;
                 Global.player.pos.set(map.updater.getEntrancePos(Integer.parseInt(mapData[1]), map.getFailsafePos()));
                 FileManager.saveCharacter();
-                FileManager.loadPlayer();
+                Global.player.map.clear();
+                Global.maps.clear();
                 FileManager.loadWorld();
+                FileManager.loadPlayer();
                 FileManager.loadActors();
                 Processes.resume();
             }

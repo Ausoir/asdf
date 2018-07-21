@@ -92,10 +92,6 @@ public class FileManager {
         }
         return result;
     }
-    public static void loadGame(){
-        loadPlayer();
-        loadActors();
-    }
     public static void loadPlayer(){
         String data = read("Data/map/Player.user");
         String keymap = read("Data/Keymap.txt");

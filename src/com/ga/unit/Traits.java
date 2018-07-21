@@ -31,8 +31,8 @@ public class Traits {
         },
 
         Crafter(3,"Craft various items."),
-        Attunement(3,"Utilize innate mana from your body."),
-        Energy(3,"Learn mana generation methods."){
+        Attunement(3,"Utilize innate energy from your body. Higher level restores more energy per hour."),
+        Energy(3,"Learn energy generation methods."){
             Tag tag = Tag.Energy;
             public void onSet(Unit host){
                 onAdd(host);
@@ -44,7 +44,7 @@ public class Traits {
                 host.tags.remove(tag);
             }
         },
-        Pyromancy(3,"Forge mana into roaring flames."){
+        Pyromancy(3,"Forge energy into roaring flames."){
             Tag tag = Tag.Fire;
             public void onSet(Unit host){
                 onAdd(host);
@@ -55,7 +55,7 @@ public class Traits {
             public void onRemove(Unit host){
                 host.tags.remove(tag);
             }
-        }, Alacritomancy(3, "Convert mana into electric energy."){
+        }, Alacritomancy(3, "Convert energy into electrical energy."){
             Tag tag = Tag.Electric;
             public void onSet(Unit host){
                 onAdd(host);
@@ -66,7 +66,7 @@ public class Traits {
             public void onRemove(Unit host){
                 host.tags.remove(tag);
             }
-        }, Infusion(3,"Create matter and soul from mana."){
+        }, Infusion(3,"Create matter and soul from energy."){
             Tag tag = Tag.Conjuration;
             public void onSet(Unit host){
                 onAdd(host);
@@ -88,7 +88,7 @@ public class Traits {
             public void onRemove(Unit host){
                 host.tags.remove(tag);
             }
-        }, Channeling(3,"Learn the techniques of continual mana drawing."){
+        }, Channeling(3,"Learn the techniques of persistent energy release."){
             Tag tag = Tag.Channeling;
             public void onSet(Unit host){
                 onAdd(host);
@@ -99,7 +99,7 @@ public class Traits {
             public void onRemove(Unit host){
                 host.tags.remove(tag);
             }
-        }, Aeromancy(3,"Generate air pressure from sources of mana."){
+        }, Aeromancy(3,"Generate air pressure from energy."){
             Tag tag = Tag.Air;
             public void onSet(Unit host){
                 onAdd(host);

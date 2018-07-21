@@ -6,5 +6,5 @@ package com.ga.unit;
 public enum Tag {
     Energy, Enchant, Curse, Channeling, Void, Electric, Air, Mutation, Fire, Conjuration,
     Strength, Athletics,
-    Mana, Currency
+    Currency
 }

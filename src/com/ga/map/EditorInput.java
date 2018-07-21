@@ -66,8 +66,8 @@ public class EditorInput extends Drawable implements Input, Updatable {
     }
 
     private void init(){
-        Updater.editor = true;
         map = Global.player.map;
+        map.updater.editor = true;
         map.updater.addUpdatee(this);
         Global.display.input = this;
         map.updater.addQueue.add(this);
@@ -294,7 +294,6 @@ public class EditorInput extends Drawable implements Input, Updatable {
             lastSaved = p.substring(5);
             save(lastSaved);
         } else if (p.startsWith("load")){
-            Updater.editor = false;
             Global.server.requestChangeMap(FileManager.makeDirectory(p.substring(5)+"@0"));
             lastSaved = p.substring(5);
             while (true){
@@ -492,7 +491,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
                     Performer[] performers = new Performer[listString.length];
                     for (int i=0;i<listString.length;i++){
                         Prop prop = list.get(i);
-                        listString[i] = i+" - "+prop.name+" (obj:"+Stock.values()[prop.factoryId].name()+", id:"+prop.subId+", seed:"+prop.seed+")";
+                        listString[i] = i+" - "+prop.name+" (obj:"+Stock.values()[prop.factoryId].name()+", id:"+prop.subId+", seed:"+prop.seed+", depth"+prop.getDepth()+")";
                         final int finalI = i;
                         performers[i] = new Performer(){
                             public void perform(){
@@ -650,7 +649,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
                 shift = false;
                 break;
             case KeyEvent.VK_INSERT:
-                Updater.editor = false;
+                map.updater.editor = false;
                 Global.server.requestChangeMap(FileManager.makeDirectory(map.name.toString()+"@0"));
                 final P asdf = Global.camera.getAdd(0,-400);
                 while (true){

@@ -4,6 +4,7 @@ import com.ga.game.Command;
 import com.ga.game.Input;
 import com.ga.game.Menu;
 import com.ga.map.Global;
+import com.ga.tool.P;
 import com.ga.unit.man.Player;
 import com.ga.unit.skill.Actions;
 
@@ -106,8 +107,9 @@ public class PlayerInput implements Input {
         }
     }
     private void inputCoord(int x, int y){
-        x = x-host.pos.x();
-        y = y-host.pos.y();
+        P hand = host.getHand();
+        x = x-hand.x();
+        y = y-hand.y();
         if (host.delay.over()) host.target.set(x,y);
     }
     public void inputDirect(String p, int x, int y){
@@ -153,7 +155,7 @@ public class PlayerInput implements Input {
                     if (move != null) changeMapping(Integer.parseInt(pair[0]), move);
                 }
             }
-        } else {
+        } else { //reset keymap
             keyActionMap.put(32, Actions.Use.name());
             keyActionMap.put(65, Actions.Left.name());
             keyActionMap.put(68, Actions.Right.name());

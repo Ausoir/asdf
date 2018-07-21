@@ -41,6 +41,10 @@ public class Weapon extends Item {
     }
 
     @Override
+    public int getValue(){
+        return super.getValue() + (quality*1500);
+    }
+    @Override
     public boolean trigger(Unit target) {
         if (!type.isBlunt()) Sound.play(map, pos, "hit_cut");
         else Sound.play(map, pos, "hit_bash");
@@ -78,7 +82,7 @@ public class Weapon extends Item {
         if (emod != null){
             r += " This weapon has "+(int)(probability*100)+"% chance of activating its enchantment every hit.";
         }
-        return r + " This weapon deals upto "+getDamage()+" damage.";
+        return r + " This weapon deals "+getDamage()+" damage.";
     }
     public String[] load(String p){
         String[] r = super.load(p);

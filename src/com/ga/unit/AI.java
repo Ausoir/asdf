@@ -3,6 +3,8 @@ package com.ga.unit;
 import com.ga.game.Observer;
 import com.ga.map.Global;
 import com.ga.tool.Interactive;
+import com.ga.tool.Line;
+import com.ga.tool.P;
 import com.ga.tool.Timer;
 import com.ga.unit.man.Man;
 import com.ga.unit.skill.Actions;
@@ -51,6 +53,29 @@ public abstract class AI implements Observer {
         }
     }
     boolean blocked(int dir){
+        boolean blocked = false;
+        boolean fall = true;
+        P front = host.pos.getAdd((host.getSpeed()*3+48)*dir,0);
+        if (Math.abs(host.map.mapEdge(front)-5) == 1) blocked = true;
+        else {
+            Line pp = new Line(host.pos, front);
+            Line pp2 = new Line(front.getAdd(0, -40), front.getAdd(0, 40));
+            for (Line i : host.map.land) {
+                if (i.lineCross(pp) && (Math.abs(i.getSlope()) > Line.MAXSLOPE || !i.clockwise())) {
+                    blocked = true;
+                }
+                if (i.lineCross(pp2)) {
+                    fall = false;
+                }
+            }
+        }
+        if (blocked){
+            tasks.peek().blocked(host, false);
+            return true;
+        } else if (fall){
+            tasks.peek().blocked(host, true);
+            return true;
+        }
         return false;
     }
     void hear(Prop u, String p){}
@@ -61,6 +86,7 @@ public abstract class AI implements Observer {
                 return perceived(t);
             }
         }
+        blocked(host.dir);
         return false;
     }
     boolean perceived(Prop p){

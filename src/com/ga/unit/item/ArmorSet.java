@@ -4,7 +4,6 @@ import com.ga.map.Global;
 import com.ga.map.Shader;
 import com.ga.unit.Organ;
 import com.ga.unit.Stock;
-import com.ga.unit.Tag;
 import com.ga.unit.Tags;
 import com.ga.unit.man.Man;
 
@@ -15,16 +14,16 @@ import java.awt.*;
  */
 public class ArmorSet {
     private static Armor[] bare = new Armor[]{
-            new Armor(null, "Head", 0,new Item.Material[]{Item.Material.Flesh},0,0,0, -1, 0){
+            new Armor(null, "Head", 0,new Item.Material[]{Item.Material.Organic},0,0,0, -1, 0){
                 public boolean checkBreak(boolean blunt, int d){ return true; }
             },
-            new Armor(null, "Man_skin", 0,new Item.Material[]{Item.Material.Flesh},1,0,0, -1, 0){
+            new Armor(null, "Man_skin", 0,new Item.Material[]{Item.Material.Organic},1,0,0, -1, 0){
                 public boolean checkBreak(boolean blunt, int d){ return true; }
             },
-            new Armor(null, "Man_skin", 0,new Item.Material[]{Item.Material.Flesh},2,0,0, -1, 0){
+            new Armor(null, "Man_skin", 0,new Item.Material[]{Item.Material.Organic},2,0,0, -1, 0){
                 public boolean checkBreak(boolean blunt, int d){ return true; }
             },
-            new Armor(null, "Man_skin", 0,new Item.Material[]{Item.Material.Flesh},3,0,0, -1, 0){
+            new Armor(null, "Man_skin", 0,new Item.Material[]{Item.Material.Organic},3,0,0, -1, 0){
                 public boolean checkBreak(boolean blunt, int d){ return true; }
             },
     };
@@ -99,7 +98,7 @@ public class ArmorSet {
     }
     public void onHit(){
         for (int i=0;i<display.length;i++){
-            display[i].getImage().modify(Shader.Tatter, Math.round(getOrganArmor(i).getPercentage()*10)+1);
+            display[i].getImage().modify(Shader.Tatter, Math.round(getOrganArmor(i).getPercentage()*9)+2);
         }
     }
     public void mend(){
@@ -113,6 +112,9 @@ public class ArmorSet {
         if (organ == 1 || organ == 2) return armor[1];
         if (organ == 0 || organ == 3 || organ == 4) return armor[2];
         return null;
+    }
+    public boolean isBare(){
+        return isBare(0) && isBare(1) && isBare(2);
     }
     public boolean isBare(int piece){
         return armor[piece] == bare[piece];

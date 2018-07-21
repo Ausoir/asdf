@@ -3,8 +3,8 @@ Drumstick;2;White,Fried
 Porkchop;2;Red,Roasted
 Meal;3;Grain,Vegetable,Fish
 Burger;1;Red,Vegetable,Grain,Roasted
-Sandwich;1;Vegetable,Grain
-Ration;1;Dried
+Sandwich;1;Vegetable,Grain,Cut,White
+Ration;1;Sealed,Dried,Grain,Red
+Fish;1;Fish
+Vegetables;1;Vegetable
 Meat;2;Red
-Seabrew;2;Vegetable,Fish
-Salad;1;Vegetable

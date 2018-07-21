@@ -15,7 +15,8 @@ import java.awt.*;
  */
 public class Food extends Item {
     public enum Material{
-        White(500,3),Red(800,3),Fish(600,3),Vegetable(100,10),Grain(200,8),Fruit(300,5),Boiled(200,-3),Fried(400,2),Roasted(300,0),Smoked(300,10),Dried(1000,10);
+        White(500,100),Red(700,100),Fish(600,50),Dairy(400,20),Vegetable(100,400),Grain(400,300),Fruit(200,400),Junk(100,600),
+        Cut(100,0),Boiled(200,50),Fried(400,300),Roasted(200,300),Smoked(0,1000),Dried(0,1400),Decorated(1000,-100),Sealed(0,2400);
         int value, perish;
         Material(int value, int perish){
             this.value = value;
@@ -28,6 +29,11 @@ public class Food extends Item {
             int result = 0;
             for (Material i : materials) result += i.value;
             return result;
+        }
+        int getPerish(){
+            int result = 0;
+            for (Material i : materials) result += i.perish;
+            return result / materials.length;
         }
         void load(String p){
             String[] mats = p.split(",");
@@ -45,10 +51,10 @@ public class Food extends Item {
     private int perish;
     private Type type = new Type();
     public Food(Map map, String name, int seed, int size, String materials) {
-        super(map, name, seed, new Item.Material[]{Item.Material.Flesh}, ItemType.Consumable, size);
+        super(map, name, seed, new Item.Material[]{Item.Material.Organic}, ItemType.Consumable, size);
         type.load(materials);
         this.weight = 1;
-        this.perish = Global.time + perish;
+        this.perish = Global.time + type.getPerish();
         int toxicity = getPoisonChance();
         if (toxicity > 0) {
             image = new ShadedPicture(rand, name, Shader.Color);
@@ -64,12 +70,11 @@ public class Food extends Item {
             int perishTime = perish - Global.time;
             Stat motivation = p.get("Motivation");
             if (perishTime <= 0 && rand.nextInt(10) < getPoisonChance()){
-                int severity = perishTime / 100;
-                p.buff(Buffs.Poison, severity);
+                p.buff(Buffs.Poison, Math.max(1, perishTime / 100));
                 p.say("Gawrrrr! That didn't taste good...");
-                motivation.add(-severity, false);
+                motivation.add(getMotivation(), false);
             } else {
-                motivation.add(Math.max(0, type.getValue()/80-perish), false);
+                motivation.add(getMotivation(), false);
             }
             Stat hunger = p.get("Nutrition");
             if (hunger != null) hunger.add(1, false);
@@ -80,11 +85,15 @@ public class Food extends Item {
     private int getPoisonChance(){ // 0 to 10
         return (Global.time-perish)/100;
     }
+    private int getMotivation(){
+        return Math.max(0, type.getValue()/80 - getPoisonChance());
+    }
     @Override
     public String getDescription(){
         int perishTime = perish - Global.time;
         String r = super.getDescription();
         r = r.replace(" uses "," servings ");
+        r += " This food provides "+getMotivation()+" motivation points.";
         if (perishTime <= 0) r += " This food has "+getPoisonChance()+"0% chance of causing food poisoning.";
         else r += " This food will go bad in "+perishTime+" seconds.";
         r += "\nDetail:\n" + type.getDescription();

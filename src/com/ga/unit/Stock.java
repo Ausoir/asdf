@@ -129,14 +129,17 @@ public enum Stock {
         final String[] unit = units[id].split(";",-1);
         com.ga.unit.man.Man product = new Man(map, unit[0], seed){
             public void onCreate(){
-                UnitFactory unitString = new UnitFactory(this, Faction.valueOf(unit[3]), Integer.parseInt(unit[2]));
-                unitString.setAI(Integer.parseInt(unit[4].split(":")[0]), Integer.parseInt(unit[4].split(":")[1]));
-                unitString.setMoveset(unit[5]);
-                unitString.setEquipment(unit[6], unit[7].split(","), unit[8].split(","), unit[9].split(","));
-                traits.load(this, unit[10]);
+                UnitFactory unitString = new UnitFactory(this, Faction.valueOf(unit[5]), Integer.parseInt(unit[4]));
+                unitString.setAI(Integer.parseInt(unit[6].split(":")[0]), Integer.parseInt(unit[6].split(":")[1]));
+                unitString.setMoveset(unit[7]);
+                unitString.setEquipment(unit[8].split(","), unit[9].split(","), unit[10].split(","));
+                traits.load(this, unit[11]);
             }
         };
-        product.speechType = unit[1];
+        if (!unit[2].isEmpty()) product.clip.setImage(unit[2]);
+        if (!unit[1].isEmpty()) product.setFace(unit[1]);
+        else product.setFace("Man");
+        product.speechType = unit[3];
         product.subId = id;
         return product;
     }},
@@ -171,7 +174,7 @@ public enum Stock {
         String[] data = FileManager.readText("Data/raw/Armor.txt");
         final String[] v = data[id].split(";");
         int piece = Integer.parseInt(v[1]);
-        if (piece == 1 || piece == 2) v[0] = v[0].substring(0,v[0].indexOf("_"));
+        if (piece == 1 || piece == 2) v[0] = v[0].substring(0,v[0].lastIndexOf("_"));
         Prop product = new Armor(map, v[0], seed, Item.Material.load(v[4].split(",")), piece,
                 Integer.parseInt(v[2]), Integer.parseInt(v[3]), Integer.parseInt(v[5]), Integer.parseInt(v[6]));
         product.subId = id;
@@ -360,7 +363,7 @@ public enum Stock {
         return product;
     }},
     Fist{ Prop make(Map map, int id, int seed){
-        Item product = new Weapon(map, name(),0, new Item.Material[]{Item.Material.Flesh}, Item.ItemType.Bashing, -1, 0, 0){
+        Item product = new Weapon(map, name(),0, new Item.Material[]{Item.Material.Organic}, Item.ItemType.Bashing, -1, 0, 0){
             public boolean use(final com.ga.unit.man.Man host) {
                 host.setState(Actions.Interact);
                 return true;
@@ -375,6 +378,9 @@ public enum Stock {
             public void onUnequip(com.ga.unit.man.Man host){}
             public void onCreate(){}
             public void remove(){}
+            public int getDamage() {
+                return 1;
+            }
         };
         product.range = 48;
         product.image.setCenterType(3);
@@ -383,7 +389,7 @@ public enum Stock {
         return product;
     }},
     Goldbag{ Prop make(Map map, int id, int seed){
-        Item product = new Item(map, name(),0, new Item.Material[]{Item.Material.Gold}, Item.ItemType.Bashing, 200){
+        Item product = new Item(map, name(),0, new Item.Material[]{Item.Material.Gold}, Item.ItemType.Bashing, 8000){
             public boolean use(final com.ga.unit.man.Man host) {
                 host.setState(Actions.Interact);
                 return true;
@@ -427,7 +433,7 @@ public enum Stock {
                     if (player.getStateLevel(skill) > 0) {
                         if (checkIngredients()) {
                             if (host.get("Motivation").require(100)) {
-                                if (map.updater.sleep(1, true)) {
+                                if (map.updater.sleep(1, false)) {
                                     if (!player.learnSkill(skill)) host.say("Failed to learn " + skill.name() + ".");
                                 }
                             } else host.say("No motivation...");
@@ -457,68 +463,49 @@ public enum Stock {
     }},
     Textbook{ Prop make(Map map, final int id, int seed){
         Item product = new Item(map, name(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Scroll, -1){
-            private String stat;
             public void onCreate(){
                 super.onCreate();
-                stat = Tags.trainers[seed % Tags.trainers.length].name();
-                if (id == -1) subId = rand.nextInt(4);
+                if (id == -1) subId = rand.nextInt(12);
             }
             public String[] load(String p){
                 String[] r = super.load(p);
-                stat = Tags.trainers[seed % Tags.trainers.length].name();
                 return r;
             }
             @Override
             public boolean use(com.ga.unit.man.Man host){
                 if (host instanceof MainPlayer && super.use(host)) {
-                    if (Global.player.learnable()) {
-                        if (Global.player.get(stat).get() / 100 == subId) {
-                            ArrayList<Prop> t = map.updater.collideProp(pos, 240);
-                            Prop dummy = null;
-                            for (Prop i : t) {
-                                if (i.name.equals("Training_Dummy")) {
-                                    dummy = i;
-                                }
-                            }
-                            if (dummy != null) {
-                                if (map.updater.sleep(1, true)) {
-                                    if (host.get("Motivation").require(10)) {
-                                        host.get(stat).add(rand.nextInt((400 - host.get(stat).get()) / 10) + 1, true);
-                                        host.say("Trained up " + stat + ".");
-                                        dummy.remove();
-                                        return true;
-                                    } else host.say("No Motivation...");
-                                }
-                            } else host.say("No Training Dummies nearby!");
-                        } else {
-                            if (Global.player.get(stat).get() / 100 < subId)
-                                host.say("This textbook is beyond my understanding!");
-                            else
-                                host.say("This textbook is too easy!");
+                    if (Global.player.get("Intelligence").get() == subId) {
+                        if (map.updater.sleep(1, false)) {
+                            host.get("Intelligence").addTotal(1);
+                            host.say("Trained up Intelligence.");
+                            return true;
                         }
-                    } else host.say("Not enough Intelligence stat!");
+                    } else {
+                        if (Global.player.get("Intelligence").get() < subId) host.say("This textbook is beyond my understanding!");
+                        else host.say("This textbook is too easy!");
+                    }
                 }
                 return false;
             }
             public String getName(){
                 String prefix = "Unknown";
-                if (subId == 0) prefix = "Beginner's";
-                else if (subId == 1) prefix = "Intermediate";
-                else if (subId == 2) prefix = "Advanced";
-                else if (subId == 3) prefix = "Expert";
-                return prefix + " " + super.getName()+" of "+stat;
+                if (subId < 3) prefix = "Beginner's";
+                else if (subId < 6) prefix = "Intermediate";
+                else if (subId < 9) prefix = "Advanced";
+                else if (subId < 12) prefix = "Expert";
+                return prefix + " " + super.getName();
             }
             public String getDescription(){
-                String req = "This book teaches level "+(subId+1)+" "+stat+".";
-                int understanding = Global.player.get(stat).get()/100;
-                req += " Your current level of understanding of "+stat+": "+understanding+".";
+                String req = "This book contains information for those with intellectual level of "+(subId+1)+".";
+                int understanding = Global.player.get("Intelligence").get();
+                req += " Your current Intelligence score: "+understanding+".";
                 if (understanding == subId) req += " You may learn the contents of this book.";
                 else if (understanding < subId) req += " This book is beyond your understanding.";
-                else if (understanding > subId) req += " You won't learn anything from this book.";
+                else req += " You won't learn anything from this book.";
                 return super.getDescription()+" "+req;
             }
         };
-        product.value = 94;
+        product.value = 9400;
         product.delay = 45;
         return product;
     }},
@@ -848,7 +835,7 @@ public enum Stock {
                                     if (!tangible) {
                                         if (host.pos.getSubtract(pos).getDist() < 16){
                                             host.lastLand = new Line();
-                                            host.pos = pos.getAdd(0,-24);
+                                            host.pos.add(0,-24);
                                             host.stateSet(Actions.Jump);
                                             host.vel.set(0,0);
                                             host.mobile = true;
@@ -914,30 +901,53 @@ public enum Stock {
         product.disposable = false;
         return product;
     }},
-    Manastone_Necklace{ Prop make(Map map, int id, int seed){
+    Energy_Necklace{ Prop make(Map map, int id, int seed){
         Armor product = new Armor(map, "Battery",seed,new Item.Material[]{Item.Material.Stone, Item.Material.Glass, Item.Material.Crystal, Item.Material.Obsidian}
                 ,3,0,0,40, 0){
             public String getDescription(){
-                return super.getDescription()+"\nThis item is used to store mana for magical applications.";
+                return super.getDescription()+"\nThis item is used to store energy for magical applications.";
             }
         };
-        product.name = "Manastone_Necklace";
+        product.name = "Energy_Necklace";
         product.disposable = false;
-        product.tags.add(Tag.Mana);
+        product.tags.add(Tag.Energy);
         product.tags.add(Tag.Electric);
         return product;
     }},
-    Manastone{ Prop make(Map map, int id, int seed){
-        Item product = new Item(map, "Battery",seed,new Item.Material[]{Item.Material.Stone, Item.Material.Glass, Item.Material.Crystal, Item.Material.Obsidian}
+    Battery{ Prop make(Map map, int id, int seed){
+        Item product = new Item(map, name(),seed,new Item.Material[]{Item.Material.Copper, Item.Material.Lead}
             ,Item.ItemType.Consumable,80){
             public String getDescription(){
-                return super.getDescription()+"\nThis item is used to store mana for magical applications.";
+                return super.getDescription()+"\nThis item is used to store energy for magical applications.";
             }
         };
-        product.name = "Manastone";
         product.disposable = false;
-        product.tags.add(Tag.Mana);
+        product.tags.add(Tag.Energy);
         product.tags.add(Tag.Electric);
+        return product;
+    }},
+    Steroid{ Prop make(Map map, final int id, int seed){
+        Item product = new Item(map, name(), seed, new Item.Material[]{Item.Material.Organic}, Item.ItemType.Consumable, 1){
+            @Override
+            public boolean use(com.ga.unit.man.Man host){
+                if (host instanceof MainPlayer && super.use(host)) {
+                    if (host.get("Agility").require(1)) {
+                        host.get("Strength").addTotal(1);
+                        host.say("Increased Strength by 1!");
+                        if (seed % 2 == 0) host.buff(Buffs.Poison, 1);
+                    } else {
+                        host.say("I need at least 1 Vitality to use this!");
+                    }
+                    return true;
+                }
+                return false;
+            }
+            public String getDescription(){
+                return super.getDescription()+" This drug will permanently increase your Strength by 1.";
+            }
+        };
+        product.value = 12800;
+        product.delay = 45;
         return product;
     }},
     Stomach_Full_Helm{ Prop make(Map map, int id, int seed){
@@ -1049,9 +1059,8 @@ class UnitFactory {
         unit.stats.addStat("Attack", host.rand.nextInt(10)-8);
         setAI(2, 0);
     }
-    void setEquipment(String head, String[] weapon, String[] armor, String[] helms){
+    void setEquipment(String[] weapon, String[] armor, String[] helms){
         Man man = (Man) host;
-        man.setFace(head);
         if (weapon != null && weapon.length > 0) man.setWeapon((Item) Stock.createByName(host.map, weapon[host.seed % weapon.length], -1));
         man.armor = new ArmorSet(man, getItem(host.map, helms[host.seed % helms.length],0),
                 getItem(host.map, armor[host.seed % armor.length], 2),

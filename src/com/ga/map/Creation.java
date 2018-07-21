@@ -19,7 +19,8 @@ public class Creation {
             FileManager.loadWorld();
         }
         r = new Random(seed);
-        FileManager.loadGame();
+        FileManager.loadPlayer();
+        FileManager.loadActors();
     }
     static void prepareRandom(int id){
         r = new Random(id+seed);

@@ -112,6 +112,11 @@ public class Unit extends Prop {
         if (hand == -1) return pos.getAdd(0,-clip.getHeight());
         return pos.getAdd(clip.organs[hand].ptd);
     }
+    public P getHead(){
+        int head = clip.getHead();
+        if (head == -1) return pos.getAdd(0,-clip.getHeight());
+        return pos.getAdd(clip.organs[head].ptd);
+    }
     public float getReach(){
         return getSize();
     }
@@ -236,7 +241,7 @@ public class Unit extends Prop {
                         clip.organs[i].hit(hitBox);
                     }
                     if (damageBreakthrough(i, blunt, damage)) {
-                        if (get("Agility").require(1)) {
+                        if (get("Agility").require(1+(damage/3))) {
                             Particle.explode(map, "Blood", getDepth()+.01f, getRandomPoint(), new P(), 9, 5, 0, true, 24);
                         } else {
                             buff(Buffs.Bleed, 1);

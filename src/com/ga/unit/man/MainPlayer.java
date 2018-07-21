@@ -51,6 +51,8 @@ public class MainPlayer extends Player {
             } else if (r == 4) {
                 say("Cannot cast!");
             } else if (r == 5) say("This action is beyond my abilities!");
+            else if (r == 6) say("I'm missing a required limb!");
+            else if (r == 7) say("Weapon is not usable!");
         }
         return r;
     }
@@ -80,7 +82,7 @@ public class MainPlayer extends Player {
     }
 
     public int getLevel(){
-        int level = -8;
+        int level = -2;
         for (String mainStat : mainStats){
             level += get(mainStat).getMax();
         }
@@ -88,13 +90,14 @@ public class MainPlayer extends Player {
     }
 
     public int[] getLevelRequirements(int quality){
+        boolean fastLearner = traits.has(Traits.Trait.Fast_Learner);
         return new int[][]{
             new int[]{
-                    traits.has(Traits.Trait.Fast_Learner) ? 100 : 60, //motivation
-                    traits.has(Traits.Trait.Fast_Learner) ? 3 : 5 //time
+                    fastLearner ? 100 : 85, //motivation
+                    fastLearner ? 3 : 5 //time
             }, new int[]{
-                    traits.has(Traits.Trait.Fast_Learner) ? 60 : 40,
-                    traits.has(Traits.Trait.Fast_Learner) ? 2 : 3
+                    fastLearner ? 50 : 45,
+                    fastLearner ? 1 : 2
             }, new int[]{ 0, 0 }
         }[quality];
     }
@@ -155,7 +158,7 @@ public class MainPlayer extends Player {
     protected void onMapEdge(int dir){
         if (map.name.isField()){
             MapName newMapName = map.name.getNext(dir);
-            if (newMapName.isValid() && map.updater.sleep(1, true)) {
+            if (newMapName.isValid() && map.updater.sleep(1, false)) {
                 vel.set(0,0);
                 stateSet(Actions.Idle);
                 delay.time = 200;

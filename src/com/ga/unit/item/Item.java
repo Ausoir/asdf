@@ -78,7 +78,7 @@ public class Item extends Prop {
             }
         },
         Bronze(.4f,5,4,1.2f,1500,new Color(133, 72, 0,80)),
-        Iron(.4f,4,5,1.5f,2000),
+        Iron(.5f,4,5,1.5f,2000),
         Silver(.2f,10,7,.8f,9000){
             public void onSet(Item host){
                 host.tags.add(Tag.Mutation);
@@ -92,8 +92,8 @@ public class Item extends Prop {
         },
         Lead(.4f,9,2,1.6f,1500,new Color(19, 31, 75,100)),
         Steel(.2f,4,6,4,8000),
-        Titanium(.2f,3,7,5,30000),
-        Crystal(.2f,3,9,.3f,2000,new Color(28, 133, 67,140)){
+        Titanium(.1f,3,7,5,30000),
+        Crystal(.1f,3,9,.3f,2000,new Color(28, 133, 67,140)){
             public void onSet(Item host){
                 host.tags.add(Tag.Conjuration);
                 host.tags.add(Tag.Channeling);
@@ -115,7 +115,7 @@ public class Item extends Prop {
             }
         },
         Other(0,0,0,1,0),
-        Flesh(.4f,0,0,1,0),
+        Organic(.4f,0,0,1,0),
         Stone(.3f,6,5,1.2f,0,new Color(107, 107, 107,255));
         int weight, hardness, value, warmth = 0;
         Color color;
@@ -230,10 +230,10 @@ public class Item extends Prop {
     Cooldown cooldown = new Cooldown(3);
     public int delay = 0;
     public float probability;
-    private int durability = 1, uses = 1;
+    private int durability, uses;
     public boolean disposable = true;
     public ItemType type = ItemType.Throwing;
-    public int value = 100;
+    public int value;
     Man owner;
     public Item(Map map, String name, int seed, Material[] materials, ItemType type, int durability) {
         super(map, name, seed, 7);
@@ -244,7 +244,7 @@ public class Item extends Prop {
         material = Material.get(rand, materials);
         setMaterial(material);
         speed = weight*2;
-        value += material.value;
+        value = material.value + 100;
         final Item me = this;
         onInteract = new Interactive(){
             public void interact(Man p){
@@ -352,13 +352,12 @@ public class Item extends Prop {
     public int getValue(){
         float r = value;
         int adverb = admod.ordinal();
-        boolean special = smod != SpecialtyMod.None;
-        if (special && smod != SpecialtyMod.Cursed) r += 2000 + 1000*adverb;
-        if (emod != null && !isCursed()){
-            r += Math.pow(2,emod.value)*800*ademod.level;
+        if (isCursed()) r = Math.max(100,r-500);
+        else {
+            if (smod != SpecialtyMod.None) r += 2000 + 1000*adverb;
+            if (emod != null) r += Math.pow(2,emod.value)*800*ademod.level;
         }
-        if (isCursed() || smod == SpecialtyMod.Cursed) r = Math.max(100,r-500);
-        return (int) r;
+        return (int) (r * getPercentage());
     }
     boolean isCursed(){
         return smod == SpecialtyMod.Cursed;
@@ -479,6 +478,7 @@ public class Item extends Prop {
     }
     public String getDescription() {
         String r = "Weight: "+weight+"\n";
+        r += "Value: "+Dialog.money(getValue())+"\n";
         if (encumbrance > 0) r += "Encumberance: "+encumbrance+"\n";
         r += "Uses: "+uses+"/"+durability+"\n";
         r += "Material: "+material.name()+"\n";

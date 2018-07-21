@@ -5,5 +5,5 @@ Comfortwear_Torso;Comfortwear_Pants;Toughwear_Torso;Toughwear_Pants;Dustset_Tors
 Manual;Textbook
 Scroll;Potion;Battery;Threadball;Meat;Textbook;Comfortwear_Torso;Comfortwear_Pants
 Scroll;Potion;Fireball;Throwing_Knife
-Battery;Agent;Rock;Grass;Shell;Meat
+Battery;Rock;Grass;Shell;Meat
 Ration

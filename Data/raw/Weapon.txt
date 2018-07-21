@@ -1,9 +1,9 @@
 Stick;Bashing;-1;Wooden,Iron;5;0 //Weapon, Type, Encumbrance, Range, Materials, Speed, Damage
 Bamboo_Spear;Spear;-1;Wooden;-5;-1
-Broadsword;Sword;-1;Copper,Bronze,Iron,Silver,Steel;-3;1
+Broadsword;Sword;-1;Copper,Bronze,Iron,Silver,Steel;-3;0
 Mace;Swinging;-1;Copper,Bronze,Iron,Silver,Steel;-15;3
-Katana;Sword;-1;Bronze,Iron,Steel,Titanium,Crystal;5;-1
-Claw;Knife;-1;Copper,Bronze,Iron,Silver,Steel,Bone,Titanium,Crystal;15;2 //Very hard to hit with
+Katana;Sword;-1;Bronze,Iron,Steel,Titanium,Crystal;3;-2
+Claw;Knife;-1;Copper,Bronze,Iron,Silver,Steel,Bone,Titanium,Crystal;15;2
 Spear;Spear;-1;Copper,Bronze,Iron,Steel,Bone;-10;0
 Axe;Swinging;-1;Copper,Bronze,Iron,Steel;-10;2
 Dagger;Knife;-1;Glass,Copper,Bronze,Gold,Iron,Silver,Steel;24;0

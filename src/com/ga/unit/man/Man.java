@@ -109,15 +109,17 @@ public class Man extends Unit {
         return false;
     }
 
-    private void dropItem(Item p) {
+    public Item dropItem(Item p) {
         Item t = inventory.remove(p);
         if (t != null) {
             t.drop(this);
         } else if (p == weapon) {
+            t = weapon;
             weapon.drop(this);
             setWeapon(null);
-        } else return;
+        } else return null;
         say("Dropping " + p.getFullName());
+        return t;
     }
 
     public int getWeight(){
@@ -241,7 +243,7 @@ public class Man extends Unit {
         if (p > 0){
             Item newbag = (Item) Stock.Goldbag.create(map, -1, 0).start();
             setWeapon(newbag);
-            newbag.isUsable(true,-p);
+            newbag.isUsable(true, newbag.getUses()-p);
         }
     }
     public boolean requireGold(int p){
@@ -260,18 +262,17 @@ public class Man extends Unit {
     @Override
     public boolean requireMana(int p){
         if (stats.triggerEffect(Buffs.Attunement)) return true;
-        int innateLevel = traits.getTraitLevel(Traits.Trait.Attunement);
-        if (innateLevel > 0) {
-            int mana = Math.min(get("Intelligence").get() * innateLevel, p);
+        if (traits.getTraitLevel(Traits.Trait.Attunement) > 0) {
+            int mana = Math.min(get("Intelligence").get(), p);
             p -= mana;
-            get("Intelligence").add(-mana / innateLevel, false);
+            get("Intelligence").add(-mana, false);
             if (p == 0) return true;
         }
         ArrayList<Item> items = new ArrayList<>(inventory.getItems());
         items.add(weapon);
         Collections.addAll(items, armor.armor);
         for (Item i : items){
-            if (i.tags.contains(Tag.Mana)){
+            if (i.tags.contains(Tag.Energy)){
                 int mana = Math.min(i.getUses(), p);
                 if (i.isUsable(true,mana)) p -= mana;
                 if (p == 0) return true;
@@ -280,18 +281,17 @@ public class Man extends Unit {
         return false;
     }
     public boolean rechargeMana(int p){
-        int innateLevel = traits.getTraitLevel(Traits.Trait.Attunement);
-        if (innateLevel > 0) {
-            int vacant = Math.min(p, (get("Intelligence").getMax() - get("Intelligence").get()) * innateLevel);
+        if (traits.getTraitLevel(Traits.Trait.Attunement) > 0) {
+            int vacant = Math.min(p, (get("Intelligence").getMax() - get("Intelligence").get()));
             p -= vacant;
-            get("Intelligence").add(vacant / innateLevel, false);
+            get("Intelligence").add(vacant, false);
             if (p == 0) return true;
         }
         ArrayList<Item> items = new ArrayList<>(inventory.getItems());
         items.add(weapon);
         Collections.addAll(items, armor.armor);
         for (Item i : items){
-            if (i.tags.contains(Tag.Mana)){
+            if (i.tags.contains(Tag.Energy)){
                 int mana = Math.min(i.getDurability() - i.getUses(), p);
                 if (i.isUsable(true,mana)) p -= mana;
                 if (p == 0) return true;
@@ -378,7 +378,7 @@ public class Man extends Unit {
 
     public ArrayList<Prop> getAvailableItems(){
         ArrayList<Prop> items = map.updater.collideProp(pos,100);
-        items.removeIf(o -> !(o instanceof Item));
+        items.removeIf(o -> !(o instanceof Item) || o == weapon);
         items.addAll(inventory.getItems());
         if (!wieldingNone()) items.add(weapon);
         return items;

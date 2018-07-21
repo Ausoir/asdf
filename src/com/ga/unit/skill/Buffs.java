@@ -4,7 +4,6 @@ import com.ga.game.Sound;
 import com.ga.map.Global;
 import com.ga.map.Shader;
 import com.ga.map.Terrain;
-import com.ga.map.Updater;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
@@ -271,56 +270,6 @@ public enum Buffs {
             }
         };
     }},
-    Morph(1,new Tags(){{
-        add(Tag.Curse);
-        add(Tag.Electric);
-    }}){
-        private Stock[] targets = new Stock[]{Stock.Slime, Stock.Slime, Stock.Rover, Stock.Bird, Stock.Man};
-        Buff makeLocal(){
-            return new Buff(20) {
-                private Unit unit;
-                private Man mhost;
-                public void onSet() {
-                    Sound.play(host.map, host.pos, "cast");
-                    unit = (Unit) targets[Math.min(level, targets.length-1)].create(host.map, 0,-1).start();
-                    unit.pos.set(host.pos);
-                    unit.faction = host.faction;
-                    var = unit.controlId;
-                    if (host instanceof Man){
-                        mhost = (Man) host;
-                    }
-                    unit.brain = Intelligence.get("0:0;0:0", unit);
-                }
-                public void onStack(int level){
-                    if (level != this.level){
-                        this.level = level;
-                        onFinish();
-                        onSet();
-                    } else time += 20;
-                }
-                public void onFinish(){
-                    unit.remove();
-                    host.setVisible(true);
-                }
-                public boolean update() {
-                    if (host.stateDuration == 0) { //effectively a late onLoad()
-                        if (host instanceof Man) mhost = (Man) host;
-                        unit = Updater.getActor(var);
-                        if (unit != null){
-                            unit.target = host.target;
-                            Actions state = host.state;
-                            if (state == Actions.Interact) state = Actions.Melee;
-                            unit.setState(state);
-                            host.delay.time = 1;
-                        } else return true;
-                    }
-                    if (host.image.visible) host.setVisible(false);
-                    if (mhost != null) mhost.setWeapon(null);
-                    host.pos.set(unit.pos);
-                    return super.update();
-                }
-            };
-        }},
     Bleed(1,new Tags(){{
         add(Tag.Curse);
         add(Tag.Mutation);
@@ -634,7 +583,7 @@ public enum Buffs {
     Attunement(3,new Tags(){{
         add(Tag.Enchant);
         add(Tag.Channeling);
-        add(Tag.Mana);
+        add(Tag.Energy);
     }}){ Buff makeLocal() {
         return new Buff(16) {
             public boolean onTrigger(){

@@ -31,8 +31,8 @@ public class Stat {
     }
     public void setMax(int p){
         int diff = p - max;
+        current = Math.max(max, Math.max(0, diff));
         max = p;
-        current = Math.max(0, diff);
     }
     public void addTotal(int p){
         setTotal(max + p);

@@ -57,7 +57,7 @@ public class MenuShop extends Panel {
     public void show(String title, Item[] wares, int[] prices, Performer[] actions){
         display();
         titleLabel.setText(title);
-        gold.setText("Cash: " + Global.player.getGold()+"$");
+        gold.setText("Cash: " + Dialog.money(Global.player.getGold()));
         panel.removeAll();
         int itemsize = wares.length;
         for (int i = 0; i < itemsize; i++) {

@@ -19,13 +19,17 @@ public enum Behavior {
         }
     }, Wander {
         public void blocked(Unit host, boolean fall) {
+            host.say("Blocked!");
             host.face(-host.dir, true);
-            host.setState(Actions.Right);
+            if (host.dir == 1) host.setState(Actions.Right);
+            else if (host.dir == -1) host.setState(Actions.Left);
+            host.delay.time = 100;
         }
         boolean update(Unit host) {
             if (Global.r.nextInt(16) == 0) {
-                int dir = Global.r.nextInt(3);
+                int dir = Global.r.nextInt(3)-1;
                 if (dir == 1) host.setState(Actions.Right);
+                else if (dir == -1) host.setState(Actions.Left);
                 else {
                     host.face(dir - 1, false);
                     host.setState(Actions.Idle);

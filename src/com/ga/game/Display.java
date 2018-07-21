@@ -54,7 +54,7 @@ public class Display extends JPanel {
             public void mouseReleased(java.awt.event.MouseEvent e) {
                 mX = e.getX();
                 mY = e.getY();
-                if (Updater.editor) mouseInput(-e.getButton());
+                if (Global.player.map.updater.editor) mouseInput(-e.getButton());
                 else if (mode == e.getButton()) mode = -1;
             }
 
@@ -68,7 +68,7 @@ public class Display extends JPanel {
             public void mouseDragged(MouseEvent e) {
                 mX = e.getX();
                 mY = e.getY();
-                if (Updater.editor) mouseInput(0);
+                if (Global.player.map.updater.editor) mouseInput(0);
             }
 
             @Override
@@ -177,7 +177,7 @@ public class Display extends JPanel {
         if (focus) input(mode);
     }
     private void input(int mode){
-        if (this.mode != mode || mode <= 0 || Updater.editor) {
+        if (this.mode != mode || mode <= 0 || Global.player.map.updater.editor) {
             this.mode = mode;
             if (input != null) {
                 input.input(mode, (int) (mX - Settings.centerX + Global.camera.x), (int) (mY - Settings.centerY + Global.camera.y));

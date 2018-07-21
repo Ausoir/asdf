@@ -70,32 +70,6 @@ public enum Intelligence {
                     host.say("@atk tgt");
                 }
             }
-            boolean blocked(int dir){
-                boolean blocked = false;
-                boolean fall = true;
-                P front = host.pos.getAdd((host.getSpeed()*3+48)*dir,0);
-                if (Math.abs(host.map.mapEdge(front)-5) == 1) blocked = true;
-                else {
-                    Line pp = new Line(host.pos, front);
-                    Line pp2 = new Line(front.getAdd(0, -40), front.getAdd(0, 40));
-                    for (Line i : host.map.land) {
-                        if (i.lineCross(pp) && (Math.abs(i.getSlope()) > Line.MAXSLOPE || !i.clockwise())) {
-                            blocked = true;
-                        }
-                        if (i.lineCross(pp2)) {
-                            fall = false;
-                        }
-                    }
-                }
-                if (blocked){
-                    tasks.peek().blocked(host, false);
-                    return true;
-                } else if (fall){
-                    tasks.peek().blocked(host, true);
-                    return true;
-                }
-                return false;
-            }
             void hear(Prop u, String p){
                 if (tasks.peek().getAlertness() < 1) {
                     int dir = u.pos.x - host.pos.x > 0 ? 1 : -1;
@@ -136,12 +110,12 @@ public enum Intelligence {
 
                 void load(String p) {
                     super.load(p);
-                    String[] data = FileManager.readText("raw/Shop.txt");
+                    String[] data = FileManager.readText("Data/raw/Shop.txt");
                     advertise = new Timer(100+host.rand.nextInt(200), false);
                     low = host.rand.nextFloat()*2 + .5f;
                     high = host.rand.nextFloat()*2 + 2.5f;
                     String r = "I'm selling ";
-                    int length = host.rand.nextInt(48) + 1;
+                    int length = host.rand.nextInt(20) + 1;
                     String[] items = new String[length];
                     String[] inventory = data[host.seed % data.length].split(";");
                     for (int i = 0; i < length; i++) {
@@ -187,7 +161,7 @@ public enum Intelligence {
                 }
             });
         }
-    }, Pawnbroker{
+    }, Dealer{
         public AI make(Unit host) {
             return process(new NeutralAI(host) {
                 private String[] wanted;
@@ -195,12 +169,12 @@ public enum Intelligence {
 
                 void load(String p) {
                     super.load(p);
-                    String[] data = FileManager.readText("raw/Pawn.txt");
+                    String[] data = FileManager.readText("Data/raw/Pawn.txt");
                     advertise = new Timer(100+host.rand.nextInt(200), false);
                     wanted = data[host.seed % data.length].split(";");
                     priceR = new float[wanted.length];
                     for (int i=0;i<priceR.length;i++){
-                        priceR[i] = host.rand.nextFloat()*1500;
+                        priceR[i] = host.rand.nextFloat()+.1f;
                     }
                 }
 
@@ -234,8 +208,9 @@ public enum Intelligence {
                             options[i] = item.getFullName() + " - "+ Dialog.money(price);
                             action[i] = new Performer() {
                                 public void perform() {
-                                    item.remove();
+                                    Global.player.dropItem(item).remove();
                                     Global.player.obtainGold(price);
+                                    Global.player.say("Sold "+item.getName()+" for "+Dialog.money(price)+"!");
                                     host.say("@sold");
                                 }
                             };
@@ -243,49 +218,6 @@ public enum Intelligence {
                         Menu.menu.showDialog("Wanted list",
                                 "What would you like to sell?", options, action);
                     }
-                }
-            });
-        }
-    }, Transporter{
-        public AI make(Unit host) {
-            return process(new NeutralAI(host) {
-                private String[] options;
-                private Performer[] performers;
-                void load(String p) {
-                    super.load(p);
-                    final ArrayList<Integer> prices = new ArrayList<>();
-                    ArrayList<Integer> destinations = new ArrayList<>();
-                    for (int i=-6;i<=6;i++){
-                        if (i != 0 && host.rand.nextInt(6) == 0){
-                            int newmap = host.map.name.getIndex()+i;
-                            if (FileManager.isFile("Data/map/"+newmap+".map")){
-                                destinations.add(newmap);
-                                prices.add(Math.abs(i));
-                            }
-                        }
-                    }
-                    options = new String[destinations.size()];
-                    performers = new Performer[destinations.size()];
-                    for (int i=0;i<destinations.size();i++){
-                        final int destination = destinations.get(i);
-                        final int price = prices.get(i);
-                        options[i] = FileManager.read("Data/map/"+destination+".map").split("%")[0]
-                                .split(";")[0] + " - "+Dialog.money(price);
-                        performers[i] = new Performer(){
-                            public void perform(){
-                                if (Global.player.requireGold(price)) {
-                                    Global.server.requestChangeMap(destination+"@-1");
-                                } else {
-                                    Global.player.say("Not enough money..");
-                                }
-                            }
-                        };
-                    }
-                }
-
-                void shop() {
-                    Menu.menu.showDialog("Transportation",
-                        "Where would you like to go?", options, performers);
                 }
             });
         }
@@ -302,19 +234,70 @@ public enum Intelligence {
                 void shop() {
                     Menu.menu.showDialog("Inn",
                             "Rest for the night? "+Dialog.money(price)+" for 5 hours.",
-                            new String[]{"Yes", "No"},
+                            new String[]{"Pay for the night"},
                             new Performer[]{
                                     new Performer(){
                                         public void perform(){
                                             if (Global.player.requireGold(price)) {
-                                                Global.player.get("Motivation").add(10,false);
-                                                Global.player.map.updater.sleep(5, true);
-                                                Global.player.get("Nutrition").heal();
+                                                Global.player.get("Nutrition").add(5, true);
+                                                if (Global.player.map.updater.sleep(5, true)){
+                                                    Global.player.get("Motivation").add(10,false);
+                                                    Global.player.get("Agility").heal();
+                                                    Global.player.get("Intelligence").heal();
+                                                    Global.player.get("Strength").heal();
+                                                } else {
+                                                    Global.player.obtainGold(price);
+                                                    Global.player.get("Nutrition").add(-5, true);
+                                                }
                                             } else {
                                                 Global.player.say("Not enough money..");
                                             }
                                         }
                                     }, new Performer(){}
+                            });
+                }
+            });
+        }
+    }, Trainer {
+        public AI make(Unit host) {
+            return process(new NeutralAI(host) {
+                private String stat;
+                private int price;
+
+                void load(String p) {
+                    super.load(p);
+                    stat = new String[]{"Strength","Agility","Intelligence"}[host.rand.nextInt(3)];
+                    price = (host.rand.nextInt(30)+20)*100+99;
+                }
+
+                void shop() {
+                    int[] requirements = Global.player.getLevelRequirements(0);
+                    String message = "Train your "+stat+" for only "+Dialog.money(price)+"!";
+                    message += "Requires "+requirements[0]+" motivation and "+requirements[1]+" hours.";
+                    message += "\nCurrent motivation: "+Global.player.get("Motivation").get();
+                    message += "\nCurrent nutrition: "+Global.player.get("Nutrition").get();
+                    Menu.menu.showDialog("Trainer",
+                            message,
+                            new String[]{"Begin training"},
+                            new Performer[]{
+                                    new Performer(){
+                                        public void perform(){
+                                            if (Global.player.requireGold(price)) {
+                                                Global.player.get("Nutrition").add(5, true);
+                                                if (Global.player.map.updater.sleep(5, true)){
+                                                    Global.player.get("Motivation").add(10,false);
+                                                    Global.player.get("Agility").heal();
+                                                    Global.player.get("Intelligence").heal();
+                                                    Global.player.get("Strength").heal();
+                                                } else {
+                                                    Global.player.obtainGold(price);
+                                                    Global.player.get("Nutrition").add(-5, true);
+                                                }
+                                            } else {
+                                                Global.player.say("Not enough money..");
+                                            }
+                                        }
+                                    }
                             });
                 }
             });

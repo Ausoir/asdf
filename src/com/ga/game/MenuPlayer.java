@@ -3,6 +3,7 @@ package com.ga.game;
 import com.ga.map.Global;
 import com.ga.map.Picture;
 import com.ga.tool.Performer;
+import com.ga.tool.SyncRand;
 import com.ga.unit.*;
 import com.ga.unit.item.Crafts;
 import com.ga.unit.item.Item;
@@ -29,7 +30,8 @@ public class MenuPlayer extends Panel {
         private String[] stats = MainPlayer.mainStats;
         private JButton[] statButtons = new JButton[stats.length];
         private JLabel level = new JLabel();
-        private JLabel motivation = new JLabel(), nutrition = new JLabel();
+        private JLabel motivation = new JLabel(), nutrition = new JLabel(), fatigue = new JLabel();
+        private JLabel stamina = new JLabel(), vitality = new JLabel(), energy = new JLabel();
         private JLabel points = new JLabel();
         StatPanel(){
             setLayout(new GridBagLayout());
@@ -40,6 +42,58 @@ public class MenuPlayer extends Panel {
             statgrid.ipady = 20;
             statgrid.gridx = 1;
             statgrid.gridy = 0;
+            points.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    Menu.menu.showDialog("Innovation Points", "What would you like to do?",
+                            new String[]{"Spend 1 Innovation to gain 30 Motivation", "Spend 3 Innovation to learn 1 new skill from choice of 3"},
+                            new Performer[]{
+                                    new Performer(){
+                                        public void perform() {
+                                            if (Global.player.get("Innovation").require(1)){
+                                                Global.player.get("Motivation").add(30,false);
+                                                Global.player.say("Obtained 30 Motivation!");
+                                            } else Global.player.say("Not enough Innovation points!");
+                                        }
+                                    }, new Performer(){
+                                        public void perform() {
+                                            Actions[] actions = Actions.values();
+                                            Actions[] skills = new Actions[]{actions[SyncRand.r.nextInt(actions.length)], actions[SyncRand.r.nextInt(actions.length)], actions[SyncRand.r.nextInt(actions.length)]};
+                                            if (Global.player.learnable()) {
+                                                if (Global.player.get("Innovation").require(3)) {
+                                                    Menu.menu.showDialog("Learn a new skill", "Choose a skill to learn",
+                                                            new String[]{"Cancel to refund 1 Innovation", skills[0].name(), skills[1].name(), skills[2].name()},
+                                                            new Performer[]{
+                                                                    new Performer() {
+                                                                        public void perform() {
+                                                                            Global.player.get("Innovation").add(1, false);
+                                                                        }
+                                                                    }, new Performer() {
+                                                                        public void perform() {
+                                                                            Global.player.learnSkill(skills[0]);
+                                                                            Global.player.say("Learned "+skills[0].name()+"!");
+                                                                        }
+                                                                    }, new Performer() {
+                                                                        public void perform() {
+                                                                            Global.player.learnSkill(skills[1]);
+                                                                            Global.player.say("Learned "+skills[1].name()+"!");
+                                                                        }
+                                                                    }, new Performer() {
+                                                                        public void perform() {
+                                                                            Global.player.learnSkill(skills[2]);
+                                                                            Global.player.say("Learned "+skills[2].name()+"!");
+                                                                        }
+                                                                    }
+                                                            }
+                                                    );
+                                                } else Global.player.say("Not enough Innovation points!");
+                                            } else Global.player.say("Not enough Memory to learn new skills!");
+                                        }
+                                    }
+                            }
+                    );
+                }
+            });
             add(points, statgrid);
             statgrid.gridx = 0;
             add(level, statgrid);
@@ -50,7 +104,6 @@ public class MenuPlayer extends Panel {
                 final Performer perf = new Performer() {
                     public void perform() {
                         Global.player.level(stats[index], 0);
-                        Menu.menu.showMenu();
                     }
                 };
                 statButtons[i].addActionListener(e -> Menu.menu.showDialog(stats[index], getTrainDescription(stats[index]),
@@ -73,11 +126,9 @@ public class MenuPlayer extends Panel {
             motivation.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Menu.menu.showDialog("Motivation", "You need motivation to improve stats.");
+                    Menu.menu.showDialog("Motivation", "You need motivation to improve stats or learn new things.");
                 }
             });
-            add(motivation, statgrid);
-            statgrid.gridy++;
             nutrition.setIcon(iconDescribe);
             nutrition.addMouseListener(new MouseAdapter() {
                 @Override
@@ -85,7 +136,46 @@ public class MenuPlayer extends Panel {
                     Menu.menu.showDialog("Nutrition", "You require 1 nutrition every hour.");
                 }
             });
+            fatigue.setIcon(iconDescribe);
+            fatigue.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    Menu.menu.showDialog("Fatigue", "You require 1 fatigue every hour.");
+                }
+            });
+            stamina.setIcon(iconDescribe);
+            stamina.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    Menu.menu.showDialog("Stamina", "You need Stamina to do most actions.");
+                }
+            });
+            vitality.setIcon(iconDescribe);
+            vitality.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    Menu.menu.showDialog("Vitality", "When you are hit or otherwise hurt you will die unless you have Vitality.");
+                }
+            });
+            energy.setIcon(iconDescribe);
+            energy.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    Menu.menu.showDialog("Stamina", "You use Energy to cast magic.");
+                }
+            });
+            add(stamina, statgrid);
+            statgrid.gridy++;
+            add(vitality, statgrid);
+            statgrid.gridy++;
+            add(energy, statgrid);
+            statgrid.gridy-= 2;
+            statgrid.gridx++;
+            add(motivation, statgrid);
+            statgrid.gridy++;
             add(nutrition, statgrid);
+            statgrid.gridy++;
+            add(fatigue, statgrid);
         }
         JButton makeStatButton(String p){
             final JButton button = new JButton(p);
@@ -109,7 +199,6 @@ public class MenuPlayer extends Panel {
             return button;
         }
         private String getTrainDescription(String stat){
-            int[] requirements = Global.player.getLevelRequirements(0);
             String r;
             switch (stat) {
                 case "Strength":
@@ -124,9 +213,11 @@ public class MenuPlayer extends Panel {
                 default:
                     r = "Increase "+stat+" by 1. ";
             }
+            int[] requirements = Global.player.getLevelRequirements(0);
             r += "Requires "+requirements[0]+" motivation and "+requirements[1]+" hours.";
             r += "\nCurrent motivation: "+Global.player.get("Motivation").get();
             r += "\nCurrent nutrition: "+Global.player.get("Nutrition").get();
+            r += "\nCurrent fatigue: "+Global.player.get("Fatigue").get();
             return r;
         }
         void refresh(){
@@ -140,9 +231,22 @@ public class MenuPlayer extends Panel {
             nutrition.setFont(Panel.smallfont);
             nutrition.setForeground(Panel.fontcolor);
             nutrition.setText("Nutrition - "+player.get("Nutrition").toString().replace(",", "/"));
+            fatigue.setFont(Panel.smallfont);
+            fatigue.setForeground(Panel.fontcolor);
+            fatigue.setText("Fatigue - "+player.get("Fatigue").toString().replace(",", "/"));
+            stamina.setFont(Panel.smallfont);
+            stamina.setForeground(Panel.fontcolor);
+            stamina.setText("Stamina - "+player.get("Strength").toString().replace(",", "/"));
+            vitality.setFont(Panel.smallfont);
+            vitality.setForeground(Panel.fontcolor);
+            vitality.setText("Vitality - "+player.get("Agility").toString().replace(",", "/"));
+            energy.setFont(Panel.smallfont);
+            energy.setForeground(Panel.fontcolor);
+            energy.setText("Energy - "+player.get("Intelligence").toString().replace(",", "/"));
             points.setFont(Panel.smallfont);
             points.setForeground(Color.RED);
-            points.setText("Available Points "+player.getLevel());
+            points.setText("Innovation Points "+player.get("Innovation").get());
+            if (!player.traits.has(Traits.Trait.Innovation)) points.setVisible(false);
             for (int i=0;i<stats.length;i++) statButtons[i].setText(stats[i]+" - "+player.get(stats[i]).getMax());
         }
     }
@@ -151,11 +255,11 @@ public class MenuPlayer extends Panel {
         private GridBagConstraints grid = new GridBagConstraints();
         private JPanel panel;
         private JScrollPane scroll;
-        private JLabel gold;
+        private JLabel weight;
         private Border emptyborder = new EmptyBorder(5,8,5,8);
         EquipmentPanel(){
             setLayout(new BoxLayout(this,BoxLayout.PAGE_AXIS));
-            gold = new JLabel();
+            weight = new JLabel();
             panel = new JPanel();
             panel.setOpaque(false);
             panel.setLayout(new BoxLayout(panel,BoxLayout.PAGE_AXIS));
@@ -167,12 +271,12 @@ public class MenuPlayer extends Panel {
             scroll.setBorder(null);
             scroll.setOpaque(false);
             setBackground(Panel.forecolor2);
-            add(gold, BorderLayout.LINE_START);
+            add(weight, BorderLayout.LINE_START);
             add(scroll, BorderLayout.LINE_START);
         }
         void refresh(){
             int maxEncumbrance = Global.player.get("Agility").getMax();
-            gold.setText("Encumbrance:"+(maxEncumbrance-Global.player.getVacancy())+"/"+maxEncumbrance+
+            weight.setText("Encumbrance:"+(maxEncumbrance-Global.player.getVacancy())+"/"+maxEncumbrance+
                     "                 Warmth:"+Global.player.getWarmth());
             panel.removeAll();
 
@@ -253,11 +357,11 @@ public class MenuPlayer extends Panel {
         private GridBagConstraints grid = new GridBagConstraints();
         private JPanel panel;
         private JScrollPane scroll;
-        private JLabel gold;
+        private JLabel weight;
         private Border emptyborder = new EmptyBorder(5,8,5,8);
         InventoryPanel(){
             setLayout(new BoxLayout(this,BoxLayout.PAGE_AXIS));
-            gold = new JLabel();
+            weight = new JLabel();
             panel = new JPanel();
             panel.setOpaque(false);
             panel.setLayout(new BoxLayout(panel,BoxLayout.PAGE_AXIS));
@@ -269,11 +373,11 @@ public class MenuPlayer extends Panel {
             scroll.setBorder(null);
             scroll.setOpaque(false);
             setBackground(Panel.forecolor2);
-            add(gold, BorderLayout.LINE_START);
+            add(weight, BorderLayout.LINE_START);
             add(scroll, BorderLayout.LINE_START);
         }
         void refresh(){
-            gold.setText("Weight:"+Global.player.getWeight());
+            weight.setText("Weight:"+Global.player.getWeight());
             panel.removeAll();
             Inventory inv = Global.player.inventory;
             int itemsize = inv.getItemSize();
@@ -350,7 +454,9 @@ public class MenuPlayer extends Panel {
             for (Actions i : PlayerInput.basicMoves){
                 if (i != Actions.Idle) makeSlot(i);
             }
-            for (Actions i : Global.player.moveset) makeSlot(i);
+            for (Actions i : Global.player.moveset){
+                if (i != Actions.Use) makeSlot(i);
+            }
             int points = Global.player.get("Intelligence").get();
             skillpoints.setText(Dialog.get("mem")+": "+points);
         }
@@ -475,8 +581,11 @@ public class MenuPlayer extends Panel {
         void refresh() {
             panel.removeAll();
             panel.add(makeOption("Inspect Self","dsc","Your general description."));
-            panel.add(makeOption("Rest","h","Rest for an hour, removing curable debuffs and consuming available food. Shortcut is ',' key."));
-            panel.add(makeOption("Sleep","zzz","Sleep for six hours."));
+            panel.add(makeOption("Rest","h","Rest for an hour, removing curable debuffs and restoring fatigue."));
+            if (Global.player.get("Nutrition").get() == 0){
+                String starve = Global.player.get("Agility").get() == 0 ? "STARVE TO DEATH":"Starve";
+                panel.add(makeOption(starve,"st","Starve, gaining 1 Nutrition point at the cost of 1 Vitality."));
+            }
             TitledBorder b = BorderFactory.createTitledBorder(BorderFactory.createMatteBorder(2,2,2,2,Panel.forecolor));
             b.setTitle("Default");
             panel.setBorder(b);
@@ -534,13 +643,21 @@ public class MenuPlayer extends Panel {
         private void command(String p){
             switch (p) {
                 case "h":
-                    Global.player.map.updater.sleep(1, true);
+                    Global.player.rest();
+                    Menu.menu.showMenu();
                     break;
                 case "dsc":
                     Menu.menu.showDialog("My Description", Global.player.getDescription());
                     break;
                 case "opt":
                     Menu.menu.showDialog("Options", "apparently none.");
+                    break;
+                case "st":
+                    if (Global.player.get("Agility").require(1)){
+                        Global.player.get("Nutrition").add(1, false);
+                        Global.player.say("I have "+Global.player.get("Agility").get()+" Vitality left!");
+                    } else Global.player.die();
+                    Menu.menu.showMenu();
                     break;
             }
         }
@@ -682,6 +799,7 @@ public class MenuPlayer extends Panel {
     private SkillPanel skillpanel = new SkillPanel();
     private TraitPanel traitpanel = new TraitPanel();
     private CraftPanel craftpanel = new CraftPanel();
+    private JButton[] buttons = new JButton[7];
     MenuPlayer() {
         targetSizeX = 764;
         setLayout(new GridBagLayout());
@@ -717,13 +835,13 @@ public class MenuPlayer extends Panel {
         GridLayout gridlayout = new GridLayout(7,1,20,36);
         mainpanel.setOpaque(false);
         mainpanel.setLayout(gridlayout);
-        mainpanel.add(makeOption(Dialog.get("Action"), "act"));
-        mainpanel.add(makeOption(Dialog.get("Stat"), "stats"));
-        mainpanel.add(makeOption(Dialog.get("Equipment"), "equip"));
-        mainpanel.add(makeOption(Dialog.get("Inventory"), "inventory"));
-        mainpanel.add(makeOption(Dialog.get("Skill"), "spell"));
-        mainpanel.add(makeOption(Dialog.get("Trait"), "trait"));
-        mainpanel.add(makeOption(Dialog.get("Craft"), "craft"));
+        mainpanel.add(buttons[0] = makeOption(Dialog.get("Action"), "act"));
+        mainpanel.add(buttons[1] = makeOption(Dialog.get("Stat"), "stats"));
+        mainpanel.add(buttons[2] = makeOption(Dialog.get("Equipment"), "equip"));
+        mainpanel.add(buttons[3] = makeOption(Dialog.get("Inventory"), "inventory"));
+        mainpanel.add(buttons[4] = makeOption(Dialog.get("Skill"), "spell"));
+        mainpanel.add(buttons[5] = makeOption(Dialog.get("Trait"), "trait"));
+        mainpanel.add(buttons[6] = makeOption(Dialog.get("Craft"), "craft"));
         grid.gridx = 0;
         add(mainpanel,grid);
     }
@@ -800,11 +918,18 @@ public class MenuPlayer extends Panel {
             display();
         }
     }
-    public void display(){
-        super.setVisible(true);
-        if (Global.player != null){
-            super.display();
-            setBackground(new Color(120,120,120,180));
+    void refresh(){
+        if (actionpanel.isVisible()) actionpanel.refresh();
+        else if (statspanel.isVisible()) statspanel.refresh();
+        else if (inventorypanel.isVisible()) inventorypanel.refresh();
+        else if (skillpanel.isVisible()) skillpanel.refresh();
+        else if (traitpanel.isVisible()) traitpanel.refresh();
+        else if (equipmentPanel.isVisible()) equipmentPanel.refresh();
+        else if (craftpanel.isVisible()) craftpanel.refresh();
+    }
+    public void setVisible(boolean flag){
+        super.setVisible(flag);
+        if (flag){
             actionpanel.refresh();
             statspanel.refresh();
             inventorypanel.refresh();
@@ -812,7 +937,17 @@ public class MenuPlayer extends Panel {
             traitpanel.refresh();
             equipmentPanel.refresh();
             craftpanel.refresh();
+            if (Global.player.armor.isBare() && Global.player.wieldingNone()) buttons[2].setVisible(false);
+            if (Global.player.inventory.getItemSize() == 0) buttons[3].setVisible(false);
+            if (Global.player.moveset.size() <= 1) buttons[4].setVisible(false);
+            if (Global.player.traits.getTraits().size() == 0) buttons[5].setVisible(false);
+            if (Global.player.crafting.size() == 0) buttons[6].setVisible(false);
         }
+    }
+    public void display(){
+        super.setVisible(true);
+        super.display();
+        setBackground(new Color(120,120,120,180));
     }
 }
 

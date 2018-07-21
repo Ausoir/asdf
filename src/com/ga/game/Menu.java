@@ -14,6 +14,7 @@ public class Menu extends JPanel implements Updatable {
     public static Menu menu = new Menu();
     private Panel current;
     private MenuPlayer menuPlayer = new MenuPlayer();
+    private int turn = 0;
 
     static void init(){
         menu.current = new Panel();
@@ -35,12 +36,11 @@ public class Menu extends JPanel implements Updatable {
             menuPlayer.setVisible(false);
         }
         menuPlayer.toggle();
+        if (menuPlayer.isVisible()) turn = 40;
     }
     public void showDialog(String title, String message) {
-        if (current.getClass() != MenuDialog.class){
-            select(new MenuDialog());
-            ((MenuDialog) current).show(title, message);
-        } else ((MenuDialog) current).rewrite(title, message);
+        select(new MenuDialog());
+        ((MenuDialog) current).show(title, message);
     }
     public void showDialog(String title, String message, String[] options, final Performer[] actions) {
         if (current.getClass() != MenuDialog.class) select(new MenuDialog());
@@ -63,6 +63,10 @@ public class Menu extends JPanel implements Updatable {
     }
     @Override
     public void update() {
+        if (turn-- % 36 == 0){
+            if (turn == 1) turn = 40;
+            menuPlayer.refresh();
+        }
         current.update();
     }
 }
