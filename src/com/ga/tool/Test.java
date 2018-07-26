@@ -10,7 +10,7 @@ import java.util.Random;
 public class Test {
     public static void main(String[] args){
         Global.init();
-        int seed = 2423584;//(int) (Math.random() * 999999);
+        int seed = 890235;//(int) (Math.random() * 999999);
         int max = 100;
         float[] r = new float[max], r2 = new float[max], r3 = new float[max];
         for (int i = 0; i < max; i++) {
@@ -24,8 +24,8 @@ public class Test {
         for (int i = 0; i < max; i++) {
             String town = (r[i]+"").substring(0,Math.min(5,(r[i]+"").length()));
             String temp = (r2[i]+"").substring(0,Math.min(5,(r2[i]+"").length()));
-            String biom = (r3[i]+"").substring(0,Math.min(5,(r3[i]+"").length()));
-            Global.p(i + " " + (Math.abs(r[i])<.4f?"TOWN":"    ") + " " + town + "   " + temp + " " + (r2[i]>1?"WARM":"    ") + "   " + biom + (r3[i]>1?" WOOD":"    "));
+            String biom = ((r3[i]*3)+"").substring(0,Math.min(5,(r3[i]+"").length()));
+            Global.p(i + " " + (Math.abs(r[i])<.4f?"TOWN":"    ") + " " + town + "   " + temp + " " + (r2[i]>1?" WET":"    ") + "   " + biom + (r3[i]>1?" WARM":"    "));
         }
     }
 }

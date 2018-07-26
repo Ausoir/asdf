@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 class GenerateGrassland {
     static void generate(Map map){
-        map.callname = "";
+        map.panoramaName = "Grassland";
         Generator generator = new Generator(map, 0);
         map.size = new P(Creation.r.nextInt(4000)+2000, Creation.r.nextInt(4000)+2000);
         int depth = 4;

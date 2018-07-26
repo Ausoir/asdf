@@ -18,7 +18,6 @@ import java.util.HashMap;
  */
 public class Unit extends Prop {
     private static final float OFFSET_UNIT = .0001f;
-    public L<Actions> moveset = new L<>();
     public HashMap<Actions, Cooldown> cooldown = new HashMap<>();
     public int controlId;
     public Body clip;
@@ -37,6 +36,16 @@ public class Unit extends Prop {
     private int jumpAcross = 0;
     public int stateDuration = 0;
     private boolean moveTriggered = false;
+    public L<Actions> moveset = new L<>(){
+        public String toString(){
+            StringBuilder r = new StringBuilder();
+            if (isEmpty()) return r.toString();
+            for (Actions i : this){
+                r.append(i.name()).append(":").append(Math.max(0,getCooldown(i).time-Global.time)).append(",");
+            }
+            return r.substring(0,r.length()-1);
+        }
+    };
 
     public Unit(Map map, String name, int seed) {
         super(map, null, seed, 8);

@@ -36,7 +36,7 @@ public class Item extends Prop {
         Shooting(Actions.Shoot_Handgun, 3, .5f, 0, "swing_normal"), Rifle(Actions.Shoot_Rifle, 3, 1f, 0, "swing_normal"),
         Bow(Actions.Shoot_Arrow, 1, 1, 0, "swing_normal"), Throwing(Actions.Throw, 3, .1f, 0, "swing_normal"),
         Darting(Actions.Dart, 3, .1f, 0, "swing_normal"), Consumable(Actions.Consume, 1, .1f, 0, "drink");
-        Actions action;
+        public Actions action;
         String sound;
         int centerType;
         float weightMultiplier, durabilityAddition;
@@ -486,6 +486,7 @@ public class Item extends Prop {
             if (cd > 0){
                 r += " "+Dialog.get("?itemEnc",new String[]{getRarityDescription(), ade+emod.name(), cooldown+""});
                 r += " "+Dialog.get("itemEncRdy", new String[]{""+cd});
+                r += "\n";
             }
         }
         return r;

@@ -21,8 +21,8 @@ public class Map {
     int margin = 0;
     public Weather weather = new Weather(this);
     public ArrayList<Line> land = new ArrayList<>();
-    public ArrayList<Line> landRaw = new ArrayList<>();
-    public HashMap<Integer, String> formTextures = new HashMap<>();
+    ArrayList<Line> landRaw = new ArrayList<>();
+    HashMap<Integer, String> formTextures = new HashMap<>();
     public HashMap<Integer, Terrain> terrains = new HashMap<>();
     private static HashMap<String, String> defaultProps = new HashMap<String, String>() {{
         put("grass", "Rock=.1,Bush=.2,Weed=1");
@@ -34,8 +34,8 @@ public class Map {
     }};
     public P size;
     public MapName name;
-    String callname = "Somewhere";
-    private String panoramaName = "";
+    private String callname = "Somewhere";
+    String panoramaName = "";
     private Thing[] panorama = new Thing[3];
     public Updater updater;
     int temperature = 0;

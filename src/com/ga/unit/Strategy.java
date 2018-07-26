@@ -14,7 +14,9 @@ public enum Strategy {
         public int micromanage(Unit host, Actions action, float dist){
             if (action == Actions.Use){
                 Man man = (Man) host;
-                if (man.wieldingNone() || !man.weapon.isUsable(false, 1)){
+                if (man.wieldingNone()){
+                    action = Actions.Punch;
+                } else if (!man.weapon.isUsable(false, 1)){
                     action = Actions.Throw;
                 }
             }
@@ -28,22 +30,7 @@ public enum Strategy {
             }
             return Melee.micromanage(host, action, dist);
         }
-    },
-    Archer{
-        public int micromanage(Unit host, Actions action, float dist){
-            return Ranged.micromanage(host, action, dist);
-        }
-    },
-    Spear{
-        public int micromanage(Unit host, Actions action, float dist){
-            int fb;
-            if (host.state == Actions.Hold && dist > 300){
-                host.delay.time = -1;
-                fb = host.setState(getMove(host, host.brain.target.pos));
-            } else fb = super.micromanage(host, action, dist);
-            return fb;
-        }
-    }, Careful, Magic;
+    };
     public float getDist(Unit host){
         int avgX = 0, avgY = 0;
         for (Organ i : host.brain.target.clip.organs){
@@ -53,7 +40,7 @@ public enum Strategy {
         avgX /= host.brain.target.clip.organs.length*2;
         avgY /= host.brain.target.clip.organs.length*2;
         P hostPos = host.getHand();
-        P targetPos = host.brain.target.getHead();
+        P targetPos = host.brain.target.pos;
         int x = (int) ((targetPos.x + host.brain.target.vel.x) - (hostPos.x + host.vel.x));
         int y = (int) (targetPos.y - hostPos.y);
         host.target = new P(x+avgX,y+avgY);
@@ -72,15 +59,8 @@ public enum Strategy {
     }
     public int micromanage(Unit host, Actions action, float dist){
         int fb = host.setState(action);
-        if (host.state == Actions.Rest) {
-            host.delay.time = host.stats.restTimer.max/4;
-            host.delay.performer = new Performer(){
-                public void perform(){
-                    host.get("Strength").heal();
-                }
-            };
-        }
-        else if (host.state.getTags().contains(Tag.Channeling)) host.delay.set(100);
+        action.specialOrder(host, dist);
+        if (host.state.getTags().contains(Tag.Channeling)) host.delay.set(160);
         return fb;
     }
     public void update(Unit host){

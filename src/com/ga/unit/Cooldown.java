@@ -6,7 +6,7 @@ public class Cooldown {
     public int time;
     private int duration;
     public Cooldown(int duration){
-        time = Global.time + duration;
+        time = Global.time;
         setDuration(duration);
     }
     public void load(String p){

@@ -4,7 +4,7 @@ import com.ga.tool.P;
 
 class GenerateForest {
     static void generate(Map map){
-        map.callname = "Forest";
+        map.panoramaName = "Forest";
         Generator generator = new Generator(map, 0);
         map.size = new P(Creation.r.nextInt(4000)+4000, 2800);
         TerrainTrail ground = new TerrainTrail(map, new P(-40, map.size.y()+40));
@@ -17,7 +17,7 @@ class GenerateForest {
         generator.makeEdgeSpawns();
     }
     static void generateDeepwoods(Map map){
-        map.callname = "Forest";
+        map.panoramaName = "Forest";
         Generator generator = new Generator(map, 0);
         map.size = new P(Creation.r.nextInt(4000)+4000, 4000);
         TerrainTrail ground = new TerrainTrail(map, new P(-40, map.size.y()+40));

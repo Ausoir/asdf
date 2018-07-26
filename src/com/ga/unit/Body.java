@@ -280,7 +280,7 @@ public class Body {
         }
     }
 
-    public int getHead(){
+    int getHead(){
         for (int i=0;i<organs.length;i++) {
             if (organs[i].vital && !organs[i].amputated) return i;
         }

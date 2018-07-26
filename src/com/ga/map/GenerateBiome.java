@@ -24,9 +24,9 @@ public class GenerateBiome {
         float var = Global.sin(mapVar)+Global.cos(mapVar)+Global.sin(mapVar*5)+Global.sin(mapVar*10);
         return Math.round(var);
     }
-    private static int getTemperature(int index){
+    private static int getTemperature(int index){ //usually 0 ~ 5
         float mapVar = ((Global.sin(Creation.seed)*25678) + (index * 653))/40000f;
         float var = Global.sin(mapVar)+Global.cos(mapVar)+Global.sin(mapVar*4)+Global.sin(mapVar*12);
-        return Math.round(var)-1;
+        return Math.round(var*2);
     }
 }

@@ -313,7 +313,8 @@ public enum Buffs {
                         @Override
                         public void onAttack(Unit p) {
                             p.buff(Buffs.Burn, level);
-                            Particle.explode(host.map, "Flame", host.getDepth(), pos, new P(0, -20), 6, 10, 5, false, 10);
+                            Particle.explode(host.map, "Flame", host.getDepth(), pos, new P(0, -20), 3, 10, 25, true, 6);
+                            Particle.explode(host.map, "Smoke", host.getDepth(), pos, new P(0, -20), 3, 15, 25, false, 6);
                             remove();
                         }
                         @Override
@@ -322,7 +323,7 @@ public enum Buffs {
                         }
                         @Override
                         public void update(){
-                            Particle.explode(host.map, "Flame", host.getDepth(), pos, new P(0, -20), 6, 10, 5, false, 10);
+                            Particle.explode(host.map, "Flame", host.getDepth(), pos, new P(0, -20), 2, 10, 8, false, 5);
                             super.update();
                         }
                     };

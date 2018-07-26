@@ -79,7 +79,7 @@ public class Organ extends Line {
                 private final int length = (int) getLength();
                 public void update() {
                     if (tangible) {
-                        Particle.explode(host.map, "Blood", host.getDepth(), pos, new P(0, -15), 4, 5, 5, true, 5);
+                        Particle.explode(host.map, "Blood", host.getDepth(), pos, new P(0, -15), 1, 5, 5, true, 9);
                     }
                     super.update();
                 }

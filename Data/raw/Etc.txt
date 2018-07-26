@@ -16,4 +16,4 @@ Threadball;2;0;200;Cloth
 Bone;1;1;0;Bone;Cannot be eaten raw. Used as a cooking ingredient.
 Pitcher;2;2;200;Glass,Stone,Iron,Copper
 Resin;2;2;200;Organic
-Rune;1;1;2500;Crystal,Gold,Obsidian,Bone,Silver;This item is usually made of useful materials and thus used as a catalyst or an ingredient.
+Rune;1;1;2500;Crystal,Gold,Obsidian,Bone,Silver;This item is usually made of rare materials for use as catalysts or ingredients.

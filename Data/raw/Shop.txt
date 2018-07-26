@@ -1,4 +1,4 @@
-Fruit;Fish;Vegetables;Cheese;Flour;Meat;Birdmeat;Kitchenware //Grocery
+Fruit;Fish;Vegetables;Cheese;Bread;Meat;Birdmeat;Kitchenware //Grocery
 Meal;Drumstick;Porkchop;Burger;Sandwich;Jerky //Restaurant
 Falchion;Broadsword;Axe;Lancesword;Cutlass;Claymore;Mace;Spear;Halberd;Cleaver;Pickaxe;Rapier;Warhammer;Greatsword;Striker;Ration //Weaponsmith
 Chainmail_Torso;Chainmail_Pants;Lace_Helm;Legion_Helm;Platemail_Torso;Platemail_Pants;Battlewear_Torso;Battlewear_Pants //Armorsmith

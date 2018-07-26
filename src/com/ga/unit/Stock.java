@@ -1,5 +1,6 @@
 package com.ga.unit;
 
+import com.ga.game.Dialog;
 import com.ga.game.FileManager;
 import com.ga.game.Menu;
 import com.ga.game.Settings;
@@ -406,6 +407,9 @@ public enum Stock {
             }
             public void onCreate(){
                 isUsable(true, 100);
+            }
+            public String getDescription(){
+                return super.getDescription()+"This is your standard currency. Contains "+Dialog.money(getUses())+".";
             }
         };
         product.tags.add(Tag.Currency);
@@ -906,7 +910,7 @@ public enum Stock {
         return product;
     }},
     Jewelry{ Prop make(Map map, int id, int seed){
-        Armor product = new Armor(map, "Battery",seed,Item.Material.values()
+        Armor product = new Armor(map, "Fiery_Necklace",seed,Item.Material.values()
                 ,3,0,0,1000, 0){
         };
         product.name = "Jewelry";
@@ -1017,6 +1021,18 @@ public enum Stock {
         };
         product.value = 12800;
         product.delay = 45;
+        return product;
+    }},
+    Purse{ Prop make(Map map, int id, int seed){
+        Armor product = new Armor(map, "Fannypack",seed,new Item.Material[]{Item.Material.Cloth, Item.Material.Leather}
+                ,3,3,2,10000, 0){
+            public String getDescription(){
+                return super.getDescription()+"Contains "+Dialog.money(getUses())+".";
+            }
+        };
+        product.name = "Purse";
+        product.tags.add(Tag.Currency);
+        product.disposable = false;
         return product;
     }},
     Stomach_Full_Helm{ Prop make(Map map, int id, int seed){
@@ -1156,6 +1172,13 @@ class UnitFactory {
         Intelligence.get(type+":"+subType+";"+"1:0", host);
     }
     void setMoveset(String p){
-        Actions.load(host, p);
+        if (!p.isEmpty()) {
+            String[] skills = p.split(",");
+            String r = "";
+            for (String i : skills) {
+                r += i + ":0,";
+            }
+            Actions.load(host, r.substring(0, r.length() - 1));
+        }
     }
 }
