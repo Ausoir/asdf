@@ -2,6 +2,8 @@ package com.ga.game;
 
 import com.ga.map.Global;
 import com.ga.map.Updater;
+import com.ga.tool.L;
+import com.ga.tool.Performer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,6 +20,7 @@ public class Display extends JPanel {
     private int mY = 0;
     boolean focus = true;
     private String lastChat = "";
+    public L<Performer> onResize = new L<>();
     Display() {
         Global.display = this;
         setLayout(null);
@@ -30,6 +33,7 @@ public class Display extends JPanel {
                 Settings.setScreenSize(getWidth(), getHeight());
                 Menu.menu.resize();
                 chatbox.setBounds(0,Settings.screenY-40,500,40);
+                for (Performer i : onResize) i.perform();
             }
         });
         addFocusListener(new FocusListener(){

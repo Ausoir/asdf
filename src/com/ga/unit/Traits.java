@@ -7,10 +7,19 @@ import java.util.ArrayList;
  */
 public class Traits {
     public enum Trait {
-        Fast_Learner(1,"Level twice as fast at the cost of triple motivation cost."), Haggler(1,"Get 30% off shop prices."),
-        Tough(1,"Resist flinching from being hit."), Innovation(1,"Learn random skill every level."), Perception(1,"Learn to identify others."),
+        Fast_Learner(1,"Learn faster at the cost of more motivation cost."), Haggler(1,"Always get preferable item prices."),
+        Tough(1,"Resist flinching from being hit."),
         Herbalism(1,"Pick materials from bushes and trees."), Rune_Literacy(1,"Identify, use, and create scrolls."),
-        Alchemy(1,"Identify, use, and create potions."), Meditation(1,"Spend time to remove all buffs"),
+        Alchemy(1,"Identify, use, and create potions."), Meditation(1,"Resting removes all buffs."),
+        Cooking(1,"Learn to craft food with ingredients and enhance them using kitchenware."),
+        Innovation(1,"Gain access to Innovation points that can be used for Motivation, new talents, or free skills."){
+            public void onSet(Unit host){
+                host.get("Innovation").setMax(3);
+            }
+            public void onRemove(Unit host){
+                host.get("Innovation").setMax(0);
+            }
+        },
 
         Lung_Injury(2,"Rest time quadrupled."){
             public void onSet(Unit host){
@@ -30,7 +39,8 @@ public class Traits {
             }
         },
 
-        Crafter(3,"Craft various items."),
+        Crafting(3,"Craft various items."),
+        Tailor(3,"Repair clothings and armor. Higher levels repair faster with less resources."), //1:1 hour, 1 res per 50%. 2:1 hour, - res per 50%. 3:1 hour for full.
         Attunement(3,"Utilize innate energy from your body. Higher level restores more energy per hour."),
         Energy(3,"Learn energy generation methods."){
             Tag tag = Tag.Energy;
@@ -55,18 +65,8 @@ public class Traits {
             public void onRemove(Unit host){
                 host.tags.remove(tag);
             }
-        }, Alacritomancy(3, "Convert energy into electrical energy."){
-            Tag tag = Tag.Electric;
-            public void onSet(Unit host){
-                onAdd(host);
-            }
-            public void onAdd(Unit host){
-                host.tags.add(tag);
-            }
-            public void onRemove(Unit host){
-                host.tags.remove(tag);
-            }
-        }, Infusion(3,"Create matter and soul from energy."){
+        },
+        Infusion(3,"Create matter and soul from energy."){
             Tag tag = Tag.Conjuration;
             public void onSet(Unit host){
                 onAdd(host);
@@ -77,18 +77,8 @@ public class Traits {
             public void onRemove(Unit host){
                 host.tags.remove(tag);
             }
-        }, Shadoweaving(3,"Learn the secrets of weaving dark energy."){
-            Tag tag = Tag.Void;
-            public void onSet(Unit host){
-                onAdd(host);
-            }
-            public void onAdd(Unit host){
-                host.tags.add(tag);
-            }
-            public void onRemove(Unit host){
-                host.tags.remove(tag);
-            }
-        }, Channeling(3,"Learn the techniques of persistent energy release."){
+        },
+        Channeling(3,"Learn the techniques of persistent energy release."){
             Tag tag = Tag.Channeling;
             public void onSet(Unit host){
                 onAdd(host);
@@ -99,7 +89,8 @@ public class Traits {
             public void onRemove(Unit host){
                 host.tags.remove(tag);
             }
-        }, Aeromancy(3,"Generate air pressure from energy."){
+        },
+        Aeromancy(3,"Guide air with energy."){
             Tag tag = Tag.Air;
             public void onSet(Unit host){
                 onAdd(host);
@@ -110,8 +101,9 @@ public class Traits {
             public void onRemove(Unit host){
                 host.tags.remove(tag);
             }
-        }, Morphing(3,"Learn to manipulate flesh."){
-            Tag tag = Tag.Mutation;
+        },
+        Shadoweaving(3,"Learn the secrets of weaving dark energy."){
+            Tag tag = Tag.Void;
             public void onSet(Unit host){
                 onAdd(host);
             }
@@ -121,7 +113,8 @@ public class Traits {
             public void onRemove(Unit host){
                 host.tags.remove(tag);
             }
-        }, Enchanting(3,"Learn to enchant and curse entities."){
+        },
+        Enchanting(3,"Learn to manipulate entities with enchantments and curses."){
             Tag tag = Tag.Enchant;
             Tag tag2 = Tag.Curse;
             public void onSet(Unit host){

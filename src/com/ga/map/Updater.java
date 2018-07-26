@@ -1,13 +1,12 @@
 package com.ga.map;
 
 import com.ga.game.Observer;
-import com.ga.tool.Line;
+import com.ga.tool.L;
 import com.ga.tool.P;
 import com.ga.unit.*;
 import com.ga.unit.man.Man;
 
 import java.awt.*;
-import java.util.ArrayList;
 
 /**
  * Created by Ga on 5/6/2016. asd
@@ -16,13 +15,13 @@ public class Updater {
     public boolean editor = false;
     private Map map;
     private Drawable drawee;
-    private ArrayList<Particle> effects = new ArrayList<>();
-    private ArrayList<Updatable> updatee = new ArrayList<>();
-    public ArrayList<Prop> props = new ArrayList<>();
-    ArrayList<AI> controllee = new ArrayList<>();
-    public ArrayList<Unit> unitsLoaded = new ArrayList<>();
-    public ArrayList<Observer> addQueue = new ArrayList<>();
-    private ArrayList<Observer> removeQueue = new ArrayList<>();
+    private L<Particle> effects = new L<>();
+    private L<Updatable> updatee = new L<>();
+    public L<Prop> props = new L<>();
+    L<AI> controllee = new L<>();
+    public L<Unit> unitsLoaded = new L<>();
+    public L<Observer> addQueue = new L<>();
+    private L<Observer> removeQueue = new L<>();
 
     Updater(Map map){
         this.map = map;
@@ -95,8 +94,8 @@ public class Updater {
 //        Grapher.draw(g2);
 //        printDraw();
     }
-    private ArrayList<Drawable> printDraw(){
-        ArrayList<Drawable> stack = new ArrayList<>();
+    private L<Drawable> printDraw(){
+        L<Drawable> stack = new L<>();
         Drawable t = drawee;
         while (t.next != null){
             stack.add(t);
@@ -135,8 +134,8 @@ public class Updater {
         }
         return null;
     }
-    public ArrayList<Prop> collideInteractive(P p){
-        ArrayList<Prop> result = new ArrayList<>();
+    public L<Prop> collideInteractive(P p){
+        L<Prop> result = new L<>();
         for (Prop i : props){
             if (i.onInteract != null) {
                 if (i.pos.getSubtract(p).getDist() <= 24) result.add(i);
@@ -153,8 +152,8 @@ public class Updater {
         }
         return result;
     }
-    ArrayList<Prop> collideAll(P p, int r){
-        ArrayList<Prop> result = new ArrayList<>();
+    L<Prop> collideAll(P p, int r){
+        L<Prop> result = new L<>();
         for (Prop i : props){
             if (p.getSubtract(i.pos).getDist() <= r+i.getSize()) result.add(i);
         }
@@ -163,22 +162,22 @@ public class Updater {
         }
         return result;
     }
-    public ArrayList<Prop> collideProp(P p, int r){
-        ArrayList<Prop> result = new ArrayList<>();
+    public L<Prop> collideProp(P p, int r){
+        L<Prop> result = new L<>();
         for (Prop i : props){
             if (i.hittable(Faction.Destructive) && p.getSubtract(i.pos).getDist() <= r+i.getSize()) result.add(i);
         }
         return result;
     }
-    public ArrayList<Unit> collideUnit(P p, int r, Faction faction){
-        ArrayList<Unit> result = new ArrayList<>();
+    public L<Unit> collideUnit(P p, int r, Faction faction){
+        L<Unit> result = new L<>();
         for (Unit i : unitsLoaded){
             if (i.hittable(faction) && p.getSubtract(i.pos).getDist() <= r) result.add(i);
         }
         return result;
     }
-    public ArrayList<Unit> perceive(Unit host, P vision, int r){
-        ArrayList<Unit> seen = new ArrayList<>();
+    public L<Unit> perceive(Unit host, P vision, int r){
+        L<Unit> seen = new L<>();
         int max = r;
         for (Unit i : unitsLoaded){
             if (host != i && i.image.visible) {
@@ -202,6 +201,9 @@ public class Updater {
         }
         return seen;
     }
+    void onTimeChange(){
+        for (Prop i : props) i.onTimeChange();
+    }
     public boolean sleep(int p, boolean checkEnemy){
         for (Unit i : unitsLoaded) {
             if (i.map == Global.player.map && i.faction.canAttack(Global.player.faction) && (checkEnemy || i.brain.target == Global.player)) {
@@ -219,8 +221,13 @@ public class Updater {
             return false;
         }
         map.weather.fadeIn();
+        //Hour pass
         Global.player.stats.clearBuffs();
-        Global.hourPass(p);
+        Global.player.get("Intelligence").add(Math.max(0, Global.player.traits.getTraitLevel(Traits.Trait.Attunement)-1), false);
+        Global.player.get("Strength").heal();
+        Global.timePass(p*100);
+        Global.hour+=p;
+        for (Map i : Global.maps) i.onTimeChange();
         return true;
     }
     public P getEntrancePos(int p, P failsafe) {

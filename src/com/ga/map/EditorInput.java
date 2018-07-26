@@ -109,6 +109,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
         } else if (p.startsWith("size")){
             String[] size = p.substring(5).split(",");
             map.size.set(Integer.parseInt(size[0]), Integer.parseInt(size[1]));
+            map.onTimeChange();
         } else if (p.startsWith("camera")){
             Global.cameraTo.set(new P(p.substring(7)));
         } else if (p.startsWith("snap")){

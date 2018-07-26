@@ -9,18 +9,12 @@ import java.awt.*;
  */
 public class Weather extends Drawable{
     private static int[][] colors = new int[][]{
-            new int[]{120,40,220,50},
-            new int[]{150,0,150,100},
-            new int[]{255,255,255,40},
+            new int[]{220,100,220,60},
             new int[]{255,255,255,0},
-            new int[]{255,255,255,20},
-            new int[]{255,255,255,0},
-            new int[]{255,255,255,0},
-            new int[]{150,0,0,50},
-            new int[]{0,0,150,70},
-            new int[]{0,0,0,50},
+            new int[]{170,80,80,40},
+            new int[]{0,0,150,60},
             new int[]{0,0,0,70},
-            new int[]{0,0,0,70}
+            new int[]{120,40,220,50}
     };
     private Map map;
     private float fade = 0;
@@ -56,7 +50,7 @@ public class Weather extends Drawable{
         toColor = new int[]{0,0,0,255};
     }
     boolean isNight(){
-        return Global.hour % colors.length >= 8;
+        return Global.hour % colors.length >= 2;
     }
     public void start(){
         map.updater.addQueue.add(this);

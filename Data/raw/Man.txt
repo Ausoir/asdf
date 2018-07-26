@@ -1,18 +1,27 @@
 Dummy;;;punk;1;Evil;0:0;Idle;;Toughwear;Mask; //Humanoids-Name,Speech Type,Level,Faction,AI Type,AI Subtype,Moveset,Face,Weapons,Armors,Headgears,Trait
 Player;;;player;1;Player;0:0;Idle;;;;
-Resident;;;resident;1;Neutral;1:0;Sprint;,,,,,,,,,Potion,Stick;Comfortwear,Dustset,Toughwear,Comfortwear,Comfortwear,Suit,Robe,Comfortwear;;
-Merchant;;;merchant;1;Neutral;3:0;Sprint;;Sweat_Suit,Brown_Suit,Suit;Sunglass,;
-Dealer;;;seafood;1;Neutral;4:0;Sprint;;Spring_Suit;Glasses;
-Innkeep;;;merchant;1;Neutral;5:0;Sprint;;Brown_Suit;;
-Trainer;;;merchant;1;Neutral;6:0;Sprint;;Robe;Bandana;
+Resident;;;resident;1;Neutral;1:0;Backstep;,,,,,,,,,Potion,Stick;Comfortwear,Dustset,Toughwear,Comfortwear,Comfortwear,Suit,Robe,Comfortwear;;
+Shopkeeper;;;merchant;1;Neutral;3:0;Backstep;;Spring_Suit;Glasses,;
+Waiter;;;merchant;1;Neutral;3:0;Backstep;;Suit;;
+Blacksmith;;;merchant;1;Neutral;3:0;Backstep;;Adventurewear;;
+Armorsmith;;;merchant;1;Neutral;3:0;Backstep;;Adventurewear;;
+Tailor;;;merchant;1;Neutral;3:0;Backstep;;Comfortwear;Glasses;
+Librarian;;;merchant;1;Neutral;3:0;Backstep;;Sweat_Suit;Glasses;
+Alchemist;;;merchant;1;Neutral;3:0;Backstep;;Brown_Suit;Mask;
+Guildsman;;;merchant;1;Neutral;3:0;Backstep;;Dustset;Bandana;
+Apprentice;;;merchant;1;Neutral;3:0;Backstep;;Labwear;Glasses;
+Junkseller;;;merchant;1;Neutral;3:0;Backstep;;Toughwear;Buzzcut;
+Dealer;;;seafood;1;Neutral;4:0;Backstep;;Spring_Suit;Glasses;
+Innkeep;;;merchant;1;Neutral;5:0;Backstep;;Brown_Suit;;
+Trainer;;;merchant;1;Neutral;6:0;Backstep;;Robe;Bandana;
 Looter;;;punk;1;Punk;2:1;Use,Backstep,Kick;Stick,Bamboo_Spear,;Comfortwear,Toughwear;;
 Punk;;;punk;2;Punk;2:1;Use,Charge,Dash,Uppercut;Dagger,Axe,Pickaxe;Comfortwear,Dustset,Toughwear;Mask,Bandana;
 Yeller;;;punk;3;Punk;2:1;Use,Backstep,Calling;Dagger,Spear;,Comfortwear,Dustset,Toughwear;,Bandana;Infusion:3
-Phantom;Phantom;Shadowrobe;;16;Curse;2:1;Whirlwind,Use,Shadowstep,Magic_Arrow,Shock,Lightning;Greatsword,Halberd,Warhammer;Shadowrobe;;Shadoweaving:2,Alacritomancy:2,Infusion:1,Tough:1
+Phantom;Phantom;Shadowrobe;;16;Curse;2:1;Whirlwind,Use,Shadowstep,Magic_Arrow,Shock,Lightning;Greatsword,Halberd,Warhammer;Shadowrobe;;Shadoweaving:2,Aeromancy:2,Infusion:1,Tough:1
 Monk;;;punk;7;Punk;2:1;Backstep,Use,Punch,Kick,Sidekick,Dash,Leap;,Spear,Bamboo_Spear,Threadball,Throwing Knife,Scroll,Potion;Robe;;
 Guard;;;soldier;5;Neutral;2:1;Use,Sidekick,Underhand,Dash,Whirlwind;Broadsword,Spear,Mace;Chainmail,Platemail;Lace_Helm,Legion_Helm;
 Archer;;;soldier;6;Punk;2:3;Use,Kick,Backstep;Bow;Chainmail,Platemail,Dustset;Lace_Helm;
-Wanderer;;;punk;8;Punk;2:1;Use,Underhand,Lunge,Dash,Shadowstep;Katana,Broadsword,Katana,Claw;Robe,Shadowrobe;;Attunement:2,Shadoweaving:2,Alacritomancy:2
+Wanderer;;;punk;8;Punk;2:1;Use,Underhand,Lunge,Dash,Shadowstep;Katana,Broadsword,Katana,Claw;Robe,Shadowrobe;;Attunement:2,Shadoweaving:2,Aeromancy:2
 Skeleton;Skull;Skeleton_skin;undead;9;Evil;2:1;Use;Broadsword,Spear,Cutlass,Falchion;;Lace_Helm,Legion_Helm,Full_Helm;Tough:1
 Revenant;Skull;Skeleton_skin;undead;12;Evil;2:1;Use,Charge,Mark;Broadsword,Claymore,Cutlass,Falchion;;Lace_Helm,Legion_Helm,Full_Helm;Tough:1
 Hunter;;;soldier;8;Evil;2:1;Backstep,Kick,Dash,Blink,Use;Revolver,Rifle,Pistol;Brown_Suit,Dustset;Sunglass;

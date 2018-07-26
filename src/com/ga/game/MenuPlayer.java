@@ -59,7 +59,7 @@ public class MenuPlayer extends Panel {
                                         public void perform() {
                                             Actions[] actions = Actions.values();
                                             Actions[] skills = new Actions[]{actions[SyncRand.r.nextInt(actions.length)], actions[SyncRand.r.nextInt(actions.length)], actions[SyncRand.r.nextInt(actions.length)]};
-                                            if (Global.player.learnable()) {
+                                            if (Global.player.canLearn()) {
                                                 if (Global.player.get("Innovation").require(3)) {
                                                     Menu.menu.showDialog("Learn a new skill", "Choose a skill to learn",
                                                             new String[]{"Cancel to refund 1 Innovation", skills[0].name(), skills[1].name(), skills[2].name()},
@@ -246,7 +246,7 @@ public class MenuPlayer extends Panel {
             points.setFont(Panel.smallfont);
             points.setForeground(Color.RED);
             points.setText("Innovation Points "+player.get("Innovation").get());
-            if (!player.traits.has(Traits.Trait.Innovation)) points.setVisible(false);
+            if (player.get("Innovation").get() == 0) points.setVisible(false);
             for (int i=0;i<stats.length;i++) statButtons[i].setText(stats[i]+" - "+player.get(stats[i]).getMax());
         }
     }
@@ -275,9 +275,8 @@ public class MenuPlayer extends Panel {
             add(scroll, BorderLayout.LINE_START);
         }
         void refresh(){
-            int maxEncumbrance = Global.player.get("Agility").getMax();
-            weight.setText("Encumbrance:"+(maxEncumbrance-Global.player.getVacancy())+"/"+maxEncumbrance+
-                    "                 Warmth:"+Global.player.getWarmth());
+            weight.setText("Encumbrance:"+Global.player.armor.getEncumbrance()+"/"+Global.player.get("Agility").getMax()+
+                    "                 Warmth:"+Global.player.armor.getWarmth());
             panel.removeAll();
 
             grid.gridy = 0;
@@ -451,6 +450,10 @@ public class MenuPlayer extends Panel {
             panel.removeAll();
             panel.add(new JLabel(Dialog.get("Remap")));
             panel.add(Box.createRigidArea(new Dimension(0,12)));
+            makeSlot("_EXIT");
+            makeSlot("_MENU");
+            makeSlot("_CTRL");
+            makeSlot("_SAY");
             for (Actions i : PlayerInput.basicMoves){
                 if (i != Actions.Idle) makeSlot(i);
             }
@@ -460,9 +463,52 @@ public class MenuPlayer extends Panel {
             int points = Global.player.get("Intelligence").get();
             skillpoints.setText(Dialog.get("mem")+": "+points);
         }
+        void makeSlot(String extra){
+            String key = Global.player.input.getMapping(extra);
+            if (key == null) key = "";
+            else key = "["+key+"]";
+            JPanel panel = new JPanel();
+            panel.setOpaque(false);
+            panel.setLayout(new BoxLayout(panel,BoxLayout.LINE_AXIS));
+            panel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
+            final JLabel equip = new JLabel(extra.substring(1));
+            final JLabel keyLabel = new JLabel(" "+key+" ");
+            keyLabel.setForeground(Color.RED);
+            equip.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    equip.setText(" "+Dialog.get("reqInput"));
+                    equip.requestFocus();
+                }
+            });
+            equip.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (equip.hasFocus()) {
+                        Global.player.input.changeMapping(e.getButton(), extra);
+                        Global.display.requestFocus();
+                        Menu.menu.showMenu();
+                        Menu.menu.showMenu();
+                    }
+                }
+            });
+            equip.addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyReleased(KeyEvent e) {
+                    Global.player.input.changeMapping(e.getKeyCode(), extra);
+                    Global.display.requestFocus();
+                    Menu.menu.showMenu();
+                    Menu.menu.showMenu();
+                }
+            });
+            panel.add(keyLabel);
+            panel.add(equip);
+            this.panel.add(panel);
+            this.panel.add(Box.createRigidArea(new Dimension(0,4)));
+        }
         void makeSlot(final Actions move){
             final String displayName = Dialog.get(move.name());
-            String key = Global.player.input.getMapping(move);
+            String key = Global.player.input.getMapping(move.name());
             if (key == null) key = "";
             else key = "["+key+"]";
             JPanel panel = new JPanel();
@@ -594,6 +640,7 @@ public class MenuPlayer extends Panel {
             other.removeAll();
             other.add(makeOption("Other","opt","Do stuff."));
             other.add(makeOption("Help","?","Noob"));
+            other.add(makeOption("Exit","x","Exit the game (Press Esc)."));
             b = BorderFactory.createTitledBorder(BorderFactory.createMatteBorder(2,2,2,2,Panel.forecolor));
             b.setTitle("Other");
             other.setBorder(b);
@@ -648,6 +695,9 @@ public class MenuPlayer extends Panel {
                     break;
                 case "dsc":
                     Menu.menu.showDialog("My Description", Global.player.getDescription());
+                    break;
+                case "?":
+                    Menu.menu.showDialog("Help", "The controls are WASD for movement and left click to interact with the world.");
                     break;
                 case "opt":
                     Menu.menu.showDialog("Options", "apparently none.");
@@ -815,9 +865,9 @@ public class MenuPlayer extends Panel {
         grid.fill = GridBagConstraints.BOTH;
         add(actionpanel,grid);
         add(statspanel,grid);
+        add(skillpanel,grid);
         add(equipmentPanel,grid);
         add(inventorypanel,grid);
-        add(skillpanel,grid);
         add(traitpanel,grid);
         add(craftpanel,grid);
         command("");
@@ -837,9 +887,9 @@ public class MenuPlayer extends Panel {
         mainpanel.setLayout(gridlayout);
         mainpanel.add(buttons[0] = makeOption(Dialog.get("Action"), "act"));
         mainpanel.add(buttons[1] = makeOption(Dialog.get("Stat"), "stats"));
-        mainpanel.add(buttons[2] = makeOption(Dialog.get("Equipment"), "equip"));
-        mainpanel.add(buttons[3] = makeOption(Dialog.get("Inventory"), "inventory"));
-        mainpanel.add(buttons[4] = makeOption(Dialog.get("Skill"), "spell"));
+        mainpanel.add(buttons[2] = makeOption(Dialog.get("Skill"), "spell"));
+        mainpanel.add(buttons[3] = makeOption(Dialog.get("Equipment"), "equip"));
+        mainpanel.add(buttons[4] = makeOption(Dialog.get("Inventory"), "inventory"));
         mainpanel.add(buttons[5] = makeOption(Dialog.get("Trait"), "trait"));
         mainpanel.add(buttons[6] = makeOption(Dialog.get("Craft"), "craft"));
         grid.gridx = 0;
@@ -880,12 +930,12 @@ public class MenuPlayer extends Panel {
         return button;
     }
     private void command(String p){
+        actionpanel.setVisible(false);
         statspanel.setVisible(false);
+        skillpanel.setVisible(false);
         equipmentPanel.setVisible(false);
         inventorypanel.setVisible(false);
-        skillpanel.setVisible(false);
         traitpanel.setVisible(false);
-        actionpanel.setVisible(false);
         craftpanel.setVisible(false);
         switch (p) {
             case "act":
@@ -910,6 +960,7 @@ public class MenuPlayer extends Panel {
                 craftpanel.setVisible(true);
                 break;
         }
+        refresh();
     }
     void toggle(){
         if (isVisible()){
@@ -918,36 +969,27 @@ public class MenuPlayer extends Panel {
             display();
         }
     }
-    void refresh(){
+    private void refresh(){
         if (actionpanel.isVisible()) actionpanel.refresh();
         else if (statspanel.isVisible()) statspanel.refresh();
-        else if (inventorypanel.isVisible()) inventorypanel.refresh();
         else if (skillpanel.isVisible()) skillpanel.refresh();
+        else if (inventorypanel.isVisible()) inventorypanel.refresh();
         else if (traitpanel.isVisible()) traitpanel.refresh();
         else if (equipmentPanel.isVisible()) equipmentPanel.refresh();
         else if (craftpanel.isVisible()) craftpanel.refresh();
     }
-    public void setVisible(boolean flag){
-        super.setVisible(flag);
-        if (flag){
-            actionpanel.refresh();
-            statspanel.refresh();
-            inventorypanel.refresh();
-            skillpanel.refresh();
-            traitpanel.refresh();
-            equipmentPanel.refresh();
-            craftpanel.refresh();
-            if (Global.player.armor.isBare() && Global.player.wieldingNone()) buttons[2].setVisible(false);
-            if (Global.player.inventory.getItemSize() == 0) buttons[3].setVisible(false);
-            if (Global.player.moveset.size() <= 1) buttons[4].setVisible(false);
-            if (Global.player.traits.getTraits().size() == 0) buttons[5].setVisible(false);
-            if (Global.player.crafting.size() == 0) buttons[6].setVisible(false);
-        }
-    }
     public void display(){
-        super.setVisible(true);
         super.display();
         setBackground(new Color(120,120,120,180));
+        if (Global.player.armor.isBare() && Global.player.wieldingNone()) buttons[3].setVisible(false);
+        else buttons[3].setVisible(true);
+        if (Global.player.inventory.getItemSize() == 0) buttons[4].setVisible(false);
+        else buttons[4].setVisible(true);
+        if (Global.player.traits.getTraits().size() == 0) buttons[5].setVisible(false);
+        else buttons[5].setVisible(true);
+        if (Global.player.crafting.size() == 0) buttons[6].setVisible(false);
+        else buttons[6].setVisible(true);
+        refresh();
     }
 }
 

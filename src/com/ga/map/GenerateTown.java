@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 class GenerateTown {
     static void generate(Map map){
+        map.callname = "Town";
         Generator generator = new Generator(map, 0);
         map.size = new P(4000+Creation.r.nextInt(4000), 1400);
         String[] landTexture = new String[]{"dirt&grass","dirt&road_unpaved","dirt&road_normal","dirt&road_highway"};
@@ -38,7 +39,7 @@ class GenerateTown {
                         }
                     }
                     if (Math.abs(l.getSlope()) < .01f) {
-                        String[] buildings = new String[]{"House1","House2","House3","House4","Restaurant","Inn","Shop","Insurance","Armory","Hospital","Clothier","Safehouse","School"};
+                        String[] buildings = new String[]{"House1","House2","House3","House4","Restaurant","Inn","Shop","Range","Laboratory","Armory","Hospital","Clothier","Safehouse","School"};
                         bid = generator.generateBuildings(buildings, l, bid) + 1;
                     }
                 }

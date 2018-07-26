@@ -109,7 +109,6 @@ public class FileManager {
         player.map.setTexture();
         player.map.render();
         Global.camera = player.map.mapEdgeCenter(player.map.size.getMult(.5f, .5f));
-        player.map.onTimeChange();
         player.start();
         Menu.init();
     }
@@ -232,12 +231,12 @@ public class FileManager {
         String data = read("Data/map/World.map");
         String[] meta = data.split(",");
         Creation.seed = Integer.parseInt(meta[0]);
-        Global.time = Integer.parseInt(meta[1]);
+        Global.hour = Integer.parseInt(meta[1]);
         Global.controlId = Integer.parseInt(meta[2]);
     }
 
     public static void saveWorld(){
-        save(FileManager.makeDirectory("Data/map/World.map"), Creation.seed + "," + Global.time + "," + Global.controlId);
+        save(FileManager.makeDirectory("Data/map/World.map"), Creation.seed + "," + Global.hour + "," + Global.controlId);
         save(FileManager.makeDirectory("Data/map/Actors.map"), Updater.toActorString());
     }
 }

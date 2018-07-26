@@ -29,9 +29,6 @@ public class Creation {
         if (p == -1) return r.nextInt(99999);
         return p;
     }
-    static Random getRegionVariable(int map){
-        return new Random(seed+map);
-    }
     private static String toBase8(int p){
         char hex[]={'0','1','2','3','4','5','6','7','8'};
         int num = p, rem;

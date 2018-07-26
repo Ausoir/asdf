@@ -4,6 +4,7 @@ import com.ga.game.FileManager;
 import com.ga.game.Settings;
 import com.ga.tool.Line;
 import com.ga.tool.P;
+import com.ga.tool.Performer;
 import com.ga.unit.Prop;
 import com.ga.unit.Stock;
 import com.ga.unit.Thing;
@@ -33,42 +34,27 @@ public class Map {
     }};
     public P size;
     public MapName name;
-    private String callname = "Somewhere";
-    private static final int magnify = 2;
-    private Thing panorama;
+    String callname = "Somewhere";
+    private String panoramaName = "";
+    private Thing[] panorama = new Thing[3];
     public Updater updater;
+    int temperature = 0;
 
     Map(String name) {
         this.name = new MapName(name);
         updater = new Updater(this);
-        onTimeChange();
     }
 
     public void start() {
         if (name.isField() && !FileManager.isFile(FileManager.makeDirectory("Data/map/" + name + ".map"))) {
-            make(name);
+            GenerateBiome.generate(this, name);
+            generateProps();
             FileManager.saveMap(name.value, this);
             clear();
         }
         load(name.value);
         weather.start();
-    }
-
-    private void make(MapName dir) {
-        switch (callname = dir.getBiomeName()) {
-            case "Grassland":
-                if (dir.getIndex() % 3 == 0) GenerateTown.generate(this);
-                else GenerateGrassland.generate(this);
-                break;
-            case "Forest":
-                GenerateForest.generate(this);
-                break;
-            case "Desert":
-                GenerateDesert.generate(this);
-                break;
-        }
-        panorama = new Thing(this, "Bg_" + callname, 0, 0);
-        generateProps();
+        onTimeChange();
     }
 
     public void load(String dir) {
@@ -76,30 +62,42 @@ public class Map {
         String[] line = data.split("%");
         String[] names = line[0].split(";");
         callname = names[0];
+        this.size = new P(names[2]);
+        panoramaName = names[1];
         if (names[1].equals("")) {
-            panorama = new Thing(this, "", 0, 0) {
+            panorama[0] = new Thing(this, "", 0, 0) {
                 @Override
                 public void draw(Graphics2D g) {
                     g.setColor(Color.black);
                     g.fillRect(0, 0, Settings.screenX, Settings.screenY);
                 }
-            };
+            }.start();
         } else {
-            panorama = new Thing(this, names[1], 0, 0) {
-                @Override
-                public void draw(Graphics2D g) {
-                    P t = new P(Global.rel.x + pos.x, Global.rel.y + pos.y).mult(.1f);
-                    P size = image.getSize();
-                    t.x = Global.clamp(t.x, -size.x + Settings.screenX, 0);
-                    t.y = Global.clamp(t.y, -size.y + Settings.screenY, 0);
-                    g.drawImage(image.getImage(), (int) (t.x), (int) (t.y), (int) size.x, (int) size.y, null);
+            for (int i=0;i<3;i++){
+                float depth = (i+.1f) * .1f;
+                panorama[i] = new Thing(this, panoramaName+ "_" + i, 0, depth) {
+                    @Override
+                    public void setImage(String p){
+                        super.setImage(p);
+                        P imgSize = image.getSize();
+                        imgSize.x = Math.max(Settings.screenX, Math.max((map.size.x-Settings.screenX)*depth+Settings.screenX,imgSize.x));
+                        imgSize.y = Math.max(Settings.screenY, Math.max((map.size.y-Settings.screenY)*depth+Settings.screenY,imgSize.y));
+                    }
+                    @Override
+                    public void draw(Graphics2D g) {
+                        P size = image.getSize();
+                        P t = Global.rel.getMult(depth, depth).add(pos);
+                        g.drawImage(image.getImage(), (int) (t.x), (int) (t.y), (int) size.x, (int) size.y, null);
+                    }
+                }.start();
+            }
+            Global.display.onResize.add(new Performer(){
+                public void perform(){
+                    for (Thing i : panorama) i.setImage(i.name);
                 }
-            };
-            panorama.name = names[1];
+            });
         }
-        panorama.start();
-        panorama.image.getSize().mult(magnify);
-        this.size = new P(names[2]);
+        this.temperature = names.length<=3?0:Integer.parseInt(names[3]);
         if (line.length > 1) {
             String[] sections = line[1].split(";");
             if (!line[1].equals("")) {
@@ -145,7 +143,7 @@ public class Map {
 
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder(callname + ";" + panorama.name + ";" + size.x() + "," + size.y() + "\n");
+        StringBuilder result = new StringBuilder(callname + ";" + panoramaName + ";" + size.x() + "," + size.y() + ";" + temperature + "\n");
         Iterator it = formTextures.entrySet().iterator();
         while (it.hasNext()) {
             java.util.Map.Entry pair = (java.util.Map.Entry) it.next();
@@ -315,11 +313,14 @@ public class Map {
     }
 
     public void onTimeChange() {
-        if (panorama != null && panorama.image != null && panorama.image.visible) {
-            panorama.setImage(panorama.name + (weather.isNight() ? "_Night" : ""));
-            panorama.image.setSize(panorama.image.getSize().getMult(magnify, magnify));
+        if (panorama != null && !panoramaName.equals("")) {
+            for (int i=0;i<panorama.length;i++){
+                panorama[i].name = panoramaName + ("_"+i) + (weather.isNight() ? "_Night" : "");
+                panorama[i].setImage(panorama[i].name);
+            }
             weather.refreshTimeColor();
         }
+        updater.onTimeChange();
     }
 
     public int mapEdge(P p) {

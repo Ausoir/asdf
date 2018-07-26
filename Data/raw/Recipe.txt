@@ -1,7 +1,5 @@
-Battery@Time:1;Rock:1;Weed:1
-Charger@Time:1;Rock:1;Electric:1
-Scroll@Time:1;Weed:*
-Training_Dummy@Time:3;Fiber:*;Fiber:*;Fiber:*
+Battery@Time:1;Scrap:*;Weed:1;Resin:1
 Cutlass@Time:2;Rock:0;Broadsword:*
-Seabrew@Time:1;Starfish:*;Salt:1;Pot:0
-Salad@Time:0;Weed:*;Salt:1
+Fish@Time:1;Starfish:*;Butcher_Knife:0
+Vegetables@Time:1;Weed:*;Salt:1;Pot:0;Water:1
+Kitchenware@Time:3;Scrap:*;Hammer:1

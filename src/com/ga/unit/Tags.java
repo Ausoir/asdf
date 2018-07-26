@@ -10,7 +10,7 @@ import java.util.Map;
 public class Tags extends ArrayList<Tag> {
     public static final Tags blank = new Tags();
     public static final Tag[] trainers = new Tag[]{
-        Tag.Strength, Tag.Athletics, Tag.Electric, Tag.Channeling, Tag.Fire, Tag.Air, Tag.Mutation, Tag.Conjuration
+        Tag.Strength, Tag.Athletics, Tag.Energy, Tag.Enchant, Tag.Channeling, Tag.Void, Tag.Air, Tag.Fire, Tag.Conjuration
     };
 
     boolean containsAny(Tags p){

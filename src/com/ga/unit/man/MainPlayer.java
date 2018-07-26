@@ -53,6 +53,7 @@ public class MainPlayer extends Player {
             } else if (r == 5) say("This action is beyond my abilities!");
             else if (r == 6) say("I'm missing a required limb!");
             else if (r == 7) say("Weapon is not usable!");
+            else if (r == 8) say("Not enough Energy!");
         }
         return r;
     }
@@ -67,18 +68,6 @@ public class MainPlayer extends Player {
         boolean r = super.hit(hitBox, blunt, damage);
         if (r) statBar.show(0, 1);
         return r;
-    }
-
-    public boolean learnable() {
-        return getTotalExpertise() < get("Intelligence").getMax();
-    }
-
-    private int getTotalExpertise() {
-        int total = 0;
-        for (Tag i : Tags.trainers) {
-            total += get(i.name()).get() / 100;
-        }
-        return total;
     }
 
     public int getLevel(){
@@ -102,36 +91,43 @@ public class MainPlayer extends Player {
         }[quality];
     }
 
-    public void level(String stat, int quality) {
+    public boolean level(String stat, int quality) {
         int[] requirements = getLevelRequirements(quality);
         if (get("Motivation").get() >= requirements[0]) {
             if (map.updater.sleep(requirements[1], true)) {
                 get("Motivation").add(-requirements[0], false);
-                get(stat).addTotal(1);
                 Sound.play(map, pos, "heal");
                 Particle.holyExplosion(map, pos.getAdd(clip.organs[BODY].ptd), getDepth());
-                int level = getLevel();
-                String statChangeNotice = stat+" increased by 1. ";
-                if (level > 1) {
-                    int i, current = 1, prev;
-                    for (i = 1; i < level; i += prev) {
-                        prev = current;
-                        current = i;
+                String statChangeNotice = stat + " increased by 1. ";
+                boolean isStat = false; //Leveled up trait
+                for (String i : mainStats) if (isStat = i.equals(stat)) break;
+                if (isStat) {
+                    get(stat).addTotal(1);
+                    int level = getLevel();
+                    get("Innovation").add(1, false);
+                    if (level > 1) {
+                        int i, current = 1, prev;
+                        for (i = 1; i < level; i += prev) {
+                            prev = current;
+                            current = i;
+                        }
+                        if (i != level) { //not fibo
+                            Stat decay;
+                            String decayStat;
+                            do {
+                                decayStat = mainStats[SyncRand.r.nextInt(mainStats.length)];
+                                decay = get(decayStat);
+                            } while (decay.getMax() <= 1);
+                            decay.addTotal(-1);
+                            statChangeNotice += decayStat + " decayed by 1.";
+                        }
                     }
-                    if (i != level) { //not fibo
-                        Stat decay;
-                        String decayStat;
-                        do {
-                            decayStat = mainStats[SyncRand.r.nextInt(mainStats.length)];
-                            decay = get(decayStat);
-                        } while (decay.getMax() <= 1);
-                        decay.addTotal(-1);
-                        statChangeNotice += decayStat+" decayed by 1.";
-                    }
-                }
-                say("Leveled up! "+statChangeNotice);
+                    say("Leveled up! " + statChangeNotice);
+                } else learnTrait(Traits.Trait.getByName(stat));
+                return true;
             }
         } else say("Requires "+requirements[0]+" motivation points!");
+        return false;
     }
 
     public void die() {

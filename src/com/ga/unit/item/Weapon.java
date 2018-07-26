@@ -19,6 +19,7 @@ public class Weapon extends Item {
         cooldown.setDuration(0);
         rotation = 35;
         delay = 0;
+        disposable = false;
     }
     public void onCreate(){
         imbueMeta(true, true, .1f);
@@ -40,6 +41,10 @@ public class Weapon extends Item {
         return quality < material.hardness;
     }
 
+    @Override
+    public int getSpeed(){
+        return getUses()==0?speed-10:speed;
+    }
     @Override
     public int getValue(){
         return super.getValue() + (quality*1500);

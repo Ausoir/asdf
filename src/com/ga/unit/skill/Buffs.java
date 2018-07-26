@@ -97,7 +97,7 @@ public enum Buffs {
     }},
     Shock(1,new Tags(){{
         add(Tag.Curse);
-        add(Tag.Electric);
+        add(Tag.Air);
     }}){ Buff makeLocal(){
         return new Buff(10) {
             public void onSet(){
@@ -141,8 +141,6 @@ public enum Buffs {
                     for (Unit i : host.map.updater.collideUnit(host.pos, host.getSize() + 40, Faction.Destructive)) {
                         if (Global.r.nextBoolean()) i.buff(Burn, 1);
                     }
-                    host.stateSet(Actions.Sprint);
-                    host.delay.time = 8;
                 }
                 var++;
                 Particle.smoke(host.map, host.getRandomPoint(), host.getDepth()+.01f);
@@ -167,7 +165,6 @@ public enum Buffs {
                 time += level;
                 host.stats.triggerEffect(Buffs.Bleed);
                 host.stats.triggerEffect(Buffs.Burn);
-                host.stats.triggerEffect(Buffs.Shock);
                 onLoad();
             }
             public void onLoad(){
@@ -249,7 +246,7 @@ public enum Buffs {
                 mark = new Thing(host.map, "Mark", host.seed, 150);
                 mark.image.setCenterType(2);
                 mark.start();
-                mark.pos = host.pos;
+                mark.pos = host.getHead();
                 mark.save = false;
             }
             public void onSet() {
@@ -258,7 +255,7 @@ public enum Buffs {
                 mark = new Thing(host.map, "Mark", host.seed, 150);
                 mark.image.setCenterType(2);
                 mark.start();
-                mark.pos = host.pos;
+                mark.pos = host.getHead();
                 mark.save = false;
             }
             public boolean onTrigger(){
@@ -272,7 +269,6 @@ public enum Buffs {
     }},
     Bleed(1,new Tags(){{
         add(Tag.Curse);
-        add(Tag.Mutation);
     }}){
         final int[] bleedRate = new int[]{999, 80, 24, 8, 2, 2};
         Buff makeLocal(){
@@ -301,28 +297,33 @@ public enum Buffs {
                 }
             };
         }},
-    Icepath(2,new Tags(){{
+    Flamewalk(2,new Tags(){{
         add(Tag.Enchant);
-        add(Tag.Conjuration);
+        add(Tag.Fire);
     }}){ Buff makeLocal(){
         return new Buff(4) {
             private int tick = 1;
             public void onSet() {
-                Sound.play(host.map, host.pos, "freeze");
+                Sound.play(host.map, host.pos, "fire");
             }
             public boolean update() {
                 tick++;
                 if (tick % 8 == 0) {
-                    final Projectile p = new Projectile(host.map, "Ice", host.pos.getAdd(0, -5), new P(), 0) {
+                    final Projectile p = new Projectile(host.map, "Flame", host.pos.getAdd(0, -5), new P(), 0) {
                         @Override
                         public void onAttack(Unit p) {
-                            p.buff(Buffs.Freeze, level);
-                            Particle.explode(host.map, "Ice", host.getDepth(), pos, new P(0, -20), 6, 10, 5, true, 10);
+                            p.buff(Buffs.Burn, level);
+                            Particle.explode(host.map, "Flame", host.getDepth(), pos, new P(0, -20), 6, 10, 5, false, 10);
                             remove();
                         }
                         @Override
                         public void stuck() {
                             vel.set(0, 0);
+                        }
+                        @Override
+                        public void update(){
+                            Particle.explode(host.map, "Flame", host.getDepth(), pos, new P(0, -20), 6, 10, 5, false, 10);
+                            super.update();
                         }
                     };
                     p.faction = host.faction;
@@ -386,7 +387,6 @@ public enum Buffs {
     }},
     Rejuvenate(2,new Tags(){{
         add(Tag.Enchant);
-        add(Tag.Mutation);
     }}){ Buff makeLocal(){
         return new Buff(10){
             private int tick = 0;
@@ -402,7 +402,6 @@ public enum Buffs {
     }},
     Mutilation(2, new Tags(){{
         add(Tag.Curse);
-        add(Tag.Mutation);
     }}){ Buff makeLocal(){
         return new Buff(3) {
             public void onSet() {
@@ -465,7 +464,7 @@ public enum Buffs {
     }},
     Stun(2,new Tags(){{
         add(Tag.Curse);
-        add(Tag.Electric);
+        add(Tag.Air);
     }}){ Buff makeLocal(){
         return new Buff(3) {
             public void onSet() {
@@ -512,7 +511,6 @@ public enum Buffs {
     }},
     Poison(3,new Tags(){{
         add(Tag.Curse);
-        add(Tag.Mutation);
     }}){ Buff makeLocal(){
         return new Buff(100) {
             private int tick = 0;
@@ -596,7 +594,7 @@ public enum Buffs {
     Affinity(3,new Tags(){{
         add(Tag.Enchant);
         add(Tag.Channeling);
-        add(Tag.Electric);
+        add(Tag.Air);
     }}){ Buff makeLocal() {
         return new Buff(20) {
             public void onSet(){

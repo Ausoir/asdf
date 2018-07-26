@@ -14,15 +14,11 @@ public class MapName {
     private void set(String p){
         value = p;
     }
-
-    private String getBiome(){
-        return getMapname().substring(1, 2);
-    }
     public int getIndex(){
-        return Integer.parseInt(getMapname().substring(2));
+        return Integer.parseInt(getMapname().substring(1));
     }
     public MapName getNext(int dir){
-        return new MapName(instance+"_"+getBiome()+(getIndex()+dir));
+        return new MapName(instance+"_"+(getIndex()+dir));
     }
     public boolean isValid(){
         return getIndex() > 0;
@@ -30,22 +26,9 @@ public class MapName {
     public boolean isField(){
         return value.startsWith(FileManager.makeDirectory("ins/_"));
     }
-    String getBiomeName(){
-        switch (getBiome()){
-            case "G":
-                return "Grassland";
-            case "F":
-                return "Forest";
-            case "D":
-                return "Desert";
-        }
-        return null;
-    }
-
     public boolean equals(String p){
         return toString().equals(p);
     }
-
     String getMapname(){
         return value.substring(value.lastIndexOf(File.separator)+1);
     }

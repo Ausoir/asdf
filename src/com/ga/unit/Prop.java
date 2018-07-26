@@ -112,6 +112,7 @@ public class Prop extends Thing {
             if (edge > 0) {
                 if (Math.abs(edge-5) == 1) onMapEdge(edge-5);
                 else if (edge == 2) remove();
+                else if (edge == 8) vel.y = 0;
             }
             pos.add(vel);
             if (gravity) {
@@ -119,6 +120,9 @@ public class Prop extends Thing {
             }
             vel.x *= .94f;
         }
+    }
+    public void onTimeChange(){
+
     }
     public String[] load(String p) {
         String[] ps = p.split("@",-1);

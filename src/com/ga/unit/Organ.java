@@ -71,9 +71,9 @@ public class Organ extends Line {
     void hit(Line p){
         ptd.set(pt.getAdd(p.getAtan(maxLength)));
     }
-    void amputate(Line p, int damage){
+    public void amputate(Line p, int damage){
         Sound.play(host.map, host.pos, "hit_bloody");
-        int intensity = 22 + damage;
+        int intensity = 18 + damage*2;
         if (image != null) {
             final Projectile flyingOrgan = new Projectile(host.map, null, new P(host.pos), p.ptd.getAdd(Global.r.nextInt(24)-12,-Global.r.nextInt(12)), intensity) {
                 private final int length = (int) getLength();

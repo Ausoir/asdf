@@ -2,10 +2,7 @@ package com.ga.unit.man;
 
 import com.ga.game.Sound;
 import com.ga.map.Map;
-import com.ga.tool.Line;
-import com.ga.tool.P;
-import com.ga.tool.Performer;
-import com.ga.tool.ToolString;
+import com.ga.tool.*;
 import com.ga.unit.*;
 import com.ga.unit.item.ArmorSet;
 import com.ga.unit.item.Crafts;
@@ -15,7 +12,6 @@ import com.ga.unit.skill.Buffs;
 import com.ga.unit.skill.Stat;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.Collections;
 
 import static com.ga.unit.man.BodyHumanoid.FIST;
@@ -30,7 +26,7 @@ public class Man extends Unit {
     private String face;
     public ArmorSet armor;
     public Inventory inventory = new Inventory(this);
-    public ArrayList<String> crafting = new ArrayList<>();
+    public L<String> crafting = new L<>();
 
     public Man(Map map, String name, int seed) {
         super(map, name, seed);
@@ -76,7 +72,7 @@ public class Man extends Unit {
     @Override
     public String toString(){
         StringBuilder r = new StringBuilder();
-        r.append(super.toString()).append("@").append(ToolString.tosArrayList(crafting)).append("@;");
+        r.append(super.toString()).append("@").append(crafting.toString()).append("@;");
         r.append("#").append(face).append(";").append(weapon.forceToString()).append(";").append(armor.toString());
         if (inventory.getItemSize() != 0) r.append(";").append(inventory.toString());
         return r.toString();
@@ -209,8 +205,7 @@ public class Man extends Unit {
     }
 
     public int getVacancy(){
-        Stat dex = get("Agility");
-        return dex.getMax() - armor.getEncumbrance() - weapon.encumbrance;
+        return get("Agility").getMax() - armor.getEncumbrance();
     }
 
     public Stat get(String p){
@@ -218,7 +213,7 @@ public class Man extends Unit {
     }
 
     public int getGold(){
-        ArrayList<Item> items = new ArrayList<>(inventory.getItems());
+        L<Item> items = new L<>(inventory.getItems());
         items.add(weapon);
         Collections.addAll(items, armor.armor);
         int money = 0;
@@ -230,12 +225,12 @@ public class Man extends Unit {
         return money;
     }
     public void obtainGold(int p){
-        ArrayList<Item> items = new ArrayList<>(inventory.getItems());
+        L<Item> items = new L<>(inventory.getItems());
         items.add(weapon);
         Collections.addAll(items, armor.armor);
         for (Item i : items){
             if (i.tags.contains(Tag.Currency)){
-                int money = Math.min(i.getDurability()-i.getUses(), p);
+                int money = Math.min(i.durability-i.getUses(), p);
                 p -= money;
                 i.isUsable(true,-money);
             }
@@ -247,7 +242,7 @@ public class Man extends Unit {
         }
     }
     public boolean requireGold(int p){
-        ArrayList<Item> items = new ArrayList<>(inventory.getItems());
+        L<Item> items = new L<>(inventory.getItems());
         items.add(weapon);
         Collections.addAll(items, armor.armor);
         for (Item i : items){
@@ -268,7 +263,7 @@ public class Man extends Unit {
             get("Intelligence").add(-mana, false);
             if (p == 0) return true;
         }
-        ArrayList<Item> items = new ArrayList<>(inventory.getItems());
+        L<Item> items = new L<>(inventory.getItems());
         items.add(weapon);
         Collections.addAll(items, armor.armor);
         for (Item i : items){
@@ -287,13 +282,13 @@ public class Man extends Unit {
             get("Intelligence").add(vacant, false);
             if (p == 0) return true;
         }
-        ArrayList<Item> items = new ArrayList<>(inventory.getItems());
+        L<Item> items = new L<>(inventory.getItems());
         items.add(weapon);
         Collections.addAll(items, armor.armor);
         for (Item i : items){
             if (i.tags.contains(Tag.Energy)){
-                int mana = Math.min(i.getDurability() - i.getUses(), p);
-                if (i.isUsable(true,mana)) p -= mana;
+                int mana = Math.min(i.durability - i.getUses(), p);
+                if (i.isUsable(true, -mana)) p -= mana;
                 if (p == 0) return true;
             }
         }
@@ -334,10 +329,6 @@ public class Man extends Unit {
         return null;
     }
 
-    public int getWarmth(){
-        return armor.getWarmth();
-    }
-
     public void setVisible(boolean p) {
         super.setVisible(p);
         armor.setVisible(p);
@@ -376,15 +367,15 @@ public class Man extends Unit {
         clip.organs[5].setImage(p);
     }
 
-    public ArrayList<Prop> getAvailableItems(){
-        ArrayList<Prop> items = map.updater.collideProp(pos,100);
+    public L<Prop> getAvailableItems(){
+        L<Prop> items = map.updater.collideProp(pos,100);
         items.removeIf(o -> !(o instanceof Item) || o == weapon);
         items.addAll(inventory.getItems());
         if (!wieldingNone()) items.add(weapon);
         return items;
     }
-    public ArrayList<Prop> getAvailableProps() {
-        ArrayList<Prop> items = map.updater.collideProp(pos,120);
+    public L<Prop> getAvailableProps() {
+        L<Prop> items = map.updater.collideProp(pos,120);
         items.removeIf(o -> (o instanceof Item));
         items.removeIf(o -> !o.image.visible);
         return items;

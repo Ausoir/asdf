@@ -117,7 +117,7 @@ public enum Intelligence {
                     String r = "I'm selling ";
                     int length = host.rand.nextInt(20) + 1;
                     String[] items = new String[length];
-                    String[] inventory = data[host.seed % data.length].split(";");
+                    String[] inventory = data[type].split(";");
                     for (int i = 0; i < length; i++) {
                         items[i] = inventory[host.rand.nextInt(inventory.length)];
                     }
@@ -156,7 +156,7 @@ public enum Intelligence {
                 }
 
                 private int fluctuate(int value) {
-                    float fluc = (host.rand.nextFloat() * (high - low)) + low;
+                    float fluc = host.traits.has(Traits.Trait.Haggler) ? ((high+low+low)/3) : (host.rand.nextFloat() * (high - low)) + low;
                     return (int) (value * fluc);
                 }
             });
@@ -228,26 +228,26 @@ public enum Intelligence {
 
                 void load(String p) {
                     super.load(p);
-                    price = (host.rand.nextInt(50)+30)*100+99;
+                    price = (host.rand.nextInt(30)+30)*100+99;
                 }
 
                 void shop() {
                     Menu.menu.showDialog("Inn",
-                            "Rest for the night? "+Dialog.money(price)+" for 5 hours.",
+                            "Rest for the night? "+Dialog.money(price)+" for 3 hours. Heal Fatigue, Stamina, Vitality, Energy, and get 10 Motivation. Food is paid for.",
                             new String[]{"Pay for the night"},
                             new Performer[]{
                                     new Performer(){
                                         public void perform(){
                                             if (Global.player.requireGold(price)) {
-                                                Global.player.get("Nutrition").add(5, true);
-                                                if (Global.player.map.updater.sleep(5, true)){
+                                                Global.player.get("Nutrition").add(3, true);
+                                                if (Global.player.map.updater.sleep(3, true)){
                                                     Global.player.get("Motivation").add(10,false);
+                                                    Global.player.get("Fatigue").add(9,false);
                                                     Global.player.get("Agility").heal();
                                                     Global.player.get("Intelligence").heal();
                                                     Global.player.get("Strength").heal();
                                                 } else {
                                                     Global.player.obtainGold(price);
-                                                    Global.player.get("Nutrition").add(-5, true);
                                                 }
                                             } else {
                                                 Global.player.say("Not enough money..");
@@ -266,33 +266,31 @@ public enum Intelligence {
 
                 void load(String p) {
                     super.load(p);
-                    stat = new String[]{"Strength","Agility","Intelligence"}[host.rand.nextInt(3)];
-                    price = (host.rand.nextInt(30)+20)*100+99;
+                    ArrayList<Traits.Trait> traits = Traits.Trait.getByType(3);
+                    String[] stats = new String[traits.size()+3];
+                    stats[0] = "Strength";
+                    stats[1] = "Agility";
+                    stats[2] = "Intelligence";
+                    for (int i=3;i<stats.length;i++){
+                        stats[i] = traits.get(i-3).name();
+                    }
+                    stat = stats[type];
+                    price = (host.rand.nextInt(30)+30)*100+99;
                 }
 
                 void shop() {
-                    int[] requirements = Global.player.getLevelRequirements(0);
-                    String message = "Train your "+stat+" for only "+Dialog.money(price)+"!";
-                    message += "Requires "+requirements[0]+" motivation and "+requirements[1]+" hours.";
+                    int[] requirements = Global.player.getLevelRequirements(1);
+                    String message = "Would you like to train your "+stat+"?";
+                    message += "Requires "+Dialog.money(price)+", "+requirements[0]+" motivation, and "+requirements[1]+" hours.";
                     message += "\nCurrent motivation: "+Global.player.get("Motivation").get();
                     message += "\nCurrent nutrition: "+Global.player.get("Nutrition").get();
-                    Menu.menu.showDialog("Trainer",
-                            message,
+                    Menu.menu.showDialog("Trainer", message,
                             new String[]{"Begin training"},
                             new Performer[]{
                                     new Performer(){
                                         public void perform(){
                                             if (Global.player.requireGold(price)) {
-                                                Global.player.get("Nutrition").add(5, true);
-                                                if (Global.player.map.updater.sleep(5, true)){
-                                                    Global.player.get("Motivation").add(10,false);
-                                                    Global.player.get("Agility").heal();
-                                                    Global.player.get("Intelligence").heal();
-                                                    Global.player.get("Strength").heal();
-                                                } else {
-                                                    Global.player.obtainGold(price);
-                                                    Global.player.get("Nutrition").add(-5, true);
-                                                }
+                                                if (!Global.player.level(stat, 1)) Global.player.obtainGold(price);
                                             } else {
                                                 Global.player.say("Not enough money..");
                                             }

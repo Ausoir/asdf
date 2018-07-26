@@ -84,7 +84,7 @@ public enum Crafts {
             }
             if (ingredients.size() == 1){
                 int time = Integer.parseInt(usage.get(0));
-                if (host.get("Nutrition") != null && host.get("Nutrition").get() >= time) return time;
+                if (host.get("Nutrition").get() >= time) return time;
             }
         }
         return -1;

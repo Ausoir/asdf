@@ -219,6 +219,10 @@ public enum Stock {
                 super.stateUpdate();
                 if (state == Actions.Melee) attack();
             }
+            public void die(){
+                Stock.createByName(map, "Meat", -1).start().pos.set(pos);
+                super.die();
+            }
             public void onCreate(){
                 UnitFactory unitString = new UnitFactory(this, Faction.Predator, 3);
                 unitString.setMoveset("Melee");
@@ -255,11 +259,11 @@ public enum Stock {
             }
             public void onCreate(){
                 UnitFactory unit = new UnitFactory(this, Faction.Predator, 1);
-                unit.setStat("Speed", 12);
+                unit.setStat("Speed", 8);
                 unit.setMoveset("Melee");
             }
             public void die(){
-                Threadball.create(map, -1, -1).start().pos.set(pos);
+                Stock.createByName(map, "Resin", -1).start().pos.set(pos);
                 super.die();
             }
         };
@@ -291,6 +295,10 @@ public enum Stock {
             }
             public void buff(Buffs buff, int level){
                 super.buff(buff, level*2);
+            }
+            public void die(){
+                Stock.createByName(map, "Birdmeat", -1).start().pos.set(pos);
+                super.die();
             }
             public void onCreate(){
                 UnitFactory unitString = new UnitFactory(this, Faction.Predator, 2);
@@ -340,10 +348,11 @@ public enum Stock {
         product.clip = new Body(product, name());
         return product;
     }},
-    Golem { Prop make(Map map, int id, int seed) {
+    Wyvern { Prop make(Map map, int id, int seed) {
         Unit product = new Unit(map, name(), seed){
             public void onCreate(){
-                UnitFactory unitString = new UnitFactory(this, Faction.Predator, 12);
+                UnitFactory unitString = new UnitFactory(this, Faction.Predator, 16);
+                unitString.setStat("Agility",80);
                 unitString.setMoveset("Melee");
             }
         };
@@ -351,11 +360,12 @@ public enum Stock {
         product.clip = new Body(product, name());
         return product;
     }},
-    Wyvern { Prop make(Map map, int id, int seed) {
+    Wheeler { Prop make(Map map, int id, int seed) {
         Unit product = new Unit(map, name(), seed){
             public void onCreate(){
-                UnitFactory unitString = new UnitFactory(this, Faction.Predator, 16);
-                unitString.setMoveset("Melee");
+                UnitFactory unitString = new UnitFactory(this, Faction.Predator, 20);
+                unitString.setStat("Agility",80);
+                unitString.setMoveset("Shoot_Rifle");
             }
         };
         product.gravity = false;
@@ -512,7 +522,7 @@ public enum Stock {
     Bandage{ Prop make(Map map, int id, int seed){
         Item product = new Item(map, name(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Consumable, 4) {
             public boolean use(com.ga.unit.man.Man host) {
-                if (isUsable(true, 1) && super.use(host)){
+                if (super.use(host) && isUsable(true, 1)){
                     host.stats.triggerEffect(Buffs.Bleed);
                     return true;
                 }
@@ -531,7 +541,7 @@ public enum Stock {
                 if (seed != 0) imbueMeta(false, false, 1);
             }
             public boolean use(com.ga.unit.man.Man host) {
-                if (isUsable(true, 1) && super.use(host)){
+                if (super.use(host) && isUsable(true, 1)){
                     host.buff(emod, ademod.level*2);
                     return true;
                 }
@@ -551,7 +561,7 @@ public enum Stock {
             Actions spell;
             @Override
             public boolean use(com.ga.unit.man.Man host){
-                if (isUsable(true, 1) && super.use(host)) {
+                if (super.use(host) && isUsable(true, 1)) {
                     if (spell != null){
                         host.buff(Buffs.Attunement, 1);
                         host.stateLevel = 3;
@@ -590,10 +600,7 @@ public enum Stock {
         return product;
     }},
     Ethersword{ Prop make(Map map, int id, int seed){
-        Weapon product = new Weapon(map, name(), seed, new Item.Material[]{Item.Material.Crystal}, Item.ItemType.Sword, -1, 0, 0){
-            public String toString(){
-                return "";
-            }
+        Weapon product = new Weapon(map, name(), seed, new Item.Material[]{Item.Material.Crystal}, Item.ItemType.Sword, 1, 0, 0){
             public void remove(){
                 super.remove();
                 Particle.holyExplosion(map, pos,getDepth());
@@ -602,10 +609,15 @@ public enum Stock {
                 Particle.holyExplosion(map, pos,getDepth());
                 return super.trigger(host);
             }
+            public void onUnequip(Man host) {
+                super.onUnequip(host);
+                remove();
+            }
             public int getDamage(){
-                return 3;
+                return 6;
             }
         };
+        product.disposable = true;
         product.weight = 0;
         product.image.setCenterType(3);
         return product;
@@ -690,7 +702,7 @@ public enum Stock {
                     index = productSeed.substring(productSeed.length()-5);
                     final String finalIndex = index;
                     Random tRand = new Random(Integer.parseInt(productSeed.substring(0, productSeed.length() - 5)));
-                    String[] possibleLoot = new String[]{"Bandage","Threadball","Battery","Potion","Scroll"};
+                    String[] possibleLoot = new String[]{"Candle","Cup","Chair","Comfortwear","Threadball"};
                     final int itemNum = tRand.nextInt(5);
                     final Item[] products = new Item[itemNum];
                     Performer[] actions = new Performer[itemNum];
@@ -722,7 +734,7 @@ public enum Stock {
                 Item.ItemType.Darting, 10){
             @Override
             public boolean use(final com.ga.unit.man.Man host){
-                if (!host.clip.organs[BodyHumanoid.FIST].amputated && isUsable(true, 1) && super.use(host)) {
+                if (!host.clip.organs[BodyHumanoid.FIST].amputated && super.use(host) && isUsable(true, 1)) {
                     host.delay.performer = new Performer() {
                         public void perform() {
                             final Projectile p = new Projectile(map, "Tanto", host.pos.getAdd(host.clip.organs[BodyHumanoid.OFIST].ptd), host.pos.getAdd(host.target), 70) {
@@ -762,7 +774,7 @@ public enum Stock {
         Item product = new Item(map, name(), seed, new Item.Material[]{Item.Material.Stone}, Item.ItemType.Throwing, 1) {
             @Override
             public boolean use(final com.ga.unit.man.Man host) {
-                if (isUsable(true, 1) && super.use(host)) {
+                if (super.use(host) && isUsable(true, 1)) {
                     final int explosionDamage = rand.nextInt(36)+24;
                     host.delay.performer = new Performer() {
                         public void perform() {
@@ -806,11 +818,11 @@ public enum Stock {
         product.delay = 10;
         return product;
     }},
-    Threadball{ Prop make(Map map, int id, int seed){
+    Grappler{ Prop make(Map map, int id, int seed){
         Item product = new Item(map, name(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Throwing, 5) {
             @Override
             public boolean use(final com.ga.unit.man.Man host) {
-                if (isUsable(true, 1) && super.use(host)) {
+                if (super.use(host) && isUsable(true, 1)) {
                     host.stateSet(Actions.Dart);
                     final Item me = this;
                     host.delay.performer = new Performer() {
@@ -903,34 +915,91 @@ public enum Stock {
     }},
     Energy_Necklace{ Prop make(Map map, int id, int seed){
         Armor product = new Armor(map, "Battery",seed,new Item.Material[]{Item.Material.Stone, Item.Material.Glass, Item.Material.Crystal, Item.Material.Obsidian}
-                ,3,0,0,40, 0){
+                ,3,0,0,20, 0){
             public String getDescription(){
-                return super.getDescription()+"\nThis item is used to store energy for magical applications.";
+                return super.getDescription()+"\nThis item is used to store Energy for magical applications.";
             }
         };
         product.name = "Energy_Necklace";
         product.disposable = false;
         product.tags.add(Tag.Energy);
-        product.tags.add(Tag.Electric);
         return product;
     }},
     Battery{ Prop make(Map map, int id, int seed){
         Item product = new Item(map, name(),seed,new Item.Material[]{Item.Material.Copper, Item.Material.Lead}
-            ,Item.ItemType.Consumable,80){
+            ,Item.ItemType.Consumable,20){
             public String getDescription(){
-                return super.getDescription()+"\nThis item is used to store energy for magical applications.";
+                return super.getDescription()+"\nThis item is used to store Energy for magical applications.";
             }
         };
         product.disposable = false;
         product.tags.add(Tag.Energy);
-        product.tags.add(Tag.Electric);
+        return product;
+    }},
+    Alcohol{ Prop make(Map map, int id, int seed){
+        String name = new String[]{"Beer","Cocktail","Mead","Rum","Grog"}[seed % 5];
+        return new Item(map, name,seed,new Item.Material[]{Item.Material.Organic}
+                ,Item.ItemType.Consumable,((seed % 5)*2)+1) {
+            public String getDescription() {
+                return super.getDescription() + "\nDrink to restore Energy into your body.";
+            }
+
+            @Override
+            public boolean use(Man p) {
+                if (super.use(p) && isUsable(true, 1)) {
+                    p.get("Intelligence").heal();
+                    return true;
+                }
+                return false;
+            }
+        };
+    }},
+    Kitchenware{ Prop make(Map map, final int id, int seed){
+        String name = new String[]{"Butcher_Knife","Pot","Frying_Pan","Grill","Smoking_Rack","Drying_Rack","Spice","Vacuum_Sealer"}[seed % 8];
+        Food.Ingredient method = com.ga.unit.item.Food.Ingredient.getByType(2).get(seed % 8);
+        Item product = new Item(map, name, seed, new Item.Material[]{Item.Material.Steel, Item.Material.Glass, Item.Material.Iron, Item.Material.Copper}, Item.ItemType.Bashing, 12){
+            @Override
+            public boolean use(com.ga.unit.man.Man host){
+                if (host instanceof MainPlayer && super.use(host) && host.traits.has(Traits.Trait.Cooking) && isUsable(true, 1)) {
+                    ArrayList<Prop> items = host.getAvailableItems();
+                    ArrayList<Food> foods = new ArrayList<>();
+                    for (Prop i : items){
+                        if (i instanceof Food){
+                            foods.add((com.ga.unit.item.Food) i);
+                        }
+                    }
+                    if (foods.size() > 0){
+                        Food prev = null;
+                        for (Food i : foods){
+                            i.cook(method);
+                            Particle.smoke(map, i.pos, i.getDepth());
+                            if (prev != null){
+                                i.combine(prev, method);
+                                i.name += " and "+prev.name;
+                            }
+                            prev = i;
+                        }
+                        prev.name = method.name() + " " + prev.name;
+                        Sound.play(map, host.pos, "fire");
+                        host.say("Cooking complete!");
+                        return true;
+                    }
+                }
+                return false;
+            }
+            public String getDescription(){
+                return super.getDescription()+" This item can be used to cook food if you have the Cooking trait.";
+            }
+        };
+        product.weight /= 2;
+        product.value = 2000;
         return product;
     }},
     Steroid{ Prop make(Map map, final int id, int seed){
         Item product = new Item(map, name(), seed, new Item.Material[]{Item.Material.Organic}, Item.ItemType.Consumable, 1){
             @Override
             public boolean use(com.ga.unit.man.Man host){
-                if (host instanceof MainPlayer && super.use(host)) {
+                if (host instanceof MainPlayer && super.use(host) && isUsable(true, 1)) {
                     if (host.get("Agility").require(1)) {
                         host.get("Strength").addTotal(1);
                         host.say("Increased Strength by 1!");
@@ -958,7 +1027,6 @@ public enum Stock {
         };
         product.tags.add(Tag.Channeling);
         product.tags.add(Tag.Conjuration);
-        product.tags.add(Tag.Electric);
         product.tags.add(Tag.Fire);
         product.tags.add(Tag.Enchant);
         product.tags.add(Tag.Air);

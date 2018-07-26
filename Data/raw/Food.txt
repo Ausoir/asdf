@@ -1,10 +1,14 @@
-Fruit;1;Fruit //Name, Weight, Materials
-Drumstick;2;White,Fried
-Porkchop;2;Red,Roasted
-Meal;3;Grain,Vegetable,Fish
-Burger;1;Red,Vegetable,Grain,Roasted
-Sandwich;1;Vegetable,Grain,Cut,White
-Ration;1;Sealed,Dried,Grain,Red
+Fruit;1;Fruit //Name, Uses, Materials
 Fish;1;Fish
-Vegetables;1;Vegetable
 Meat;2;Red
+Birdmeat;2;White
+Bread;3;Grain
+Cheese;3;Dairy
+Vegetables;4;Vegetable
+Drumstick;2;White,Fried
+Porkchop;1;Red,Roasted
+Jerky;3;Red,Dried,Smoked,Spiced
+Meal;1;Grain,Vegetable,Fish,Fruit,Cut,Spiced
+Burger;1;Red,Vegetable,Grain,Roasted,Dairy,Cut
+Sandwich;2;Vegetable,Grain,Cut,Dairy,White
+Ration;3;Sealed,Dried,Grain,Grain

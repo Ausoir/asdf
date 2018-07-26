@@ -72,26 +72,25 @@ public class Item extends Prop {
         },
         Glass(.1f,1,7,.5f,2000),
         Brass(.4f,7,4,.7f,1500,new Color(133, 123, 23,70)),
-        Copper(.4f,5,3,1f,1500,new Color(133, 92, 38,70)){
+        Copper(.4f,4,3,1f,1500,new Color(133, 92, 38,70)){
             public void onSet(Item host){
                 warmth -= 1;
             }
         },
         Bronze(.4f,5,4,1.2f,1500,new Color(133, 72, 0,80)),
-        Iron(.5f,4,5,1.5f,2000),
+        Iron(.5f,5,5,1.5f,2000),
         Silver(.2f,10,7,.8f,9000){
             public void onSet(Item host){
-                host.tags.add(Tag.Mutation);
+                host.tags.add(Tag.Enchant);
             }
         },
         Gold(.2f,10,9,.5f,16000){
             public void onSet(Item host){
-                host.tags.add(Tag.Electric);
                 host.tags.add(Tag.Enchant);
             }
         },
         Lead(.4f,9,2,1.6f,1500,new Color(19, 31, 75,100)),
-        Steel(.2f,4,6,4,8000),
+        Steel(.2f,3,6,4,8000),
         Titanium(.1f,3,7,5,30000),
         Crystal(.1f,3,9,.3f,2000,new Color(28, 133, 67,140)){
             public void onSet(Item host){
@@ -111,7 +110,6 @@ public class Item extends Prop {
         Bone(.2f,1,3,.8f,3000){
             public void onSet(Item host){
                 host.tags.add(Tag.Curse);
-                host.tags.add(Tag.Mutation);
             }
         },
         Other(0,0,0,1,0),
@@ -230,7 +228,8 @@ public class Item extends Prop {
     Cooldown cooldown = new Cooldown(3);
     public int delay = 0;
     public float probability;
-    private int durability, uses;
+    public int durability;
+    private int uses;
     public boolean disposable = true;
     public ItemType type = ItemType.Throwing;
     public int value;
@@ -422,7 +421,7 @@ public class Item extends Prop {
         Sound.play(map, pos, type.sound);
     }
     public float getPercentage(){
-        return (float)getUses()/getDurability();
+        return (float)getUses()/durability;
     }
     void mend(){
         if (!isInfinite()) uses = durability;
@@ -441,9 +440,6 @@ public class Item extends Prop {
             return true;
         }
         return false;
-    }
-    public int getDurability(){
-        return durability;
     }
     public int getUses(){
         return uses;
@@ -495,7 +491,7 @@ public class Item extends Prop {
         return r;
     }
     public int getDamage() {
-        return type.isBlunt()?weight:weight+material.hardness;
+        return type.isBlunt() || getUses() == 0?weight:weight+material.hardness;
     }
     public Line getLine(){
         float len = image.getSize().x * dir * (image.getCenterType()==1?.5f:1) + 2;

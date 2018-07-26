@@ -31,7 +31,7 @@ public class Global {
     public static P rel = new P();
     private static float[] sinv = new float[360];
     private static float[] cosv = new float[360];
-    public static int time, hour;
+    public static int time = 0, hour;
     public static Timer updates = new Timer(40,true);
     public static ArrayList<EventTimer> timers = new ArrayList<>();
     public static Font font = new Font("Helvetica",Font.PLAIN,20);
@@ -89,13 +89,6 @@ public class Global {
             EventTimer timer = (EventTimer) it.next();
             if (timer.update(p)) it.remove();
         }
-    }
-    public static void hourPass(int p){
-        Global.player.get("Intelligence").add(Math.max(0, Global.player.traits.getTraitLevel(Traits.Trait.Attunement)-1), false);
-        Global.player.get("Strength").heal();
-        timePass(p*100);
-        hour+=p;
-        for (Map i : maps) i.onTimeChange();
     }
     public static boolean inCamera(float x, float y, float sizeX, float sizeY){
         return (x > Global.camera.x-Settings.centerX-sizeX && y > Global.camera.y-Settings.centerY-sizeY

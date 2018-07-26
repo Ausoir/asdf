@@ -11,7 +11,6 @@ import com.ga.unit.skill.Stat;
 import com.ga.unit.skill.Stats;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -19,7 +18,7 @@ import java.util.HashMap;
  */
 public class Unit extends Prop {
     private static final float OFFSET_UNIT = .0001f;
-    public ArrayList<Actions> moveset = new ArrayList<>();
+    public L<Actions> moveset = new L<>();
     public HashMap<Actions, Cooldown> cooldown = new HashMap<>();
     public int controlId;
     public Body clip;
@@ -68,7 +67,7 @@ public class Unit extends Prop {
     @Override
     public String toString(){
         return super.toString() + "@" + controlId + "@" + map.name.toString() + "@" + clip.toString() + "@" + stats.toString() + "@" + faction.name() +
-                "@" + brain.toString() + "@" + ToolString.tosArrayList(moveset) + "@" + traits.toString();
+                "@" + brain.toString() + "@" + moveset.toString() + "@" + traits.toString();
     }
     @Override
     public void onField(){
@@ -77,15 +76,18 @@ public class Unit extends Prop {
     private int getMemorySize(){
         return moveset.size()-1+traits.getMemorySize();
     }
+    public boolean canLearn(){
+        return getMemorySize() < get("Intelligence").getMax();
+    }
     public boolean learnSkill(Actions move){
-        if (!moveset.contains(move) && getMemorySize() < get("Intelligence").getMax()){
+        if (!moveset.contains(move) && canLearn()){
             moveset.add(move);
             return true;
         }
         return false;
     }
     public boolean learnTrait(Traits.Trait p) {
-        return getMemorySize() < get("Intelligence").getMax() && traits.learn(this, p);
+        return canLearn() && traits.learn(this, p);
     }
 
     public P getRandomPoint(){
@@ -152,27 +154,25 @@ public class Unit extends Prop {
         return Math.max(0, getStatePower(state)+1-state.getDifficulty());
     }
     public void stateSet(Actions state){
-        if (this.state != Actions.Dead) {
-            face(target.x > 0 ? 1 : -1, false);
-            clip.setState(state.getClipName());
-            if (state != Actions.Idle){
-                stats.restTimer.reset();
-                getCooldown(state).reset();
-                delay.performer = null;
-                stateInterrupt();
-                delay.set(state.getDel());
-                if (delay.max != 0 && state.isDynamicAnimation()){
-                    int attackSpeed = getAttackSpeed();
-                    int clipspeed = clip.setSpeed(attackSpeed);
-                    delay.set(Math.max(clipspeed, delay.time - attackSpeed));
-                }
+        face(target.x > 0 ? 1 : -1, false);
+        clip.setState(state.getClipName());
+        if (state != Actions.Idle){
+            stats.restTimer.reset();
+            getCooldown(state).reset();
+            delay.performer = null;
+            stateInterrupt();
+            delay.set(state.getDel());
+            if (delay.max != 0 && state.isDynamicAnimation()){
+                int attackSpeed = getAttackSpeed();
+                int clipspeed = clip.setSpeed(attackSpeed);
+                delay.set(Math.max(clipspeed, delay.time - attackSpeed));
             }
-            this.state = state;
-            damageMod = 1;
-            stateDuration = 0;
-            moveTriggered = false;
-            stateOnSet(state);
         }
+        this.state = state;
+        damageMod = 1;
+        stateDuration = 0;
+        moveTriggered = false;
+        stateOnSet(state);
     }
     protected int getAttackSpeed(){
         return get("Attack").get();
@@ -240,15 +240,15 @@ public class Unit extends Prop {
                         brain.onHit();
                         clip.organs[i].hit(hitBox);
                     }
-                    if (damageBreakthrough(i, blunt, damage)) {
-                        if (get("Agility").require(1+(damage/3))) {
+                    if (stats.triggerEffect(Buffs.Mark)) clip.organs[i].amputate(hitBox, damage);
+                    else if (damageBreakthrough(i, blunt, damage)) {
+                        if (get("Agility").require(1+(damage/4))) {
                             Particle.explode(map, "Blood", getDepth()+.01f, getRandomPoint(), new P(), 9, 5, 0, true, 24);
                         } else {
                             buff(Buffs.Bleed, 1);
                             clip.organs[i].amputate(hitBox, damage);
                         }
                     }
-                    if (stats.triggerEffect(Buffs.Mark)) clip.organs[i].amputate(hitBox, damage);
                 } else {
                     clip.organs[i].hit(hitBox);
                 }

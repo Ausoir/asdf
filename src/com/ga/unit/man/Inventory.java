@@ -1,14 +1,13 @@
 package com.ga.unit.man;
 
+import com.ga.tool.L;
 import com.ga.unit.item.Item;
-
-import java.util.ArrayList;
 
 /**
  * Created by Ga on 8/9/2016. asd
  */
 public class Inventory {
-    private ArrayList<Item> items = new ArrayList<>();
+    private L<Item> items = new L<>();
     public int weight = 0;
     private int volume = 0;
     private int maxSize = 0;
@@ -29,7 +28,7 @@ public class Inventory {
     public Item getItem(int p){
         return items.get(p);
     }
-    ArrayList<Item> getItems(){
+    L<Item> getItems(){
         return items;
     }
     public int getItemSize(){

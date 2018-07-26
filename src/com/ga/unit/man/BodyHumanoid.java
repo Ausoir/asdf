@@ -14,8 +14,8 @@ public class BodyHumanoid extends Body {
         super(host, "Man");
     }
 
-    private void setAppendages(){
-        switch (this.state) {
+    public void setAppendages(String state){
+        switch (state) {
             case "Interact":
                 rotateAppendage(FIST, 15, 0);
                 localAnimation[15][OFIST][0] = localAnimation[1][OFIST][0];
@@ -79,7 +79,7 @@ public class BodyHumanoid extends Body {
     @Override
     public void setState(String state) {
         super.setState(state);
-        setAppendages();
+        setAppendages(state);
     }
 
     public boolean update() {

@@ -21,7 +21,10 @@ public class Stats {
     }
     public Stat getStat(String p) {
         Stat stat = stats.get(p);
-        if (stat == null) Global.p("Can't find stat "+p);
+        if (stat == null){
+            Global.p("Couldn't find stat "+p+".");
+            return new Stat(0);
+        }
         return stat;
     }
     public void addStat(String p, int value){

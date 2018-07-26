@@ -1,16 +1,19 @@
 Rock;2;1;0;Stone //Weapon, Image Type, Weight, Value, Materials
+Water;2;0;0;Other
 Shell;2;0;250;Bone
-Starfish;2;0;250;Flesh;A cooking ingredient.
-Grass;1;0;0;Cloth
+Starfish;2;0;250;Organic;A cooking ingredient.
 Flowerpot;2;1;500;Wooden,Silver,Stone,Glass
 Chair;2;8;1500;Wooden,Silver,Stone,Brass
 Salt;2;0;0;Other;A cooking ingredient.
 Sugar;2;0;0;Other;A cooking ingredient.
 Cup;2;0;0;Glass
 Statue;2;12;4000;Stone
-Pot;2;6;4;Steel,Glass
+Scrap;1;6;0;Steel,Iron,Copper,Bronze,Brass,Lead
 Jug;2;4;1;Glass
 Stool;2;6;1000;Wooden,Other
 Candle;2;0;200;Other
+Threadball;2;0;200;Cloth
 Bone;1;1;0;Bone;Cannot be eaten raw. Used as a cooking ingredient.
-Rune;1;1;2500;Glass,Crystal,Gold,Obsidian,Bone,Silver;This item is usually made of useful materials and thus used as a catalyst or an ingredient.
+Pitcher;2;2;200;Glass,Stone,Iron,Copper
+Resin;2;2;200;Organic
+Rune;1;1;2500;Crystal,Gold,Obsidian,Bone,Silver;This item is usually made of useful materials and thus used as a catalyst or an ingredient.

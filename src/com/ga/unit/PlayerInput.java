@@ -58,6 +58,18 @@ public class PlayerInput implements Input {
         return keyActionMap.get(p);
     }
 
+    public void changeMapping(int key, String event){
+        keyActionMap.remove(key);
+        Iterator i = keyActionMap.entrySet().iterator();
+        while (i.hasNext()) {
+            Map.Entry e = (Map.Entry) i.next();
+            if (e.getValue().equals(event)){
+                i.remove();
+                break;
+            }
+        }
+        keyActionMap.put(key, event);
+    }
     public void changeMapping(int key, Actions event){
         keyActionMap.remove(key);
         Iterator i = keyActionMap.entrySet().iterator();
@@ -77,10 +89,10 @@ public class PlayerInput implements Input {
             keyActionMap.put(-key, "Idle");
         }
     }
-    public String getMapping(Actions move){
+    public String getMapping(String name){
         String r = null;
         for (Map.Entry<Integer, String> i : keyActionMap.entrySet()) {
-            if (i.getValue().equals(move.name())){
+            if (i.getValue().equals(name)){
                 int key = i.getKey();
                 String keyname = KeyEvent.getKeyText(key);
                 if (key == 1) keyname = "LMB";

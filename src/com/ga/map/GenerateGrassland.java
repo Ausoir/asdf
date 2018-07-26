@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 class GenerateGrassland {
     static void generate(Map map){
+        map.callname = "";
         Generator generator = new Generator(map, 0);
         map.size = new P(Creation.r.nextInt(4000)+2000, Creation.r.nextInt(4000)+2000);
         int depth = 4;
@@ -34,16 +35,10 @@ class GenerateGrassland {
         generator.makeEdgeSpawns();
         map.normalize(0,800);
         map.size.y -= 400;
-        int feature = Creation.getRegionVariable(map.name.getIndex()).nextInt(3);
-        if (feature == 0) {
+        if (Creation.r.nextInt(3) == 0) {
             Line l = map.landRaw.get(Creation.r.nextInt(map.landRaw.size()));
             if (l.opt > 0 && l.tid >= 0 && l.clockwise() && Math.abs(l.getSlope()) < .1f) {
                 generator.generateBuildings(new String[]{"To_Forest"}, l, 10);
-            }
-        } else if (feature == 1){
-            Line l = map.landRaw.get(Creation.r.nextInt(map.landRaw.size()));
-            if (l.opt > 0 && l.tid >= 0 && l.clockwise() && Math.abs(l.getSlope()) < .1f) {
-                generator.generateBuildings(new String[]{"To_Desert"}, l, 10);
             }
         }
     }
