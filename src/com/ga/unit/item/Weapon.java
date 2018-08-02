@@ -9,11 +9,10 @@ import com.ga.unit.Unit;
  * Created by Ga on 8/1/2016. asd
  */
 public class Weapon extends Item {
-    protected int quality = 0;
-    private int damageMod;
+    private int quality = 0;
     public Weapon(Map map, String name, int seed, Material[] materials, ItemType type, int durability, int speedMod, int damageMod) {
         super(map, name, seed, materials, type, durability);
-        this.damageMod = damageMod;
+        this.weight += damageMod;
         speed = weight - speedMod;
         value = value*2 + 1000;
         cooldown.setDuration(0);
@@ -43,7 +42,7 @@ public class Weapon extends Item {
 
     @Override
     public int getSpeed(){
-        return getUses()==0?speed-10:speed;
+        return uses==0?speed-10:speed;
     }
     @Override
     public int getValue(){
@@ -72,7 +71,7 @@ public class Weapon extends Item {
     }
     @Override
     public int getDamage() {
-        int damage = (super.getDamage()+damageMod+quality)*(1+(int)(quality*.2f));
+        int damage = super.getDamage()+quality;
         return Math.max(0,damage);
     }
     @Override

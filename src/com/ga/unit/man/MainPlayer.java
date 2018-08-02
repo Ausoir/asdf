@@ -154,7 +154,7 @@ public class MainPlayer extends Player {
     protected void onMapEdge(int dir){
         if (map.name.isField()){
             MapName newMapName = map.name.getNext(dir);
-            if (newMapName.isValid() && map.updater.sleep(1, false)) {
+            if (map.updater.sleep(1, false)) {
                 vel.set(0,0);
                 stateSet(Actions.Idle);
                 delay.time = 200;

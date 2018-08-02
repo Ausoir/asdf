@@ -9,17 +9,15 @@ import com.ga.unit.item.Item;
 public class Inventory {
     private L<Item> items = new L<>();
     public int weight = 0;
-    private int volume = 0;
     private int maxSize = 0;
     private Man host;
-    public Inventory(Man host){
+    Inventory(Man host){
         this.host = host;
     }
     boolean addItem(Item p){
-        if (volume+p.volume > maxSize) return false;
+        if (vacant()) return false;
         items.add(p);
         weight += p.weight;
-        volume += p.volume;
         return true;
     }
     public boolean vacant(){
@@ -45,7 +43,6 @@ public class Inventory {
     public Item remove(int p){
         Item r = items.get(p);
         weight -= r.weight;
-        volume -= r.volume;
         items.remove(p);
         return r;
     }

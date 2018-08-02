@@ -19,6 +19,37 @@ public class Stats {
     public Stats(Unit host){
         this.host = host;
     }
+    public String toString(){
+        String result = "";
+        for (Map.Entry pair : stats.entrySet()){
+            result += pair.getKey() + ":" + pair.getValue()+"&";
+        }
+        result = result.substring(0,result.length()-1)+"/";
+        for (Buff i : effects){
+            result += i.toString()+",";
+        }
+        return result.substring(0,result.length()-1);
+    }
+    public void load(String p){
+        String[] statOrBuff = p.split("/");
+        String[] data = statOrBuff[0].split("&");
+        for (String i : data){
+            String[] pair = i.split(":");
+            Stat newstat = new Stat(pair[1]);
+            stats.put(pair[0], newstat);
+        }
+        if (statOrBuff.length > 1) {
+            data = statOrBuff[1].split(",");
+            for (String i : data) {
+                String[] t = i.split("&");
+                Buffs buffs = Buffs.values()[Integer.parseInt(t[0])];
+                Buff buff = buffs.make(host, Integer.parseInt(t[1]));
+                effects.add(buff);
+                buff.time = Integer.parseInt(t[2]);
+                buff.var = Integer.parseInt(t[3]);
+            }
+        }
+    }
     public Stat getStat(String p) {
         Stat stat = stats.get(p);
         if (stat == null){
@@ -35,8 +66,8 @@ public class Stats {
         if (origBuff == null)
         {
             Buff buff = p.make(host, level);
-            buff.onSet();
             effects.add(buff);
+            buff.onSet();
         } else {
             origBuff.onStack(level);
         }
@@ -60,7 +91,7 @@ public class Stats {
     public boolean rest(int mag){
         if (restTimer.update(mag)){
             stats.get("Strength").heal();
-            host.stateSet(Actions.Idle);
+            host.setState(Actions.Idle);
             return true;
         }
         return false;
@@ -71,26 +102,6 @@ public class Stats {
             if (effect.update()){
                 effect.onFinish();
                 effects.remove(i--);
-            }
-        }
-    }
-    public void load(String p){
-        String[] statOrBuff = p.split("/");
-        String[] data = statOrBuff[0].split("&");
-        for (String i : data){
-            String[] pair = i.split(":");
-            Stat newstat = new Stat(pair[1]);
-            stats.put(pair[0], newstat);
-        }
-        if (statOrBuff.length > 1) {
-            data = statOrBuff[1].split(",");
-            for (String i : data) {
-                String[] t = i.split("&");
-                Buffs buffs = Buffs.values()[Integer.parseInt(t[0])];
-                Buff buff = buffs.make(host, Integer.parseInt(t[1]));
-                effects.add(buff);
-                effects.get(effects.size()-1).time = Integer.parseInt(t[2]);
-                effects.get(effects.size()-1).var = Integer.parseInt(t[3]);
             }
         }
     }
@@ -105,17 +116,6 @@ public class Stats {
             if (i != effects.size()-1) r += "\n";
         }
         return r;
-    }
-    public String toString(){
-        String result = "";
-        for (Map.Entry pair : stats.entrySet()){
-            result += pair.getKey() + ":" + pair.getValue()+"&";
-        }
-        result = result.substring(0,result.length()-1)+"/";
-        for (Buff i : effects){
-            result += i.toString()+",";
-        }
-        return result.substring(0,result.length()-1);
     }
     public void endBuff(Buffs p){
         for (int i=0;i<effects.size();i++) {

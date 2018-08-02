@@ -181,7 +181,7 @@ public class Display extends JPanel {
         if (focus) input(mode);
     }
     private void input(int mode){
-        if (this.mode != mode || mode <= 0 || Global.player.map.updater.editor) {
+        if (this.mode != mode || mode <= 0) {
             this.mode = mode;
             if (input != null) {
                 input.input(mode, (int) (mX - Settings.centerX + Global.camera.x), (int) (mY - Settings.centerY + Global.camera.y));

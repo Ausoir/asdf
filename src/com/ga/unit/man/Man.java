@@ -49,9 +49,9 @@ public class Man extends Unit {
         String[] items = t[1].split(";",-1);
         setFace(items[0]);
         if (!items[1].equals("")) setWeapon((Item) Stock.get(map, items[1]));
-        armor = new ArmorSet(this, items[2],items[3],items[4],items[5]);
-        if (items.length > 6){
-            for (int i=6;i<items.length;i++){
+        armor = new ArmorSet(this, items[2],items[3],items[4],items[5],items[6]);
+        if (items.length > 7){
+            for (int i=7;i<items.length;i++){
                 Item item = (Item) Stock.get(map, items[i]);
                 inventory.addItem(item);
             }
@@ -219,7 +219,7 @@ public class Man extends Unit {
         int money = 0;
         for (Item i : items){
             if (i.tags.contains(Tag.Currency)){
-                money += i.getUses();
+                money += i.uses;
             }
         }
         return money;
@@ -230,7 +230,7 @@ public class Man extends Unit {
         Collections.addAll(items, armor.armor);
         for (Item i : items){
             if (i.tags.contains(Tag.Currency)){
-                int money = Math.min(i.durability-i.getUses(), p);
+                int money = Math.min(i.durability-i.uses, p);
                 p -= money;
                 i.isUsable(true,-money);
             }
@@ -238,7 +238,7 @@ public class Man extends Unit {
         if (p > 0){
             Item newbag = (Item) Stock.Goldbag.create(map, -1, 0).start();
             setWeapon(newbag);
-            newbag.isUsable(true, newbag.getUses()-p);
+            newbag.isUsable(true, newbag.uses-p);
         }
     }
     public boolean requireGold(int p){
@@ -247,12 +247,27 @@ public class Man extends Unit {
         Collections.addAll(items, armor.armor);
         for (Item i : items){
             if (i.tags.contains(Tag.Currency)){
-                int money = Math.min(i.getUses(), p);
+                int money = Math.min(i.uses, p);
                 if (i.isUsable(true,money)) p -= money;
                 if (p == 0) return true;
             }
         }
         return false;
+    }
+    public int getMana(){
+        int total = 0;
+        if (traits.getTraitLevel(Traits.Trait.Attunement) > 0) {
+            total += get("Intelligence").get();
+        }
+        L<Item> items = new L<>(inventory.getItems());
+        items.add(weapon);
+        Collections.addAll(items, armor.armor);
+        for (Item i : items){
+            if (i.tags.contains(Tag.Energy)){
+                total += i.uses;
+            }
+        }
+        return total;
     }
     @Override
     public boolean requireMana(int p){
@@ -268,7 +283,7 @@ public class Man extends Unit {
         Collections.addAll(items, armor.armor);
         for (Item i : items){
             if (i.tags.contains(Tag.Energy)){
-                int mana = Math.min(i.getUses(), p);
+                int mana = Math.min(i.uses, p);
                 if (i.isUsable(true,mana)) p -= mana;
                 if (p == 0) return true;
             }
@@ -287,7 +302,7 @@ public class Man extends Unit {
         Collections.addAll(items, armor.armor);
         for (Item i : items){
             if (i.tags.contains(Tag.Energy)){
-                int mana = Math.min(i.durability - i.getUses(), p);
+                int mana = Math.min(i.durability - i.uses, p);
                 if (i.isUsable(true, -mana)) p -= mana;
                 if (p == 0) return true;
             }
@@ -297,7 +312,7 @@ public class Man extends Unit {
 
     public boolean hit(Line hitBox, boolean blunt, int damage) {
         boolean r = super.hit(hitBox, blunt, damage);
-        armor.onHit();
+        armor.refresh();
         return r;
     }
 

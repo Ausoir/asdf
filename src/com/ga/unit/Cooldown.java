@@ -13,7 +13,7 @@ public class Cooldown {
         time = Integer.parseInt(p);
     }
     public String toString(){
-        return ""+time;
+        return ""+Math.max(0, time-Global.time);
     }
     public boolean isReady(){
         return Global.time >= time;
@@ -21,7 +21,7 @@ public class Cooldown {
     public void setDuration(int p){
         duration = p;
     }
-    void setDone(){
+    public void setDone(){
         time = Global.time;
     }
     public void reset(){

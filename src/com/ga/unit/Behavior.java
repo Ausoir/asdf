@@ -133,6 +133,7 @@ public enum Behavior {
                 for (Unit i : allunits) {
                     host.brain.target = i;
                     host.brain.setTask(Hunt);
+                    return true;
                 }
             }
             return false;

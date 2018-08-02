@@ -2,7 +2,6 @@ package com.ga.game;
 
 import com.ga.map.*;
 import com.ga.tool.Line;
-import com.ga.unit.Prop;
 import com.ga.unit.Stock;
 import com.ga.unit.Traits;
 import com.ga.unit.item.Crafts;
@@ -31,11 +30,14 @@ public class Command {
                 else if (cmd[0].equals("hour")){
                     Global.hour++;
                     for (Map map : Global.maps) map.onTimeChange();
-                }
-                else if (cmd[0].equals("heal")) {
+                } else if (cmd[0].equals("heal")) {
                     host.get("Strength").heal();
                     host.get("Agility").heal();
                     host.get("Intelligence").heal();
+                } else if (cmd[0].equals("reinvigorate")) {
+                        host.get("Nutrition").heal();
+                        host.get("Fatigue").heal();
+                        host.get("Motivation").heal();
                 } else if (cmd[0].equals("stat")){
                     host.get(cmd[1]).setMax(Integer.parseInt(cmd[2]));
                     host.get(cmd[1]).heal();
@@ -73,11 +75,8 @@ public class Command {
                 }
                 else if (cmd[0].equals("tatter")){
                     int dmg = Integer.parseInt(cmd[1]);
-                    if (dmg < 0) Global.player.armor.mend();
-                    for (Item item : Global.player.armor.armor){
-                        item.isUsable(true, dmg);
-                    }
-                    Global.player.armor.onHit();
+                    for (Item item : Global.player.armor.armor) item.isUsable(true, dmg);
+                    Global.player.armor.refresh();
                 }
                 else if (p.equals("editor")){
                     Global.display.input = new EditorInput();

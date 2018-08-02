@@ -14,6 +14,7 @@ import com.ga.unit.Unit;
 public class Projectile extends Prop {
     public float rotSpeed = .03f;
     public int damage = 0;
+    public boolean blunt = true;
     public EventTimer delay = new EventTimer(-1, false, null);
     private Projectile(Map map, String name, P pt, float rot, int speed) {
         super(map, name, 0);
@@ -51,7 +52,7 @@ public class Projectile extends Prop {
         rotation+=rotSpeed*vel.x;
         if (tangible) {
             for (Unit i : map.updater.unitsLoaded){
-                if (i.hittable(faction) && i.hit(new Line(pos,pos.getAdd(vel)),damage)) onAttack(i);
+                if (i.hittable(faction) && i.hit(new Line(pos,pos.getAdd(vel)),blunt,damage)) onAttack(i);
             }
         }
         super.update();

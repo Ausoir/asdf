@@ -13,6 +13,11 @@ public class L<T> extends ArrayList<T> {
         if (!isEmpty()) return super.get(0);
         return null;
     }
+    public void addAll(T[] p){
+        for (T i : p){
+            add(i);
+        }
+    }
     public String toString(){
         if (size() == 0) return "";
         String r = "";

@@ -32,18 +32,11 @@ public enum Strategy {
         }
     };
     public float getDist(Unit host){
-        int avgX = 0, avgY = 0;
-        for (Organ i : host.brain.target.clip.organs){
-            avgX += i.pt.x + i.ptd.x;
-            avgY += i.pt.y + i.ptd.y;
-        }
-        avgX /= host.brain.target.clip.organs.length*2;
-        avgY /= host.brain.target.clip.organs.length*2;
         P hostPos = host.getHand();
         P targetPos = host.brain.target.pos;
         int x = (int) ((targetPos.x + host.brain.target.vel.x) - (hostPos.x + host.vel.x));
         int y = (int) (targetPos.y - hostPos.y);
-        host.target = new P(x+avgX,y+avgY);
+        host.target = new P(x,y-host.brain.target.clip.getHeight());
         if (host instanceof Man) ((Man)host).weapon.rotateTo(host.target.getMult(host.dir,host.dir));
         return (float) Math.abs(Math.sqrt(x * x + y * y) - host.getReach());
     }
@@ -69,8 +62,19 @@ public enum Strategy {
         Actions action;
         ArrayList<Actions> moves = new ArrayList<>();
         for (Actions act : host.moveset) {
-            if (dist < act.getRange(host) && host.getCooldown(act).isReady()) {
-                if (host.get("Strength").get() >= act.getCost()) moves.add(act);
+            float diff = act.getRange(host) - dist;
+            if (diff > 0 && host.getCooldown(act).isReady()) {
+                if (host.get("Strength").get() >= act.getCost()){
+                    boolean added = false;
+                    for (int i=0;i<moves.size();i++){
+                        if (moves.get(i).getRange(host) - dist > diff){
+                            moves.add(i, act);
+                            added = true;
+                            break;
+                        }
+                    }
+                    if (!added) moves.add(act);
+                }
                 else moves.add(Actions.Rest);
             }
         }

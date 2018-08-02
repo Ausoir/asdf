@@ -41,7 +41,7 @@ public class Food extends Item {
     public class Type{
         ArrayList<Ingredient> ingredients;
         int getValue(){
-            return (getNutrition()*100) + (getMotivation()*2) + (getPerish()*20);
+            return (getNutrition()*80) + (getMotivation()*20) + (getPerish()*20);
         }
         int getNutrition(){
             int result = 0;
@@ -100,13 +100,13 @@ public class Food extends Item {
                 cook(i);
             }
         }
-        durability += food.getUses();
+        durability += food.uses;
         durability *= method.loss;
-        isUsable(true, -food.getUses());
+        isUsable(true, -food.uses);
         food.remove();
     }
     public int getValue(){
-        return (type.getValue()*(10-getPoisonChance())*getUses())/10;
+        return (type.getValue()*(10-getPoisonChance())*uses)/10;
     }
     @Override
     public boolean use(Man p){

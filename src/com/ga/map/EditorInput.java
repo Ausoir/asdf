@@ -262,7 +262,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
             map.normalize(marginX, marginY);
         } else if (p.startsWith("gen land")){
             Creation.prepareRandom(-(int) (Math.random()*1000));
-            GenerateGrassland.generate(map);
+            GeneratePlains.generateFields(map);
         } else if (p.startsWith("gen town")){
             Creation.prepareRandom(-(int) (Math.random()*1000));
             GenerateTown.generate(map);

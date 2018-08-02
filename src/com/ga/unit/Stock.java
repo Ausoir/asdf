@@ -1,10 +1,8 @@
 package com.ga.unit;
 
 import com.ga.game.Dialog;
-import com.ga.game.FileManager;
+import com.ga.game.*;
 import com.ga.game.Menu;
-import com.ga.game.Settings;
-import com.ga.game.Sound;
 import com.ga.map.Creation;
 import com.ga.map.Global;
 import com.ga.map.Map;
@@ -192,7 +190,7 @@ public enum Stock {
         if (id == 1) return new MainPlayer(map, seed);
         return new Player(map, seed);
     }},
-    Rover{ Prop make(Map map, int id, int seed) {
+    Dog{ Prop make(Map map, int id, int seed) {
         Unit product = new Unit(map, name(), seed){
             public float getReach(){
                 return 240;
@@ -409,7 +407,7 @@ public enum Stock {
                 isUsable(true, 100);
             }
             public String getDescription(){
-                return super.getDescription()+"This is your standard currency. Contains "+Dialog.money(getUses())+".";
+                return super.getDescription()+"This is your standard currency. Contains "+Dialog.money(uses)+".";
             }
         };
         product.tags.add(Tag.Currency);
@@ -462,12 +460,12 @@ public enum Stock {
             public String getDescription(){
                 int difficulty = skill.getDifficulty();
                 int power = Global.player.getStateLevel(skill);
-                String req = "Fields of study: ";
-                for (Tag i : skill.getTrainers()) req += "[" + i.name() + "] ";
-                req += "x Difficulty "+difficulty+".";
-                req += " Your current level of expertise in this field: "+power+".";
-                if (power > 0) req += " You are capable of performing this action.";
-                else req += " You are incapable of performing this action.";
+                StringBuilder req = new StringBuilder("Fields of study: ");
+                for (Tag i : skill.getTrainers()) req.append("[").append(i.name()).append("] ");
+                req.append("x Difficulty ").append(difficulty).append(".");
+                req.append(" Your current level of expertise in this field: ").append(power).append(".");
+                if (power > 0) req.append(" You are capable of performing this action.");
+                else req.append(" You are incapable of performing this action.");
                 return super.getDescription()+" "+req;
             }
         };
@@ -480,10 +478,6 @@ public enum Stock {
             public void onCreate(){
                 super.onCreate();
                 if (id == -1) subId = rand.nextInt(12);
-            }
-            public String[] load(String p){
-                String[] r = super.load(p);
-                return r;
             }
             @Override
             public boolean use(com.ga.unit.man.Man host){
@@ -502,21 +496,20 @@ public enum Stock {
                 return false;
             }
             public String getName(){
-                String prefix = "Unknown";
-                if (subId < 3) prefix = "Beginner's";
+                String prefix = "Expert";
+                if (subId < 3) prefix = "Novice";
                 else if (subId < 6) prefix = "Intermediate";
                 else if (subId < 9) prefix = "Advanced";
-                else if (subId < 12) prefix = "Expert";
                 return prefix + " " + super.getName();
             }
             public String getDescription(){
-                String req = "This book contains information for those with intellectual level of "+(subId+1)+".";
+                String req = " This book contains information for those with intellectual level of "+(subId+1)+".";
                 int understanding = Global.player.get("Intelligence").get();
                 req += " Your current Intelligence score: "+understanding+".";
                 if (understanding == subId) req += " You may learn the contents of this book.";
                 else if (understanding < subId) req += " This book is beyond your understanding.";
                 else req += " You won't learn anything from this book.";
-                return super.getDescription()+" "+req;
+                return super.getDescription()+req;
             }
         };
         product.value = 9400;
@@ -623,7 +616,6 @@ public enum Stock {
         };
         product.disposable = true;
         product.weight = 0;
-        product.image.setCenterType(3);
         return product;
     }},
     Booth{ Prop make(Map map, int id, int seed){
@@ -652,9 +644,8 @@ public enum Stock {
         return product;
     }},
     Something{ Prop make(Map map, int id, final int seed){ //unused
-        final Prop product = new Prop(map, name(), seed){
+        return new Prop(map, name(), seed){
         };
-        return product;
     }},
     Spawner{ Prop make(Map map, final int id, int seed) {
         Prop product = new Prop(map, name(), seed){
@@ -732,9 +723,50 @@ public enum Stock {
         product.image.setCenterType(2);
         return product;
     }},
+    Repairkit{ Prop make(Map map, int id, int seed){
+        int level = (seed % 9)+1;
+        Item product = new Item(map, name(),seed,new Item.Material[]{Item.Material.values()[seed % Item.Material.values().length]}
+                , Item.ItemType.Scroll, 20*level){
+            public boolean use(Man host){
+                if (host == Global.player && super.use(host)) {
+                    final Item repairkit = this;
+                    L<Prop> items = Global.player.getAvailableItems();
+                    items.addAll(host.armor.armor);
+                    items.removeIf(o -> (!(o instanceof Armor) && !(o instanceof Weapon)) || ((Item) o).isInfinite() || ((Item) o).getMaterial() != getMaterial() || o == this);
+                    String[] itemList = new String[items.size()];
+                    Performer[] perf = new Performer[itemList.length];
+                    for (int i = 0; i < itemList.length; i++) {
+                        Item item = (Item) items.get(i);
+                        itemList[i] = "Repair " + item.name;
+                        perf[i] = new Performer() {
+                            public void perform() {
+                                if (isUsable(false, 1) && cooldown.isReady() && host.map.updater.sleep(1, true)) {
+                                    cooldown.reset();
+                                    int fixAmount = Math.min(item.durability - item.uses, repairkit.uses);
+                                    item.isUsable(true, -fixAmount);
+                                    repairkit.isUsable(true, fixAmount);
+                                    host.armor.refresh();
+                                }
+                            }
+                        };
+                    }
+                    Menu.menu.showDialog("Use Repairkit", "Select a weapon or an armor to repair", itemList, perf);
+                }
+                return true;
+            }
+            public String getName(){
+                return getMaterial().name() + " " + super.getName();
+            }
+            public String getDescription(){
+                return super.getDescription()+"Use this trinket to repair items made of same material. Takes 1 hour.";
+            }
+        };
+        product.disposable = false;
+        return product;
+    }},
     Throwing_Knife{ Prop make(Map map, int id, int seed){
         Item product = new Item(map, "Tanto", seed,
-                new Item.Material[]{Item.Material.Steel, Item.Material.Bone, Item.Material.Bronze, Item.Material.Titanium, Item.Material.Glass},
+                new Item.Material[]{Item.Material.Steel, Item.Material.Bone, Item.Material.Copper, Item.Material.Iron, Item.Material.Titanium, Item.Material.Glass},
                 Item.ItemType.Darting, 10){
             @Override
             public boolean use(final com.ga.unit.man.Man host){
@@ -900,40 +932,11 @@ public enum Stock {
         product.delay = 45;
         return product;
     }},
-    Runnerkit{ Prop make(Map map, int id, int seed){
-        Armor product = new Armor(map, name(),seed,Item.Material.values()
-                ,3,0,0,8, 0){
-        };
-        product.disposable = false;
-        product.weight = 1;
-        product.tags.add(new Tag[]{Tag.Strength,Tag.Athletics}[product.rand.nextInt(2)]);
-        return product;
-    }},
-    Jewelry{ Prop make(Map map, int id, int seed){
-        Armor product = new Armor(map, "Fiery_Necklace",seed,Item.Material.values()
-                ,3,0,0,1000, 0){
-        };
-        product.name = "Jewelry";
-        product.disposable = false;
-        return product;
-    }},
-    Energy_Necklace{ Prop make(Map map, int id, int seed){
-        Armor product = new Armor(map, "Battery",seed,new Item.Material[]{Item.Material.Stone, Item.Material.Glass, Item.Material.Crystal, Item.Material.Obsidian}
-                ,3,0,0,20, 0){
-            public String getDescription(){
-                return super.getDescription()+"\nThis item is used to store Energy for magical applications.";
-            }
-        };
-        product.name = "Energy_Necklace";
-        product.disposable = false;
-        product.tags.add(Tag.Energy);
-        return product;
-    }},
     Battery{ Prop make(Map map, int id, int seed){
-        Item product = new Item(map, name(),seed,new Item.Material[]{Item.Material.Copper, Item.Material.Lead}
-            ,Item.ItemType.Consumable,20){
+        Item product = new Item(map, name(),seed,new Item.Material[]{Item.Material.Copper}
+            ,Item.ItemType.Consumable,10){
             public String getDescription(){
-                return super.getDescription()+"\nThis item is used to store Energy for magical applications.";
+                return super.getDescription()+"\nThis item can store Energy for magical applications.";
             }
         };
         product.disposable = false;
@@ -979,7 +982,7 @@ public enum Stock {
                             Particle.smoke(map, i.pos, i.getDepth());
                             if (prev != null){
                                 i.combine(prev, method);
-                                i.name += " and "+prev.name;
+                                i.name = String.format("%s and %s", i.name, prev.name);
                             }
                             prev = i;
                         }
@@ -1027,7 +1030,7 @@ public enum Stock {
         Armor product = new Armor(map, "Fannypack",seed,new Item.Material[]{Item.Material.Cloth, Item.Material.Leather}
                 ,3,3,2,10000, 0){
             public String getDescription(){
-                return super.getDescription()+"Contains "+Dialog.money(getUses())+".";
+                return super.getDescription()+"Contains "+Dialog.money(uses)+".";
             }
         };
         product.name = "Purse";
@@ -1035,17 +1038,213 @@ public enum Stock {
         product.disposable = false;
         return product;
     }},
-    Stomach_Full_Helm{ Prop make(Map map, int id, int seed){
-        Armor product = new Armor(map, "Full_Helm",seed,new Item.Material[]{Item.Material.Titanium},0,0,0,-1, 0){
+    Bag1{ Prop make(Map map, int id, int seed){
+        Armor product = new Armor(map, "Fannypack",seed,new Item.Material[]{Item.Material.Cloth, Item.Material.Leather}
+                ,3,3,2,10000, 0){
             public String getDescription(){
-                return super.getDescription()+" Something is odd about this helmet.";
+                return super.getDescription()+"Contains "+Dialog.money(uses)+".";
             }
         };
+        product.name = "Magical_Bag";
+        product.tags.add(Tag.Currency);
+        product.disposable = false;
+        return product;
+    }},
+    Bag2{ Prop make(Map map, int id, int seed){
+        Armor product = new Armor(map, "Fannypack",seed,new Item.Material[]{Item.Material.Cloth, Item.Material.Leather}
+                ,3,3,2,10000, 0){
+            public String getDescription(){
+                return super.getDescription()+"Contains "+Dialog.money(uses)+".";
+            }
+        };
+        product.name = "Magical_Bag";
+        product.tags.add(Tag.Currency);
+        product.disposable = false;
+        return product;
+    }},
+    Energy_Necklace{ Prop make(Map map, int id, int seed){
+        int level = seed % 4 + 1;
+        Armor product = new Armor(map, "Jewelry",seed,new Item.Material[]{new Item.Material[]{Item.Material.Stone, Item.Material.Glass, Item.Material.Crystal, Item.Material.Obsidian}[level]}
+                ,4,level,0,level * 8, 0){
+            public String getFullName(){
+                return "Level " + level + " " + super.getFullName();
+            }
+            public String getDescription(){
+                return super.getDescription()+"\nThis item can store Energy for magical applications.";
+            }
+        };
+        product.name = "Energy_Necklace";
+        product.disposable = false;
+        product.tags.add(Tag.Energy);
+        return product;
+    }},
+    Chaos_Necklace{ Prop make(Map map, int id, int seed){
+        Armor product = new Armor(map, "Jewelry",seed,new Item.Material[]{Item.Material.Other}
+                ,4,1,0,20, 0){
+            public boolean trigger(Unit host){
+                if (isUsable(true, 1) && cooldown.isReady()) {
+                    cooldown.reset();
+                    host.buff(Buffs.values()[seed % Buffs.values().length], 3);
+                    return true;
+                }
+                return false;
+            }
+            public String getDescription(){
+                return super.getDescription()+"\nUsing this trinket will imbue random level 3 buff on the wearer.";
+            }
+        };
+        product.name = "Chaos_Necklace";
+        product.disposable = false;
+        return product;
+    }},
+    Swordcollar{ Prop make(Map map, int id, int seed){
+        int level = seed % 8 + 1;
+        Armor product = new Armor(map, "Jewelry",seed,new Item.Material[]{Item.Material.Stone}
+                ,4,1,0,20, 0){
+            public boolean trigger(Unit host){
+                if (cooldown.isReady()) {
+                    if (isUsable(true, 1)) {
+                        Particle.sparkle(host.map, "Glare", host.getDepth(), host.getHand(), 24, 6);
+                        cooldown.reset();
+                        host.stateSet(Actions.Ethersword);
+                        host.stateLevel = level;
+                        return true;
+                    }
+                } else host.say("");
+                return false;
+            }
+            public String getFullName(){
+                return "Level "+level+" "+super.getFullName();
+            }
+            public String getDescription(){
+                return super.getDescription()+"\nUsing this trinket will cast level "+level+" Ethersword.";
+            }
+        };
+        product.name = "Swordcollar";
+        product.disposable = false;
+        return product;
+    }},
+    Memoryfoam_Necklace{ Prop make(Map map, int id, int seed){
+        Armor product = new Armor(map, "Jewelry",seed,new Item.Material[]{Item.Material.Organic}
+                ,4,1,0,1,0){
+            private String location;
+            public void onCreate(){
+                imbueMeta(true, false, 0);
+            }
+            public boolean trigger(Unit host){
+                if (host == Global.player && isUsable(true, 1) && cooldown.isReady()) {
+                    cooldown.reset();
+                    String[] location = this.location.split("&");
+                    if (host.map.name.toString().equals(location[0])){
+                        host.pos.add(new P(location[1]).getSubtract(host.pos));
+                        Particle.holyExplosion(host.map, host.getHead(), host.getDepth());
+                    } else {
+                        Global.server.afterMapChange = new Performer() {
+                            public void perform() {
+                                Global.player.pos = new P(location[1]);
+                                Particle.holyExplosion(host.map, host.getHead(), host.getDepth());
+                            }
+                        };
+                        Global.server.requestChangeMap(location[0] + "@0");
+                    }
+                    return true;
+                }
+                return false;
+            }
+            public boolean use(com.ga.unit.man.Man host){
+                if (super.use(host)){
+                    location = host.map.name+"&"+host.pos.toString();
+                    return true;
+                }
+                return false;
+            }
+            public String getDescription(){
+                return super.getDescription()+"\nThis trinket will remember the location of where you had put it on. Activate to return to the location.";
+            }
+            public String[] load(String p){
+                String[] r = super.load(p);
+                location = r[8];
+                return r;
+            }
+            public String toString(){
+                return super.toString()+"@"+location;
+            }
+        };
+        product.name = "Memoryfoam_Necklace";
+        return product;
+    }},
+    Rogue_Cloak{ Prop make(Map map, int id, int seed){
+        int level = (seed % 2)+1;
+        Armor product = new Armor(map, name(),seed,new Item.Material[]{Item.Material.Cloth}
+                ,3,level*2-1,0,8, 0){
+            public String getFullName(){
+                if (level == 1) return super.getFullName();
+                else return "Master "+super.getFullName();
+            }
+        };
+        for (int i=0;i<level;i++) product.tags.add(Tag.Athletics);
+        return product;
+    }},
+    Rogue_Bracelet{ Prop make(Map map, int id, int seed){
+        int level = (seed % 2)+1;
+        Armor product = new Armor(map, name(),seed,new Item.Material[]{Item.Material.Cloth}
+                ,4,level*2-1,0,8, 0){
+            public String getFullName(){
+                if (level == 1) return super.getFullName();
+                else return "Master "+super.getFullName();
+            }
+        };
+        for (int i=0;i<level;i++) product.tags.add(Tag.Athletics);
+        return product;
+    }},
+    Rogue_Dagger{ Prop make(Map map, int id, int seed){
+        int level = (seed % 2)+1;
+        Weapon product = new Weapon(map, "Knife", seed, new Item.Material[]{Item.Material.Steel}, Item.ItemType.Sword, 7, 24, 1){
+            public boolean trigger(Unit target){
+                boolean r = super.trigger(target);
+                for (Item item : owner.armor.armor) item.isUsable(true, -2);
+                owner.armor.refresh();
+                return r;
+            }
+        };
+        product.name = name();
+        for (int i=0;i<level;i++) product.tags.add(Tag.Athletics);
+        return product;
+    }},
+    Jewel_Scarf{ Prop make(Map map, int id, int seed){
+        Armor product = new Armor(map, "Jewelry",seed,new Item.Material[]{Item.Material.Silk},3,4,0,24, 0);
+        product.name = "Jewel_Scarf";
         product.tags.add(Tag.Channeling);
         product.tags.add(Tag.Conjuration);
         product.tags.add(Tag.Fire);
         product.tags.add(Tag.Enchant);
+        product.tags.add(Tag.Curse);
         product.tags.add(Tag.Air);
+        product.tags.add(Tag.Void);
+        return product;
+    }},
+    Jewel_Bracelet{ Prop make(Map map, int id, int seed){
+        Armor product = new Armor(map, "Jewelry",seed,new Item.Material[]{Item.Material.Titanium},4,4,0,8, 0);
+        product.name = "Jewel_Bracelet";
+        product.tags.add(Tag.Channeling);
+        product.tags.add(Tag.Conjuration);
+        product.tags.add(Tag.Fire);
+        product.tags.add(Tag.Enchant);
+        product.tags.add(Tag.Curse);
+        product.tags.add(Tag.Air);
+        product.tags.add(Tag.Void);
+        return product;
+    }},
+    Jewel_Crown{ Prop make(Map map, int id, int seed){
+        Armor product = new Armor(map, "Jewelry",seed,new Item.Material[]{Item.Material.Titanium},0,4,0,24, 0);
+        product.name = "Jewel_Crown";
+        product.tags.add(Tag.Channeling);
+        product.tags.add(Tag.Conjuration);
+        product.tags.add(Tag.Fire);
+        product.tags.add(Tag.Enchant);
+        product.tags.add(Tag.Curse);
+        product.tags.add(Tag.Air);
+        product.tags.add(Tag.Void);
         return product;
     }};
     private static HashMap<String, String> extRegistry = new HashMap<>();
@@ -1069,16 +1268,15 @@ public enum Stock {
                 return i.create(map, -1, seed);
             }
         }
-        Prop r = createByNameFromReg(map, p, seed);
-        if (r != null) return r;
-        return null;//Stock.Object.create(map, 0,0);
+        return createByNameFromReg(map, p, seed);
     }
     public static Prop createByNameFromReg(Map map, String p, int seed){
         String name = extRegistry.get(p);
         if (name != null){
             String[] data = name.split("@");
-            return Stock.valueOf(data[0]).create(map, Integer.parseInt(data[1]), -1);
+            return Stock.valueOf(data[0]).create(map, Integer.parseInt(data[1]), seed);
         }
+        assert false;
         return null;
     }
     public Prop create(Map map, int subId, int seed){
@@ -1089,37 +1287,6 @@ public enum Stock {
         return r;
     }
     abstract Prop make(Map map, int subid, int seed);
-    public static String getFactoryName(int id){
-        return id==-1?"":values()[id].name();
-    }
-    void isFurniture(Prop product){
-        product.image.setCenterType(2);
-        product.gravity = true;
-        product.mobile = false;
-        randomSide(product);
-    }
-    Prop makeAddon(Prop p){
-        p.save = false;
-        isFurniture(p);
-        return p;
-    }
-    static void randomSide(Prop p){
-        p.dir = p.seed % 2 == 0 ? 1 : -1;
-    }
-    private static String getItem(Map map, String p, int piece){
-        if (p == null || p.equals("")) return "";
-        String pieceName = "";
-        if (piece == 1) pieceName = "_Pants";
-        else if (piece == 2) pieceName = "_Torso";
-        Prop product = Stock.createByName(map, p+pieceName,-1);
-        if (product instanceof Item) {
-            Item r = (Item) product;
-            return r.toString();
-        } else {
-            Global.p("["+p+"] is not an Item");
-            return "";
-        }
-    }
     public static void init(){
         for (String raw : new String[]{"Object","Etc","Man","Beast","Weapon","Armor","Food"}){
             String[] data = FileManager.readText("Data/raw/"+raw+".txt");
@@ -1147,9 +1314,10 @@ class UnitFactory {
         Man man = (Man) host;
         if (weapon != null && weapon.length > 0) man.setWeapon((Item) Stock.createByName(host.map, weapon[host.seed % weapon.length], -1));
         man.armor = new ArmorSet(man, getItem(host.map, helms[host.seed % helms.length],0),
-                getItem(host.map, armor[host.seed % armor.length], 2),
                 getItem(host.map, armor[host.seed % armor.length], 1),
-                getItem(host.map, armor[host.seed % armor.length], 3));
+                getItem(host.map, armor[host.seed % armor.length], 2),
+                getItem(host.map, armor[host.seed % armor.length], 3),
+                getItem(host.map, armor[host.seed % armor.length], 4));
     }
     private static String getItem(Map map, String p, int piece){
         if (p == null || p.equals("")) return "";
@@ -1174,9 +1342,9 @@ class UnitFactory {
     void setMoveset(String p){
         if (!p.isEmpty()) {
             String[] skills = p.split(",");
-            String r = "";
+            StringBuilder r = new StringBuilder();
             for (String i : skills) {
-                r += i + ":0,";
+                r.append(i).append(":0,");
             }
             Actions.load(host, r.substring(0, r.length() - 1));
         }

@@ -114,7 +114,7 @@ public class Traits {
                 host.tags.remove(tag);
             }
         },
-        Enchanting(3,"Learn to manipulate entities with enchantments and curses."){
+        Bloodcraft(3,"Use blood magic to manipulate entities with enchantments and curses."){
             Tag tag = Tag.Enchant;
             Tag tag2 = Tag.Curse;
             public void onSet(Unit host){

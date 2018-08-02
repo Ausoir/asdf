@@ -20,9 +20,6 @@ public class MapName {
     public MapName getNext(int dir){
         return new MapName(instance+"_"+(getIndex()+dir));
     }
-    public boolean isValid(){
-        return getIndex() > 0;
-    }
     public boolean isField(){
         return value.startsWith(FileManager.makeDirectory("ins/_"));
     }

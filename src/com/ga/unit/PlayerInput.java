@@ -29,6 +29,7 @@ public class PlayerInput implements Input {
         add(Actions.Throw);
         add(Actions.Wield);
         add(Actions.Drop);
+        add(Actions.Activate);
     }};
     private ArrayList<Integer> pressed = new ArrayList<>();
     public Player host;

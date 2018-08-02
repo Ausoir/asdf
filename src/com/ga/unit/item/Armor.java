@@ -24,9 +24,9 @@ public class Armor extends Item {
         this.piece = piece;
         this.warmth = warmth;
         delay = 80;
-        if (piece == 1) image.set(name, 1);
-        else if (piece == 2) image.set(name, 0);
-        else if (piece == 3) weight = 0;
+        if (piece == 1) image.set(name, 0);
+        else if (piece == 2) image.set(name, 1);
+        else if (piece == 4) weight = 0;
     }
     void shade(int color){}
     public void onCreate(){
@@ -42,7 +42,7 @@ public class Armor extends Item {
         return Math.max(0,material.hardness + armorMod);
     }
     int getWarmth(){
-        return warmth+material.warmth;
+        return Math.max(0, warmth+material.getWarmth());
     }
     protected void setModifier(SpecialtyMod mod){
         if (mod == SpecialtyMod.Hardened) armorMod += admod.magnitude;
@@ -62,7 +62,7 @@ public class Armor extends Item {
     }
     @Override
     public boolean use(final Man host){
-        if (host.getVacancy() >= 0) {
+        if (host.getVacancy() >= encumbrance) {
             host.setState(type.action);
             final Armor me = this;
             host.delay.performer = new Performer() {
@@ -87,9 +87,8 @@ public class Armor extends Item {
     @Override
     public String getName(){
         String r = material.name() + " " + super.getName();
-        if (piece == 1) r+=" Pants";
-        else if (piece == 2) r+=" Armor";
-        else if (piece == 3) r+=" Trinket";
+        if (piece == 1) r+=" Armor";
+        else if (piece == 2) r+=" Pants";
         return r;
     }
     public String getDescription(){
@@ -97,7 +96,8 @@ public class Armor extends Item {
         r = r.replace(" uses "," durability ");
         if (emod != null) r += " This armor has "+probability*100+"% chance of activating its enchantment on being hit.";
         if (getArmor() > 0) r += " This armor decreases damage by "+getArmor()+" points.";
-        if (pocket > 0) r += " It has "+pocket+" pockets.";
+        if (getWarmth() > 0) r += " This armor provides "+getWarmth()+" warmth.";
+        if (pocket > 0) r += " This armor has "+pocket+" pockets.";
         return r;
     }
 }

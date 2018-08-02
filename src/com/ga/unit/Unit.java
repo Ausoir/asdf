@@ -41,7 +41,7 @@ public class Unit extends Prop {
             StringBuilder r = new StringBuilder();
             if (isEmpty()) return r.toString();
             for (Actions i : this){
-                r.append(i.name()).append(":").append(Math.max(0,getCooldown(i).time-Global.time)).append(",");
+                r.append(i.name()).append(":").append(getCooldown(i).toString()).append(",");
             }
             return r.substring(0,r.length()-1);
         }
@@ -165,13 +165,13 @@ public class Unit extends Prop {
     public void stateSet(Actions state){
         face(target.x > 0 ? 1 : -1, false);
         clip.setState(state.getClipName());
-        if (state != Actions.Idle){
+        if (state != Actions.Idle) {
             stats.restTimer.reset();
             getCooldown(state).reset();
             delay.performer = null;
             stateInterrupt();
             delay.set(state.getDel());
-            if (delay.max != 0 && state.isDynamicAnimation()){
+            if (delay.max != 0 && state.isDynamicAnimation()) {
                 int attackSpeed = getAttackSpeed();
                 int clipspeed = clip.setSpeed(attackSpeed);
                 delay.set(Math.max(clipspeed, delay.time - attackSpeed));
@@ -239,23 +239,30 @@ public class Unit extends Prop {
                     if (mid.getSubtract(pos.getAdd(0, -clip.getHeight())).getDist() < radius + getSize()) {
                         delay.performer = null;
                         grounded = false;
-                        if (!traits.has(Traits.Trait.Tough)) {
+                        if (blunt && !traits.has(Traits.Trait.Tough)) {
                             if (stats.getEffectLevel(Buffs.Stun) < 1) {
                                 vel.x = damage * Float.compare(pos.x, hitBox.pt.x);
                                 vel.y += -damage;
                             }
-                            stateSet(Actions.Hit);
+                            setState(Actions.Hit);
                         }
                         brain.onHit();
                         clip.organs[i].hit(hitBox);
                     }
                     if (stats.triggerEffect(Buffs.Mark)) clip.organs[i].amputate(hitBox, damage);
                     else if (damageBreakthrough(i, blunt, damage)) {
-                        if (get("Agility").require(1+(damage/4))) {
+                        int trueDamage = 1 + (damage/4);
+                        if (get("Agility").require(trueDamage)) {
                             Particle.explode(map, "Blood", getDepth()+.01f, getRandomPoint(), new P(), 9, 5, 0, true, 24);
                         } else {
-                            buff(Buffs.Bleed, 1);
-                            clip.organs[i].amputate(hitBox, damage);
+                            if (!blunt){
+                                buff(Buffs.Bleed, 1);
+                                clip.organs[i].amputate(hitBox, damage);
+                            } else {
+                                trueDamage = Math.max(1, trueDamage - (get("Agility").get()*4));
+                                get("Agility").set(0, false);
+                                buff(Buffs.Bleed, trueDamage);
+                            }
                         }
                     }
                 } else {
@@ -274,7 +281,7 @@ public class Unit extends Prop {
     public void die() {
         save = false;
         onInteract = null;
-        if (state != Actions.Dead) stateSet(Actions.Dead);
+        setState(Actions.Dead);
     }
 
     public void remove(){
@@ -303,12 +310,12 @@ public class Unit extends Prop {
             if (vel.y > 0){
                 if (vel.y >= Settings.gravityMax) {
                     if (hittable(Faction.Destructive)) {
-                        stateSet(Actions.Down);
+                        setState(Actions.Down);
                         delay.time = (int) (800f / Global.clamp(get("Agility").getMax(), 1, 800));
                     }
                 } else if (state == Actions.Jump && stateDuration > 1) {
                     Sound.play(map, pos, "land");
-                    stateSet(Actions.Hit);
+                    setState(Actions.Hit);
                     delay.set(4);
                 }
             }
@@ -352,14 +359,12 @@ public class Unit extends Prop {
     public void update() {
         speech.update();
         if (clip.update()) moveTriggered(0);
-        if (state != Actions.Dead) {
-            stats.update();
-            if (delay.update() && delay.performer == null){
-                if (!moveTriggered) moveTriggered(0);
-                stateFinish();
-            }
-            stateUpdate();
+        stats.update();
+        if (delay.update() && delay.performer == null){
+            if (!moveTriggered) moveTriggered(0);
+            stateFinish();
         }
+        stateUpdate();
         super.update();
     }
 
@@ -396,6 +401,6 @@ public class Unit extends Prop {
         }
         clip.setOrganHealth();
         clip.updateStatus();
-        stateSet(Actions.Down);
+        setState(Actions.Down);
     }
 }

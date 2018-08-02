@@ -161,7 +161,7 @@ public class MenuPlayer extends Panel {
             energy.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Menu.menu.showDialog("Stamina", "You use Energy to cast magic.");
+                    Menu.menu.showDialog("Energy", "You use Energy to cast magic.");
                 }
             });
             add(stamina, statgrid);
@@ -286,7 +286,7 @@ public class MenuPlayer extends Panel {
             b.setTitle(Dialog.get("wielded"));
             ((JPanel) panel.getComponent(0)).setBorder(b);
 
-            for (int i=0;i<4;i++) {
+            for (int i=0;i<5;i++) {
                 if (!Global.player.armor.isBare(i)) {
                     grid.gridy++;
                     Item equipped = Global.player.armor.armor[i];
@@ -294,9 +294,10 @@ public class MenuPlayer extends Panel {
                     b = BorderFactory.createTitledBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Panel.forecolor));
                     String title = Dialog.get("equipped");
                     if (i == 0) title += " - "+Dialog.get("bhead");
-                    else if (i == 1) title += " - "+Dialog.get("bleg");
-                    else if (i == 2) title += " - "+Dialog.get("btorso");
-                    else title += " - Trinket";
+                    else if (i == 1) title += " - "+Dialog.get("btorso");
+                    else if (i == 2) title += " - "+Dialog.get("bleg");
+                    else if (i == 3) title += " - Back";
+                    else if (i == 4) title += " - Trinket";
                     b.setTitle(title);
                     panel.setBorder(b);
                 }
@@ -376,10 +377,10 @@ public class MenuPlayer extends Panel {
             add(scroll, BorderLayout.LINE_START);
         }
         void refresh(){
-            weight.setText("Weight:"+Global.player.getWeight());
-            panel.removeAll();
             Inventory inv = Global.player.inventory;
             int itemsize = inv.getItemSize();
+            weight.setText("Pockets:"+itemsize+"/"+Global.player.armor.getPockets());
+            panel.removeAll();
             for (int i = 0; i < itemsize; i++) {
                 Item item = inv.getItem(i);
                 grid.gridy = i;

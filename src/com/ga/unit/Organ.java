@@ -75,7 +75,7 @@ public class Organ extends Line {
         Sound.play(host.map, host.pos, "hit_bloody");
         int intensity = 18 + damage*2;
         if (image != null) {
-            final Projectile flyingOrgan = new Projectile(host.map, null, new P(host.pos), p.ptd.getAdd(Global.r.nextInt(24)-12,-Global.r.nextInt(12)), intensity) {
+            final Projectile flyingOrgan = new Projectile(host.map, null, new P(host.pos), p.ptd.disperse(8,8), intensity) {
                 private final int length = (int) getLength();
                 public void update() {
                     if (tangible) {

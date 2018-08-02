@@ -6,6 +6,7 @@ import com.ga.game.Processes;
 import com.ga.game.Settings;
 import com.ga.map.Global;
 import com.ga.map.Updater;
+import com.ga.tool.Performer;
 import com.ga.unit.Faction;
 import com.ga.unit.Stock;
 import com.ga.unit.Unit;
@@ -27,6 +28,7 @@ public class Server {
     private TCPClient tcpUploader, tcpDownloader;
     private boolean stop;
     private ListenServer server;
+    public Performer afterMapChange;
 
     public void startServer(){
         stop = false;
@@ -110,6 +112,7 @@ public class Server {
                 FileManager.loadPlayer();
                 FileManager.loadActors();
                 Processes.resume();
+                if (afterMapChange != null) afterMapChange.perform();
             }
         }, 1);
     }

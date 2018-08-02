@@ -206,7 +206,7 @@ public class Updater {
     }
     public boolean sleep(int p, boolean checkEnemy){
         for (Unit i : unitsLoaded) {
-            if (i.map == Global.player.map && i.faction.canAttack(Global.player.faction) && (checkEnemy || i.brain.target == Global.player)) {
+            if (i.map == Global.player.map && i.hittable(Global.player.faction) && (checkEnemy || i.brain.target == Global.player)) {
                 Global.player.say("There are enemies on the map!");
                 return false;
             }
@@ -228,6 +228,7 @@ public class Updater {
         Global.timePass(p*100);
         Global.hour+=p;
         for (Map i : Global.maps) i.onTimeChange();
+        onTimeChange();
         return true;
     }
     public P getEntrancePos(int p, P failsafe) {

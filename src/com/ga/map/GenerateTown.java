@@ -7,7 +7,6 @@ import java.util.ArrayList;
 
 class GenerateTown {
     static void generate(Map map){
-        map.panoramaName = "Town";
         Generator generator = new Generator(map, 0);
         map.size = new P(4000+Creation.r.nextInt(4000), 1400);
         String[] landTexture = new String[]{"dirt&grass","dirt&road_unpaved","dirt&road_normal","dirt&road_highway"};

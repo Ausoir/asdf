@@ -129,18 +129,6 @@ public class Map {
         }
     }
 
-    int getNextTerrain() {
-        int high = -1;
-        int nextPolygon = 0;
-        for (Line i : landRaw) {
-            if (i.tid > high) {
-                high = i.tid;
-                nextPolygon = i.tid + 1;
-            }
-        }
-        return nextPolygon;
-    }
-
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder(callname + ";" + panoramaName + ";" + size.x() + "," + size.y() + ";" + temperature + "\n");
@@ -166,6 +154,18 @@ public class Map {
         landRaw.clear();
         terrains.clear();
         formTextures.clear();
+    }
+
+    int getNextTerrain() {
+        int high = -1;
+        int nextPolygon = 0;
+        for (Line i : landRaw) {
+            if (i.tid > high) {
+                high = i.tid;
+                nextPolygon = i.tid + 1;
+            }
+        }
+        return nextPolygon;
     }
 
     public void setTexture() {
@@ -320,7 +320,6 @@ public class Map {
             }
             weather.refreshTimeColor();
         }
-        updater.onTimeChange();
     }
 
     public int mapEdge(P p) {
@@ -379,5 +378,9 @@ public class Map {
             i.pt = i.pt.getAdd(p);
             i.ptd = i.ptd.getAdd(p);
         }
+    }
+
+    public boolean isSnowing(){
+        return temperature >= 2;
     }
 }

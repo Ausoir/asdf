@@ -5,9 +5,20 @@ import com.ga.tool.P;
 
 import java.util.ArrayList;
 
-class GenerateGrassland {
-    static void generate(Map map){
-        map.panoramaName = "Grassland";
+class GeneratePlains {
+    static void generateGrasslands(Map map){
+        generate(map, map.isSnowing() ? "dirt&snow&Weed=.1,Snowbush=.2" : "dirt&grass&Weed=.2,Bush=.3");
+    }
+    static void generateFields(Map map){
+        String theme;
+        if (map.isSnowing()) theme = "dirt&snow&Rock=.1,Snowbush=.2,Weed=.4,Snowtree=1";
+        else theme = "dirt&grass&Rock=.1,Bush=.2,Weed=.4,Tree=1";
+        generate(map, theme);
+    }
+    static void generateDesert(Map map){
+        generate(map, "dirt&sand&Rock=.1,Deadbush=.2");
+    }
+    private static void generate(Map map, String theme){
         Generator generator = new Generator(map, 0);
         map.size = new P(Creation.r.nextInt(4000)+2000, Creation.r.nextInt(4000)+2000);
         int depth = 4;
@@ -31,7 +42,8 @@ class GenerateGrassland {
         trail.add(new P(trail.last.x, highestY+400));
         trail.add(new P(start.x, highestY+400));
         trail.setOpt(1);
-        trail.finish(depth+"&dirt&grass"+(Creation.r.nextBoolean()?"&Rock=.1,Bush=.2,Weed=.4,Tree=1":""));
+        String props = depth+"&"+theme;
+        trail.finish(props);
         generator.makeEdgeSpawns();
         map.normalize(0,800);
         map.size.y -= 400;

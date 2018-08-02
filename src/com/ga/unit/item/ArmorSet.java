@@ -26,12 +26,15 @@ public class ArmorSet {
             new Armor(null, "Man_skin", 0,new Item.Material[]{Item.Material.Organic},3,0,0, -1, 0){
                 public boolean checkBreak(boolean blunt, int d){ return true; }
             },
+            new Armor(null, "Man_skin", 0,new Item.Material[]{Item.Material.Organic},4,0,0, -1, 0){
+                public boolean checkBreak(boolean blunt, int d){ return true; }
+            },
     };
     public Armor[] armor;
     public Tags tags = new Tags();
     private Man host;
     public Organ[] display;
-    public ArmorSet(Man host, String head, String body, String legs, String etc){
+    public ArmorSet(Man host, String head, String body, String legs, String back, String etc){
         this.host = host;
         Organ[] organs = host.clip.organs;
         display = new Organ[organs.length];
@@ -53,8 +56,8 @@ public class ArmorSet {
             display[i].setImage(null);
             display[i].getImage().visible = false;
         }
-        armor = new Armor[4];
-        String[] armors = new String[]{head,body,legs,etc};
+        armor = new Armor[5];
+        String[] armors = new String[]{head,body,legs,back,etc};
         for (int i=0;i<armor.length;i++){
             if (armors[i].equals("")) armor[i] = bare[i];
             else armor[i] = (Armor) Stock.get(host.map, armors[i]);
@@ -68,24 +71,24 @@ public class ArmorSet {
         if (p == bare[piece]) {
             if (piece == 0) display[5].getImage().visible = false;
             else if (piece == 1) {
-                display[1].getImage().visible = false;
-                display[2].getImage().visible = false;
+                display[0].setImage(null, 2);
+                display[3].setImage(null, 0);
+                display[4].setImage(null, 2);
             } else if (piece == 2){
-                display[0].getImage().visible = false;
-                display[3].getImage().visible = false;
-                display[4].getImage().visible = false;
+                display[1].setImage(null, 1);
+                display[2].setImage(null, 1);
             }
         } else {
             if (piece == 0) display[5].setImage(p.name);
             else if (piece == 1) {
-                display[1].setImage(p.name, 1);
-                display[2].setImage(p.name, 1);
-            } else if (piece == 2){
                 display[0].setImage(p.name, 2);
                 display[3].setImage(p.name, 0);
                 display[4].setImage(p.name, 2);
+            } else if (piece == 2){
+                display[1].setImage(p.name, 1);
+                display[2].setImage(p.name, 1);
             }
-            onHit();
+            refresh();
         }
         updateStatus();
     }
@@ -96,21 +99,15 @@ public class ArmorSet {
         }
         host.inventory.setMaxSize(getPockets());
     }
-    public void onHit(){
+    public void refresh(){
         for (int i=0;i<display.length;i++){
             display[i].getImage().modify(Shader.Tatter, Math.round(getOrganArmor(i).getPercentage()*9)+2);
         }
     }
-    public void mend(){
-        for (int i=0;i<armor.length;i++){
-            armor[i].mend();
-            set(armor[i],i);
-        }
-    }
     public Armor getOrganArmor(int organ){
         if (organ == 5) return armor[0];
-        if (organ == 1 || organ == 2) return armor[1];
-        if (organ == 0 || organ == 3 || organ == 4) return armor[2];
+        else if (organ == 0 || organ == 3 || organ == 4) return armor[1];
+        else if (organ == 1 || organ == 2) return armor[2];
         return null;
     }
     public boolean isBare(){
@@ -157,18 +154,18 @@ public class ArmorSet {
     }
     public String getDescription(){
         if (isBare(0) && isBare(1) && isBare(2)) return "Nothing";
-        String r = "";
-        if (!isBare(0)) r += armor[0].getFullName()+", ";
-        if (!isBare(1)) r += armor[1].getFullName()+", ";
-        if (!isBare(2)) r += armor[2].getFullName()+", ";
+        StringBuilder r = new StringBuilder();
+        for (int i=0;i<armor.length;i++) {
+            if (!isBare(i)) r.append(armor[i].getFullName()).append(", ");
+        }
         return r.substring(0,r.length()-2);
     }
     @Override
     public String toString(){
-        String r = "";
+        StringBuilder r = new StringBuilder();
         for (int i=0;i<armor.length;i++){
-            if (armor[i] != bare[i]) r += armor[i].toString()+";";
-            else r += ";";
+            if (armor[i] != bare[i]) r.append(armor[i].toString()).append(";");
+            else r.append(";");
         }
         return r.substring(0,r.length()-1);
     }

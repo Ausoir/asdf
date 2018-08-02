@@ -88,7 +88,7 @@ public enum Intelligence {
             }
             protected boolean perceived(Prop p){
                 if (p instanceof Unit) {
-                    if (host.faction.canAttack(p.faction)) {
+                    if (p.hittable(host.faction)) {
                         target = (Unit) p;
                         host.say("@c tgt");
                         setTask(Behavior.Hunt);

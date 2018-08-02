@@ -34,12 +34,9 @@ public abstract class AI implements Observer {
             if (tasks.peek().update(host)) {
                 tasks.pop();
                 taskProgress = 0;
-                if (tasks.empty()) bored();
+                if (tasks.empty()) setTask(Behavior.Wander);
             }
         }
-    }
-    void bored(){
-        setTask(Behavior.Wander);
     }
     public void setTask(Behavior p){
         tasks.push(p);
@@ -52,7 +49,7 @@ public abstract class AI implements Observer {
             }
         }
     }
-    boolean blocked(int dir){
+    private boolean blocked(int dir){
         boolean blocked = false;
         boolean fall = true;
         P front = host.pos.getAdd((host.getSpeed()*3+48)*dir,0);
@@ -101,11 +98,11 @@ public abstract class AI implements Observer {
         }
     }
     public String toString() {
-        String r = "";
+        StringBuilder r = new StringBuilder();
         for (int i=tasks.size()-1;i>=0;i--) {
-            r += tasks.get(i).toString(host)+"&";
+            r.append(tasks.get(i).toString(host)).append("&");
         }
-        if (r.length()>0) r = r.substring(0,r.length()-1);
+        if (r.length()>0) r = new StringBuilder(r.substring(0, r.length() - 1));
         return factoryId+":"+type+";"+r;
     }
 }
