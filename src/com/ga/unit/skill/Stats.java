@@ -126,6 +126,12 @@ public class Stats {
             }
         }
     }
+    public boolean isDangerous(){
+        for (Buff i : effects){
+            if (i.isDangerous()) return true;
+        }
+        return false;
+    }
     public void clearBuffs() {
         for (int i=0;i<effects.size();i++) {
             Buff effect = effects.remove(0);

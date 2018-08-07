@@ -69,26 +69,32 @@ public class ArmorSet {
         if (p == null) p = bare[piece];
         armor[piece] = p;
         if (p == bare[piece]) {
-            if (piece == 0) display[5].getImage().visible = false;
+            if (piece == 0) display[5].setImage(null);
             else if (piece == 1) {
-                display[0].setImage(null, 2);
+                display[0].setImage(null, 1);
                 display[3].setImage(null, 0);
-                display[4].setImage(null, 2);
+                display[4].setImage(null, 1);
             } else if (piece == 2){
-                display[1].setImage(null, 1);
-                display[2].setImage(null, 1);
+                display[1].setImage(null, 2);
+                display[2].setImage(null, 2);
             }
         } else {
-            if (piece == 0) display[5].setImage(p.name);
-            else if (piece == 1) {
-                display[0].setImage(p.name, 2);
+            if (piece == 0){
+                display[5].setImage(p.name);
+                display[5].getImage().modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 9) + 2);
+            } else if (piece == 1) {
+                display[0].setImage(p.name, 1);
                 display[3].setImage(p.name, 0);
-                display[4].setImage(p.name, 2);
+                display[4].setImage(p.name, 1);
+                display[0].getImage().modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 9) + 2);
+                display[3].getImage().modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 9) + 2);
+                display[4].getImage().modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 9) + 2);
             } else if (piece == 2){
-                display[1].setImage(p.name, 1);
-                display[2].setImage(p.name, 1);
+                display[1].setImage(p.name, 2);
+                display[2].setImage(p.name, 2);
+                display[1].getImage().modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 9) + 2);
+                display[2].getImage().modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 9) + 2);
             }
-            refresh();
         }
         updateStatus();
     }
@@ -100,15 +106,15 @@ public class ArmorSet {
         host.inventory.setMaxSize(getPockets());
     }
     public void refresh(){
-        for (int i=0;i<display.length;i++){
-            display[i].getImage().modify(Shader.Tatter, Math.round(getOrganArmor(i).getPercentage()*9)+2);
-        }
+        set(armor[0], 0);
+        set(armor[1], 1);
+        set(armor[2], 2);
     }
-    public Armor getOrganArmor(int organ){
-        if (organ == 5) return armor[0];
-        else if (organ == 0 || organ == 3 || organ == 4) return armor[1];
-        else if (organ == 1 || organ == 2) return armor[2];
-        return null;
+    public int getOrganArmor(int organ){
+        if (organ == 0 || organ == 3 || organ == 4) return 1;
+        else if (organ == 1 || organ == 2) return 2;
+        assert organ == 5;
+        return 0;
     }
     public boolean isBare(){
         return isBare(0) && isBare(1) && isBare(2);

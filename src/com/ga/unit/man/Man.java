@@ -189,7 +189,7 @@ public class Man extends Unit {
 
     @Override
     protected boolean damageBreakthrough(int organ, boolean blunt, int damage){
-        return armor.getOrganArmor(organ).checkBreak(blunt, damage);
+        return armor.armor[armor.getOrganArmor(organ)].checkBreak(blunt, damage);
     }
 
     @Override

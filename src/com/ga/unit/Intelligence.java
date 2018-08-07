@@ -147,16 +147,12 @@ public enum Intelligence {
                 }
 
                 void shop(){
-                    int[] newPrice = prices;
-                    for (int i = 0; i < newPrice.length; i++) {
-                        newPrice[i] *= Global.player.getShopPrice();
-                    }
                     Menu.menu.showShop("Trader's Wares - \"" + host.getConversation() + "\"",
                             products, prices, actions);
                 }
 
                 private int fluctuate(int value) {
-                    float fluc = host.traits.has(Traits.Trait.Haggler) ? ((high+low+low)/3) : (host.rand.nextFloat() * (high - low)) + low;
+                    float fluc = host.traits.has(Traits.Trait.Haggler) ? ((high+low)/2) : (host.rand.nextFloat() * (high - low)) + low;
                     return (int) (value * fluc);
                 }
             });

@@ -172,7 +172,7 @@ public class Item extends Prop {
         }
     }
     enum SpecialtyMod{
-        None, Light, Heavy, Sharp, Dull, Tough, Hardened, Runic, Instant, Cursed, Athletic, Strengthening, Branded, Unwieldy, Quick, Slow;
+        None, Light, Heavy, Sharp, Dull, Tough, Hardened, Runic, Instant, Cursed, Athletic, Strengthening, Branded, Quick, Slow;
         static SpecialtyMod get(Random seed){
             if (seed.nextInt(8) == 0) return values()[seed.nextInt(values().length)];
             return None;
@@ -242,9 +242,7 @@ public class Item extends Prop {
     protected Buffs emod = null;
     Material material;
     public int weight, range, speed;
-    public int encumbrance = 0;
     protected Cooldown cooldown = new Cooldown(3);
-    public int delay = 0;
     public float probability;
     public int durability, uses;
     public boolean disposable = true;
@@ -336,7 +334,6 @@ public class Item extends Prop {
         else if (mod == SpecialtyMod.Tough) durability *= 2;
         else if (mod == SpecialtyMod.Runic) probability += .2f*admod.magnitude;
         else if (mod == SpecialtyMod.Instant) cooldown.setDuration(0);
-        else if (mod == SpecialtyMod.Unwieldy) encumbrance+=admod.magnitude;
         else if (mod == SpecialtyMod.Cursed) tags.add(Tag.Enchant);
         else if (mod == SpecialtyMod.Quick) this.speed = Math.max(0, this.speed - admod.magnitude);
         else if (mod == SpecialtyMod.Slow) this.speed += admod.magnitude;
@@ -471,7 +468,7 @@ public class Item extends Prop {
         return false;
     }
     public boolean trigger(Unit target){
-        if (isUsable(true, 1) && emod != null && cooldown.isReady() && SyncRand.r.nextFloat() < probability){
+        if (emod != null && cooldown.isReady() && SyncRand.r.nextFloat() < probability && isUsable(true, 1)){
             cooldown.reset();
             target.buff(emod, ademod.level);
             return true;
@@ -489,7 +486,6 @@ public class Item extends Prop {
     public String getDescription() {
         String r = "Weight: "+weight+"\n";
         r += "Value: "+Dialog.money(getValue())+"\n";
-        if (encumbrance > 0) r += "Encumberance: "+encumbrance+"\n";
         r += "Uses: "+uses+"/"+durability+"\n";
         r += "Material: "+material.name()+"\n";
         if (tags.size() > 0) r += "Catalyzers: "+tags.toString()+"\n";
@@ -511,6 +507,9 @@ public class Item extends Prop {
     public Line getLine(){
         float len = image.getSize().x * dir * (image.getCenterType()==1?.5f:1) + 2;
         return new Line(pos, pos.getAdd(len*Global.cos(rotation), len*Global.sin(rotation)));
+    }
+    public void onTimeChange(){
+        if (getValue() >= 100 && owner == null) remove();
     }
     public String forceToString(){
         boolean forced = false;

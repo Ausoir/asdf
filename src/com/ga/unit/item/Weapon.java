@@ -17,7 +17,6 @@ public class Weapon extends Item {
         value = value*2 + 1000;
         cooldown.setDuration(0);
         rotation = 35;
-        delay = 0;
         disposable = false;
     }
     public void onCreate(){
@@ -50,8 +49,10 @@ public class Weapon extends Item {
     }
     @Override
     public boolean trigger(Unit target) {
-        if (!type.isBlunt()) Sound.play(map, pos, "hit_cut");
-        else Sound.play(map, pos, "hit_bash");
+        if (!type.isBlunt()){
+            isUsable(true, 1);
+            Sound.play(map, pos, "hit_cut");
+        } else Sound.play(map, pos, "hit_bash");
         return super.trigger(target);
     }
     @Override

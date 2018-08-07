@@ -201,7 +201,7 @@ public class Updater {
         }
         return seen;
     }
-    void onTimeChange(){
+    private void onTimeChange(){
         for (Prop i : props) i.onTimeChange();
     }
     public boolean sleep(int p, boolean checkEnemy){
@@ -210,6 +210,10 @@ public class Updater {
                 Global.player.say("There are enemies on the map!");
                 return false;
             }
+        }
+        if (Global.player.stats.isDangerous()){
+            Global.player.say("I am inflicted with dangerous status effect!");
+            return false;
         }
         if (!Global.player.get("Fatigue").require(p)){
             Global.player.say("I am too tired! I need "+p+" Fatigue points.");
@@ -223,7 +227,6 @@ public class Updater {
         map.weather.fadeIn();
         //Hour pass
         Global.player.stats.clearBuffs();
-        Global.player.get("Intelligence").add(Math.max(0, Global.player.traits.getTraitLevel(Traits.Trait.Attunement)-1), false);
         Global.player.get("Strength").heal();
         Global.timePass(p*100);
         Global.hour+=p;

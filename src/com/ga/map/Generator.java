@@ -11,7 +11,6 @@ import com.ga.unit.Stock;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Objects;
 
 /**
  * Created by ga on 5/28/17. asd
@@ -124,7 +123,7 @@ public class Generator {
                             if (!exitExists){
                                 float spawnX = house.size.x/2;
                                 P spawnPoint = new P(spawnX, house.checkLand(new Line(spawnX, 0, spawnX, house.size.y)).getCrossPointY(spawnX));
-                                Objects.requireNonNull(Stock.createByName(house, "Signpost", -1)).start().pos.set(spawnPoint);
+                                Stock.createByName(house, "Signpost", -1).start().pos.set(spawnPoint);
                                 Stock.Spawn.create(house, -1, 3).start().pos.set(spawnPoint.getAdd(0,-50));
                                 Prop exit = (Prop) Stock.Travel.create(house, 1, 3).start();
                                 exit.seed = bid + exit.seed - 1;
@@ -133,31 +132,30 @@ public class Generator {
                                 FileManager.saveMap("ins/"+prop.name, house);
                             }
                         }
-                    } else if (prop.subId == 2) { //building
+                    } else if (prop.subId == 2) { //outside to inside
                         prop.name = map.name.getModifiedMapname(prop.name+map.name.getMapname()) + bid;
                         Map house = new Map("building/inside/" + building);
                         house.start();
                         house.updater.processQueue();
                         for (Prop ob : house.updater.props) {
-                            if (ob.factoryId == Stock.Travel.ordinal() && ob.subId == 3) { //exit
+                            if (ob.factoryId == Stock.Travel.ordinal() && ob.subId == 3) { //inside to outside
                                 ob.name = map.name.toString();
                                 ob.seed = bid + ob.seed - 1;
+                            } else if (ob.factoryId != Stock.Spawn.ordinal()){
+                                if (Creation.r.nextBoolean()) ob.remove();
+                                else ob.seed = -1;
                             }
                         }
                         FileManager.saveMap(map.name.getModifiedMapname("B"+map.name.getMapname()) + bid, house);
                     }
+                } else {
+                    if (Creation.r.nextBoolean()) prop.remove();
+                    else prop.seed = -1;
                 }
             }
         }
         blueprint.updater.addQueue.clear();
         return highestBid;
-    }
-    float lowestY(){
-        float r = 0;
-        for (Line i : map.landRaw) {
-            if (i.clockwise() && i.pt.y > r && !i.vertical()) r = i.pt.y;
-        }
-        return r;
     }
     void makeEdgeSpawns(){
         Line leftSpawn = map.checkLand(new Line(map.size.x-24,0,map.size.x-24,map.size.y));
@@ -176,6 +174,7 @@ public class Generator {
                 }
             }
         }
+        assert high != null;
         TerrainTrail blocker = null;
         for (final Line i : map.landRaw) {
             if (i.tid == high.tid){
@@ -191,6 +190,7 @@ public class Generator {
                 }
             }
         }
+        assert blocker != null;
         blocker.finish(depth+"&_0,0,0,255&none");
         blocker.reverse();
         Iterator it = map.landRaw.iterator();

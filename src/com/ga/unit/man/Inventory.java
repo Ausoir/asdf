@@ -15,10 +15,12 @@ public class Inventory {
         this.host = host;
     }
     boolean addItem(Item p){
-        if (vacant()) return false;
-        items.add(p);
-        weight += p.weight;
-        return true;
+        if (vacant()) {
+            items.add(p);
+            weight += p.weight;
+            return true;
+        }
+        return false;
     }
     public boolean vacant(){
         return items.size() < maxSize;

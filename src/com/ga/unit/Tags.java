@@ -1,16 +1,20 @@
 package com.ga.unit;
 
-import java.util.ArrayList;
+import com.ga.tool.L;
+
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Created by Ga on 4/5/2017. aaa
  */
-public class Tags extends ArrayList<Tag> {
+public class Tags extends L<Tag> {
     public static final Tags blank = new Tags();
     public static final Tag[] trainers = new Tag[]{
         Tag.Strength, Tag.Athletics, Tag.Energy, Tag.Enchant, Tag.Channeling, Tag.Void, Tag.Air, Tag.Fire, Tag.Conjuration
+    };
+    static final Tag[] trainables = new Tag[]{
+            Tag.Energy, Tag.Enchant, Tag.Channeling, Tag.Void, Tag.Air, Tag.Fire, Tag.Conjuration
     };
 
     boolean containsAny(Tags p){

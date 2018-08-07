@@ -142,10 +142,10 @@ public class Picture {
     private static BufferedImage getTexture(BufferedImage image, int sx, int sy, int px, int py) {
         return image.getSubimage(px * sx, py * sy, sx, sy);
     }
-    static void newImage(String path, String p, BufferedImage image){
+    public static void newImage(String path, String p, BufferedImage image){
         String fullPath = FileManager.makeDirectory(path+p+".png");
         FileManager.save(fullPath,"");
-        File output = new File("Data/"+fullPath);
+        File output = new File(fullPath);
         try {
             ImageIO.write(image, "png", output);
         } catch (IOException e) {

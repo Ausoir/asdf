@@ -12,7 +12,8 @@ import com.ga.unit.skill.Actions;
  * Created by Ga on 8/9/2016. asd
  */
 public class Armor extends Item {
-    private int piece;
+    int encumbrance;
+    public int piece;
     private int armorMod = 0;
     private int warmth;
     int pocket;
@@ -23,7 +24,6 @@ public class Armor extends Item {
         this.pocket = pockets;
         this.piece = piece;
         this.warmth = warmth;
-        delay = 80;
         if (piece == 1) image.set(name, 0);
         else if (piece == 2) image.set(name, 1);
         else if (piece == 4) weight = 0;
@@ -94,10 +94,11 @@ public class Armor extends Item {
     public String getDescription(){
         String r = super.getDescription();
         r = r.replace(" uses "," durability ");
-        if (emod != null) r += " This armor has "+probability*100+"% chance of activating its enchantment on being hit.";
-        if (getArmor() > 0) r += " This armor decreases damage by "+getArmor()+" points.";
-        if (getWarmth() > 0) r += " This armor provides "+getWarmth()+" warmth.";
-        if (pocket > 0) r += " This armor has "+pocket+" pockets.";
+        if (encumbrance > 0) r += "Encumberance: "+encumbrance+"\n";
+        if (emod != null) r += "This armor has "+probability*100+"% chance of activating its enchantment on being hit. ";
+        if (getArmor() > 0) r += "This armor decreases damage by "+getArmor()+" points. ";
+        if (getWarmth() > 0) r += "This armor provides "+getWarmth()+" warmth. ";
+        if (pocket > 0) r += "This armor has "+pocket+" pockets. ";
         return r;
     }
 }

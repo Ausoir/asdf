@@ -4,8 +4,6 @@ import com.ga.map.Creation;
 import com.ga.map.GenerateBiome;
 import com.ga.map.Global;
 
-import java.util.Random;
-
 /**
  * Created by Ga on 12/13/2016. asdasdasdawdadqw
  */

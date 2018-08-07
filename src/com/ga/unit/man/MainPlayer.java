@@ -52,15 +52,8 @@ public class MainPlayer extends Player {
                 say("Cannot cast!");
             } else if (r == 5) say("This action is beyond my abilities!");
             else if (r == 6) say("I'm missing a required limb!");
-            else if (r == 7) say("Weapon is not usable!");
             else if (r == 8) say("Not enough Energy!");
         }
-        return r;
-    }
-
-    public float getShopPrice() {
-        float r = 1;
-        if (traits.has(Traits.Trait.Haggler)) r = .7f;
         return r;
     }
 
@@ -68,14 +61,6 @@ public class MainPlayer extends Player {
         boolean r = super.hit(hitBox, blunt, damage);
         if (r) statBar.show(0, 1);
         return r;
-    }
-
-    public int getLevel(){
-        int level = -2;
-        for (String mainStat : mainStats){
-            level += get(mainStat).getMax();
-        }
-        return level;
     }
 
     public int[] getLevelRequirements(int quality){
@@ -103,8 +88,7 @@ public class MainPlayer extends Player {
                 for (String i : mainStats) if (isStat = i.equals(stat)) break;
                 if (isStat) {
                     get(stat).addTotal(1);
-                    int level = getLevel();
-                    get("Innovation").add(1, false);
+                    int level = get("Level").getMax();
                     if (level > 1) {
                         int i, current = 1, prev;
                         for (i = 1; i < level; i += prev) {
@@ -122,8 +106,9 @@ public class MainPlayer extends Player {
                             statChangeNotice += decayStat + " decayed by 1.";
                         }
                     }
-                    say("Leveled up! " + statChangeNotice);
                 } else learnTrait(Traits.Trait.getByName(stat));
+                say("Leveled up! " + statChangeNotice);
+                get("Level").addTotal(1);
                 return true;
             }
         } else say("Requires "+requirements[0]+" motivation points!");
@@ -171,7 +156,7 @@ public class MainPlayer extends Player {
         if (!get("Intelligence").isFull()) statBar.show(2, .7f);
         statBar.update();
         if (input.ctrl) Global.cameraTo = pos.getAdd(target.getMult(.5f,.5f));
-        else Global.cameraTo = pos.getAdd(vel.getAdd(0,-Settings.gravity).clamp(-10,-10,10,10).mult(50,20));
+        else Global.cameraTo = pos.getAdd(vel.getAdd(0,-Settings.gravity).clamp(-8,-6,8,6).mult(24,8));
     }
 
     public void remove() {

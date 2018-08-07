@@ -73,7 +73,7 @@ public class Organ extends Line {
     }
     public void amputate(Line p, int damage){
         Sound.play(host.map, host.pos, "hit_bloody");
-        int intensity = 18 + damage*2;
+        int intensity = 16 + damage;
         if (image != null) {
             final Projectile flyingOrgan = new Projectile(host.map, null, new P(host.pos), p.ptd.disperse(8,8), intensity) {
                 private final int length = (int) getLength();
@@ -95,7 +95,7 @@ public class Organ extends Line {
             flyingOrgan.dir = host.dir;
             flyingOrgan.setDepth(host.getDepth());
             flyingOrgan.gravity = true;
-            flyingOrgan.delay.set(999);
+            flyingOrgan.delay.set(600);
             flyingOrgan.delay.performer = new Performer(){
                 @Override
                 public void perform(){

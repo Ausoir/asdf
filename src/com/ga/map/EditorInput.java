@@ -154,7 +154,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
                 }
             }
             message(msg);
-        } else if (p.startsWith("travel")) {
+        } else if (p.startsWith("travel")) { //SubId 1 is Outside, 2 is outside to inside, 3 is inside to outside
             String[] to = p.substring(7).split("@");
             if (to.length == 1) to = new String[]{to[0], "-1"};
             selectTool(Tool.OBJECT);
@@ -279,8 +279,10 @@ public class EditorInput extends Drawable implements Input, Updatable {
         } else if (p.equals("clearO")){
             map.updater.props.clear();
         } else if (p.equals("clear")){
+            P size = map.size;
             map.clear();
             map = new Map(map.name.toString());
+            map.size = size;
             map.updater.addQueue.add(this);
         } else if (p.equals("refresh")){
 //            map.updater.unrender();
@@ -620,16 +622,16 @@ public class EditorInput extends Drawable implements Input, Updatable {
                 setSpeed(0,0);
                 break;
             case KeyEvent.VK_UP:
-                currentO.pos.add(0,-1);
+                currentO.pos.add(0,shift?-10:-1);
                 break;
             case KeyEvent.VK_DOWN:
-                currentO.pos.add(0,1);
+                currentO.pos.add(0,shift?10:1);
                 break;
             case KeyEvent.VK_LEFT:
-                currentO.pos.add(-1,0);
+                currentO.pos.add(shift?-10:-1,0);
                 break;
             case KeyEvent.VK_RIGHT:
-                currentO.pos.add(1,0);
+                currentO.pos.add(shift?10:1,0);
                 break;
             case KeyEvent.VK_Z:
                 if (control) command("load "+lastSaved, 0, 0);

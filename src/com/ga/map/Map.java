@@ -32,7 +32,7 @@ public class Map {
         put("snow", "Rock=.1,Bush=.1");
         put("sand", "XBush=.1,Shell=.2,Starfish=.3");
     }};
-    public P size;
+    public P size = new P();
     public MapName name;
     private String callname = "Somewhere";
     String panoramaName = "";

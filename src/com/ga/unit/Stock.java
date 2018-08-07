@@ -338,7 +338,7 @@ public enum Stock {
                 else moves = "Fireblast";
                 UnitFactory unit = new UnitFactory(this, Faction.Predator, 5);
                 unit.setStat("Intelligence", 20);
-                for (int i=0;i<8;i++) traits.learn(this, Traits.Trait.Attunement);
+                traits.learn(this, Traits.Trait.Attunement);
                 for (int i=0;i<8;i++) traits.learn(this, Traits.Trait.Pyromancy);
                 unit.setMoveset(moves);
             }
@@ -372,7 +372,7 @@ public enum Stock {
         return product;
     }},
     Fist{ Prop make(Map map, int id, int seed){
-        Item product = new Weapon(map, name(),0, new Item.Material[]{Item.Material.Organic}, Item.ItemType.Bashing, -1, 0, 0){
+        Item product = new Weapon(map, name(),0, new Item.Material[]{Item.Material.Organic}, Item.ItemType.Throwing, -1, 0, 0){
             public boolean use(final com.ga.unit.man.Man host) {
                 host.setState(Actions.Interact);
                 return true;
@@ -470,26 +470,27 @@ public enum Stock {
             }
         };
         product.value = 94;
-        product.delay = 45;
         return product;
     }},
     Textbook{ Prop make(Map map, final int id, int seed){
         Item product = new Item(map, name(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Scroll, -1){
+            private Traits.Trait trait = Traits.Trait.getByName(Tags.trainables[seed % Tags.trainables.length].name());
             public void onCreate(){
                 super.onCreate();
-                if (id == -1) subId = rand.nextInt(12);
+                if (id == -1) subId = rand.nextInt(4)+1;
             }
             @Override
             public boolean use(com.ga.unit.man.Man host){
                 if (host instanceof MainPlayer && super.use(host)) {
-                    if (Global.player.get("Intelligence").get() == subId) {
-                        if (map.updater.sleep(1, false)) {
-                            host.get("Intelligence").addTotal(1);
-                            host.say("Trained up Intelligence.");
+                    int level = Global.player.traits.getTraitLevel(trait);
+                    if (level == subId) {
+                        if (map.updater.sleep(1, true)) {
+                            host.learnTrait(trait);
+                            host.say("Trained up "+trait.name()+"!");
                             return true;
                         }
                     } else {
-                        if (Global.player.get("Intelligence").get() < subId) host.say("This textbook is beyond my understanding!");
+                        if (level < subId) host.say("This textbook is beyond my understanding!");
                         else host.say("This textbook is too easy!");
                     }
                 }
@@ -497,27 +498,26 @@ public enum Stock {
             }
             public String getName(){
                 String prefix = "Expert";
-                if (subId < 3) prefix = "Novice";
-                else if (subId < 6) prefix = "Intermediate";
-                else if (subId < 9) prefix = "Advanced";
+                if (subId == 0) prefix = "Novice";
+                else if (subId == 1) prefix = "Intermediate";
+                else if (subId == 2) prefix = "Advanced";
                 return prefix + " " + super.getName();
             }
             public String getDescription(){
-                String req = " This book contains information for those with intellectual level of "+(subId+1)+".";
-                int understanding = Global.player.get("Intelligence").get();
-                req += " Your current Intelligence score: "+understanding+".";
-                if (understanding == subId) req += " You may learn the contents of this book.";
+                String req = " This book contains information for those with understanding of "+trait.name()+" level "+(subId+1)+".";
+                int understanding = Global.player.traits.getTraitLevel(trait);
+                req += " Your current "+trait.name()+" level: "+understanding+".";
+                if (understanding == subId) req += " You may learn from the contents of this book.";
                 else if (understanding < subId) req += " This book is beyond your understanding.";
                 else req += " You won't learn anything from this book.";
                 return super.getDescription()+req;
             }
         };
         product.value = 9400;
-        product.delay = 45;
         return product;
     }},
     Bandage{ Prop make(Map map, int id, int seed){
-        Item product = new Item(map, name(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Consumable, 4) {
+        return new Item(map, name(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Consumable, 4) {
             public boolean use(com.ga.unit.man.Man host) {
                 if (super.use(host) && isUsable(true, 1)){
                     host.stats.triggerEffect(Buffs.Bleed);
@@ -529,8 +529,6 @@ public enum Stock {
                 return super.getDescription()+" Use to stop bleeding.";
             }
         };
-        product.delay = 45;
-        return product;
     }},
     Potion{ Prop make(Map map, int id, int seed){
         Item product = new Item(map, name(), seed, new Item.Material[]{Item.Material.Glass}, Item.ItemType.Consumable, 1) {
@@ -550,7 +548,6 @@ public enum Stock {
             }
         };
         product.range = 600;
-        product.delay = 45;
         return product;
     }},
     Scroll{ Prop make(Map map, int id, int seed){
@@ -593,7 +590,6 @@ public enum Stock {
         };
         product.probability = 1;
         product.range = 400;
-        product.delay = 30;
         return product;
     }},
     Ethersword{ Prop make(Map map, int id, int seed){
@@ -643,8 +639,13 @@ public enum Stock {
         };
         return product;
     }},
-    Something{ Prop make(Map map, int id, final int seed){ //unused
+    Clockwork{ Prop make(Map map, int id, final int seed){ //unused
         return new Prop(map, name(), seed){
+            private float revolve = (seed % 100 - 50) * .01f;
+            public void update(){
+                super.update();
+                rotation += revolve;
+            }
         };
     }},
     Spawner{ Prop make(Map map, final int id, int seed) {
@@ -737,7 +738,7 @@ public enum Stock {
                     Performer[] perf = new Performer[itemList.length];
                     for (int i = 0; i < itemList.length; i++) {
                         Item item = (Item) items.get(i);
-                        itemList[i] = "Repair " + item.name;
+                        itemList[i] = "Repair " + item.getFullName();
                         perf[i] = new Performer() {
                             public void perform() {
                                 if (isUsable(false, 1) && cooldown.isReady() && host.map.updater.sleep(1, true)) {
@@ -799,11 +800,9 @@ public enum Stock {
                 return false;
             }
         };
-        product.encumbrance = 2;
         product.range = 500;
         product.image.setCenterType(3);
         product.value = 16;
-        product.delay = 10;
         return product;
     }},
     Fireball{ Prop make(Map map, int id, int seed){
@@ -851,7 +850,6 @@ public enum Stock {
         };
         product.range = 200;
         product.value = 16;
-        product.delay = 10;
         return product;
     }},
     Grappler{ Prop make(Map map, int id, int seed){
@@ -915,11 +913,10 @@ public enum Stock {
         };
         product.range = 1200;
         product.value = 16;
-        product.delay = 10;
         return product;
     }},
     Book{ Prop make(Map map, int id, int seed){
-        Item product = new Item(map, name(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Scroll, -1){
+        return new Item(map, name(), seed, new Item.Material[]{Item.Material.Cloth}, Item.ItemType.Scroll, -1){
             @Override
             public boolean use(com.ga.unit.man.Man host){
                 if (super.use(host)){
@@ -929,8 +926,6 @@ public enum Stock {
                 return false;
             }
         };
-        product.delay = 45;
-        return product;
     }},
     Battery{ Prop make(Map map, int id, int seed){
         Item product = new Item(map, name(),seed,new Item.Material[]{Item.Material.Copper}
@@ -1023,7 +1018,6 @@ public enum Stock {
             }
         };
         product.value = 12800;
-        product.delay = 45;
         return product;
     }},
     Purse{ Prop make(Map map, int id, int seed){

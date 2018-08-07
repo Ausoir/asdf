@@ -12,7 +12,7 @@ public class MapName {
         set(p);
     }
     private void set(String p){
-        value = p;
+        value = FileManager.makeDirectory(p);
     }
     public int getIndex(){
         return Integer.parseInt(getMapname().substring(1));

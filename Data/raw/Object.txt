@@ -7,7 +7,7 @@ Stone;2;1;0;.3,.3;1;0
 Bush;2;1;0;.3,.3;1;0
 Deadbush;2;1;0;.3,.3;1;0
 Tree;2;1;0;.3,.3;1;0
-Training_Dummy;2;1;0;0,0;1;0
+Appliance;1;0;0;.1,.1;1;0
 Door;2;0;0;0,0;1;0
 Signpost;2;1;0;0,0;1;0
 Streetlight;2;1;0;0,0;1;0
@@ -37,3 +37,5 @@ Dungeon;1;0;0;.2,.2;1;0
 Sign_Food;1;0;0;0,0;1;0
 Snowtree;2;1;0;.3,.3;1;0
 Snowbush;2;1;0;.3,.3;1;0
+Ladder;2;0;0;0,0;0;8
+Training_Dummy;2;1;0;0,0;1;0

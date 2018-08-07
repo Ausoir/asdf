@@ -131,6 +131,7 @@ public enum Buffs {
         add(Tag.Fire);
     }}){ Buff makeLocal(int level){
         return new Buff(level, 4) {
+            public boolean isDangerous() { return true; }
             public void onSet() {
                 Sound.play(host.map, host.pos, "fire");
             }
@@ -503,6 +504,7 @@ public enum Buffs {
     }}){ Buff makeLocal(int level){
         return new Buff(level, 100) {
             private int tick = 0;
+            public boolean isDangerous() { return true; }
             public void onSet() {
                 var = 0;
             }
@@ -612,6 +614,7 @@ public enum Buffs {
     }}){ Buff makeLocal(int level) {
         return new Buff(level, 8) {
             private int turn = 0;
+            public boolean isDangerous() { return true; }
             public void onFinish() {
                 if (host instanceof MainPlayer){
                     host.pos.set(Global.r.nextInt((int) host.map.size.x-64)+36, Global.r.nextInt((int) host.map.size.y-64)+36);
@@ -673,6 +676,9 @@ abstract class Buff{
     public void onStack(int level){
         this.level = level;
         time = Global.time + (increment * level);
+    }
+    public boolean isDangerous(){
+        return false;
     }
     public boolean update(){
         return Global.time >= time;

@@ -183,10 +183,8 @@ public enum Actions {
             if (host.delay.over() && host.grounded && host.state != action) {
                 if (action.organs == null || host.clip.hasOrgans(action.organs)) {
                     if (host.getCooldown(action).isReady()) {
-                        if (host.get("Strength").get() >= action.getCost()) {
-                            if (man.weapon.isUsable(false, 1)) return 0;
-                            else return 7;
-                        } else return 2;
+                        if (host.get("Strength").get() >= action.getCost()) return 0;
+                        else return 2;
                     } else return 3;
                 } else return 6;
             } else return 1;
@@ -581,11 +579,11 @@ public enum Actions {
         add(Tag.Strength);
     }}){
         public int getRange(Unit host){
-            return 80+(host.stateLevel*10);
+            return 180;
         }
         public void trigger(Man host){
             Sound.play(host.map, host.pos, "swing_normal");
-            int power = (int) (Math.log(host.stateLevel)*20);
+            int power = (int) (Math.log(host.stateLevel)*12);
             host.vel.y += power*Global.sin(host.target.getAtan());
             host.vel.x += power*Global.cos(host.target.getAtan());
         }

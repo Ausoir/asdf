@@ -1,10 +1,14 @@
 Stick;Bashing;-1;Wooden;5;0 //Weapon, Type, Range, Materials, Speed, Damage
 Staff;Bashing;-1;Wooden,Iron,Steel;-5;1
 Bamboo_Spear;Spear;-1;Wooden;-5;-1
+Cane;Bashing;-1;Wooden,Iron,Steel,Silver,Gold;0;1
+Parasol;Swinging;-1;Cloth,Nylon,Silk;-1;1
 Broadsword;Sword;-1;Copper,Iron,Silver,Steel;-3;0
+Shortsword;Sword;-1;Copper,Iron,Steel;0;0
 Mace;Swinging;-1;Copper,Iron,Silver,Steel;-15;2
 Hammer;Swinging;-1;Stone,Wooden,Copper,Iron,Steel,Bone;0;0
 Longhammer;Bashing;-1;Iron,Silver,Steel,Crystal;-5;1
+Crowbar;Bashing;-1;Iron,Steel;-5;1
 Spear;Spear;-1;Copper,Iron,Steel,Bone;-10;0
 Axe;Swinging;-1;Copper,Iron,Steel;-10;2
 Dagger;Knife;-1;Glass,Copper,Gold,Iron,Silver,Steel;14;-1
@@ -28,6 +32,7 @@ Warhammer;Bashing;-1;Wooden,Iron,Silver,Steel,Titanium,Bone;-20;3
 Bow;Bow;700;Wooden,Bone;0;0
 Revolver;Shooting;480;Steel;0;0
 Pistol;Shooting;480;Steel;0;0
-Rifle;Rifle;700;Steel;0;0
+Rifle;Rifle;700;Wooden;0;0
+Longrifle;Rifle;700;Steel;0;1
 Dart;Darting;600;Copper,Iron,Steel,Silver;0;0
 Javelin;Throwing;600;Iron,Copper,Steel,Silver;0;0

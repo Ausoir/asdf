@@ -2,8 +2,8 @@ Rock;2;1;0;Stone //Weapon, Image Type, Weight, Value, Materials
 Water;2;0;0;Other
 Shell;2;0;250;Bone
 Starfish;2;0;250;Organic;A cooking ingredient.
-Flowerpot;2;1;500;Wooden,Silver,Stone,Glass
-Chair;2;8;1500;Wooden,Silver,Stone
+Flowerpot;2;1;500;Wooden
+Chair;2;8;1500;Wooden,Stone
 Salt;2;0;0;Other;A cooking ingredient.
 Sugar;2;0;0;Other;A cooking ingredient.
 Cup;2;0;0;Glass

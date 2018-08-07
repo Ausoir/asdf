@@ -7,19 +7,15 @@ import java.util.ArrayList;
  */
 public class Traits {
     public enum Trait {
-        Fast_Learner(1,"Learn faster at the cost of more motivation cost."), Haggler(1,"Always get preferable item prices."),
+        Fast_Learner(1,"Learn faster at the cost of more motivation cost."), Haggler(1,"Always get normal item prices."),
         Tough(1,"Resist flinching from being hit."),
         Herbalism(1,"Pick materials from bushes and trees."), Rune_Literacy(1,"Identify, use, and create scrolls."),
         Alchemy(1,"Identify, use, and create potions."), Meditation(1,"Resting removes all buffs."),
         Cooking(1,"Learn to craft food with ingredients and enhance them using kitchenware."),
-        Innovation(1,"Gain access to Innovation points that can be used for Motivation, new talents, or free skills."){
-            public void onSet(Unit host){
-                host.get("Innovation").setMax(3);
-            }
-            public void onRemove(Unit host){
-                host.get("Innovation").setMax(0);
-            }
-        },
+        Innovation(1,"Gain access to Innovation points that can be used for Motivation, new talents, or free skills."),
+        Crafting(1,"Craft various items."),
+        Tailor(1,"Repair clothings and armor. Higher levels repair faster with less resources."),
+        Attunement(1,"Utilize innate energy from your body. Higher level restores more energy per hour."),
 
         Lung_Injury(2,"Rest time quadrupled."){
             public void onSet(Unit host){
@@ -28,9 +24,9 @@ public class Traits {
             public void onRemove(Unit host){
                 host.stats.restTimer.max *= .25f;
             }
-        }, Damaged_Liver(2,"Nutrition from food halved. Cannot drink potions."),
-        Blindness(2,"Cannot read books or scrolls. Cannot target properly."),
-        Brain_Damage(2,"Lose all traits and skills. Cannot obtain new traits or skills."){
+        }, Damaged_Liver(2,"Nutrition from food -1. Potions do no effect."),
+        Blindness(2,"Cannot read books or scrolls. Cannot target properly. Cannot see any objects."),
+        Brain_Damage(2,"Lose all traits and skills."){
             public void onSet(Unit host){
                 for (Trait i : host.traits.trait){
                     if (i.type != 2) host.traits.forget(host, i);
@@ -39,9 +35,6 @@ public class Traits {
             }
         },
 
-        Crafting(3,"Craft various items."),
-        Tailor(3,"Repair clothings and armor. Higher levels repair faster with less resources."), //1:1 hour, 1 res per 50%. 2:1 hour, - res per 50%. 3:1 hour for full.
-        Attunement(3,"Utilize innate energy from your body. Higher level restores more energy per hour."),
         Energy(3,"Learn energy generation methods."){
             Tag tag = Tag.Energy;
             public void onSet(Unit host){

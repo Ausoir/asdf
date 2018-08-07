@@ -10,7 +10,6 @@ class GenerateTown {
         Generator generator = new Generator(map, 0);
         map.size = new P(4000+Creation.r.nextInt(4000), 1400);
         String[] landTexture = new String[]{"dirt&grass","dirt&road_unpaved","dirt&road_normal","dirt&road_highway"};
-//        String[] foundationTexture = new String[]{"whitebrick&basic", "concrete&basic", "concrete&road_unpaved", "rockwood&basic"};
         int max = Creation.r.nextInt(4)+2;
 
         TerrainTrail trail = new TerrainTrail(map, new P(-40, map.size.y+40));
@@ -20,7 +19,6 @@ class GenerateTown {
         trail.finish((max+1)+"&"+landTexture[Creation.r.nextInt(landTexture.length)]);
 
         generator.makeEdgeSpawns();
-//        generateFoundations(map, max, generator.lowestY()+24, foundationTexture[Creation.r.nextInt(foundationTexture.length)]);
         map.normalize(0,2400);
         map.size.y -= 1600;
         int bid=10;
