@@ -3,8 +3,10 @@ package com.ga.game;
 import com.ga.map.Global;
 import com.ga.map.Picture;
 import com.ga.tool.Performer;
-import com.ga.tool.SyncRand;
-import com.ga.unit.*;
+import com.ga.unit.PlayerInput;
+import com.ga.unit.Prop;
+import com.ga.unit.Tag;
+import com.ga.unit.Traits;
 import com.ga.unit.item.Crafts;
 import com.ga.unit.item.Item;
 import com.ga.unit.man.Inventory;
@@ -17,7 +19,10 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.plaf.basic.BasicScrollBarUI;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -45,87 +50,7 @@ public class MenuPlayer extends Panel {
             points.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Menu.menu.showDialog("Innovation Points", "What would you like to do?",
-                            new String[]{"Spend 1 Innovation to gain 16 Motivation", "Spend 3 Innovation to learn 1 new trait from choice of 3", "Spend 5 Innovation to learn 1 new skill from choice of 3"},
-                            new Performer[]{
-                                    new Performer(){
-                                        public void perform() {
-                                            if (Global.player.get("Level").require(1)){
-                                                Global.player.get("Motivation").add(16,false);
-                                                Global.player.say("Obtained 30 Motivation!");
-                                            } else Global.player.say("Not enough Innovation points!");
-                                        }
-                                    }, new Performer(){
-                                        public void perform() {
-                                            Traits.Trait[] actions = Traits.Trait.values();
-                                            Traits.Trait[] skills = new Traits.Trait[]{actions[SyncRand.r.nextInt(actions.length)], actions[SyncRand.r.nextInt(actions.length)], actions[SyncRand.r.nextInt(actions.length)]};
-                                            if (Global.player.canLearn()) {
-                                                if (Global.player.get("Level").require(3)) {
-                                                    Menu.menu.showDialog("Learn a new skill", "Choose a skill to learn",
-                                                            new String[]{"Cancel to refund 1 Innovation", skills[0].name(), skills[1].name(), skills[2].name()},
-                                                            new Performer[]{
-                                                                    new Performer() {
-                                                                        public void perform() {
-                                                                            Global.player.get("Level").add(1, false);
-                                                                        }
-                                                                    }, new Performer() {
-                                                                        public void perform() {
-                                                                            Global.player.learnTrait(skills[0]);
-                                                                            Global.player.say("Learned "+skills[0].name()+"!");
-                                                                        }
-                                                                    }, new Performer() {
-                                                                        public void perform() {
-                                                                            Global.player.learnTrait(skills[1]);
-                                                                            Global.player.say("Learned "+skills[1].name()+"!");
-                                                                        }
-                                                                    }, new Performer() {
-                                                                        public void perform() {
-                                                                            Global.player.learnTrait(skills[2]);
-                                                                            Global.player.say("Learned "+skills[2].name()+"!");
-                                                                        }
-                                                                    }
-                                                            }
-                                                    );
-                                                } else Global.player.say("Not enough Innovation points!");
-                                            } else Global.player.say("Not enough Memory to learn new skills!");
-                                        }
-                                    }, new Performer(){
-                                public void perform() {
-                                    Actions[] actions = Actions.values();
-                                    Actions[] skills = new Actions[]{actions[SyncRand.r.nextInt(actions.length)], actions[SyncRand.r.nextInt(actions.length)], actions[SyncRand.r.nextInt(actions.length)]};
-                                    if (Global.player.canLearn()) {
-                                        if (Global.player.get("Level").require(5)) {
-                                            Menu.menu.showDialog("Learn a new skill", "Choose a skill to learn",
-                                                    new String[]{"Cancel to refund 2 Innovation", skills[0].name(), skills[1].name(), skills[2].name()},
-                                                    new Performer[]{
-                                                            new Performer() {
-                                                                public void perform() {
-                                                                    Global.player.get("Level").add(2, false);
-                                                                }
-                                                            }, new Performer() {
-                                                        public void perform() {
-                                                            Global.player.learnSkill(skills[0]);
-                                                            Global.player.say("Learned "+skills[0].name()+"!");
-                                                        }
-                                                    }, new Performer() {
-                                                        public void perform() {
-                                                            Global.player.learnSkill(skills[1]);
-                                                            Global.player.say("Learned "+skills[1].name()+"!");
-                                                        }
-                                                    }, new Performer() {
-                                                        public void perform() {
-                                                            Global.player.learnSkill(skills[2]);
-                                                            Global.player.say("Learned "+skills[2].name()+"!");
-                                                        }
-                                                    }
-                                                    }
-                                            );
-                                        } else Global.player.say("Not enough Innovation points!");
-                                    } else Global.player.say("Not enough Memory to learn new skills!");
-                                }
-                            }
-                            }
-                    );
+                    Menu.menu.showDialog("Level up points", "Click on a stat to increase it by 1.");
                 }
             });
             add(points, statgrid);
@@ -136,10 +61,21 @@ public class MenuPlayer extends Panel {
             statgrid.gridx = 1;
             statgrid.gridy = 1;
             statgrid.ipady = 32;
-            for (String stat : stats) {
+            for (int i=0;i<stats.length;i++){
+                final int var = i;
                 JButton button = makeStatButton("");
                 button.setIcon(iconDescribe);
-                button.addActionListener(e -> Menu.menu.showDialog(stat,Dialog.get("?"+stat)));
+                final Performer perf = new Performer() {
+                    public void perform() {
+                        if (Global.player.get("Level").require(1))
+                            Global.player.get(stats[var]).setMax(Global.player.get(stats[var]).getMax() + 1);
+                    }
+                };
+                statButtons[var].addActionListener(e -> {
+                    perf.perform();
+                    refresh();
+                });
+                button.addActionListener(e -> Menu.menu.showDialog(stats[var],Dialog.get("?"+stats[var])));
             }
             statgrid.gridx = 0;
             statgrid.gridy = stats.length+1;
@@ -247,13 +183,18 @@ public class MenuPlayer extends Panel {
             energy.setText("Energy - "+player.get("Intelligence").toString().replace(",", "/"));
             points.setFont(Panel.smallfont);
             points.setForeground(Color.RED);
-            points.setText("Innovation Points "+player.get("Level").get());
-            if (player.get("Level").get() == 0 || !player.traits.has(Traits.Trait.Innovation)) points.setVisible(false);
+            points.setText("Available Points: "+player.get("Level").get());
+            if (player.get("Level").get() == 0) points.setVisible(false);
+            else points.setVisible(true);
             for (int i=0;i<stats.length;i++) statButtons[i].setText(stats[i]+" - "+player.get(stats[i]).getMax());
-            if (player.get("Stamina").isFull()) stamina.setVisible(false);
+            if (player.get("Strength").isFull()) stamina.setVisible(false);
+            else stamina.setVisible(true);
             if (player.get("Agility").isFull()) vitality.setVisible(false);
+            else vitality.setVisible(true);
+            if (!player.traits.has(Traits.Trait.Attunement) || player.get("Intelligence").isFull()) energy.setVisible(false);
+            else energy.setVisible(true);
             if (player.get("Motivation").get() == 0) motivation.setVisible(false);
-            if (!player.traits.has(Traits.Trait.Attunement)) energy.setVisible(false);
+            else motivation.setVisible(true);
         }
     }
 
@@ -303,7 +244,7 @@ public class MenuPlayer extends Panel {
                     else if (i == 1) title += " - "+Dialog.get("btorso");
                     else if (i == 2) title += " - "+Dialog.get("bleg");
                     else if (i == 3) title += " - Back";
-                    else if (i == 4) title += " - Trinket";
+                    else title += " - Trinket";
                     b.setTitle(title);
                     panel.setBorder(b);
                 }

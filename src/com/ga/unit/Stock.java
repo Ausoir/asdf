@@ -427,7 +427,7 @@ public enum Stock {
                 skill = learnables.get(seed % learnables.size());
                 return r;
             }
-            private boolean checkIngredients(){
+            private boolean checkIngredients(Unit host){
                 ArrayList<Prop> t = map.updater.collideProp(pos, 240);
                 Tags r = new Tags();
                 r.addAll(skill.getTrainers());
@@ -436,6 +436,7 @@ public enum Stock {
                         i.remove();
                     }
                 }
+                r.addAll(host.getTags());
                 return r.size() == 0;
             }
             @Override
@@ -443,13 +444,13 @@ public enum Stock {
                 if (host instanceof Player && super.use(host)) {
                     Player player = (Player) host;
                     if (player.getStateLevel(skill) > 0) {
-                        if (checkIngredients()) {
-                            if (host.get("Motivation").require(100)) {
+                        if (checkIngredients(host)) {
+                            if (host.get("Motivation").require(10)) {
                                 if (map.updater.sleep(1, false)) {
                                     if (!player.learnSkill(skill)) host.say("Failed to learn " + skill.name() + ".");
                                 }
-                            } else host.say("No motivation...");
-                        } else host.say("Catalysts required!");
+                            } else host.say("Need at least 10 Motivation...");
+                        } else host.say("I lack the catalysts required to learn this action!");
                     } else host.say("Not skilled enough to learn "+skill.name()+"!");
                 }
                 return false;
@@ -484,10 +485,11 @@ public enum Stock {
                 if (host instanceof MainPlayer && super.use(host)) {
                     int level = Global.player.traits.getTraitLevel(trait);
                     if (level == subId) {
-                        if (map.updater.sleep(1, true)) {
-                            host.learnTrait(trait);
-                            host.say("Trained up "+trait.name()+"!");
-                            return true;
+                        if (host.traits.canLearn(trait) && map.updater.sleep(subId+1, true)) {
+                            if (host.learnTrait(trait)){
+                                host.say("Trained up "+trait.name()+"!");
+                                return true;
+                            }
                         }
                     } else {
                         if (level < subId) host.say("This textbook is beyond my understanding!");
@@ -510,7 +512,7 @@ public enum Stock {
                 if (understanding == subId) req += " You may learn from the contents of this book.";
                 else if (understanding < subId) req += " This book is beyond your understanding.";
                 else req += " You won't learn anything from this book.";
-                return super.getDescription()+req;
+                return super.getDescription()+req+"\nTakes "+(subId+1)+" hours to read.";
             }
         };
         product.value = 9400;
@@ -650,23 +652,35 @@ public enum Stock {
     }},
     Spawner{ Prop make(Map map, final int id, int seed) {
         Prop product = new Prop(map, name(), seed){
+            public String[] load(String p){
+                String[] r = super.load(p);
+                name = r[5];
+                return r;
+            }
+            public String toString(){
+                return super.toString() + "@" + name;
+            }
             public void onField(){
-                super.onField();
-                rotation = Math.min(Global.time, rotation);
-                if (Global.time - rotation > 10) {
-                    boolean exist = false;
-                    for (Unit i : map.updater.unitsLoaded){
-                        if (i.brain.factoryId == id && i.seed == seed){
-                            exist = true; //counts the fresh dead
-                            break;
+                timeUpdate();
+            }
+            public void onTimeChange(){
+                timeUpdate();
+            }
+            private void timeUpdate(){
+                if (!map.updater.editor && (Global.hour >= rotation)) {
+                    int count = 0;
+                    for (Unit unit : map.updater.unitsLoaded){
+                        if (unit.name.equals(name)) count++;
+                    }
+                    for (Prop prop : map.updater.props){
+                        if (prop.factoryId != factoryId && prop.name.equals(name)) count++;
+                    }
+                    if (count < id){
+                        for (int i=0;i<Math.min(id-count, ((Global.hour-rotation)/seed)+1);i++) {
+                            Stock.createByName(map, name, -1).start().pos.set(pos);
                         }
                     }
-                    if (!exist){
-                        Unit man = (Unit) Man.create(map, id, seed);
-                        man.pos.set(pos);
-                        man.start();
-                        rotation = Global.time;
-                    }
+                    rotation = Global.hour + seed;
                 }
             }
         };
@@ -1331,7 +1345,7 @@ class UnitFactory {
         host.get(stat).setMax(value);
     }
     void setAI(int type, int subType){
-        Intelligence.get(type+":"+subType+";"+"1:0", host);
+        Intelligence.get(type+":"+subType+","+"1:0", host);
     }
     void setMoveset(String p){
         if (!p.isEmpty()) {

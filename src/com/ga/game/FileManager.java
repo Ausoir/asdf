@@ -7,7 +7,6 @@ import com.ga.map.Updater;
 import com.ga.tool.Line;
 import com.ga.unit.Clip;
 import com.ga.unit.Stock;
-import com.ga.unit.Unit;
 import com.ga.unit.man.MainPlayer;
 import com.ga.unit.skill.Actions;
 
@@ -102,6 +101,7 @@ public class FileManager {
             System.exit(1);
         }
         player.load(data);
+        player.map.updater.editor = false;
         player.input.load(keymap);
         Command.host = player;
         player.lastLand = new Line();

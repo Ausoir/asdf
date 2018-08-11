@@ -103,7 +103,7 @@ public abstract class AI implements Observer {
             r.append(tasks.get(i).toString(host)).append("&");
         }
         if (r.length()>0) r = new StringBuilder(r.substring(0, r.length() - 1));
-        return factoryId+":"+type+";"+r;
+        return factoryId+":"+type+","+r;
     }
 }
 

@@ -2,7 +2,10 @@ package com.ga.unit.man;
 
 import com.ga.game.Sound;
 import com.ga.map.Map;
-import com.ga.tool.*;
+import com.ga.tool.L;
+import com.ga.tool.Line;
+import com.ga.tool.P;
+import com.ga.tool.Performer;
 import com.ga.unit.*;
 import com.ga.unit.item.ArmorSet;
 import com.ga.unit.item.Crafts;
@@ -43,11 +46,10 @@ public class Man extends Unit {
     }
     @Override
     public String[] load(String p){
-        String[] t = p.split("#");
-        String[] lines = super.load(t[0]);
+        String[] items = p.split("#",-1);
+        String[] lines = super.load(items[0]);
         Crafts.load(this, lines[13]);
-        String[] items = t[1].split(";",-1);
-        setFace(items[0]);
+        setFace(lines[14]);
         if (!items[1].equals("")) setWeapon((Item) Stock.get(map, items[1]));
         armor = new ArmorSet(this, items[2],items[3],items[4],items[5],items[6]);
         if (items.length > 7){
@@ -67,14 +69,14 @@ public class Man extends Unit {
                 armor.set(null, 0);
             }
         };
-        return t;
+        return items;
     }
     @Override
     public String toString(){
         StringBuilder r = new StringBuilder();
-        r.append(super.toString()).append("@").append(crafting.toString()).append("@;");
-        r.append("#").append(face).append(";").append(weapon.forceToString()).append(";").append(armor.toString());
-        if (inventory.getItemSize() != 0) r.append(";").append(inventory.toString());
+        r.append(super.toString()).append("@").append(crafting.toString()).append("@");
+        r.append(face).append("#").append(weapon.forceToString()).append("#").append(armor.toString());
+        if (inventory.getItemSize() != 0) r.append("#").append(inventory.toString());
         return r.toString();
     }
     public void setWeapon(Item p){

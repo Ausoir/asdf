@@ -170,8 +170,8 @@ public class ArmorSet {
     public String toString(){
         StringBuilder r = new StringBuilder();
         for (int i=0;i<armor.length;i++){
-            if (armor[i] != bare[i]) r.append(armor[i].toString()).append(";");
-            else r.append(";");
+            if (armor[i] != bare[i]) r.append(armor[i].toString()).append("#");
+            else r.append("#");
         }
         return r.substring(0,r.length()-1);
     }

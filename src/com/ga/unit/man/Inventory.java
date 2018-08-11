@@ -57,7 +57,7 @@ public class Inventory {
         if (items.size() == 0) return "";
         String r = "";
         for (Item item : items) {
-            r += item.toString() + ";";
+            r += item.toString() + "#";
         }
         return r.substring(0,r.length()-1);
     }

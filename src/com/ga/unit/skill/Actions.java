@@ -555,7 +555,7 @@ public enum Actions {
         public void trigger(Man host){
             Line hitbox = host.clip.organs[1].getAdd(host.pos);
             for (Unit i : host.map.updater.collideUnit(host.pos, (int) hitbox.getLength()+64, host.faction)) {
-                if (i.state != Actions.Down && i.hit(hitbox, 1)) {
+                if (i.state != Actions.Down && i.hit(hitbox, 0)) {
                     i.setState(Actions.Hit);
                     Sound.play(host.map, host.pos, "hit_whip");
                     new Thing(host.map, "hit_0", -1, 150) {
@@ -583,15 +583,15 @@ public enum Actions {
         }
         public void trigger(Man host){
             Sound.play(host.map, host.pos, "swing_normal");
-            int power = (int) (Math.log(host.stateLevel)*12);
-            host.vel.y += power*Global.sin(host.target.getAtan());
-            host.vel.x += power*Global.cos(host.target.getAtan());
+            int power = (int) (Math.log(host.stateLevel)*2);
+            host.vel.y += (8+power)*Global.sin(host.target.getAtan());
+            host.vel.x += (6+power)*Global.cos(host.target.getAtan());
         }
         public void update(Man host){
             if (host.delay.time > 14 && Math.abs(host.vel.x)>2){
                 Line hitbox = host.clip.organs[2].getAdd(host.pos.getAdd(host.vel));
                 for (Unit i : host.map.updater.collideUnit(host.pos, (int) hitbox.getLength() + 64, host.faction)) {
-                    if (i.hit(hitbox, 7)) {
+                    if (i.hit(hitbox, 5)) {
                         Sound.play(host.map, host.pos, "hit_bash");
                         new Thing(host.map, "hit_1", -1, 150) {
                             private int n = 0;
@@ -606,9 +606,8 @@ public enum Actions {
                         i.setState(Hit);
                         int force = 24;
                         i.vel = hitbox.getAtan(force);
+                        host.vel.x = 0;
                         Particle.explode(host.map, "Fire", i.getDepth(), hitbox.ptd, new P(), 6, 12, 0, false, 4);
-                        host.stateSet(Idle);
-                        host.clip.setState("Sidekick");
                         break;
                     }
                 }
@@ -1313,7 +1312,7 @@ public enum Actions {
             final int level = host.stateLevel;
             Particle.explode(host.map, "Flame", host.getDepth(), host.getHand(), host.target, 4, 12, 20, false, level*8);
             if (host.stateDuration % 12 == 0) {
-                final Projectile p = new Projectile(host.map, "Mark", host.getHand(), host.target.getAdd(host.pos)
+                final Projectile p = new Projectile(host.map, "Flame", host.getHand(), host.target.getAdd(host.pos)
                         .getAdd(Global.r.nextInt(50) - 25, Global.r.nextInt(50) - 25), 30) {
                     public void stuck() {
                         remove();

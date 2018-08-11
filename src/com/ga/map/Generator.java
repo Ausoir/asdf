@@ -142,15 +142,15 @@ public class Generator {
                                 ob.name = map.name.toString();
                                 ob.seed = bid + ob.seed - 1;
                             } else if (ob.factoryId != Stock.Spawn.ordinal()){
-                                if (Creation.r.nextBoolean()) ob.remove();
-                                else ob.seed = -1;
+                                if (prop.seed < -2 && Creation.r.nextBoolean()) ob.remove();
+                                else if (ob.seed == -2 || ob.seed == -3) ob.seed = -1;
                             }
                         }
                         FileManager.saveMap(map.name.getModifiedMapname("B"+map.name.getMapname()) + bid, house);
                     }
                 } else {
-                    if (Creation.r.nextBoolean()) prop.remove();
-                    else prop.seed = -1;
+                    if (prop.seed < -2 && Creation.r.nextBoolean()) prop.remove();
+                    else if (prop.seed == -2 || prop.seed == -3) prop.seed = -1;
                 }
             }
         }

@@ -1,19 +1,17 @@
-Dummy;;;punk;1;Evil;0:0;Idle;;Toughwear;Mask; //Humanoids-Name,Speech Type,Level,Faction,AI Type,AI Subtype,Moveset,Face,Weapons,Armors,Headgears,Trait
+Stander;;;punk;1;Evil;0:0;Idle;;Toughwear;Mask; //Humanoids-Name,Speech Type,Level,Faction,AI Type,AI Subtype,Moveset,Face,Weapons,Armors,Headgears,Trait
 Player;;;player;1;Player;0:0;Idle;;;;
 Resident;;;resident;1;Neutral;1:0;Backstep;,,,,,,,,,Potion,Stick;Comfortwear,Dustset,Toughwear,Comfortwear,Comfortwear,Suit,Robe,Comfortwear;;
 Shopkeeper;;;merchant;1;Neutral;3:0;Backstep;;Spring_Suit;Glasses,;
-Waiter;;;merchant;1;Neutral;3:0;Backstep;;Suit;;
-Blacksmith;;;merchant;1;Neutral;3:0;Backstep;;Adventurewear;;
-Armorsmith;;;merchant;1;Neutral;3:0;Backstep;;Adventurewear;;
-Tailor;;;merchant;1;Neutral;3:0;Backstep;;Comfortwear;Glasses;
-Librarian;;;merchant;1;Neutral;3:0;Backstep;;Sweat_Suit;Glasses;
-Alchemist;;;merchant;1;Neutral;3:0;Backstep;;Brown_Suit;Mask;
+Waiter;;;merchant;1;Neutral;3:1;Backstep;;Suit;;
+Blacksmith;;;merchant;1;Neutral;3:4;Backstep;;Adventurewear;;
+Armorsmith;;;merchant;1;Neutral;3:3;Backstep;;Adventurewear;;
+Tailor;;;merchant;1;Neutral;3:2;Backstep;;Comfortwear;Glasses;
+Technician;;;merchant;1;Neutral;3:5;Backstep;;Labwear;Glasses;
 Guildsman;;;merchant;1;Neutral;3:0;Backstep;;Dustset;Bandana;
-Apprentice;;;merchant;1;Neutral;3:0;Backstep;;Labwear;Glasses;
-Junkseller;;;merchant;1;Neutral;3:0;;;Jumpsuit;Buzzcut;
+Trainer;;;merchant;1;Neutral;6:0;Backstep;;Robe;Bandana;
 Dealer;;;seafood;1;Neutral;4:0;Backstep;;Spring_Suit;Glasses;
 Innkeep;;;merchant;1;Neutral;5:0;Backstep;;Brown_Suit;;
-Trainer;;;merchant;1;Neutral;6:0;Backstep;;Robe;Bandana;
+Junkseller;;;merchant;1;Neutral;3:0;;;Jumpsuit;Buzzcut;
 Looter;;;punk;1;Punk;2:1;Use,Backstep,Kick;Stick,Bamboo_Spear,;;;
 Punk;;;punk;4;Punk;2:1;Use,Charge,Dash,Uppercut;Dagger,Axe,Pickaxe;Jean;Buzzcut;
 Yeller;;;punk;5;Punk;2:1;Use,Backstep,Calling;Staff;Jean;Buzzcut;Infusion:3

@@ -61,7 +61,8 @@ public class Command {
                 else if (cmd[0].equals("act")){
                     host.stateSet(Actions.valueOf(cmd[1]));
                     if (cmd.length > 2) host.stateLevel = Integer.parseInt(cmd[2]);
-                } else if (cmd[0].equals("learnSkill")) host.learnSkill(Actions.valueOf(cmd[1]));
+                } else if (cmd[0].equals("level")) Global.player.level();
+                else if (cmd[0].equals("learnSkill")) host.learnSkill(Actions.valueOf(cmd[1]));
                 else if (cmd[0].equals("learnTrait")) host.learnTrait(Traits.Trait.valueOf(cmd[1]));
                 else if (cmd[0].equals("forgetSkill")) host.moveset.remove(Actions.valueOf(cmd[1]));
                 else if (cmd[0].equals("forgetTrait")) host.traits.forget(host, Traits.Trait.valueOf(cmd[1]));

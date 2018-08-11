@@ -509,7 +509,7 @@ public class Item extends Prop {
         return new Line(pos, pos.getAdd(len*Global.cos(rotation), len*Global.sin(rotation)));
     }
     public void onTimeChange(){
-        if (getValue() >= 100 && owner == null) remove();
+        if (getValue() >= 500 && owner == null) remove();
     }
     public String forceToString(){
         boolean forced = false;

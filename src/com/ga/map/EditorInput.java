@@ -12,7 +12,9 @@ import com.ga.unit.item.Item;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 
 public class EditorInput extends Drawable implements Input, Updatable {
     private enum Tool {
@@ -67,7 +69,6 @@ public class EditorInput extends Drawable implements Input, Updatable {
 
     private void init(){
         map = Global.player.map;
-        map.updater.editor = true;
         map.updater.addUpdatee(this);
         Global.display.input = this;
         map.updater.addQueue.add(this);
@@ -102,18 +103,18 @@ public class EditorInput extends Drawable implements Input, Updatable {
     }
 
     private void command(String p, int x, int y){
+        String[] cmd = p.split("[ @]");
         if (p.equals("mapname")) {
             message(lastSaved);
         } else if (p.equals("size")) {
             message(map.size.toString());
-        } else if (p.startsWith("size")){
-            String[] size = p.substring(5).split(",");
-            map.size.set(Integer.parseInt(size[0]), Integer.parseInt(size[1]));
+        } else if (cmd[0].equals("size")){
+            map.size.set(new P(cmd[1]));
             map.onTimeChange();
-        } else if (p.startsWith("camera")){
-            Global.cameraTo.set(new P(p.substring(7)));
-        } else if (p.startsWith("snap")){
-            if (p.equals("snap")) message(SNAP+"");
+        } else if (cmd[0].equals("camera")){
+            Global.cameraTo.set(new P(cmd[1]));
+        } else if (cmd[0].equals("snap")){
+            if (cmd.length == 1) message(SNAP+"");
             else SNAP = Integer.parseInt(p.substring(5));
         } else if (p.equals("reverse")){
             reverse(lastSelected);
@@ -140,7 +141,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
                 }
             }
             message(msg);
-        } else if (p.startsWith("spawn")) {
+        } else if (cmd[0].equals("spawn")) {
             int to = Integer.parseInt(p.substring(6));
             selectTool(Tool.OBJECT);
             currentO = Stock.Spawn.create(map, -1, to);
@@ -154,70 +155,66 @@ public class EditorInput extends Drawable implements Input, Updatable {
                 }
             }
             message(msg);
-        } else if (p.startsWith("travel")) { //SubId 1 is Outside, 2 is outside to inside, 3 is inside to outside
-            String[] to = p.substring(7).split("@");
-            if (to.length == 1) to = new String[]{to[0], "-1"};
+        } else if (cmd[0].equals("travel")) { //SubId 1 is outside, 2 is outside to inside, 3 is inside to outside
             selectTool(Tool.OBJECT);
-            currentO = Stock.Travel.create(map, Integer.parseInt(to[0]), Integer.parseInt(to[1]));
+            currentO = Stock.Travel.create(map, Integer.parseInt(cmd[1]), Integer.parseInt(cmd[2]));
             make(currentO);
-            message("Travel to ["+to[0]+" @ "+to[1]+"] spawned");
-        } else if (p.startsWith("spawner")) {
-            String[] to = p.substring(8).split("@");
-            if (to.length == 1) to = new String[]{to[0], "-1"};
+            message("Travel to ["+cmd[1]+" @ "+cmd[2]+"] spawned");
+        } else if (cmd[0].equals("spawner")) { //name, interval, max
+            if (cmd.length == 1) message("spawner name, interval, max");
             selectTool(Tool.OBJECT);
-            currentO = Stock.Spawner.create(map, Integer.parseInt(to[0]), Integer.parseInt(to[1]));
+            currentO = Stock.Spawner.create(map, Integer.parseInt(cmd[2]), Integer.parseInt(cmd[3]));
+            currentO.name = cmd[1];
             make(currentO);
-            message("Spawner ["+to[0]+" @ "+to[1]+"] spawned");
-        } else if (p.startsWith("info")) {
+            message("Spawner ["+cmd[1]+" @ "+cmd[2]+"] spawned");
+        } else if (cmd[0].equals("info")) {
             selectTool(Tool.OBJECT);
             currentO = Stock.Info.create(map, 1, 1);
-            currentO.name = p.substring(5);
+            currentO.name = cmd[1];
             make(currentO);
             message("Info spawned");
-        } else if (p.startsWith("prop")) {
-            String[] aux = p.substring(5).split("@");
-            for (int ii=0;ii<Integer.parseInt(aux[0]);ii++){
+        } else if (cmd[0].equals("prop")) {
+            for (int ii=0;ii<Integer.parseInt(cmd[1]);ii++){
                 int rx = (int) (Math.random()*map.size.x);
                 for (Line l : map.landRaw) {
                     if (l.tid == lastSelected && l.clockwise() && l.lineCross(new Line(rx,0,rx,map.size.y))) {
-                        map.placeProp(l, aux[1], -1);
+                        map.placeProp(l, cmd[2], -1);
                     }
                 }
             }
-        } else if (p.startsWith("copy")) {
-            String[] texs = message.split(" ")[3].split("&");
-            txDepth = texs[0];
-            txTexture = texs[1];
-            txShader = texs[2];
-        } else if (p.startsWith("depth")) {
-            txDepth = p.substring(6);
-        } else if (p.startsWith("texture")) {
-            txTexture = p.substring(8);
-        } else if (p.startsWith("shader")) {
-            txShader = p.substring(7);
-        } else if (p.startsWith("cdepth")) {
+        } else if (cmd[0].equals("copy")) {
+            txDepth = cmd[1];
+            txTexture = cmd[2];
+            txShader = cmd[3];
+        } else if (cmd[0].equals("depth")) {
+            txDepth = cmd[1];
+        } else if (cmd[0].equals("texture")) {
+            txTexture = cmd[1];
+        } else if (cmd[0].equals("shader")) {
+            txShader = cmd[1];
+        } else if (cmd[0].equals("cdepth")) {
             String[] data = map.formTextures.get(lastSelected).split("&");
             map.formTextures.put(lastSelected, p.substring(7)+"&"+data[1]+"&"+data[2]);
             map.updater.remove(map.terrains.get(lastSelected));
 //            map.render(lastSelected);
             command("show",0,0);
-        } else if (p.startsWith("ctexture")) {
+        } else if (cmd[0].equals("ctexture")) {
             String[] data = map.formTextures.get(lastSelected).split("&");
             map.formTextures.put(lastSelected, data[0]+"&"+p.substring(9)+"&"+data[2]);
             map.updater.remove(map.terrains.get(lastSelected));
 //            map.render(lastSelected);
             command("show",0,0);
-        } else if (p.startsWith("cshader")) {
+        } else if (cmd[0].equals("cshader")) {
             String[] data = map.formTextures.get(lastSelected).split("&");
             map.formTextures.put(lastSelected, data[0]+"&"+data[1]+"&"+p.substring(8));
             map.updater.remove(map.terrains.get(lastSelected));
 //            map.render(lastSelected);
             command("show",0,0);
-        } else if (p.startsWith("idO")){
+        } else if (cmd[0].equals("idO")){
             currentO.subId = Integer.parseInt(p.substring(4));
-        } else if (p.startsWith("seedO")){
+        } else if (cmd[0].equals("seedO")){
             currentO.seed = Integer.parseInt(p.substring(6));
-        } else if (p.startsWith("changeO")){
+        } else if (cmd[0].equals("changeO")){
             currentO.load(p.substring(8));
         } else if (p.equals("showO")){
             message(currentO.toString());
@@ -231,13 +228,13 @@ public class EditorInput extends Drawable implements Input, Updatable {
                     message("Climbable");
                 }
             }
-        } else if (p.startsWith("line")) {
+        } else if (cmd[0].equals("line")) {
             lineChange = p.substring(5);
-        } else if (p.startsWith("copt")) {
+        } else if (cmd[0].equals("copt")) {
             int option = Integer.parseInt(p.substring(5));
             lastSelectedLine.opt = option;
             message("Option changed to "+option);
-        } else if (p.startsWith("opt")) {
+        } else if (cmd[0].equals("opt")) {
             int option = Integer.parseInt(p.substring(4));
             for (Line l : map.landRaw){
                 if (l.tid == lastSelected){
@@ -247,12 +244,12 @@ public class EditorInput extends Drawable implements Input, Updatable {
             }
         } else if (p.equals("grow")){
             map.generateProps();
-        } else if (p.startsWith("smooth")){
+        } else if (cmd[0].equals("smooth")){
             smooth = Integer.parseInt(p.substring(7));
             message("Select a land to smooth");
-        } else if (p.startsWith("clean")){
+        } else if (cmd[0].equals("clean")){
             map.clean();
-        } else if (p.startsWith("normalize")){
+        } else if (cmd[0].equals("normalize")){
             int marginX = 4, marginY = 4;
             String[] margins = p.substring(10).split(",");
             if (margins.length > 1){
@@ -260,16 +257,16 @@ public class EditorInput extends Drawable implements Input, Updatable {
                 marginY = Integer.parseInt(margins[1]);
             }
             map.normalize(marginX, marginY);
-        } else if (p.startsWith("gen land")){
+        } else if (cmd[0].equals("gen land")){
             Creation.prepareRandom(-(int) (Math.random()*1000));
             GeneratePlains.generateFields(map);
-        } else if (p.startsWith("gen town")){
+        } else if (cmd[0].equals("gen town")){
             Creation.prepareRandom(-(int) (Math.random()*1000));
             GenerateTown.generate(map);
-        } else if (p.startsWith("blocker")){
+        } else if (cmd[0].equals("blocker")){
             Generator gen = new Generator(map, map.getNextTerrain());
             gen.generateBlocker(Integer.parseInt(p.substring(8)), lastSelected);
-        } else if (p.startsWith("move")){
+        } else if (cmd[0].equals("move")){
             P m = new P(p.substring(5));
             for (Line l : map.landRaw){
                 l.pt.add(m);
@@ -288,17 +285,17 @@ public class EditorInput extends Drawable implements Input, Updatable {
 //            map.updater.unrender();
             map.setTexture();
             map.render();
-        } else if (p.startsWith("new")){
+        } else if (cmd[0].equals("new")){
             String newname = p.substring(4);
             FileManager.save(FileManager.makeDirectory("map/"+newname+".map"),newname+";;780,780");
             lastSaved = newname;
             command("load "+lastSaved, 0, 0);
-        } else if (p.startsWith("save")){
+        } else if (cmd[0].equals("save")){
             lastSaved = p.substring(5);
             save(lastSaved);
-        } else if (p.startsWith("load")){
-            Global.server.requestChangeMap(FileManager.makeDirectory(p.substring(5)+"@0"));
-            lastSaved = p.substring(5);
+        } else if (cmd[0].equals("load")){
+            Global.server.requestChangeMap(FileManager.makeDirectory(cmd[1]+"@0"));
+            lastSaved = cmd[1];
             while (true){
                 try {
                     Thread.sleep(100);
@@ -313,16 +310,13 @@ public class EditorInput extends Drawable implements Input, Updatable {
             }
         } else if (p.equals("exit")){
             System.exit(0);
-        } else if (p.startsWith("build")){
+        } else if (cmd[0].equals("build")){
             new Generator(Global.player.map, map.getNextTerrain()).generateBuilding(p.substring(6), new P(x,y), 9999);
-        } else if (p.startsWith("o")){
-            try {
-                selectTool(Tool.OBJECT);
-                currentO.remove();
-                currentO = make(p.substring(2), new P(x,y));
-            } catch (Exception e) {
-                message(p + " Not found");
-            }
+        } else if (cmd[0].equals("spawner")){
+        } else if (cmd[0].equals("o")){
+            selectTool(Tool.OBJECT);
+            currentO.remove();
+            currentO = make(p.substring(2), new P(x,y));
         }
     }
 
@@ -494,7 +488,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
                     Performer[] performers = new Performer[listString.length];
                     for (int i=0;i<listString.length;i++){
                         Prop prop = list.get(i);
-                        listString[i] = i+" - "+prop.name+" (obj:"+Stock.values()[prop.factoryId].name()+", id:"+prop.subId+", seed:"+prop.seed+", depth"+prop.getDepth()+")";
+                        listString[i] = i+" - "+prop.name+" (obj:"+Stock.values()[prop.factoryId].name()+", id:"+prop.subId+", seed:"+prop.seed+", depth:"+prop.getDepth()+", rot:"+prop.rotation+")";
                         final int finalI = i;
                         performers[i] = new Performer(){
                             public void perform(){

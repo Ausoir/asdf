@@ -85,7 +85,7 @@ public class Unit extends Prop {
     private int getMemorySize(){
         return moveset.size()-1+traits.getMemorySize();
     }
-    public boolean canLearn(){
+    private boolean canLearn(){
         return getMemorySize() < get("Intelligence").getMax();
     }
     public boolean learnSkill(Actions move){
@@ -96,7 +96,11 @@ public class Unit extends Prop {
         return false;
     }
     public boolean learnTrait(Traits.Trait p) {
-        return canLearn() && traits.learn(this, p);
+        if (canLearn() && traits.canLearn(p)){
+            traits.learn(this, p);
+            return true;
+        }
+        return false;
     }
 
     public P getRandomPoint(){
@@ -322,6 +326,7 @@ public class Unit extends Prop {
         }
     }
     protected void stateOnSet(Actions state){
+        stateLevel = Math.max(1, stateLevel);
         state.onSet(this);
     }
     protected void stateUpdate(){

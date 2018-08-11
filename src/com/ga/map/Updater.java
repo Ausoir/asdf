@@ -12,7 +12,7 @@ import java.awt.*;
  * Created by Ga on 5/6/2016. asd
  */
 public class Updater {
-    public boolean editor = false;
+    public boolean editor = true;
     private Map map;
     private Drawable drawee;
     private L<Particle> effects = new L<>();

@@ -4,7 +4,8 @@ import com.ga.game.Dialog;
 import com.ga.game.FileManager;
 import com.ga.game.Menu;
 import com.ga.map.Global;
-import com.ga.tool.*;
+import com.ga.tool.Performer;
+import com.ga.tool.Timer;
 import com.ga.unit.item.Item;
 import com.ga.unit.man.Man;
 import com.ga.unit.skill.Actions;
@@ -257,42 +258,35 @@ public enum Intelligence {
     }, Trainer {
         public AI make(Unit host) {
             return process(new NeutralAI(host) {
-                private String stat;
                 private int price;
 
                 void load(String p) {
                     super.load(p);
-                    ArrayList<Traits.Trait> traits = Traits.Trait.getByType(3);
-                    String[] stats = new String[traits.size()+3];
-                    stats[0] = "Strength";
-                    stats[1] = "Agility";
-                    stats[2] = "Intelligence";
-                    for (int i=3;i<stats.length;i++){
-                        stats[i] = traits.get(i-3).name();
-                    }
-                    stat = stats[type];
                     price = (host.rand.nextInt(30)+30)*100+99;
                 }
-
                 void shop() {
-                    int[] requirements = Global.player.getLevelRequirements(1);
-                    String message = "Would you like to train your "+stat+"?";
-                    message += "Requires "+Dialog.money(price)+", "+requirements[0]+" motivation, and "+requirements[1]+" hours.";
-                    message += "\nCurrent motivation: "+Global.player.get("Motivation").get();
+                    int reqMot = 100, reqTime = 5;
+                    String message = "Would you like to level up?";
+                    message += "\nRequires "+Dialog.money(price)+", "+reqMot+" motivation, and "+reqTime+" hours.";
+                    message += "\n\nCurrent motivation: "+Global.player.get("Motivation").get();
                     message += "\nCurrent nutrition: "+Global.player.get("Nutrition").get();
                     Menu.menu.showDialog("Trainer", message,
-                            new String[]{"Begin training"},
-                            new Performer[]{
-                                    new Performer(){
-                                        public void perform(){
-                                            if (Global.player.requireGold(price)) {
-                                                if (!Global.player.level(stat, 1)) Global.player.obtainGold(price);
-                                            } else {
-                                                Global.player.say("Not enough money..");
+                        new String[]{"Begin training"},
+                        new Performer[]{
+                            new Performer(){
+                                public void perform(){
+                                    if (Global.player.get("Motivation").get() >= reqMot){
+                                        if (Global.player.getGold() >= price) {
+                                            if (Global.player.map.updater.sleep(reqTime, true)) {
+                                                Global.player.level();
+                                                Global.player.get("Motivation").require(reqMot);
+                                                Global.player.requireGold(price);
                                             }
-                                        }
-                                    }
-                            });
+                                        } else Global.player.say("Not enough money...");
+                                    } else Global.player.say("Not enough Motivation..");
+                                }
+                            }
+                        });
                 }
             });
         }
@@ -303,7 +297,7 @@ public enum Intelligence {
         return p;
     }
     public static AI get(String p, Unit host){
-        String[] data = p.split(";");
+        String[] data = p.split(",");
         String[] values = data[0].split(":");
         AI r = values()[Integer.parseInt(values[0])].make(host);
         r.type = Integer.parseInt(values[1]);

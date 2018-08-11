@@ -12,7 +12,7 @@ Door;2;0;0;0,0;1;0
 Signpost;2;1;0;0,0;1;0
 Streetlight;2;1;0;0,0;1;0
 Pole;2;1;0;0,.2;1;0
-Cone;2;1;0;0,0;1;0
+Ladder;2;0;0;0,0;0;8
 Shorttable;2;1;0;0,0;1;8
 Shortchair;2;1;0;0,0;1;8
 Floodlight;1;1;0;0,0;1;0
@@ -29,7 +29,7 @@ Bed;2;0;0;.2,.2;1;8
 Cabinet;2;0;0;.2,.2;1;8
 Dresser;2;0;0;.3,.3;1;8
 Refrigerator;2;0;0;.3,.1;1;8
-Lightstand;2;0;0;.2,.2;1;0
+OBSOLETE;2;1;0;0,0;1;0
 Vent;2;0;0;.2,.2;1;8
 Decoration;1;0;0;.1,.1;1;0
 Warning;1;0;0;.1,.1;1;8
@@ -37,5 +37,3 @@ Dungeon;1;0;0;.2,.2;1;0
 Sign_Food;1;0;0;0,0;1;0
 Snowtree;2;1;0;.3,.3;1;0
 Snowbush;2;1;0;.3,.3;1;0
-Ladder;2;0;0;0,0;0;8
-Training_Dummy;2;1;0;0,0;1;0

@@ -138,8 +138,10 @@ public enum Buffs {
             public boolean update() {
                 if (var % 20 == 0 && Global.r.nextBoolean()) {
                     host.hit(host.getPosLine(), level);
-                    for (Unit i : host.map.updater.collideUnit(host.pos, host.getSize() + 40, Faction.Destructive)) {
-                        if (Global.r.nextBoolean()) i.buff(Burn, 1);
+                    if (level > 1) {
+                        for (Unit i : host.map.updater.collideUnit(host.pos, host.getSize() + 40, Faction.Destructive)) {
+                            if (Global.r.nextBoolean()) i.buff(Burn, 1);
+                        }
                     }
                 }
                 var++;

@@ -7,12 +7,11 @@ import java.util.ArrayList;
  */
 public class Traits {
     public enum Trait {
-        Fast_Learner(1,"Learn faster at the cost of more motivation cost."), Haggler(1,"Always get normal item prices."),
+        Haggler(1,"Always get normal item prices."),
         Tough(1,"Resist flinching from being hit."),
         Herbalism(1,"Pick materials from bushes and trees."), Rune_Literacy(1,"Identify, use, and create scrolls."),
         Alchemy(1,"Identify, use, and create potions."), Meditation(1,"Resting removes all buffs."),
         Cooking(1,"Learn to craft food with ingredients and enhance them using kitchenware."),
-        Innovation(1,"Gain access to Innovation points that can be used for Motivation, new talents, or free skills."),
         Crafting(1,"Craft various items."),
         Tailor(1,"Repair clothings and armor. Higher levels repair faster with less resources."),
         Attunement(1,"Utilize innate energy from your body. Higher level restores more energy per hour."),
@@ -159,16 +158,22 @@ public class Traits {
     public ArrayList<Trait> getTraits() {
         return trait;
     }
-    boolean learn(Unit host, Trait p){
+    void learn(Unit host, Trait p){
         if (has(p)) {
             int lvl = trait.indexOf(p);
-            if (level.get(lvl) == MAXLEVEL) return false;
             level.set(lvl, level.get(lvl) + 1);
             p.onAdd(host);
         } else {
             trait.add(p);
             level.add(1);
             p.onSet(host);
+        }
+    }
+    boolean canLearn(Trait p){
+        if (has(p)) {
+            if (p.type != 3) return false;
+            int lvl = trait.indexOf(p);
+            return level.get(lvl) != MAXLEVEL;
         }
         return true;
     }
