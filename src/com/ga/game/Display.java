@@ -1,7 +1,6 @@
 package com.ga.game;
 
 import com.ga.map.Global;
-import com.ga.map.Updater;
 import com.ga.tool.L;
 import com.ga.tool.Performer;
 
@@ -58,7 +57,7 @@ public class Display extends JPanel {
             public void mouseReleased(java.awt.event.MouseEvent e) {
                 mX = e.getX();
                 mY = e.getY();
-                if (Global.player.map.updater.editor) mouseInput(-e.getButton());
+                if (Global.editor) mouseInput(-e.getButton());
                 else if (mode == e.getButton()) mode = -1;
             }
 
@@ -72,7 +71,7 @@ public class Display extends JPanel {
             public void mouseDragged(MouseEvent e) {
                 mX = e.getX();
                 mY = e.getY();
-                if (Global.player.map.updater.editor) mouseInput(0);
+                if (Global.editor) mouseInput(0);
             }
 
             @Override

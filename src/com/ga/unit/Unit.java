@@ -244,26 +244,23 @@ public class Unit extends Prop {
                         delay.performer = null;
                         grounded = false;
                         if (blunt && !traits.has(Traits.Trait.Tough)) {
-                            if (stats.getEffectLevel(Buffs.Stun) < 1) {
-                                vel.x = damage * Float.compare(pos.x, hitBox.pt.x);
-                                vel.y += -damage;
-                            }
+                            vel.x = damage * Float.compare(pos.x, hitBox.pt.x);
+                            vel.y += -damage;
                             setState(Actions.Hit);
                         }
                         brain.onHit();
                         clip.organs[i].hit(hitBox);
                     }
-                    if (damageBreakthrough(i, blunt, damage)) {
-                        if (!isProne() && get("Agility").require(1)) {
+                    if (damageBreakthrough(i, blunt, damage) || stats.triggerEffect(Buffs.Mark)) {
+                        if (get("Agility").require(1)) {
                             Particle.explode(map, "Blood", getDepth()+.01f, getRandomPoint(), new P(), 9, 5, 0, true, 24);
-                        } else {
                             if (!blunt){
                                 buff(Buffs.Bleed, 1);
                                 clip.organs[i].amputate(hitBox, damage);
                             } else {
                                 buff(Buffs.Bleed, 1);
                             }
-                        }
+                        } else die();
                     }
                 } else {
                     clip.organs[i].hit(hitBox);
@@ -272,10 +269,6 @@ public class Unit extends Prop {
             }
         }
         return false;
-    }
-
-    private boolean isProne(){
-        return delay.time > 0 || stats.triggerEffect(Buffs.Mark);
     }
 
     public Stat get(String p){

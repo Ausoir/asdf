@@ -3,8 +3,8 @@ package com.ga.game;
 import com.ga.map.Global;
 import com.ga.map.Picture;
 import com.ga.tool.Performer;
-import com.ga.unit.man.Player;
 import com.ga.unit.item.Item;
+import com.ga.unit.man.Player;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -54,7 +54,7 @@ public class MenuShop extends Panel {
         setBackground(forecolor);
         scroll.setBackground(new Color(120, 86, 47, 180));
     }
-    public void show(String title, Item[] wares, int[] prices, Performer[] actions){
+    void show(String title, Item[] wares, int[] prices, Performer[] actions){
         display();
         titleLabel.setText(title);
         gold.setText("Cash: " + Dialog.money(Global.player.getGold()));
@@ -66,6 +66,7 @@ public class MenuShop extends Panel {
                 makeSlot(wares[i], prices[i], actions[i]);
             }
         }
+        panel.updateUI();
     }
     private void makeSlot(final Item item, final int price, final Performer action){
         JPanel panel = new JPanel();

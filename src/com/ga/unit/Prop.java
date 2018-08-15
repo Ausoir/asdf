@@ -122,7 +122,6 @@ public class Prop extends Thing {
         }
     }
     public void onTimeChange(){
-
     }
     public String[] load(String p) {
         String[] ps = p.split("@",-1);
@@ -130,10 +129,9 @@ public class Prop extends Thing {
         rotation = Float.parseFloat(ps[4]);
         return ps;
     }
-
     @Override
     public String toString(){
-        return (factoryId==-1?name:""+factoryId) + "@" + subId + "@" + seed + "@" + pos
+        return factoryId + "@" + subId + "@" + seed + "@" + pos
                 + "@" + String.format(java.util.Locale.US,"%.2f", rotation);
     }
 }

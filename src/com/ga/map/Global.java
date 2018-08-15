@@ -8,7 +8,6 @@ import com.ga.game.Settings;
 import com.ga.tool.EventTimer;
 import com.ga.tool.P;
 import com.ga.tool.Timer;
-import com.ga.unit.Traits;
 import com.ga.unit.man.MainPlayer;
 
 import java.awt.*;
@@ -31,9 +30,10 @@ public class Global {
     public static P rel = new P();
     private static float[] sinv = new float[360];
     private static float[] cosv = new float[360];
+    public static boolean editor = false;
     public static int time = 0, hour;
-    public static Timer updates = new Timer(40,true);
-    public static ArrayList<EventTimer> timers = new ArrayList<>();
+    static Timer updates = new Timer(40,true);
+    private static ArrayList<EventTimer> timers = new ArrayList<>();
     public static Font font = new Font("Helvetica",Font.PLAIN,20);
     public static int controlId;
     public static float scale = 1;

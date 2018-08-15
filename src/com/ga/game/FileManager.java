@@ -72,24 +72,24 @@ public class FileManager {
         save(FileManager.makeDirectory("Data/map/"+name+".map"), result);
     }
     public static String read(String dir) {
-        String result = "";
+        StringBuilder result = new StringBuilder();
         try {
             try (BufferedReader br = new BufferedReader(new FileReader(dir))) {
                 String newline = br.readLine();
                 if (newline != null) {
                     String line = newline.split(" //")[0];
-                    result = line + "%";
+                    result = new StringBuilder(line + "%");
                     while (line != null) {
                         line = br.readLine();
-                        if (line != null) result += line.split(" //")[0] + "%";
+                        if (line != null) result.append(line.split(" //")[0]).append("%");
                     }
-                    result = result.substring(0, result.length() - 1);
+                    result = new StringBuilder(result.substring(0, result.length() - 1));
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return result;
+        return result.toString();
     }
     public static void loadPlayer(){
         String data = read("Data/map/Player.user");
@@ -101,7 +101,6 @@ public class FileManager {
             System.exit(1);
         }
         player.load(data);
-        player.map.updater.editor = false;
         player.input.load(keymap);
         Command.host = player;
         player.lastLand = new Line();

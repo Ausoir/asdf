@@ -158,6 +158,76 @@ public enum Intelligence {
                 }
             });
         }
+    }, Innkeep{
+        public AI make(Unit host) {
+            return process(new NeutralAI(host) {
+                private int price;
+                void load(String p) {
+                    super.load(p);
+                    price = (host.rand.nextInt(30)+30)*100+99;
+                }
+                void shop() {
+                    Menu.menu.showDialog("Inn",
+                            "Rest for 3 hours? Costs "+Dialog.money(price)+". Heal 1 Vitality, 9 Fatigue, and gain 10 Motivation. Food is paid for.",
+                            new String[]{"Pay"},
+                            new Performer[]{
+                                    new Performer(){
+                                        public void perform(){
+                                            if (Global.player.requireGold(price)) {
+                                                Global.player.get("Nutrition").add(3, true);
+                                                if (Global.player.map.updater.sleep(3, true)){
+                                                    Global.player.get("Motivation").add(10,false);
+                                                    Global.player.get("Fatigue").add(9,false);
+                                                    Global.player.get("Agility").add(1, false);
+                                                    Global.player.get("Strength").heal();
+                                                } else {
+                                                    Global.player.get("Nutrition").add(-3, true);
+                                                    Global.player.obtainGold(price);
+                                                }
+                                            } else {
+                                                Global.player.say("Not enough money..");
+                                            }
+                                        }
+                                    }, new Performer(){}
+                            });
+                }
+            });
+        }
+    }, Trainer{
+        public AI make(Unit host) {
+            return process(new NeutralAI(host) {
+                private int price;
+
+                void load(String p) {
+                    super.load(p);
+                    price = (host.rand.nextInt(60)+30)*100+99;
+                }
+                void shop() {
+                    int reqMot = 100, reqTime = 5;
+                    String message = "I can help you train if you have the time, motivation, and money. Would you like to level up?";
+                    message += "\nRequires "+Dialog.money(price)+", "+reqMot+" motivation, and "+reqTime+" hours.";
+                    message += "\n\nCurrent motivation: "+Global.player.get("Motivation").get();
+                    message += "\nCurrent nutrition: "+Global.player.get("Nutrition").get();
+                    Menu.menu.showDialog("Trainer", message,
+                        new String[]{"Begin training"},
+                        new Performer[]{
+                            new Performer(){
+                                public void perform(){
+                                    if (Global.player.get("Motivation").get() >= reqMot){
+                                        if (Global.player.getGold() >= price) {
+                                            if (Global.player.map.updater.sleep(reqTime, true)) {
+                                                Global.player.level();
+                                                Global.player.get("Motivation").require(reqMot);
+                                                Global.player.requireGold(price);
+                                            }
+                                        } else Global.player.say("Not enough money...");
+                                    } else Global.player.say("Not enough Motivation..");
+                                }
+                            }
+                        });
+                }
+            });
+        }
     }, Dealer{
         public AI make(Unit host) {
             return process(new NeutralAI(host) {
@@ -215,78 +285,6 @@ public enum Intelligence {
                         Menu.menu.showDialog("Wanted list",
                                 "What would you like to sell?", options, action);
                     }
-                }
-            });
-        }
-    }, Innkeep {
-        public AI make(Unit host) {
-            return process(new NeutralAI(host) {
-                private int price;
-
-                void load(String p) {
-                    super.load(p);
-                    price = (host.rand.nextInt(30)+30)*100+99;
-                }
-
-                void shop() {
-                    Menu.menu.showDialog("Inn",
-                            "Rest for the night? "+Dialog.money(price)+" for 3 hours. Heal Fatigue, Stamina, Vitality, Energy, and get 10 Motivation. Food is paid for.",
-                            new String[]{"Pay for the night"},
-                            new Performer[]{
-                                    new Performer(){
-                                        public void perform(){
-                                            if (Global.player.requireGold(price)) {
-                                                Global.player.get("Nutrition").add(3, true);
-                                                if (Global.player.map.updater.sleep(3, true)){
-                                                    Global.player.get("Motivation").add(10,false);
-                                                    Global.player.get("Fatigue").add(9,false);
-                                                    Global.player.get("Agility").heal();
-                                                    Global.player.get("Intelligence").heal();
-                                                    Global.player.get("Strength").heal();
-                                                } else {
-                                                    Global.player.obtainGold(price);
-                                                }
-                                            } else {
-                                                Global.player.say("Not enough money..");
-                                            }
-                                        }
-                                    }, new Performer(){}
-                            });
-                }
-            });
-        }
-    }, Trainer {
-        public AI make(Unit host) {
-            return process(new NeutralAI(host) {
-                private int price;
-
-                void load(String p) {
-                    super.load(p);
-                    price = (host.rand.nextInt(30)+30)*100+99;
-                }
-                void shop() {
-                    int reqMot = 100, reqTime = 5;
-                    String message = "Would you like to level up?";
-                    message += "\nRequires "+Dialog.money(price)+", "+reqMot+" motivation, and "+reqTime+" hours.";
-                    message += "\n\nCurrent motivation: "+Global.player.get("Motivation").get();
-                    message += "\nCurrent nutrition: "+Global.player.get("Nutrition").get();
-                    Menu.menu.showDialog("Trainer", message,
-                        new String[]{"Begin training"},
-                        new Performer[]{
-                            new Performer(){
-                                public void perform(){
-                                    if (Global.player.get("Motivation").get() >= reqMot){
-                                        if (Global.player.getGold() >= price) {
-                                            if (Global.player.map.updater.sleep(reqTime, true)) {
-                                                Global.player.level();
-                                                Global.player.get("Motivation").require(reqMot);
-                                                Global.player.requireGold(price);
-                                            }
-                                        } else Global.player.say("Not enough money...");
-                                    } else Global.player.say("Not enough Motivation..");
-                                }
-                            }
-                        });
                 }
             });
         }

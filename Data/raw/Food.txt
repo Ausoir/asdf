@@ -1,13 +1,13 @@
 Fruit;1;Fruit //Name, Uses, Materials
 Fish;1;Fish
-Meat;2;Red
-Birdmeat;2;White
-Bread;3;Grain
-Cheese;3;Dairy
-Vegetables;4;Vegetable
+Meat;1;Red
+Birdmeat;1;White
+Bread;1;Grain
+Cheese;1;Dairy
+Vegetables;1;Vegetable
 Drumstick;2;White,Fried
 Porkchop;1;Red,Roasted
-Jerky;3;Red,Dried,Smoked,Spiced
+Jerky;2;Red,Dried,Smoked,Spiced
 Meal;1;Grain,Vegetable,Fish,Fruit,Cut,Spiced
 Burger;1;Red,Vegetable,Grain,Roasted,Dairy,Cut
 Sandwich;2;Vegetable,Grain,Cut,Dairy,White

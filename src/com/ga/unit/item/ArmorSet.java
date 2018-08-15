@@ -14,19 +14,19 @@ import java.awt.*;
  */
 public class ArmorSet {
     private static Armor[] bare = new Armor[]{
-            new Armor(null, "Head", 0,new Item.Material[]{Item.Material.Organic},0,0,0, -1, 0){
+            new Armor(null, "Head", 0,new Item.Material[]{Item.Material.Organic},0,0,0, 0){
                 public boolean checkBreak(boolean blunt, int d){ return true; }
             },
-            new Armor(null, "Man_skin", 0,new Item.Material[]{Item.Material.Organic},1,0,0, -1, 0){
+            new Armor(null, "Man_skin", 0,new Item.Material[]{Item.Material.Organic},1,0,0, 0){
                 public boolean checkBreak(boolean blunt, int d){ return true; }
             },
-            new Armor(null, "Man_skin", 0,new Item.Material[]{Item.Material.Organic},2,0,0, -1, 0){
+            new Armor(null, "Man_skin", 0,new Item.Material[]{Item.Material.Organic},2,0,0, 0){
                 public boolean checkBreak(boolean blunt, int d){ return true; }
             },
-            new Armor(null, "Man_skin", 0,new Item.Material[]{Item.Material.Organic},3,0,0, -1, 0){
+            new Armor(null, "Man_skin", 0,new Item.Material[]{Item.Material.Organic},3,0,0, 0){
                 public boolean checkBreak(boolean blunt, int d){ return true; }
             },
-            new Armor(null, "Man_skin", 0,new Item.Material[]{Item.Material.Organic},4,0,0, -1, 0){
+            new Armor(null, "Man_skin", 0,new Item.Material[]{Item.Material.Organic},4,0,0, 0){
                 public boolean checkBreak(boolean blunt, int d){ return true; }
             },
     };
@@ -133,6 +133,15 @@ public class ArmorSet {
     public void remove(Armor p){
         for (int i=0;i<armor.length;i++){
             if (armor[i] == p) set(null, i);
+        }
+    }
+    public void drop(){
+        for (int i=0;i<4;i++) {
+            if (!isBare(i)) {
+                armor[i].onUnequip(host);
+                armor[i].start();
+                set(null, i);
+            }
         }
     }
     public void setVisible(boolean visible){

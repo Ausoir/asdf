@@ -8,7 +8,7 @@ Salt;2;0;0;Other;A cooking ingredient.
 Sugar;2;0;0;Other;A cooking ingredient.
 Cup;2;0;0;Glass
 Statue;2;12;4000;Stone
-Scrap;1;6;0;Steel,Iron,Copper
+Lockpick;1;0;2000;Copper
 Jug;2;4;1;Glass
 Stool;2;6;1000;Wooden,Other
 Candle;2;0;200;Other

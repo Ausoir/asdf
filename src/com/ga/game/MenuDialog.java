@@ -18,7 +18,7 @@ public class MenuDialog extends Panel {
     MenuDialog(){
         setLayout(new BoxLayout(this,BoxLayout.PAGE_AXIS));
         titleLabel = new JLabel();
-        titleLabel.setFont(new Font("Helvetica",Font.BOLD,18));
+        titleLabel.setFont(titlefont);
         titleLabel.setForeground(new Color(200, 200, 200, 200));
         JPanel panel = new JPanel();
         panel.setOpaque(false);
@@ -72,7 +72,7 @@ public class MenuDialog extends Panel {
         JLabel[] options1 = new JLabel[options.length];
         for (int i = 0; i < options.length; i++) {
             if (options[i] != null) {
-                options1[i] = new JLabel(">" + options[i]);
+                options1[i] = new JLabel("> " + options[i]);
                 final int ii = i;
                 options1[i].addMouseListener(new MouseAdapter() {
                     @Override
@@ -81,10 +81,11 @@ public class MenuDialog extends Panel {
                         if (actions[ii] != null) actions[ii].perform();
                     }
                 });
-                options1[i].setFont(new Font("Helvetica", Font.ITALIC, 14));
+                options1[i].setFont(optionfont);
                 options1[i].setForeground(new Color(200, 200, 200, 200));
                 optPanel.add(options1[i]);
             }
         }
+        optPanel.updateUI();
     }
 }

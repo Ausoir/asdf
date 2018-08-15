@@ -12,7 +12,7 @@ import com.ga.tool.Timer;
  * Created by Ga on 8/29/2016. zxc
  */
 public class Particle extends Thing {
-    private static int PARTICLE_NUM = 128;
+    private static int PARTICLE_NUM = 64;
     private static Particle[] particles = new Particle[PARTICLE_NUM];
     private static int index = PARTICLE_NUM;
     private Timer timer = new Timer(4, false);

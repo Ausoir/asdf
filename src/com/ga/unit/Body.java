@@ -17,6 +17,7 @@ public class Body {
     private HashMap<String, int[][]> animation = new HashMap<String, int[][]>() {{
         put("Idle", new int[][]{new int[]{0, -1}, new int[]{-2}});
     }};
+    public String name;
     private Clip clip;
     public Unit host;
     private int[] nextAnimation = animation.get("Idle")[0];
@@ -34,8 +35,9 @@ public class Body {
     private float appendageSize = 1;
     protected int size = 0;
 
-    protected Body(Unit host, String current) {
+    public Body(Unit host, String current) {
         this.host = host;
+        name = current;
         this.clip = Clips.clip.get(current);
         set(clip);
         appendageSize = (float) Math.abs(host.rand.nextGaussian()*.3f)+.7f;
@@ -300,7 +302,7 @@ public class Body {
     }
 
     public void load(String p){
-        for (int i=0;i<p.length();i++){
+        for (int i=0;i<Math.min(organs.length, p.length());i++){
             organs[i].image.visible = !(organs[i].amputated = p.charAt(i) == '0');
         }
         updateStatus();

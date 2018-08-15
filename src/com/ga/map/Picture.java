@@ -1,7 +1,6 @@
 package com.ga.map;
 
 import com.ga.game.FileManager;
-import com.ga.game.Settings;
 import com.ga.tool.P;
 
 import javax.imageio.ImageIO;
@@ -69,6 +68,9 @@ public class Picture {
     }
     public P getSize(){
         return size;
+    }
+    P getCenter(){ //Center when pos.getSubtract(image.getCenter())
+        return halfSize.getSubtract(size.getMult(.5f,.5f));
     }
     public int getCenterType(){
         return type;

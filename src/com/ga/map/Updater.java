@@ -12,7 +12,6 @@ import java.awt.*;
  * Created by Ga on 5/6/2016. asd
  */
 public class Updater {
-    public boolean editor = true;
     private Map map;
     private Drawable drawee;
     private L<Particle> effects = new L<>();
@@ -40,7 +39,7 @@ public class Updater {
     public void updateControl(){
         for (AI i : controllee) i.update();
     }
-    public void addUpdatee(Updatable p){
+    void addUpdatee(Updatable p){
         updatee.add(p);
     }
     public void processQueue(){
@@ -79,7 +78,7 @@ public class Updater {
         processQueue();
         Global.updateCamera();
         for (Updatable i : updatee) i.update();
-        if (!editor){
+        if (!Global.editor){
             for (Prop i : props) i.update();
             for (Unit i : unitsLoaded) i.update(); //new class?
         }
@@ -138,7 +137,7 @@ public class Updater {
         L<Prop> result = new L<>();
         for (Prop i : props){
             if (i.onInteract != null) {
-                if (i.pos.getSubtract(p).getDist() <= 24) result.add(i);
+                if (i.pos.getSubtract(i.image.getCenter()).getSubtract(p).getDist() <= 24) result.add(i);
             }
         }
         for (Unit i : unitsLoaded){
@@ -183,19 +182,10 @@ public class Updater {
             if (host != i && i.image.visible) {
                 float x = Math.abs(i.pos.x-vision.x), y = Math.abs(i.pos.y - vision.y);
                 if (x < r && y < r/3) {
-//                    int overlap = 0;
-//                    P head = i.clip.organs[Math.max(0, i.clip.getHead())].pt.getAdd(i.pos);
-//                    for (Line l : host.map.land){
-//                        if (l.depth > host.getDepth() && new Line(head, new P(head.x, 0)).lineCross(l)){
-//                            overlap++;
-//                        }
-//                    }
-//                    if (overlap % 2 == 0) {
-                        if (x + y < max) {
-                            max = (int) (x + y);
-                            seen.add(0, i);
-                        } else seen.add(i);
-//                    }
+                    if (x + y < max) {
+                        max = (int) (x + y);
+                        seen.add(0, i);
+                    } else seen.add(i);
                 }
             }
         }

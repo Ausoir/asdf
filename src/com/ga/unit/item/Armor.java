@@ -5,6 +5,7 @@ import com.ga.map.Map;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
 import com.ga.unit.Tag;
+import com.ga.unit.man.BodyHumanoid;
 import com.ga.unit.man.Man;
 import com.ga.unit.skill.Actions;
 
@@ -13,19 +14,19 @@ import com.ga.unit.skill.Actions;
  */
 public class Armor extends Item {
     int encumbrance;
-    public int piece;
+    private int piece;
     private int armorMod = 0;
     private int warmth;
     int pocket;
-    public Armor(Map map, String name, int seed, Material[] materials, int piece, int encumbrance, int pockets, int durability, int warmth) {
-        super(map, name, seed, materials, ItemType.Armor, durability);
+    public Armor(Map map, String name, int seed, Material[] materials, int piece, int encumbrance, int pockets, int warmth) {
+        super(map, name, seed, materials, ItemType.Armor);
         this.encumbrance = encumbrance;
         value = value*2 + 500;
         this.pocket = pockets;
         this.piece = piece;
         this.warmth = warmth;
         if (piece == 1) image.set(name, 0);
-        else if (piece == 2) image.set(name, 1);
+        else if (piece == 2) image.set(name, 2);
         else if (piece == 4) weight = 0;
     }
     void shade(int color){}
@@ -36,8 +37,7 @@ public class Armor extends Item {
     boolean isCursed() {
         return emod != null && emod.tags.contains(Tag.Curse) || super.isCursed();
     }
-    public void randomSize(P sizeVariance) {
-    }
+    public void randomSize(P sizeVariance) {}
     private float getArmor(){
         return Math.max(0,material.hardness + armorMod);
     }
@@ -67,7 +67,7 @@ public class Armor extends Item {
             final Armor me = this;
             host.delay.performer = new Performer() {
                 public void perform() {
-                    if (host.get("Strength").getMax() >= weight) {
+                    if (host.clip instanceof BodyHumanoid) {
                         if (host.armor.isBare(piece)) {
                             Sound.play(host.map, host.pos, "wear");
                             me.remove();
@@ -77,7 +77,7 @@ public class Armor extends Item {
                         } else {
                             host.setState(Actions.Wield);
                         }
-                    } else host.say("Too heavy!");
+                    }
                 }
             };
             return true;
@@ -94,8 +94,8 @@ public class Armor extends Item {
     public String getDescription(){
         String r = super.getDescription();
         r = r.replace(" uses "," durability ");
-        if (encumbrance > 0) r += "Encumberance: "+encumbrance+"\n";
-        if (emod != null) r += "This armor has "+probability*100+"% chance of activating its enchantment on being hit. ";
+        if (encumbrance > 0) r += "Encumbrance: "+encumbrance+"\n";
+        if (emod != null) r += "This armor has "+(int)(probability*100)+"% chance of activating its enchantment on being hit. ";
         if (getArmor() > 0) r += "This armor decreases damage by "+getArmor()+" points. ";
         if (getWarmth() > 0) r += "This armor provides "+getWarmth()+" warmth. ";
         if (pocket > 0) r += "This armor has "+pocket+" pockets. ";

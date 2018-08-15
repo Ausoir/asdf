@@ -29,14 +29,12 @@ class GenerateTown {
                 if (map.checkLand(new Line(mid.x, 0, mid.x, mid.y - 1), l.depth) == null) {
                     if (Creation.r.nextInt(3) == 0) {
                         for (int ii = 0; ii < Creation.r.nextInt(9); ii++) {
-                            if (l.getWidth() > 200) map.placeProp(l, "Barrel=.5,Crate=1", -1); // if > ladder width 160
-                        }
-                        for (int ii = 0; ii < Creation.r.nextInt(9); ii++) {
-//                          map.placeProp(l, "Resident=.4", -1);
+                            map.placeProp(l, "Scrap=.1,Streetlight=.2,Cone=.3,Pole=.4,Bush=.5", -1);
                         }
                     }
                     if (Math.abs(l.getSlope()) < .01f) {
-                        String[] buildings = new String[]{"House1","House2","House3","House4","Restaurant","Inn","Shop","Range","Laboratory","Armory","Hospital","Clothier","Safehouse","School"};
+                        String[] buildings = new String[]{"House1","House2","House3","House4","Hideout",
+                                "Restaurant","Hideout","Shop","Range","Laboratory","Armory","Hospital","Clothier","Safehouse","School"};
                         bid = generator.generateBuildings(buildings, l, bid) + 1;
                     }
                 }

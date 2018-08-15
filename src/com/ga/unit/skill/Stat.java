@@ -18,7 +18,7 @@ public class Stat {
     public Stat(int p){
         setTotal(p);
     }
-    private void setTotal(int p){
+    public void setTotal(int p){
         current += p-max;
         max = p;
     }
@@ -28,11 +28,6 @@ public class Stat {
             if (current > max) current = max;
             else if (current < 0) current = 0;
         }
-    }
-    public void setMax(int p){
-        int diff = p - max;
-        current = Math.max(max, Math.max(0, diff));
-        max = p;
     }
     public void addTotal(int p){
         setTotal(max + p);

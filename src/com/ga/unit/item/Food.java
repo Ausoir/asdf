@@ -16,7 +16,7 @@ import java.util.ArrayList;
  */
 public class Food extends Item {
     public enum Ingredient {
-        White(1,3,-10,3),Red(1,3,-10,2),Fish(1,2,-2,1),Dairy(1,2,1,0),Vegetable(1,1,-2,8),Grain(1,2,0,10),Fruit(1,1,4,7),
+        White(1,1,-10,3),Red(1,1,-10,2),Fish(1,1,-2,1),Dairy(1,1,1,0),Vegetable(1,1,-2,8),Grain(1,1,0,10),Fruit(1,1,4,7),
         Cut(2,0,0,-1,.8f),Boiled(2,1,-1,1,.5f),Fried(2,0,5,6,.4f),Roasted(2,1,3,2,.6f),Smoked(2,0,0,1,.6f),Dried(2,-1,-1,24,.7f),Spiced(2,0,5,-8,.7f),Sealed(2,0,0,30,.3f);
         int type, nutrition, taste, perish;
         float loss = .5f;

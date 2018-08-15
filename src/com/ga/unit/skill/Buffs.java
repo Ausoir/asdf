@@ -486,6 +486,34 @@ public enum Buffs {
             }
         };
     }},
+    Morph(2,new Tags(){{
+        add(Tag.Curse);
+        add(Tag.Enchant);
+        add(Tag.Channeling);
+    }}){
+        private String[] targets = new String[]{"Bird", "Slime", "Dog"};
+        private Body origForm;
+        Buff makeLocal(int level){
+            return new Buff(level, 0) {
+                public void onSet() {
+                    this.time = Global.time + 20;
+                    Sound.play(host.map, host.pos, "cast");
+                    morph();
+                }
+                public void onLoad(){
+                    morph();
+                    host.clip.load(host.toString().split("@",-1)[7]);
+                }
+                private void morph(){
+                    origForm = host.clip;
+                    host.clip = new Body(host, targets[level % targets.length]);
+                    if (host instanceof Man) ((Man) host).armor.drop();
+                }
+                public void onFinish(){
+                    host.clip = origForm;
+                }
+            };
+    }},
     Rejuvenate(3,new Tags(){{
         add(Tag.Enchant);
         add(Tag.Strength);

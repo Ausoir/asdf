@@ -10,10 +10,9 @@ import com.ga.unit.Unit;
  */
 public class Weapon extends Item {
     private int quality = 0;
-    public Weapon(Map map, String name, int seed, Material[] materials, ItemType type, int durability, int speedMod, int damageMod) {
-        super(map, name, seed, materials, type, durability);
-        this.weight += damageMod;
-        speed = weight - speedMod;
+    public Weapon(Map map, String name, int seed, Material[] materials, ItemType type) {
+        super(map, name, seed, materials, type);
+        speed = 6 - (weight*2) - (range/20);
         value = value*2 + 1000;
         cooldown.setDuration(0);
         rotation = 35;
@@ -21,6 +20,7 @@ public class Weapon extends Item {
     }
     public void onCreate(){
         imbueMeta(true, true, .1f);
+        if (rand.nextInt(10) == 0) quality = 1;
     }
     protected void setModifier(SpecialtyMod mod){
         if (mod == SpecialtyMod.Sharp) quality += admod.magnitude;
@@ -45,7 +45,7 @@ public class Weapon extends Item {
     }
     @Override
     public int getValue(){
-        return super.getValue() + (quality*1500);
+        return super.getValue() + (quality*4000);
     }
     @Override
     public boolean trigger(Unit target) {

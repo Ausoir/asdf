@@ -68,7 +68,7 @@ public class MenuPlayer extends Panel {
                 final Performer perf = new Performer() {
                     public void perform() {
                         if (Global.player.get("Level").require(1))
-                            Global.player.get(stats[var]).setMax(Global.player.get(stats[var]).getMax() + 1);
+                            Global.player.get(stats[var]).addTotal(1);
                     }
                 };
                 statButtons[var].addActionListener(e -> {

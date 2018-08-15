@@ -107,46 +107,12 @@ public class Generator {
                     highestBid = Math.max(highestBid, prop.seed);
                 } else if (prop.factoryId == Stock.Travel.ordinal()) {
                     if (prop.subId == 1) { //overmap
-                        MapName propDestination = new MapName(MapName.instance + prop.name);
-                        if (propDestination.isField()){
-                            prop.name = prop.name + map.name.getIndex();
-                            Map house = new Map(prop.name);
-                            house.start();
-                            house.updater.processQueue();
-                            boolean exitExists = false;
-                            for (Prop ob : house.updater.props) {
-                                if (ob.factoryId == Stock.Travel.ordinal() && ob.subId == 1 && map.name.equals(ob.name)) {
-                                    exitExists = true;
-                                    break;
-                                }
-                            }
-                            if (!exitExists){
-                                float spawnX = house.size.x/2;
-                                P spawnPoint = new P(spawnX, house.checkLand(new Line(spawnX, 0, spawnX, house.size.y)).getCrossPointY(spawnX));
-                                Stock.createByName(house, "Signpost", -1).start().pos.set(spawnPoint);
-                                Stock.Spawn.create(house, -1, 3).start().pos.set(spawnPoint.getAdd(0,-50));
-                                Prop exit = (Prop) Stock.Travel.create(house, 1, 3).start();
-                                exit.seed = bid + exit.seed - 1;
-                                exit.pos.set(spawnPoint.getAdd(0,-50));
-                                exit.name = map.name.toString();
-                                FileManager.saveMap("ins/"+prop.name, house);
-                            }
-                        }
+                        Global.p("Unimplemented travel ID 1 found."); //NOT IMPLEMENTED
                     } else if (prop.subId == 2) { //outside to inside
-                        prop.name = map.name.getModifiedMapname(prop.name+map.name.getMapname()) + bid;
-                        Map house = new Map("building/inside/" + building);
-                        house.start();
-                        house.updater.processQueue();
-                        for (Prop ob : house.updater.props) {
-                            if (ob.factoryId == Stock.Travel.ordinal() && ob.subId == 3) { //inside to outside
-                                ob.name = map.name.toString();
-                                ob.seed = bid + ob.seed - 1;
-                            } else if (ob.factoryId != Stock.Spawn.ordinal()){
-                                if (prop.seed < -2 && Creation.r.nextBoolean()) ob.remove();
-                                else if (ob.seed == -2 || ob.seed == -3) ob.seed = -1;
-                            }
-                        }
-                        FileManager.saveMap(map.name.getModifiedMapname("B"+map.name.getMapname()) + bid, house);
+                        String newmap = map.name.getModifiedMapname("B"+map.name.getMapname()+"_"+bid);
+                        makeTravelPath(prop, 0, bid,
+                                newmap+"_0", //Something like B_114
+                                FileManager.makeDirectory("building/inside/") + building+"_0");
                     }
                 } else {
                     if (prop.seed < -2 && Creation.r.nextBoolean()) prop.remove();
@@ -156,6 +122,34 @@ public class Generator {
         }
         blueprint.updater.addQueue.clear();
         return highestBid;
+    }
+    private void makeTravelPath(Prop travel, int index, int returnSeedOffset, String newMapName, String mapToLoad){
+        travel.name = newMapName;
+        Map house = new Map(mapToLoad);
+        house.start();
+        house.updater.processQueue();
+        for (Prop ob : house.updater.props) {
+            if (ob.factoryId == Stock.Travel.ordinal()) {
+                String newMapNameWithoutIndex = newMapName.substring(0,newMapName.lastIndexOf("_"));
+                if (ob.subId == 3) { //inside to outside
+                    if (index == 0) {
+                        ob.name = map.name.toString();
+                        ob.seed = returnSeedOffset + ob.seed - 1;
+                    } else {
+                        ob.name = newMapNameWithoutIndex+"_"+(index-1);
+                    }
+                } else if (ob.subId == 2) { //inside to inside
+                    String newLoadMapWithoutIndex = mapToLoad.substring(0,mapToLoad.lastIndexOf("_"));
+                    makeTravelPath(ob, ++index, returnSeedOffset,
+                            newMapNameWithoutIndex+"_"+index,
+                            newLoadMapWithoutIndex+"_"+index); //Something like B_114_1
+                }
+            } else if (ob.factoryId != Stock.Spawn.ordinal()){
+                if (travel.seed < -2 && Creation.r.nextBoolean()) ob.remove();
+                else if (ob.seed == -2 || ob.seed == -3) ob.seed = -1;
+            }
+        }
+        FileManager.saveMap(newMapName, house);
     }
     void makeEdgeSpawns(){
         Line leftSpawn = map.checkLand(new Line(map.size.x-24,0,map.size.x-24,map.size.y));

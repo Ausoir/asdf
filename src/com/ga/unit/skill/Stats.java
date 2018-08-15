@@ -20,13 +20,13 @@ public class Stats {
         this.host = host;
     }
     public String toString(){
-        String result = "";
+        StringBuilder result = new StringBuilder();
         for (Map.Entry pair : stats.entrySet()){
-            result += pair.getKey() + ":" + pair.getValue()+"&";
+            result.append(pair.getKey()).append(":").append(pair.getValue()).append("&");
         }
-        result = result.substring(0,result.length()-1)+"/";
+        result = new StringBuilder(result.substring(0, result.length() - 1) + "/");
         for (Buff i : effects){
-            result += i.toString()+",";
+            result.append(i.toString()).append(",");
         }
         return result.substring(0,result.length()-1);
     }
@@ -100,8 +100,8 @@ public class Stats {
         for (int i=0;i<effects.size();i++) {
             Buff effect = effects.get(i);
             if (effect.update()){
-                effect.onFinish();
                 effects.remove(i--);
+                effect.onFinish(); //if die() happens effect is already removed
             }
         }
     }
@@ -110,21 +110,12 @@ public class Stats {
     }
     public String getEffectsList(){
         if (effects.size() == 0) return "None";
-        String r = "";
+        StringBuilder r = new StringBuilder();
         for (int i=0;i<effects.size();i++){
-            r += effects.get(i).getDescription();
-            if (i != effects.size()-1) r += "\n";
+            r.append(effects.get(i).getDescription());
+            if (i != effects.size()-1) r.append("\n");
         }
-        return r;
-    }
-    public void endBuff(Buffs p){
-        for (int i=0;i<effects.size();i++) {
-            Buff effect = effects.get(i);
-            if (effect.buff == p){
-                effects.remove(i--);
-                effect.onFinish();
-            }
-        }
+        return r.toString();
     }
     public boolean isDangerous(){
         for (Buff i : effects){

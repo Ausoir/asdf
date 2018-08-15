@@ -1,7 +1,6 @@
 package com.ga.game;
 
 import com.ga.map.Global;
-import com.ga.map.Updatable;
 import com.ga.tool.Performer;
 import com.ga.unit.item.Item;
 
@@ -10,7 +9,7 @@ import javax.swing.*;
 /**
  * Created by ga on 6/6/17. asd
  */
-public class Menu extends JPanel implements Updatable {
+public class Menu extends JPanel {
     public static Menu menu = new Menu();
     private Panel current;
     private MenuPlayer menuPlayer = new MenuPlayer();
@@ -24,7 +23,6 @@ public class Menu extends JPanel implements Updatable {
         Global.display.add(menu);
     }
     private void select(Panel p){
-        Global.player.map.updater.addUpdatee(this);
         remove(current);
         current = p;
         add(p);
@@ -48,19 +46,11 @@ public class Menu extends JPanel implements Updatable {
         if (current.getClass() != MenuShop.class) select(new MenuShop());
         ((MenuShop) current).show(title, wares, prices, actions);
     }
-    public void showContainer(String title, Item[] wares, Performer[] actions){
-        if (current.getClass() != MenuContainer.class) select(new MenuContainer());
-        ((MenuContainer) current).show(title, wares, actions);
-    }
     void resize(){
         setBounds(0,0, Settings.screenX, Settings.screenY);
         current.resize();
     }
     void onExit(){
         Global.display.requestFocus();
-    }
-    @Override
-    public void update() {
-        current.update();
     }
 }

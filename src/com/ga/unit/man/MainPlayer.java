@@ -31,9 +31,7 @@ public class MainPlayer extends Player {
 
     @Override
     public int setState(Actions state) {
-        if (state == Actions.Use && !grounded) state = Actions.Airstrike;
-        else if (state == Actions.Jump && this.state == Actions.Rest) state = Actions.Leap;
-        else if (state == Actions.Rest && (this.state == Actions.Right || this.state == Actions.Left)) {
+        if (state == Actions.Rest && (this.state == Actions.Right || this.state == Actions.Left)) {
             if (vel.x != 0) target.x = dir;
             state = Actions.Sprint;
         } else if (this.state == Actions.Sprint){
@@ -66,6 +64,7 @@ public class MainPlayer extends Player {
         Particle.holyExplosion(map, pos.getAdd(clip.organs[BODY].ptd), getDepth());
         String statChangeNotice = "";
         int level = get("Level").getMax();
+        get("Level").addTotal(1);
         if (level > 1) {
             int i, current = 1, prev;
             for (i = 1; i < level; i += prev) {
@@ -75,16 +74,21 @@ public class MainPlayer extends Player {
             if (i != level) { //not fibo
                 Stat decay;
                 String decayStat;
+                int count = 0;
                 do {
                     decayStat = mainStats[SyncRand.r.nextInt(mainStats.length)];
                     decay = get(decayStat);
-                } while (decay.getMax() <= 1);
-                decay.addTotal(-1);
-                statChangeNotice += decayStat + " decayed by 1.";
+                } while (++count < 9 && decay.getMax() <= 1);
+                if (count >= 9){
+                    get("Level").add(-1, true);
+                    statChangeNotice += "No stat point is obtained on this level.";
+                } else {
+                    decay.addTotal(-1);
+                    statChangeNotice += decayStat + " decayed by 1.";
+                }
             }
         }
         say("Leveled up! " + statChangeNotice);
-        get("Level").addTotal(1);
     }
 
     public void die() {

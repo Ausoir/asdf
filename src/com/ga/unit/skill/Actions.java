@@ -207,6 +207,8 @@ public enum Actions {
                         for (Prop i : obj) {
                             if (i.onInteract != null) {
                                 i.onInteract.interact(host);
+                                host.stateSet(Idle);
+                                host.delay.time = 20;
                                 break;
                             }
                         }
@@ -228,7 +230,17 @@ public enum Actions {
         public void update(Unit host){
             float speed = host.getSpeed();
             host.vel.x += speed * host.dir * (2f + host.stateLevel*.2f);
-            if (host.stateDuration >= 60 && host.stateDuration % 60 == 0 && !host.get("Strength").require(1)) host.setState(Actions.Idle);
+            if (checkEnemy(host) && host.stateDuration >= 60 && host.stateDuration % 60 == 0 && !host.get("Strength").require(1)) host.setState(Actions.Idle);
+        }
+        private boolean checkEnemy(Unit host){
+            if (host == Global.player){
+                for (Unit i : host.map.updater.unitsLoaded) {
+                    if (i.map == Global.player.map && i.hittable(Global.player.faction) && i.brain.target == Global.player) {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
         public boolean onFinish(Unit host){
             return false;
@@ -394,7 +406,7 @@ public enum Actions {
             host.delay.time = 200;
         }
     },
-    Grab(15,3,12,7,0,new int[]{FIST},new Tags(){{
+    Grab(15,3,12,5,0,new int[]{FIST},new Tags(){{
         add(Tag.Strength);
     }}){
         public String getClipName(){
@@ -406,7 +418,7 @@ public enum Actions {
                 for (Unit victim : target) {
                     if (victim.state == Down || victim.state == Hit) { //down or stunned
                         Sound.play(host.map, host.pos, "wear");
-                        Weapon holder = new Weapon(host.map, null, 0, new Item.Material[]{Item.Material.Organic}, Item.ItemType.Bashing, 1+(victim.get("Agility").get()*4), -20, 0) {
+                        Weapon holder = new Weapon(host.map, null, 0, new Item.Material[]{Item.Material.Organic}, Item.ItemType.Bashing) {
                             public String forceToString() {
                                 return "";
                             }
@@ -428,7 +440,7 @@ public enum Actions {
                         holder.start();
                         holder.image = victim.image;
                         holder.onInteract = null;
-                        holder.weight = Math.max(1, victim.getSize() / 8);
+                        holder.weight = Math.max(1, victim.get("Strength").getMax()/2);
                         holder.save = false;
                         host.setWeapon(holder);
                         victim.mobile = false;
@@ -443,7 +455,7 @@ public enum Actions {
             return false;
         }
     },
-    Charge(30,0,14,5,0,new int[]{RLEG, LLEG},new Tags(){{
+    Charge(30,0,14,4,0,new int[]{RLEG, LLEG},new Tags(){{
         add(Tag.Strength);
         add(Tag.Athletics);
     }}){
@@ -469,7 +481,7 @@ public enum Actions {
             }
         }
     },
-    Hold(65,1,14,4,0,new int[]{FIST, OFIST},new Tags(){{
+    Hold(65,1,14,2,0,new int[]{FIST, OFIST},new Tags(){{
         add(Tag.Strength);
     }}){
         public int getRange(Unit host){
@@ -507,7 +519,7 @@ public enum Actions {
             host.vel.x += host.getSpeed() * -host.dir * 1.2f;
         }
     },
-    Uppercut(35,2,12,6,0,new int[]{FIST},new Tags(){{
+    Uppercut(35,2,12,1,0,new int[]{FIST},new Tags(){{
         add(Tag.Strength);
     }}){
         public String getClipName(){
@@ -549,7 +561,7 @@ public enum Actions {
             }
         }
     },
-    Kick(3,1,2,2,0,new int[]{RLEG},new Tags(){{
+    Kick(3,1,2,1,0,new int[]{RLEG},new Tags(){{
         add(Tag.Strength);
     }}){
         public void trigger(Man host){
@@ -575,7 +587,7 @@ public enum Actions {
             }
         }
     },
-    Sidekick(40,3,7,4,0,new int[]{RLEG},new Tags(){{
+    Sidekick(40,3,7,3,0,new int[]{RLEG},new Tags(){{
         add(Tag.Strength);
     }}){
         public int getRange(Unit host){
@@ -614,7 +626,7 @@ public enum Actions {
             }
         }
     },
-    Punch(12,1,0,3,0,new int[]{FIST},new Tags(){{
+    Punch(12,1,0,2,0,new int[]{FIST},new Tags(){{
         add(Tag.Strength);
     }}){
         public int getRange(Unit p){
@@ -667,7 +679,7 @@ public enum Actions {
             if (p.delay.time % 6 == 0) p.attackSound();
         }
     },
-    Stab(40,2,12,6,0,new int[]{FIST},new Tags(){{
+    Stab(40,2,12,5,0,new int[]{FIST},new Tags(){{
         add(Tag.Strength);
     }}){
         public void onSet(Unit p){
@@ -678,7 +690,7 @@ public enum Actions {
             p.attack();
         }
     },
-    Dash(35,2,12,5,0,new int[]{RLEG, LLEG},new Tags(){{
+    Dash(35,2,12,2,0,new int[]{RLEG, LLEG},new Tags(){{
         add(Tag.Strength);
     }}){
         public int getRange(Unit p){
@@ -703,7 +715,7 @@ public enum Actions {
             host.vel.set(20 * host.dir * (1+(host.stateLevel*.2f)), -5);
         }
     },
-    Vault(4,1,7,5,0,new int[]{RLEG, LLEG},new Tags(){{
+    Vault(4,1,7,3,0,new int[]{RLEG, LLEG},new Tags(){{
         add(Tag.Athletics);
         add(Tag.Strength);
     }}){
@@ -731,7 +743,7 @@ public enum Actions {
             host.vel.x += power*Global.cos(host.target.getAtan());
         }
     },
-    Lunge(24,1,12,4,0,new int[]{LLEG, RLEG, FIST},new Tags(){{
+    Lunge(24,1,12,3,0,new int[]{LLEG, RLEG, FIST},new Tags(){{
         add(Tag.Strength);
     }}){
         public void onSet(Man host){
@@ -747,7 +759,7 @@ public enum Actions {
             }
         }
     },
-    Underhand(32,9,13,8,0,new int[]{LLEG, RLEG, FIST, OFIST},new Tags(){{
+    Underhand(32,9,13,6,0,new int[]{LLEG, RLEG, FIST, OFIST},new Tags(){{
         add(Tag.Strength);
     }}){
         public void trigger(Man host){
@@ -924,7 +936,7 @@ public enum Actions {
             p.buff(Buffs.Evade,2);
         }
     },
-    Airstrike(27,1,11,4,0,new int[]{LLEG, RLEG, FIST},new Tags(){{
+    Airstrike(27,1,11,3,0,new int[]{LLEG, RLEG, FIST},new Tags(){{
         add(Tag.Strength);
     }}){
         public boolean isDynamicAnimation(){ return false; }
@@ -1161,7 +1173,7 @@ public enum Actions {
             }
         }
     },
-    Infuse(18,3,1,4,20,new int[]{FIST},new Tags(){{
+    Infuse(18,3,10,4,20,new int[]{FIST},new Tags(){{
         add(Tag.Conjuration);
     }}){
         public String getClipName(){
@@ -1170,30 +1182,31 @@ public enum Actions {
         public void update(Man host){
             Particle.frozen(host.map, host.pos.getAdd(host.clip.organs[FIST].ptd), host.getDepth()+.01f);
             Particle.frozen(host.map, host.pos.getAdd(host.clip.organs[BodyHumanoid.OFIST].ptd), host.getDepth()+.01f);
+            if (host.stateDuration == 400){
+                Sound.play(host.map, host.pos, "freeze");
+                String target = host.getConversation();
+                Prop t = Stock.createByNameFromReg(host.map, target, -1);
+                if (t != null) {
+                    t.start();
+                    if (t instanceof Item) {
+                        host.setWeapon((Item) t);
+                        ((Item) t).setMaterial(Item.Material.Crystal);
+                        if (t.tags.contains(Tag.Currency) || t.tags.contains(Tag.Energy)){
+                            ((Item)t).uses = 0;
+                        }
+                    } else {
+                        t.pos.set(host.pos);
+                        int ctype = t.image.getCenterType();
+                        t.image = new ShadedPicture(t.rand, t.name, Shader.Color);
+                        ((ShadedPicture) t.image).shade(new Color(48, 156, 200, 150).getRGB());
+                        t.image.setCenterType(ctype);
+                    }
+                } else host.rechargeMana(20);
+                host.setState(Down);
+            }
         }
         public boolean onFinish(Unit host){
             return false;
-        }
-        public void trigger(final Man host){
-            Sound.play(host.map, host.pos, "freeze");
-            String target = host.getConversation();
-            Prop t = Stock.createByNameFromReg(host.map, target, -1);
-            if (t != null) {
-                t.start();
-                if (t instanceof Item) {
-                    host.setWeapon((Item) t);
-                    ((Item) t).setMaterial(Item.Material.Crystal);
-                    if (t.tags.contains(Tag.Currency) || t.tags.contains(Tag.Energy)){
-                        ((Item)t).uses = 0;
-                    }
-                } else {
-                    t.pos.set(host.pos);
-                    int ctype = t.image.getCenterType();
-                    t.image = new ShadedPicture(t.rand, t.name, Shader.Color);
-                    ((ShadedPicture) t.image).shade(new Color(48, 156, 200, 150).getRGB());
-                    t.image.setCenterType(ctype);
-                }
-            }
         }
     },
     Fireball(48,1,4,1,4,new int[]{FIST},new Tags(){{
@@ -1234,7 +1247,7 @@ public enum Actions {
             };
             p.gravity = true;
             p.faction = host.faction;
-            p.damage = level*20;
+            p.damage = level*30;
             p.delay.set(2);
             p.delay.performer = new Performer(){
                 public void perform(){
@@ -1283,7 +1296,7 @@ public enum Actions {
             p.gravity = true;
             p.image.setSize(p.image.getSize().getMult(3, 3));
             p.faction = host.faction;
-            p.damage = host.stateLevel*20;
+            p.damage = host.stateLevel*30;
             p.setDepth(host.getDepth());
             p.delay.set(50);
             p.delay.performer = new Performer() {
@@ -1461,7 +1474,7 @@ public enum Actions {
             host.setState(Down);
         }
     },
-    Shadowstep(4,1,12,2,0,new int[]{FIST},new Tags(){{
+    Shadowstep(4,1,12,1,0,new int[]{FIST},new Tags(){{
         add(Tag.Void);
         add(Tag.Air);
     }}){
@@ -1527,7 +1540,6 @@ public enum Actions {
     },
     Disarm(4,1,24,3,8,new int[]{FIST},new Tags(){{
         add(Tag.Void);
-        add(Tag.Air);
     }}){
         public String getClipName(){
             return "Conjure";
@@ -1851,7 +1863,7 @@ public enum Actions {
             } else return 1;
         }
     },
-    Generate(40,0,1,1,0,new Tags(){{
+    Generate(40,0,2,1,0,new Tags(){{
         add(Tag.Energy);
     }}){
         public String getClipName(){

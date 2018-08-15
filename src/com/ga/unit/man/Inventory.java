@@ -28,7 +28,7 @@ public class Inventory {
     public Item getItem(int p){
         return items.get(p);
     }
-    L<Item> getItems(){
+    public L<Item> getItems(){
         return items;
     }
     public int getItemSize(){

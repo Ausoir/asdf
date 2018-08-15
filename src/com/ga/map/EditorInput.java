@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
+@SuppressWarnings("ALL")
 public class EditorInput extends Drawable implements Input, Updatable {
     private enum Tool {
         NONE, REPOSITION, MODIFY, LINE, RECTANGLE, DELETE,
@@ -61,6 +62,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
     private int smooth = 0;
 
     public EditorInput() {
+        Global.editor = true;
         init();
         currentO = new Prop(map, "Error", 0);
         Global.updates.time = -1;
@@ -158,6 +160,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
         } else if (cmd[0].equals("travel")) { //SubId 1 is outside, 2 is outside to inside, 3 is inside to outside
             selectTool(Tool.OBJECT);
             currentO = Stock.Travel.create(map, Integer.parseInt(cmd[1]), Integer.parseInt(cmd[2]));
+            if (cmd.length > 3) currentO.name = cmd[3];
             make(currentO);
             message("Travel to ["+cmd[1]+" @ "+cmd[2]+"] spawned");
         } else if (cmd[0].equals("spawner")) { //name, interval, max
@@ -286,7 +289,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
             map.setTexture();
             map.render();
         } else if (cmd[0].equals("new")){
-            String newname = p.substring(4);
+            String newname = cmd[1];
             FileManager.save(FileManager.makeDirectory("map/"+newname+".map"),newname+";;780,780");
             lastSaved = newname;
             command("load "+lastSaved, 0, 0);
@@ -312,11 +315,10 @@ public class EditorInput extends Drawable implements Input, Updatable {
             System.exit(0);
         } else if (cmd[0].equals("build")){
             new Generator(Global.player.map, map.getNextTerrain()).generateBuilding(p.substring(6), new P(x,y), 9999);
-        } else if (cmd[0].equals("spawner")){
         } else if (cmd[0].equals("o")){
             selectTool(Tool.OBJECT);
             currentO.remove();
-            currentO = make(p.substring(2), new P(x,y));
+            currentO = make(cmd, new P(x,y));
         }
     }
 
@@ -478,7 +480,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
                     }
                 } else if (tool == Tool.OBJECT) {
                     if (shift) alignObject(x,y,currentO,currentO instanceof Item ? -2 : -1);
-                    currentO = make(currentO.name, new P(x, y));
+                    currentO = make(new String[]{currentO.name}, new P(x, y));
                 } else if (tool == Tool.SELECT) {
                     ArrayList<Prop> list = new ArrayList<>();
                     for (Prop i : map.updater.props){
@@ -646,7 +648,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
                 shift = false;
                 break;
             case KeyEvent.VK_INSERT:
-                map.updater.editor = false;
+                Global.editor = false;
                 Global.server.requestChangeMap(FileManager.makeDirectory(map.name.toString()+"@0"));
                 final P asdf = Global.camera.getAdd(0,-400);
                 while (true){
@@ -663,14 +665,11 @@ public class EditorInput extends Drawable implements Input, Updatable {
                 break;
         }
     }
-    private Prop make(String name, P p){
-        if (name == null) return new Prop(map, "Error", 0);
-        int seed = -1;
-        if (name.contains(":")){
-            seed = Integer.parseInt(name.split(":")[1]);
-            name = name.substring(0,name.indexOf(":"));
-        }
-        Prop r = Stock.createByName(map, name, seed);
+    private Prop make(String[] args, P p){
+        Prop r;
+        if (args.length > 2) r = Stock.createByName(map, args[1], Integer.parseInt(args[2]));
+        else if (args.length > 1) r = Stock.createByName(map, args[1], -1);
+        else return new Prop(map, "Error", 0);
         make(r);
         r.pos = p;
         return r;

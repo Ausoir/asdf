@@ -5,4 +5,4 @@ Claw;Katana;Tanto
 Spiced Fish and Cut Bread and Cheese;Cut Vegetables and Fruit;Fried Fish and Cut Fruit and Vegetables;Roasted Fish and Fried Fish;Smoked Fish and Meat
 Roasted Vegetables and Cheese;Cut Bread and Vegetables;Smoked Vegetables;Sealed Vegetables and Meat;Spiced Vegetables and Fruit;Boiled Vegetables and Fried Cheese
 Cut Fruit;Spiced Fruit and Cut Fruit;Smoked Fruit and Fried Cheese;Cut Fruit and Meat;Boiled Birdmeat and Sealed Fruit;Roasted Fruit
-Battery;Threadball;Scroll;Potion
+Battery;Grappler;Scroll;Potion

@@ -238,7 +238,7 @@ public class Man extends Unit {
             }
         }
         if (p > 0){
-            Item newbag = (Item) Stock.Goldbag.create(map, -1, 0).start();
+            Item newbag = (Item) Stock.Moneybag.create(map, -1, 0).start();
             setWeapon(newbag);
             newbag.isUsable(true, newbag.uses-p);
         }
@@ -362,7 +362,7 @@ public class Man extends Unit {
     public void draw(Graphics2D g) {
         for (int i=0;i<clip.organs.length;i++) {
             clip.organs[i].draw(g);
-            armor.display[i].draw(g);
+            if (armor.display.length > i) armor.display[i].draw(g);
         }
     }
 
