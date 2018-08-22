@@ -24,6 +24,7 @@ public class Panel extends JPanel {
     public void display(){
         setVisible(true);
         resize();
+        setColor();
     }
     protected void setColor(){
     }

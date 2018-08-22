@@ -69,9 +69,6 @@ public class Picture {
     public P getSize(){
         return size;
     }
-    P getCenter(){ //Center when pos.getSubtract(image.getCenter())
-        return halfSize.getSubtract(size.getMult(.5f,.5f));
-    }
     public int getCenterType(){
         return type;
     }

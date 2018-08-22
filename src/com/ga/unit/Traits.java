@@ -7,13 +7,13 @@ import java.util.ArrayList;
  */
 public class Traits {
     public enum Trait {
-        Haggler(1,"Always get normal item prices."),
-        Tough(1,"Resist flinching from being hit."),
-        Herbalism(1,"Pick materials from bushes and trees."), Rune_Literacy(1,"Identify, use, and create scrolls."),
-        Alchemy(1,"Identify, use, and create potions."), Meditation(1,"Resting removes all buffs."),
+        Tough(0,"Resist flinching from being hit."),
+
+        Herbalism(1,"Pick materials from bushes and trees."),
+        Rune_Literacy(1,"Identify, use, and create scrolls."),
+        Alchemy(1,"Identify, use, and create potions."),
         Cooking(1,"Learn to craft food with ingredients and enhance them using kitchenware."),
         Crafting(1,"Craft various items."),
-        Tailor(1,"Repair clothings and armor. Higher levels repair faster with less resources."),
         Attunement(1,"Utilize innate energy from your body. Higher level restores more energy per hour."),
 
         Lung_Injury(2,"Rest time quadrupled."){

@@ -30,6 +30,15 @@ public class Generator {
             }
         }
     }
+    void generateBuilding(String building, int buildingSize){
+        ArrayList<Line> validLands = new ArrayList<>();
+        for (Line l : map.landRaw) {
+            if (l.opt > 0 && l.tid >= 0 && l.clockwise() && Math.abs(l.getSlope()) < .1f && l.ptd.x()-l.pt.x() >= buildingSize) {
+                validLands.add(l);
+            }
+        }
+        if (validLands.size() > 0) generateBuildings(new String[]{building}, validLands.get(Creation.r.nextInt(validLands.size())), 10);
+    }
     int generateBuildings(String[] p, Line land, int bid) {
         int estate = land.ptd.x() - land.pt.x();
         ArrayList<String[]> possibleBuildings = new ArrayList<>(); //Get all buildings that fit the estate
@@ -60,7 +69,7 @@ public class Generator {
         Map blueprint = new Map("building/" + building);
         blueprint.start();
 
-        float depth = map.checkLand(new Line(pos.x, pos.y - 4, pos.x, pos.y + 600)).depth;
+        float depth = map.checkLand(new Line(pos.x, pos.y - 4, pos.x, pos.y + 600), Line::landable).depth;
         float startDepth = depth - .1f;
         float depthScale = .01f;
         P offset = new P(-blueprint.size.x / 2, -blueprint.size.y + 24);
@@ -96,7 +105,7 @@ public class Generator {
                 prop.manualDepth = true;
                 prop.map = map;
                 prop.start();
-                Line closest = blueprint.checkLand(new Line(prop.pos.getAdd(0, -4), new P(prop.pos.x, prop.pos.y + 600)));
+                Line closest = blueprint.checkLand(new Line(prop.pos.getAdd(0, -4), new P(prop.pos.x, prop.pos.y + 600)), Line::landable);
                 if (closest != null) {
                     prop.lastLand = closest;
                     prop.setDepth(startDepth + closest.depth * depthScale);
@@ -111,7 +120,7 @@ public class Generator {
                     } else if (prop.subId == 2) { //outside to inside
                         String newmap = map.name.getModifiedMapname("B"+map.name.getMapname()+"_"+bid);
                         makeTravelPath(prop, 0, bid,
-                                newmap+"_0", //Something like B_114
+                                newmap+"_0", //Something like B_1_14
                                 FileManager.makeDirectory("building/inside/") + building+"_0");
                     }
                 } else {
@@ -131,18 +140,16 @@ public class Generator {
         for (Prop ob : house.updater.props) {
             if (ob.factoryId == Stock.Travel.ordinal()) {
                 String newMapNameWithoutIndex = newMapName.substring(0,newMapName.lastIndexOf("_"));
-                if (ob.subId == 3) { //inside to outside
-                    if (index == 0) {
-                        ob.name = map.name.toString();
-                        ob.seed = returnSeedOffset + ob.seed - 1;
-                    } else {
-                        ob.name = newMapNameWithoutIndex+"_"+(index-1);
-                    }
-                } else if (ob.subId == 2) { //inside to inside
+                if (ob.subId == 2) { //inside to inside
                     String newLoadMapWithoutIndex = mapToLoad.substring(0,mapToLoad.lastIndexOf("_"));
                     makeTravelPath(ob, ++index, returnSeedOffset,
                             newMapNameWithoutIndex+"_"+index,
-                            newLoadMapWithoutIndex+"_"+index); //Something like B_114_1
+                            newLoadMapWithoutIndex+"_"+index); //Something like B_1_14_1
+                } else if (ob.subId == 3) { //inside to outside
+                    ob.name = map.name.toString();
+                    ob.seed = returnSeedOffset + ob.seed - 1;
+                } else if (ob.subId == 4) { //inside to previous inside
+                    ob.name = newMapNameWithoutIndex+"_"+(index-1);
                 }
             } else if (ob.factoryId != Stock.Spawn.ordinal()){
                 if (travel.seed < -2 && Creation.r.nextBoolean()) ob.remove();
@@ -152,9 +159,9 @@ public class Generator {
         FileManager.saveMap(newMapName, house);
     }
     void makeEdgeSpawns(){
-        Line leftSpawn = map.checkLand(new Line(map.size.x-24,0,map.size.x-24,map.size.y));
+        Line leftSpawn = map.checkLand(new Line(map.size.x-24,0,map.size.x-24,map.size.y),Line::landable);
         Stock.Spawn.create(map, -1, 1).start().pos.set(map.size.x-24,leftSpawn.getCrossPointY(leftSpawn.ptd.x-24)-Math.abs(leftSpawn.getSlope())-Settings.gravity*2-8);
-        Line rightSpawn = map.checkLand(new Line(24,0,24,map.size.y));
+        Line rightSpawn = map.checkLand(new Line(24,0,24,map.size.y),Line::landable);
         Stock.Spawn.create(map, -1, 2).start().pos.set(24,rightSpawn.getCrossPointY(24)-Math.abs(rightSpawn.getSlope())-Settings.gravity*2-8);
     }
     void generateBlocker(int depth, int p){
@@ -191,11 +198,7 @@ public class Generator {
         Line i;
         while (it.hasNext()) {
             i = (Line) it.next();
-            if (i.tid == p) it.remove();
+            if (i.tid == p) i.opt = 0;
         }
-        map.landRaw.add(new Line(-64,map.size.y+64, -64,-64, p, 0, depth));
-        map.landRaw.add(new Line(-64,-64, map.size.x+64,-64, p, 0, depth));
-        map.landRaw.add(new Line(map.size.x+64,-64, map.size.x+64,map.size.y+64, p, 0, depth));
-        map.landRaw.add(new Line(map.size.x+64,map.size.y+64, -64,map.size.y+64, p, 0, depth));
     }
 }

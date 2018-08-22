@@ -32,14 +32,23 @@ public abstract class AI implements Observer {
         if (host.state != Actions.Dead) {
             perceive(160);
             if (tasks.peek().update(host)) {
-                tasks.pop();
+                removeTask();
                 taskProgress = 0;
-                if (tasks.empty()) setTask(Behavior.Wander);
             }
         }
     }
     public void setTask(Behavior p){
         tasks.push(p);
+        setTraveler();
+    }
+    void removeTask(){
+        tasks.pop();
+        if (tasks.empty()) setTask(Behavior.Wander);
+        else setTraveler();
+    }
+    private void setTraveler(){
+        Behavior behavior = tasks.peek();
+        host.traveler = behavior == Behavior.Travel || behavior == Behavior.Hunt;
     }
     public void onAttack(){}
     public void onHit(){
@@ -49,7 +58,7 @@ public abstract class AI implements Observer {
             }
         }
     }
-    private boolean blocked(int dir){
+    private void blocked(int dir){
         boolean blocked = false;
         boolean fall = true;
         P front = host.pos.getAdd((host.getSpeed()*3+48)*dir,0);
@@ -68,12 +77,9 @@ public abstract class AI implements Observer {
         }
         if (blocked){
             tasks.peek().blocked(host, false);
-            return true;
         } else if (fall){
             tasks.peek().blocked(host, true);
-            return true;
         }
-        return false;
     }
     void hear(Prop u, String p){}
     boolean perceive(int d) {
@@ -154,7 +160,9 @@ class NeutralAI extends AI{
             }
         }
     }
-    void shop(){}
+    void shop(){
+        setTask(Behavior.Idle);
+    }
     public void update(){
         super.update();
         advertise.update();

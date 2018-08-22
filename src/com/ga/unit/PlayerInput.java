@@ -177,10 +177,12 @@ public class PlayerInput implements Input {
             keyActionMap.put(83, Actions.Drop.name());
             keyActionMap.put(81, Actions.Throw.name());
             keyActionMap.put(82, Actions.Wield.name());
+            keyActionMap.put(90, Actions.Activate.name());
             keyActionMap.put(17, "_CTRL");
             keyActionMap.put(10, "_SAY");
             keyActionMap.put(9, "_MENU");
             keyActionMap.put(38, "_UP");
+            keyActionMap.put(27, "_EXIT");
         }
     }
     @Override

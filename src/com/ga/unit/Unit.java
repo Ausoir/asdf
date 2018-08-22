@@ -20,6 +20,7 @@ public class Unit extends Prop {
     private static final float OFFSET_UNIT = .0001f;
     public HashMap<Actions, Cooldown> cooldown = new HashMap<>();
     public int controlId;
+    public boolean traveler = false;
     public Body clip;
     public Actions state = Actions.Idle;
     public boolean grounded = false;
@@ -66,7 +67,7 @@ public class Unit extends Prop {
         map = Global.getMap(sections[6]);
         clip.load(sections[7]);
         faction = Faction.valueOf(sections[9]);
-        Intelligence.get(sections[10], this);
+        Intelligence.load(sections[10], this);
         stats.load(sections[8]);
         Actions.load(this,sections[11]);
         clip.setOrganHealth();
@@ -203,7 +204,7 @@ public class Unit extends Prop {
 
     @Override
     public int getDamage(){
-        return (int) ((get("Level").get()+1)*damageMod);
+        return (int) (get("Strength").get()*damageMod);
     }
 
     protected boolean damageBreakthrough(int organ, boolean blunt, int damage){
@@ -260,7 +261,7 @@ public class Unit extends Prop {
                             } else {
                                 buff(Buffs.Bleed, 1);
                             }
-                        } else die();
+                        } else die("Lack of Vitality");
                     }
                 } else {
                     clip.organs[i].hit(hitBox);
@@ -275,7 +276,7 @@ public class Unit extends Prop {
         return stats.getStat(p);
     }
 
-    public void die() {
+    public void die(String cause) {
         save = false;
         onInteract = null;
         setState(Actions.Dead);
@@ -352,7 +353,6 @@ public class Unit extends Prop {
         }
         return null;
     }
-
     @Override
     public void update() {
         speech.update();
@@ -365,21 +365,18 @@ public class Unit extends Prop {
         stateUpdate();
         super.update();
     }
-
     public void setVisible(boolean p){
         image.visible = p;
         for (Organ i : clip.organs) {
             i.image.visible = p;
         }
     }
-
     @Override
     public void draw(Graphics2D g) {
         for (Organ i : clip.organs) {
             i.draw(g);
         }
     }
-
     public String getDescription(){
         String r = name + " [Genetic Code: "+seed+"] [Faction: "+faction.name()+"]\n";
         r += "  *** Stats ***\n"+stats.toString().split("/")[0].replace("&"," ")+"\n";
@@ -388,7 +385,6 @@ public class Unit extends Prop {
         r += "  *** Capabilities ***\n"+getTags().toString()+"\n";
         return r;
     }
-
     public void revive() {
         stats.clearBuffs();
         Particle.holyExplosion(map, pos, getDepth());

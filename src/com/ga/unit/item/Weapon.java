@@ -12,8 +12,8 @@ public class Weapon extends Item {
     private int quality = 0;
     public Weapon(Map map, String name, int seed, Material[] materials, ItemType type) {
         super(map, name, seed, materials, type);
-        speed = 6 - (weight*2) - (range/20);
-        value = value*2 + 1000;
+        speed = speed - (range/12);
+        value *= 2;
         cooldown.setDuration(0);
         rotation = 35;
         disposable = false;
@@ -21,11 +21,6 @@ public class Weapon extends Item {
     public void onCreate(){
         imbueMeta(true, true, .1f);
         if (rand.nextInt(10) == 0) quality = 1;
-    }
-    protected void setModifier(SpecialtyMod mod){
-        if (mod == SpecialtyMod.Sharp) quality += admod.magnitude;
-        else if (mod == SpecialtyMod.Dull) quality -= admod.magnitude;
-        else super.setModifier(mod);
     }
     public int getQuality(){
         return quality;

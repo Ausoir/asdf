@@ -92,6 +92,7 @@ public enum Intelligence {
                     if (p.hittable(host.faction)) {
                         target = (Unit) p;
                         host.say("@c tgt");
+                        if (tasks.peek() == Behavior.Hunt) tasks.pop();
                         setTask(Behavior.Hunt);
                         return true;
                     }
@@ -113,8 +114,8 @@ public enum Intelligence {
                     super.load(p);
                     String[] data = FileManager.readText("Data/raw/Shop.txt");
                     advertise = new Timer(100+host.rand.nextInt(200), false);
-                    low = host.rand.nextFloat()*2 + .5f;
-                    high = host.rand.nextFloat()*2 + 2.5f;
+                    low = host.rand.nextFloat()*.5f + .5f;
+                    high = host.rand.nextFloat() + 1f;
                     String r = "I'm selling ";
                     int length = host.rand.nextInt(20) + 1;
                     String[] items = new String[length];
@@ -126,7 +127,11 @@ public enum Intelligence {
                     prices = new int[length];
                     actions = new Performer[length];
                     for (int i = 0; i < length; i++) {
-                        Item item = ((Item) Stock.createByName(host.map, items[i], -1));
+                        Item item;
+                        if (items[i].contains(":")){
+                            String[] itemData = items[i].split(":");
+                            item = ((Item) Stock.createByName(host.map, itemData[0], Integer.parseInt(itemData[1]), -1));
+                        } else item = ((Item) Stock.createByName(host.map, items[i], -1));
                         int value = fluctuate(item.getValue());
                         products[i] = item;
                         prices[i] = value;
@@ -147,13 +152,14 @@ public enum Intelligence {
                     ad = r;
                 }
 
-                void shop(){
+                void shop() {
+                    super.shop();
                     Menu.menu.showShop("Trader's Wares - \"" + host.getConversation() + "\"",
                             products, prices, actions);
                 }
 
                 private int fluctuate(int value) {
-                    float fluc = host.traits.has(Traits.Trait.Haggler) ? ((high+low)/2) : (host.rand.nextFloat() * (high - low)) + low;
+                    float fluc = (host.rand.nextFloat() * (high - low)) + low;
                     return (int) (value * fluc);
                 }
             });
@@ -167,6 +173,7 @@ public enum Intelligence {
                     price = (host.rand.nextInt(30)+30)*100+99;
                 }
                 void shop() {
+                    super.shop();
                     Menu.menu.showDialog("Inn",
                             "Rest for 3 hours? Costs "+Dialog.money(price)+". Heal 1 Vitality, 9 Fatigue, and gain 10 Motivation. Food is paid for.",
                             new String[]{"Pay"},
@@ -197,14 +204,17 @@ public enum Intelligence {
         public AI make(Unit host) {
             return process(new NeutralAI(host) {
                 private int price;
+                private Traits.Trait trait;
 
                 void load(String p) {
                     super.load(p);
-                    price = (host.rand.nextInt(60)+30)*100+99;
+                    price = (host.rand.nextInt(60)+9)*100+99;
+                    trait = Traits.Trait.getByType(1).get(host.seed % Traits.Trait.getByType(1).size());
                 }
                 void shop() {
-                    int reqMot = 100, reqTime = 5;
-                    String message = "I can help you train if you have the time, motivation, and money. Would you like to level up?";
+                    super.shop();
+                    int reqMot = 20, reqTime = 2;
+                    String message = "I can teach you useful things if you have the time, motivation, and money.";
                     message += "\nRequires "+Dialog.money(price)+", "+reqMot+" motivation, and "+reqTime+" hours.";
                     message += "\n\nCurrent motivation: "+Global.player.get("Motivation").get();
                     message += "\nCurrent nutrition: "+Global.player.get("Nutrition").get();
@@ -216,7 +226,7 @@ public enum Intelligence {
                                     if (Global.player.get("Motivation").get() >= reqMot){
                                         if (Global.player.getGold() >= price) {
                                             if (Global.player.map.updater.sleep(reqTime, true)) {
-                                                Global.player.level();
+                                                Global.player.learnTrait(trait);
                                                 Global.player.get("Motivation").require(reqMot);
                                                 Global.player.requireGold(price);
                                             }
@@ -245,7 +255,8 @@ public enum Intelligence {
                     }
                 }
 
-                void shop(){
+                void shop() {
+                    super.shop();
                     ArrayList<Prop> inventory = Global.player.getAvailableItems();
                     ArrayList<Prop> available = new ArrayList<>();
                     ArrayList<Float> fluctuation = new ArrayList<>();
@@ -288,13 +299,78 @@ public enum Intelligence {
                 }
             });
         }
+    }, Guildsman{
+        public AI make(Unit host) {
+            return process(new NeutralAI(host) {
+                private int hourly, price;
+
+                void load(String p) {
+                    super.load(p);
+                    int pool = host.rand.nextInt(20000) + 20000;
+                    float ratio = host.rand.nextFloat() * .8f + .1f;
+                    hourly = (int) (pool * ratio * .01f);
+                    price = (int) (pool * (1 - ratio));
+                }
+                public boolean perceived(Prop p){
+                    if (p instanceof Unit) {
+                        if (p.hittable(host.faction)) {
+                            target = (Unit) p;
+                            host.say("@c tgt");
+                            setTask(Behavior.Hunt);
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+                void shop() {
+                    super.shop();
+                    int week = hourly*42;
+                    int month = hourly*180;
+                    int debt = Global.player.get("Insurance").getMax();
+                    if (debt >= 0) {
+                        Menu.menu.showDialog("Guildsman", "Would you like to buy our health insurance plan?\n\n" +
+                                " Every time you are in a critical accident, we will bring you here and revive you. We cover all accidents ranging from food poisoning to decapitation.\n"+
+                                " You must pay an hourly fee of "+Dialog.money(hourly)+"."+
+                                " The initial payment for the contract is "+Dialog.money(price)+", and you must pay this amount again after every accident to renew the contract.",
+                                new String[]{"Sign a contract for a week (42 hours + initial payment = "+Dialog.money(week+price)+")",
+                                        "Sign a contract for a month (180 hours + initial payment = "+Dialog.money(month+price)+")"},
+                                new Performer[]{
+                                        new Performer() {
+                                            public void perform() {
+                                                if (Global.player.requireGold(week+price)) {
+                                                    Global.player.respawnInfo = 42 + Global.hour + "&" + host.map.name.toString();
+                                                }
+                                            }
+                                        }, new Performer() {
+                                    public void perform() {
+                                                if (Global.player.requireGold(month+price)) {
+                                                    Global.player.respawnInfo = 180 + Global.hour + "&" + host.map.name.toString();
+                                                }
+                                    }
+                                }
+                                });
+                    } else {
+                        Menu.menu.showDialog("Guildsman", "You are in debt from your previous accident. You can't buy another contract until you pay off your debt.",
+                                new String[]{"Pay off debt ("+Dialog.money(-debt)+")"}, new Performer[]{
+                                        new Performer(){
+                                            public void perform(){
+                                                if (Global.player.requireGold(-debt)){
+                                                    Global.player.get("Insurance").setTotal(0, true);
+                                                }
+                                            }
+                                        }
+                                });
+                    }
+                }
+            });
+        }
     };
     public abstract AI make(Unit host);
     AI process(AI p){
         p.factoryId = ordinal();
         return p;
     }
-    public static AI get(String p, Unit host){
+    public static AI load(String p, Unit host){
         String[] data = p.split(",");
         String[] values = data[0].split(":");
         AI r = values()[Integer.parseInt(values[0])].make(host);

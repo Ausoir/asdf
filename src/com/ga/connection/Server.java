@@ -23,7 +23,6 @@ import java.util.TimerTask;
  * Created by Ga on 12/10/2016. asd
  */
 public class Server {
-    private final String local = "127.0.0.1";
     private UDPClient udp;
     private TCPClient tcpUploader, tcpDownloader;
     private boolean stop;
@@ -102,11 +101,13 @@ public class Server {
             public void run(){
                 String[] mapData = p.split("@");
                 FileManager.saveWorld();
+                boolean editor = Global.editor;
+                Global.editor = true;
                 com.ga.map.Map map = Global.getMap(mapData[0]);
                 Global.player.map = map;
                 Global.player.pos.set(map.updater.getEntrancePos(Integer.parseInt(mapData[1]), map.getFailsafePos()));
                 FileManager.saveCharacter();
-                Global.player.map.clear();
+                Global.editor = editor;
                 Global.maps.clear();
                 FileManager.loadWorld();
                 FileManager.loadPlayer();

@@ -39,11 +39,11 @@ public class Menu extends JPanel {
         ((MenuDialog) current).show(title, message);
     }
     public void showDialog(String title, String message, String[] options, final Performer[] actions) {
-        if (current.getClass() != MenuDialog.class) select(new MenuDialog());
+        select(new MenuDialog());
         ((MenuDialog) current).show(title, message, options, actions);
     }
     public void showShop(String title, Item[] wares, int[] prices, Performer[] actions){
-        if (current.getClass() != MenuShop.class) select(new MenuShop());
+        select(new MenuShop());
         ((MenuShop) current).show(title, wares, prices, actions);
     }
     void resize(){

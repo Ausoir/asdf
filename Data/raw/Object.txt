@@ -2,12 +2,12 @@ Error;1;0;0;0,0;0;0 //Name, Image Center Type, Gravity, Mobility, Random Size, R
 Weed;2;1;0;.3,.3;1;0
 Reed;2;1;0;.3,.3;1;0
 Root;2;1;0;.3,.3;1;0
-Vine;2;1;0;.3,.3;1;0
+Vine;2;0;0;.3,.3;1;0
 Stone;2;1;0;.3,.3;1;0
 Bush;2;1;0;.3,.3;1;0
 Deadbush;2;1;0;.3,.3;1;0
 Tree;2;1;0;.3,.3;1;0
-Appliance;1;0;0;.1,.1;1;0
+Appliance;1;1;0;.1,.1;1;0
 Door;2;0;0;0,0;1;0
 Signpost;2;1;0;0,0;1;0
 Streetlight;2;1;0;0,0;1;0
@@ -31,4 +31,5 @@ Snowbush;2;1;0;.3,.3;1;0
 Vent;2;0;0;.2,.2;1;8
 Warning;1;0;0;.1,.1;1;8
 Dungeon;1;0;0;.2,.2;1;0
+Sewer;1;0;0;0,0;1;0
 Sign_Food;1;0;0;0,0;1;0

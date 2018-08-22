@@ -1,12 +1,16 @@
 package com.ga.unit.man;
 
+import com.ga.game.FileManager;
+import com.ga.game.Menu;
 import com.ga.game.Settings;
 import com.ga.game.Sound;
 import com.ga.map.Global;
 import com.ga.map.Map;
 import com.ga.map.MapName;
 import com.ga.tool.Line;
+import com.ga.tool.Performer;
 import com.ga.tool.SyncRand;
+import com.ga.unit.Faction;
 import com.ga.unit.Particle;
 import com.ga.unit.Traits;
 import com.ga.unit.skill.Actions;
@@ -22,11 +26,24 @@ public class MainPlayer extends Player {
             "Strength", "Agility", "Intelligence"
     };
     private Indicator statBar;
+    public String respawnInfo;
 
     public MainPlayer(Map map, int seed) {
         super(map, seed);
         Global.player = this;
         Global.cameraTo = pos;
+    }
+
+    public String[] load(String p){
+        String[] r = super.load(p);
+        respawnInfo = r[15]; //Expiry, Map, Location
+        return r;
+    }
+    public String toString(){
+        String r = super.toString();
+        String first = r.substring(0,r.indexOf("#"));
+        String last = r.substring(r.indexOf("#"));
+        return first + "@"+respawnInfo + last;
     }
 
     @Override
@@ -65,6 +82,7 @@ public class MainPlayer extends Player {
         String statChangeNotice = "";
         int level = get("Level").getMax();
         get("Level").addTotal(1);
+        get("Motivation").setTotal((level+1)*10, true);
         if (level > 1) {
             int i, current = 1, prev;
             for (i = 1; i < level; i += prev) {
@@ -91,9 +109,34 @@ public class MainPlayer extends Player {
         say("Leveled up! " + statChangeNotice);
     }
 
-    public void die() {
-        super.die();
+    public void die(String cause) {
+        super.die(cause);
         map.weather.fadeOut();
+        delay.time = 100;
+        delay.performer = new Performer(){
+            public void perform(){
+                delay.time = -1;
+                String msg = "Cause: "+cause+"\n";
+                if (respawnInfo.isEmpty()) msg += "You have no insurance to cover this death.";
+                else {
+                    String[] data = respawnInfo.split("&");
+                    int expiry = Integer.parseInt(data[0]) - Global.hour;
+                    if (expiry < 0) msg += "Your insurance expired "+expiry+" hours ago.";
+                    else {
+                        map.updater.forceSleep(1);
+                        Menu.menu.showDialog("You fall unconscious...", msg+"Your guild agents haul your body back into the guild hall for revival...");
+                        respawnInfo = "";
+                        revive();
+                        Global.server.requestChangeMap(data[1]+"@911");
+                        return;
+                    }
+                }
+                FileManager.save(FileManager.makeDirectory("Data/map/Player.user"),FileManager.read(FileManager.makeDirectory("Data/map/Template.user")));
+                FileManager.save(FileManager.makeDirectory("Data/map/World.map"),"");
+                FileManager.save(FileManager.makeDirectory("Data/Keymap.txt"),"");
+                Menu.menu.showDialog("You die...", msg + "\n GAME OVER!");
+            }
+        };
     }
 
     public void revive() {
@@ -113,7 +156,7 @@ public class MainPlayer extends Player {
     }
 
     protected void onMapEdge(int dir){
-        if (map.name.isField()){
+        if (map.name.isField() && hittable(Faction.Destructive)){
             MapName newMapName = map.name.getNext(dir);
             if (map.updater.sleep(1, false)) {
                 vel.set(0,0);

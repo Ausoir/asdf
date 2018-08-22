@@ -14,6 +14,7 @@ class GenerateForest {
         if (map.isSnowing()) ground.finish("4&dirt&snow&Snowtree=1");
         else ground.finish("4&dirt&grass&Tree=1");
         generator.makeEdgeSpawns();
+        generator.generateBuilding("Mound", 360);
     }
     static void generateDeepwoods(Map map){
         Generator generator = new Generator(map, 0);
@@ -27,5 +28,6 @@ class GenerateForest {
         else ground.finish("3&dirt&sand&Rock=.1");
         generator.makeEdgeSpawns();
         generator.generateBuildings(new String[]{"Tree1", "Rock1"}, map.landRaw.get(1), 10);
+        generator.generateBuilding("Cave", 400);
     }
 }

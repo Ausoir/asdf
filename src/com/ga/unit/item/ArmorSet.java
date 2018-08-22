@@ -14,19 +14,19 @@ import java.awt.*;
  */
 public class ArmorSet {
     private static Armor[] bare = new Armor[]{
-            new Armor(null, "Head", 0,new Item.Material[]{Item.Material.Organic},0,0,0, 0){
+            new Armor(null, "Head", 0,new Item.Material[]{Item.Material.Organic},0,0,0,0,0){
                 public boolean checkBreak(boolean blunt, int d){ return true; }
             },
-            new Armor(null, "Man_skin", 0,new Item.Material[]{Item.Material.Organic},1,0,0, 0){
+            new Armor(null, "Man_skin", 0,new Item.Material[]{Item.Material.Organic},1,0,0,0,0){
                 public boolean checkBreak(boolean blunt, int d){ return true; }
             },
-            new Armor(null, "Man_skin", 0,new Item.Material[]{Item.Material.Organic},2,0,0, 0){
+            new Armor(null, "Man_skin", 0,new Item.Material[]{Item.Material.Organic},2,0,0,0,0){
                 public boolean checkBreak(boolean blunt, int d){ return true; }
             },
-            new Armor(null, "Man_skin", 0,new Item.Material[]{Item.Material.Organic},3,0,0, 0){
+            new Armor(null, "Man_skin", 0,new Item.Material[]{Item.Material.Organic},3,0,0,0,0){
                 public boolean checkBreak(boolean blunt, int d){ return true; }
             },
-            new Armor(null, "Man_skin", 0,new Item.Material[]{Item.Material.Organic},4,0,0, 0){
+            new Armor(null, "Man_skin", 0,new Item.Material[]{Item.Material.Organic},4,0,0,0,0){
                 public boolean checkBreak(boolean blunt, int d){ return true; }
             },
     };
@@ -81,19 +81,19 @@ public class ArmorSet {
         } else {
             if (piece == 0){
                 display[5].setImage(p.name);
-                display[5].getImage().modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 9) + 2);
+                display[5].getImage().modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 10));
             } else if (piece == 1) {
                 display[0].setImage(p.name, 1);
                 display[3].setImage(p.name, 0);
                 display[4].setImage(p.name, 1);
-                display[0].getImage().modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 9) + 2);
-                display[3].getImage().modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 9) + 2);
-                display[4].getImage().modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 9) + 2);
+                display[0].getImage().modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 10));
+                display[3].getImage().modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 10));
+                display[4].getImage().modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 10));
             } else if (piece == 2){
                 display[1].setImage(p.name, 2);
                 display[2].setImage(p.name, 2);
-                display[1].getImage().modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 9) + 2);
-                display[2].getImage().modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 9) + 2);
+                display[1].getImage().modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 10));
+                display[2].getImage().modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 10));
             }
         }
         updateStatus();

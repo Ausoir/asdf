@@ -6,19 +6,19 @@ import com.ga.tool.P;
 import java.util.ArrayList;
 
 class GeneratePlains {
-    static void generateGrasslands(Map map){
-        generate(map, map.isSnowing() ? "dirt&snow&Weed=.1,Snowbush=.2" : "dirt&grass&Weed=.2,Bush=.3");
+    static void generateHills(Map map){
+        generate(map, map.isSnowing() ? "dirt&snow&Weed=.1,Snowbush=.2" : "dirt&grass&Bush=.1,Weed=1", 2);
     }
     static void generateFields(Map map){
         String theme;
         if (map.isSnowing()) theme = "dirt&snow&Rock=.1,Snowbush=.2,Weed=.4,Snowtree=1";
         else theme = "dirt&grass&Rock=.1,Bush=.2,Weed=.4,Tree=1";
-        generate(map, theme);
+        generate(map, theme, 3);
     }
     static void generateDesert(Map map){
-        generate(map, "dirt&sand&Rock=.1,Deadbush=.2");
+        generate(map, "dirt&sand&Rock=.1,Deadbush=.2", 1);
     }
-    private static void generate(Map map, String theme){
+    private static void generate(Map map, String theme, int type){
         Generator generator = new Generator(map, 0);
         map.size = new P(Creation.r.nextInt(4000)+2000, Creation.r.nextInt(4000)+2000);
         int depth = 4;
@@ -31,7 +31,7 @@ class GeneratePlains {
         Line first = new Line(trail.last, end.getAdd(-postX,0));
         ArrayList<Line> total = new ArrayList<>();
         total.add(first);
-        divideLand(total, 0, 8);
+        divideLand(total, 0, 7, type);
         float highestY = 0;
         for (Line i : total){
             trail.add(i);
@@ -47,18 +47,23 @@ class GeneratePlains {
         generator.makeEdgeSpawns();
         map.normalize(0,800);
         map.size.y -= 400;
-        if (Creation.r.nextInt(3) == 0) {
-            Line l = map.landRaw.get(Creation.r.nextInt(map.landRaw.size()));
-            if (l.opt > 0 && l.tid >= 0 && l.clockwise() && Math.abs(l.getSlope()) < .1f) {
-                generator.generateBuildings(new String[]{"To_Forest"}, l, 10);
-            }
-        }
+        generator.generateBuilding("Cave", 400);
     }
-    private static void divideLand(ArrayList<Line> total, int current, int max){
+    private static void divideLand(ArrayList<Line> total, int current, int max, int type){
         if (current >= max) return;
         Line last = total.remove(total.size()-1);
-        P mid = new P(Creation.r.nextFloat()*(last.ptd.x-last.pt.x)+last.pt.x,
-                Creation.r.nextFloat()*(last.ptd.y-last.pt.y)+last.pt.y);
+        P mid;
+        if (type == 2){
+            mid = new P((Creation.r.nextFloat()*.8f+.1f)*(last.ptd.x-last.pt.x)+last.pt.x,
+                    (Creation.r.nextFloat()*.8f+.1f)*(last.ptd.y-last.pt.y)+last.pt.y);
+        } else if (type == 3){
+            float ratio = (Global.clamp((float) Creation.r.nextGaussian()/3,-.9f,.9f)+1)/2f;
+            mid = new P(ratio*(last.ptd.x-last.pt.x)+last.pt.x,
+                    ratio*(last.ptd.y-last.pt.y)+last.pt.y);
+        } else {
+            mid = new P(.5f*(last.ptd.x-last.pt.x)+last.pt.x,
+                    .5f*(last.ptd.y-last.pt.y)+last.pt.y);
+        }
         Line one = new Line(last.pt, mid);
         Line two = new Line(mid, last.ptd);
         float shortest = last.getLength()/(8*(current+1));
@@ -66,8 +71,8 @@ class GeneratePlains {
         float rand = Global.clamp((float) Creation.r.nextGaussian()/2,-1,1);
         mid.add(Global.cos(atan)*shortest*rand, Global.sin(atan)*shortest*rand);
         total.add(one);
-        divideLand(total, ++current, max);
+        divideLand(total, ++current, max, type);
         total.add(two);
-        divideLand(total, ++current, max);
+        divideLand(total, ++current, max, type);
     }
 }

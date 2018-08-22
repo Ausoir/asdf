@@ -4,6 +4,7 @@ Meat;1;Red
 Birdmeat;1;White
 Bread;1;Grain
 Cheese;1;Dairy
+Jelly;1;Synthetic
 Vegetables;1;Vegetable
 Drumstick;2;White,Fried
 Porkchop;1;Red,Roasted
@@ -11,4 +12,5 @@ Jerky;2;Red,Dried,Smoked,Spiced
 Meal;1;Grain,Vegetable,Fish,Fruit,Cut,Spiced
 Burger;1;Red,Vegetable,Grain,Roasted,Dairy,Cut
 Sandwich;2;Vegetable,Grain,Cut,Dairy,White
-Ration;3;Sealed,Dried,Grain,Grain
+Ration;3;Dried,Grain,Grain
+Happyjuice;18;Synthetic

@@ -1,7 +1,8 @@
-Berrybush:Fruit
-Crate:Cup,Threadball,Jug,Sugar,Salt,Candle,Pot,Statue
-Barrel:Potion,Alcohol
-Cabinet:Comfortwear_Torso,Comfortwear_Pants,Fannypack,Knapsack,Jean_Torso,Jean_Pants,Spring_Suit_Torso,Spring_Suit_Pants,Cloak
-Dresser:Buzzcut,Blondecut,Gingercut,Baldcut,Ponytail,Glasses,Strawhat,Bandana,Mask
-Refrigerator:Alcohol,Bread,Cheese,Fruit
-Toolbox:Battery,Scrap,Scroll,Potion
+Berrybush::Fruit
+Crate:Crowbar:Scrap,Cup,Threadball,Jug,Candle,Pot,Statue,Hammer
+Barrel:Crowbar:Potion,Alcohol
+Cabinet:Lockpick:Scroll,Comfortwear_Torso,Comfortwear_Pants,Jean_Torso,Jean_Pants,Spring_Suit_Torso,Spring_Suit_Pants,Cloak
+Dresser:Lockpick:Scroll,Buzzcut,Blondecut,Gingercut,Baldcut,Ponytail,Glasses,Strawhat,Bandana,Mask
+Refrigerator::Alcohol,Bread,Cheese,Fruit,Sugar,Salt,Kitchenware
+Chest:Lockpick:Manual,Textbook,Happyjuices
+Toolbox:Lockpick:Battery,Scrap,Scroll,Potion

@@ -53,7 +53,7 @@ public class Terrain extends Drawable {
         } else {
             imageTexture = new TexturePaint(image.image, new Rectangle2D.Double(0, 0, image.getSize().x, image.getSize().y));
         }
-        if (shader == Shader.Grass) offset = -2;
+        offset = shader.getOffset();
     }
     public void start(){
         map.updater.addQueue.add(this);

@@ -5,6 +5,7 @@ import com.ga.game.Menu;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
+import com.ga.unit.Faction;
 import com.ga.unit.Prop;
 import com.ga.unit.Stock;
 import com.ga.unit.Unit;
@@ -186,9 +187,10 @@ public class EditorInput extends Drawable implements Input, Updatable {
                 }
             }
         } else if (cmd[0].equals("copy")) {
-            txDepth = cmd[1];
-            txTexture = cmd[2];
-            txShader = cmd[3];
+            String[] texs = message.split(" ")[3].split("&");
+            txDepth = texs[0];
+            txTexture = texs[1];
+            txShader = texs[2];
         } else if (cmd[0].equals("depth")) {
             txDepth = cmd[1];
         } else if (cmd[0].equals("texture")) {
@@ -263,9 +265,6 @@ public class EditorInput extends Drawable implements Input, Updatable {
         } else if (cmd[0].equals("gen land")){
             Creation.prepareRandom(-(int) (Math.random()*1000));
             GeneratePlains.generateFields(map);
-        } else if (cmd[0].equals("gen town")){
-            Creation.prepareRandom(-(int) (Math.random()*1000));
-            GenerateTown.generate(map);
         } else if (cmd[0].equals("blocker")){
             Generator gen = new Generator(map, map.getNextTerrain());
             gen.generateBlocker(Integer.parseInt(p.substring(8)), lastSelected);
@@ -297,24 +296,30 @@ public class EditorInput extends Drawable implements Input, Updatable {
             lastSaved = p.substring(5);
             save(lastSaved);
         } else if (cmd[0].equals("load")){
-            Global.server.requestChangeMap(FileManager.makeDirectory(cmd[1]+"@0"));
-            lastSaved = cmd[1];
-            while (true){
-                try {
-                    Thread.sleep(100);
-                    if (!Processes.paused){
-                        Global.display.input = new EditorInput();
-                        message("Loaded "+lastSaved);
-                        break;
+            if (FileManager.isFile(FileManager.makeDirectory("Data/map/"+cmd[1]+".map"))) {
+                Global.server.requestChangeMap(FileManager.makeDirectory(cmd[1] + "@0"));
+                lastSaved = cmd[1];
+                while (true) {
+                    try {
+                        Thread.sleep(100);
+                        if (!Processes.paused) {
+                            Global.display.input = new EditorInput();
+                            message("Loaded " + lastSaved);
+                            break;
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
                 }
             }
         } else if (p.equals("exit")){
             System.exit(0);
         } else if (cmd[0].equals("build")){
             new Generator(Global.player.map, map.getNextTerrain()).generateBuilding(p.substring(6), new P(x,y), 9999);
+        } else if (cmd[0].equals("container")){
+            selectTool(Tool.OBJECT);
+            currentO.remove();
+            currentO = make(Stock.Container.create(map, Integer.parseInt(cmd[1]), Integer.parseInt(cmd[2])));
         } else if (cmd[0].equals("o")){
             selectTool(Tool.OBJECT);
             currentO.remove();
@@ -420,7 +425,8 @@ public class EditorInput extends Drawable implements Input, Updatable {
                 } else if (tool == Tool.OBJECT) {
                     currentO.pos.set(x, y);
                 } else if (tool == Tool.REMOVE && lmb) {
-                    ArrayList<Prop> props = map.updater.collideAll(new P(x,y),24);
+                    ArrayList<Prop> props = map.updater.collideProp(new P(x,y),24);
+                    props.addAll(map.updater.collideUnit(new P(x,y),24,Faction.Destructive));
                     for (Prop i : props) {
                         String name = i.name;
                         try{i.remove();}catch(Exception e){
@@ -650,7 +656,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
             case KeyEvent.VK_INSERT:
                 Global.editor = false;
                 Global.server.requestChangeMap(FileManager.makeDirectory(map.name.toString()+"@0"));
-                final P asdf = Global.camera.getAdd(0,-400);
+                final P asdf = Global.camera.getAdd(0,-40);
                 while (true){
                     try {
                         Thread.sleep(100);

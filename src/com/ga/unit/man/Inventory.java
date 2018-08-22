@@ -8,7 +8,6 @@ import com.ga.unit.item.Item;
  */
 public class Inventory {
     private L<Item> items = new L<>();
-    public int weight = 0;
     private int maxSize = 0;
     private Man host;
     Inventory(Man host){
@@ -17,7 +16,6 @@ public class Inventory {
     boolean addItem(Item p){
         if (vacant()) {
             items.add(p);
-            weight += p.weight;
             return true;
         }
         return false;
@@ -44,7 +42,6 @@ public class Inventory {
     }
     public Item remove(int p){
         Item r = items.get(p);
-        weight -= r.weight;
         items.remove(p);
         return r;
     }
@@ -55,9 +52,9 @@ public class Inventory {
     }
     public String toString(){
         if (items.size() == 0) return "";
-        String r = "";
+        StringBuilder r = new StringBuilder();
         for (Item item : items) {
-            r += item.toString() + "#";
+            r.append(item.toString()).append("#");
         }
         return r.substring(0,r.length()-1);
     }

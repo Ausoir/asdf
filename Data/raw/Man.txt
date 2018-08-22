@@ -1,28 +1,29 @@
-Stander;;;punk;1,1,1;Evil;0:0;Idle;;Toughwear;Mask; //Humanoids-Name,Speech Type,Stat,Faction,AI Type,AI Subtype,Moveset,Face,Weapons,Armors,Headgears,Trait
-Player;;;player;1,1,1;Player;0:0;Idle;;;;
-Resident;;;resident;1,1,1;Neutral;1:0;Backstep;,,,,,,,,,Potion,Stick;Comfortwear,Dustset,Toughwear,Comfortwear,Comfortwear,Suit,Robe,Comfortwear;;
-Shopkeeper;;;merchant;1,1,1;Neutral;3:0;Backstep;;Spring_Suit;Glasses,;
-Waiter;;;merchant;1,1,1;Neutral;3:1;Backstep;;Suit;;
-Blacksmith;;;merchant;1,1,1;Neutral;3:4;Backstep;;Adventurewear;;
-Armorsmith;;;merchant;1,1,1;Neutral;3:3;Backstep;;Adventurewear;;
-Tailor;;;merchant;1,1,1;Neutral;3:2;Backstep;;Comfortwear;Glasses;
-Technician;;;merchant;1,1,1;Neutral;3:5;Backstep;;Labwear;Glasses;
-Guildsman;;;merchant;1,1,1;Neutral;3:0;Backstep;;Dustset;Bandana;
-Trainer;;;merchant;1,1,1;Neutral;5:0;Backstep;;Robe;Bandana;
-Dealer;;;seafood;1,1,1;Neutral;6:0;Backstep;;Spring_Suit;Glasses;
-Innkeep;;;merchant;1,1,1;Neutral;4:0;Backstep;;Brown_Suit;;
-Junkseller;;;merchant;1,1,1;Neutral;3:0;;;Jumpsuit;Buzzcut;
-Looter;;;punk;1,1,1;Punk;2:1;Use,Backstep,Kick;Stick,Bamboo_Spear,;;;
-Punk;;;punk;4,3,1;Punk;2:1;Use,Charge,Dash,Uppercut;Dagger,Axe,Pickaxe;Jean;Buzzcut;
-Yeller;;;punk;2,3,4;Punk;2:1;Use,Backstep,Calling;Stick;Jean;Gingercut;Infusion:3
-Phantom;Phantom;Shadowrobe;;12,7,12;Curse;2:1;Whirlwind,Use,Shadowstep,Magic_Arrow,Shock,Lightning;Greatsword,Halberd,Warhammer;Shadowrobe;;Shadoweaving:2,Aeromancy:2,Infusion:4,Tough:1,Attunement:1
-Monk;;;punk;3,7,3;Punk;2:1;Backstep,Use,Punch,Kick,Sidekick,Dash,Leap;,Spear,Bamboo_Spear,Threadball,Throwing Knife,Scroll,Potion;Robe;;
-Guard;;;soldier;10,10,1;Neutral;2:1;Use,Sidekick,Hold,Underhand,Dash,Whirlwind;Broadsword,Spear,Mace;Chainmail,Platemail;Lace_Helm,Legion_Helm;
-Archer;;;soldier;8,10,1;Punk;2:2;Use,Kick,Backstep;Bow;Chainmail;Lace_Helm;
-Wanderer;;;punk;8,7,7;Punk;2:1;Use,Underhand,Lunge,Dash,Shadowstep;Katana,Broadsword,Katana,Claw;Robe,Shadowrobe;;Attunement:1,Shadoweaving:2,Aeromancy:2
-Skeleton;Skull;Skeleton_skin;undead;12,4,1;Evil;2:1;Use;Broadsword,Spear,Cutlass,Falchion;;Lace_Helm,Legion_Helm,Full_Helm;Tough:1
-Zombie;Zombie;Zombie_skin;undead;8,24,3;Evil;2:1;Punch,Charge;;;;Tough:1
-Hunter;;;soldier;2,7,5;Punk;2:2;Backstep,Kick,Blink,Use;Revolver,Rifle,Pistol;Dustset;Sunglass,Mask;Shadoweaving:1
-Spearman;;;soldier;8,8,5;Punk;2:1;Backstep,Kick,Dash,Hold,Use;Spear,Halberd;Chainmail;Lace_Helm;
-Witch;;Zombie_skin;punk;1,1,10;Evil;2:1;Blink,Enchant,Calling,Mark,Swap;;;Mask;Attunement:1,Infusion:3,Bloodcraft:4;Shadoweaving:3
-Hillbird;;;punk;4,7,8;Punk;2:1;Use,Lunge,Dash,Shadowstep;Dagger,Tanto,Claw;Dustset;Mask,Bandana;
+Stander;;;punk;1,1,1;Evil;0:0;Idle;;Toughwear;Mask;; //Humanoids-Name,Speech Type,Stat,Faction,AI Type,AI Subtype,Moveset,Face,Weapons,Armors,Headgears,Trait
+Player;;;player;1,1,1;Player;0:0;Idle;;;;;
+Resident;;;resident;1,1,1;Neutral;1:0;Backstep;,,,,,,,,,Potion,Stick;Comfortwear,Dustset,Toughwear,Comfortwear,Comfortwear,Suit,Robe,Comfortwear;;;
+Shopkeeper;;;merchant;1,1,1;Neutral;3:0;Backstep;;Spring_Suit;Glasses,;;
+Waiter;;;merchant;1,1,1;Neutral;3:1;Backstep;;Suit;Baldcut;;
+Blacksmith;;;merchant;9,5,3;Neutral;3:4;Use,Dash,Whirlwind;Longhammer;Robe;Bandana;;
+Armorsmith;;;merchant;5,9,3;Neutral;3:3;Use,Hold,Charge;Hammer;Adventurewear;Bandana;;
+Tailor;;;merchant;1,1,1;Neutral;3:2;Backstep;;Comfortwear;Glasses;;
+Technician;;;merchant;2,1,9;Neutral;3:5;Backstep,Shock,Lightning;;Labwear;Glasses;Battery;Attunement:1,Aeromancy:3,Channeling:2
+Librarian;;;merchant;1,1,5;Neutral;3:6;Backstep;;Comfortwear;Glasses;;
+Innkeep;;;merchant;1,1,1;Neutral;4:0;Backstep;;Brown_Suit;;;
+Trainer;;;merchant;7,3,3;Neutral;5:0;Punch,Kick;;Sportswear;Bandana;;
+Dealer;;;seafood;1,1,1;Neutral;6:0;Backstep;;Spring_Suit;Glasses;;
+Guildsman;;;merchant;6,7,8;Neutral;7:0;Use,Lunge,Kick,Magic_Arrow;Rogue_Dagger;Shadowrobe;Ponytail;Battery;Infusion:3
+Scrapper;;;merchant;1,1,1;Neutral;3:0;;;Jumpsuit;Buzzcut;;
+Looter;;;punk;1,1,1;Punk;2:1;Use,Backstep,Kick;Stick,Bamboo_Spear,;;;;
+Punk;;;punk;4,3,1;Punk;2:1;Use,Charge,Dash,Uppercut;Knife,Crowbar,Baseball_Bat;Jean;Buzzcut;;
+Yeller;;;punk;2,3,4;Punk;2:1;Use,Backstep,Calling;Stick;Jean;Gingercut;Battery;Infusion:3
+Phantom;Phantom;Shadowrobe;;12,7,12;Curse;2:1;Whirlwind,Use,Shadowstep,Magic_Arrow,Shock,Lightning;Greatsword,Halberd,Warhammer;Shadowrobe;;;Shadoweaving:2,Aeromancy:2,Infusion:4,Tough:1,Attunement:1
+Monk;;;punk;3,7,3;Punk;2:1;Backstep,Use,Punch,Kick,Dash,Leap;,Spear,Bamboo_Spear,Threadball,Throwing Knife,Scroll,Potion;Robe;;;
+Guard;;;soldier;10,10,1;Neutral;2:1;Use,Hold,Underhand,Dash,Whirlwind;Broadsword,Spear,Mace;Chainmail,Platemail;Lace_Helm,Legion_Helm;;
+Archer;;;soldier;8,10,1;Punk;2:2;Use,Kick,Backstep;Bow;Chainmail;Lace_Helm;;
+Wanderer;;;punk;8,7,7;Punk;2:1;Use,Underhand,Lunge,Dash,Shadowstep;Katana,Broadsword,Katana,Claw;Robe,Shadowrobe;;Battery;Attunement:1,Shadoweaving:2,Aeromancy:2
+Skeleton;Skull;Skeleton_skin;undead;12,4,1;Evil;2:1;Use;Broadsword,Spear,Cutlass,Machete;;Lace_Helm,Legion_Helm,Full_Helm;;Tough:1
+Zombie;Zombie;Zombie_skin;undead;8,24,3;Evil;2:1;Punch,Charge;;;;;Tough:1
+Hunter;;;soldier;2,7,5;Punk;2:2;Backstep,Kick,Blink,Use;Firearm;Dustset;Sunglass,Mask;Ammunition,Ammunition;Shadoweaving:1
+Spearman;;;soldier;8,8,5;Punk;2:1;Backstep,Kick,Dash,Hold,Use;Spear,Halberd;Chainmail;Lace_Helm;;
+Witch;;Zombie_skin;punk;1,1,10;Evil;2:1;Blink,Enchant,Calling,Mark,Swap;;;Mask;;Attunement:1,Infusion:3,Bloodcraft:4;Shadoweaving:3
+Hillbird;;;punk;4,7,8;Punk;2:1;Use,Lunge,Dash,Shadowstep;Dagger,Tanto,Claw;Dustset;Mask,Bandana;;

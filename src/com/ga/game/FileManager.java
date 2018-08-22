@@ -7,6 +7,7 @@ import com.ga.map.Updater;
 import com.ga.tool.Line;
 import com.ga.unit.Clip;
 import com.ga.unit.Stock;
+import com.ga.unit.Unit;
 import com.ga.unit.man.MainPlayer;
 import com.ga.unit.skill.Actions;
 
@@ -117,7 +118,7 @@ public class FileManager {
         if (!data.isEmpty()) {
             String[] actors = data.split("%");
             for (String i : actors) {
-                Stock.get(null, i).start();
+                ((Unit) Stock.get(null, i).start()).traveler = true;
             }
         }
     }

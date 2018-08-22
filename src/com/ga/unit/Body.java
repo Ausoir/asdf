@@ -250,7 +250,7 @@ public class Body {
                 }
                 if (o.vital) {
                     setState("Down");
-                    host.die();
+                    host.die("Decapitation");
                     return;
                 }
             }

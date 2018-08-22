@@ -1,5 +1,6 @@
 package com.ga.unit.skill;
 
+import com.ga.game.FileManager;
 import com.ga.game.Sound;
 import com.ga.map.Global;
 import com.ga.map.Shader;
@@ -279,7 +280,7 @@ public enum Buffs {
                 private int tick = 0;
                 public void onSet(){
                     time = Global.time + 80;
-                    if (level >= 5) host.die();
+                    if (level >= 5) host.die("Bleeding");
                 }
                 public void onStack(int level){
                     this.level += level;
@@ -327,7 +328,7 @@ public enum Buffs {
                         }
                         @Override
                         public void update(){
-                            Particle.explode(host.map, "Flame", host.getDepth(), pos, new P(0, -20), 2, 10, 8, false, 5);
+                            Particle.explode(host.map, "Flame", host.getDepth(), pos, new P(0, -20), 1, 10, 8, false, 2);
                             super.update();
                         }
                     };
@@ -344,26 +345,17 @@ public enum Buffs {
             }
         };
     }},
-    Evade(2,new Tags(){{
-        add(Tag.Enchant);
-        add(Tag.Strength);
+    Infestation(2, new Tags(){{
+        add(Tag.Curse);
+        add(Tag.Conjuration);
     }}){ Buff makeLocal(int level){
-        return new Buff(level, 3) {
+        return new Buff(level, 9) {
             public void onSet() {
-                host.tangible = false;
-            }
-            public void onLoad(){
-                host.tangible = false;
-            }
-            public boolean onTrigger(){
-                time = Global.time;
-                return true;
-            }
-            public void onFinish(){
-                host.tangible = true;
+                Sound.play(host.map, host.pos, "stun");
             }
             public boolean update() {
-                Particle.smoke(host.map, new P(host.pos), host.getDepth());
+                Particle.implode(host.map, "Poison", host.getDepth(), host.pos.getAdd(0, -24), 1, 10, false, 6);
+                if (var++ % Math.max(1, 200/level) == 0) Stock.Slime.create(host.map,-1,-1).start().pos.set(host.pos);
                 return super.update();
             }
         };
@@ -470,7 +462,7 @@ public enum Buffs {
         add(Tag.Enchant);
         add(Tag.Air);
     }}){ Buff makeLocal(int level) {
-        return new Buff(level, 15) {
+        return new Buff(level, 16) {
             public void onSet() {
                 var = Math.round(host.get("Speed").getMax());
                 host.get("Speed").add(var, true);
@@ -514,17 +506,38 @@ public enum Buffs {
                 }
             };
     }},
+    Evade(3,new Tags(){{
+        add(Tag.Enchant);
+        add(Tag.Strength);
+    }}){ Buff makeLocal(int level){
+        return new Buff(level, 3) {
+            public void onSet() {
+                host.tangible = false;
+            }
+            public void onLoad(){
+                host.tangible = false;
+            }
+            public boolean onTrigger(){
+                time = Global.time;
+                return true;
+            }
+            public void onFinish(){
+                host.tangible = true;
+            }
+            public boolean update() {
+                Particle.smoke(host.map, new P(host.pos), host.getDepth());
+                return super.update();
+            }
+        };
+    }},
     Rejuvenate(3,new Tags(){{
         add(Tag.Enchant);
         add(Tag.Strength);
     }}){ Buff makeLocal(int level){
         return new Buff(level, 9){
             private int tick = 0;
-            public void onSet(){
-                var = Math.max(1,100/level);
-            }
             public boolean update(){
-                if (tick++ % var == 0) host.get("Strength").add(1, false);
+                if (tick++ % Math.max(10, 200/level) == 0) host.get("Strength").add(1, false);
                 return super.update();
             }
         };
@@ -540,7 +553,7 @@ public enum Buffs {
             }
             public void onStack(int level){}
             public void onFinish(){
-                if (var == 0) host.die();
+                if (var == 0) host.die("Poisoning");
             }
             public boolean onTrigger(){
                 if (level > 0) level--;
@@ -551,26 +564,11 @@ public enum Buffs {
                 return true;
             }
             public boolean update() {
-                if (tick++ % (Math.max(1,20-level)) == 0){
-                    Particle.explode(host.map, "Poison", host.getDepth(),host.getRandomPoint(),new P(), level+1,5,0,true,24);
+                if (tick++ % (level+2) == 0){
+                    Particle.explode(host.map, "Poison", host.getDepth(),host.getRandomPoint(),new P(), 1,5,0,true,24);
                     return super.update();
                 }
                 return false;
-            }
-        };
-    }},
-    Infestation(3, new Tags(){{
-        add(Tag.Curse);
-        add(Tag.Conjuration);
-    }}){ Buff makeLocal(int level){
-        return new Buff(level, 9) {
-            public void onSet() {
-                Sound.play(host.map, host.pos, "stun");
-            }
-            public boolean update() {
-                Particle.implode(host.map, "Poison", host.getDepth(), host.pos.getAdd(0, -24), 1, 10, false, 6);
-                if (var++ % Math.max(1, 200/level) == 0) Stock.Slime.create(host.map,-1,-1).start().pos.set(host.pos);
-                return super.update();
             }
         };
     }},
@@ -647,7 +645,12 @@ public enum Buffs {
             public boolean isDangerous() { return true; }
             public void onFinish() {
                 if (host instanceof MainPlayer){
-                    host.pos.set(Global.r.nextInt((int) host.map.size.x-64)+36, Global.r.nextInt((int) host.map.size.y-64)+36);
+                    Global.server.requestChangeMap(FileManager.makeDirectory("ins/_")+(SyncRand.r.nextInt(20*level)-(10*level))+"@1");
+                    Global.server.afterMapChange = new Performer(){
+                        public void perform(){
+                            host.pos.set(Global.r.nextInt((int) host.map.size.x-64)+36, 48);
+                        }
+                    };
                 } else host.remove();
             }
             public boolean update() {

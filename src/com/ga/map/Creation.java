@@ -23,7 +23,7 @@ public class Creation {
         FileManager.loadActors();
     }
     static void prepareRandom(int id){
-        r = new Random(id+seed);
+        r = new Random((id*789)+seed);
     }
     public static int getSeed(int p){
         if (p == -1) return r.nextInt(99999);

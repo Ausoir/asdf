@@ -4,7 +4,6 @@ import com.ga.game.Observer;
 import com.ga.tool.L;
 import com.ga.tool.P;
 import com.ga.unit.*;
-import com.ga.unit.man.Man;
 
 import java.awt.*;
 
@@ -43,6 +42,16 @@ public class Updater {
         updatee.add(p);
     }
     public void processQueue(){
+        while (removeQueue.size() > 0){
+            Observer p = removeQueue.remove(0);
+            if (p != null) { //thread safe
+                ((Drawable) p).removeThis();
+                props.remove(p);
+                unitsLoaded.remove(p);
+                controllee.remove(p);
+                effects.remove(p);
+            }
+        }
         while (addQueue.size() > 0){
             Observer p = addQueue.remove(0);
             if (p instanceof Drawable) drawee.add((Drawable) p);
@@ -62,16 +71,6 @@ public class Updater {
             }
             if (p instanceof Particle) effects.add((Particle) p);
             if (p instanceof AI) controllee.add((AI) p);
-        }
-        while (removeQueue.size() > 0){
-            Observer p = removeQueue.remove(0);
-            if (p != null) { //thread safe
-                ((Drawable) p).removeThis();
-                props.remove(p);
-                unitsLoaded.remove(p);
-                controllee.remove(p);
-                effects.remove(p);
-            }
         }
     }
     public void update(){
@@ -106,25 +105,28 @@ public class Updater {
         if (!addQueue.remove(p) && !removeQueue.contains(p)) removeQueue.add(p);
     }
     public String toString(){
-        String result = "";
+        StringBuilder result = new StringBuilder();
         for (Prop i : props){
-            if (i.save) result += i.toString()+";";
+            if (i.save) result.append(i.toString()).append(";");
         }
-        if (result.length() > 0) result = result.substring(0,result.length()-1);
-        return result;
+        for (Unit i : unitsLoaded){
+            if (i.save && !i.traveler) result.append(i.toString()).append(";");
+        }
+        if (result.length() > 0) result = new StringBuilder(result.substring(0, result.length() - 1));
+        return result.toString();
     }
     public static String toActorString(){
-        String result = "";
+        StringBuilder result = new StringBuilder();
         for (Map map : Global.maps) {
             for (Unit i : map.updater.unitsLoaded) {
-                if (i.save) result += i.toString() + "\n";
+                if (i.save && i.traveler) result.append(i.toString()).append("\n");
             }
         }
-        return result;
+        return result.toString();
     }
     public static Unit getActor(int p){
         for (Map map : Global.maps) {
-            for (Observer i : map.updater.addQueue){
+            for (Observer i : map.updater.addQueue) {
                 if (i instanceof Unit && ((Unit) i).controlId == p) return (Unit) i;
             }
             for (Unit i : map.updater.unitsLoaded) {
@@ -137,27 +139,13 @@ public class Updater {
         L<Prop> result = new L<>();
         for (Prop i : props){
             if (i.onInteract != null) {
-                if (i.pos.getSubtract(i.image.getCenter()).getSubtract(p).getDist() <= 24) result.add(i);
+                if (i.getInteractPoint().getSubtract(p).getDist() <= 24) result.add(i);
             }
         }
         for (Unit i : unitsLoaded){
             if (i.onInteract != null) {
-                if (i instanceof Man){
-                    if (i.getHand().getSubtract(p).getDist() <= 24) result.add(i);
-                } else {
-                    if (i.pos.getSubtract(p).getDist() <= 24) result.add(i);
-                }
+                if (i.getInteractPoint().getSubtract(p).getDist() <= 24) result.add(i);
             }
-        }
-        return result;
-    }
-    L<Prop> collideAll(P p, int r){
-        L<Prop> result = new L<>();
-        for (Prop i : props){
-            if (p.getSubtract(i.pos).getDist() <= r+i.getSize()) result.add(i);
-        }
-        for (Prop i : unitsLoaded){
-            if (p.getSubtract(i.pos).getDist() <= r+i.getSize()) result.add(i);
         }
         return result;
     }
@@ -205,24 +193,33 @@ public class Updater {
             Global.player.say("I am inflicted with dangerous status effect!");
             return false;
         }
-        if (!Global.player.get("Fatigue").require(p)){
-            Global.player.say("I am too tired! I need "+p+" Fatigue points.");
+        if (Global.player.get("Fatigue").get() < p){
+            Global.player.say("I am too tired! I need "+(p-Global.player.get("Fatigue").get())+" more Fatigue points.");
             return false;
         }
-        if (!Global.player.get("Nutrition").require(p)){
-            Global.player.get("Fatigue").add(p,false);
-            Global.player.say("I am too hungry! I need "+p+" Nutrition points.");
+        if (Global.player.get("Nutrition").get() < p){
+            Global.player.say("I am too hungry! I need "+(p-Global.player.get("Nutrition").get())+" more Nutrition points.");
             return false;
         }
+        if (Global.player.armor.getWarmth() < map.temperature){
+            if (!Global.player.get("Vitality").require(p)) {
+                Global.player.say("It's too cold!");
+                return false;
+            } else Global.player.say("Vitality decreased by "+p+" from cold temperature.");
+        }
+        Global.player.get("Fatigue").require(p);
+        Global.player.get("Nutrition").require(p);
+        forceSleep(p);
+        return true;
+    }
+    public void forceSleep(int p){
         map.weather.fadeIn();
         //Hour pass
-        Global.player.stats.clearBuffs();
         Global.player.get("Strength").heal();
         Global.timePass(p*100);
         Global.hour+=p;
         for (Map i : Global.maps) i.onTimeChange();
         onTimeChange();
-        return true;
     }
     public P getEntrancePos(int p, P failsafe) {
         if (props.size() == 0) {

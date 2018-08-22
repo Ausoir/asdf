@@ -61,9 +61,6 @@ public class BodyHumanoid extends Body {
                 rotateAppendage(OFIST, 7, host.dir*.44f);
                 break;
             case "Kick":
-                rotateAppendage(LLEG, 5, 0);
-                break;
-            case "Sidekick":
                 rotateAppendage(RLEG, 14, 0);
                 break;
             case "Stab":

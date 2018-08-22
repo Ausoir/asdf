@@ -4,7 +4,6 @@ import com.ga.game.Dialog;
 import com.ga.game.Sound;
 import com.ga.map.Global;
 import com.ga.map.Map;
-import com.ga.map.ShadedPicture;
 import com.ga.map.Shader;
 import com.ga.tool.Interactive;
 import com.ga.tool.Line;
@@ -32,9 +31,10 @@ public class Item extends Prop {
             public boolean isBlunt(){return false;}},
         Swinging(Actions.Slash, 3, .8f, "swing_normal"),
         Bashing(Actions.Slash, 1, 1f, "swing_normal"),
-        Armor(Actions.Rest, 1, 1, "swing_normal"), Scroll(Actions.Read, 1, 0, "scroll"),
-        Shooting(Actions.Shoot_Handgun, 3, .5f, "swing_normal"), Rifle(Actions.Shoot_Rifle, 3, 1f, "swing_normal"),
-        Bow(Actions.Shoot_Arrow, 1, 1, "swing_normal"), Throwing(Actions.Throw, 3, .1f, "swing_normal"),
+        Shoot(Actions.Rest, 3, 1, null){
+            public boolean isBlunt(){return false;}},
+        Armor(Actions.Hit, 1, 1, "swing_normal"), Scroll(Actions.Read, 1, 0, "scroll"),
+        Throwing(Actions.Throw, 3, .1f, "swing_normal"),
         Darting(Actions.Dart, 3, .1f, "swing_normal"), Consumable(Actions.Consume, 1, .1f, "drink");
         public Actions action;
         String sound;
@@ -52,13 +52,13 @@ public class Item extends Prop {
     }
     public enum Material{
         Wooden(.5f,2,1,10,0,new Color(118, 93, 0,60)),
-        Cloth(.5f,0,0,20,200),
-        Wool(.5f,0,0,14,200){
+        Cloth(.5f,0,0,20,400),
+        Wool(.5f,0,1,14,800){
             int getWarmth(){
-                return 2;
+                return 1;
             }
         },
-        Silk(.2f,2,1,10,10000){
+        Silk(.2f,2,1,10,2000){
             public void onSet(Item host){
                 host.tags.add(Tag.Air);
             }
@@ -74,9 +74,9 @@ public class Item extends Prop {
                 return -1;
             }
         },
-        Leather(.3f,1,1,40,1500,new Color(133, 78, 32,80)),
+        Leather(.3f,1,2,40,1500,new Color(133, 78, 32,80)),
         Glass(.1f,1,7,7,2000),
-        Copper(.4f,4,3,40,1500,new Color(133, 92, 38,70)){
+        Copper(.4f,3,2,40,800,new Color(133, 92, 38,80)){
             public void onSet(Item host){
                 host.tags.add(Tag.Channeling);
             }
@@ -84,24 +84,29 @@ public class Item extends Prop {
                 return -1;
             }
         },
-        Iron(.5f,8,5,60,2000),
-        Silver(.2f,11,7,40,12000){
+        Bronze(.4f,4,4,50,1200,new Color(112, 27, 7, 100)){
+            int getWarmth(){
+                return -1;
+            }
+        },
+        Iron(.5f,5,5,60,1800),
+        Silver(.2f,7,3,40,3000){
             public void onSet(Item host){
                 host.tags.add(Tag.Enchant);
             }
         },
-        Gold(.1f,10,9,40,24000){
+        Gold(.1f,8,3,40,10000){
             public void onSet(Item host){
                 host.tags.add(Tag.Enchant);
             }
         },
-        Steel(.3f,4,6,80,8000),
+        Steel(.3f,5,7,80,5000),
         Titanium(.1f,4,7,100,16000){
             public void onSet(Item host){
                 host.tags.add(Tag.Strength);
             }
         },
-        Crystal(.1f,6,7,10,8000,new Color(28, 133, 67,140)){
+        Crystal(.1f,6,5,10,8000,new Color(28, 133, 67,140)){
             public void onSet(Item host){
                 host.tags.add(Tag.Conjuration);
                 host.tags.add(Tag.Channeling);
@@ -110,7 +115,7 @@ public class Item extends Prop {
                 return -1;
             }
         },
-        Obsidian(.1f,3,4,11,8000){
+        Obsidian(.1f,3,5,11,8000){
             public void onSet(Item host){
                 host.tags.add(Tag.Curse);
                 host.tags.add(Tag.Fire);
@@ -120,14 +125,15 @@ public class Item extends Prop {
                 return 1;
             }
         },
-        Bone(.2f,1,3,20,3000){
+        Bone(.2f,1,5,20,4000){
             public void onSet(Item host){
                 host.tags.add(Tag.Curse);
+                host.tags.add(Tag.Conjuration);
             }
         },
         Other(0,0,0,1,0),
         Organic(.4f,0,0,1,0),
-        Stone(.3f,7,5,30,0,new Color(107, 107, 107,255));
+        Stone(.3f,6,4,30,0,new Color(107, 107, 107,200));
         int weight, hardness, value, durability;
         Color color;
         float prevalence;
@@ -170,7 +176,17 @@ public class Item extends Prop {
         }
     }
     enum SpecialtyMod{
-        None, Light, Heavy, Sharp, Dull, Tough, Hardened, Runic, Instant, Cursed, Athletic, Strengthening, Branded, Quick, Slow;
+        None(""), Light("This item is unusually light."), Heavy("This item is unusually heavy."), Tough("This item has double the normal durability."),
+        Runic("Any magic imbued on this item will trigger 100% of the time."), Instant("Any cooldown on this item is reduced to 0."),
+        Cursed("Unequipping this item will cause something terrible."), Strengthening("This item will empower your Strength based skills."),
+        Branded("This item provides certain catalysts."), Quick("This item has unusually fast attack speed.");
+        private String desc;
+        SpecialtyMod(String desc){
+            this.desc = desc;
+        }
+        public String getDescription(){
+            return desc;
+        }
         static SpecialtyMod get(Random seed){
             if (seed.nextInt(8) == 0) return values()[seed.nextInt(values().length)];
             return None;
@@ -234,7 +250,7 @@ public class Item extends Prop {
             return ""+ordinal();
         }
     }
-    AdverbMod admod = AdverbMod.None;
+    private AdverbMod admod = AdverbMod.None;
     private SpecialtyMod smod = SpecialtyMod.None;
     protected AdenchantMod ademod = AdenchantMod.None;
     protected Buffs emod = null;
@@ -258,14 +274,12 @@ public class Item extends Prop {
         setType(type);
         material = Material.get(rand, materials);
         setMaterial(material);
-        speed = weight*2;
+        speed = 4 - weight*3;
         value = material.value + 100;
         final Item me = this;
         onInteract = new Interactive(){
             public void interact(Man p){
-                if (owner == null){
-                    p.setWeapon(me);
-                }
+                p.setWeapon(me);
             }
         };
         randomSize(new P(.2f,.2f));
@@ -298,14 +312,8 @@ public class Item extends Prop {
     private void applyMetaShade(){
         if (emod != null){
             int intensity = ademod.level * 30;
-            shade(new Color(48, 156, 200, intensity).getRGB());
+            image.modify(Shader.Colorize, new Color(48, 156, 200, intensity).getRGB());
         }
-    }
-    void shade(int color){
-        int ctype = image.getCenterType();
-        image = new ShadedPicture(rand, name, Shader.Color);
-        ((ShadedPicture) image).shade(color);
-        image.setCenterType(ctype);
     }
     private void setType(ItemType p){
         this.type = p;
@@ -317,7 +325,7 @@ public class Item extends Prop {
     public void setMaterial(Material mat){
         this.material = mat;
         mat.onSet(this);
-        if (mat.color != null) shade(mat.color.getRGB());
+        if (mat.color != null) image.modify(Shader.Tint, mat.color.getRGB());
         this.weight = (int) (material.weight * type.density);
         if (durability != -1) {
             durability = (int) (mat.durability * type.density);
@@ -325,22 +333,15 @@ public class Item extends Prop {
         }
         setModifier(smod);
     }
-    protected void setModifier(SpecialtyMod mod){
+    private void setModifier(SpecialtyMod mod){
         if (mod == SpecialtyMod.None) admod = AdverbMod.None;
-        else if (mod == SpecialtyMod.Sharp) smod = SpecialtyMod.None;
-        else if (mod == SpecialtyMod.Dull) smod = SpecialtyMod.None;
-        else if (mod == SpecialtyMod.Hardened) smod = SpecialtyMod.None;
         else if (mod == SpecialtyMod.Heavy) this.weight += admod.magnitude;
         else if (mod == SpecialtyMod.Light) this.weight = Math.max(0, this.weight - admod.magnitude);
         else if (mod == SpecialtyMod.Tough) durability *= 2;
-        else if (mod == SpecialtyMod.Runic) probability += .2f*admod.magnitude;
+        else if (mod == SpecialtyMod.Runic) probability = 1;
         else if (mod == SpecialtyMod.Instant) cooldown.setDuration(0);
         else if (mod == SpecialtyMod.Cursed) tags.add(Tag.Enchant);
-        else if (mod == SpecialtyMod.Quick) this.speed = Math.max(0, this.speed - admod.magnitude);
-        else if (mod == SpecialtyMod.Slow) this.speed += admod.magnitude;
-        else if (mod == SpecialtyMod.Athletic){
-            for (int i=0;i<admod.magnitude;i++) tags.add(Tag.Athletics);
-        }
+        else if (mod == SpecialtyMod.Quick) this.speed = this.speed + admod.magnitude * 3;
         else if (mod == SpecialtyMod.Strengthening){
             for (int i=0;i<admod.magnitude;i++) tags.add(Tag.Strength);
         }
@@ -409,12 +410,19 @@ public class Item extends Prop {
         return r;
     }
     public void onEquip(Man host){
+        onInteract = null;
         owner = host;
         lastLand = host.lastLand;
         save = false;
         mobile = false;
     }
     public void onUnequip(Man host){
+        final Item me = this;
+        onInteract = new Interactive(){
+            public void interact(Man p){
+                p.setWeapon(me);
+            }
+        };
         owner = null;
         lastLand = host.lastLand;
         save = true;
@@ -422,7 +430,7 @@ public class Item extends Prop {
         mobile = true;
         if (smod == SpecialtyMod.Cursed){
             ArrayList<Buffs> list = Buffs.getByTag(Tag.Curse);
-            host.buff(list.get(list.size() % seed), admod.magnitude);
+            host.buff(list.get(seed % list.size()), admod.magnitude);
         }
     }
     public void remove(){
@@ -433,21 +441,20 @@ public class Item extends Prop {
         Sound.play(map, pos, "swing_normal");
     }
     protected void playSound(){
-        Sound.play(map, pos, type.sound);
+        if (type.sound != null) Sound.play(map, pos, type.sound);
     }
     public float getPercentage(){
         return (float)uses/durability;
     }
     public boolean isUsable(boolean use, int p){ //return: is item in isUsable state
-        if (isInfinite() || uses >= p){
-            if (!isInfinite()){
-                if (use){
-                    uses -= p;
-                    if (uses == 0){
-                        Particle.groundSlam(map, pos, getDepth());
-                        if (disposable) remove();
-                    } else if (uses > durability) uses = durability;
-                }
+        if (isInfinite()) return true;
+        if (uses >= p) {
+            if (use) {
+                uses = Math.max(0, uses - p);
+                if (uses == 0) {
+                    Particle.groundSlam(map, pos, getDepth());
+                    if (disposable) remove();
+                } else if (uses > durability) uses = durability;
             }
             return true;
         }
@@ -487,6 +494,7 @@ public class Item extends Prop {
         r += "Uses: "+uses+"/"+durability+"\n";
         r += "Material: "+material.name()+"\n";
         if (tags.size() > 0) r += "Catalyzers: "+tags.toString()+"\n";
+        if (smod != SpecialtyMod.None) r += "Special Property ["+smod.name()+"]: "+smod.getDescription()+"\n";
         if (emod != null){
             String ade = "";
             if (ademod != AdenchantMod.None) ade = "Level "+ademod.level+" ";

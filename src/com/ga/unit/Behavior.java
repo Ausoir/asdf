@@ -19,7 +19,6 @@ public enum Behavior {
         }
     }, Wander {
         public void blocked(Unit host, boolean fall) {
-            host.say("Blocked!");
             host.face(-host.dir, true);
             if (host.dir == 1) host.setState(Actions.Right);
             else if (host.dir == -1) host.setState(Actions.Left);
@@ -32,7 +31,7 @@ public enum Behavior {
                 else if (dir == -1) host.setState(Actions.Left);
                 else {
                     host.face(dir - 1, false);
-                    host.setState(Actions.Idle);
+                    host.brain.removeTask();
                 }
             }
             return false;
@@ -73,12 +72,12 @@ public enum Behavior {
         }
         boolean update(Unit host) {
             P target = new P(destination);
-            host.face(host.pos.x > target.x ? -1 : 1, false);
-            host.setState(Strategy.getMove(host, target));
-            if (host.pos.getSubtract(target).getDist() <= host.getSpeed()*400) {
+            float dist = host.pos.getSubtract(target).getDist();
+            Strategy.Brute.micromanage(host, Strategy.getMove(host, target), dist);
+            if (dist <= host.getSpeed()*400) {
                 for (Prop i : host.map.updater.props){
                     if (i.factoryId == Stock.Travel.ordinal() && i.pos.toString().equals(destination)){
-                        host.brain.tasks.pop();
+                        host.brain.removeTask();
                         Map oldmap = host.map;
                         host.map = Global.getMap(i.name);
                         host.pos.set(host.map.updater.getEntrancePos(i.seed, host.map.getFailsafePos()));
@@ -125,8 +124,8 @@ public enum Behavior {
         boolean update(Unit host) {
             host.brain.taskProgress++;
             host.face(host.dir * -1, false);
-            if (host.brain.taskProgress > 64) {
-                host.brain.setTask(Idle);
+            if (host.brain.taskProgress > 32) {
+                host.brain.removeTask();
                 return true;
             } else if (host.brain.taskProgress % 4 == 0) {
                 ArrayList<Unit> allunits = host.map.updater.collideUnit(host.pos, host.brain.taskProgress*128, host.faction);

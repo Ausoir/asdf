@@ -46,7 +46,7 @@ public class Prop extends Thing {
     }
     public void onAttack(Unit p){}
     private void adjustToLand(){
-        Line closest = map.checkLand(new Line(pos.getAdd(0,-4), new P(pos.x, pos.y+600)));
+        Line closest = map.checkLand(new Line(pos.getAdd(0,-4), new P(pos.x, pos.y+600)), e -> e.opt == 1);
         if (closest != null) {
             lastLand = closest;
             setDepth(closest.depth - OFFSET_PROP);
@@ -101,6 +101,9 @@ public class Prop extends Thing {
         }
     }
     public void onCollide(Line l){
+    }
+    public P getInteractPoint(){
+        return pos;
     }
     protected void onMapEdge(int dir){
         vel.x = 0;

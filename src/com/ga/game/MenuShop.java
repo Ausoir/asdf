@@ -52,7 +52,7 @@ public class MenuShop extends Panel {
     }
     protected void setColor() {
         setBackground(forecolor);
-        scroll.setBackground(new Color(120, 86, 47, 180));
+        scroll.setBackground(forecolor2);
     }
     void show(String title, Item[] wares, int[] prices, Performer[] actions){
         display();

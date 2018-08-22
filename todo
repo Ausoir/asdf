@@ -1,11 +1,6 @@
-Sunday insurance free
-Safehouse storage for daily fee
-Pray - random eff daily limit
-Dungeon types: Sewer, Cave, Ruin, Lab
-
 Optimizable:
 -Load texture once
 -Prop collision (with terrain) uses x^2 for x calc
 
 Now:
-Finish insides for buildings like school, mansion, lab
+Guild has 3 functions: Revival point, buy insurance, give quests

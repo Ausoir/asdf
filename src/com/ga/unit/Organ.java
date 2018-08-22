@@ -17,7 +17,7 @@ import java.util.ArrayList;
  * Created by Ga on 7/29/2016. asd
  */
 public class Organ extends Line {
-    int strokeSize = 10;
+    private int strokeSize = 10;
     public ShadedPicture image;
     public boolean amputated = false;
     public Unit host;
@@ -43,7 +43,7 @@ public class Organ extends Line {
     public void setImage(String p, int index){
         setImage(p, index, Shader.XYLinearGradient);
     }
-    public void setImage(String p, int index, Shader shader){
+    private void setImage(String p, int index, Shader shader){
         image = new ShadedPicture(host.rand, p, index, shader);
         image.setSize(strokeSize, 0);
         image.shade(0);
@@ -75,7 +75,7 @@ public class Organ extends Line {
         Sound.play(host.map, host.pos, "hit_bloody");
         int intensity = 16 + damage;
         if (image != null) {
-            final Projectile flyingOrgan = new Projectile(host.map, null, new P(host.pos), p.ptd.disperse(8,8), intensity) {
+            final Projectile flyingOrgan = new Projectile(host.map, null, new P(host.pos), p.ptd.disperse(8,8), intensity) { //todo: this part may slow the game
                 private final int length = (int) getLength();
                 public void update() {
                     if (tangible) {
@@ -104,7 +104,7 @@ public class Organ extends Line {
             };
             image.visible = false;
         }
-        Particle.explode(host.map, "Blood", host.getDepth(), p.ptd, new P(), 5, 40, 0, true, 2);
+        Particle.explode(host.map, "Blood", host.getDepth(), p.ptd, new P(), 2, 40, 0, true, 2);
         amputated = true;
         for (Organ i : children) i.amputate(p, intensity);
         onAmputate.perform();

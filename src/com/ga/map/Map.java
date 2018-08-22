@@ -13,6 +13,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.function.Predicate;
 
 /**
  * Created by Ga on 5/7/2016. asd
@@ -38,7 +39,7 @@ public class Map {
     String panoramaName = "";
     private Thing[] panorama = new Thing[3];
     public Updater updater;
-    int temperature = 0;
+    public int temperature = 0;
 
     Map(String name) {
         this.name = new MapName(name);
@@ -114,7 +115,7 @@ public class Map {
                         landRaw.add(surface);
                         //set depth here so next block prop spawns auto adjust to correct land depth
                         surface.depth = Float.parseFloat(formTextures.get(surface.tid).split("&")[0]) * .1f + 3;
-                        if (surface.opt > 0) land.add(surface);
+                        if (surface.landable()) land.add(surface);
                     }
                 }
                 if (line.length > 3 && !line[3].equals(";")) {
@@ -267,29 +268,10 @@ public class Map {
         return "none";
     }
 
-    public Line checkLand(Line p, float depth) {
+    public Line checkLand(Line p, Predicate<Line> f) {
         ArrayList<Line> list = new ArrayList<>();
         for (Line i : landRaw) {
-            if (i.clockwise() && i.depth >= depth && i.lineCross(p)) {
-                list.add(i);
-            }
-        }
-        if (list.size() == 0) return null;
-        else {
-            Line highest = null;
-            for (Line i : list) {
-                if (highest == null || i.depth > highest.depth) {
-                    highest = i;
-                }
-            }
-            return highest;
-        }
-    }
-
-    public Line checkLand(Line p) {
-        ArrayList<Line> list = new ArrayList<>();
-        for (Line i : landRaw) {
-            if (i.clockwise() && i.lineCross(p)) {
+            if (f.test(i) && i.clockwise() && i.lineCross(p)) {
                 list.add(i);
             }
         }

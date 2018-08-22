@@ -16,8 +16,8 @@ import java.util.ArrayList;
  */
 public class Food extends Item {
     public enum Ingredient {
-        White(1,1,-10,3),Red(1,1,-10,2),Fish(1,1,-2,1),Dairy(1,1,1,0),Vegetable(1,1,-2,8),Grain(1,1,0,10),Fruit(1,1,4,7),
-        Cut(2,0,0,-1,.8f),Boiled(2,1,-1,1,.5f),Fried(2,0,5,6,.4f),Roasted(2,1,3,2,.6f),Smoked(2,0,0,1,.6f),Dried(2,-1,-1,24,.7f),Spiced(2,0,5,-8,.7f),Sealed(2,0,0,30,.3f);
+        White(1,1,-4,3),Red(1,1,-6,2),Fish(1,1,0,1),Dairy(1,1,2,4),Vegetable(1,0,-10,8),Grain(1,1,0,6),Fruit(1,0,3,0),Synthetic(1,0,5,1),
+        Cut(2,0,0,-1,.9f),Boiled(2,1,-1,1,.5f),Fried(2,-1,4,6,.4f),Roasted(2,1,1,1,.6f),Smoked(2,0,0,1,.6f),Dried(2,-1,-1,24,.3f),Spiced(2,0,4,-8,.7f);
         int type, nutrition, taste, perish;
         float loss = .5f;
         Ingredient(int type, int nutrition, int taste, int perish){
@@ -72,13 +72,13 @@ public class Food extends Item {
             }
         }
         String getDescription(){
-            String result = "";
-            for (Ingredient i : ingredients) result += i+", ";
+            StringBuilder result = new StringBuilder();
+            for (Ingredient i : ingredients) result.append(i).append(", ");
             return result.substring(0,result.length()-2);
         }
         public String toString(){
-            String r = "";
-            for (Ingredient i : ingredients) r += i+",";
+            StringBuilder r = new StringBuilder();
+            for (Ingredient i : ingredients) r.append(i).append(",");
             return r.substring(0,r.length()-1);
         }
     }

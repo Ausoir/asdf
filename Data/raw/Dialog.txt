@@ -12,7 +12,7 @@ mem:Intelligence
 ?Agility:Increases maximum encumbrance by 1. Also determines vitality.
 ?Intelligence:You can learn number of skills and traits up to your intelligence score. Also determines innate energy.
 ?Athletics:Increases jump height and sprint speed. Increases Rest efficiency.
-Remap:Select a skill to re-map its keybinding.
+Remap:Select an action to re-map its keybinding.
 ?itemEnc:This $ item is magically enchanted with $. This item's cooldown is $ seconds.
 itemEncRdy:This item needs $ more seconds to recharge.
 reqInput:Press a key
@@ -23,8 +23,7 @@ reqInput:Press a key
 ?Slash:Swing your weapon from top to bottom.
 ?Underhand:Attack to disarm target.
 ?Punch:Punch.
-?Kick:Kick away enemies. Does not deal much damage, but is instant and good for kicking away enemies.
-?Sidekick:Dash to and kick an enemy.
+?Kick:Kick away enemies.
 ?Whirlwind:Spin your weapon back and forth to attack multiple enemies multiple times, left and right.
 ?Warcry:Stun all nearby enemies.
 ?Grab:Grab a vulnerable target to throw them or attack other enemies with them.

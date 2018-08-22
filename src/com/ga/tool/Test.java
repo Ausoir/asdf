@@ -11,7 +11,8 @@ public class Test {
     public static void main(String[] args){
         Global.init();
         int max = 100;
-        Creation.seed = 199407;
+        Creation.seed = 138752;
+//        Creation.seed = (int) (Math.random()*999999);
         for (int i = 0; i < max; i++) {
             boolean town = GenerateBiome.getTown(i);
             int humid = GenerateBiome.getHumidity(i);

@@ -224,7 +224,7 @@ public enum Shader{
                             red = (int) Global.clamp(((targetC[0] - red) / 70f * ny) + red + Global.r.nextInt(16) - 8, 0, 255);
                             green = (int) Global.clamp(((targetC[1] - green) / 70f * ny) + green + Global.r.nextInt(16) - 8, 0, 255);
                             blue = (int) Global.clamp(((targetC[2] - blue) / 70f * ny) + blue + Global.r.nextInt(16) - 8, 0, 255);
-                            float sin = (float) (Global.sin(ix * .05f) + Global.cos(ix * .01f) - Global.sin(ix * .5f) * .05f);
+                            float sin = Global.sin(ix * .05f) + Global.cos(ix * .01f) - Global.sin(ix * .5f) * .05f;
                             if (sin + iy < -2) alpha = 0;
                             image.setRGB(ix, y, new Color(red, green, blue, alpha).getRGB());
                         }
@@ -233,7 +233,7 @@ public enum Shader{
             }
             return null;
         }
-    }),
+    }){ public int getOffset(){ return -2; }},
     Sand(new ShaderRenderer(){
         protected BufferedImage render(BufferedImage image, int x1, int x2, int y1, float slope){
             int[] targetC = new int[]{185,185,120};
@@ -253,8 +253,8 @@ public enum Shader{
                             red = (int) Global.clamp(((targetC[0] - red) / 70f * ny) + red + Global.r.nextInt(16) - 8, 0, 255);
                             green = (int) Global.clamp(((targetC[1] - green) / 70f * ny) + green + Global.r.nextInt(16) - 8, 0, 255);
                             blue = (int) Global.clamp(((targetC[2] - blue) / 70f * ny) + blue + Global.r.nextInt(16) - 8, 0, 255);
-                            float sin = (float) (Global.sin(ix * .05f)*.2f + Global.cos(ix * .01f)*.2f - Global.sin(ix * .5f) * .1f);
-                            if (sin < .4f && sin + iy * .5f < .3f) alpha = 0;
+                            float sin = Global.sin(ix * .2f) + Global.cos(ix * .2f) + Global.sin(ix * .3f) + Global.sin(ix * .5f) * .05f;
+                            if (sin + iy < -2) alpha = 0;
                             image.setRGB(ix, y, new Color(red, green, blue, alpha).getRGB());
                         }
                     }
@@ -262,13 +262,13 @@ public enum Shader{
             }
             return null;
         }
-    }),
+    }){ public int getOffset(){ return -8; }},
     Snow(new ShaderRenderer(){
         protected BufferedImage render(BufferedImage image, int x1, int x2, int y1, float slope){
             int y2 = image.getHeight()-1;
             for (int ix = x1; ix < x2; ix++) {
                 int ty = y1 + (int) ((ix - x1) * slope);
-                for (int iy = -1; iy < 75; iy++) {
+                for (int iy = -20; iy < 75; iy++) {
                     int y = Math.min(ty+iy,y2);
                     if (y >= 0) {
                         int rgb = image.getRGB(ix, y);
@@ -278,13 +278,15 @@ public enum Shader{
                         int red = (int) Global.clamp(((rgb & 0xff0000) >>> 16) + shadeMag, 0, 215 + randMax);
                         int green = (int) Global.clamp(((rgb & 0xff00) >>> 8) + shadeMag, 0, 215 + randMax);
                         int blue = (int) Global.clamp(((rgb & 0xff)) + shadeMag, 0, 215 + randMax);
+                        float sin = Global.sin(ix * .05f) + Global.cos(ix * .01f) - Global.sin(ix * .5f) * .05f;
+                        if (sin + iy < -2) alpha = 0;
                         image.setRGB(ix, y, new Color(red, green, blue, alpha).getRGB());
                     }
                 }
             }
             return null;
         }
-    }),
+    }){ public int getOffset(){ return -8; }},
     Belt(new ShaderRenderer(){
         protected BufferedImage render(BufferedImage image, int x1, int x2, int y1, float slope){
             int y2 = image.getHeight()-1;
@@ -396,7 +398,8 @@ public enum Shader{
     //Replacements
     Tatter(new ShaderRenderer(){
         protected BufferedImage render(BufferedImage image, int param) {
-            if (param >= 11) return image;
+            if (param > 9) return image;
+            param++;
             int width = image.getWidth();
             int height = image.getHeight();
             for (int y = 0; y < height; y++) {
@@ -412,10 +415,73 @@ public enum Shader{
             }
             return image;
         }
+    }),
+    Dissolve(new ShaderRenderer(){
+        protected BufferedImage render(BufferedImage image, int param) {
+            if (param > 9) return image;
+            int width = image.getWidth();
+            int height = image.getHeight();
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    int rgb = image.getRGB(x, y);
+                    int alpha = (rgb & 0xff000000) >>> 24;
+                    int red = (rgb & 0xff0000) >>> 16;
+                    int green = (rgb & 0xff00) >>> 8;
+                    int blue = (rgb & 0xff);
+                    if (Math.random()*10f > param) alpha = 0;
+                    image.setRGB(x, y, new Color(red, green, blue, alpha).getRGB());
+                }
+            }
+            return image;
+        }
+    }),
+    Tint(new ShaderRenderer(){
+        protected BufferedImage render(BufferedImage image, int param){
+            int width = image.getWidth();
+            int height = image.getHeight();
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    int rgb = image.getRGB(x, y);
+                    image.setRGB(x, y, interpolate(.2f, rgb, param));
+                }
+            }
+            return image;
+        }
+    }),
+    Colorize(new ShaderRenderer(){
+        protected BufferedImage render(BufferedImage image, int param){
+            int width = image.getWidth();
+            int height = image.getHeight();
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    int rgb = image.getRGB(x, y);
+                    image.setRGB(x, y, interpolate(.5f, rgb, param));
+                }
+            }
+            return image;
+        }
     });
     private ShaderRenderer shader;
     Shader(ShaderRenderer p){
         shader = p;
+    }
+    public int getOffset(){
+        return 0;
+    }
+    private static int interpolate(float frac, int color1, int color2){
+        int alpha = (color1 & 0xff000000) >>> 24;
+        int red = (color1 & 0xff0000) >>> 16;
+        int green = (color1 & 0xff00) >>> 8;
+        int blue = (color1 & 0xff);
+        int alpha2 = (color2 & 0xff000000) >>> 24;
+        int red2 = (color2 & 0xff0000) >>> 16;
+        int green2 = (color2 & 0xff00) >>> 8;
+        int blue2 = (color2 & 0xff);
+        int newAlpha = (int) ((alpha2-alpha) * frac + alpha);
+        int newRed = (int) ((red2-red) * frac + red);
+        int newGreen = (int) ((green2-green) * frac + green);
+        int newBlue = (int) ((blue2-blue) * frac + blue);
+        return new Color(newRed,newGreen,newBlue,newAlpha).getRGB();
     }
     protected void renderLines(ArrayList<Line> lines, P pos, float zoom, BufferedImage image){ //unused
         int[][][] shades = new int[lines.size()][][];

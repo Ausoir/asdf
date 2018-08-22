@@ -9,17 +9,17 @@ public class Stat {
     Stat(String p){
         String[] t = p.split(",");
         if (t.length == 1){
-            setTotal(Integer.parseInt(p));
+            setTotal(Integer.parseInt(p), true);
         } else {
             current = Integer.parseInt(t[0]);
             max = Integer.parseInt(t[1]);
         }
     }
     public Stat(int p){
-        setTotal(p);
+        setTotal(p, false);
     }
-    public void setTotal(int p){
-        current += p-max;
+    public void setTotal(int p, boolean force){
+        if (!force) current += p-max;
         max = p;
     }
     public void set(int p, boolean force){
@@ -30,7 +30,7 @@ public class Stat {
         }
     }
     public void addTotal(int p){
-        setTotal(max + p);
+        setTotal(max + p, false);
     }
     public int add(int p, boolean force){
         int prev = current;

@@ -69,7 +69,7 @@ public class Man extends Unit {
                 armor.set(null, 0);
             }
         };
-        return items;
+        return lines;
     }
     @Override
     public String toString(){
@@ -119,12 +119,8 @@ public class Man extends Unit {
         say("Dropping " + p.getFullName());
         return t;
     }
-
-    public int getWeight(){
-        return inventory.weight+armor.getWeight()+weapon.weight;
-    }
-    protected int getAttackSpeed(){
-        return super.getAttackSpeed()-weapon.getSpeed();
+    public int getAttackSpeed(){
+        return super.getAttackSpeed()+weapon.getSpeed();
     }
     protected void stateOnSet(Actions state){
         state.onSet(this);
@@ -318,13 +314,15 @@ public class Man extends Unit {
         return r;
     }
 
-    public void die() {
+    public void die(String cause) {
         say("@x");
         if (rand.nextBoolean()) weapon.drop(this);
         weapon.remove();
-        super.die();
+        super.die(cause);
     }
-
+    public P getInteractPoint(){
+        return getHand();
+    }
     public void onAttack(Unit p){
         weapon.trigger(p);
         brain.onAttack();

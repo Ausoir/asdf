@@ -4,11 +4,17 @@ import com.ga.tool.Line;
 import com.ga.tool.P;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 class GenerateTown {
-    static void generate(Map map){
+    private static HashMap<Integer, String[]> buildings = new HashMap<>(){{
+        put(1,new String[]{"House1","House2","House3","House4","Bighouse1","Bighouse2","Inn","Scrapyard"});
+        put(2,new String[]{"Hideout","House1","House2","House3","House4","Restaurant","Inn","Shop","Armory","School"});
+        put(3,new String[]{"Sewer","Restaurant","Shop","Pawnshop","Laboratory","Guild","Clothier","Safehouse"});
+    }};
+    static void generate(Map map, int cityType){
         Generator generator = new Generator(map, 0);
-        map.size = new P(4000+Creation.r.nextInt(4000), 1400);
+        map.size = new P(6000+Creation.r.nextInt(4000), 1400);
         String[] landTexture = new String[]{"dirt&grass","dirt&road_unpaved","dirt&road_normal","dirt&road_highway"};
         int max = Creation.r.nextInt(4)+2;
 
@@ -26,17 +32,13 @@ class GenerateTown {
         for (Line l : beforeBuilding) {
             if (l.opt > 0 && l.tid >= 0 && l.clockwise() && Math.abs(l.getSlope()) < .1f) {
                 P mid = l.getMidpoint();
-                if (map.checkLand(new Line(mid.x, 0, mid.x, mid.y - 1), l.depth) == null) {
-                    if (Creation.r.nextInt(3) == 0) {
-                        for (int ii = 0; ii < Creation.r.nextInt(9); ii++) {
-                            map.placeProp(l, "Scrap=.1,Streetlight=.2,Cone=.3,Pole=.4,Bush=.5", -1);
-                        }
+                if (Creation.r.nextInt(3) == 0) {
+                    for (int ii = 0; ii < Creation.r.nextInt(9); ii++) {
+                        map.placeProp(l, "Scrap=.1,Streetlight=.2,Cone=.3,Pole=.4,Bush=.5", -1);
                     }
-                    if (Math.abs(l.getSlope()) < .01f) {
-                        String[] buildings = new String[]{"House1","House2","House3","House4","Hideout",
-                                "Restaurant","Hideout","Shop","Range","Laboratory","Armory","Hospital","Clothier","Safehouse","School"};
-                        bid = generator.generateBuildings(buildings, l, bid) + 1;
-                    }
+                }
+                if (Math.abs(l.getSlope()) < .01f) {
+                    bid = generator.generateBuildings(buildings.get(cityType), l, bid) + 1;
                 }
             }
         }
@@ -71,7 +73,7 @@ class GenerateTown {
             int id = max-i;
             int ladderX = Creation.r.nextInt(lowPt2.x()-lowPt1.x()-80)+lowPt1.x()+40;
             float ladderDepth = id+.01f;
-            Line ground = map.checkLand(new Line(new P(ladderX, lowPt1.y), new P(ladderX, lowPt1.y+99999)), id);
+            Line ground = map.checkLand(new Line(new P(ladderX, lowPt1.y), new P(ladderX, lowPt1.y+99999)), e->e.depth>=id);
             if (ground != null) {
                 for (int y = lowPt1.y()+40; y < (int) ground.getCrossPointY(ladderX); y += 40) {
                     TerrainTrail ladder = new TerrainTrail(map, new P(ladderX - 40, y-20));

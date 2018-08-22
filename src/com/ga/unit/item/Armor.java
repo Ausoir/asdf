@@ -15,21 +15,21 @@ import com.ga.unit.skill.Actions;
 public class Armor extends Item {
     int encumbrance;
     private int piece;
-    private int armorMod = 0;
     private int warmth;
     int pocket;
-    public Armor(Map map, String name, int seed, Material[] materials, int piece, int encumbrance, int pockets, int warmth) {
+    public Armor(Map map, String name, int seed, Material[] materials, int piece, int encumbrance, int pockets, int durabilityMod, int warmth) {
         super(map, name, seed, materials, ItemType.Armor);
         this.encumbrance = encumbrance;
-        value = value*2 + 500;
+        value = value + 400;
         this.pocket = pockets;
         this.piece = piece;
         this.warmth = warmth;
         if (piece == 1) image.set(name, 0);
         else if (piece == 2) image.set(name, 2);
         else if (piece == 4) weight = 0;
+        this.durability += durabilityMod;
+        this.uses += durabilityMod;
     }
-    void shade(int color){}
     public void onCreate(){
         imbueMeta(true, true, .1f);
     }
@@ -39,14 +39,10 @@ public class Armor extends Item {
     }
     public void randomSize(P sizeVariance) {}
     private float getArmor(){
-        return Math.max(0,material.hardness + armorMod);
+        return Math.max(0,material.hardness);
     }
     int getWarmth(){
         return Math.max(0, warmth+material.getWarmth());
-    }
-    protected void setModifier(SpecialtyMod mod){
-        if (mod == SpecialtyMod.Hardened) armorMod += admod.magnitude;
-        else super.setModifier(mod);
     }
     public void remove(){
         if (owner != null) owner.armor.remove(this);
@@ -54,7 +50,8 @@ public class Armor extends Item {
     }
     public boolean checkBreak(boolean blunt, int damage){ //damage reduction
         int r = (int) Math.max(0, blunt?damage:damage - getArmor());
-        if (isUsable(true, r)){
+        if (isUsable(false, 1)){
+            isUsable(true, Math.min(r, uses));
             if (owner != null) trigger(owner);
             return false;
         }

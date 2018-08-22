@@ -13,7 +13,7 @@ public class Line {
     public P pt;
     public P ptd;
     public int tid = -1;
-    public int opt = 0; //0:normal,1:intangible,-1:lights
+    public int opt = 0; //-1:lights (prevent prop auto adjust), 0:intangible, 1:normal, 2:prevent prop auto adjust, 3:can't drop down
     public float depth = -1;
 
     public Line(String p){
@@ -51,6 +51,12 @@ public class Line {
         this.tid = tid;
         this.opt = opt;
         this.depth = depth;
+    }
+    public boolean landable(){
+        return opt >= 1;
+    }
+    public boolean droppable(){
+        return opt != 3;
     }
     public Line getAdd(P p){
         return new Line(pt.getAdd(p), ptd.getAdd(p));

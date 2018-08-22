@@ -1,7 +1,8 @@
-Fruit;Fish;Vegetables;Cheese;Bread;Meat;Birdmeat;Kitchenware //Grocery
-Meal;Drumstick;Porkchop;Burger;Sandwich;Jerky //Restaurant
-Comfortwear_Torso;Comfortwear_Pants;Jean_Torso;Jean_Pants;Dustset_Torso;Dustset_Pants;Adventurewear_Torso;Adventurewear_Pants;Suit_Torso;Suit_Pants;Sportswear_Torso;Sportswear_Pants //Tailor
-Chainmail_Torso;Chainmail_Pants;Lace_Helm;Legion_Helm;Platemail_Torso;Platemail_Pants;Battlewear_Torso;Battlewear_Pants //Armorsmith
-Falchion;Broadsword;Axe;Lancesword;Cutlass;Claymore;Mace;Spear;Halberd;Cleaver;Pickaxe;Rapier;Warhammer;Greatsword;Striker;Ration //Weaponsmith
-Manual;Textbook;Scroll;Potion;Battery;Grappler //Lab
-Katana;Tanto;Dagger;Claw;Knuckleblade;Revolver;Pistol;Bow;Throwing_Knife;Fireball;Ration //Exotic
+Baseball_Bat;Parasol;Repairkit;Battery;Fannypack;Backpack;Knapsack;Sunglass;Cap;Kitchenware;Ammunition;Potion;Scroll //Grocery
+Ration;Fruit;Fish;Vegetables;Cheese;Bread;Meat;Birdmeat;Meal;Drumstick;Porkchop;Burger;Sandwich;Jerky //Restaurant
+Cloak;Strawhat;Comfortwear_Torso;Comfortwear_Pants;Jean_Torso;Jean_Pants;Dustset_Torso;Dustset_Pants;Adventurewear_Torso;Adventurewear_Pants;Suit_Torso;Suit_Pants;Sportswear_Torso;Sportswear_Pants //Tailor
+Chainmail_Torso;Chainmail_Pants;Lace_Helm;Legion_Helm;Platemail_Torso;Platemail_Pants;Battlewear_Torso;Battlewear_Pants;Energy_Necklace;Memoryfoam_Necklace;Grappler //Armorsmith
+Machete;Broadsword;Axe;Lancesword;Cutlass;Claymore;Mace;Spear;Halberd;Cleaver;Pickaxe;Rapier;Warhammer;Greatsword;Striker;Throwing_Knife;Knife;Longhammer;Throwing_Knife;Bomb //Weaponsmith
+Scroll;Potion;Battery;Grappler //Lab
+Textbook //Library
+Katana;Tanto;Dagger;Claw;Knuckleblade;Firearm;Bow;Throwing_Knife;Fireball;Ration //Exotic
