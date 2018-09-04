@@ -5,6 +5,7 @@ import com.ga.game.FileManager;
 import com.ga.game.Menu;
 import com.ga.map.Global;
 import com.ga.tool.Performer;
+import com.ga.tool.T;
 import com.ga.tool.Timer;
 import com.ga.unit.item.Item;
 import com.ga.unit.man.Man;
@@ -112,7 +113,7 @@ public enum Intelligence {
 
                 void load(String p) {
                     super.load(p);
-                    String[] data = FileManager.readText("Data/raw/Shop.txt");
+                    String[] data = FileManager.read("Data/raw/Shop.txt").split("%");
                     advertise = new Timer(100+host.rand.nextInt(200), false);
                     low = host.rand.nextFloat()*.5f + .5f;
                     high = host.rand.nextFloat() + 1f;
@@ -181,14 +182,14 @@ public enum Intelligence {
                                     new Performer(){
                                         public void perform(){
                                             if (Global.player.requireGold(price)) {
-                                                Global.player.get("Nutrition").add(3, true);
+                                                Global.player.stats.get("Nutrition").add(3, true);
                                                 if (Global.player.map.updater.sleep(3, true)){
-                                                    Global.player.get("Motivation").add(10,false);
-                                                    Global.player.get("Fatigue").add(9,false);
-                                                    Global.player.get("Agility").add(1, false);
-                                                    Global.player.get("Strength").heal();
+                                                    Global.player.stats.get("Motivation").add(10,false);
+                                                    Global.player.stats.get("Fatigue").add(9,false);
+                                                    Global.player.stats.get("Agility").add(1, false);
+                                                    Global.player.stats.get("Strength").heal();
                                                 } else {
-                                                    Global.player.get("Nutrition").add(-3, true);
+                                                    Global.player.stats.get("Nutrition").add(-3, true);
                                                     Global.player.obtainGold(price);
                                                 }
                                             } else {
@@ -216,18 +217,18 @@ public enum Intelligence {
                     int reqMot = 20, reqTime = 2;
                     String message = "I can teach you useful things if you have the time, motivation, and money.";
                     message += "\nRequires "+Dialog.money(price)+", "+reqMot+" motivation, and "+reqTime+" hours.";
-                    message += "\n\nCurrent motivation: "+Global.player.get("Motivation").get();
-                    message += "\nCurrent nutrition: "+Global.player.get("Nutrition").get();
+                    message += "\n\nCurrent motivation: "+Global.player.stats.get("Motivation").get();
+                    message += "\nCurrent nutrition: "+Global.player.stats.get("Nutrition").get();
                     Menu.menu.showDialog("Trainer", message,
                         new String[]{"Begin training"},
                         new Performer[]{
                             new Performer(){
                                 public void perform(){
-                                    if (Global.player.get("Motivation").get() >= reqMot){
+                                    if (Global.player.stats.get("Motivation").get() >= reqMot){
                                         if (Global.player.getGold() >= price) {
                                             if (Global.player.map.updater.sleep(reqTime, true)) {
                                                 Global.player.learnTrait(trait);
-                                                Global.player.get("Motivation").require(reqMot);
+                                                Global.player.stats.get("Motivation").require(reqMot);
                                                 Global.player.requireGold(price);
                                             }
                                         } else Global.player.say("Not enough money...");
@@ -246,7 +247,7 @@ public enum Intelligence {
 
                 void load(String p) {
                     super.load(p);
-                    String[] data = FileManager.readText("Data/raw/Pawn.txt");
+                    String[] data = FileManager.read("Data/raw/Pawn.txt").split("%");
                     advertise = new Timer(100+host.rand.nextInt(200), false);
                     wanted = data[host.seed % data.length].split(";");
                     priceR = new float[wanted.length];
@@ -326,8 +327,7 @@ public enum Intelligence {
                     super.shop();
                     int week = hourly*42;
                     int month = hourly*180;
-                    int debt = Global.player.get("Insurance").getMax();
-                    if (debt >= 0) {
+                    if (Global.player.respawnInfo.isEmpty()) {
                         Menu.menu.showDialog("Guildsman", "Would you like to buy our health insurance plan?\n\n" +
                                 " Every time you are in a critical accident, we will bring you here and revive you. We cover all accidents ranging from food poisoning to decapitation.\n"+
                                 " You must pay an hourly fee of "+Dialog.money(hourly)+"."+
@@ -338,28 +338,23 @@ public enum Intelligence {
                                         new Performer() {
                                             public void perform() {
                                                 if (Global.player.requireGold(week+price)) {
-                                                    Global.player.respawnInfo = 42 + Global.hour + "&" + host.map.name.toString();
-                                                }
+                                                    Global.player.respawnInfo = 42 + Global.hour + "," + host.map.name.toString();
+                                                    host.say("@sold");
+                                                } else Global.player.say("Not enough money...");
                                             }
                                         }, new Performer() {
                                     public void perform() {
                                                 if (Global.player.requireGold(month+price)) {
-                                                    Global.player.respawnInfo = 180 + Global.hour + "&" + host.map.name.toString();
-                                                }
+                                                    Global.player.respawnInfo = 180 + Global.hour + "," + host.map.name.toString();
+                                                    host.say("@sold");
+                                                } else Global.player.say("Not enough money...");
                                     }
                                 }
                                 });
                     } else {
-                        Menu.menu.showDialog("Guildsman", "You are in debt from your previous accident. You can't buy another contract until you pay off your debt.",
-                                new String[]{"Pay off debt ("+Dialog.money(-debt)+")"}, new Performer[]{
-                                        new Performer(){
-                                            public void perform(){
-                                                if (Global.player.requireGold(-debt)){
-                                                    Global.player.get("Insurance").setTotal(0, true);
-                                                }
-                                            }
-                                        }
-                                });
+                        int time = Integer.parseInt(Global.player.respawnInfo.split(",")[0])-Global.hour;
+                        if (time < 0) Menu.menu.showDialog("Guildsman", "Your previous contract expired "+time+" hours ago.");
+                        else Menu.menu.showDialog("Guildsman", "You are already in contract. Your current contract will expire in "+time+" hours.");
                     }
                 }
             });
@@ -370,13 +365,11 @@ public enum Intelligence {
         p.factoryId = ordinal();
         return p;
     }
-    public static AI load(String p, Unit host){
-        String[] data = p.split(",");
-        String[] values = data[0].split(":");
-        AI r = values()[Integer.parseInt(values[0])].make(host);
-        r.type = Integer.parseInt(values[1]);
+    public static AI load(Unit host, T p){
+        AI r = values()[p.get(0).get(0).getInt()].make(host);
+        r.type = p.get(0).get(1).getInt();
         host.brain = r;
-        r.load(data[1]);
+        r.load(p.get(1).get());
         return r;
     }
 }

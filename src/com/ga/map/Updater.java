@@ -3,6 +3,7 @@ package com.ga.map;
 import com.ga.game.Observer;
 import com.ga.tool.L;
 import com.ga.tool.P;
+import com.ga.tool.T;
 import com.ga.unit.*;
 
 import java.awt.*;
@@ -107,10 +108,10 @@ public class Updater {
     public String toString(){
         StringBuilder result = new StringBuilder();
         for (Prop i : props){
-            if (i.save) result.append(i.toString()).append(";");
+            if (i.save) result.append(T.wrap(i.toString())).append(",");
         }
         for (Unit i : unitsLoaded){
-            if (i.save && !i.traveler) result.append(i.toString()).append(";");
+            if (i.save && !i.traveler) result.append(T.wrap(i.toString())).append(",");
         }
         if (result.length() > 0) result = new StringBuilder(result.substring(0, result.length() - 1));
         return result.toString();
@@ -189,33 +190,33 @@ public class Updater {
                 return false;
             }
         }
-        if (Global.player.stats.isDangerous()){
+        if (Global.player.status.isDangerous()){
             Global.player.say("I am inflicted with dangerous status effect!");
             return false;
         }
-        if (Global.player.get("Fatigue").get() < p){
-            Global.player.say("I am too tired! I need "+(p-Global.player.get("Fatigue").get())+" more Fatigue points.");
+        if (Global.player.stats.get("Fatigue").get() < p){
+            Global.player.say("I am too tired! I need "+(p-Global.player.stats.get("Fatigue").get())+" more Fatigue points.");
             return false;
         }
-        if (Global.player.get("Nutrition").get() < p){
-            Global.player.say("I am too hungry! I need "+(p-Global.player.get("Nutrition").get())+" more Nutrition points.");
+        if (Global.player.stats.get("Nutrition").get() < p){
+            Global.player.say("I am too hungry! I need "+(p-Global.player.stats.get("Nutrition").get())+" more Nutrition points.");
             return false;
         }
         if (Global.player.armor.getWarmth() < map.temperature){
-            if (!Global.player.get("Vitality").require(p)) {
+            if (!Global.player.stats.get("Vitality").require(p)) {
                 Global.player.say("It's too cold!");
                 return false;
             } else Global.player.say("Vitality decreased by "+p+" from cold temperature.");
         }
-        Global.player.get("Fatigue").require(p);
-        Global.player.get("Nutrition").require(p);
+        Global.player.stats.get("Fatigue").require(p);
+        Global.player.stats.get("Nutrition").require(p);
         forceSleep(p);
         return true;
     }
     public void forceSleep(int p){
         map.weather.fadeIn();
         //Hour pass
-        Global.player.get("Strength").heal();
+        Global.player.stats.get("Strength").heal();
         Global.timePass(p*100);
         Global.hour+=p;
         for (Map i : Global.maps) i.onTimeChange();

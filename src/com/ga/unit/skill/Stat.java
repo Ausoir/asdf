@@ -6,7 +6,7 @@ package com.ga.unit.skill;
 public class Stat {
     private int max;
     private int current;
-    Stat(String p){
+    public Stat(String p){
         String[] t = p.split(",");
         if (t.length == 1){
             setTotal(Integer.parseInt(p), true);
@@ -59,10 +59,10 @@ public class Stat {
     public int get(){
         return current;
     }
-    public String toString(){
-        return current+","+max;
-    }
     public int getMax() {
         return max;
+    }
+    public String toString(){
+        return "["+current+","+max+"]";
     }
 }

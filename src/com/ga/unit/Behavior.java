@@ -37,7 +37,7 @@ public enum Behavior {
             return false;
         }
     }, Travel {
-        String destination = "", var = "";
+        String destination = "", var = ""; //todo: CANNOT HAVE STATIC VALUES
         public void blocked(Unit host, boolean fall) {
         }
         public void load(Unit host, String p){
@@ -183,6 +183,6 @@ public enum Behavior {
 
     }
     public String toString(Unit host){
-        return ordinal()+":"+getVar(host);
+        return "["+ordinal()+","+getVar(host)+"]";
     }
 }

@@ -174,10 +174,14 @@ public class Body {
         return organs[SyncRand.r.nextInt(organs.length)].ptd;
     }
 
+    public boolean isStateValid(String p){
+        return animation.containsKey(p);
+    }
+
     public void setState(String state) {
         this.state = state;
         current = 0;
-        if (animation.containsKey(state)){
+        if (isStateValid(state)){
             int[][] t = animation.get(state);
             nextAnimation = t[0];
             nextTrigger = t[1][0];

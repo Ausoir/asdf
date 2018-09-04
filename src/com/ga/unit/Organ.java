@@ -126,7 +126,7 @@ public class Organ extends Line {
         return "";
     }
 
-    void stitch() {
+    public void stitch() {
         amputated = false;
         image.visible = true;
     }

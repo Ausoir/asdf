@@ -1,5 +1,5 @@
 Shell;Bone;Resin;Jewelry
 Striker;Rapier;Lancesword;Claw;Katana;Tanto
-Cut Fish and Cut Bread and Cheese;Cut Vegetables and Boiled Fruit;Fried Bread and Spiced Meat;Roasted Cheese and Birdmeat;Boiled Vegetables and Fried Cheese
+Cut Fish and Cut Bread and Cheese;Cut Vegetables and Boiled Fruit;Fried Bread and Spiced Meat;Roasted Cheese and Bird_Meat;Boiled Vegetables and Fried Cheese
 Battery;Grappler;Fireball;Scroll;Potion;Lockpick
 Ammunition;Bandage;Vitamin;Rum;Mead

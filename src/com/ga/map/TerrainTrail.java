@@ -72,7 +72,7 @@ class TerrainTrail {
     private void setTexture(String p){
         map.formTextures.put(terrain, p);
         for (Line i : lines){
-            i.depth = Float.parseFloat(p.split("&")[0]);
+            i.depth = Float.parseFloat(p.split(",")[0]);
         }
     }
     void finish(String p){

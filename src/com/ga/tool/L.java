@@ -20,10 +20,10 @@ public class L<T> extends ArrayList<T> {
     }
     public String toString(){
         if (size() == 0) return "";
-        String r = "";
+        StringBuilder r = new StringBuilder();
         for (Object i : this){
-            r += i.toString()+",";
+            r.append(i.toString()).append(",");
         }
-        return r.substring(0,r.length()-1);
+        return "["+r.substring(0,r.length()-1)+"]";
     }
 }

@@ -9,9 +9,6 @@ public class Cooldown {
         time = Global.time;
         setDuration(duration);
     }
-    public void load(String p){
-        time = Integer.parseInt(p);
-    }
     public String toString(){
         return ""+Math.max(0, time-Global.time);
     }

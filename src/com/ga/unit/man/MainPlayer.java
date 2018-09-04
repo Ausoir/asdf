@@ -10,6 +10,7 @@ import com.ga.map.MapName;
 import com.ga.tool.Line;
 import com.ga.tool.Performer;
 import com.ga.tool.SyncRand;
+import com.ga.tool.T;
 import com.ga.unit.Faction;
 import com.ga.unit.Particle;
 import com.ga.unit.Traits;
@@ -34,16 +35,13 @@ public class MainPlayer extends Player {
         Global.cameraTo = pos;
     }
 
-    public String[] load(String p){
-        String[] r = super.load(p);
-        respawnInfo = r[15]; //Expiry, Map, Location
-        return r;
+    public void load(T p){
+        super.load(p.get(1));
+        respawnInfo = p.get(0).get(); //Expiry, Map, Location
     }
     public String toString(){
         String r = super.toString();
-        String first = r.substring(0,r.indexOf("#"));
-        String last = r.substring(r.indexOf("#"));
-        return first + "@"+respawnInfo + last;
+        return "["+respawnInfo+"],["+r+"]";
     }
 
     @Override
@@ -58,7 +56,7 @@ public class MainPlayer extends Player {
         if (r != 0){
             if (r == 2) {
                 statBar.show(1, 1);
-                if (state.getCost() > get("Strength").getMax()) say("Stamina cost is beyond my limit!");
+                if (state.getCost() > stats.get("Strength").getMax()) say("Stamina cost is beyond my limit!");
             } else if (r == 3) {
                 statBar.showCd(getCooldown(state).time);
             } else if (r == 4) {
@@ -80,9 +78,9 @@ public class MainPlayer extends Player {
         Sound.play(map, pos, "heal");
         Particle.holyExplosion(map, pos.getAdd(clip.organs[BODY].ptd), getDepth());
         String statChangeNotice = "";
-        int level = get("Level").getMax();
-        get("Level").addTotal(1);
-        get("Motivation").setTotal((level+1)*10, true);
+        int level = stats.get("Level").getMax();
+        stats.get("Level").addTotal(1);
+        stats.get("Motivation").setTotal((level+1)*10, true);
         if (level > 1) {
             int i, current = 1, prev;
             for (i = 1; i < level; i += prev) {
@@ -95,10 +93,10 @@ public class MainPlayer extends Player {
                 int count = 0;
                 do {
                     decayStat = mainStats[SyncRand.r.nextInt(mainStats.length)];
-                    decay = get(decayStat);
+                    decay = stats.get(decayStat);
                 } while (++count < 9 && decay.getMax() <= 1);
                 if (count >= 9){
-                    get("Level").add(-1, true);
+                    stats.get("Level").add(-1, true);
                     statChangeNotice += "No stat point is obtained on this level.";
                 } else {
                     decay.addTotal(-1);
@@ -119,7 +117,7 @@ public class MainPlayer extends Player {
                 String msg = "Cause: "+cause+"\n";
                 if (respawnInfo.isEmpty()) msg += "You have no insurance to cover this death.";
                 else {
-                    String[] data = respawnInfo.split("&");
+                    String[] data = respawnInfo.split(",");
                     int expiry = Integer.parseInt(data[0]) - Global.hour;
                     if (expiry < 0) msg += "Your insurance expired "+expiry+" hours ago.";
                     else {
@@ -127,14 +125,21 @@ public class MainPlayer extends Player {
                         Menu.menu.showDialog("You fall unconscious...", msg+"Your guild agents haul your body back into the guild hall for revival...");
                         respawnInfo = "";
                         revive();
-                        Global.server.requestChangeMap(data[1]+"@911");
+                        Global.server.requestChangeMap(data[1]+",911");
                         return;
                     }
                 }
                 FileManager.save(FileManager.makeDirectory("Data/map/Player.user"),FileManager.read(FileManager.makeDirectory("Data/map/Template.user")));
                 FileManager.save(FileManager.makeDirectory("Data/map/World.map"),"");
                 FileManager.save(FileManager.makeDirectory("Data/Keymap.txt"),"");
-                Menu.menu.showDialog("You die...", msg + "\n GAME OVER!");
+                FileManager.cleanMaps();
+                Menu.menu.showDialog("You die...", msg + "\n GAME OVER!", new String[]{"Click here to exit"}, new Performer[]{
+                        new Performer(){
+                            public void perform(){
+                                System.exit(0);
+                            }
+                        }
+                });
             }
         };
     }
@@ -151,7 +156,7 @@ public class MainPlayer extends Player {
     }
 
     public boolean requireMana(int p) {
-        if (traits.getTraitLevel(Traits.Trait.Attunement) > 0) statBar.show(2, 1);
+        if (traits.getTraitLevel(Traits.Trait.Affinity) > 0) statBar.show(2, 1);
         return super.requireMana(p);
     }
 
@@ -162,7 +167,7 @@ public class MainPlayer extends Player {
                 vel.set(0,0);
                 stateSet(Actions.Idle);
                 delay.time = 200;
-                Global.server.requestChangeMap(newMapName.toString() +"@"+ (dir<0?1:2));
+                Global.server.requestChangeMap(newMapName.toString() +","+ (dir<0?1:2));
             }
         }
         super.onMapEdge(dir);
@@ -170,9 +175,9 @@ public class MainPlayer extends Player {
 
     public void update() {
         super.update();
-        if (!get("Agility").isFull()) statBar.show(0, .7f);
-        if (!get("Strength").isFull()) statBar.show(1, .7f);
-        if (!get("Intelligence").isFull()) statBar.show(2, .7f);
+        if (!stats.get("Agility").isFull()) statBar.show(0, .7f);
+        if (!stats.get("Strength").isFull()) statBar.show(1, .7f);
+        if (!stats.get("Intelligence").isFull()) statBar.show(2, .7f);
         statBar.update();
         if (input.ctrl) Global.cameraTo = pos.getAdd(target.getMult(.5f,.5f));
         else Global.cameraTo = pos.getAdd(vel.getAdd(0,-Settings.gravity).clamp(-8,-6,8,6).mult(24,8));
@@ -186,9 +191,9 @@ public class MainPlayer extends Player {
     public MainPlayer start() {
         super.start();
         statBar = new Indicator(this);
-        statBar.setMeasuree(0, get("Agility"));
-        statBar.setMeasuree(1, get("Strength"));
-        statBar.setMeasuree(2, get("Intelligence"));
+        statBar.setMeasuree(0, stats.get("Agility"));
+        statBar.setMeasuree(1, stats.get("Strength"));
+        statBar.setMeasuree(2, stats.get("Intelligence"));
         return this;
     }
 }

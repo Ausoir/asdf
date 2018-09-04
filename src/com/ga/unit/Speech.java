@@ -1,21 +1,19 @@
 package com.ga.unit;
 
 import com.ga.game.FileManager;
-import com.ga.game.Panel;
-import com.ga.map.Drawable;
 import com.ga.map.Global;
-import com.ga.tool.P;
+import com.ga.tool.T;
 import com.ga.tool.Timer;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Created by Ga on 7/31/2016. asd
  */
 public class Speech extends Thing {
-    static Color forecolor = new Color(30,30,30,255);
+    private static T reactions = FileManager.readLiterals("Data/raw/Reaction.txt");
+    private static Color forecolor = new Color(30,30,30,255);
     private Unit host;
     private ArrayList<String> msg = new ArrayList<>();
     private Timer timer = new Timer(-1,false);
@@ -72,13 +70,9 @@ public class Speech extends Thing {
         }
     }
     private String getRandom(String p){
-        HashMap<String,ArrayList<String>> dialog = FileManager.readDialogue("Data/raw/Reaction.txt"); //static cache?
-        ArrayList<String> results = dialog.get(host.speechType+":"+p);
-        if (results == null){
-            results = dialog.get(":"+p);
-            if (results == null) return "";
-        }
-        return results.get(rand.nextInt(results.size()));
+        T results = reactions.startsWith(host.speechType+":"+p);
+        if (results == null) return "";
+        return results.get(1).getRand(rand).get();
     }
 
     public void update() {

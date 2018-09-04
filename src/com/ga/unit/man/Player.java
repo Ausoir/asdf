@@ -3,6 +3,8 @@ package com.ga.unit.man;
 import com.ga.map.Map;
 import com.ga.unit.PlayerInput;
 import com.ga.unit.Prop;
+import com.ga.unit.skill.Actions;
+import com.ga.unit.skill.Buffs;
 
 import java.util.ArrayList;
 
@@ -20,6 +22,13 @@ public class Player extends Man {
         speechType = "p";
     }
 
+    public int setState(Actions p){
+        if (status.getEffectLevel(Buffs.Morph) > 0){
+            if (!clip.isStateValid(p.name())) p = Actions.Melee;
+        }
+        return super.setState(p);
+    }
+
     public void rest(){
         int level = 2;
         ArrayList<Prop> props = getAvailableProps();
@@ -29,7 +38,7 @@ public class Player extends Man {
                 break;
             } else if (i.name.equals("Chair") || i.name.equals("Shortchair") || i.name.equals("Bench")) level = 3;
         }
-        get("Fatigue").add(level, false);
+        stats.get("Fatigue").add(level, false);
         map.updater.sleep(1, true);
     }
 }

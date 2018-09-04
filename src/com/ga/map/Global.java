@@ -5,14 +5,12 @@ import com.ga.game.Display;
 import com.ga.game.FileManager;
 import com.ga.game.Processes;
 import com.ga.game.Settings;
-import com.ga.tool.EventTimer;
 import com.ga.tool.P;
 import com.ga.tool.Timer;
 import com.ga.unit.man.MainPlayer;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Random;
 
 /**
@@ -33,7 +31,6 @@ public class Global {
     public static boolean editor = false;
     public static int time = 0, hour;
     static Timer updates = new Timer(40,true);
-    private static ArrayList<EventTimer> timers = new ArrayList<>();
     public static Font font = new Font("Helvetica",Font.PLAIN,20);
     public static int controlId;
     public static float scale = 1;
@@ -84,11 +81,6 @@ public class Global {
     }
     public static void timePass(int p){
         time+=p;
-        Iterator it = timers.iterator();
-        while (it.hasNext()){
-            EventTimer timer = (EventTimer) it.next();
-            if (timer.update(p)) it.remove();
-        }
     }
     public static boolean inCamera(float x, float y, float sizeX, float sizeY){
         return (x > Global.camera.x-Settings.centerX-sizeX && y > Global.camera.y-Settings.centerY-sizeY

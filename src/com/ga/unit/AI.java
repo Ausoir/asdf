@@ -2,10 +2,7 @@ package com.ga.unit;
 
 import com.ga.game.Observer;
 import com.ga.map.Global;
-import com.ga.tool.Interactive;
-import com.ga.tool.Line;
-import com.ga.tool.P;
-import com.ga.tool.Timer;
+import com.ga.tool.*;
 import com.ga.unit.man.Man;
 import com.ga.unit.skill.Actions;
 
@@ -96,20 +93,20 @@ public abstract class AI implements Observer {
         return false;
     }
     void load(String p) {
-        String[] tasks = p.split("&");
-        for (int i=tasks.length-1;i>=0;i--) {
-            String[] v = tasks[i].split(":");
-            setTask(Behavior.values()[Integer.parseInt(v[0])]);
-            this.tasks.peek().load(host, v[1]);
+        T s = new T(p);
+        for (int i=s.size()-1;i>=0;i--) {
+            T t = s.get(i);
+            setTask(Behavior.values()[t.get(0).getInt()]);
+            this.tasks.peek().load(host, t.get(1).get());
         }
     }
     public String toString() {
         StringBuilder r = new StringBuilder();
         for (int i=tasks.size()-1;i>=0;i--) {
-            r.append(tasks.get(i).toString(host)).append("&");
+            r.append(tasks.get(i).toString(host)).append(",");
         }
         if (r.length()>0) r = new StringBuilder(r.substring(0, r.length() - 1));
-        return factoryId+":"+type+","+r;
+        return "[["+factoryId+","+type+"],["+r+"]]";
     }
 }
 

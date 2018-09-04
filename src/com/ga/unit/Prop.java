@@ -6,6 +6,7 @@ import com.ga.map.Map;
 import com.ga.tool.Interactive;
 import com.ga.tool.Line;
 import com.ga.tool.P;
+import com.ga.tool.T;
 
 import java.util.ArrayList;
 
@@ -126,15 +127,13 @@ public class Prop extends Thing {
     }
     public void onTimeChange(){
     }
-    public String[] load(String p) {
-        String[] ps = p.split("@",-1);
-        pos.load(ps[3]);
-        rotation = Float.parseFloat(ps[4]);
-        return ps;
+    public void load(T p) {
+        pos.load(p.get(3));
+        rotation = p.get(4).getFloat();
     }
     @Override
     public String toString(){
-        return factoryId + "@" + subId + "@" + seed + "@" + pos
-                + "@" + String.format(java.util.Locale.US,"%.2f", rotation);
+        return factoryId + "," + subId + "," + seed + "," + pos
+                + "," + String.format(java.util.Locale.US,"%.2f", rotation);
     }
 }

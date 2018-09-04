@@ -1,5 +1,7 @@
 package com.ga.unit;
 
+import com.ga.tool.T;
+
 import java.util.ArrayList;
 
 /**
@@ -9,21 +11,12 @@ public class Traits {
     public enum Trait {
         Tough(0,"Resist flinching from being hit."),
 
-        Herbalism(1,"Pick materials from bushes and trees."),
-        Rune_Literacy(1,"Identify, use, and create scrolls."),
-        Alchemy(1,"Identify, use, and create potions."),
-        Cooking(1,"Learn to craft food with ingredients and enhance them using kitchenware."),
-        Crafting(1,"Craft various items."),
-        Attunement(1,"Utilize innate energy from your body. Higher level restores more energy per hour."),
+        Literacy(1,"Learn to read runes. You may now identify scrolls."),
+        Alchemy(1,"Gain familiarity with alchemy. You may now identify potions."),
+        Affinity(1,"Utilize energy from your body. The energy store is equal to your Intelligence."),
 
-        Lung_Injury(2,"Rest time quadrupled."){
-            public void onSet(Unit host){
-                host.stats.restTimer.max *= 4;
-            }
-            public void onRemove(Unit host){
-                host.stats.restTimer.max *= .25f;
-            }
-        }, Damaged_Liver(2,"Nutrition from food -1. Potions do no effect."),
+        Lung_Injury(2,"Rest time quadrupled."),
+        Damaged_Liver(2,"Nutrition from food -1. Potions do no effect."),
         Blindness(2,"Cannot read books or scrolls. Cannot target properly. Cannot see any objects."),
         Brain_Damage(2,"Lose all traits and skills."){
             public void onSet(Unit host){
@@ -152,8 +145,8 @@ public class Traits {
         }
     }
     public static int MAXLEVEL = 4;
-    ArrayList<Trait> trait = new ArrayList<>();
-    ArrayList<Integer> level = new ArrayList<>();
+    private ArrayList<Trait> trait = new ArrayList<>();
+    private ArrayList<Integer> level = new ArrayList<>();
 
     public ArrayList<Trait> getTraits() {
         return trait;
@@ -202,20 +195,18 @@ public class Traits {
         }
         return r;
     }
-    void load(Unit host, String p){
-        if (!p.equals("")){
-            for (String i : p.split(",")){
-                Trait trait = Trait.valueOf(i.split(":")[0]);
-                for (int lvl=0;lvl<Integer.parseInt(i.split(":")[1]);lvl++) host.learnTrait(trait);
-            }
+    void load(Unit host, T p){
+        for (T i : p){
+            Trait trait = Trait.valueOf(i.get(0).get());
+            for (int lvl=0;lvl<i.get(1).getInt();lvl++) host.learnTrait(trait);
         }
     }
     public String toString(){
         if (trait.size() == 0) return "";
-        String r = "";
+        StringBuilder r = new StringBuilder();
         for (int i=0;i<trait.size();i++){
-            r += trait.get(i).toString()+":"+level.get(i)+",";
+            r.append("[").append(trait.get(i).toString()).append(",").append(level.get(i)).append("],");
         }
-        return r.substring(0,r.length()-1);
+        return "["+r.substring(0,r.length()-1)+"]";
     }
 }

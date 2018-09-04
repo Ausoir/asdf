@@ -7,16 +7,16 @@ import java.util.ArrayList;
 
 class GeneratePlains {
     static void generateHills(Map map){
-        generate(map, map.isSnowing() ? "dirt&snow&Weed=.1,Snowbush=.2" : "dirt&grass&Bush=.1,Weed=1", 2);
+        generate(map, map.isSnowing() ? "dirt,snow,[Weed=.1,Snowbush=.2]" : "dirt,grass,[Bush=.1,Weed=1]", 2);
     }
     static void generateFields(Map map){
         String theme;
-        if (map.isSnowing()) theme = "dirt&snow&Rock=.1,Snowbush=.2,Weed=.4,Snowtree=1";
-        else theme = "dirt&grass&Rock=.1,Bush=.2,Weed=.4,Tree=1";
+        if (map.isSnowing()) theme = "dirt,snow,[Rock=.1,Snowbush=.2,Weed=.4,Snowtree=1]";
+        else theme = "dirt,grass,[Rock=.1,Bush=.2,Weed=.4,Tree=1]";
         generate(map, theme, 3);
     }
     static void generateDesert(Map map){
-        generate(map, "dirt&sand&Rock=.1,Deadbush=.2", 1);
+        generate(map, "dirt,sand,[Rock=.1,Deadbush=.2]", 1);
     }
     private static void generate(Map map, String theme, int type){
         Generator generator = new Generator(map, 0);
@@ -42,12 +42,12 @@ class GeneratePlains {
         trail.add(new P(trail.last.x, highestY+400));
         trail.add(new P(start.x, highestY+400));
         trail.setOpt(1);
-        String props = depth+"&"+theme;
+        String props = depth+","+theme;
         trail.finish(props);
         generator.makeEdgeSpawns();
         map.normalize(0,800);
         map.size.y -= 400;
-        generator.generateBuilding("Cave", 400);
+        if (Creation.r.nextBoolean()) generator.generateBuilding("Cave", 400);
     }
     private static void divideLand(ArrayList<Line> total, int current, int max, int type){
         if (current >= max) return;

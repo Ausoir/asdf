@@ -8,7 +8,7 @@ import com.ga.tool.*;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Buffs;
 import com.ga.unit.skill.Stat;
-import com.ga.unit.skill.Stats;
+import com.ga.unit.skill.Status;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -18,6 +18,7 @@ import java.util.HashMap;
  */
 public class Unit extends Prop {
     private static final float OFFSET_UNIT = .0001f;
+    public H<String, Stat> stats = new H<>();
     public HashMap<Actions, Cooldown> cooldown = new HashMap<>();
     public int controlId;
     public boolean traveler = false;
@@ -27,7 +28,7 @@ public class Unit extends Prop {
     public AI brain;
     public EventTimer delay = new EventTimer(5, false, null);
     public P target = new P();
-    public Stats stats = new Stats(this);
+    public Status status = new Status(this);
     public Traits traits = new Traits();
     public float damageMod = 1;
     protected String speechType;
@@ -42,9 +43,9 @@ public class Unit extends Prop {
             StringBuilder r = new StringBuilder();
             if (isEmpty()) return r.toString();
             for (Actions i : this){
-                r.append(i.name()).append(":").append(getCooldown(i).toString()).append(",");
+                r.append("[").append(i.name()).append(",").append(getCooldown(i).toString()).append("],");
             }
-            return r.substring(0,r.length()-1);
+            return "["+r.substring(0,r.length()-1)+"]";
         }
     };
 
@@ -61,33 +62,33 @@ public class Unit extends Prop {
         return this;
     }
     @Override
-    public String[] load(String p){
-        String[] sections = super.load(p);
-        controlId = Integer.parseInt(sections[5]);
-        map = Global.getMap(sections[6]);
-        clip.load(sections[7]);
-        faction = Faction.valueOf(sections[9]);
-        Intelligence.load(sections[10], this);
-        stats.load(sections[8]);
-        Actions.load(this,sections[11]);
+    public void load(T p){
+        super.load(p);
+        controlId = p.get(5).getInt();
+        map = Global.getMap(p.get(6).get());
+        clip.load(p.get(7).get());
+        faction = Faction.valueOf(p.get(10).get());
+        Intelligence.load(this, p.get(11));
+        for (T i : p.get(8)) this.stats.put(i.get(0).get(), new Stat(i.get(1).get()));
+        status.load(p.get(9));
+        Actions.load(this,p.get(12));
         clip.setOrganHealth();
-        traits.load(this,sections[12]);
-        return sections;
+        traits.load(this,p.get(13));
     }
     @Override
     public String toString(){
-        return super.toString() + "@" + controlId + "@" + map.name.toString() + "@" + clip.toString() + "@" + stats.toString() + "@" + faction.name() +
-                "@" + brain.toString() + "@" + moveset.toString() + "@" + traits.toString();
+        return super.toString() + "," + controlId + "," + map.name.toString() + "," + clip.toString() + "," + stats.toString() + "," + status.toString() + "," + faction.name() +
+                "," + brain.toString() + "," + moveset.toString() + "," + traits.toString();
     }
     @Override
     public void onField(){
-        stats.initialize();
+        status.initialize();
     }
     private int getMemorySize(){
         return moveset.size()-1+traits.getMemorySize();
     }
     private boolean canLearn(){
-        return getMemorySize() < get("Intelligence").getMax();
+        return getMemorySize() < stats.get("Intelligence").getMax();
     }
     public boolean learnSkill(Actions move){
         if (!moveset.contains(move) && canLearn()){
@@ -145,7 +146,7 @@ public class Unit extends Prop {
         return r;
     }
     public float getSpeed(){
-        return get("Speed").get()*clip.getLegStatus()*.01f;
+        return stats.get("Speed").get()*clip.getLegStatus()*.01f;
     }
     public void attackSound(){
         Sound.play(map, pos, "swing_normal");
@@ -171,7 +172,6 @@ public class Unit extends Prop {
         face(target.x > 0 ? 1 : -1, false);
         clip.setState(state.getClipName());
         if (state != Actions.Idle) {
-            stats.restTimer.reset();
             getCooldown(state).reset();
             delay.performer = null;
             stateInterrupt();
@@ -189,7 +189,7 @@ public class Unit extends Prop {
         stateOnSet(state);
     }
     protected int getAttackSpeed(){
-        return get("Attack").get();
+        return stats.get("Attack").get();
     }
     public boolean face(int dir, boolean force) {
         if (force || (delay.over() && grounded && this.dir != dir)) {
@@ -204,7 +204,7 @@ public class Unit extends Prop {
 
     @Override
     public int getDamage(){
-        return (int) (get("Strength").get()*damageMod);
+        return (int) (stats.get("Strength").get()*damageMod);
     }
 
     protected boolean damageBreakthrough(int organ, boolean blunt, int damage){
@@ -212,7 +212,7 @@ public class Unit extends Prop {
     }
 
     public void buff(Buffs buff, int level){
-        stats.addEffect(buff, level);
+        status.addEffect(buff, level);
     }
 
     @Override
@@ -245,15 +245,15 @@ public class Unit extends Prop {
                         delay.performer = null;
                         grounded = false;
                         if (blunt && !traits.has(Traits.Trait.Tough)) {
-                            vel.x = damage * Float.compare(pos.x, hitBox.pt.x);
-                            vel.y += -damage;
+                            vel.x = damage/2 * Float.compare(pos.x, hitBox.pt.x);
+                            vel.y -= damage/3;
                             setState(Actions.Hit);
                         }
                         brain.onHit();
                         clip.organs[i].hit(hitBox);
                     }
-                    if (damageBreakthrough(i, blunt, damage) || stats.triggerEffect(Buffs.Mark)) {
-                        if (get("Agility").require(1)) {
+                    if (damageBreakthrough(i, blunt, damage) || status.triggerEffect(Buffs.Mark)) {
+                        if (stats.get("Agility").require(1)) {
                             Particle.explode(map, "Blood", getDepth()+.01f, getRandomPoint(), new P(), 9, 5, 0, true, 24);
                             if (!blunt){
                                 buff(Buffs.Bleed, 1);
@@ -270,10 +270,6 @@ public class Unit extends Prop {
             }
         }
         return false;
-    }
-
-    public Stat get(String p){
-        return stats.getStat(p);
     }
 
     public void die(String cause) {
@@ -309,7 +305,7 @@ public class Unit extends Prop {
                 if (vel.y >= Settings.gravityMax) {
                     if (hittable(Faction.Destructive)) {
                         setState(Actions.Down);
-                        delay.time = (int) (800f / Global.clamp(get("Agility").getMax(), 1, 800));
+                        delay.time = (int) (160f / stats.get("Agility").getMax());
                     }
                 } else if (state == Actions.Jump && stateDuration > 1) {
                     Sound.play(map, pos, "land");
@@ -349,7 +345,10 @@ public class Unit extends Prop {
         for (Unit i : map.updater.collideUnit(hand, (int) getReach(), faction)){
             i.hit(new Line(hand, hand.getAdd(dir*5,0)), getDamage());
             onAttack(i);
-            if (!stats.triggerEffect(Buffs.Cleave)) return i;
+            if (status.triggerEffect(Buffs.Might)){
+                i.vel.add(i.pos.x-pos.x>0?100:-100,-50);
+                i.setState(Actions.Down);
+            } else return i;
         }
         return null;
     }
@@ -357,7 +356,7 @@ public class Unit extends Prop {
     public void update() {
         speech.update();
         if (clip.update()) moveTriggered(0);
-        stats.update();
+        status.update();
         if (delay.update() && delay.performer == null){
             if (!moveTriggered) moveTriggered(0);
             stateFinish();
@@ -379,22 +378,22 @@ public class Unit extends Prop {
     }
     public String getDescription(){
         String r = name + " [Genetic Code: "+seed+"] [Faction: "+faction.name()+"]\n";
-        r += "  *** Stats ***\n"+stats.toString().split("/")[0].replace("&"," ")+"\n";
-        r += "  *** Effects ***\n"+stats.getEffectsList()+"\n";
+        r += "  *** Status ***\n"+ status.toString().split("/")[0].replace(","," ")+"\n";
+        r += "  *** Effects ***\n"+ status.getEffectsList()+"\n";
         r += "  *** Traits ***\n"+traits.toString()+"\n";
         r += "  *** Capabilities ***\n"+getTags().toString()+"\n";
         return r;
     }
     public void revive() {
-        stats.clearBuffs();
+        status.clearBuffs();
         Particle.holyExplosion(map, pos, getDepth());
         state = Actions.Idle;
-        delay.set(50);
         for (Organ i : clip.organs){
             i.stitch();
         }
         clip.setOrganHealth();
         clip.updateStatus();
         setState(Actions.Down);
+        delay.set(400);
     }
 }

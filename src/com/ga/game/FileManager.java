@@ -5,6 +5,7 @@ import com.ga.map.Global;
 import com.ga.map.Map;
 import com.ga.map.Updater;
 import com.ga.tool.Line;
+import com.ga.tool.T;
 import com.ga.unit.Clip;
 import com.ga.unit.Stock;
 import com.ga.unit.Unit;
@@ -13,7 +14,6 @@ import com.ga.unit.skill.Actions;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 
 /**
@@ -97,11 +97,7 @@ public class FileManager {
         String keymap = read("Data/Keymap.txt");
         MainPlayer player = ((MainPlayer) Stock.Player.create(null, 1, 0));
         Global.display.input = player.input;
-        if (!data.contains("@")){
-            Global.p("Player gone!");
-            System.exit(1);
-        }
-        player.load(data);
+        player.load(new T(data));
         player.input.load(keymap);
         Command.host = player;
         player.lastLand = new Line();
@@ -203,23 +199,20 @@ public class FileManager {
         return new Clip(readModelProperty(data), readModel(data), readAnimation(data), readClipFrames(data), readMoveset(data));
     }
 
-    public static HashMap<String, ArrayList<String>> readDialogue(String dir){
+    public static T readLiterals(String dir){
         String data = read(dir);
-        String[] lines = data.split("%");
-        HashMap<String,ArrayList<String>> result = new HashMap<>();
-        for (String line1 : lines) {
-            String[] type = line1.split("@");
-            String[] results = type[1].split(";");
-            ArrayList<String> values = new ArrayList<>();
-            Collections.addAll(values, results);
-            result.put(type[0], values);
+        String[] lines = data.split("%", -1);
+        T r = new T("");
+        for (String i : lines){
+            r.add(new T(i));
         }
-        return result;
+        return r;
     }
 
-    public static String[] readText(String dir){
+    public static T readLiteral(String dir, int line){
         String data = read(dir);
-        return data.split("%");
+        String[] lines = data.split("%", -1);
+        return new T(lines[line]);
     }
 
     public static boolean isFile(String p){
@@ -238,5 +231,15 @@ public class FileManager {
     public static void saveWorld(){
         save(FileManager.makeDirectory("Data/map/World.map"), Creation.seed + "," + Global.hour + "," + Global.controlId);
         save(FileManager.makeDirectory("Data/map/Actors.map"), Updater.toActorString());
+    }
+
+    public static void cleanMaps() {
+        File[] files = new File(makeDirectory("Data/map/ins")).listFiles();
+        if (files != null) {
+            for (File file : files)
+                if (!file.isDirectory()) {
+                    boolean delete = file.delete();
+                }
+        }
     }
 }

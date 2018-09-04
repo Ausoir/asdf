@@ -25,7 +25,7 @@ public class Terrain extends Drawable {
     private P finalSize;
     Map map;
     public Terrain(Map map, String texture, Shader shader, float depth){
-        image = new ShadedPicture(null, texture.startsWith("_")?null:texture, shader){
+        image = new ShadedPicture(null, texture.startsWith("/")?null:texture, shader){
             @Override
             public void shade(int p){
                 if (shader != null) {
@@ -48,7 +48,7 @@ public class Terrain extends Drawable {
 //        else this.color = new Color(c,c,c,255);
 
         if (image.image == null){
-            String[] data = texture.substring(1).split(",");
+            String[] data = texture.substring(1).split("/");
             this.color = new Color(Integer.parseInt(data[0]),Integer.parseInt(data[1]),Integer.parseInt(data[2]),Integer.parseInt(data[3]));
         } else {
             imageTexture = new TexturePaint(image.image, new Rectangle2D.Double(0, 0, image.getSize().x, image.getSize().y));

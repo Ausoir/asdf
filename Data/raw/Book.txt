@@ -1,0 +1,8 @@
+Valuables In Everything,[Make_Scrap]
+Know Your First Aid,[Patch_Wound,Bandage]
+Resources In The Wild,[Vegetables,Stick,Firewood,Rock]
+7 Easy Cooking Recipes,[Sandwich,Drumstick,Steak,Burger,Meal,Jerky,Ration]
+Introduction to Knitting,[Robe_Torso,Robe_Pants,Comfortwear_Torso,Comfortwear_Pants]
+Murder Murder DIY,[Knife,Dagger,Staff,Hammer,Balaclava]
+Apprenticeship,[Scribe_Scroll]
+Witch Guide,[Pot,Water,Brew_Potion]

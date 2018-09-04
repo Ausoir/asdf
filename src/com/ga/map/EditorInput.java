@@ -5,6 +5,7 @@ import com.ga.game.Menu;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
+import com.ga.tool.T;
 import com.ga.unit.Faction;
 import com.ga.unit.Prop;
 import com.ga.unit.Stock;
@@ -26,11 +27,8 @@ public class EditorInput extends Drawable implements Input, Updatable {
     public class Keybinding {
         private HashMap<Integer, String> map = new HashMap<>();
         Keybinding(){
-            String[] t = FileManager.readText(FileManager.makeDirectory("Data/Editor_Keymap.txt"));
-            for (String i : t){
-                String[] mapping = i.split(":");
-                map.put(Integer.parseInt(mapping[0]), mapping[1]);
-            }
+            T t = FileManager.readLiterals(FileManager.makeDirectory("Data/Editor_Keymap.txt"));
+            for (T i : t) map.put(i.get(0).getInt(), i.get(1).get());
         }
         public String get(int p){
             return map.get(p);
@@ -182,12 +180,12 @@ public class EditorInput extends Drawable implements Input, Updatable {
                 int rx = (int) (Math.random()*map.size.x);
                 for (Line l : map.landRaw) {
                     if (l.tid == lastSelected && l.clockwise() && l.lineCross(new Line(rx,0,rx,map.size.y))) {
-                        map.placeProp(l, cmd[2], -1);
+                        map.placeProp(l, Stock.createByName(map, cmd[2], -1));
                     }
                 }
             }
         } else if (cmd[0].equals("copy")) {
-            String[] texs = message.split(" ")[3].split("&");
+            String[] texs = message.split(" ")[3].split(",");
             txDepth = texs[0];
             txTexture = texs[1];
             txShader = texs[2];
@@ -198,20 +196,20 @@ public class EditorInput extends Drawable implements Input, Updatable {
         } else if (cmd[0].equals("shader")) {
             txShader = cmd[1];
         } else if (cmd[0].equals("cdepth")) {
-            String[] data = map.formTextures.get(lastSelected).split("&");
-            map.formTextures.put(lastSelected, p.substring(7)+"&"+data[1]+"&"+data[2]);
+            String[] data = map.formTextures.get(lastSelected).split(",");
+            map.formTextures.put(lastSelected, p.substring(7)+","+data[1]+","+data[2]);
             map.updater.remove(map.terrains.get(lastSelected));
 //            map.render(lastSelected);
             command("show",0,0);
         } else if (cmd[0].equals("ctexture")) {
-            String[] data = map.formTextures.get(lastSelected).split("&");
-            map.formTextures.put(lastSelected, data[0]+"&"+p.substring(9)+"&"+data[2]);
+            String[] data = map.formTextures.get(lastSelected).split(",");
+            map.formTextures.put(lastSelected, data[0]+","+p.substring(9)+","+data[2]);
             map.updater.remove(map.terrains.get(lastSelected));
 //            map.render(lastSelected);
             command("show",0,0);
         } else if (cmd[0].equals("cshader")) {
-            String[] data = map.formTextures.get(lastSelected).split("&");
-            map.formTextures.put(lastSelected, data[0]+"&"+data[1]+"&"+p.substring(8));
+            String[] data = map.formTextures.get(lastSelected).split(",");
+            map.formTextures.put(lastSelected, data[0]+","+data[1]+","+p.substring(8));
             map.updater.remove(map.terrains.get(lastSelected));
 //            map.render(lastSelected);
             command("show",0,0);
@@ -220,7 +218,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
         } else if (cmd[0].equals("seedO")){
             currentO.seed = Integer.parseInt(p.substring(6));
         } else if (cmd[0].equals("changeO")){
-            currentO.load(p.substring(8));
+            currentO.load(new T(p.substring(8)));
         } else if (p.equals("showO")){
             message(currentO.toString());
         } else if (p.equals("show")){
@@ -297,7 +295,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
             save(lastSaved);
         } else if (cmd[0].equals("load")){
             if (FileManager.isFile(FileManager.makeDirectory("Data/map/"+cmd[1]+".map"))) {
-                Global.server.requestChangeMap(FileManager.makeDirectory(cmd[1] + "@0"));
+                Global.server.requestChangeMap(FileManager.makeDirectory(cmd[1] + ",0"));
                 lastSaved = cmd[1];
                 while (true) {
                     try {
@@ -338,7 +336,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
     }
 
     private String getTexture(){
-        return txDepth+"&"+txTexture+"&"+txShader;
+        return txDepth+","+txTexture+","+txShader;
     }
 
     private void alignObject(int x, int y, Prop obj, int offset){
@@ -554,7 +552,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
                         for (int i = 0; i < map.landRaw.size(); i++) {
                             Line l = map.landRaw.get(i);
                             if (l.lineCross(new Line(new P(x, y), lmbP))) {
-                                l.load(lineChange+","+l.tid+","+l.opt);
+                                l.load(new T(lineChange+","+l.tid+","+l.opt));
                                 break;
                             }
                         }
@@ -655,7 +653,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
                 break;
             case KeyEvent.VK_INSERT:
                 Global.editor = false;
-                Global.server.requestChangeMap(FileManager.makeDirectory(map.name.toString()+"@0"));
+                Global.server.requestChangeMap(FileManager.makeDirectory(map.name.toString()+",0"));
                 final P asdf = Global.camera.getAdd(0,-40);
                 while (true){
                     try {

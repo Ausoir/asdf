@@ -1,2 +1,2 @@
-Gang@Punk:6;Punk:4,Yeller:1;Yeller:2
-Army@Soldier:6;Guard:4
+Gang,[[Punk,6],[Punk,4],[Yeller,1],[Yeller,2]]
+Army,[[Soldier,6],[Guard,4]]

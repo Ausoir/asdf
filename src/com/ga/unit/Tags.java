@@ -17,7 +17,7 @@ public class Tags extends L<Tag> {
             Tag.Energy, Tag.Enchant, Tag.Channeling, Tag.Void, Tag.Air, Tag.Fire, Tag.Conjuration
     };
 
-    boolean containsAny(Tags p){
+    public boolean containsAny(Tags p){
         for (Tag i : p){
             if (contains(i)) return true;
         }

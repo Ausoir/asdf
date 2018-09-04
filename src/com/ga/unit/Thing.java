@@ -54,6 +54,6 @@ public class Thing extends Drawable {
         map.updater.remove(this);
     }
     public String toString(){
-        return name + "@" + pos;
+        return name + "," + pos;
     }
 }

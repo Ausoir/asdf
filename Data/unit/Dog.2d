@@ -20,7 +20,7 @@ Right@0,1,2,1
 Jump@10,-1
 Hit@3,-1
 Dead@4,-1
-Rest@3
+Rest@6
 Melee@7,8,0,-1
 Sprint@9,10,11
 Down@5

@@ -20,6 +20,7 @@ Backstep@1,2
 Sprint@1,2
 Jump@3,4,-1
 Melee@7,-1
+Hit@4,-1
 Dead@5
-Rest@4,-1
+Rest@5,-1
 Drop@4,-1

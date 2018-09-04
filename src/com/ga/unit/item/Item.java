@@ -5,10 +5,7 @@ import com.ga.game.Sound;
 import com.ga.map.Global;
 import com.ga.map.Map;
 import com.ga.map.Shader;
-import com.ga.tool.Interactive;
-import com.ga.tool.Line;
-import com.ga.tool.P;
-import com.ga.tool.SyncRand;
+import com.ga.tool.*;
 import com.ga.unit.*;
 import com.ga.unit.man.Man;
 import com.ga.unit.skill.Actions;
@@ -31,8 +28,7 @@ public class Item extends Prop {
             public boolean isBlunt(){return false;}},
         Swinging(Actions.Slash, 3, .8f, "swing_normal"),
         Bashing(Actions.Slash, 1, 1f, "swing_normal"),
-        Shoot(Actions.Rest, 3, 1, null){
-            public boolean isBlunt(){return false;}},
+        Shoot(Actions.Rest, 3, .1f, null),
         Armor(Actions.Hit, 1, 1, "swing_normal"), Scroll(Actions.Read, 1, 0, "scroll"),
         Throwing(Actions.Throw, 3, .1f, "swing_normal"),
         Darting(Actions.Dart, 3, .1f, "swing_normal"), Consumable(Actions.Consume, 1, .1f, "drink");
@@ -76,7 +72,7 @@ public class Item extends Prop {
         },
         Leather(.3f,1,2,40,1500,new Color(133, 78, 32,80)),
         Glass(.1f,1,7,7,2000),
-        Copper(.4f,3,2,40,800,new Color(133, 92, 38,80)){
+        Copper(.4f,3,3,40,1500,new Color(133, 92, 38,80)){
             public void onSet(Item host){
                 host.tags.add(Tag.Channeling);
             }
@@ -84,12 +80,12 @@ public class Item extends Prop {
                 return -1;
             }
         },
-        Bronze(.4f,4,4,50,1200,new Color(112, 27, 7, 100)){
+        Bronze(.4f,4,4,50,2000,new Color(112, 27, 7, 100)){
             int getWarmth(){
                 return -1;
             }
         },
-        Iron(.5f,5,5,60,1800),
+        Iron(.5f,5,5,60,2500),
         Silver(.2f,7,3,40,3000){
             public void onSet(Item host){
                 host.tags.add(Tag.Enchant);
@@ -100,7 +96,7 @@ public class Item extends Prop {
                 host.tags.add(Tag.Enchant);
             }
         },
-        Steel(.3f,5,7,80,5000),
+        Steel(.3f,5,7,80,7000),
         Titanium(.1f,4,7,100,16000){
             public void onSet(Item host){
                 host.tags.add(Tag.Strength);
@@ -156,6 +152,14 @@ public class Item extends Prop {
             Material[] list = new Material[plist.length];
             for (int i=0;i<plist.length;i++) list[i] = valueOf(plist[i]);
             return list;
+        }
+        public static Material getByName(String p) {
+            for (Material i : values()) {
+                if (i.name().equals(p)){
+                    return i;
+                }
+            }
+            return null;
         }
         static Material get(Random seed, Material[] list){
             float pool = 0;
@@ -263,19 +267,16 @@ public class Item extends Prop {
     public ItemType type = ItemType.Throwing;
     public int value;
     protected Man owner;
-    public Item(Map map, String name, int seed, Material[] materials, ItemType type, int durability) {
-        this(map, name, seed ,materials, type);
+    public Item(Map map, String name, int seed, Material material, ItemType type, int durability) {
+        this(map, name, seed, material, type);
         this.durability = durability;
         this.uses = durability;
     }
-    public Item(Map map, String name, int seed, Material[] materials, ItemType type) {
+    public Item(Map map, String name, int seed, Material material, ItemType type) {
         super(map, name, seed, 7);
         gravity = true;
         setType(type);
-        material = Material.get(rand, materials);
-        setMaterial(material);
-        speed = 4 - weight*3;
-        value = material.value + 100;
+        if (material != null) setMaterial(material);
         final Item me = this;
         onInteract = new Interactive(){
             public void interact(Man p){
@@ -284,6 +285,9 @@ public class Item extends Prop {
         };
         randomSize(new P(.2f,.2f));
         range = Math.max(32, getSize()-8);
+    }
+    protected void imbueMaterial(Material[] materials){
+        setMaterial(Material.get(rand, materials));
     }
     protected void imbueMeta(boolean canSmod, boolean canAdmod, float emodProb){
         if (canSmod) smod = SpecialtyMod.get(rand);
@@ -297,13 +301,12 @@ public class Item extends Prop {
         applyMetaShade();
         uses = durability;
     }
-    private void loadMeta(String p){
-        String[] metadata = p.split("_");
-        smod = SpecialtyMod.load(metadata[0]);
-        admod = AdverbMod.load(metadata[1]);
-        if (!metadata[2].equals("")){
-            emod = Buffs.values()[Integer.parseInt(metadata[2])];
-            ademod = AdenchantMod.load(metadata[3]);
+    private void loadMeta(T p){
+        smod = SpecialtyMod.load(p.get(0).get());
+        admod = AdverbMod.load(p.get(1).get());
+        if (!p.get(2).get().isEmpty()){
+            emod = Buffs.values()[p.get(2).getInt()];
+            ademod = AdenchantMod.load(p.get(3).get());
             probability = ademod.magnitude;
         }
         setModifier(smod);
@@ -328,9 +331,11 @@ public class Item extends Prop {
         if (mat.color != null) image.modify(Shader.Tint, mat.color.getRGB());
         this.weight = (int) (material.weight * type.density);
         if (durability != -1) {
-            durability = (int) (mat.durability * type.density);
+            durability = (int) Math.max(1, mat.durability * type.density);
             uses = durability;
         }
+        speed = 8 - weight*4;
+        value = material.value + 100;
         setModifier(smod);
     }
     private void setModifier(SpecialtyMod mod){
@@ -464,7 +469,7 @@ public class Item extends Prop {
         return speed;
     }
     public boolean use(Man host){
-        if (host.get("Strength").getMax() >= weight) {
+        if (host.stats.get("Strength").getMax() >= weight) {
             if (host.setState(type.action) == 0) {
                 playSound();
                 return true;
@@ -517,6 +522,9 @@ public class Item extends Prop {
     public void onTimeChange(){
         if (getValue() >= 500 && owner == null) remove();
     }
+    public boolean isInfinite(){
+        return durability == -1;
+    }
     public String forceToString(){
         boolean forced = false;
         if (!save){
@@ -528,21 +536,19 @@ public class Item extends Prop {
         return r;
     }
     @Override
-    public String[] load(String p){
-        String[] sections = super.load(p);
-        uses = Integer.parseInt(sections[5]);
-        cooldown.load(sections[6]);
-        loadMeta(sections[7]);
-        return sections;
-    }
-    public boolean isInfinite(){
-        return durability == -1;
+    public void load(T p){
+        super.load(p);
+        uses = p.get(5).getInt();
+        cooldown.time = p.get(6).getInt();
+        loadMeta(p.get(7));
+        Material mat = Material.values()[p.get(8).getInt()];
+        if (mat != material) setMaterial(mat);
     }
     @Override
     public String toString(){
         String t = super.toString();
-        String meta = smod+"_"+admod+"_"+(emod==null?"":emod.ordinal())+"_"+ademod;
-        if (!t.equals("")) t += "@"+uses+"@"+cooldown.toString()+"@"+meta;
+        String meta = T.wrap(smod+","+admod+","+(emod==null?"":emod.ordinal())+","+ademod);
+        if (!t.isEmpty()) t += ","+uses+","+cooldown.toString()+","+meta+","+material.ordinal();
         return t;
     }
 }

@@ -9,6 +9,9 @@ public class P {
     public static final P blank = new P();
     public float x, y;
     public P(String p){
+        load(new T(p));
+    }
+    public P(T p){
         load(p);
     }
     public P(){
@@ -82,9 +85,6 @@ public class P {
     public float getDist(){
         return (float) Math.sqrt((this.x*this.x)+(this.y*this.y));
     }
-    public boolean inOval(float x, float y){
-        return (Math.abs(this.x) < x && Math.abs(this.y) < y);
-    }
     public P getAdd(P p){
         return getAdd(p.x,p.y);
     }
@@ -104,10 +104,9 @@ public class P {
         return getAdd(dX, dY);
     }
     public String toString(){
-        return x + "," + y;
+        return T.wrap(x + "," + y);
     }
-    public void load(String p){
-        String[] t = p.split(",");
-        set(Float.parseFloat(t[0]), Float.parseFloat(t[1]));
+    public void load(T p){
+        set(p.get(0).getFloat(), p.get(1).getFloat());
     }
 }

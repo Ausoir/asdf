@@ -30,6 +30,7 @@ public class GenerateBiome {
         Global.editor = editor;
     }
     public static boolean getTown(int index){
+        if (index <= 3) return true; //starting location
         index *= 1243;
         int mapVar = Creation.seed + index;
         float var = (Global.cos((mapVar) * .2f) + Global.sin((mapVar) * .2f) + Global.sin((mapVar) * .3f) * 1.1f) * Global.cos((mapVar) * .5f);

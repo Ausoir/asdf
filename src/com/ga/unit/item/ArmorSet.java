@@ -2,6 +2,7 @@ package com.ga.unit.item;
 
 import com.ga.map.Global;
 import com.ga.map.Shader;
+import com.ga.tool.T;
 import com.ga.unit.Organ;
 import com.ga.unit.Stock;
 import com.ga.unit.Tags;
@@ -14,19 +15,19 @@ import java.awt.*;
  */
 public class ArmorSet {
     private static Armor[] bare = new Armor[]{
-            new Armor(null, "Head", 0,new Item.Material[]{Item.Material.Organic},0,0,0,0,0){
+            new Armor(null, "Head", 0,Item.Material.Organic,0,0,0,0,0){
                 public boolean checkBreak(boolean blunt, int d){ return true; }
             },
-            new Armor(null, "Man_skin", 0,new Item.Material[]{Item.Material.Organic},1,0,0,0,0){
+            new Armor(null, "Man_skin", 0,Item.Material.Organic,1,0,0,0,0){
                 public boolean checkBreak(boolean blunt, int d){ return true; }
             },
-            new Armor(null, "Man_skin", 0,new Item.Material[]{Item.Material.Organic},2,0,0,0,0){
+            new Armor(null, "Man_skin", 0,Item.Material.Organic,2,0,0,0,0){
                 public boolean checkBreak(boolean blunt, int d){ return true; }
             },
-            new Armor(null, "Man_skin", 0,new Item.Material[]{Item.Material.Organic},3,0,0,0,0){
+            new Armor(null, "Man_skin", 0,Item.Material.Organic,3,0,0,0,0){
                 public boolean checkBreak(boolean blunt, int d){ return true; }
             },
-            new Armor(null, "Man_skin", 0,new Item.Material[]{Item.Material.Organic},4,0,0,0,0){
+            new Armor(null, "Man_skin", 0,Item.Material.Organic,4,0,0,0,0){
                 public boolean checkBreak(boolean blunt, int d){ return true; }
             },
     };
@@ -179,8 +180,8 @@ public class ArmorSet {
     public String toString(){
         StringBuilder r = new StringBuilder();
         for (int i=0;i<armor.length;i++){
-            if (armor[i] != bare[i]) r.append(armor[i].toString()).append("#");
-            else r.append("#");
+            if (armor[i] != bare[i]) r.append(T.wrap(armor[i].toString())).append(",");
+            else r.append(",");
         }
         return r.substring(0,r.length()-1);
     }

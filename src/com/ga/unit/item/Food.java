@@ -4,123 +4,40 @@ import com.ga.map.Global;
 import com.ga.map.Map;
 import com.ga.map.ShadedPicture;
 import com.ga.map.Shader;
+import com.ga.tool.T;
 import com.ga.unit.man.Man;
 import com.ga.unit.skill.Buffs;
-import com.ga.unit.skill.Stat;
 
 import java.awt.*;
-import java.util.ArrayList;
 
 /**
  * Created by Ga on 2/17/2017. asd
  */
 public class Food extends Item {
-    public enum Ingredient {
-        White(1,1,-4,3),Red(1,1,-6,2),Fish(1,1,0,1),Dairy(1,1,2,4),Vegetable(1,0,-10,8),Grain(1,1,0,6),Fruit(1,0,3,0),Synthetic(1,0,5,1),
-        Cut(2,0,0,-1,.9f),Boiled(2,1,-1,1,.5f),Fried(2,-1,4,6,.4f),Roasted(2,1,1,1,.6f),Smoked(2,0,0,1,.6f),Dried(2,-1,-1,24,.3f),Spiced(2,0,4,-8,.7f);
-        int type, nutrition, taste, perish;
-        float loss = .5f;
-        Ingredient(int type, int nutrition, int taste, int perish){
-            this.type = type;
-            this.nutrition = nutrition;
-            this.taste = taste;
-            this.perish = perish;
-        }
-        Ingredient(int type, int nutrition, int taste, int perish, float loss){
-            this(type, nutrition, taste, perish);
-            this.loss = loss;
-        }
-        public static ArrayList<Ingredient> getByType(int p){
-            ArrayList<Ingredient> r = new ArrayList<>();
-            for (Ingredient i : values()){
-                if (i.type == p) r.add(i);
-            }
-            return r;
-        }
-    }
-    public class Type{
-        ArrayList<Ingredient> ingredients;
-        int getValue(){
-            return (getNutrition()*80) + (getMotivation()*20) + (getPerish()*20);
-        }
-        int getNutrition(){
-            int result = 0;
-            for (Ingredient i : Ingredient.values()){
-                if (ingredients.contains(i)) result += i.nutrition;
-            }
-            return result;
-        }
-        int getMotivation(){
-            int result = 0;
-            for (Ingredient i : ingredients){
-                result = Math.max(result, i.taste);
-            }
-            return result;
-        }
-        int getPerish(){
-            int result = 0;
-            for (Ingredient i : ingredients) result += i.perish;
-            int min = ingredients.get(0).perish;
-            for (Ingredient i : ingredients) min = Math.min(result, i.perish);
-            return (result+min) / (ingredients.size()+1);
-        }
-        void load(String p){
-            ingredients = new ArrayList<>();
-            String[] mats = p.split(",");
-            for (String mat : mats) {
-                ingredients.add(Ingredient.valueOf(mat));
-            }
-        }
-        String getDescription(){
-            StringBuilder result = new StringBuilder();
-            for (Ingredient i : ingredients) result.append(i).append(", ");
-            return result.substring(0,result.length()-2);
-        }
-        public String toString(){
-            StringBuilder r = new StringBuilder();
-            for (Ingredient i : ingredients) r.append(i).append(",");
-            return r.substring(0,r.length()-1);
-        }
-    }
-    private int perish;
-    private Type type = new Type();
-    public Food(Map map, String name, int seed, int uses, String materials) {
-        super(map, name, seed, new Item.Material[]{Item.Material.Organic}, ItemType.Consumable, uses);
-        type.load(materials);
-        this.perish = Global.hour + type.getPerish();
+    private int nutrition, taste, perish;
+    public Food(Map map, String name, int seed, int uses) {
+        super(map, name, seed, Material.Organic, ItemType.Consumable, uses);
         onTimeChange();
     }
-    public void cook(Ingredient ingredient){
-        type.ingredients.add(ingredient);
-        perish = (((perish - Global.hour)+ingredient.perish)/2)+Global.hour;
-    }
-    public void combine(Food food, Ingredient method){
-        for (Ingredient i : food.type.ingredients){
-            if (i.type == 1){
-                cook(i);
-            }
-        }
-        durability += food.uses;
-        durability *= method.loss;
-        isUsable(true, -food.uses);
-        food.remove();
+    public void set(int nutrition, int taste, int perish){
+        this.nutrition = nutrition;
+        this.taste = taste;
+        this.perish = Global.hour + perish;
     }
     public int getValue(){
-        return (type.getValue()*(10-getPoisonChance())*uses)/10;
+        return (int) Math.max(0, ((uses*(taste+nutrition)+.4f*(perish-Global.hour))*100));
     }
     @Override
     public boolean use(Man p){
         if (isUsable(true, 1) && super.use(p)) {
             int perishTime = perish - Global.hour;
-            Stat motivation = p.get("Motivation");
-            if (perishTime <= 0 && rand.nextInt(10) < getPoisonChance()){
+            if (perishTime <= 0 && seed % 10 < getPoisonChance()){
                 p.buff(Buffs.Poison, 1);
                 p.say("Gawrrrr! That didn't taste good...");
-                motivation.add(getMotivation(), false);
             } else {
-                motivation.add(getMotivation(), false);
+                p.stats.get("Motivation").add(taste, false);
             }
-            p.get("Nutrition").add(type.getValue()/2, false);
+            p.stats.get("Nutrition").add(nutrition, false);
             return true;
         }
         return false;
@@ -128,18 +45,14 @@ public class Food extends Item {
     private int getPoisonChance(){ // 0 to 10
         return (int) Global.clamp(Global.hour-perish, 0, 10);
     }
-    private int getMotivation(){
-        return Math.max(0, type.getMotivation() - getPoisonChance());
-    }
     @Override
     public String getDescription(){
         int perishTime = perish - Global.hour;
         String r = super.getDescription();
         r = r.replace(" uses "," servings ");
-        r += " This food provides "+type.getNutrition()+" Nutrition points and "+getMotivation()+" Motivation points.";
-        if (perishTime <= 0) r += " This food has "+getPoisonChance()+"0% chance of causing food poisoning.";
+        r += " This food provides "+nutrition+" Nutrition points and "+taste+" Motivation points.";
+        if (perishTime < 0) r += " This food has "+getPoisonChance()+"0% chance of causing food poisoning.";
         else r += " This food will go bad in "+perishTime+" hours.";
-        r += "\nDetail:\n" + type.getDescription();
         return r;
     }
     public void onTimeChange(){
@@ -149,17 +62,16 @@ public class Food extends Item {
             ((ShadedPicture) image).shade(new Color(100 - toxicity, 255 - toxicity, 100 - toxicity, 180).getRGB());
         }
     }
-    public String[] load(String p){
-        String[] r = super.load(p);
-        perish = Integer.parseInt(r[8]);
-        type.load(r[9]);
-        name = r[10];
-        return r;
+    public void load(T p){
+        super.load(p);
+        nutrition = p.get(9).getInt();
+        taste = p.get(10).getInt();
+        perish = p.get(11).getInt();
     }
     @Override
     public String toString(){
         String r = super.toString();
-        if (!r.equals("")) r += "@"+perish+"@"+type.toString()+"@"+name;
+        if (!r.equals("")) r += ","+nutrition+","+taste+","+perish;
         return r;
     }
 }

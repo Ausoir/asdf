@@ -16,17 +16,14 @@ public class Line {
     public int opt = 0; //-1:lights (prevent prop auto adjust), 0:intangible, 1:normal, 2:prevent prop auto adjust, 3:can't drop down
     public float depth = -1;
 
-    public Line(String p){
+    public Line(T p){
         load(p);
     }
-    public void load(String p){
-        String[] data = p.split(",");
-        float[] intdata = new float[data.length];
-        for (int i=0;i<data.length;i++) intdata[i] = Float.parseFloat(data[i]);
-        pt = new P(new P(intdata[0], intdata[1]));
-        ptd = new P(new P(intdata[2], intdata[3]));
-        tid = (int) intdata[4];
-        opt = (int) intdata[5];
+    public void load(T p){
+        pt = new P(p.get(0));
+        ptd = new P(p.get(1));
+        tid = p.get(2).getInt();
+        opt = p.get(3).getInt();
     }
     public Line(){
         pt = new P();
@@ -112,7 +109,7 @@ public class Line {
         g.drawLine((int) (offset.x+pt.x+x), (int) (offset.y+pt.y+y), (int) (offset.x+ptd.x+x), (int) (offset.y+ptd.y+y));
     }
     public String toString(){
-        return pt + "," + ptd + "," + tid + "," + opt;
+        return T.wrap(pt + "," + ptd + "," + tid + "," + opt);
     }
 
     public P getMidpoint() {

@@ -4,6 +4,7 @@ package com.ga.game;
  * Created by Ga on 7/26/2016.
  */
 public class Settings {
+    public static final int version = 0;
     public static int receiverPort;
     public static int senderPort;
     public static int tcpDownloadPort;

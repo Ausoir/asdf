@@ -7,6 +7,7 @@ import com.ga.game.Settings;
 import com.ga.map.Global;
 import com.ga.map.Updater;
 import com.ga.tool.Performer;
+import com.ga.tool.T;
 import com.ga.unit.Faction;
 import com.ga.unit.Stock;
 import com.ga.unit.Unit;
@@ -80,7 +81,7 @@ public class Server {
     public void requestChangeMap(String map){
         if (isHost()) changeMap(map);
         else {
-            String[] mapData = map.split("@");
+            String[] mapData = map.split(",");
             try {
                 Global.p("Reported map change to client server.");
                 udp.send("CM}" + mapData[0] + "}" + mapData[1]);
@@ -88,7 +89,7 @@ public class Server {
                 Global.p("Map downloaded from server.");
                 Global.maps.clear();
                 Global.maps.add(Global.player.map);
-                changeMap(FileManager.makeDirectory("Data/multiplayer/serverMap@" + mapData[1]));
+                changeMap(FileManager.makeDirectory("Data/multiplayer/serverMap," + mapData[1]));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -99,7 +100,7 @@ public class Server {
         Processes.pause();
         new Timer().schedule(new TimerTask() {
             public void run(){
-                String[] mapData = p.split("@");
+                String[] mapData = p.split(",");
                 FileManager.saveWorld();
                 boolean editor = Global.editor;
                 Global.editor = true;
@@ -190,7 +191,7 @@ public class Server {
                     }
                     Player player = (Player) Stock.Player.create(Global.player.map,0,0);
                     Client newest = new Client(player, udp.getClientPort(), udp.getClientIP());
-                    player.load(FileManager.read(FileManager.makeDirectory("Data/map/multiplayer/"+udp.getClientIP()+".user")));
+                    player.load(new T(FileManager.read(FileManager.makeDirectory("Data/map/multiplayer/"+udp.getClientIP()+".user"))));
                     player.map = Global.player.map;
                     player.faction = Faction.Player2;
                     player.controlId = Global.player.controlId + 1;//Global.getControlId();
@@ -291,9 +292,9 @@ public class Server {
                         e.printStackTrace();
                     } finally {
                         if (output == null){
-                            requestChangeMap(FileManager.makeDirectory("Data/multiplayer/serverMap@0"));
+                            requestChangeMap(FileManager.makeDirectory("Data/multiplayer/serverMap,0"));
                             Player player = (Player) Stock.Player.create(Global.player.map,0,0);
-                            player.load(FileManager.read(FileManager.makeDirectory("Data/map/multiplayer/serverPlayer.user")));
+                            player.load(new T(FileManager.read(FileManager.makeDirectory("Data/map/multiplayer/serverPlayer.user"))));
                             player.map = Global.player.map;
                             Global.player.controlId = Integer.parseInt(msg[1]);
                             player.faction = Faction.Player2;

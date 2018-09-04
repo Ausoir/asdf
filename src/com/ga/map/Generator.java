@@ -5,6 +5,7 @@ import com.ga.game.Observer;
 import com.ga.game.Settings;
 import com.ga.tool.Line;
 import com.ga.tool.P;
+import com.ga.tool.T;
 import com.ga.unit.Prop;
 import com.ga.unit.Stock;
 
@@ -26,7 +27,8 @@ public class Generator {
     public static void init(){
         for (String[] i : FileManager.fileCache.get("map")){
             if (i[1].startsWith(FileManager.makeDirectory("Data/map/building")) && !i[1].startsWith(FileManager.makeDirectory("Data/map/building/inside"))) {
-                buildings.put(i[0], Integer.valueOf(FileManager.read(FileManager.makeDirectory(i[1])).split("%")[0].split(";",-1)[2].split(",")[0]));
+                String meta = FileManager.read(FileManager.makeDirectory(i[1])).split("%")[0];
+                buildings.put(i[0], new T(meta).get(2).get(0).getInt());
             }
         }
     }
@@ -37,7 +39,9 @@ public class Generator {
                 validLands.add(l);
             }
         }
-        if (validLands.size() > 0) generateBuildings(new String[]{building}, validLands.get(Creation.r.nextInt(validLands.size())), 10);
+        if (validLands.size() > 0) {
+            generateBuilding(building, validLands.get(Creation.r.nextInt(validLands.size())).getMidpoint(), 10);
+        }
     }
     int generateBuildings(String[] p, Line land, int bid) {
         int estate = land.ptd.x() - land.pt.x();
@@ -86,8 +90,8 @@ public class Generator {
         }
         for (java.util.Map.Entry pair : blueprint.formTextures.entrySet()) {
             String newTexture = (String) pair.getValue();
-            float newDepth = Float.parseFloat(newTexture.substring(0, newTexture.indexOf("&")));
-            newTexture = (startDepth + newDepth * depthScale) + newTexture.substring(newTexture.indexOf("&"));
+            float newDepth = Float.parseFloat(newTexture.substring(0, newTexture.indexOf(",")));
+            newTexture = (startDepth + newDepth * depthScale) + newTexture.substring(newTexture.indexOf(","));
             map.formTextures.put(((int) pair.getKey()) + next, newTexture);
         }
         for (java.util.Map.Entry pair : blueprint.terrains.entrySet()) {

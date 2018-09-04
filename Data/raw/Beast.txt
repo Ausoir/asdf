@@ -1,1 +1,1 @@
-Mantis;;2,2,2;Evil;2:0;Melee //Beasts-Name,Speech Type,Stats,Faction,AI Type,Moveset
+Mantis,,[2,2,2],Evil,[2,0],[Melee] //Beasts-Name,Speech Type,Stats,Faction,AI Type,Moveset

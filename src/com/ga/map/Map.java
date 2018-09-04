@@ -5,6 +5,7 @@ import com.ga.game.Settings;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Performer;
+import com.ga.tool.T;
 import com.ga.unit.Prop;
 import com.ga.unit.Stock;
 import com.ga.unit.Thing;
@@ -25,7 +26,8 @@ public class Map {
     ArrayList<Line> landRaw = new ArrayList<>();
     HashMap<Integer, String> formTextures = new HashMap<>();
     public HashMap<Integer, Terrain> terrains = new HashMap<>();
-    private static HashMap<String, String> defaultProps = new HashMap<String, String>() {{
+    private static HashMap<String, String> defaultProps = new HashMap<>() {{
+        put("", null);
         put("grass", "Rock=.1,Bush=.2,Weed=1");
         put("dirt", "Rock=.2");
         put("rock", "Rock=.2");
@@ -61,11 +63,11 @@ public class Map {
     public void load(String dir) {
         String data = FileManager.read(FileManager.makeDirectory("Data/map/" + dir + ".map"));
         String[] line = data.split("%");
-        String[] names = line[0].split(";");
-        callname = names[0];
-        this.size = new P(names[2]);
-        panoramaName = names[1];
-        if (names[1].equals("")) {
+        T s = new T(line[0]);
+        callname = s.get(0).get();
+        panoramaName = s.get(1).get();
+        this.size = new P(s.get(2));
+        if (panoramaName.equals("")) {
             panorama[0] = new Thing(this, "", 0, 0) {
                 @Override
                 public void draw(Graphics2D g) {
@@ -98,33 +100,24 @@ public class Map {
                 }
             });
         }
-        this.temperature = names.length<=3?0:Integer.parseInt(names[3]);
+        this.temperature = s.get(3, new T("0")).getInt();
         if (line.length > 1) {
-            String[] sections = line[1].split(";");
-            if (!line[1].equals("")) {
-                for (String section1 : sections) {
-                    String values[] = section1.split(":");
-                    formTextures.put(Integer.parseInt(values[0]), values[1]);
-                }
+            s = new T(line[1]);
+            for (T i : s) {
+                formTextures.put(i.get(0).getInt(), i.get(1).get());
             }
             if (line.length > 2) {
-                if (!line[2].equals("")) {
-                    sections = line[2].split(";");
-                    for (String section1 : sections) {
-                        Line surface = new Line(section1);
-                        landRaw.add(surface);
-                        //set depth here so next block prop spawns auto adjust to correct land depth
-                        surface.depth = Float.parseFloat(formTextures.get(surface.tid).split("&")[0]) * .1f + 3;
-                        if (surface.landable()) land.add(surface);
-                    }
+                s = new T(line[2]);
+                for (T i : s) {
+                    Line surface = new Line(i);
+                    landRaw.add(surface);
+                    //set depth here so next block prop spawns auto adjust to correct land depth
+                    surface.depth = Float.parseFloat(formTextures.get(surface.tid).split(",")[0]) * .1f + 3;
+                    if (surface.landable()) land.add(surface);
                 }
-                if (line.length > 3 && !line[3].equals(";")) {
-                    sections = line[3].split(";");
-                    if (sections.length > 0) {
-                        for (String section1 : sections) {
-                            Stock.get(this, section1).start();
-                        }
-                    }
+                if (line.length > 3) {
+                    s = new T(line[3]);
+                    for (T i : s) Stock.get(this, i.get()).start();
                 }
             }
         }
@@ -132,24 +125,24 @@ public class Map {
 
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder(callname + ";" + panoramaName + ";" + size.x() + "," + size.y() + ";" + temperature + "\n");
+        StringBuilder result = new StringBuilder(callname + "," + panoramaName + "," + size.toString() + "," + temperature + "\n");
         Iterator it = formTextures.entrySet().iterator();
         while (it.hasNext()) {
             java.util.Map.Entry pair = (java.util.Map.Entry) it.next();
-            result.append(pair.getKey()).append(":").append(pair.getValue());
-            if (it.hasNext()) result.append(";");
+            result.append("[").append(pair.getKey()).append(",").append("[").append(pair.getValue()).append("]").append("]");
+            if (it.hasNext()) result.append(",");
         }
         result.append("\n");
         ArrayList<Line> landRawClone = (ArrayList<Line>) landRaw.clone();
         for (Line i : landRawClone) {
-            if (!i.toString().equals("")) result.append(i).append(";");
+            if (!i.toString().equals("")) result.append(i).append(",");
         }
         if (landRawClone.size() > 0) result = new StringBuilder(result.substring(0, result.length() - 1));
         result.append("\n").append(updater.toString());
         return result.toString();
     }
 
-    public void clear() {
+    void clear() {
         updater.clear();
         land.clear();
         landRaw.clear();
@@ -173,7 +166,7 @@ public class Map {
         for (final Line i : landRaw) {
             if (i.tid >= 0) {
                 String formTexture = formTextures.get(i.tid);
-                String[] formName = formTexture.split("&");
+                String[] formName = formTexture.split(",");
                 float depth = Float.parseFloat(formName[0]);
                 Terrain terrain = terrains.get(i.tid);
                 if (terrain == null) {
@@ -208,16 +201,21 @@ public class Map {
                     if (Math.abs(l.getSlope()) < .5f) {
                         String texture = formTextures.get(l.tid);
                         if (texture != null) {
-                            String[] formProps = formTextures.get(l.tid).split("&");
+                            T formProps = new T(formTextures.get(l.tid));
                             int size = (int) (Math.abs(l.ptd.x - l.pt.x) * .02f);
                             for (int ii = 0; ii < size; ii++) {
-                                String prop = null;
-                                if (formProps.length > 3) {
-                                    prop = formProps[3];
-                                } else if (formProps.length > 2) {
-                                    prop = defaultProps.get(formProps[2]);
+                                T propString = formProps.get(3, new T(defaultProps.get(formProps.get(2).get())));
+                                if (!propString.isEmpty()) {
+                                    String prop = null; //[0,[4,dirt,road_unpaved,[Grass=.1,Bush=1]]]
+                                    float rand = Creation.r.nextFloat();
+                                    for (T i : propString) {
+                                        if (rand < Float.parseFloat(i.get().split("=")[1])){
+                                            prop = i.get().split("=")[0];
+                                            break;
+                                        }
+                                    }
+                                    placeProp(l, Stock.createByName(this, prop, -1));
                                 }
-                                if (prop != null) placeProp(l, prop, -1);
                             }
                         }
                     }
@@ -226,42 +224,24 @@ public class Map {
         }
     }
 
-    Prop placeProp(Line l, String p, int seed) {
-        String prop = null;
-        String[] props = p.split(",");
-        float rand = Creation.r.nextFloat();
-        if (props.length > 1) {
-            for (String ii : props) {
-                if (rand < Float.parseFloat(ii.split("=")[1])) {
-                    prop = ii.split("=")[0];
-                    break;
-                }
-            }
-        } else {
-            if (rand < Float.parseFloat(p.split("=")[1])) prop = p.split("=")[0];
+    void placeProp(Line l, Prop prop) {
+        float landSize = Math.abs(l.ptd.x - l.pt.x);
+        prop.manualDepth = false;
+        P size = prop.image.getSize();
+        if (landSize >= size.x) {
+            float halfSizeX = size.x / 2;
+            int tx = (int) (Creation.r.nextFloat() * (l.ptd.x - l.pt.x));
+            tx = (int) Global.clamp(tx, halfSizeX, (l.ptd.x - l.pt.x) - halfSizeX);
+            prop.pos = new P(l.pt.x + tx, (int) l.getCrossPointY(l.pt.x + tx));
+            prop.rotation = l.getAtan();
+            prop.start();
         }
-        if (prop != null) {
-            float landSize = Math.abs(l.ptd.x - l.pt.x);
-            Prop t = Stock.createByName(this, prop, seed);
-            t.manualDepth = false;
-            P size = t.image.getSize();
-            if (landSize >= size.x) {
-                float halfSizeX = size.x / 2;
-                int tx = (int) (Creation.r.nextFloat() * (l.ptd.x - l.pt.x));
-                tx = (int) Global.clamp(tx, halfSizeX, (l.ptd.x - l.pt.x) - halfSizeX);
-                t.pos = new P(l.pt.x + tx, (int) l.getCrossPointY(l.pt.x + tx));
-                t.rotation = l.getAtan();
-                t.start();
-                return t;
-            }
-        }
-        return null;
     }
 
     public String getLand(int p) {
         String terrain = formTextures.get(p);
         if (terrain != null) {
-            String t[] = formTextures.get(p).split("&");
+            String t[] = formTextures.get(p).split(",");
             if (t.length > 1) return t[1];
             else return t[0];
         }

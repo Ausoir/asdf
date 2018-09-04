@@ -2,17 +2,13 @@ package com.ga.unit.man;
 
 import com.ga.game.Sound;
 import com.ga.map.Map;
-import com.ga.tool.L;
-import com.ga.tool.Line;
-import com.ga.tool.P;
-import com.ga.tool.Performer;
+import com.ga.tool.*;
 import com.ga.unit.*;
 import com.ga.unit.item.ArmorSet;
 import com.ga.unit.item.Crafts;
 import com.ga.unit.item.Item;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Buffs;
-import com.ga.unit.skill.Stat;
 
 import java.awt.*;
 import java.util.Collections;
@@ -45,19 +41,13 @@ public class Man extends Unit {
         return this;
     }
     @Override
-    public String[] load(String p){
-        String[] items = p.split("#",-1);
-        String[] lines = super.load(items[0]);
-        Crafts.load(this, lines[13]);
-        setFace(lines[14]);
-        if (!items[1].equals("")) setWeapon((Item) Stock.get(map, items[1]));
-        armor = new ArmorSet(this, items[2],items[3],items[4],items[5],items[6]);
-        if (items.length > 7){
-            for (int i=7;i<items.length;i++){
-                Item item = (Item) Stock.get(map, items[i]);
-                inventory.addItem(item);
-            }
-        }
+    public void load(T p){
+        super.load(p);
+        Crafts.load(this, p.get(14));
+        setFace(p.get(15).get());
+        setWeapon((Item) Stock.get(map, p.get(16).get()));
+        armor = new ArmorSet(this, p.get(17).get(),p.get(18).get(),p.get(19).get(),p.get(20).get(),p.get(21).get());
+        for (T i : p.get(22)) inventory.addItem((Item) Stock.get(map, i.get()));
         final Man me = this;
         clip.organs[FIST].onAmputate = new Performer(){
             public void perform(){
@@ -69,14 +59,13 @@ public class Man extends Unit {
                 armor.set(null, 0);
             }
         };
-        return lines;
     }
     @Override
     public String toString(){
         StringBuilder r = new StringBuilder();
-        r.append(super.toString()).append("@").append(crafting.toString()).append("@");
-        r.append(face).append("#").append(weapon.forceToString()).append("#").append(armor.toString());
-        if (inventory.getItemSize() != 0) r.append("#").append(inventory.toString());
+        r.append(super.toString()).append(",").append(crafting.toString()).append(",");
+        r.append(face).append(",").append(T.wrap(weapon.forceToString())).append(",").append(armor.toString());
+        r.append(",").append(inventory.toString());
         return r.toString();
     }
     public void setWeapon(Item p){
@@ -198,18 +187,12 @@ public class Man extends Unit {
         for (Tag i : mytags){
             if (tags.contains(i)) r++;
         }
-        if (state.getTrainers().contains(Tag.Strength)) r += get("Strength").getMax();
+        if (state.getTrainers().contains(Tag.Strength)) r += stats.get("Strength").getMax();
         return Math.max(0,r) / Math.max(1,tags.size());
     }
-
     public int getVacancy(){
-        return get("Agility").getMax() - armor.getEncumbrance();
+        return stats.get("Agility").getMax() - armor.getEncumbrance();
     }
-
-    public Stat get(String p){
-        return stats.getStat(p);
-    }
-
     public int getGold(){
         L<Item> items = new L<>(inventory.getItems());
         items.add(weapon);
@@ -254,8 +237,8 @@ public class Man extends Unit {
     }
     public int getMana(){
         int total = 0;
-        if (traits.getTraitLevel(Traits.Trait.Attunement) > 0) {
-            total += get("Intelligence").get();
+        if (traits.getTraitLevel(Traits.Trait.Affinity) > 0) {
+            total += stats.get("Intelligence").get();
         }
         L<Item> items = new L<>(inventory.getItems());
         items.add(weapon);
@@ -269,11 +252,11 @@ public class Man extends Unit {
     }
     @Override
     public boolean requireMana(int p){
-        if (stats.triggerEffect(Buffs.Attunement)) return true;
-        if (traits.getTraitLevel(Traits.Trait.Attunement) > 0) {
-            int mana = Math.min(get("Intelligence").get(), p);
+        if (status.triggerEffect(Buffs.Affinity)) return true;
+        if (traits.getTraitLevel(Traits.Trait.Affinity) > 0) {
+            int mana = Math.min(stats.get("Intelligence").get(), p);
             p -= mana;
-            get("Intelligence").add(-mana, false);
+            stats.get("Intelligence").add(-mana, false);
             if (p == 0) return true;
         }
         L<Item> items = new L<>(inventory.getItems());
@@ -289,10 +272,10 @@ public class Man extends Unit {
         return false;
     }
     public boolean rechargeMana(int p){
-        if (traits.getTraitLevel(Traits.Trait.Attunement) > 0) {
-            int vacant = Math.min(p, (get("Intelligence").getMax() - get("Intelligence").get()));
+        if (traits.getTraitLevel(Traits.Trait.Affinity) > 0) {
+            int vacant = Math.min(p, (stats.get("Intelligence").getMax() - stats.get("Intelligence").get()));
             p -= vacant;
-            get("Intelligence").add(vacant, false);
+            stats.get("Intelligence").add(vacant, false);
             if (p == 0) return true;
         }
         L<Item> items = new L<>(inventory.getItems());
@@ -397,7 +380,7 @@ public class Man extends Unit {
     }
 
     @Override
-    protected Tags getTags(){
+    public Tags getTags(){
         Tags r = new Tags();
         r.addAll(super.getTags());
         r.addAll(armor.tags);

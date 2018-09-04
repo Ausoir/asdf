@@ -1,6 +1,7 @@
 package com.ga.unit.man;
 
 import com.ga.tool.L;
+import com.ga.tool.T;
 import com.ga.unit.item.Item;
 
 /**
@@ -12,6 +13,12 @@ public class Inventory {
     private Man host;
     Inventory(Man host){
         this.host = host;
+    }
+    public String toString(){
+        if (items.size() == 0) return "";
+        StringBuilder r = new StringBuilder();
+        for (Item item : items) r.append(T.wrap(item.toString())).append(",");
+        return T.wrap(r.substring(0,r.length()-1));
     }
     boolean addItem(Item p){
         if (vacant()) {
@@ -49,13 +56,5 @@ public class Inventory {
         int i = items.indexOf(item);
         if (i == -1) return null;
         return remove(i);
-    }
-    public String toString(){
-        if (items.size() == 0) return "";
-        StringBuilder r = new StringBuilder();
-        for (Item item : items) {
-            r.append(item.toString()).append("#");
-        }
-        return r.substring(0,r.length()-1);
     }
 }

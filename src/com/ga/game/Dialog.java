@@ -8,7 +8,7 @@ import java.util.HashMap;
 public class Dialog {
     private static HashMap<String,String> cache = new HashMap<>();
     static void init(){
-        String[] data = FileManager.readText("Data/raw/Dialog.txt");
+        String[] data = FileManager.read("Data/raw/Dialog.txt").split("%");
         for (String i : data){
             String[] t = i.split(":");
             cache.put(t[0],t[1]);
