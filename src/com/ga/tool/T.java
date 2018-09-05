@@ -6,45 +6,37 @@ public class T extends L<T> {
     public static String wrap(String p){
         return "["+p+"]";
     }
+    public static String unwrap(String p){
+        return p.substring(1, p.length()-1);
+    }
     private String value;
     public T(String p){
-        if (p != null) {
-            value = p;
-            String current = "";
-            int depth = 0;
-            boolean addOne = false;
-            for (int i = 0; i < p.length(); i++) {
-                boolean write = true;
-                char ch = p.charAt(i);
-                if (ch == '[') {
-                    if (depth == 0) write = false;
-                    depth++;
-                } else if (ch == ']') {
-                    depth--;
-                    if (depth == 0) {
-                        write = false;
-                        addOne = true;
-                    }
-                }
-                if (ch == ',' && depth == 0) {
-                    add(new T(current));
-                    current = "";
-                    addOne = true;
-                    write = false;
-                }
-                if (write) current += ch;
+        boolean addOne = false;
+        if (p.startsWith("[")){
+            p = p.substring(1,p.length()-1);
+            if (!p.isEmpty()) addOne = true;
+        }
+        value = p;
+        String current = "";
+        int depth = 0;
+        for (int i=0;i<p.length();i++){
+            char ch = p.charAt(i);
+            if (ch == '[') depth++;
+            else if (ch == ']') depth--;
+            if (ch == ',' && depth == 0){
+                add(new T(current));
+                current = "";
+                addOne = true;
             }
-            if (addOne) add(new T(current));
-        } else value = "";
+            else current += ch;
+        }
+        if (addOne) add(new T(current));
     }
     public T startsWith(String p){
         for (T i : this){
             if (i.get(0).value.equals(p)) return i;
         }
         return null;
-    }
-    public String[] toStringArray(){
-        return value.split(",");
     }
     public T getRand(Random rand){
         return get(rand.nextInt(size()));

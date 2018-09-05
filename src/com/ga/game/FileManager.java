@@ -204,7 +204,7 @@ public class FileManager {
         String[] lines = data.split("%", -1);
         T r = new T("");
         for (String i : lines){
-            r.add(new T(i));
+            r.add(new T("["+i+"]"));
         }
         return r;
     }
@@ -212,7 +212,7 @@ public class FileManager {
     public static T readLiteral(String dir, int line){
         String data = read(dir);
         String[] lines = data.split("%", -1);
-        return new T(lines[line]);
+        return new T("["+lines[line]+"]");
     }
 
     public static boolean isFile(String p){

@@ -38,7 +38,7 @@ public class Player extends Man {
                 break;
             } else if (i.name.equals("Chair") || i.name.equals("Shortchair") || i.name.equals("Bench")) level = 3;
         }
-        stats.get("Fatigue").add(level, false);
+        stats.fatigue.add(level, false);
         map.updater.sleep(1, true);
     }
 }

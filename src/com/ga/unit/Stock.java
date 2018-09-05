@@ -124,8 +124,8 @@ public enum Stock {
                 UnitFactory unitString = new UnitFactory(this, Faction.valueOf(data.get(5).get()), data.get(4));
                 unitString.setAI(data.get(6).get(0).getInt(), data.get(6).get(1).getInt());
                 unitString.setMoveset(data.get(7).get());
-                unitString.addInventory(data.get(11).toStringArray());
-                unitString.setEquipment(data.get(8).toStringArray(), data.get(9).toStringArray(), data.get(10).toStringArray());
+                unitString.addInventory(data.get(11));
+                unitString.setEquipment(data.get(8), data.get(9), data.get(10));
                 traits.load(this, data.get(12));
             }
         };
@@ -141,7 +141,7 @@ public enum Stock {
         Item product = new Item(map, data.get(0).get(), seed, null, Item.ItemType.Swinging){
             public void onCreate(){
                 super.onCreate();
-                imbueMaterial(Item.Material.load(data.get(4).toStringArray()));
+                imbueMaterial(Item.Material.load(data.get(4)));
             }
             public String getDescription(){
                 String r = super.getDescription();
@@ -162,7 +162,7 @@ public enum Stock {
         Item product = new Weapon(map, data.get(0).get(), seed, null, Item.ItemType.valueOf(data.get(1).get())){
             public void onCreate(){
                 super.onCreate();
-                imbueMaterial(Item.Material.load(data.get(2).toStringArray()));
+                imbueMaterial(Item.Material.load(data.get(2)));
             }
         };
         for (T i : data.get(3)) product.tags.add(Tag.valueOf(i.get()));
@@ -178,7 +178,7 @@ public enum Stock {
                 Integer.parseInt(data.get(2).get()), Integer.parseInt(data.get(3).get()), Integer.parseInt(data.get(5).get()), Integer.parseInt(data.get(6).get())){
             public void onCreate(){
                 super.onCreate();
-                imbueMaterial(Item.Material.load(data.get(4).get().split(",")));
+                imbueMaterial(Item.Material.load(data.get(4)));
             }
         };
         product.subId = id;
@@ -267,8 +267,8 @@ public enum Stock {
             }
             public void onCreate(){
                 UnitFactory unit = new UnitFactory(this, Faction.Predator, new T("1,1,1"));
-                unit.setStat("Speed", 8);
                 unit.setMoveset("Melee");
+                stats.speed = 8;
             }
             public void die(String p){
                 Stock.createByName(map, "Resin", -1).start().pos.set(pos);
@@ -294,7 +294,7 @@ public enum Stock {
                     vel.x += dir * 4;
                     delay.time = 4;
                     buff(Buffs.Slowfall, 3);
-                    stats.get("Strength").heal();
+                    stats.strength.heal();
                 } else {
                     if (state == Actions.Melee) state = Actions.Shock;
                     super.stateSet(state);
@@ -345,7 +345,7 @@ public enum Stock {
                 if (seed % 2 == 1) moves = "Meteorform,Fireball";
                 else moves = "Fireblast";
                 UnitFactory unit = new UnitFactory(this, Faction.Predator, new T("3,4,9"));
-                unit.setStat("Intelligence", 20);
+                stats.intelligence.setTotal(20, true);
                 traits.learn(this, Traits.Trait.Affinity);
                 for (int i=0;i<8;i++) traits.learn(this, Traits.Trait.Pyromancy);
                 unit.setMoveset(moves);
@@ -359,7 +359,7 @@ public enum Stock {
         Unit product = new Unit(map, name(), seed){
             public void onCreate(){
                 UnitFactory unitString = new UnitFactory(this, Faction.Predator, new T("9,9,9"));
-                unitString.setStat("Agility",80);
+                stats.agility.setTotal(40, true);
                 unitString.setMoveset("Melee");
             }
         };
@@ -399,7 +399,7 @@ public enum Stock {
                     pj.dir = dir;
                     pj.rotSpeed = 0;
                     pj.blunt = false;
-                    pj.rotateTo(target.getSubtract(tip));
+                    pj.rotateTo(target.getSubtract(tip.getSubtract(pos)));
                     pj.faction = faction;
                     pj.damage = 5;
                     Particle.smoke(map, pj.pos, pj.getDepth());
@@ -495,7 +495,7 @@ public enum Stock {
                     Player player = (Player) host;
                     if (player.getStateLevel(skill) > 0) {
                         if (checkIngredients(host)) {
-                            if (host.stats.get("Motivation").require(10)) {
+                            if (host.stats.motivation.require(10)) {
                                 if (map.updater.sleep(1, false)) {
                                     if (!player.learnSkill(skill)) host.say("Failed to learn " + skill.name() + ".");
                                 }
@@ -766,23 +766,21 @@ public enum Stock {
         product.onInteract = new Interactive(){
             public void interact(com.ga.unit.man.Man p){
                 if (seed > 0) {
-                    boolean openable = data.get(1).get().equals("");
+                    boolean openable = data.get(1).get().isEmpty();
                     if (!openable){
-                        String[] v = data.get(1).get().split(",");
                         L<Prop> items = p.getAvailableItems();
                         L<Prop> validItems = new L<>();
-                        for (String i : v) {
+                        for (T i : data.get(1)) {
                             for (Prop item : items){
-                                if (item.name.equals(i)) validItems.add(item);
+                                if (item.name.equals(i.get())) validItems.add(item);
                             }
                         }
                         Prop item = validItems.getFirst();
                         openable = item != null && ((Item)item).isUsable(true, 1);
                     }
                     if (openable) {
-                        String[] v = data.get(2).get().split(",");
-                        String lootName = v[seed % v.length];
-                        Global.player.setWeapon((Item) createByName(map, lootName, -1).start());
+                        String loot = data.get(2).get(seed % data.get(2).size()).get();
+                        Global.player.setWeapon((Item) createByName(map, loot, -1).start());
                         Global.player.say("Found " + Global.player.weapon.getFullName() + "!");
                         product.seed = 0;
                         product.image.modify(Shader.Tint, new Color(160,0,0,255).getRGB());
@@ -952,7 +950,7 @@ public enum Stock {
                             public void perform() {
                                 P tip = host.weapon.getLine().ptd;
                                 final Item wpn = host.weapon;
-                                int str = host.stats.get("Strength").getMax();
+                                int str = host.stats.strength.getMax();
                                 int speed = (int) (40 + Global.clamp(str * 12 + 20, 48, 120) - (SyncRand.r.nextFloat() * (44 / str)));
                                 final Projectile pj = new Projectile(host.map, "Arrow", tip, host.getHand().getAdd(host.target), speed) {
                                     public void onField() {}
@@ -1288,7 +1286,7 @@ public enum Stock {
             @Override
             public boolean use(Man p) {
                 if (super.use(p) && isUsable(true, 1)) {
-                    p.stats.get("Intelligence").heal();
+                    p.stats.intelligence.heal();
                     return true;
                 }
                 return false;
@@ -1314,7 +1312,7 @@ public enum Stock {
             @Override
             public boolean use(com.ga.unit.man.Man host){
                 if (host instanceof MainPlayer && super.use(host) && isUsable(true, 1)) {
-                    host.stats.get("Agility").add(1, false);
+                    host.stats.agility.add(1, false);
                     host.say("Restored 1 Vitality!");
                     return true;
                 }
@@ -1562,6 +1560,8 @@ public enum Stock {
             return Stock.valueOf(data[0]).create(map, Integer.parseInt(data[1]), seed);
         }
         assert false;
+        Global.p("Could not find Stock ["+p+"]");
+        System.exit(1);
         return null;
     }
     public Prop create(Map map, int subId, int seed){
@@ -1587,29 +1587,27 @@ class UnitFactory {
         host.controlId = Global.getControlId();
         host.faction = faction;
         int str = stats.get(0).getInt(), agi = stats.get(1).getInt(), wis = stats.get(2).getInt();
-        unit.stats.put("Strength", new Stat(str));
-        unit.stats.put("Agility", new Stat(agi));
-        unit.stats.put("Intelligence", new Stat(wis));
-        unit.stats.put("Level", new Stat(str+agi+wis));
-        unit.stats.put("Speed", new Stat(18+host.rand.nextInt(8)));
-        unit.stats.put("Attack", new Stat(host.rand.nextInt(10)-8));
+        unit.stats.strength = new Stat(str);
+        unit.stats.agility = new Stat(agi);
+        unit.stats.intelligence = new Stat(wis);
+        unit.stats.level = new Stat(str+agi+wis);
+        unit.stats.speed = 18+host.rand.nextInt(8);
+        unit.stats.attack = host.rand.nextInt(10)-8;
         setAI(2, 0);
     }
-    void setEquipment(String[] weapon, String[] armor, String[] helms){
+    void setEquipment(T weapon, T armor, T helms){
         Man man = (Man) host;
-        if (weapon != null && weapon.length > 0) man.setWeapon((Item) Stock.createByName(host.map, weapon[host.seed % weapon.length], -1));
-        man.armor = new ArmorSet(man, getItem(host.map, helms[host.seed % helms.length],0),
-                getItem(host.map, armor[host.seed % armor.length], 1),
-                getItem(host.map, armor[host.seed % armor.length], 2),
-                getItem(host.map, armor[host.seed % armor.length], 3),
-                getItem(host.map, armor[host.seed % armor.length], 4));
+        if (!weapon.get().isEmpty()) man.setWeapon((Item) Stock.createByName(host.map, weapon.get(host.seed % weapon.size()).get(), -1));
+        man.armor = new ArmorSet(man, getItem(host.map, helms.get(host.seed % helms.size()).get(),0),
+                getItem(host.map, armor.get(host.seed % armor.size()).get(), 1),
+                getItem(host.map, armor.get(host.seed % armor.size()).get(), 2),
+                "", "");
     }
-    void addInventory(String[] items){
+    void addInventory(T items){
         Man man = (Man) host;
-        man.inventory.setMaxSize(items.length);
-        for (String item : items) {
-            man.setWeapon((Item) Stock.createByName(host.map, item, -1));
-            man.sheathe();
+        man.inventory.setMaxSize(items.size());
+        for (T item : items) {
+            man.inventory.addItem((Item) Stock.createByName(host.map, item.get(), -1));
         }
     }
     private static String getItem(Map map, String p, int piece){
@@ -1626,11 +1624,8 @@ class UnitFactory {
             return "";
         }
     }
-    void setStat(String stat, int value){
-        host.stats.get(stat).setTotal(value, false);
-    }
     void setAI(int type, int subType){
-        Intelligence.load(host, new T("["+type+","+subType+"],[[1,0]]"));
+        Intelligence.load(host, new T("[["+type+","+subType+"],[[1,0]]]"));
     }
     void setMoveset(String p){
         if (!p.isEmpty()) {

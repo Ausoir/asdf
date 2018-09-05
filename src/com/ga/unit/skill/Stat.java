@@ -1,19 +1,18 @@
 package com.ga.unit.skill;
 
+import com.ga.tool.T;
+
 /**
  * Created by Ga on 8/1/2016.
  */
 public class Stat {
+    public String name;
     private int max;
     private int current;
-    public Stat(String p){
-        String[] t = p.split(",");
-        if (t.length == 1){
-            setTotal(Integer.parseInt(p), true);
-        } else {
-            current = Integer.parseInt(t[0]);
-            max = Integer.parseInt(t[1]);
-        }
+    public Stat(String name, T p){
+        this.name = name;
+        current = p.get(0).getInt();
+        max = p.get(1).getInt();
     }
     public Stat(int p){
         setTotal(p, false);

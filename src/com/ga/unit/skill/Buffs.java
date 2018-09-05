@@ -94,7 +94,7 @@ public enum Buffs {
                 spike();
             }
             private void spike(){
-                if (!host.stats.get("Strength").require(1)){
+                if (!host.stats.strength.require(1)){
                     Particle.holyExplosion(host.map, host.pos, host.getDepth());
                     host.setState(Actions.Down);
                     host.status.clearBuffs();
@@ -104,7 +104,7 @@ public enum Buffs {
                 Particle.sparkle(host.map, "Glare", host.getDepth(),host.getRandomPoint(),20+host.getSize(),4);
                 if (var++ % 60 == 0){
                     host.setState(Actions.Hit);
-                    host.stats.get("Strength").add(-1,false);
+                    host.stats.strength.add(-1,false);
                 }
                 return super.update();
             }
@@ -146,8 +146,8 @@ public enum Buffs {
             private final static int freezeThreshold = 24;
             public void onSet() {
                 Sound.play(host.map, host.pos, "freeze");
-                var = host.stats.get("Speed").add(-Math.round(host.getSpeed()*30), false);
-                host.stats.get("Attack").add(-15, true);
+                var = host.stats.speed += -Math.round(host.getSpeed()*30);
+                host.stats.attack -= 15;
                 host.status.triggerEffect(Buffs.Bleed);
                 host.status.triggerEffect(Buffs.Burn);
                 onLoad();
@@ -158,7 +158,7 @@ public enum Buffs {
             public void onStack(int level){
                 if (!frozen) {
                     super.onStack(level);
-                    var += host.stats.get("Speed").add(-level, false);
+                    var += host.stats.speed -= level;
                     onLoad();
                 }
             }
@@ -202,8 +202,8 @@ public enum Buffs {
             }
             public void onFinish() {
                 if (frozen) melt();
-                host.stats.get("Speed").add(-var, true);
-                host.stats.get("Attack").add(15, true);
+                host.stats.speed -= var;
+                host.stats.attack += 15;
             }
             public boolean onTrigger(){
                 if (level > 1) level--;
@@ -340,9 +340,9 @@ public enum Buffs {
                 var = level;
             }
             private void augment(int p){
-                host.stats.get("Strength").addTotal(p);
-                host.stats.get("Agility").addTotal(p);
-                host.stats.get("Intelligence").addTotal(p);
+                host.stats.strength.addTotal(p);
+                host.stats.agility.addTotal(p);
+                host.stats.intelligence.addTotal(p);
             }
             public void onFinish() {
                 augment(-var);
@@ -369,9 +369,9 @@ public enum Buffs {
                 var = level;
             }
             private void augment(int p){
-                host.stats.get("Strength").addTotal(-p);
-                host.stats.get("Agility").addTotal(-p);
-                host.stats.get("Intelligence").addTotal(-p);
+                host.stats.strength.addTotal(-p);
+                host.stats.agility.addTotal(-p);
+                host.stats.intelligence.addTotal(-p);
             }
             public void onFinish() {
                 augment(-var);
@@ -466,11 +466,11 @@ public enum Buffs {
         return new Buff(level, 10) {
             public void onSet() {
                 var = 8 + level;
-                host.stats.get("Attack").add(var, true);
+                host.stats.attack += var;
             }
             public void onStack(int level){}
             public void onFinish() {
-                host.stats.get("Attack").add(-var, true);
+                host.stats.attack -= var;
             }
             public boolean update() {
                 Particle.sparkle(host.map, "Fire", host.getDepth()+.01f, host.getRandomPoint(), 8, 3);
@@ -531,11 +531,11 @@ public enum Buffs {
     }}){ Buff makeLocal(int level) {
         return new Buff(level, 16) {
             public void onSet() {
-                var = Math.round(host.stats.get("Speed").getMax());
-                host.stats.get("Speed").add(var, true);
+                var = level * 4 + 4;
+                host.stats.speed += var;
             }
             public void onFinish() {
-                host.stats.get("Speed").add(-var, true);
+                host.stats.speed -= var;
             }
             public boolean update() {
                 if (Math.random() < .2f) {
@@ -592,7 +592,7 @@ public enum Buffs {
         return new Buff(level, 9){
             private int tick = 0;
             public boolean update(){
-                if (tick++ % Math.max(10, 200/level) == 0) host.stats.get("Strength").add(1, false);
+                if (tick++ % Math.max(10, 200/level) == 0) host.stats.strength.add(1, false);
                 return super.update();
             }
         };

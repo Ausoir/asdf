@@ -33,18 +33,15 @@ public class Command {
                     Global.hour++;
                     for (Map map : Global.maps) map.onTimeChange();
                 } else if (cmd[0].equals("heal")) {
-                    host.stats.get("Strength").heal();
-                    host.stats.get("Agility").heal();
-                    host.stats.get("Intelligence").heal();
+                    host.stats.strength.heal();
+                    host.stats.agility.heal();
+                    host.stats.intelligence.heal();
                 } else if (cmd[0].equals("reinvigorate")) {
-                        host.stats.get("Nutrition").heal();
-                        host.stats.get("Fatigue").heal();
-                        host.stats.get("Motivation").heal();
+                        host.stats.nutrition.heal();
+                        host.stats.fatigue.heal();
+                        host.stats.motivation.heal();
                 } else if (cmd[0].equals("morph")){
                     host.clip = new Body(host, cmd[1]);
-                } else if (cmd[0].equals("stat")){
-                    host.stats.get(cmd[1]).setTotal(Integer.parseInt(cmd[2]), true);
-                    host.stats.get(cmd[1]).heal();
                 } else if (cmd[0].equals("unit")){
                     int loop = 1;
                     if (cmd.length>2) loop = Integer.parseInt(cmd[2]);
@@ -69,11 +66,11 @@ public class Command {
                     if (cmd.length > 2) host.stateLevel = Integer.parseInt(cmd[2]);
                 } else if (cmd[0].equals("level")) Global.player.level();
                 else if (cmd[0].equals("resetLevel")){
-                    host.stats.get("Strength").setTotal(1, true);
-                    host.stats.get("Agility").setTotal(1, true);
-                    host.stats.get("Intelligence").setTotal(1, true);
-                    host.stats.get("Level").setTotal(1, true);
-                    host.stats.get("Level").heal();
+                    host.stats.strength.setTotal(1, true);
+                    host.stats.agility.setTotal(1, true);
+                    host.stats.intelligence.setTotal(1, true);
+                    host.stats.level.setTotal(1, true);
+                    host.stats.level.heal();
                 }
                 else if (cmd[0].equals("learnSkill")) host.learnSkill(Actions.valueOf(cmd[1]));
                 else if (cmd[0].equals("learnTrait")) host.learnTrait(Traits.Trait.valueOf(cmd[1]));

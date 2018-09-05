@@ -35,9 +35,9 @@ public class Food extends Item {
                 p.buff(Buffs.Poison, 1);
                 p.say("Gawrrrr! That didn't taste good...");
             } else {
-                p.stats.get("Motivation").add(taste, false);
+                p.stats.motivation.add(taste, false);
             }
-            p.stats.get("Nutrition").add(nutrition, false);
+            p.stats.nutrition.add(nutrition, false);
             return true;
         }
         return false;

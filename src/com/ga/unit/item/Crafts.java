@@ -75,7 +75,7 @@ public enum Crafts {
             return craft.ingreds;
         }
         T r = recipes.startsWith(p);
-        if (r != null) return r.get(1).toStringArray();
+        if (r != null) return r.get(1).get().split(",");
         return new String[]{};
     }
     public static void craftByName(Man host, String p) {
@@ -159,7 +159,7 @@ public enum Crafts {
             }
             if (ingredients.size() == 1){
                 int time = Integer.parseInt(usage.get(0));
-                if (host.stats.get("Nutrition").get() >= time) return time;
+                if (host.stats.nutrition.get() >= time) return time;
             }
         }
         return -1;

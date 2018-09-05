@@ -26,7 +26,7 @@ public enum Intelligence {
         public AI make(Unit host){ return process(new AI(host){
             Timer advertise;
             String ad = "@talk";
-            public void load(String p) {
+            public void load(T p) {
                 super.load(p);
                 advertise = new Timer(80+host.rand.nextInt(240), false);
             }
@@ -111,7 +111,7 @@ public enum Intelligence {
                 private float low;
                 private float high;
 
-                void load(String p) {
+                void load(T p) {
                     super.load(p);
                     String[] data = FileManager.read("Data/raw/Shop.txt").split("%");
                     advertise = new Timer(100+host.rand.nextInt(200), false);
@@ -169,7 +169,7 @@ public enum Intelligence {
         public AI make(Unit host) {
             return process(new NeutralAI(host) {
                 private int price;
-                void load(String p) {
+                void load(T p) {
                     super.load(p);
                     price = (host.rand.nextInt(30)+30)*100+99;
                 }
@@ -182,14 +182,14 @@ public enum Intelligence {
                                     new Performer(){
                                         public void perform(){
                                             if (Global.player.requireGold(price)) {
-                                                Global.player.stats.get("Nutrition").add(3, true);
+                                                Global.player.stats.nutrition.add(3, true);
                                                 if (Global.player.map.updater.sleep(3, true)){
-                                                    Global.player.stats.get("Motivation").add(10,false);
-                                                    Global.player.stats.get("Fatigue").add(9,false);
-                                                    Global.player.stats.get("Agility").add(1, false);
-                                                    Global.player.stats.get("Strength").heal();
+                                                    Global.player.stats.motivation.add(10,false);
+                                                    Global.player.stats.fatigue.add(9,false);
+                                                    Global.player.stats.agility.add(1, false);
+                                                    Global.player.stats.strength.heal();
                                                 } else {
-                                                    Global.player.stats.get("Nutrition").add(-3, true);
+                                                    Global.player.stats.nutrition.add(-3, true);
                                                     Global.player.obtainGold(price);
                                                 }
                                             } else {
@@ -207,7 +207,7 @@ public enum Intelligence {
                 private int price;
                 private Traits.Trait trait;
 
-                void load(String p) {
+                void load(T p) {
                     super.load(p);
                     price = (host.rand.nextInt(60)+9)*100+99;
                     trait = Traits.Trait.getByType(1).get(host.seed % Traits.Trait.getByType(1).size());
@@ -217,18 +217,18 @@ public enum Intelligence {
                     int reqMot = 20, reqTime = 2;
                     String message = "I can teach you useful things if you have the time, motivation, and money.";
                     message += "\nRequires "+Dialog.money(price)+", "+reqMot+" motivation, and "+reqTime+" hours.";
-                    message += "\n\nCurrent motivation: "+Global.player.stats.get("Motivation").get();
-                    message += "\nCurrent nutrition: "+Global.player.stats.get("Nutrition").get();
+                    message += "\n\nCurrent motivation: "+Global.player.stats.motivation.get();
+                    message += "\nCurrent nutrition: "+Global.player.stats.nutrition.get();
                     Menu.menu.showDialog("Trainer", message,
                         new String[]{"Begin training"},
                         new Performer[]{
                             new Performer(){
                                 public void perform(){
-                                    if (Global.player.stats.get("Motivation").get() >= reqMot){
+                                    if (Global.player.stats.motivation.get() >= reqMot){
                                         if (Global.player.getGold() >= price) {
                                             if (Global.player.map.updater.sleep(reqTime, true)) {
                                                 Global.player.learnTrait(trait);
-                                                Global.player.stats.get("Motivation").require(reqMot);
+                                                Global.player.stats.motivation.require(reqMot);
                                                 Global.player.requireGold(price);
                                             }
                                         } else Global.player.say("Not enough money...");
@@ -245,7 +245,7 @@ public enum Intelligence {
                 private String[] wanted;
                 private float[] priceR;
 
-                void load(String p) {
+                void load(T p) {
                     super.load(p);
                     String[] data = FileManager.read("Data/raw/Pawn.txt").split("%");
                     advertise = new Timer(100+host.rand.nextInt(200), false);
@@ -305,7 +305,7 @@ public enum Intelligence {
             return process(new NeutralAI(host) {
                 private int hourly, price;
 
-                void load(String p) {
+                void load(T p) {
                     super.load(p);
                     int pool = host.rand.nextInt(20000) + 20000;
                     float ratio = host.rand.nextFloat() * .8f + .1f;
@@ -369,7 +369,7 @@ public enum Intelligence {
         AI r = values()[p.get(0).get(0).getInt()].make(host);
         r.type = p.get(0).get(1).getInt();
         host.brain = r;
-        r.load(p.get(1).get());
+        r.load(p.get(1));
         return r;
     }
 }

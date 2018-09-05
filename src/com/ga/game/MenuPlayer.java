@@ -13,6 +13,7 @@ import com.ga.unit.man.Inventory;
 import com.ga.unit.man.MainPlayer;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Buffs;
+import com.ga.unit.skill.Stat;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -31,9 +32,9 @@ import java.util.ArrayList;
  */
 public class MenuPlayer extends Panel {
     private class StatPanel extends JPanel {
+        private Stat[] stats = new Stat[]{Global.player.stats.strength, Global.player.stats.agility, Global.player.stats.intelligence};
         private GridBagConstraints statgrid = new GridBagConstraints();
-        private String[] stats = MainPlayer.mainStats;
-        private JButton[] statButtons = new JButton[stats.length];
+        private JButton[] statButtons = new JButton[3];
         private JLabel level = new JLabel();
         private JLabel motivation = new JLabel(), nutrition = new JLabel(), fatigue = new JLabel();
         private JLabel stamina = new JLabel(), vitality = new JLabel(), energy = new JLabel();
@@ -57,25 +58,27 @@ public class MenuPlayer extends Panel {
             statgrid.gridx = 0;
             add(level, statgrid);
             statgrid.gridy = 1;
-            for (int i=0;i<stats.length;i++) statButtons[i] = makeStatButton(stats[i]);
+            statButtons[0] = makeStatButton("Strength");
+            statButtons[1] = makeStatButton("Agility");
+            statButtons[2] = makeStatButton("Intelligence");
             statgrid.gridx = 1;
             statgrid.gridy = 1;
             statgrid.ipady = 32;
-            for (int i=0;i<stats.length;i++){
+            for (int i=0;i<3;i++){
                 final int var = i;
                 JButton button = makeStatButton("");
                 button.setIcon(iconDescribe);
                 final Performer perf = new Performer() {
                     public void perform() {
-                        if (Global.player.stats.get("Level").require(1))
-                            Global.player.stats.get(stats[var]).addTotal(1);
+                        if (Global.player.stats.level.require(1))
+                            stats[var].addTotal(1);
                     }
                 };
                 statButtons[var].addActionListener(e -> {
                     perf.perform();
                     refresh();
                 });
-                button.addActionListener(e -> Menu.menu.showDialog(stats[var],Dialog.get("?"+stats[var])));
+                button.addActionListener(e -> Menu.menu.showDialog(stats[var].name,Dialog.get("?"+stats[var])));
             }
             statgrid.gridx = 0;
             statgrid.gridy = stats.length+1;
@@ -162,38 +165,38 @@ public class MenuPlayer extends Panel {
             MainPlayer player = Global.player;
             level.setFont(Panel.font);
             level.setForeground(Panel.fontcolor);
-            level.setText("Level "+player.stats.get("Level").getMax());
+            level.setText("Level "+player.stats.level.getMax());
             motivation.setFont(Panel.smallfont);
             motivation.setForeground(Panel.fontcolor);
-            motivation.setText("Motivation - "+player.stats.get("Motivation").toString().replace(",", "/"));
+            motivation.setText("Motivation - "+player.stats.motivation.toString().replace(",", "/"));
             nutrition.setFont(Panel.smallfont);
             nutrition.setForeground(Panel.fontcolor);
-            nutrition.setText("Nutrition - "+player.stats.get("Nutrition").toString().replace(",", "/"));
+            nutrition.setText("Nutrition - "+player.stats.nutrition.toString().replace(",", "/"));
             fatigue.setFont(Panel.smallfont);
             fatigue.setForeground(Panel.fontcolor);
-            fatigue.setText("Fatigue - "+player.stats.get("Fatigue").toString().replace(",", "/"));
+            fatigue.setText("Fatigue - "+player.stats.fatigue.toString().replace(",", "/"));
             stamina.setFont(Panel.smallfont);
             stamina.setForeground(Panel.fontcolor);
-            stamina.setText("Stamina - "+player.stats.get("Strength").toString().replace(",", "/"));
+            stamina.setText("Stamina - "+player.stats.strength.toString().replace(",", "/"));
             vitality.setFont(Panel.smallfont);
             vitality.setForeground(Panel.fontcolor);
-            vitality.setText("Vitality - "+player.stats.get("Agility").toString().replace(",", "/"));
+            vitality.setText("Vitality - "+player.stats.agility.toString().replace(",", "/"));
             energy.setFont(Panel.smallfont);
             energy.setForeground(Panel.fontcolor);
-            energy.setText("Energy - "+player.stats.get("Intelligence").toString().replace(",", "/"));
+            energy.setText("Energy - "+player.stats.intelligence.toString().replace(",", "/"));
             points.setFont(Panel.smallfont);
             points.setForeground(Color.RED);
-            points.setText("Available Points: "+player.stats.get("Level").get());
-            if (player.stats.get("Level").get() == 0) points.setVisible(false);
+            points.setText("Available Points: "+player.stats.level.get());
+            if (player.stats.level.get() == 0) points.setVisible(false);
             else points.setVisible(true);
-            for (int i=0;i<stats.length;i++) statButtons[i].setText(stats[i]+" - "+player.stats.get(stats[i]).getMax());
-            if (player.stats.get("Strength").isFull()) stamina.setVisible(false);
+            for (int i=0;i<stats.length;i++) statButtons[i].setText(stats[i].name+" - "+stats[i].getMax());
+            if (player.stats.strength.isFull()) stamina.setVisible(false);
             else stamina.setVisible(true);
-            if (player.stats.get("Agility").isFull()) vitality.setVisible(false);
+            if (player.stats.agility.isFull()) vitality.setVisible(false);
             else vitality.setVisible(true);
-            if (!player.traits.has(Traits.Trait.Affinity) || player.stats.get("Intelligence").isFull()) energy.setVisible(false);
+            if (!player.traits.has(Traits.Trait.Affinity) || player.stats.intelligence.isFull()) energy.setVisible(false);
             else energy.setVisible(true);
-            if (player.stats.get("Motivation").get() == 0) motivation.setVisible(false);
+            if (player.stats.motivation.get() == 0) motivation.setVisible(false);
             else motivation.setVisible(true);
         }
     }
@@ -222,7 +225,7 @@ public class MenuPlayer extends Panel {
             add(scroll, BorderLayout.LINE_START);
         }
         void refresh(){
-            weight.setText("Encumbrance:"+Global.player.armor.getEncumbrance()+"/"+Global.player.stats.get("Agility").getMax()+
+            weight.setText("Encumbrance:"+Global.player.armor.getEncumbrance()+"/"+Global.player.stats.agility.getMax()+
                     "                 Warmth:"+Global.player.armor.getWarmth()+"/"+Global.player.map.temperature);
             panel.removeAll();
 
@@ -408,7 +411,7 @@ public class MenuPlayer extends Panel {
             for (Actions i : Global.player.moveset){
                 if (i != Actions.Use) makeSlot(i);
             }
-            int points = Global.player.stats.get("Intelligence").get();
+            int points = Global.player.stats.intelligence.get();
             skillpoints.setText(Dialog.get("mem")+": "+points);
         }
         void makeSlot(String extra){
@@ -623,8 +626,8 @@ public class MenuPlayer extends Panel {
             panel.removeAll();
             panel.add(makeOption("Level Up","lvl","Level up with sufficient Motivation points and time."));
             panel.add(makeOption("Rest","h","Rest for an hour, removing curable debuffs and restoring fatigue. Restore fatigue twice more near chairs and benches, and three times more near beds."));
-            if (Global.player.stats.get("Nutrition").get() == 0){
-                if (Global.player.stats.get("Agility").get() > 0) panel.add(makeOption("Starve", "st", "Starve, gaining 1 Nutrition point at the cost of 1 Vitality."));
+            if (Global.player.stats.nutrition.get() == 0){
+                if (Global.player.stats.agility.get() > 0) panel.add(makeOption("Starve", "st", "Starve, gaining 1 Nutrition point at the cost of 1 Vitality."));
                 else panel.add(makeOption("STARVE TO DEATH", "st", "Submit to starvation and die."));
             }
             TitledBorder b = BorderFactory.createTitledBorder(BorderFactory.createMatteBorder(2,2,2,2,Panel.forecolor));
@@ -689,21 +692,21 @@ public class MenuPlayer extends Panel {
                     Menu.menu.showMenu();
                     break;
                 case "lvl":
-                    int reqMot = Global.player.stats.get("Motivation").getMax(), reqTime = 3;
+                    int reqMot = Global.player.stats.motivation.getMax(), reqTime = 3;
                     String message = "If you have the time and motivation, you may train to make yourself stronger.";
                     message += "\nRequires "+reqMot+" Motivation points, and "+reqTime+" hours (= "+reqTime+" Nutrition and Fatigue points).";
-                    message += "\n\nCurrent Motivation: "+Global.player.stats.get("Motivation").get();
-                    message += "\nCurrent Nutrition: "+Global.player.stats.get("Nutrition").get();
-                    message += "\nCurrent Fatigue: "+Global.player.stats.get("Fatigue").get();
+                    message += "\n\nCurrent Motivation: "+Global.player.stats.motivation.get();
+                    message += "\nCurrent Nutrition: "+Global.player.stats.nutrition.get();
+                    message += "\nCurrent Fatigue: "+Global.player.stats.fatigue.get();
                     Menu.menu.showDialog("Level Up", message,
                             new String[]{"Begin Training!"},
                             new Performer[]{
                                     new Performer(){
                                         public void perform(){
-                                            if (Global.player.stats.get("Motivation").get() >= reqMot){
+                                            if (Global.player.stats.motivation.get() >= reqMot){
                                                 if (Global.player.map.updater.sleep(reqTime, true)) {
                                                     Global.player.level();
-                                                    Global.player.stats.get("Motivation").require(reqMot);
+                                                    Global.player.stats.motivation.require(reqMot);
                                                 }
                                             } else Global.player.say("Not enough Motivation..");
                                         }
@@ -717,9 +720,9 @@ public class MenuPlayer extends Panel {
                     Menu.menu.showDialog("Options", "apparently none.");
                     break;
                 case "st":
-                    if (Global.player.stats.get("Agility").require(1)){
-                        Global.player.stats.get("Nutrition").add(1, false);
-                        Global.player.say("I have "+Global.player.stats.get("Agility").get()+" Vitality left!");
+                    if (Global.player.stats.agility.require(1)){
+                        Global.player.stats.nutrition.add(1, false);
+                        Global.player.say("I have "+Global.player.stats.agility.get()+" Vitality left!");
                     } else Global.player.die("Starvation");
                     Menu.menu.showMenu();
                     break;

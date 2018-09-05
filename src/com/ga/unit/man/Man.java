@@ -62,11 +62,7 @@ public class Man extends Unit {
     }
     @Override
     public String toString(){
-        StringBuilder r = new StringBuilder();
-        r.append(super.toString()).append(",").append(crafting.toString()).append(",");
-        r.append(face).append(",").append(T.wrap(weapon.forceToString())).append(",").append(armor.toString());
-        r.append(",").append(inventory.toString());
-        return r.toString();
+        return super.toString()+","+crafting.toString()+","+face+","+T.wrap(weapon.forceToString())+","+armor.toString()+","+inventory.toString();
     }
     public void setWeapon(Item p){
         if (p == null) p = fist;
@@ -187,11 +183,11 @@ public class Man extends Unit {
         for (Tag i : mytags){
             if (tags.contains(i)) r++;
         }
-        if (state.getTrainers().contains(Tag.Strength)) r += stats.get("Strength").getMax();
+        if (state.getTrainers().contains(Tag.Strength)) r += stats.strength.getMax();
         return Math.max(0,r) / Math.max(1,tags.size());
     }
     public int getVacancy(){
-        return stats.get("Agility").getMax() - armor.getEncumbrance();
+        return stats.agility.getMax() - armor.getEncumbrance();
     }
     public int getGold(){
         L<Item> items = new L<>(inventory.getItems());
@@ -238,7 +234,7 @@ public class Man extends Unit {
     public int getMana(){
         int total = 0;
         if (traits.getTraitLevel(Traits.Trait.Affinity) > 0) {
-            total += stats.get("Intelligence").get();
+            total += stats.intelligence.get();
         }
         L<Item> items = new L<>(inventory.getItems());
         items.add(weapon);
@@ -254,9 +250,9 @@ public class Man extends Unit {
     public boolean requireMana(int p){
         if (status.triggerEffect(Buffs.Affinity)) return true;
         if (traits.getTraitLevel(Traits.Trait.Affinity) > 0) {
-            int mana = Math.min(stats.get("Intelligence").get(), p);
+            int mana = Math.min(stats.intelligence.get(), p);
             p -= mana;
-            stats.get("Intelligence").add(-mana, false);
+            stats.intelligence.add(-mana, false);
             if (p == 0) return true;
         }
         L<Item> items = new L<>(inventory.getItems());
@@ -273,9 +269,9 @@ public class Man extends Unit {
     }
     public boolean rechargeMana(int p){
         if (traits.getTraitLevel(Traits.Trait.Affinity) > 0) {
-            int vacant = Math.min(p, (stats.get("Intelligence").getMax() - stats.get("Intelligence").get()));
+            int vacant = Math.min(p, (stats.intelligence.getMax() - stats.intelligence.get()));
             p -= vacant;
-            stats.get("Intelligence").add(vacant, false);
+            stats.intelligence.add(vacant, false);
             if (p == 0) return true;
         }
         L<Item> items = new L<>(inventory.getItems());

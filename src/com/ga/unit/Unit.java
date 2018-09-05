@@ -18,7 +18,26 @@ import java.util.HashMap;
  */
 public class Unit extends Prop {
     private static final float OFFSET_UNIT = .0001f;
-    public H<String, Stat> stats = new H<>();
+    public class Stats{
+        public int speed, attack;
+        public Stat motivation, intelligence, nutrition, agility,
+                fatigue, level, strength;
+        void load(T p){
+            speed = p.get(0).getInt();
+            attack = p.get(1).getInt();
+            level = new Stat("Level", p.get(2));
+            motivation = new Stat("Motivation", p.get(3));
+            nutrition = new Stat("Nutrition", p.get(4));
+            fatigue = new Stat("Fatigue", p.get(5));
+            strength = new Stat("Strength", p.get(6));
+            agility = new Stat("Agility", p.get(7));
+            intelligence = new Stat("Intelligence", p.get(8));
+        }
+        public String toString(){
+            return T.wrap(speed+","+attack+","+level+","+motivation+","+nutrition+","+fatigue+","+strength+","+agility+","+intelligence);
+        }
+    }
+    public Stats stats = new Stats();
     public HashMap<Actions, Cooldown> cooldown = new HashMap<>();
     public int controlId;
     public boolean traveler = false;
@@ -69,7 +88,7 @@ public class Unit extends Prop {
         clip.load(p.get(7).get());
         faction = Faction.valueOf(p.get(10).get());
         Intelligence.load(this, p.get(11));
-        for (T i : p.get(8)) this.stats.put(i.get(0).get(), new Stat(i.get(1).get()));
+        this.stats.load(p.get(8));
         status.load(p.get(9));
         Actions.load(this,p.get(12));
         clip.setOrganHealth();
@@ -88,7 +107,7 @@ public class Unit extends Prop {
         return moveset.size()-1+traits.getMemorySize();
     }
     private boolean canLearn(){
-        return getMemorySize() < stats.get("Intelligence").getMax();
+        return getMemorySize() < stats.intelligence.getMax();
     }
     public boolean learnSkill(Actions move){
         if (!moveset.contains(move) && canLearn()){
@@ -146,7 +165,7 @@ public class Unit extends Prop {
         return r;
     }
     public float getSpeed(){
-        return stats.get("Speed").get()*clip.getLegStatus()*.01f;
+        return stats.speed*clip.getLegStatus()*.01f;
     }
     public void attackSound(){
         Sound.play(map, pos, "swing_normal");
@@ -189,7 +208,7 @@ public class Unit extends Prop {
         stateOnSet(state);
     }
     protected int getAttackSpeed(){
-        return stats.get("Attack").get();
+        return stats.attack;
     }
     public boolean face(int dir, boolean force) {
         if (force || (delay.over() && grounded && this.dir != dir)) {
@@ -204,7 +223,7 @@ public class Unit extends Prop {
 
     @Override
     public int getDamage(){
-        return (int) (stats.get("Strength").get()*damageMod);
+        return (int) (stats.strength.get()*damageMod);
     }
 
     protected boolean damageBreakthrough(int organ, boolean blunt, int damage){
@@ -253,7 +272,7 @@ public class Unit extends Prop {
                         clip.organs[i].hit(hitBox);
                     }
                     if (damageBreakthrough(i, blunt, damage) || status.triggerEffect(Buffs.Mark)) {
-                        if (stats.get("Agility").require(1)) {
+                        if (stats.agility.require(1)) {
                             Particle.explode(map, "Blood", getDepth()+.01f, getRandomPoint(), new P(), 9, 5, 0, true, 24);
                             if (!blunt){
                                 buff(Buffs.Bleed, 1);
@@ -305,7 +324,7 @@ public class Unit extends Prop {
                 if (vel.y >= Settings.gravityMax) {
                     if (hittable(Faction.Destructive)) {
                         setState(Actions.Down);
-                        delay.time = (int) (160f / stats.get("Agility").getMax());
+                        delay.time = (int) (160f / stats.agility.getMax());
                     }
                 } else if (state == Actions.Jump && stateDuration > 1) {
                     Sound.play(map, pos, "land");

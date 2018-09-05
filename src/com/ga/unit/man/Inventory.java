@@ -20,7 +20,7 @@ public class Inventory {
         for (Item item : items) r.append(T.wrap(item.toString())).append(",");
         return T.wrap(r.substring(0,r.length()-1));
     }
-    boolean addItem(Item p){
+    public boolean addItem(Item p){
         if (vacant()) {
             items.add(p);
             return true;

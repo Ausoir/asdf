@@ -61,9 +61,8 @@ public class Map {
     }
 
     public void load(String dir) {
-        String data = FileManager.read(FileManager.makeDirectory("Data/map/" + dir + ".map"));
-        String[] line = data.split("%");
-        T s = new T(line[0]);
+        T data = FileManager.readLiterals(FileManager.makeDirectory("Data/map/" + dir + ".map"));
+        T s = data.get(0);
         callname = s.get(0).get();
         panoramaName = s.get(1).get();
         this.size = new P(s.get(2));
@@ -101,13 +100,11 @@ public class Map {
             });
         }
         this.temperature = s.get(3, new T("0")).getInt();
-        if (line.length > 1) {
-            s = new T(line[1]);
-            for (T i : s) {
-                formTextures.put(i.get(0).getInt(), i.get(1).get());
-            }
-            if (line.length > 2) {
-                s = new T(line[2]);
+        if (data.size() > 1) {
+            s = data.get(1);
+            for (T i : s) formTextures.put(i.get(0).getInt(), i.get(1).get());
+            if (data.size() > 2) {
+                s = data.get(2);
                 for (T i : s) {
                     Line surface = new Line(i);
                     landRaw.add(surface);
@@ -115,8 +112,8 @@ public class Map {
                     surface.depth = Float.parseFloat(formTextures.get(surface.tid).split(",")[0]) * .1f + 3;
                     if (surface.landable()) land.add(surface);
                 }
-                if (line.length > 3) {
-                    s = new T(line[3]);
+                if (data.size() > 3) {
+                    s = data.get(3);
                     for (T i : s) Stock.get(this, i.get()).start();
                 }
             }

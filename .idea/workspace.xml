@@ -2,353 +2,39 @@
 <project version="4">
   <component name="BookmarkManager">
     <bookmark url="file://$PROJECT_DIR$/src/com/ga/unit/Intelligence.java" description="AI r = values()[s.get(0).get(0).getInt()].make(hos..." line="368" />
-    <bookmark url="file://$PROJECT_DIR$/src/com/ga/unit/Unit.java" description="faction = Faction.valueOf(p.get(9).get());" line="69" />
+    <bookmark url="file://$PROJECT_DIR$/src/com/ga/unit/Unit.java" description="faction = Faction.valueOf(p.get(9).get());" line="88" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="79d7eda2-caee-46bf-a9ab-c399133bfcef" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Data/item/armor/Quiver.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Data/map/building/Cabin.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Data/map/building/Tree2.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Data/map/building/Tree3.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Data/map/building/Tree4.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Data/map/building/inside/Cabin_0.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Data/object/Firewood.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Data/raw/Book.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/com/ga/tool/H.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/com/ga/tool/Standalone_BiomeTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/com/ga/tool/T.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/com/ga/unit/skill/Status.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/Editor_Keymap.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Data/Editor_Keymap.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/item/Frying_Pan.png" beforeDir="false" afterPath="$PROJECT_DIR$/Data/item/weapon/Frying_Pan.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/item/Fuel.png" beforeDir="false" afterPath="$PROJECT_DIR$/Data/item/Fuel.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/item/food/Porkchop.png" beforeDir="false" afterPath="$PROJECT_DIR$/Data/item/food/Steak.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Data/map/Player.user" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/Player.user" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/Template.user" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/Template.user" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Data/map/World.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/World.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/Armory.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/Armory.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/Bighouse1.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/Bighouse1.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/Bighouse2.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/Bighouse2.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/Cave.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/Cave.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/Clothier.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/Clothier.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/Guild.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/Guild.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/Hideout.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/Hideout.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/House1.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/House1.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/House2.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/House2.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/House3.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/House3.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/House4.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/House4.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/Inn.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/Inn.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/Laboratory.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/Laboratory.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/Mansion.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/Mansion.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/Mound.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/Mound.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/Pawnshop.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/Pawnshop.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/Restaurant.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/Restaurant.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/Rock1.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/Rock1.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/Safehouse.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/Safehouse.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/School.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/School.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/Scrapyard.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/Scrapyard.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/Sewer.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/Sewer.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/Shop.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/Shop.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/Tree1.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/Tree1.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/inside/Armory_0.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/inside/Armory_0.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/inside/Bighouse1_0.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/inside/Bighouse1_0.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/inside/Bighouse2_0.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/inside/Bighouse2_0.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/inside/Cave_0.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/inside/Cave_0.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/inside/Clothier_0.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/inside/Clothier_0.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/inside/Guild_0.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/inside/Guild_0.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/inside/Hideout_0.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/inside/Hideout_0.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/inside/Hideout_1.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/inside/Hideout_1.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/inside/House1_0.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/inside/House1_0.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/inside/House2_0.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/inside/House2_0.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/inside/House3_0.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/inside/House3_0.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/inside/House4_0.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/inside/House4_0.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/inside/House4_1.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/inside/House4_1.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/inside/Inn_0.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/inside/Inn_0.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/inside/Laboratory_0.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/inside/Laboratory_0.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/inside/Mound_0.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/inside/Mound_0.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/inside/Mound_1.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/inside/Mound_1.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/inside/Mound_2.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/inside/Mound_2.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/inside/Mound_3.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/inside/Mound_3.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/inside/Pawnshop_0.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/inside/Pawnshop_0.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/inside/Restaurant_0.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/inside/Restaurant_0.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/inside/Safehouse_0.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/inside/Safehouse_0.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/inside/School_0.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/inside/School_0.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/inside/Sewer_0.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/inside/Sewer_0.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/inside/Shop_0.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/inside/Shop_0.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_-1_10_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_-1_11_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_-1_12_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_-1_13_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_-1_14_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_-2_10_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_-3_10_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_-4_10_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_-4_11_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_-5_10_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_0_10_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_10_10_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_10_11_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_10_12_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_10_13_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_10_14_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_10_15_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_10_16_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_10_17_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_10_18_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_10_20_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_11_10_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_11_11_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_11_12_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_11_13_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_12_10_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_12_11_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_12_12_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_12_13_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_12_14_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_12_15_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_12_16_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_12_16_1.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_13_10_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_13_11_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_13_12_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_13_13_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_13_14_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_13_15_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_13_16_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_13_17_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_13_18_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_13_19_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_13_20_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_13_21_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_13_22_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_10_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_10_1.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_10_2.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_10_3.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_11_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_11_1.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_11_2.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_11_3.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_12_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_12_1.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_12_2.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_12_3.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_13_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_13_1.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_13_2.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_13_3.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_14_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_14_1.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_14_2.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_14_3.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_15_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_15_1.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_15_2.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_15_3.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_16_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_16_1.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_16_2.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_16_3.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_17_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_17_1.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_17_2.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_17_3.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_18_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_18_1.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_18_2.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_18_3.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_19_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_19_1.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_19_2.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_19_3.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_20_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_20_1.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_20_2.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_20_3.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_21_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_21_1.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_21_2.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_21_3.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_22_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_22_1.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_22_2.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_22_3.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_23_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_23_1.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_23_2.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_23_3.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_24_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_24_1.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_24_2.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_24_3.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_25_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_25_1.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_25_2.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_25_3.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_26_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_26_1.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_26_2.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_26_3.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_27_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_27_1.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_27_2.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_27_3.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_28_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_28_1.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_28_2.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_28_3.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_29_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_29_1.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_29_2.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_29_3.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_30_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_30_1.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_30_2.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_30_3.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_31_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_31_1.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_31_2.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_31_3.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_32_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_32_1.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_32_2.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_32_3.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_33_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_33_1.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_33_2.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_33_3.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_34_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_34_1.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_34_2.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_34_3.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_35_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_35_1.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_35_2.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_35_3.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_36_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_36_1.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_36_2.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_36_3.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_37_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_37_1.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_37_2.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_37_3.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_38_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_38_1.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_38_2.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_38_3.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_20_10_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_20_11_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_20_13_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_20_14_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_20_15_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_20_16_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_7_10_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_8_10_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_8_11_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_8_12_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_8_12_1.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_8_13_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_8_14_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_8_15_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_8_16_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_8_17_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_9_10_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_9_11_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_9_12_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_9_14_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_9_15_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_9_16_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_9_17_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_9_18_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_9_18_1.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_9_20_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_9_20_1.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/_-1.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/_-2.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/_-3.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/_-4.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/_-5.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/_0.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/_1.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/_10.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/_11.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/_12.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/_13.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/_20.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/_7.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/_8.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/ins/_9.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/raw/Armor.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Data/raw/Armor.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/raw/Beast.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Data/raw/Beast.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/raw/Etc.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Data/raw/Etc.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/raw/Food.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Data/raw/Food.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_12_0.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/ins/B_1_12_0.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_14_0.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/ins/B_1_14_0.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_15_0.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/ins/B_1_15_0.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Data/map/ins/_1.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/ins/_1.map" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Data/raw/Loot.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Data/raw/Loot.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/raw/Man.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Data/raw/Man.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/raw/Mob.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Data/raw/Mob.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/raw/Object.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Data/raw/Object.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/raw/Pawn.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Data/raw/Pawn.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/raw/Reaction.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Data/raw/Reaction.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/raw/Recipe.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Data/raw/Recipe.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/raw/Shop.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Data/raw/Shop.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/raw/Weapon.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Data/raw/Weapon.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/unit/Crawler.2d" beforeDir="false" afterPath="$PROJECT_DIR$/Data/unit/Crawler.2d" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/unit/Dog.2d" beforeDir="false" afterPath="$PROJECT_DIR$/Data/unit/Dog.2d" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/game/Command.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/game/Command.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/game/FileManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/game/FileManager.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/game/Settings.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/game/Settings.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/map/Global.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/map/Global.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/map/Map$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/map/Map$1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/map/Map.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/map/Map.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/tool/Line.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/tool/Line.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/tool/P.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/tool/P.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Organ.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Organ.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Thing.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Thing.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Unit.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Unit.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/skill/Stat.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/skill/Stat.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/connection/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/connection/Server.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ga/game/Command.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/game/Command.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/game/Dialog.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/game/Dialog.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ga/game/FileManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/game/FileManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ga/game/MenuPlayer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/game/MenuPlayer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/game/Settings.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/game/Settings.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/map/EditorInput.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/map/EditorInput.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/map/GenerateBiome.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/map/GenerateBiome.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/map/GenerateForest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/map/GenerateForest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/map/GeneratePlains.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/map/GeneratePlains.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/map/GenerateTown.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/map/GenerateTown.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/map/Generator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/map/Generator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/map/Global.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/map/Global.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ga/map/Map.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/map/Map.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/map/Mob.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/map/Mob.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/map/Terrain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/map/Terrain.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/map/TerrainTrail.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/map/TerrainTrail.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ga/map/Updater.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/map/Updater.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/tool/L.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/tool/L.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/tool/Line.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/tool/Line.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/tool/P.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/tool/P.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/ga/tool/T.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/tool/T.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ga/tool/Test.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/tool/Test.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ga/unit/AI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/AI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/unit/Behavior.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/Behavior.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ga/unit/Body.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/Body.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/unit/Cooldown.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/Cooldown.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ga/unit/Intelligence.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/Intelligence.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/unit/Organ.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/Organ.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/unit/Prop.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/Prop.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/unit/Speech.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/Speech.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ga/unit/Stock.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/Stock.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/unit/Tag.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/Tag.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/unit/Tags.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/Tags.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/unit/Thing.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/Thing.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/unit/Traits.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/Traits.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/ga/unit/Strategy.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/Strategy.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ga/unit/Unit.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/Unit.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/unit/item/Armor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/item/Armor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/unit/item/ArmorSet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/item/ArmorSet.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ga/unit/item/Crafts.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/item/Crafts.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ga/unit/item/Food.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/item/Food.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ga/unit/item/Item.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/item/Item.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/unit/item/Weapon.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/item/Weapon.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ga/unit/man/Inventory.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/man/Inventory.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ga/unit/man/MainPlayer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/man/MainPlayer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ga/unit/man/Man.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/man/Man.java" afterDir="false" />
@@ -356,8 +42,6 @@
       <change beforePath="$PROJECT_DIR$/src/com/ga/unit/skill/Actions.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/skill/Actions.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ga/unit/skill/Buffs.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/skill/Buffs.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ga/unit/skill/Stat.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/skill/Stat.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/unit/skill/Stats.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/todo" beforeDir="false" afterPath="$PROJECT_DIR$/todo" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -372,24 +56,45 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Generator.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/ga/map/Generator.java">
+      <file leaf-file-name="Stock.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Stock.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-283">
-              <caret line="79" column="12" selection-start-line="79" selection-start-column="12" selection-end-line="79" selection-end-column="12" />
+            <state relative-caret-position="200">
+              <caret line="363" column="13" lean-forward="true" selection-start-line="363" selection-start-column="13" selection-end-line="363" selection-end-column="13" />
+              <folding>
+                <element signature="docComment;class#Stock#0" />
+                <element signature="e#1131#1132#0" expanded="true" />
+                <element signature="e#1199#1200#0" expanded="true" />
+                <element signature="e#1928#1929#0" expanded="true" />
+                <element signature="e#1996#1997#0" expanded="true" />
+                <element signature="class#2461:3968" />
+                <element signature="method#make#0;class#2461:3968" />
+                <element signature="class#2664:3504" />
+                <element signature="method#onField#0;class#2664:3504" />
+                <element signature="class#3161:3470" />
+                <element signature="class#3979:4532" />
+                <element signature="method#make#0;class#3979:4532" />
+                <element signature="class#4116:4361" />
+                <element signature="method#onCreate#0;class#4116:4361" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Food.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/com/ga/unit/item/Food.java">
+      <file leaf-file-name="Player.user" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Data/map/Player.user">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
-              <caret line="28" column="5" lean-forward="true" selection-start-line="28" selection-start-column="5" selection-end-line="28" selection-end-column="5" />
-              <folding>
-                <element signature="e#721#722#0" expanded="true" />
-                <element signature="e#818#819#0" expanded="true" />
-              </folding>
+            <state>
+              <caret column="106" selection-start-column="106" selection-end-column="106" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Unit.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Unit.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="175">
+              <caret line="35" column="22" selection-start-line="35" selection-start-column="22" selection-end-line="35" selection-end-column="22" />
             </state>
           </provider>
         </entry>
@@ -405,36 +110,36 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>#&quot;</find>
-      <find>get(</find>
-      <find>get(</find>
-      <find>t get(</find>
-      <find>t get</find>
-      <find>Stat get</find>
-      <find>get(&quot;</find>
-      <find>load(</find>
-      <find>.get(&quot;</find>
-      <find>Rest</find>
-      <find>.get(</find>
-      <find>Man{</find>
-      <find>Item</find>
-      <find>tostr</find>
-      <find>&quot;[&quot;</find>
-      <find>&quot;@&quot;</find>
-      <find>1@0</find>
-      <find>@</find>
-      <find>hit(</find>
-      <find>Lack of</find>
-      <find>Crawler</find>
-      <find>data</find>
-      <find>Craftin</find>
-      <find>crafting</find>
       <find>Weapon{</find>
       <find>imbueMat</find>
       <find>,</find>
       <find>request</find>
       <find>requ</find>
       <find>requestCh</find>
+      <find>Container</find>
+      <find>:</find>
+      <find>Crate:</find>
+      <find>Crate</find>
+      <find>toString</find>
+      <find>void load(String</find>
+      <find>memory</find>
+      <find>Arch</find>
+      <find>Craw</find>
+      <find>Unitfa</find>
+      <find>addInventory</find>
+      <find>Man{</find>
+      <find>&quot;Stre</find>
+      <find>getspee</find>
+      <find>Strn</find>
+      <find>get(&quot;Strength&quot;)</find>
+      <find>agil</find>
+      <find>mainStats</find>
+      <find>decayStat</find>
+      <find>statNames</find>
+      <find>statNam</find>
+      <find>get(&quot;Motivation&quot;)</find>
+      <find>.get(&quot;Attack&quot;)</find>
+      <find>speed.add</find>
     </findStrings>
     <replaceStrings>
       <replace>Icepath</replace>
@@ -451,6 +156,7 @@
       <replace>Affinity</replace>
       <replace>Steak</replace>
       <replace>Road_Unpaved</replace>
+      <replace>.attack</replace>
     </replaceStrings>
     <dirStrings>
       <dir>C:\Users\kizen\IdeaProjects\asdf\Data\map\building</dir>
@@ -462,57 +168,57 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/Data/map/ins/B_1_10_0.map" />
-        <option value="$PROJECT_DIR$/Data/map/building/Armory.map" />
-        <option value="$PROJECT_DIR$/src/com/ga/map/Terrain.java" />
-        <option value="$PROJECT_DIR$/Data/map/building/Sewer.map" />
-        <option value="$PROJECT_DIR$/Data/map/building/inside/Bighouse2_0.map" />
         <option value="$PROJECT_DIR$/Data/map/building/inside/Sewer_0.map" />
-        <option value="$PROJECT_DIR$/src/com/ga/tool/Test.java" />
         <option value="$PROJECT_DIR$/src/com/ga/map/GeneratePlains.java" />
         <option value="$PROJECT_DIR$/src/com/ga/map/GenerateForest.java" />
         <option value="$PROJECT_DIR$/src/com/ga/map/TerrainTrail.java" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/Behavior.java" />
-        <option value="$PROJECT_DIR$/src/com/ga/unit/AI.java" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/skill/Stats.java" />
-        <option value="$PROJECT_DIR$/src/com/ga/unit/skill/Stat.java" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/skill/Status.java" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/Traits.java" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/Cooldown.java" />
-        <option value="$PROJECT_DIR$/src/com/ga/unit/Intelligence.java" />
-        <option value="$PROJECT_DIR$/src/com/ga/unit/skill/Actions.java" />
-        <option value="$PROJECT_DIR$/src/com/ga/game/MenuPlayer.java" />
-        <option value="$PROJECT_DIR$/src/com/ga/game/Command.java" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/man/Player.java" />
         <option value="$PROJECT_DIR$/src/com/ga/map/Generator.java" />
-        <option value="$PROJECT_DIR$/src/com/ga/tool/T.java" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/item/ArmorSet.java" />
-        <option value="$PROJECT_DIR$/src/com/ga/map/Updater.java" />
-        <option value="$PROJECT_DIR$/src/com/ga/unit/man/Inventory.java" />
         <option value="$PROJECT_DIR$/src/com/ga/tool/P.java" />
-        <option value="$PROJECT_DIR$/src/com/ga/map/Map.java" />
         <option value="$PROJECT_DIR$/src/com/ga/tool/Line.java" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/Prop.java" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/item/Weapon.java" />
-        <option value="$PROJECT_DIR$/src/com/ga/unit/item/Item.java" />
         <option value="$PROJECT_DIR$/Data/map/ins/_1.map" />
-        <option value="$PROJECT_DIR$/src/com/ga/unit/Unit.java" />
-        <option value="$PROJECT_DIR$/Data/map/Player.user" />
         <option value="$PROJECT_DIR$/Data/map/Template.user" />
-        <option value="$PROJECT_DIR$/src/com/ga/unit/man/Man.java" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/Tag.java" />
-        <option value="$PROJECT_DIR$/src/com/ga/unit/item/Crafts.java" />
         <option value="$PROJECT_DIR$/Data/raw/Recipe.txt" />
         <option value="$PROJECT_DIR$/Data/raw/Weapon.txt" />
         <option value="$PROJECT_DIR$/Data/raw/Etc.txt" />
         <option value="$PROJECT_DIR$/Data/raw/Food.txt" />
         <option value="$PROJECT_DIR$/src/com/ga/map/GenerateTown.java" />
         <option value="$PROJECT_DIR$/src/com/ga/map/EditorInput.java" />
-        <option value="$PROJECT_DIR$/src/com/ga/unit/Stock.java" />
-        <option value="$PROJECT_DIR$/src/com/ga/unit/man/MainPlayer.java" />
-        <option value="$PROJECT_DIR$/src/com/ga/unit/skill/Buffs.java" />
         <option value="$PROJECT_DIR$/src/com/ga/connection/Server.java" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/item/Food.java" />
+        <option value="$PROJECT_DIR$/Data/raw/Loot.txt" />
+        <option value="$PROJECT_DIR$/src/com/ga/tool/Test.java" />
+        <option value="$PROJECT_DIR$/src/com/ga/game/FileManager.java" />
+        <option value="$PROJECT_DIR$/src/com/ga/map/Map.java" />
+        <option value="$PROJECT_DIR$/Data/map/ins/B_1_15_0.map" />
+        <option value="$PROJECT_DIR$/src/com/ga/unit/AI.java" />
+        <option value="$PROJECT_DIR$/src/com/ga/unit/Intelligence.java" />
+        <option value="$PROJECT_DIR$/src/com/ga/unit/skill/Actions.java" />
+        <option value="$PROJECT_DIR$/src/com/ga/unit/Strategy.java" />
+        <option value="$PROJECT_DIR$/Data/map/Actors.map" />
+        <option value="$PROJECT_DIR$/src/com/ga/unit/man/Inventory.java" />
+        <option value="$PROJECT_DIR$/src/com/ga/tool/T.java" />
+        <option value="$PROJECT_DIR$/src/com/ga/unit/Stock.java" />
+        <option value="$PROJECT_DIR$/src/com/ga/unit/skill/Stat.java" />
+        <option value="$PROJECT_DIR$/src/com/ga/unit/man/MainPlayer.java" />
+        <option value="$PROJECT_DIR$/src/com/ga/game/MenuPlayer.java" />
+        <option value="$PROJECT_DIR$/src/com/ga/unit/item/Item.java" />
+        <option value="$PROJECT_DIR$/src/com/ga/unit/item/Crafts.java" />
+        <option value="$PROJECT_DIR$/src/com/ga/unit/skill/Buffs.java" />
+        <option value="$PROJECT_DIR$/src/com/ga/game/Command.java" />
+        <option value="$PROJECT_DIR$/src/com/ga/map/Updater.java" />
+        <option value="$PROJECT_DIR$/src/com/ga/unit/man/Man.java" />
+        <option value="$PROJECT_DIR$/Data/map/Player.user" />
+        <option value="$PROJECT_DIR$/src/com/ga/unit/Unit.java" />
       </list>
     </option>
   </component>
@@ -561,10 +267,10 @@
   </component>
   <component name="PropertiesComponent">
     <property name="SearchEverywhereHistoryKey" value="Crawler&#9;PSI&#9;JAVA://com.ga.unit.Stock#Crawler&#10;Jump&#9;PSI&#9;JAVA://com.ga.unit.skill.Actions#Jump&#10;acto&#9;FILE&#9;file://C:/Users/kizen/IdeaProjects/asdf/Data/map/Actors.map&#10;armo&#9;FILE&#9;file://C:/Users/kizen/IdeaProjects/asdf/Data/raw/Armor.txt&#10;inte&#9;FILE&#9;file://C:/Users/kizen/IdeaProjects/asdf/src/com/ga/unit/Intelligence.java" />
-    <property name="project.structure.last.edited" value="Project" />
+    <property name="project.structure.last.edited" value="Global Libraries" />
     <property name="project.structure.proportion" value="0.0" />
-    <property name="project.structure.side.proportion" value="0.0" />
-    <property name="settings.editor.selected.configurable" value="preferences.keymap" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="settings.editor.selected.configurable" value="preferences.fileTypes" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -666,12 +372,12 @@
     <layout>
       <window_info anchor="right" id="Palette" order="3" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32965517" />
-      <window_info anchor="bottom" id="Messages" order="9" weight="0.2262069" />
+      <window_info anchor="bottom" id="Messages" order="9" sideWeight="0.49804688" weight="0.2262069" />
       <window_info anchor="right" id="Palette&#9;" order="6" />
       <window_info id="Image Layers" order="6" />
       <window_info anchor="right" id="Capture Analysis" order="4" />
-      <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.20689656" />
+      <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.5032552" side_tool="true" weight="0.2924138" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49674478" visible="true" weight="0.20689656" />
       <window_info anchor="bottom" id="Version Control" order="8" weight="0.25931033" />
       <window_info id="Capture Tool" order="3" />
       <window_info id="Designer" order="2" />
@@ -681,7 +387,7 @@
       <window_info id="Structure" order="1" sideWeight="0.5006896" side_tool="true" weight="0.13541667" />
       <window_info id="UI Designer" order="4" />
       <window_info anchor="right" id="Theme Preview" order="5" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.2924138" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49674478" weight="0.2924138" />
       <window_info id="Favorites" order="5" sideWeight="0.5008696" side_tool="true" weight="0.13541667" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -717,21 +423,28 @@
     <MESSAGE value="spawner, Level up system" />
     <MESSAGE value="spawner, Level up system, staged dungeon mapgen" />
     <MESSAGE value="Revival system, adjust items, firearms" />
-    <option name="LAST_COMMIT_MESSAGE" value="Revival system, adjust items, firearms" />
+    <MESSAGE value="Unified flat file data system" />
+    <option name="LAST_COMMIT_MESSAGE" value="Unified flat file data system" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="390" />
+      <option name="time" value="403" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
-        <watch expression="p.get(0).get()" language="JAVA" />
+        <watch expression="items" language="JAVA" />
       </configuration>
     </watches-manager>
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="breakpointCondition">
+      <expression>
+        <expression-string>host != Global.player</expression-string>
+        <language-id>JAVA</language-id>
+        <custom-info>com.ga.map.Global</custom-info>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
       <expression>
         <expression-string>s.get(0).equals(&quot;&quot;)</expression-string>
         <language-id>JAVA</language-id>
@@ -780,47 +493,52 @@
     </expressions>
     <expressions id="watch">
       <expression>
-        <expression-string>p.get(0).get()</expression-string>
+        <expression-string>items</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>s.get()</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>t.get()</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>t.get(0).get()</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>data.get(5).size()</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>data.get(5).get()</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>data.get(4).get()</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>data.get()</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>s.get(2).get()</expression-string>
         <language-id>JAVA</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
         <expression-string>p.get()</expression-string>
-        <language-id>JAVA</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>p.get(0).get(0).get()</expression-string>
-        <language-id>JAVA</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>p.get(0).get(0)</expression-string>
-        <language-id>JAVA</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>new T(meta).get(2).get(0).get()</expression-string>
-        <language-id>JAVA</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>new T(meta).get(2).get()</expression-string>
-        <language-id>JAVA</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>new T(meta).get(2)</expression-string>
-        <language-id>JAVA</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>new T(meta).get()</expression-string>
-        <language-id>JAVA</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>p.get(9).get()</expression-string>
         <language-id>JAVA</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
@@ -834,93 +552,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://C:/Program Files/Java/jdk-10.0.1/lib/src.zip!/java.base/java/util/HashMap.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="183">
-          <caret line="554" column="13" selection-start-line="554" selection-start-column="13" selection-end-line="554" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Data/raw/Man.txt">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/game/FileManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="208">
-          <caret line="99" column="16" selection-start-line="99" selection-start-column="16" selection-end-line="99" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Behavior.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="430">
-          <caret line="185" column="48" selection-start-line="185" selection-start-column="48" selection-end-line="185" selection-end-column="48" />
-          <folding>
-            <element signature="e#6547#6548#0" expanded="true" />
-            <element signature="e#6600#6601#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/AI.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="490">
-          <caret line="129" column="53" lean-forward="true" selection-start-line="129" selection-start-column="53" selection-end-line="129" selection-end-column="53" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Data/map/Actors.map">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/tool/Performer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="6" column="16" selection-start-line="6" selection-start-column="16" selection-end-line="6" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/skill/Status.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="407">
-          <caret line="92" column="13" lean-forward="true" selection-start-line="92" selection-start-column="13" selection-end-line="92" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/skill/Stat.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="8" column="11" selection-start-line="8" selection-start-column="11" selection-end-line="8" selection-end-column="11" />
-          <folding>
-            <element signature="e#407#408#0" expanded="true" />
-            <element signature="e#441#442#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/tool/H.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="12" column="18" selection-start-line="12" selection-start-column="18" selection-end-line="12" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/skill/Status.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="15" column="5" selection-start-line="15" selection-start-column="5" selection-end-line="15" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Traits.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="258">
-          <caret line="198" column="21" selection-start-line="198" selection-start-column="21" selection-end-line="198" selection-end-column="21" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Cooldown.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="240">
@@ -932,13 +563,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/game/Command.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="35" column="30" selection-start-line="35" selection-start-column="30" selection-end-line="35" selection-end-column="30" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/ga/unit/man/Player.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="401">
@@ -946,83 +570,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/skill/Actions.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="348">
-          <caret line="2085" selection-start-line="2085" selection-end-line="2085" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Intelligence.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="377">
-          <caret line="370" column="23" lean-forward="true" selection-start-line="370" selection-start-column="23" selection-end-line="370" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/ga/tool/L.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
           <caret line="4" column="13" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/map/Updater.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1183">
-          <caret line="113" column="73" selection-start-line="113" selection-start-column="73" selection-end-line="113" selection-end-column="73" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/man/Inventory.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="19" column="33" lean-forward="true" selection-start-line="19" selection-start-column="33" selection-end-line="19" selection-end-column="33" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/item/ArmorSet.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="445">
-          <caret line="179" column="18" selection-start-line="179" selection-start-column="18" selection-end-line="179" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/tool/T.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="385">
-          <caret line="69" column="17" selection-start-line="69" selection-start-column="17" selection-end-line="69" selection-end-column="17" />
-          <folding>
-            <element signature="e#1414#1415#0" expanded="true" />
-            <element signature="e#1462#1463#0" expanded="true" />
-            <element signature="e#1980#1981#0" expanded="true" />
-            <element signature="e#2026#2027#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/tool/P.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="420">
-          <caret line="112" lean-forward="true" selection-start-line="112" selection-end-line="112" />
-          <folding>
-            <element signature="e#243#244#0" expanded="true" />
-            <element signature="e#266#267#0" expanded="true" />
-            <element signature="e#2439#2440#0" expanded="true" />
-            <element signature="e#2481#2482#0" expanded="true" />
-            <element signature="e#2508#2509#0" expanded="true" />
-            <element signature="e#2575#2576#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/map/Map.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="320">
-          <caret line="68" column="34" selection-start-line="68" selection-start-column="34" selection-end-line="68" selection-end-column="34" />
         </state>
       </provider>
     </entry>
@@ -1046,13 +597,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/item/Item.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2773">
-          <caret line="313" column="5" lean-forward="true" selection-start-line="313" selection-start-column="5" selection-end-line="313" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Data/map/ins/_1.map">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="45">
@@ -1060,31 +604,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Unit.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="448">
-          <caret line="262" column="29" lean-forward="true" selection-start-line="262" selection-start-column="29" selection-end-line="262" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Data/map/Template.user">
       <provider selected="true" editor-type-id="text-editor">
         <state>
           <caret column="251" lean-forward="true" selection-start-column="251" selection-end-column="251" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Data/map/Player.user">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="251" selection-start-column="251" selection-end-column="251" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/man/Man.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="178">
-          <caret line="46" column="33" lean-forward="true" selection-start-line="46" selection-start-column="33" selection-end-line="46" selection-end-column="33" />
         </state>
       </provider>
     </entry>
@@ -1098,28 +621,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/item/Crafts.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="20" selection-start-line="20" selection-end-line="20" />
-          <folding>
-            <element signature="e#7113#7114#0" expanded="true" />
-            <element signature="e#7169#7170#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Data/raw/Recipe.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
           <caret line="8" column="29" selection-start-line="8" selection-start-column="29" selection-end-line="8" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/game/MenuPlayer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="328">
-          <caret line="752" column="57" lean-forward="true" selection-start-line="752" selection-start-column="57" selection-end-line="752" selection-end-column="57" />
         </state>
       </provider>
     </entry>
@@ -1134,24 +639,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Prop.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="326">
-          <caret line="43" column="16" selection-start-line="43" selection-start-column="16" selection-end-line="43" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Data/raw/Weapon.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="375">
           <caret line="25" selection-start-line="25" selection-end-line="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Data/raw/Etc.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="345">
-          <caret line="23" column="28" lean-forward="true" selection-start-line="23" selection-start-column="28" selection-end-line="23" selection-end-column="28" />
         </state>
       </provider>
     </entry>
@@ -1169,9 +660,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Data/sound/stun.wav">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/ga/map/EditorInput.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="208">
@@ -1179,68 +667,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Stock.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="375">
-          <caret line="1432" column="71" selection-start-line="1432" selection-start-column="71" selection-end-line="1432" selection-end-column="71" />
-          <folding>
-            <element signature="docComment;class#Stock#0" />
-            <element signature="e#1131#1132#0" expanded="true" />
-            <element signature="e#1199#1200#0" expanded="true" />
-            <element signature="e#1435#1629#0" expanded="true" />
-            <element signature="e#1628#1629#0" expanded="true" />
-            <element signature="e#1928#1929#0" expanded="true" />
-            <element signature="e#1996#1997#0" expanded="true" />
-            <element signature="e#2234#2417#0" expanded="true" />
-            <element signature="e#2416#2417#0" expanded="true" />
-            <element signature="class#2461:3968" />
-            <element signature="method#make#0;class#2461:3968" />
-            <element signature="class#2664:3504" />
-            <element signature="method#onField#0;class#2664:3504" />
-            <element signature="class#3161:3470" />
-            <element signature="class#3979:4532" />
-            <element signature="method#make#0;class#3979:4532" />
-            <element signature="class#4116:4361" />
-            <element signature="method#onCreate#0;class#4116:4361" />
-            <element signature="class#4541:5602" />
-            <element signature="method#make#0;class#4541:5602" />
-            <element signature="class#4689:5295" />
-            <element signature="method#onCreate#0;class#4689:5295" />
-            <element signature="class#UnitFactory#0" />
-            <element signature="method#UnitFactory#0;class#UnitFactory#0" />
-            <element signature="method#setEquipment#0;class#UnitFactory#0" />
-            <element signature="method#addInventory#0;class#UnitFactory#0" />
-            <element signature="method#getItem#0;class#UnitFactory#0" />
-            <element signature="method#setMoveset#0;class#UnitFactory#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/man/MainPlayer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="257">
-          <caret line="127" column="65" selection-start-line="127" selection-start-column="65" selection-end-line="127" selection-end-column="65" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/skill/Buffs.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="693" column="130" selection-start-line="693" selection-start-column="130" selection-end-line="693" selection-end-column="130" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/ga/connection/Server.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
           <caret line="294" column="99" selection-start-line="294" selection-start-column="99" selection-end-line="294" selection-end-column="99" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/map/Generator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-283">
-          <caret line="79" column="12" selection-start-line="79" selection-start-column="12" selection-end-line="79" selection-end-column="12" />
         </state>
       </provider>
     </entry>
@@ -1252,6 +682,613 @@
             <element signature="e#721#722#0" expanded="true" />
             <element signature="e#818#819#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Data/sound/stun.wav">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Data/map/ins/B_1_10_0.map">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="172" lean-forward="true" selection-start-line="3" selection-start-column="172" selection-end-line="3" selection-end-column="172" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Data/raw/Loot.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" lean-forward="true" selection-start-line="1" selection-end-line="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Prop.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="340">
+          <caret line="130" selection-start-line="130" selection-end-line="130" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/tool/Test.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="10" selection-start-line="10" selection-end-line="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Data/map/building/Armory.map">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" selection-start-line="1" selection-end-line="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/map/Generator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="190">
+          <caret line="31" column="13" lean-forward="true" selection-start-line="31" selection-start-column="13" selection-end-line="31" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/game/FileManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="205">
+          <caret line="201" column="20" selection-start-line="201" selection-start-column="20" selection-end-line="201" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Data/map/ins/B_1_15_0.map">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="580" selection-start-line="3" selection-start-column="580" selection-end-line="3" selection-end-column="580" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Data/raw/Etc.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="345">
+          <caret line="23" column="28" lean-forward="true" selection-start-line="23" selection-start-column="28" selection-end-line="23" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/tool/P.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="14" selection-start-line="14" selection-end-line="14" />
+          <folding>
+            <element signature="e#268#269#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/map/Map.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="302">
+          <caret line="69" column="53" lean-forward="true" selection-start-line="69" selection-start-column="53" selection-end-line="69" selection-end-column="53" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/AI.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="156">
+          <caret line="117" column="16" selection-start-line="117" selection-start-column="16" selection-end-line="117" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Strategy.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="42" column="68" selection-start-line="42" selection-start-column="68" selection-end-line="42" selection-end-column="68" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Data/map/Actors.map">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/item/Armor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="175">
+          <caret line="47" selection-start-line="47" selection-end-line="47" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/man/Inventory.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="26" column="9" lean-forward="true" selection-start-line="26" selection-start-column="9" selection-end-line="26" selection-end-column="9" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Data/raw/Man.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="300">
+          <caret line="20" column="129" selection-start-line="20" selection-start-column="129" selection-end-line="20" selection-end-column="129" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/tool/T.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="44" selection-start-line="44" selection-end-line="44" />
+          <folding>
+            <element signature="e#192#193#0" expanded="true" />
+            <element signature="e#243#244#0" expanded="true" />
+            <element signature="e#1285#1286#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/item/ArmorSet.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="445">
+          <caret line="62" selection-start-line="62" selection-end-line="62" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/man/MainPlayer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="453">
+          <caret line="98" column="54" selection-start-line="98" selection-start-column="54" selection-end-line="98" selection-end-column="54" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/game/MenuPlayer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="279">
+          <caret line="192" column="74" lean-forward="true" selection-start-line="192" selection-start-column="74" selection-end-line="192" selection-end-column="74" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/item/Item.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="171">
+          <caret line="471" column="31" selection-start-line="471" selection-start-column="31" selection-end-line="471" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/skill/Buffs.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="261">
+          <caret line="535" column="13" lean-forward="true" selection-start-line="535" selection-start-column="13" selection-end-line="535" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Stock.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="200">
+          <caret line="363" column="13" lean-forward="true" selection-start-line="363" selection-start-column="13" selection-end-line="363" selection-end-column="13" />
+          <folding>
+            <element signature="docComment;class#Stock#0" />
+            <element signature="e#1131#1132#0" expanded="true" />
+            <element signature="e#1199#1200#0" expanded="true" />
+            <element signature="e#1928#1929#0" expanded="true" />
+            <element signature="e#1996#1997#0" expanded="true" />
+            <element signature="class#2461:3968" />
+            <element signature="method#make#0;class#2461:3968" />
+            <element signature="class#2664:3504" />
+            <element signature="method#onField#0;class#2664:3504" />
+            <element signature="class#3161:3470" />
+            <element signature="class#3979:4532" />
+            <element signature="method#make#0;class#3979:4532" />
+            <element signature="class#4116:4361" />
+            <element signature="method#onCreate#0;class#4116:4361" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/item/Crafts.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="345">
+          <caret line="163" column="5" lean-forward="true" selection-start-line="163" selection-start-column="5" selection-end-line="163" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/game/Command.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="44" selection-start-line="44" selection-end-line="44" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Intelligence.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="219" column="77" selection-start-line="219" selection-start-column="77" selection-end-line="219" selection-end-column="77" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/skill/Actions.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="28" column="60" lean-forward="true" selection-start-line="28" selection-start-column="60" selection-end-line="28" selection-end-column="60" />
+          <folding>
+            <element signature="docComment;class#Actions#0" />
+            <element signature="method#isDynamicAnimation#0;class#626:1249" />
+            <element signature="method#canSet#0;class#626:1249" />
+            <element signature="class#1256:1963" />
+            <element signature="method#isDynamicAnimation#0;class#1256:1963" />
+            <element signature="method#canSet#0;class#1256:1963" />
+            <element signature="method#onSet#1;class#1256:1963" />
+            <element signature="class#1971:2677" />
+            <element signature="method#isDynamicAnimation#0;class#1971:2677" />
+            <element signature="method#canSet#0;class#1971:2677" />
+            <element signature="method#onSet#1;class#1971:2677" />
+            <element signature="class#2687:3058" />
+            <element signature="method#onSet#0;class#2687:3058" />
+            <element signature="class#3067:3584" />
+            <element signature="method#isDynamicAnimation#0;class#3067:3584" />
+            <element signature="method#canSet#0;class#3067:3584" />
+            <element signature="method#onFinish#0;class#3067:3584" />
+            <element signature="class#3594:4131" />
+            <element signature="method#isDynamicAnimation#0;class#3594:4131" />
+            <element signature="method#canSet#0;class#3594:4131" />
+            <element signature="method#onSet#0;class#3594:4131" />
+            <element signature="method#onFinish#0;class#3594:4131" />
+            <element signature="class#4142:4690" />
+            <element signature="method#isDynamicAnimation#0;class#4142:4690" />
+            <element signature="method#canSet#0;class#4142:4690" />
+            <element signature="method#onFinish#0;class#4142:4690" />
+            <element signature="class#4701:6277" />
+            <element signature="method#onSet#0;class#4701:6277" />
+            <element signature="method#onFinish#0;class#4701:6277" />
+            <element signature="class#6291:6525" />
+            <element signature="method#onSet#0;class#6291:6525" />
+            <element signature="class#6530:7336" />
+            <element signature="method#canSet#0;class#6530:7336" />
+            <element signature="method#onSet#0;class#6530:7336" />
+            <element signature="class#7359:7440" />
+            <element signature="class#7453:8070" />
+            <element signature="method#onSet#0;class#7453:8070" />
+            <element signature="class#8120:8163" />
+            <element signature="initializer##0;class#8120:8163" />
+            <element signature="class#8164:9303" />
+            <element signature="method#isDynamicAnimation#0;class#8164:9303" />
+            <element signature="method#onSet#0;class#8164:9303" />
+            <element signature="method#update#0;class#8164:9303" />
+            <element signature="method#checkEnemy#0;class#8164:9303" />
+            <element signature="class#9328:9371" />
+            <element signature="initializer##0;class#9328:9371" />
+            <element signature="class#9372:10165" />
+            <element signature="method#onSet#0;class#9372:10165" />
+            <element signature="method#update#0;class#9372:10165" />
+            <element signature="method#specialOrder#0;class#9372:10165" />
+            <element signature="class#10192:10207" />
+            <element signature="initializer##0;class#10192:10207" />
+            <element signature="class#10208:11388" />
+            <element signature="method#trigger#0;class#10208:11388" />
+            <element signature="method#trigger#1;class#10208:11388" />
+            <element signature="class#10867:11284" />
+            <element signature="method#draw#0;class#10867:11284" />
+            <element signature="class#11431:11473" />
+            <element signature="initializer##0;class#11431:11473" />
+            <element signature="class#11474:13313" />
+            <element signature="method#trigger#0;class#11474:13313" />
+            <element signature="class#12083:12894" />
+            <element signature="method#stuck#0;class#12083:12894" />
+            <element signature="method#onAttack#0;class#12083:12894" />
+            <element signature="method#update#0;class#12083:12894" />
+            <element signature="class#13361:13404" />
+            <element signature="initializer##0;class#13361:13404" />
+            <element signature="class#13405:13990" />
+            <element signature="method#onSet#0;class#13405:13990" />
+            <element signature="class#14020:14035" />
+            <element signature="initializer##0;class#14020:14035" />
+            <element signature="class#14036:14227" />
+            <element signature="class#14272:14314" />
+            <element signature="initializer##0;class#14272:14314" />
+            <element signature="class#14315:14581" />
+            <element signature="method#onSet#0;class#14315:14581" />
+            <element signature="method#trigger#0;class#14315:14581" />
+            <element signature="class#14624:14666" />
+            <element signature="initializer##0;class#14624:14666" />
+            <element signature="class#14667:15552" />
+            <element signature="method#onSet#0;class#14667:15552" />
+            <element signature="method#update#0;class#14667:15552" />
+            <element signature="class#15577:15619" />
+            <element signature="initializer##0;class#15577:15619" />
+            <element signature="class#15620:16198" />
+            <element signature="method#trigger#0;class#15620:16198" />
+            <element signature="class#16241:16283" />
+            <element signature="initializer##0;class#16241:16283" />
+            <element signature="class#16284:18422" />
+            <element signature="method#trigger#0;class#16284:18422" />
+            <element signature="class#16801:17778" />
+            <element signature="method#onUnequip#0;class#16801:17778" />
+            <element signature="method#getLine#0;class#16801:17778" />
+            <element signature="method#update#0;class#16801:17778" />
+            <element signature="class#18473:18543" />
+            <element signature="initializer##0;class#18473:18543" />
+            <element signature="class#18544:19436" />
+            <element signature="method#onSet#0;class#18544:19436" />
+            <element signature="method#update#0;class#18544:19436" />
+            <element signature="class#19486:19528" />
+            <element signature="initializer##0;class#19486:19528" />
+            <element signature="class#19529:20367" />
+            <element signature="method#onSet#0;class#19529:20367" />
+            <element signature="method#update#0;class#19529:20367" />
+            <element signature="class#20414:20456" />
+            <element signature="initializer##0;class#20414:20456" />
+            <element signature="class#20457:22061" />
+            <element signature="method#canSet#0;class#20457:22061" />
+            <element signature="method#onSet#0;class#20457:22061" />
+            <element signature="method#update#0;class#20457:22061" />
+            <element signature="class#22103:22145" />
+            <element signature="initializer##0;class#22103:22145" />
+            <element signature="class#22146:23937" />
+            <element signature="method#trigger#0;class#22146:23937" />
+            <element signature="method#update#0;class#22146:23937" />
+            <element signature="class#22979:23432" />
+            <element signature="method#draw#0;class#22979:23432" />
+            <element signature="class#23980:24022" />
+            <element signature="initializer##0;class#23980:24022" />
+            <element signature="class#24023:25088" />
+            <element signature="method#trigger#0;class#24023:25088" />
+            <element signature="class#24567:24984" />
+            <element signature="method#draw#0;class#24567:24984" />
+            <element signature="class#25143:25185" />
+            <element signature="initializer##0;class#25143:25185" />
+            <element signature="class#25186:25923" />
+            <element signature="method#onSet#0;class#25186:25923" />
+            <element signature="method#update#0;class#25186:25923" />
+            <element signature="class#25966:26008" />
+            <element signature="initializer##0;class#25966:26008" />
+            <element signature="class#26009:26190" />
+            <element signature="method#trigger#0;class#26009:26190" />
+            <element signature="class#26239:26281" />
+            <element signature="initializer##0;class#26239:26281" />
+            <element signature="class#26282:27005" />
+            <element signature="method#onSet#0;class#26282:27005" />
+            <element signature="method#update#0;class#26282:27005" />
+            <element signature="method#trigger#0;class#26282:27005" />
+            <element signature="class#27053:27123" />
+            <element signature="initializer##0;class#27053:27123" />
+            <element signature="class#27124:28101" />
+            <element signature="method#canSet#0;class#27124:28101" />
+            <element signature="method#onSet#0;class#27124:28101" />
+            <element signature="class#28157:28199" />
+            <element signature="initializer##0;class#28157:28199" />
+            <element signature="class#28200:28583" />
+            <element signature="method#onSet#0;class#28200:28583" />
+            <element signature="method#trigger#0;class#28200:28583" />
+            <element signature="class#28650:28692" />
+            <element signature="initializer##0;class#28650:28692" />
+            <element signature="class#28693:29094" />
+            <element signature="method#trigger#0;class#28693:29094" />
+            <element signature="class#29130:29643" />
+            <element signature="method#onSet#0;class#29130:29643" />
+            <element signature="class#29685:29727" />
+            <element signature="initializer##0;class#29685:29727" />
+            <element signature="class#29754:29796" />
+            <element signature="initializer##0;class#29754:29796" />
+            <element signature="class#29797:30033" />
+            <element signature="method#trigger#0;class#29797:30033" />
+            <element signature="class#30062:30104" />
+            <element signature="initializer##0;class#30062:30104" />
+            <element signature="class#30105:30391" />
+            <element signature="method#onSet#0;class#30105:30391" />
+            <element signature="class#30418:30460" />
+            <element signature="initializer##0;class#30418:30460" />
+            <element signature="class#30461:30625" />
+            <element signature="class#30685:30727" />
+            <element signature="initializer##0;class#30685:30727" />
+            <element signature="class#30728:32783" />
+            <element signature="method#isDynamicAnimation#0;class#30728:32783" />
+            <element signature="method#canSet#0;class#30728:32783" />
+            <element signature="method#onSet#0;class#30728:32783" />
+            <element signature="method#update#0;class#30728:32783" />
+            <element signature="class#31649:32066" />
+            <element signature="method#draw#0;class#31649:32066" />
+            <element signature="class#32810:32877" />
+            <element signature="initializer##0;class#32810:32877" />
+            <element signature="class#32878:33712" />
+            <element signature="method#canSet#0;class#32878:33712" />
+            <element signature="method#trigger#0;class#32878:33712" />
+            <element signature="class#33761:33803" />
+            <element signature="initializer##0;class#33761:33803" />
+            <element signature="class#33804:34058" />
+            <element signature="method#trigger#0;class#33804:34058" />
+            <element signature="class#34104:34149" />
+            <element signature="initializer##0;class#34104:34149" />
+            <element signature="class#34150:37102" />
+            <element signature="method#onSet#0;class#34150:37102" />
+            <element signature="class#35250:35420" />
+            <element signature="class#36662:36848" />
+            <element signature="class#37135:37180" />
+            <element signature="initializer##0;class#37135:37180" />
+            <element signature="class#37181:38804" />
+            <element signature="method#trigger#0;class#37181:38804" />
+            <element signature="class#37468:38037" />
+            <element signature="method#onField#0;class#37468:38037" />
+            <element signature="method#onAttack#0;class#37468:38037" />
+            <element signature="method#update#0;class#37468:38037" />
+            <element signature="class#38835:38880" />
+            <element signature="initializer##0;class#38835:38880" />
+            <element signature="class#38881:39200" />
+            <element signature="method#trigger#0;class#38881:39200" />
+            <element signature="class#39230:39275" />
+            <element signature="initializer##0;class#39230:39275" />
+            <element signature="class#39276:40011" />
+            <element signature="method#trigger#0;class#39276:40011" />
+            <element signature="class#40057:40102" />
+            <element signature="initializer##0;class#40057:40102" />
+            <element signature="class#40103:41652" />
+            <element signature="method#update#0;class#40103:41652" />
+            <element signature="class#41698:41766" />
+            <element signature="initializer##0;class#41698:41766" />
+            <element signature="class#41767:43479" />
+            <element signature="method#trigger#0;class#41767:43479" />
+            <element signature="class#42047:43159" />
+            <element signature="method#stuck#0;class#42047:43159" />
+            <element signature="method#update#0;class#42047:43159" />
+            <element signature="class#43512:43576" />
+            <element signature="initializer##0;class#43512:43576" />
+            <element signature="class#43577:45378" />
+            <element signature="method#trigger#0;class#43577:45378" />
+            <element signature="class#43810:44886" />
+            <element signature="method#stuck#0;class#43810:44886" />
+            <element signature="method#update#0;class#43810:44886" />
+            <element signature="class#45432:45499" />
+            <element signature="initializer##0;class#45432:45499" />
+            <element signature="class#45500:47234" />
+            <element signature="method#update#0;class#45500:47234" />
+            <element signature="method#update#1;class#45500:47234" />
+            <element signature="class#46166:46691" />
+            <element signature="class#47265:47354" />
+            <element signature="initializer##0;class#47265:47354" />
+            <element signature="class#47355:49272" />
+            <element signature="method#update#0;class#47355:49272" />
+            <element signature="class#47794:48926" />
+            <element signature="method#onAttack#0;class#47794:48926" />
+            <element signature="method#stuck#0;class#47794:48926" />
+            <element signature="method#update#0;class#47794:48926" />
+            <element signature="class#49298:49336" />
+            <element signature="initializer##0;class#49298:49336" />
+            <element signature="class#49337:50092" />
+            <element signature="method#onSet#0;class#49337:50092" />
+            <element signature="class#50118:50156" />
+            <element signature="initializer##0;class#50118:50156" />
+            <element signature="class#50157:50745" />
+            <element signature="method#trigger#0;class#50157:50745" />
+            <element signature="class#50779:50847" />
+            <element signature="initializer##0;class#50779:50847" />
+            <element signature="class#50848:52213" />
+            <element signature="method#trigger#0;class#50848:52213" />
+            <element signature="class#51277:51615" />
+            <element signature="method#die#0;class#51277:51615" />
+            <element signature="class#52261:52321" />
+            <element signature="initializer##0;class#52261:52321" />
+            <element signature="class#52322:55473" />
+            <element signature="method#onSet#0;class#52322:55473" />
+            <element signature="class#53752:54121" />
+            <element signature="method#draw#0;class#53752:54121" />
+            <element signature="class#55517:55555" />
+            <element signature="initializer##0;class#55517:55555" />
+            <element signature="class#55556:56418" />
+            <element signature="method#trigger#0;class#55556:56418" />
+            <element signature="class#56461:56499" />
+            <element signature="initializer##0;class#56461:56499" />
+            <element signature="class#56500:57276" />
+            <element signature="method#trigger#0;class#56500:57276" />
+            <element signature="class#57325:57362" />
+            <element signature="initializer##0;class#57325:57362" />
+            <element signature="class#57363:59864" />
+            <element signature="method#trigger#0;class#57363:59864" />
+            <element signature="class#58469:58721" />
+            <element signature="method#draw#0;class#58469:58721" />
+            <element signature="class#59908:59974" />
+            <element signature="initializer##0;class#59908:59974" />
+            <element signature="class#59975:61580" />
+            <element signature="method#update#0;class#59975:61580" />
+            <element signature="class#60478:61210" />
+            <element signature="method#onAttack#0;class#60478:61210" />
+            <element signature="method#update#0;class#60478:61210" />
+            <element signature="class#61633:61699" />
+            <element signature="initializer##0;class#61633:61699" />
+            <element signature="class#61700:63431" />
+            <element signature="method#update#0;class#61700:63431" />
+            <element signature="class#62003:62975" />
+            <element signature="method#stuck#0;class#62003:62975" />
+            <element signature="method#update#0;class#62003:62975" />
+            <element signature="class#63485:63551" />
+            <element signature="initializer##0;class#63485:63551" />
+            <element signature="class#63552:66490" />
+            <element signature="method#onFinish#0;class#63552:66490" />
+            <element signature="method#trigger#0;class#63552:66490" />
+            <element signature="method#update#0;class#63552:66490" />
+            <element signature="class#64902:65209" />
+            <element signature="method#draw#0;class#64902:65209" />
+            <element signature="class#66535:66576" />
+            <element signature="initializer##0;class#66535:66576" />
+            <element signature="class#66577:69159" />
+            <element signature="method#trigger#0;class#66577:69159" />
+            <element signature="method#update#0;class#66577:69159" />
+            <element signature="class#69189:69230" />
+            <element signature="initializer##0;class#69189:69230" />
+            <element signature="class#69231:70054" />
+            <element signature="method#canSet#0;class#69231:70054" />
+            <element signature="class#70083:70146" />
+            <element signature="initializer##0;class#70083:70146" />
+            <element signature="class#70147:70689" />
+            <element signature="method#trigger#0;class#70147:70689" />
+            <element signature="class#70718:70758" />
+            <element signature="initializer##0;class#70718:70758" />
+            <element signature="class#70759:71192" />
+            <element signature="method#update#0;class#70759:71192" />
+            <element signature="class#71223:71287" />
+            <element signature="initializer##0;class#71223:71287" />
+            <element signature="class#71288:72566" />
+            <element signature="method#onSet#0;class#71288:72566" />
+            <element signature="class#71468:72549" />
+            <element signature="method#update#0;class#71468:72549" />
+            <element signature="class#72598:72638" />
+            <element signature="initializer##0;class#72598:72638" />
+            <element signature="class#72639:75547" />
+            <element signature="method#update#0;class#72639:75547" />
+            <element signature="class#73874:74127" />
+            <element signature="method#draw#0;class#73874:74127" />
+            <element signature="class#75578:75618" />
+            <element signature="initializer##0;class#75578:75618" />
+            <element signature="class#75619:75923" />
+            <element signature="method#update#0;class#75619:75923" />
+            <element signature="class#75952:76015" />
+            <element signature="initializer##0;class#75952:76015" />
+            <element signature="class#76016:77400" />
+            <element signature="method#trigger#0;class#76016:77400" />
+            <element signature="class#76195:77369" />
+            <element signature="method#update#0;class#76195:77369" />
+            <element signature="e#77652#77960#0" />
+            <element signature="e#77965#78156#0" />
+            <element signature="e#78161#79179#0" />
+            <element signature="e#79611#79746#0" />
+            <element signature="e#79751#80571#0" />
+            <element signature="e#80841#80956#0" />
+            <element signature="e#81349#81572#0" />
+            <element signature="e#81577#81969#0" />
+            <element signature="e#81974#82168#0" />
+            <element signature="e#82235#82616#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/map/Updater.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="171">
+          <caret line="205" column="44" selection-start-line="205" selection-start-column="44" selection-end-line="205" selection-end-column="44" />
+          <folding>
+            <element signature="e#954#955#0" expanded="true" />
+            <element signature="e#1004#1005#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/man/Man.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="330">
+          <caret line="36" column="29" lean-forward="true" selection-start-line="36" selection-start-column="29" selection-end-line="36" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Data/map/Player.user">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="106" selection-start-column="106" selection-end-column="106" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/skill/Stat.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-163">
+          <caret line="11" column="11" selection-start-line="11" selection-start-column="11" selection-end-line="11" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Unit.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="175">
+          <caret line="35" column="22" selection-start-line="35" selection-start-column="22" selection-end-line="35" selection-end-column="22" />
         </state>
       </provider>
     </entry>
@@ -1331,6 +1368,17 @@
         </settings>
       </state>
       <state key="ProjectLibrariesConfigurable.UI">
+        <settings>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ScopeChooserConfigurable.UI">
         <settings>
           <splitter-proportions>
             <option name="proportions">

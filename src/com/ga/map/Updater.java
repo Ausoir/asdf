@@ -194,29 +194,29 @@ public class Updater {
             Global.player.say("I am inflicted with dangerous status effect!");
             return false;
         }
-        if (Global.player.stats.get("Fatigue").get() < p){
-            Global.player.say("I am too tired! I need "+(p-Global.player.stats.get("Fatigue").get())+" more Fatigue points.");
+        if (Global.player.stats.fatigue.get() < p){
+            Global.player.say("I am too tired! I need "+(p-Global.player.stats.fatigue.get())+" more Fatigue points.");
             return false;
         }
-        if (Global.player.stats.get("Nutrition").get() < p){
-            Global.player.say("I am too hungry! I need "+(p-Global.player.stats.get("Nutrition").get())+" more Nutrition points.");
+        if (Global.player.stats.nutrition.get() < p){
+            Global.player.say("I am too hungry! I need "+(p-Global.player.stats.nutrition.get())+" more Nutrition points.");
             return false;
         }
         if (Global.player.armor.getWarmth() < map.temperature){
-            if (!Global.player.stats.get("Vitality").require(p)) {
+            if (!Global.player.stats.agility.require(p)) {
                 Global.player.say("It's too cold!");
                 return false;
             } else Global.player.say("Vitality decreased by "+p+" from cold temperature.");
         }
-        Global.player.stats.get("Fatigue").require(p);
-        Global.player.stats.get("Nutrition").require(p);
+        Global.player.stats.fatigue.require(p);
+        Global.player.stats.nutrition.require(p);
         forceSleep(p);
         return true;
     }
     public void forceSleep(int p){
         map.weather.fadeIn();
         //Hour pass
-        Global.player.stats.get("Strength").heal();
+        Global.player.stats.strength.heal();
         Global.timePass(p*100);
         Global.hour+=p;
         for (Map i : Global.maps) i.onTimeChange();

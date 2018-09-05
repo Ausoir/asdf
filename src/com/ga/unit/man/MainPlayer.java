@@ -23,9 +23,6 @@ import static com.ga.unit.man.BodyHumanoid.BODY;
  * Created by Ga on 12/29/2016. asd
  */
 public class MainPlayer extends Player {
-    public static String[] mainStats = new String[]{
-            "Strength", "Agility", "Intelligence"
-    };
     private Indicator statBar;
     public String respawnInfo;
 
@@ -41,7 +38,7 @@ public class MainPlayer extends Player {
     }
     public String toString(){
         String r = super.toString();
-        return "["+respawnInfo+"],["+r+"]";
+        return "[["+respawnInfo+"],["+r+"]]";
     }
 
     @Override
@@ -56,7 +53,7 @@ public class MainPlayer extends Player {
         if (r != 0){
             if (r == 2) {
                 statBar.show(1, 1);
-                if (state.getCost() > stats.get("Strength").getMax()) say("Stamina cost is beyond my limit!");
+                if (state.getCost() > stats.strength.getMax()) say("Stamina cost is beyond my limit!");
             } else if (r == 3) {
                 statBar.showCd(getCooldown(state).time);
             } else if (r == 4) {
@@ -78,9 +75,9 @@ public class MainPlayer extends Player {
         Sound.play(map, pos, "heal");
         Particle.holyExplosion(map, pos.getAdd(clip.organs[BODY].ptd), getDepth());
         String statChangeNotice = "";
-        int level = stats.get("Level").getMax();
-        stats.get("Level").addTotal(1);
-        stats.get("Motivation").setTotal((level+1)*10, true);
+        int level = stats.level.getMax();
+        stats.level.addTotal(1);
+        stats.motivation.setTotal((level+1)*10, true);
         if (level > 1) {
             int i, current = 1, prev;
             for (i = 1; i < level; i += prev) {
@@ -88,19 +85,18 @@ public class MainPlayer extends Player {
                 current = i;
             }
             if (i != level) { //not fibo
-                Stat decay;
-                String decayStat;
+                Stat[] mainStats = new Stat[]{Global.player.stats.strength, Global.player.stats.agility, Global.player.stats.intelligence};
+                Stat decayStat;
                 int count = 0;
                 do {
                     decayStat = mainStats[SyncRand.r.nextInt(mainStats.length)];
-                    decay = stats.get(decayStat);
-                } while (++count < 9 && decay.getMax() <= 1);
+                } while (++count < 9 && decayStat.getMax() <= 1);
                 if (count >= 9){
-                    stats.get("Level").add(-1, true);
+                    stats.level.add(-1, true);
                     statChangeNotice += "No stat point is obtained on this level.";
                 } else {
-                    decay.addTotal(-1);
-                    statChangeNotice += decayStat + " decayed by 1.";
+                    decayStat.addTotal(-1);
+                    statChangeNotice += decayStat.name + " decayed by 1.";
                 }
             }
         }
@@ -175,9 +171,9 @@ public class MainPlayer extends Player {
 
     public void update() {
         super.update();
-        if (!stats.get("Agility").isFull()) statBar.show(0, .7f);
-        if (!stats.get("Strength").isFull()) statBar.show(1, .7f);
-        if (!stats.get("Intelligence").isFull()) statBar.show(2, .7f);
+        if (!stats.agility.isFull()) statBar.show(0, .7f);
+        if (!stats.strength.isFull()) statBar.show(1, .7f);
+        if (!stats.intelligence.isFull()) statBar.show(2, .7f);
         statBar.update();
         if (input.ctrl) Global.cameraTo = pos.getAdd(target.getMult(.5f,.5f));
         else Global.cameraTo = pos.getAdd(vel.getAdd(0,-Settings.gravity).clamp(-8,-6,8,6).mult(24,8));
@@ -191,9 +187,9 @@ public class MainPlayer extends Player {
     public MainPlayer start() {
         super.start();
         statBar = new Indicator(this);
-        statBar.setMeasuree(0, stats.get("Agility"));
-        statBar.setMeasuree(1, stats.get("Strength"));
-        statBar.setMeasuree(2, stats.get("Intelligence"));
+        statBar.setMeasuree(0, stats.agility);
+        statBar.setMeasuree(1, stats.strength);
+        statBar.setMeasuree(2, stats.intelligence);
         return this;
     }
 }

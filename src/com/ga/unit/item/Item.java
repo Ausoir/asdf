@@ -148,9 +148,9 @@ public class Item extends Prop {
         int getWarmth(){
             return 0;
         }
-        public static Material[] load(String[] plist){
-            Material[] list = new Material[plist.length];
-            for (int i=0;i<plist.length;i++) list[i] = valueOf(plist[i]);
+        public static Material[] load(T plist){
+            Material[] list = new Material[plist.size()];
+            for (int i=0;i<plist.size();i++) list[i] = valueOf(plist.get(i).get());
             return list;
         }
         public static Material getByName(String p) {
@@ -469,7 +469,7 @@ public class Item extends Prop {
         return speed;
     }
     public boolean use(Man host){
-        if (host.stats.get("Strength").getMax() >= weight) {
+        if (host.stats.strength.getMax() >= weight) {
             if (host.setState(type.action) == 0) {
                 playSound();
                 return true;

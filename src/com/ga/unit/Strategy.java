@@ -40,7 +40,7 @@ public enum Strategy {
         P targetPos = host.brain.target.pos;
         int x = (int) ((targetPos.x + host.brain.target.vel.x) - (hostPos.x + host.vel.x));
         int y = (int) (targetPos.y - hostPos.y);
-        host.target = new P(x,y-host.brain.target.clip.getHeight());
+        host.target = new P(x,y-host.brain.target.clip.getHeight()+6);
         if (host instanceof Man) ((Man)host).weapon.rotateTo(host.target.getMult(host.dir,host.dir));
         return (float) Math.abs(Math.sqrt(x * x + y * y) - host.getReach());
     }
@@ -86,6 +86,6 @@ public enum Strategy {
         else if (moves.size() > 2) action = moves.get(SyncRand.r.nextInt(moves.size()));
         else action = getMove(host, host.brain.target.pos);
         int fb = micromanage(host, action, dist);
-//        host.say(host.get("Strength").toString() + " " + action.name() + " " + fb);
+//        host.say(host.strength.toString() + " " + action.name() + " " + fb);
     }
 }

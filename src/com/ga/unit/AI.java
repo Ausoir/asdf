@@ -92,10 +92,9 @@ public abstract class AI implements Observer {
     boolean perceived(Prop p){
         return false;
     }
-    void load(String p) {
-        T s = new T(p);
-        for (int i=s.size()-1;i>=0;i--) {
-            T t = s.get(i);
+    void load(T p) {
+        for (int i=p.size()-1;i>=0;i--) {
+            T t = p.get(i);
             setTask(Behavior.values()[t.get(0).getInt()]);
             this.tasks.peek().load(host, t.get(1).get());
         }
@@ -116,7 +115,7 @@ class NeutralAI extends AI{
     NeutralAI(Unit host) {
         super(host);
     }
-    void load(String p){
+    void load(T p){
         super.load(p);
         advertise = new Timer(100+host.rand.nextInt(200), false);
         host.onInteract = new Interactive() {
