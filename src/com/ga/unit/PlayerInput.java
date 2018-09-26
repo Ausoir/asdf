@@ -169,7 +169,7 @@ public class PlayerInput implements Input {
                 }
             }
         } else { //reset keymap
-            keyActionMap.put(32, Actions.Use.name());
+            keyActionMap.put(1, Actions.Use.name()); //32
             keyActionMap.put(65, Actions.Left.name());
             keyActionMap.put(68, Actions.Right.name());
             keyActionMap.put(16, Actions.Rest.name());

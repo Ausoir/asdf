@@ -17,15 +17,15 @@ public class Armor extends Item {
     private int piece;
     private int warmth;
     int pocket;
-    public Armor(Map map, String name, int seed, Material material, int piece, int encumbrance, int pockets, int durabilityMod, int warmth) {
-        super(map, name, seed, material, ItemType.Armor);
+    public Armor(Map map, String name, String imageName, int seed, Material material, int piece, int encumbrance, int pockets, int durabilityMod, int warmth) {
+        super(map, name, imageName, seed, material, ItemType.Armor);
         this.encumbrance = encumbrance;
         value = value + 400;
         this.pocket = pockets;
         this.piece = piece;
         this.warmth = warmth;
-        if (piece == 1) image.set(name, 0);
-        else if (piece == 2) image.set(name, 2);
+        if (piece == 1) image.set("/"+imageName+"/32/64/0/0");
+        else if (piece == 2) image.set("/"+imageName+"/32/64/2/0");
         else if (piece == 4) weight = 0;
         this.durability += durabilityMod;
         this.uses += durabilityMod;

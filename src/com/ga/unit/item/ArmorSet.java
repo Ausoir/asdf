@@ -1,10 +1,10 @@
 package com.ga.unit.item;
 
 import com.ga.map.Global;
+import com.ga.map.Picture;
 import com.ga.map.Shader;
 import com.ga.tool.T;
 import com.ga.unit.Organ;
-import com.ga.unit.Stock;
 import com.ga.unit.Tags;
 import com.ga.unit.man.Man;
 
@@ -15,19 +15,19 @@ import java.awt.*;
  */
 public class ArmorSet {
     private static Armor[] bare = new Armor[]{
-            new Armor(null, "Head", 0,Item.Material.Organic,0,0,0,0,0){
+            new Armor(null, "Head","Head", 0,Item.Material.Organic,0,0,0,0,0){
                 public boolean checkBreak(boolean blunt, int d){ return true; }
             },
-            new Armor(null, "Man_skin", 0,Item.Material.Organic,1,0,0,0,0){
+            new Armor(null, "Man_skin","Man_skin", 0,Item.Material.Organic,1,0,0,0,0){
                 public boolean checkBreak(boolean blunt, int d){ return true; }
             },
-            new Armor(null, "Man_skin", 0,Item.Material.Organic,2,0,0,0,0){
+            new Armor(null, "Man_skin","Man_skin", 0,Item.Material.Organic,2,0,0,0,0){
                 public boolean checkBreak(boolean blunt, int d){ return true; }
             },
-            new Armor(null, "Man_skin", 0,Item.Material.Organic,3,0,0,0,0){
+            new Armor(null, "Man_skin","Man_skin", 0,Item.Material.Organic,3,0,0,0,0){
                 public boolean checkBreak(boolean blunt, int d){ return true; }
             },
-            new Armor(null, "Man_skin", 0,Item.Material.Organic,4,0,0,0,0){
+            new Armor(null, "Man_skin","Man_skin", 0,Item.Material.Organic,4,0,0,0,0){
                 public boolean checkBreak(boolean blunt, int d){ return true; }
             },
     };
@@ -35,7 +35,7 @@ public class ArmorSet {
     public Tags tags = new Tags();
     private Man host;
     public Organ[] display;
-    public ArmorSet(Man host, String head, String body, String legs, String back, String etc){
+    public ArmorSet(Man host, Item head, Item body, Item legs, Item back, Item etc){
         this.host = host;
         Organ[] organs = host.clip.organs;
         display = new Organ[organs.length];
@@ -55,13 +55,13 @@ public class ArmorSet {
             display[i].setSize(organs[i].getSize());
             display[i].type = organs[i].type;
             display[i].setImage(null);
-            display[i].getImage().visible = false;
+            display[i].image.visible = false;
         }
         armor = new Armor[5];
-        String[] armors = new String[]{head,body,legs,back,etc};
+        Item[] armors = new Item[]{head,body,legs,back,etc};
         for (int i=0;i<armor.length;i++){
-            if (armors[i].equals("")) armor[i] = bare[i];
-            else armor[i] = (Armor) Stock.get(host.map, armors[i]);
+            if (armors[i] == null) armor[i] = bare[i];
+            else armor[i] = (Armor) armors[i];
             armor[i].owner = host;
         }
         for (int i=0;i<armor.length;i++) set(armor[i], i);
@@ -72,29 +72,29 @@ public class ArmorSet {
         if (p == bare[piece]) {
             if (piece == 0) display[5].setImage(null);
             else if (piece == 1) {
-                display[0].setImage(null, 1);
-                display[3].setImage(null, 0);
-                display[4].setImage(null, 1);
+                display[0].setImage(null);
+                display[3].setImage(null);
+                display[4].setImage(null);
             } else if (piece == 2){
-                display[1].setImage(null, 2);
-                display[2].setImage(null, 2);
+                display[1].setImage(null);
+                display[2].setImage(null);
             }
         } else {
             if (piece == 0){
-                display[5].setImage(p.name);
-                display[5].getImage().modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 10));
+                display[5].setImage(p.image.image);
+                display[5].image.modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 10));
             } else if (piece == 1) {
-                display[0].setImage(p.name, 1);
-                display[3].setImage(p.name, 0);
-                display[4].setImage(p.name, 1);
-                display[0].getImage().modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 10));
-                display[3].getImage().modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 10));
-                display[4].getImage().modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 10));
+                display[0].setImage(Picture.load("/"+p.imageName+"/32/64/1/0", null));
+                display[3].setImage(p.image.image);
+                display[4].setImage(Picture.load("/"+p.imageName+"/32/64/1/0", null));
+                display[0].image.modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 10));
+                display[3].image.modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 10));
+                display[4].image.modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 10));
             } else if (piece == 2){
-                display[1].setImage(p.name, 2);
-                display[2].setImage(p.name, 2);
-                display[1].getImage().modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 10));
-                display[2].getImage().modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 10));
+                display[1].setImage(p.image.image);
+                display[2].setImage(p.image.image);
+                display[1].image.modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 10));
+                display[2].image.modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 10));
             }
         }
         updateStatus();
@@ -148,11 +148,7 @@ public class ArmorSet {
     public void setVisible(boolean visible){
         for (Organ i : display) i.image.visible = visible;
     }
-    public int getWeight(){
-        int r = 0;
-        for (Armor i : armor) r += i.weight;
-        return r;
-    }
+
     public int getEncumbrance(){
         int r = 0;
         for (Armor i : armor) r += i.encumbrance;

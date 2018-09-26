@@ -15,14 +15,12 @@ import java.awt.*;
  */
 public class Food extends Item {
     private int nutrition, taste, perish;
-    public Food(Map map, String name, int seed, int uses) {
-        super(map, name, seed, Material.Organic, ItemType.Consumable, uses);
-        onTimeChange();
-    }
-    public void set(int nutrition, int taste, int perish){
+    public Food(Map map, String name, String imageName, int seed, int uses, int nutrition, int taste, int perish) {
+        super(map, name, imageName, seed, Material.Organic, ItemType.Consumable, uses);
         this.nutrition = nutrition;
         this.taste = taste;
         this.perish = Global.hour + perish;
+        onTimeChange();
     }
     public int getValue(){
         return (int) Math.max(0, ((uses*(taste+nutrition)+.4f*(perish-Global.hour))*100));
@@ -58,20 +56,18 @@ public class Food extends Item {
     public void onTimeChange(){
         int toxicity = getPoisonChance();
         if (toxicity > 0) {
-            image = new ShadedPicture(rand, name, Shader.Color);
+            image = new ShadedPicture(rand, image.image, Shader.Color);
             ((ShadedPicture) image).shade(new Color(100 - toxicity, 255 - toxicity, 100 - toxicity, 180).getRGB());
         }
     }
     public void load(T p){
         super.load(p);
-        nutrition = p.get(9).getInt();
-        taste = p.get(10).getInt();
-        perish = p.get(11).getInt();
+        perish = p.get(9).getInt();
     }
     @Override
     public String toString(){
         String r = super.toString();
-        if (!r.equals("")) r += ","+nutrition+","+taste+","+perish;
+        if (!r.equals("")) r += ","+perish;
         return r;
     }
 }

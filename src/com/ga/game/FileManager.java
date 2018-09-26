@@ -199,6 +199,14 @@ public class FileManager {
         return new Clip(readModelProperty(data), readModel(data), readAnimation(data), readClipFrames(data), readMoveset(data));
     }
 
+    public static void saveLiterals(String dir, T p){
+        String r = "";
+        for (int i=0;i<p.size();i++){
+            r += p.get(i).get() + (i == p.size()-1?"":"\n");
+        }
+        save(dir, r);
+    }
+
     public static T readLiterals(String dir){
         String data = read(dir);
         String[] lines = data.split("%", -1);
@@ -212,7 +220,7 @@ public class FileManager {
     public static T readLiteral(String dir, int line){
         String data = read(dir);
         String[] lines = data.split("%", -1);
-        return new T("["+lines[line]+"]");
+        return new T("["+lines[line % lines.length]+"]");
     }
 
     public static boolean isFile(String p){

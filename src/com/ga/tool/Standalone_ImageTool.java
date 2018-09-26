@@ -26,11 +26,11 @@ public class Standalone_ImageTool {
         Picture.init();
         String file = "Jean";
         Picture image = new Picture(new Random());
-        image.set(file, 0);
+        image.set("/"+file+"/32/64/0/0");
         Picture image1 = new Picture(new Random());
-        image1.set(file, 1);
+        image1.set("/"+file+"/32/64/1/0");
         Picture image2 = new Picture(new Random());
-        image2.set(file, 2);
+        image2.set("/"+file+"/32/64/2/0");
         BufferedImage newimage = changeOrder(image.image, image1.image, image2.image);
         Picture.newImage("Data/item/armor/",file,newimage);
         Global.p("");
@@ -66,8 +66,5 @@ public class Standalone_ImageTool {
             }
         }
         return result;
-    }
-    private static String getInt(int p){
-        return (p<0?p+"":" "+p);
     }
 }

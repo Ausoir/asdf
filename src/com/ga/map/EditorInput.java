@@ -63,7 +63,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
     public EditorInput() {
         Global.editor = true;
         init();
-        currentO = new Prop(map, "Error", 0);
+        currentO = new Prop(map, "Error","Error", 0);
         Global.updates.time = -1;
         lastSaved = map.name.toString();
     }
@@ -74,7 +74,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
         Global.display.input = this;
         map.updater.addQueue.add(this);
         Global.camera = new P(map.size.getMult(.5f,.5f));
-        currentO = new Prop(map, null,-1);
+        currentO = new Prop(map, null,"Error",-1);
         currentO.save = false;
         map.updater.update();
         for (Prop i : map.updater.props){
@@ -673,7 +673,7 @@ public class EditorInput extends Drawable implements Input, Updatable {
         Prop r;
         if (args.length > 2) r = Stock.createByName(map, args[1], Integer.parseInt(args[2]));
         else if (args.length > 1) r = Stock.createByName(map, args[1], -1);
-        else return new Prop(map, "Error", 0);
+        else return new Prop(map, "Error","Error", 0);
         make(r);
         r.pos = p;
         return r;

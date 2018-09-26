@@ -55,7 +55,6 @@ public enum Strategy {
         return host.dir == 1 ? Actions.Right : Actions.Left;
     }
     public int micromanage(Unit host, Actions action, float dist){
-        host.face(host.brain.target.pos.x>host.pos.x?1:-1, false);
         int fb = host.setState(action);
         if (fb == 2) host.setState(Actions.Rest);
         action.specialOrder(host, dist);
@@ -64,7 +63,6 @@ public enum Strategy {
     }
     public void update(Unit host){
         float dist = getDist(host);
-        host.face(host.brain.target.pos.x>host.pos.x?1:-1, false);
         Actions action;
         ArrayList<Actions> moves = new ArrayList<>();
         for (Actions act : host.moveset) {

@@ -2,6 +2,7 @@ package com.ga.map;
 
 import com.ga.game.FileManager;
 import com.ga.tool.P;
+import com.ga.tool.SyncRand;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -31,16 +32,25 @@ public class Picture {
             int randIndex = i[0].indexOf("-");
             if (randIndex != -1){
                 String category = i[0].substring(0, randIndex);
-                if (multiples.get(category) == null) multiples.put(category, 1);
-                else multiples.put(category, multiples.get(category)+1);
+                multiples.merge(category, 1, (a, b) -> a + b);
             }
             directory.put(i[0], i[1]);
         }
-        cache.put("Drop",getTexture(loadCache("Icon"),24,24,0,0));
-        cache.put("Buy",getTexture(loadCache("Icon"),24,24,1,0));
-        cache.put("Describe",getTexture(loadCache("Icon"),24,24,2,0));
-        cache.put("POI",getTexture(loadCache("Icon"),24,24,3,0));
-        cache.put("Move",getTexture(loadCache("Icon"),24,24,4,0));
+        cache.put("Drop", load("/Icon/24/24/0/0",null));
+        cache.put("Buy", load("/Icon/24/24/1/0",null));
+        cache.put("Info", load("/Icon/24/24/2/0",null));
+        cache.put("POI", load("/Icon/24/24/3/0",null));
+        cache.put("Travel", load("/Icon/24/24/4/0",null));
+        cache.put("Spark", load("/Effects/24/24/0/0",null));
+        cache.put("Smoke", load("/Effects/24/24/1/0",null));
+        cache.put("Poison", load("/Effects/24/24/2/0",null));
+        cache.put("Ice", load("/Effects/24/24/3/0",null));
+        cache.put("Dust", load("/Effects/24/24/4/0",null));
+        cache.put("Blood", load("/Effects/24/24/5/0",null));
+        cache.put("Fire", load("/Effects/24/24/6/0",null));
+        cache.put("Flame", load("/Effects/24/24/7/0",null));
+        cache.put("Glare", load("/Effects/24/24/8/0",null));
+        cache.put("Man_skin", load("Man_skin",null));
     }
     public Picture(Random rand){
         this.rand = rand;
@@ -50,10 +60,10 @@ public class Picture {
         if (this.image != null) setSize(image.getWidth(), image.getHeight());
     }
     public void set(String name){
-        if (name != null) set(load(name));
-    }
-    public void set(String name, int index){
-        if (name != null) set(getTexture(load(name),32,64,index,0));
+        if (name != null){
+            if (cache.containsKey(name)) set(cache.get(name));
+            else set(load(name));
+        }
     }
     public BufferedImage getImage(){
         return image;
@@ -78,32 +88,42 @@ public class Picture {
         else if (type == 2) halfSize = new P(size.x/2, size.y-8);
         else if (type == 3) halfSize = new P(8, size.y/2);
     }
-    private BufferedImage load(String dir){
-        BufferedImage image = null;
-        String file = directory.get(dir);
-        if (file == null){
-            Integer num = multiples.get(dir);
-            if (num != null) {
-                if (rand == null) rand = new Random();
-                dir += "-" + rand.nextInt(num);
-                file = directory.get(dir);
+    public static BufferedImage load(String dir, Random rand){
+        if (dir != null && dir.startsWith("/")){
+            String[] meta = dir.substring(1).split("/");
+            int sx = Integer.parseInt(meta[1]), sy = Integer.parseInt(meta[2]), px = Integer.parseInt(meta[3]), py = Integer.parseInt(meta[4]);
+            return load(meta[0], rand).getSubimage(px * sx, py * sy, sx, sy);
+        } else {
+            BufferedImage image = null;
+            String file = directory.get(dir);
+            if (file == null) {
+                Integer num = multiples.get(dir);
+                if (num != null) {
+                    if (rand == null) rand = SyncRand.r;
+                    dir += "-" + rand.nextInt(num);
+                    file = directory.get(dir);
+                }
             }
+            if (file != null) {
+                try {
+                    image = ImageIO.read(new File(file));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else if (dir != null) {
+                Global.p("Can't read picture file [" + dir + "]");
+                try {
+                    image = ImageIO.read(new File("Data/Error.png"));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            assert image != null;
+            return toCompatibleImage(image);
         }
-        if (file != null) {
-            try {
-                image = ImageIO.read(new File(file));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else if (dir != null) {
-            Global.p("Can't read picture file ["+dir + "]");
-            try {
-                image = ImageIO.read(new File("Data/Error.png"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return toCompatibleImage(image);
+    }
+    public BufferedImage load(String dir){
+        return load(dir, rand);
     }
     public static BufferedImage loadCache(String dir){
         BufferedImage image = cache.get(dir);
@@ -114,9 +134,11 @@ public class Picture {
                 image = ImageIO.read(new File(file));
             } catch (IOException e) {
                 e.printStackTrace();
+
             }
             cache.put(dir, image);
         } else if (dir != null) Global.p("Can't read picture cache ["+dir + "]");
+        assert image != null;
         return toCompatibleImage(image);
     }
     static BufferedImage toCompatibleImage(BufferedImage image)
@@ -137,9 +159,6 @@ public class Picture {
 
         // return the new optimized image
         return new_image;
-    }
-    private static BufferedImage getTexture(BufferedImage image, int sx, int sy, int px, int py) {
-        return image.getSubimage(px * sx, py * sy, sx, sy);
     }
     public static void newImage(String path, String p, BufferedImage image){
         String fullPath = FileManager.makeDirectory(path+p+".png");

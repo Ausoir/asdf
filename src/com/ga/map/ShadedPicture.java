@@ -11,15 +11,9 @@ public class ShadedPicture extends Picture {
     protected Shader shader;
     private BufferedImage shadow;
 
-    public ShadedPicture(Random rand, String p, Shader shader) {
+    public ShadedPicture(Random rand, BufferedImage p, Shader shader) {
         super(rand);
         set(p);
-        setShader(shader);
-    }
-
-    public ShadedPicture(Random rand, String p, int index, Shader shader) {
-        super(rand);
-        set(p, index);
         setShader(shader);
     }
 

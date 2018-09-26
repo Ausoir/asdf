@@ -67,7 +67,7 @@ public class Map {
         panoramaName = s.get(1).get();
         this.size = new P(s.get(2));
         if (panoramaName.equals("")) {
-            panorama[0] = new Thing(this, "", 0, 0) {
+            panorama[0] = new Thing(this, "Panorama", null, 0, 0) {
                 @Override
                 public void draw(Graphics2D g) {
                     g.setColor(Color.black);
@@ -77,7 +77,7 @@ public class Map {
         } else {
             for (int i=0;i<3;i++){
                 float depth = (i+.1f) * .1f;
-                panorama[i] = new Thing(this, panoramaName+ "_" + i, 0, depth) {
+                panorama[i] = new Thing(this, panoramaName, panoramaName+ "_" + i, 0, depth) {
                     @Override
                     public void setImage(String p){
                         super.setImage(p);

@@ -17,7 +17,7 @@ public class Projectile extends Prop {
     public boolean blunt = true;
     public EventTimer delay = new EventTimer(-1, false, null);
     private Projectile(Map map, String name, P pt, float rot, int speed) {
-        super(map, name, 0);
+        super(map, name, name, 0);
         pos = pt;
         save = false;
         vel.set(Global.cos(rot)*speed, Global.sin(rot)*speed);

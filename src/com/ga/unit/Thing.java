@@ -17,19 +17,20 @@ public class Thing extends Drawable {
     public int seed;
     public Picture image;
     public P pos;
-    public String name;
+    public String name, imageName;
     public int dir = 1;
     public float rotation = 0;
     public boolean save = true;
-    public Thing(Map map, String name, int seed, float depth){
+    public Thing(Map map, String name, String imageName, int seed, float depth){
         this.map = map;
         this.name = name;
+        this.imageName = imageName;
         this.seed = seed;
         pos = new P();
         rand = new Random(seed);
         image = new Picture(rand);
         setDepth(depth);
-        if (name != null) setImage(name);
+        setImage(imageName);
     }
     public Thing start(){
         map.updater.addQueue.add(this);

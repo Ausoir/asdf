@@ -848,7 +848,7 @@ public class MenuPlayer extends Panel {
         }
     }
 
-    private ImageIcon iconDescribe = new ImageIcon(Picture.loadCache("Describe"));
+    private ImageIcon iconDescribe = new ImageIcon(Picture.loadCache("Info"));
     private GridBagConstraints grid = new GridBagConstraints();
     private JPanel mainpanel = new JPanel();
     private OptionPanel optionpanel = new OptionPanel();

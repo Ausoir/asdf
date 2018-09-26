@@ -11,7 +11,7 @@ class GenerateForest {
         ground.move(map.size.x()+80, 0);
         ground.move(0, 640);
         ground.climbable();
-        if (map.isSnowing()) ground.finish("4,dirt,snow,[Snowtree=1]");
+        if (map.isSnowing()) ground.finish("4,dirt,snow,[Frozen Tree=1]");
         else ground.finish("4,dirt,grass,[Tree=1]");
         generator.makeEdgeSpawns();
         if (Creation.r.nextBoolean()) generator.generateBuilding("Mound", 360);
@@ -24,7 +24,7 @@ class GenerateForest {
         ground.move(map.size.x()+80, 0);
         ground.move(0, 640);
         ground.climbable();
-        if (map.isSnowing()) ground.finish("3,dirt,snow,[Rock=.1,Snowtree=.2,Snowbush=.4]");
+        if (map.isSnowing()) ground.finish("3,dirt,snow,[Rock=.1,Frozen Tree=.2,Frozen Bush=.4]");
         else ground.finish("3,dirt,sand,[Rock=.1,Tree=.2,Bush=.4]");
         generator.makeEdgeSpawns();
         generator.generateBuildings(new String[]{"Tree1", "Tree2", "Tree3", "Tree4", "Tree1", "Tree2", "Tree3", "Tree4", "Cabin", "Rock1"}, map.landRaw.get(1), 10);

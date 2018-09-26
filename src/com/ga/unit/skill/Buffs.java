@@ -5,10 +5,7 @@ import com.ga.game.Sound;
 import com.ga.map.Global;
 import com.ga.map.Shader;
 import com.ga.map.Terrain;
-import com.ga.tool.Line;
-import com.ga.tool.P;
-import com.ga.tool.Performer;
-import com.ga.tool.SyncRand;
+import com.ga.tool.*;
 import com.ga.unit.*;
 import com.ga.unit.item.Projectile;
 import com.ga.unit.man.MainPlayer;
@@ -228,7 +225,7 @@ public enum Buffs {
         return new Buff(level, 4) {
             private Thing mark;
             public void onLoad(){
-                mark = new Thing(host.map, "Mark", host.seed, host.getDepth()+1);
+                mark = new Thing(host.map, "Mark","Mark", host.seed, host.getDepth()+1);
                 mark.image.setCenterType(2);
                 mark.start();
                 mark.save = false;
@@ -236,7 +233,7 @@ public enum Buffs {
             public void onSet() {
                 time += level;
                 Sound.play(host.map, host.pos, "freeze");
-                mark = new Thing(host.map, "Mark", host.seed, host.getDepth()+1);
+                mark = new Thing(host.map, "Mark","Mark", host.seed, host.getDepth()+1);
                 mark.image.setCenterType(2);
                 mark.start();
                 mark.save = false;
@@ -290,7 +287,7 @@ public enum Buffs {
         add(Tag.Enchant);
         add(Tag.Channeling);
     }}){
-        private String[] targets = new String[]{"Slime", "Slime", "Dog", "Bird", "Crawler"};
+        private String[] targets = new String[]{"Man", "Slime", "Dog", "Bird", "Crawler"};
         private Body origForm;
         Buff makeLocal(int level){
             return new Buff(level, 0) {
@@ -301,7 +298,7 @@ public enum Buffs {
                 }
                 public void onLoad(){
                     morph();
-                    host.clip.load(host.toString().split("@",-1)[7]);
+                    host.clip.load(new T(host.toString()).get(7).get());
                 }
                 private void morph(){
                     origForm = host.clip;

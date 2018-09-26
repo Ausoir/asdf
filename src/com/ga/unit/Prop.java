@@ -26,11 +26,8 @@ public class Prop extends Thing {
     public Line lastLand = new Line();
     public Tags tags = new Tags();
     public boolean manualDepth = true;
-    public Prop(Map map, String name, int seed, int depth) {
-        super(map, name, seed, depth);
-    }
-    public Prop(Map map, String name, int seed) {
-        this(map, name, seed, 4);
+    public Prop(Map map, String name, String imageName, int seed) {
+        super(map, name, imageName, seed, 4);
     }
     public int getDamage(){
         return 0;

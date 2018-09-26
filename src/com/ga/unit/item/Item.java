@@ -26,8 +26,8 @@ public class Item extends Prop {
             public boolean isBlunt(){return false;}},
         Knife(Actions.Thrust, 3, .3f, "swing_knife"){
             public boolean isBlunt(){return false;}},
-        Swinging(Actions.Slash, 3, .8f, "swing_normal"),
-        Bashing(Actions.Slash, 1, 1f, "swing_normal"),
+        Swinging(Actions.Slash, 3, 1f, "swing_normal"),
+        Bashing(Actions.Slash, 1, .8f, "swing_normal"),
         Shoot(Actions.Rest, 3, .1f, null),
         Armor(Actions.Hit, 1, 1, "swing_normal"), Scroll(Actions.Read, 1, 0, "scroll"),
         Throwing(Actions.Throw, 3, .1f, "swing_normal"),
@@ -72,6 +72,9 @@ public class Item extends Prop {
         },
         Leather(.3f,1,2,40,1500,new Color(133, 78, 32,80)),
         Glass(.1f,1,7,7,2000),
+        Other(0,0,0,1,0),
+        Organic(.4f,0,0,1,0),
+        Stone(.3f,6,4,30,0,new Color(107, 107, 107,200)),
         Copper(.4f,3,3,40,1500,new Color(133, 92, 38,80)){
             public void onSet(Item host){
                 host.tags.add(Tag.Channeling);
@@ -126,10 +129,7 @@ public class Item extends Prop {
                 host.tags.add(Tag.Curse);
                 host.tags.add(Tag.Conjuration);
             }
-        },
-        Other(0,0,0,1,0),
-        Organic(.4f,0,0,1,0),
-        Stone(.3f,6,4,30,0,new Color(107, 107, 107,200));
+        };
         int weight, hardness, value, durability;
         Color color;
         float prevalence;
@@ -267,13 +267,13 @@ public class Item extends Prop {
     public ItemType type = ItemType.Throwing;
     public int value;
     protected Man owner;
-    public Item(Map map, String name, int seed, Material material, ItemType type, int durability) {
-        this(map, name, seed, material, type);
+    public Item(Map map, String name, String imageName, int seed, Material material, ItemType type, int durability) {
+        this(map, name, imageName, seed, material, type);
         this.durability = durability;
         this.uses = durability;
     }
-    public Item(Map map, String name, int seed, Material material, ItemType type) {
-        super(map, name, seed, 7);
+    public Item(Map map, String name, String imageName, int seed, Material material, ItemType type) {
+        super(map, name, imageName, seed);
         gravity = true;
         setType(type);
         if (material != null) setMaterial(material);
@@ -524,6 +524,10 @@ public class Item extends Prop {
     }
     public boolean isInfinite(){
         return durability == -1;
+    }
+    public void onCollide(Line l){
+        super.onCollide(l);
+        rotation = l.getAtan();
     }
     public String forceToString(){
         boolean forced = false;

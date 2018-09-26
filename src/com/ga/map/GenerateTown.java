@@ -28,7 +28,7 @@ class GenerateTown {
         generator.makeEdgeSpawns();
         map.normalize(0,2400);
         map.size.y -= 1600;
-        int bid=10;
+        int bid = 10;
         ArrayList<Line> beforeBuilding = (ArrayList<Line>) map.landRaw.clone();
         for (Line l : beforeBuilding) {
             if (l.opt > 0 && l.tid >= 0 && l.clockwise() && Math.abs(l.getSlope()) < .1f) {
@@ -38,8 +38,8 @@ class GenerateTown {
                     for (int ii = 0; ii < Creation.r.nextInt(9); ii++) map.placeProp(l, Stock.createByName(map, "Cone", -1));
                     for (int ii = 0; ii < Creation.r.nextInt(9); ii++) map.placeProp(l, Stock.createByName(map, "Pole", -1));
                 }
-                for (int ii = 0; ii < Creation.r.nextInt(9); ii++) map.placeProp(l, Stock.createByName(map, map.isSnowing()?"Snowbush":"Bush", -1));
-                for (int ii = 0; ii < Creation.r.nextInt(9); ii++) map.placeProp(l, Stock.createByName(map, map.isSnowing()?"Snowtree":"Tree", -1));
+                for (int ii = 0; ii < Creation.r.nextInt(9); ii++) map.placeProp(l, Stock.createByName(map, map.isSnowing()?"Frozen Bush":"Bush", -1));
+                for (int ii = 0; ii < Creation.r.nextInt(9); ii++) map.placeProp(l, Stock.createByName(map, map.isSnowing()?"Frozen Tree":"Tree", -1));
                 if (!map.isSnowing()) {
                     for (int ii = 0; ii < Creation.r.nextInt(7); ii++)
                         map.placeProp(l, Stock.createByName(map, "Resident", -1));

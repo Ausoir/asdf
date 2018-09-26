@@ -11,8 +11,8 @@ import com.ga.unit.Unit;
  */
 public class Weapon extends Item {
     private int quality = 0;
-    public Weapon(Map map, String name, int seed, Material material, ItemType type) {
-        super(map, name, seed, material, type);
+    public Weapon(Map map, String name, String imageName, int seed, Material material, ItemType type) {
+        super(map, name, imageName, seed, material, type);
         speed = speed - (range/12);
         value *= 2;
         cooldown.setDuration(0);

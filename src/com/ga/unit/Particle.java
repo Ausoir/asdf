@@ -3,7 +3,6 @@ package com.ga.unit;
 import com.ga.game.Settings;
 import com.ga.map.Global;
 import com.ga.map.Map;
-import com.ga.map.Picture;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 import com.ga.tool.Timer;
@@ -19,7 +18,7 @@ public class Particle extends Thing {
     private P vel;
     private boolean gravity;
     private Particle(Map map, String name, float depth, P pt, P vel, float rotation, float speed, boolean gravity, int lifetime) {
-        super(map, name, (int) (Math.random() * 9999), depth);
+        super(map, name, name, (int) (Math.random() * 9999), depth);
         pos = pt;
         save = false;
         this.vel = new P(vel);
@@ -34,9 +33,6 @@ public class Particle extends Thing {
         else index = 0;
         if (particles[index] != null) particles[index].remove();
         particles[index] = new Particle(map, name, depth, pt, vel, rotation, speed, gravity, lifetime);
-    }
-    public void setImage(String p){
-        image.set(Picture.loadCache(p));
     }
     public static void dripHoly(Map map, P pt, float depth){
         explode(map, "Glare",depth,pt,new P(),1,4,0,true,4);

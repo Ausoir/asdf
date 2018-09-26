@@ -70,6 +70,7 @@ public class Generator {
         return bid;
     }
     public int generateBuilding(String building, P pos, int bid){
+        Global.p("Generating building ["+building+"]");
         Map blueprint = new Map("building/" + building);
         blueprint.start();
 

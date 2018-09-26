@@ -25,7 +25,7 @@ public class Terrain extends Drawable {
     private P finalSize;
     Map map;
     public Terrain(Map map, String texture, Shader shader, float depth){
-        image = new ShadedPicture(null, texture.startsWith("/")?null:texture, shader){
+        image = new ShadedPicture(null, texture.startsWith("/")?null:Picture.load(texture,null), shader){
             @Override
             public void shade(int p){
                 if (shader != null) {

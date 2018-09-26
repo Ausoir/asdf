@@ -1,6 +1,7 @@
 package com.ga.unit;
 
 import com.ga.map.Global;
+import com.ga.map.Picture;
 import com.ga.tool.Clips;
 import com.ga.tool.P;
 import com.ga.tool.SyncRand;
@@ -14,7 +15,7 @@ import java.util.Map;
  * Created by Ga on 8/1/2016. asd
  */
 public class Body {
-    private HashMap<String, int[][]> animation = new HashMap<String, int[][]>() {{
+    private HashMap<String, int[][]> animation = new HashMap<>() {{
         put("Idle", new int[][]{new int[]{0, -1}, new int[]{-2}});
     }};
     public String name;
@@ -31,8 +32,7 @@ public class Body {
     protected String state = "Idle";
     public int BODY;
     private int legNum = 0, legCurrent = 0;
-    private int handNum = 0, handCurrent = 0;
-    private float appendageSize = 1;
+    private float appendageSize;
     protected int size = 0;
 
     public Body(Unit host, String current) {
@@ -43,16 +43,6 @@ public class Body {
         appendageSize = (float) Math.abs(host.rand.nextGaussian()*.3f)+.7f;
         randomize();
         organs[BODY].pt.y = -getHeight();
-    }
-
-    void setOrganHealth(){
-        int hpPool = 0;
-        for (Organ organ : organs) hpPool += organ.health;
-//        int mod = host.strength.getMax()*organs.length;
-        int mod = 100;
-        for (Organ organ : organs) {
-            organ.health = (int) (((float) organ.health / hpPool) * mod);
-        }
     }
 
     private void setProperties(int[][] p){
@@ -71,10 +61,7 @@ public class Body {
             }
             if (type == 1){
                 organs[i].hand = true;
-                handNum++;
-                handCurrent++;
             }
-            organs[i].health = p[2][i];
         }
     }
 
@@ -134,8 +121,8 @@ public class Body {
                 else organs[p] = new Organ(parent, tip);
                 organs[p].host = host;
                 organs[p].type = Math.abs(type);
-                if (type == 0) organs[p].setImage(model[p][2]);
-                else organs[p].setImage(model[p][2],organs[p].type-1);
+                if (type == 0) organs[p].setImage(Picture.load(model[p][2],null));
+                else organs[p].setImage(Picture.load("/"+model[p][2]+"/32/64/"+(organs[p].type-1)+"/0", null));
             } else {
                 organs[p] = new Organ(parent, tip);
                 organs[p].host = host;
@@ -243,15 +230,9 @@ public class Body {
 
     void updateStatus(){
         legCurrent = legNum;
-        handCurrent = handNum;
         for (Organ o : organs) {
             if (o.amputated) {
-                if (o.leg){
-                    legCurrent--;
-                }
-                if (o.hand){
-                    handCurrent--;
-                }
+                if (o.leg) legCurrent--;
                 if (o.vital) {
                     setState("Down");
                     host.die("Decapitation");
@@ -282,7 +263,7 @@ public class Body {
 
     public void setImage(String p){
         for (Organ i : organs){
-            if (i.type != 0) i.setImage(p,i.type-1);
+            if (i.type != 0) i.setImage(Picture.load("/"+p+"/32/64/"+(i.type-1)+"/0",null));
         }
     }
 
@@ -314,10 +295,10 @@ public class Body {
 
     @Override
     public String toString() {
-        String r = "";
+        StringBuilder r = new StringBuilder();
         for (Organ i : organs){
-            r += i.amputated?"0":"1";
+            r.append(i.amputated ? "0" : "1");
         }
-        return r;
+        return r.toString();
     }
 }

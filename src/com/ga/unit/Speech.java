@@ -21,7 +21,7 @@ public class Speech extends Thing {
     boolean visible = false;
     String text = "";
     Speech(Unit host){
-        super(null, null, host.seed, 15);
+        super(null, "Speech", null, host.seed, 15);
         this.host = host;
         pos = host.pos;
     }

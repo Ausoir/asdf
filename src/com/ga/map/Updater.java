@@ -136,20 +136,6 @@ public class Updater {
         }
         return null;
     }
-    public L<Prop> collideInteractive(P p){
-        L<Prop> result = new L<>();
-        for (Prop i : props){
-            if (i.onInteract != null) {
-                if (i.getInteractPoint().getSubtract(p).getDist() <= 24) result.add(i);
-            }
-        }
-        for (Unit i : unitsLoaded){
-            if (i.onInteract != null) {
-                if (i.getInteractPoint().getSubtract(p).getDist() <= 24) result.add(i);
-            }
-        }
-        return result;
-    }
     public L<Prop> collideProp(P p, int r){
         L<Prop> result = new L<>();
         for (Prop i : props){

@@ -149,7 +149,7 @@ public enum Actions {
                 Global.player.sheathe();
             } else if (Global.player.input.selectingItem-10 < Global.player.inventory.getItemSize()) {
                 Item item = Global.player.inventory.getItem(Global.player.input.selectingItem-10);
-                host.delay.time = Math.max(1, host.delay.time - item.getSpeed()*2);
+                if (item != null) host.delay.time = Math.max(1, host.delay.time - item.getSpeed()*2);
             }
         }
         public boolean onFinish(Man host){
@@ -206,12 +206,23 @@ public enum Actions {
         public String getClipName(){
             return "Mark";
         }
-    }, Interact(8){
+    }, Interact(16){
         public void onSet(final Man host){
             host.delay.performer = new Performer() {
                 public void perform() {
                     P reach = host.getHand();
-                    Prop obj = host.map.updater.collideInteractive(reach).getFirst();
+                    L<Prop> result = new L<>();
+                    for (Prop i : host.map.updater.props){
+                        if (i.onInteract != null) {
+                            if (i.getInteractPoint().getSubtract(reach).getDist() <= 24) result.add(i);
+                        }
+                    }
+                    for (Unit i : host.map.updater.unitsLoaded){
+                        if (i.onInteract != null) {
+                            if (i.getInteractPoint().getSubtract(reach).getDist() <= 24) result.add(i);
+                        }
+                    }
+                    Prop obj = result.getFirst();
                     if (obj != null) {
                         if (obj.onInteract != null) {
                             obj.onInteract.interact(host);
@@ -252,7 +263,7 @@ public enum Actions {
             return false;
         }
     },
-    Rest(0,0,0,0,0,new Tags(){{
+    Rest(50,0,0,0,0,new Tags(){{
         add(Tag.Athletics);
     }}){
         public int getRange(Unit p){
@@ -260,21 +271,15 @@ public enum Actions {
         }
         public void onSet(Unit host){
             if (host.stats.strength.isFull()) host.stateSet(Idle);
-//            else host.stats.strength.add(-1, false);
+            host.delay.set(host.delay.time + 200/host.stateLevel);
         }
         public void update(Unit host) {
-            if (host.stateDuration >= 480/(3 + host.stateLevel)){
-                host.stats.strength.heal();
-                host.setState(Actions.Idle);
-            }
+            int term = host.delay.max / host.stats.strength.getMax();
+            if (host.stateDuration > 0 && host.stateDuration % term == 0) host.stats.strength.add(1, false);
         }
-        public void specialOrder(Unit host, float dist){
-            host.delay.time = 480/(3 + host.stateLevel);
-            host.delay.performer = new Performer(){
-                public void perform(){
-                    host.stats.strength.heal();
-                }
-            };
+        public boolean onFinish(Unit host){
+            host.stats.strength.add(1, false);
+            return true;
         }
     },
     Melee(24,1,0,0,0,new Tags(){{
@@ -293,7 +298,7 @@ public enum Actions {
             for (Unit i : host.map.updater.collideUnit(hitbox.ptd, (int) hitbox.getLength()+64, host.faction)) {
                 if (i.hit(hitbox, damage)) {
                     Sound.play(host.map, host.pos, "hit_punch");
-                    new Thing(host.map, "hit_1", -1, 150) {
+                    new Thing(host.map, "hit","hit_1", -1, 150) {
                         private int n = 0;
                         public void draw(Graphics2D g) {
                             if (n <= 7) {
@@ -452,7 +457,7 @@ public enum Actions {
                 for (Unit victim : target) {
                     if (victim.state == Down || victim.state == Hit) { //down or stunned
                         Sound.play(host.map, host.pos, "wear");
-                        Weapon holder = new Weapon(host.map, null, 0, Item.Material.Organic, Item.ItemType.Bashing) {
+                        Weapon holder = new Weapon(host.map, "Victim",null, 0, Item.Material.Organic, Item.ItemType.Bashing) {
                             public String forceToString() {
                                 return "";
                             }
@@ -604,7 +609,7 @@ public enum Actions {
                 for (Unit i : host.map.updater.collideUnit(host.pos, (int) hitbox.getLength() + 64, host.faction)) {
                     if (i.hit(hitbox, 5)) {
                         Sound.play(host.map, host.pos, "hit_bash");
-                        new Thing(host.map, "hit_1", -1, 150) {
+                        new Thing(host.map, "hit","hit_1", -1, 150) {
                             private int n = 0;
                             public void draw(Graphics2D g) {
                                 if (n <= 7) {
@@ -639,7 +644,7 @@ public enum Actions {
             for (Unit i : host.map.updater.collideUnit(hitbox.ptd, (int) hitbox.getLength()+64, host.faction)) {
                 if (i.hit(hitbox, damage)) {
                     Sound.play(host.map, host.pos, "hit_punch");
-                    new Thing(host.map, "hit_1", -1, 150) {
+                    new Thing(host.map, "hit","hit_1", -1, 150) {
                         private int n = 0;
                         public void draw(Graphics2D g) {
                             if (n <= 7) {
@@ -842,7 +847,7 @@ public enum Actions {
                 host.attack();
                 for (Unit i : host.map.updater.collideUnit(host.pos, 64, host.faction)) {
                     Sound.play(host.map, host.pos, "hit_bash");
-                    new Thing(host.map, "hit_1", -1, 150) {
+                    new Thing(host.map, "hit","hit_1", -1, 150) {
                         private int n = 0;
                         public void draw(Graphics2D g) {
                             if (n <= 7) {
@@ -975,7 +980,7 @@ public enum Actions {
             r.start();
         }
     },
-    Magic_Arrow(40,1,2,1,1,new Tags(){{
+    Glowshot(40,1,2,1,1,new Tags(){{
         add(Tag.Conjuration);
     }}){
         public int getRange(Unit host){
@@ -1001,7 +1006,7 @@ public enum Actions {
                     if (tangible || lastLand.depth == 0) rotateTo(vel);
                 }
             };
-            pj.image = new ShadedPicture(pj.rand, pj.name, Shader.Color);
+            pj.image = new ShadedPicture(pj.rand, pj.image.image, Shader.Color);
             ((ShadedPicture) pj.image).shade(new Color(255,255,255,255).getRGB());
             pj.setDepth(300);
             pj.lastLand = host.lastLand;
@@ -1079,7 +1084,7 @@ public enum Actions {
                     } else {
                         t.pos.set(host.pos);
                         int ctype = t.image.getCenterType();
-                        t.image = new ShadedPicture(t.rand, t.name, Shader.Color);
+                        t.image = new ShadedPicture(t.rand, t.image.image, Shader.Color);
                         ((ShadedPicture) t.image).shade(new Color(48, 156, 200, 150).getRGB());
                         t.image.setCenterType(ctype);
                     }

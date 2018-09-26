@@ -1,30 +1,30 @@
-Rock,2,1,0,[Stone],[Hard] //Weapon, Image Type, Weight, Value, Materials
-Water,2,0,0,[Other],[]
-Shell,2,0,250,[Bone],[Sharp]
-Starfish,2,0,250,[Organic],[],A cooking ingredient.
-Flowerpot,2,1,500,[Organic],[]
-Chair,2,6,1500,[Wooden,Stone],[]
-Salt,2,0,0,[Other],[],A cooking ingredient.
-Sugar,2,0,0,[Other],[],A cooking ingredient.
-Cup,2,0,0,[Glass],[]
-Statue,2,12,4000,[Stone],[Hard]
-Lockpick,1,0,2000,[Wooden],[]
-Jug,2,4,1,[Glass],[]
-Stool,2,6,1000,[Wooden,Other],[]
-Candle,2,0,200,[Other],[]
-Threadball,2,0,200,[Cloth],[]
-Bone,1,1,0,[Bone],[],Cannot be eaten raw. Used as a cooking ingredient.
-Pitcher,2,2,200,[Glass,Stone,Iron,Copper],[]
-Lightstand,2,1,400,[Wooden,Iron],[]
-Cone,2,1,100,[Other],[]
-Resin,2,2,500,[Organic],[]
-Dummy,2,4,200,[Wooden,Cloth,Leather],[]
-Ammunition,2,1,500,[Copper,Bronze,Silver,Steel,Titanium],[]
-Firewood,1,0,200,[Wooden],[]
-Pot,1,3,1000,[Stone,Copper,Iron],[]
-Grill,1,1,1000,[Wooden,Copper,Iron],[]
-Smoking_Rack,1,2,1000,[Wooden,Copper,Iron],[]
-Drying_Rack,1,2,1000,[Wooden,Leather],[]
-Spice,1,0,1000,[Organic],[]
-Paper,1,0,1000,[Other],[]
-Rune,1,1,2500,[Crystal,Gold,Obsidian,Bone,Silver],[],This item is usually made of rare materials for use as catalysts or ingredients.
+Rock,Rock,2,1,0,[Stone],[Hard] //Weapon, Image Type, Weight, Value, Materials
+Water,Water,2,0,0,[Other],[]
+Shell,Shell,2,0,250,[Bone],[Sharp]
+Starfish,Starfish,2,0,250,[Organic],[],A cooking ingredient.
+Flowerpot,Flowerpot,2,1,500,[Organic],[]
+Chair,Chair,2,6,1500,[Wooden,Stone],[]
+Salt,Salt,2,0,0,[Other],[],A cooking ingredient.
+Sugar,Sugar,2,0,0,[Other],[],A cooking ingredient.
+Cup,Cup,2,0,0,[Glass],[]
+Statue,Statue,2,12,4000,[Stone],[Hard]
+Lockpick,Lockpick,1,0,2000,[Wooden],[]
+Jug,Jug,2,4,1,[Glass],[]
+Stool,Stool,2,6,1000,[Wooden,Other],[]
+Candle,Candle,2,0,200,[Other],[]
+Threadball,Threadball,2,0,200,[Cloth],[]
+Bone,Bone,1,1,0,[Bone],[],Cannot be eaten raw. Used as a cooking ingredient.
+Pitcher,Pitcher,2,2,200,[Glass,Stone,Iron,Copper],[]
+Lightstand,Lightstand,2,1,400,[Wooden,Iron],[]
+Cone,Cone,2,1,100,[Other],[]
+Resin,Resin,2,2,500,[Organic],[]
+Dummy,Dummy,2,4,200,[Wooden,Cloth,Leather],[]
+Ammunition,Ammunition,2,1,500,[Copper,Bronze,Silver,Steel,Titanium],[]
+Firewood,Firewood,1,0,200,[Wooden],[]
+Pot,Pot,1,3,1000,[Stone,Copper,Iron],[]
+Grill,Grill,1,1,1000,[Wooden,Copper,Iron],[]
+Smoking Rack,Smoking_Rack,1,2,1000,[Wooden,Copper,Iron],[]
+Drying Rack,Drying_Rack,1,2,1000,[Wooden,Leather],[]
+Spice,Spice,1,0,1000,[Organic],[]
+Paper,Paper,1,0,1000,[Other],[]
+Rune,Rune,1,1,2500,[Crystal,Gold,Obsidian,Bone,Silver],[],This item is usually made of rare materials for use as catalysts or ingredients.

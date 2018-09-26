@@ -31,6 +31,7 @@ public class Inventory {
         return items.size() < maxSize;
     }
     public Item getItem(int p){
+        if (p < 0 || p >= items.size()) return null;
         return items.get(p);
     }
     public L<Item> getItems(){

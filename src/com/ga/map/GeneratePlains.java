@@ -7,16 +7,16 @@ import java.util.ArrayList;
 
 class GeneratePlains {
     static void generateHills(Map map){
-        generate(map, map.isSnowing() ? "dirt,snow,[Weed=.1,Snowbush=.2]" : "dirt,grass,[Bush=.1,Weed=1]", 2);
+        generate(map, map.isSnowing() ? "dirt,snow,[Weed=.1,Frozen Bush=.2]" : "dirt,grass,[Bush=.1,Weed=1]", 2);
     }
     static void generateFields(Map map){
         String theme;
-        if (map.isSnowing()) theme = "dirt,snow,[Rock=.1,Snowbush=.2,Weed=.4,Snowtree=1]";
+        if (map.isSnowing()) theme = "dirt,snow,[Rock=.1,Frozen Bush=.2,Weed=.4,Frozen Tree=1]";
         else theme = "dirt,grass,[Rock=.1,Bush=.2,Weed=.4,Tree=1]";
         generate(map, theme, 3);
     }
     static void generateDesert(Map map){
-        generate(map, "dirt,sand,[Rock=.1,Deadbush=.2]", 1);
+        generate(map, "dirt,sand,[Rock=.1,Dead Bush=.2]", 1);
     }
     private static void generate(Map map, String theme, int type){
         Generator generator = new Generator(map, 0);

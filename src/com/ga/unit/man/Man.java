@@ -46,7 +46,8 @@ public class Man extends Unit {
         Crafts.load(this, p.get(14));
         setFace(p.get(15).get());
         setWeapon((Item) Stock.get(map, p.get(16).get()));
-        armor = new ArmorSet(this, p.get(17).get(),p.get(18).get(),p.get(19).get(),p.get(20).get(),p.get(21).get());
+        armor = new ArmorSet(this, (Item) Stock.get(map, p.get(17).get()),(Item) Stock.get(map, p.get(18).get()),(Item) Stock.get(map, p.get(19).get()),
+                (Item) Stock.get(map, p.get(20).get()),(Item) Stock.get(map, p.get(21).get()));
         for (T i : p.get(22)) inventory.addItem((Item) Stock.get(map, i.get()));
         final Man me = this;
         clip.organs[FIST].onAmputate = new Performer(){
@@ -219,6 +220,7 @@ public class Man extends Unit {
         }
     }
     public boolean requireGold(int p){
+        if (p == 0) return true;
         L<Item> items = new L<>(inventory.getItems());
         items.add(weapon);
         Collections.addAll(items, armor.armor);
@@ -248,6 +250,7 @@ public class Man extends Unit {
     }
     @Override
     public boolean requireMana(int p){
+        if (p == 0) return true;
         if (status.triggerEffect(Buffs.Affinity)) return true;
         if (traits.getTraitLevel(Traits.Trait.Affinity) > 0) {
             int mana = Math.min(stats.intelligence.get(), p);
@@ -358,7 +361,7 @@ public class Man extends Unit {
 
     public void setFace(String p){
         face = p;
-        clip.organs[5].setImage(p);
+        clip.organs[5].setImage(image.load(p));
     }
 
     public L<Prop> getAvailableItems(){

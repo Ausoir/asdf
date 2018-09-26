@@ -115,7 +115,7 @@ public enum Intelligence {
                     super.load(p);
                     String[] data = FileManager.read("Data/raw/Shop.txt").split("%");
                     advertise = new Timer(100+host.rand.nextInt(200), false);
-                    low = host.rand.nextFloat()*.5f + .5f;
+                    low = host.rand.nextFloat() * .5f + .5f;
                     high = host.rand.nextFloat() + 1f;
                     String r = "I'm selling ";
                     int length = host.rand.nextInt(20) + 1;
@@ -242,15 +242,14 @@ public enum Intelligence {
     }, Dealer{
         public AI make(Unit host) {
             return process(new NeutralAI(host) {
-                private String[] wanted;
+                private T wanted;
                 private float[] priceR;
 
                 void load(T p) {
                     super.load(p);
-                    String[] data = FileManager.read("Data/raw/Pawn.txt").split("%");
+                    wanted = FileManager.readLiteral("Data/raw/Pawn.txt", host.seed);
                     advertise = new Timer(100+host.rand.nextInt(200), false);
-                    wanted = data[host.seed % data.length].split(";");
-                    priceR = new float[wanted.length];
+                    priceR = new float[wanted.size()];
                     for (int i=0;i<priceR.length;i++){
                         priceR[i] = host.rand.nextFloat()+.1f;
                     }
@@ -262,8 +261,8 @@ public enum Intelligence {
                     ArrayList<Prop> available = new ArrayList<>();
                     ArrayList<Float> fluctuation = new ArrayList<>();
                     for (Prop i : inventory){
-                        for (int ii=0;ii<wanted.length;ii++){
-                            if (i.name.equals(wanted[ii])){
+                        for (int ii=0;ii<wanted.size();ii++){
+                            if (i.name.equals(wanted.get(ii).get())){
                                 available.add(i);
                                 fluctuation.add(priceR[ii]);
                                 break;
@@ -272,10 +271,10 @@ public enum Intelligence {
                     }
                     if (available.size() == 0){
                         String list = "I'm a broker. I buy ";
-                        for (int i=0;i<wanted.length;i++){
-                            if (i != wanted.length-1) list += wanted[i]+"s, ";
-                            else if (i > 0) list += "or "+wanted[i]+"s.";
-                            else list += wanted[i]+"s.";
+                        for (int i=0;i<wanted.size();i++){
+                            if (i != wanted.size()-1) list += wanted.get(i)+"s, ";
+                            else if (i > 0) list += "or "+wanted.get(i)+"s.";
+                            else list += wanted.get(i)+"s.";
                         }
                         Menu.menu.showDialog("Buyer", list+" Do you need something?");
                     } else {

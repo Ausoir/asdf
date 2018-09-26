@@ -1,35 +1,35 @@
-Error,1,0,0,0,0,0,0 //Name, Image Center Type, Gravity, Mobility, Random Size, Random Side, Generate Land
-Weed,2,1,0,[.3,.3],1,0
-Reed,2,1,0,[.3,.3],1,0
-Root,2,1,0,[.3,.3],1,0
-Vine,2,0,0,[.3,.3],1,0
-Stone,2,1,0,[.3,.3],1,0
-Bush,2,1,0,[.3,.3],1,0
-Deadbush,2,1,0,[.3,.3],1,0
-Tree,2,1,0,[.3,.3],1,0
-Appliance,1,1,0,[.1,.1],1,0
-Door,2,0,0,[0,0],1,0
-Signpost,2,1,0,[0,0],1,0
-Streetlight,2,1,0,[0,0],1,0
-Pole,2,1,0,[0,.2],1,0
-Ladder,2,0,0,[0,0],0,8
-Shorttable,2,1,0,[0,0],1,8
-Shortchair,2,1,0,[0,0],1,8
-Floodlight,1,1,0,[0,0],1,0
-Decoration,1,0,0,[.1,.1],1,0
-Light,1,0,0,[0,0],1,0
-Table,2,0,0,[.2,.2],1,8
-Desk,2,0,0,[.2,.2],1,8
-Bench,2,0,0,[.1,0],1,8
-Counter,2,0,0,[.3,.1],1,16
-Bottler,2,0,0,[.2,.2],1,8
-Smalltable,2,0,0,[0,0],1,8
-Painting,1,0,0,[.2,.2],1,0
-Bed,2,0,0,[.2,.2],1,8
-Snowtree,2,1,0,[.3,.3],1,0
-Snowbush,2,1,0,[.3,.3],1,0
-Vent,2,0,0,[.2,.2],1,8
-Warning,1,0,0,[.1,.1],1,8
-Dungeon,1,0,0,[.2,.2],1,0
-Sewer,1,0,0,[0,0],1,0
-Sign_Food,1,0,0,[0,0],1,0
+Error,Error,1,0,0,0,0,0,0 //Name, Image Name, Image Center Type, Gravity, Mobility, Random Size, Random Side, Generate Land
+Weed,Weed,2,1,0,[.3,.3],1,0
+Reed,Reed,2,1,0,[.3,.3],1,0
+Root,Root,2,1,0,[.3,.3],1,0
+Vine,Vine,2,0,0,[.3,.3],1,0
+Stone,Stone,2,1,0,[.3,.3],1,0
+Bush,Bush,2,1,0,[.3,.3],1,0
+Dead Bush,Deadbush,2,1,0,[.3,.3],1,0
+Tree,Tree,2,1,0,[.3,.3],1,0
+Appliance,Appliance,1,1,0,[.1,.1],1,0
+Door,Door,2,0,0,[0,0],1,0
+Signpost,Signpost,2,1,0,[0,0],1,0
+Streetlight,Streetlight,2,1,0,[0,0],1,0
+Pole,Pole,2,1,0,[0,.2],1,0
+Ladder,Ladder,2,0,0,[0,0],0,8
+Table,Shorttable,2,1,0,[0,0],1,8
+Chair,Shortchair,2,1,0,[0,0],1,8
+Floodlight,Floodlight,1,1,0,[0,0],1,0
+Decoration,Decoration,1,0,0,[.1,.1],1,0
+Light,Light,1,0,0,[0,0],1,0
+Table,Table,2,0,0,[.2,.2],1,8
+Desk,Desk,2,0,0,[.2,.2],1,8
+Bench,Bench,2,0,0,[.1,0],1,8
+Counter,Counter,2,0,0,[.3,.1],1,16
+Bottler,Bottler,2,0,0,[.2,.2],1,8
+Table,Smalltable,2,0,0,[0,0],1,8
+Painting,Painting,1,0,0,[.2,.2],1,0
+Bed,Bed,2,0,0,[.2,.2],1,8
+Frozen Tree,Snowtree,2,1,0,[.3,.3],1,0
+Frozen Bush,Snowbush,2,1,0,[.3,.3],1,0
+Vent,Vent,2,0,0,[.2,.2],1,8
+Warning,Warning,1,0,0,[.1,.1],1,8
+Dungeon,Dungeon,1,0,0,[.2,.2],1,0
+Sewer,Sewer,1,0,0,[0,0],1,0
+Food Sign,Sign_Food,1,0,0,[0,0],1,0

@@ -1,3 +1,9 @@
+To do features:
+Hospital fix broken limbs
+Utilize trait type 2 (disease/wounds) (on death?)
+Armors tiered
+Winning the game (new biome < -1, simple story)
+
 Optimizable:
 -Load texture once
 -Prop collision (with terrain) uses x^2 for x calc

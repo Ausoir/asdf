@@ -2,7 +2,6 @@ package com.ga.unit;
 
 import com.ga.game.Sound;
 import com.ga.map.Global;
-import com.ga.map.Picture;
 import com.ga.map.ShadedPicture;
 import com.ga.map.Shader;
 import com.ga.tool.Line;
@@ -11,6 +10,7 @@ import com.ga.tool.Performer;
 import com.ga.unit.item.Projectile;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 /**
@@ -23,7 +23,6 @@ public class Organ extends Line {
     public Unit host;
     private ArrayList<Organ> children = new ArrayList<>();
     public int type;
-    int health;
     private int maxLength = 80;
     public boolean vital = false;
     boolean leg = false, hand = false;
@@ -37,19 +36,12 @@ public class Organ extends Line {
         } else pt = new P();
         ptd = new P();
     }
-    public void setImage(String p){
-        image = new ShadedPicture(host.rand, p, null);
-    }
-    public void setImage(String p, int index){
-        setImage(p, index, Shader.XYLinearGradient);
-    }
-    private void setImage(String p, int index, Shader shader){
-        image = new ShadedPicture(host.rand, p, index, shader);
-        image.setSize(strokeSize, 0);
-        image.shade(0);
-    }
-    public Picture getImage(){
-        return image;
+    public void setImage(BufferedImage p){
+        image = new ShadedPicture(host.rand, p, Shader.XYLinearGradient);
+        if (type != 0) {
+            image.setSize(strokeSize, 0);
+            image.shade(0);
+        }
     }
     public void setSize(int size){
         this.strokeSize = size;

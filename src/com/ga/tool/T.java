@@ -11,26 +11,27 @@ public class T extends L<T> {
     }
     private String value;
     public T(String p){
-        boolean addOne = false;
-        if (p.startsWith("[")){
-            p = p.substring(1,p.length()-1);
-            if (!p.isEmpty()) addOne = true;
-        }
-        value = p;
-        String current = "";
-        int depth = 0;
-        for (int i=0;i<p.length();i++){
-            char ch = p.charAt(i);
-            if (ch == '[') depth++;
-            else if (ch == ']') depth--;
-            if (ch == ',' && depth == 0){
-                add(new T(current));
-                current = "";
-                addOne = true;
+        if (p != null) {
+            boolean addOne = false;
+            if (p.startsWith("[")) {
+                p = p.substring(1, p.length() - 1);
+                if (!p.isEmpty()) addOne = true;
             }
-            else current += ch;
-        }
-        if (addOne) add(new T(current));
+            value = p;
+            StringBuilder current = new StringBuilder();
+            int depth = 0;
+            for (int i = 0; i < p.length(); i++) {
+                char ch = p.charAt(i);
+                if (ch == '[') depth++;
+                else if (ch == ']') depth--;
+                if (ch == ',' && depth == 0) {
+                    add(new T(current.toString()));
+                    current = new StringBuilder();
+                    addOne = true;
+                } else current.append(ch);
+            }
+            if (addOne) add(new T(current.toString()));
+        } else value = "";
     }
     public T startsWith(String p){
         for (T i : this){
@@ -43,6 +44,16 @@ public class T extends L<T> {
     }
     public String get(){
         return value;
+    }
+    public void refresh(){
+        if (size() > 0) {
+            for (T i : this) i.refresh();
+            StringBuilder v = new StringBuilder();
+            for (int i = 0; i < size(); i++) {
+                v.append(get(i).toString()).append((i == size() - 1) ? "" : ",");
+            }
+            value = v.toString();
+        }
     }
     public T get(int index){
         if (size() <= index) return new T(""); //Performance Optimized
@@ -66,6 +77,6 @@ public class T extends L<T> {
         return value.equals(p);
     }
     public String toString(){
-        return value;
+        return size() > 0 ? wrap(value) : value;
     }
 }

@@ -26,9 +26,9 @@ public class Unit extends Prop {
             speed = p.get(0).getInt();
             attack = p.get(1).getInt();
             level = new Stat("Level", p.get(2));
-            motivation = new Stat("Motivation", p.get(3));
-            nutrition = new Stat("Nutrition", p.get(4));
-            fatigue = new Stat("Fatigue", p.get(5));
+            if (!p.get(3).equals("null")) motivation = new Stat("Motivation", p.get(3));
+            if (!p.get(4).equals("null")) nutrition = new Stat("Nutrition", p.get(4));
+            if (!p.get(5).equals("null")) fatigue = new Stat("Fatigue", p.get(5));
             strength = new Stat("Strength", p.get(6));
             agility = new Stat("Agility", p.get(7));
             intelligence = new Stat("Intelligence", p.get(8));
@@ -69,8 +69,7 @@ public class Unit extends Prop {
     };
 
     public Unit(Map map, String name, int seed) {
-        super(map, null, seed, 8);
-        this.name = name;
+        super(map, name, null, seed);
         gravity = true;
         tags.add(Tag.Athletics);
     }
@@ -91,7 +90,6 @@ public class Unit extends Prop {
         this.stats.load(p.get(8));
         status.load(p.get(9));
         Actions.load(this,p.get(12));
-        clip.setOrganHealth();
         traits.load(this,p.get(13));
     }
     @Override
@@ -410,7 +408,6 @@ public class Unit extends Prop {
         for (Organ i : clip.organs){
             i.stitch();
         }
-        clip.setOrganHealth();
         clip.updateStatus();
         setState(Actions.Down);
         delay.set(400);

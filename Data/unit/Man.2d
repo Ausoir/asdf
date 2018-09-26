@@ -1,5 +1,5 @@
 -4,3,Man_skin;4,2,Man_skin;4,2,Man_skin;4,1,Man_skin;-4,3,Man_skin;-4,0,Man_skin //larm,lleg,rleg,body,rarm,head
-18,21,21,27,18,15;1,2,2,4,1,4;2,3,3,6,2,2 //linewidth,vital,health
+18,21,21,27,18,15;1,2,2,4,1,4 //linewidth,vital
 
 -1,35;2,40;-2,40;0,-35;1,37;0,-15/4
 7,35;-12,40;14,42;0,-35;-7,36;0,-15/8 //move
