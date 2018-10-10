@@ -31,7 +31,7 @@ public class Player extends Man {
 
     public void rest(){
         int level = 2;
-        ArrayList<Prop> props = getAvailableProps();
+        ArrayList<Prop> props = getAvailableProps(e -> true);
         for (Prop i : props){
             if (i.name.equals("Bed")){
                 level = 4;

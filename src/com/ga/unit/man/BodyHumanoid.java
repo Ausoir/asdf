@@ -9,9 +9,15 @@ import com.ga.unit.skill.Actions;
  * Created by Ga on 8/1/2016. asd
  */
 public class BodyHumanoid extends Body {
-    public static final int FIST = 0, LLEG = 1, RLEG = 2, BODY = 3, OFIST = 4, HEAD = 5;
+    public static final int FIST = 0, LLEG = 1, RLEG = 2, HEAD = 3, BODY = 4, OFIST = 5;
     BodyHumanoid(Unit host) {
         super(host, "Man");
+        organs[FIST].name = "right hand";
+        organs[OFIST].name = "left hand";
+        organs[LLEG].name = "left leg";
+        organs[RLEG].name = "right leg";
+        organs[BODY].name = "body";
+        organs[HEAD].name = "head";
     }
 
     public void setAppendages(String state){
@@ -20,6 +26,14 @@ public class BodyHumanoid extends Body {
                 rotateAppendage(FIST, 15, 0);
                 localAnimation[15][OFIST][0] = localAnimation[1][OFIST][0];
                 localAnimation[15][OFIST][1] = localAnimation[1][OFIST][1];
+                rotateAppendage(BODY, 15, 0);
+                localAnimation[15][BODY][0] = (int) Global.clamp(localAnimation[15][BODY][0],-15,15);
+                localAnimation[15][BODY][1] = Math.min(5,localAnimation[15][BODY][1]);
+                break;
+            case "Offhand":
+                rotateAppendage(OFIST, 15, 0);
+                localAnimation[15][FIST][0] = localAnimation[1][FIST][0];
+                localAnimation[15][FIST][1] = localAnimation[1][FIST][1];
                 rotateAppendage(BODY, 15, 0);
                 localAnimation[15][BODY][0] = (int) Global.clamp(localAnimation[15][BODY][0],-15,15);
                 localAnimation[15][BODY][1] = Math.min(5,localAnimation[15][BODY][1]);

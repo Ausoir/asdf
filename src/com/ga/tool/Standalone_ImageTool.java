@@ -1,7 +1,6 @@
 package com.ga.tool;
 
 import com.ga.game.FileManager;
-import com.ga.map.Global;
 import com.ga.map.Picture;
 
 import java.awt.*;
@@ -24,16 +23,17 @@ public class Standalone_ImageTool {
 //        }
         FileManager.init();
         Picture.init();
-        String file = "Jean";
-        Picture image = new Picture(new Random());
-        image.set("/"+file+"/32/64/0/0");
-        Picture image1 = new Picture(new Random());
-        image1.set("/"+file+"/32/64/1/0");
-        Picture image2 = new Picture(new Random());
-        image2.set("/"+file+"/32/64/2/0");
-        BufferedImage newimage = changeOrder(image.image, image1.image, image2.image);
-        Picture.newImage("Data/item/armor/",file,newimage);
-        Global.p("");
+        String[] files = new String[]{"Burlap","Camo","Cargo","Kevlar","Leather","Mythringmail","Rogue","Security","Sweater","Template","Uniform"};
+        for (String file : files) {
+            Picture image = new Picture(new Random());
+            image.set("/" + file + "/32/64/0/0");
+            Picture image1 = new Picture(new Random());
+            image1.set("/" + file + "/32/64/1/0");
+            Picture image2 = new Picture(new Random());
+            image2.set("/" + file + "/32/64/2/0");
+            BufferedImage newimage = changeOrder(image.image, image1.image, image2.image);
+            Picture.newImage("Data/item/armor/", file, newimage);
+        }
     }
     private static BufferedImage changeOrder(BufferedImage image,BufferedImage image1,BufferedImage image2){
         int width = image.getWidth();

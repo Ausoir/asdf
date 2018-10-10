@@ -21,6 +21,7 @@ public class PlayerInput implements Input {
     private HashMap<Integer, String> keyActionMap = new HashMap<>();
     public static ArrayList<Actions> basicMoves = new ArrayList<>() {{
         add(Actions.Use);
+        add(Actions.Offhand);
         add(Actions.Idle);
         add(Actions.Left);
         add(Actions.Right);
@@ -178,6 +179,7 @@ public class PlayerInput implements Input {
             keyActionMap.put(81, Actions.Throw.name());
             keyActionMap.put(82, Actions.Wield.name());
             keyActionMap.put(90, Actions.Activate.name());
+            keyActionMap.put(3, Actions.Offhand.name());
             keyActionMap.put(17, "_CTRL");
             keyActionMap.put(10, "_SAY");
             keyActionMap.put(9, "_MENU");

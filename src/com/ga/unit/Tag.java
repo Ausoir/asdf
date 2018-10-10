@@ -8,5 +8,5 @@ public enum Tag {
     Enchant, Channeling, Void, Air, Fire, Conjuration, //Magic Trainers
     Strength, Athletics, //Melee Trainers
     Curse, //Magic Label Only
-    Currency, Hard, Sharp //Item Quality
+    Currency //Item Quality
 }

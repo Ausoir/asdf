@@ -121,9 +121,9 @@ public enum Stock {
                 UnitFactory unitString = new UnitFactory(this, Faction.valueOf(data.get(5).get()), data.get(4));
                 unitString.setAI(data.get(6).get(0).getInt(), data.get(6).get(1).getInt());
                 unitString.setMoveset(data.get(7).get());
-                unitString.addInventory(data.get(11));
-                unitString.setEquipment(data.get(8), data.get(9), data.get(10));
-                traits.load(this, data.get(12));
+                unitString.addInventory(data.get(12));
+                unitString.setEquipment(data.get(8), data.get(9), data.get(10), data.get(11));
+                traits.load(this, data.get(13));
             }
         };
         if (!data.get(2).get().isEmpty()) product.clip.setImage(data.get(2).get());
@@ -142,11 +142,10 @@ public enum Stock {
             }
             public String getDescription(){
                 String r = super.getDescription();
-                if (data.size() > 7) r += data.get(7).get();
+                if (data.size() > 6) r += data.get(6).get();
                 return r;
             }
         };
-        for (T i : data.get(6)) product.tags.add(Tag.valueOf(i.get()));
         product.weight = Integer.parseInt(data.get(3).get());
         product.value = Integer.parseInt(data.get(4).get());
         product.dir = product.seed % 2 == 0 ? 1 : -1;
@@ -162,7 +161,6 @@ public enum Stock {
                 imbueMaterial(Item.Material.load(data.get(3)));
             }
         };
-        for (T i : data.get(4)) product.tags.add(Tag.valueOf(i.get()));
         product.subId = id;
         return product;
     }},
@@ -255,8 +253,10 @@ public enum Stock {
                 super.buff(buff, level);
             }
             public void onCreate(){
-                UnitFactory unit = new UnitFactory(this, Faction.Predator, new T("1,1,1"));
+                int agi = rand.nextInt(8)+1;
+                UnitFactory unit = new UnitFactory(this, Faction.Predator, new T("3,"+agi+",3"));
                 unit.setMoveset("[Melee]");
+                traits.load(this, new T("[Bloodless,1],[Inorganic,1],[Instinct,1]"));
                 stats.speed = 8;
             }
             public void die(String p){
@@ -277,7 +277,7 @@ public enum Stock {
                 return 200;
             }
             public void stateSet(Actions state) {
-                if (SyncRand.r.nextBoolean()) state = Actions.Jump;
+                if (SyncRand.getBool()) state = Actions.Jump;
                 if (state == Actions.Jump){
                     vel.y = -Settings.gravity*8;
                     vel.x += dir * 4;
@@ -362,6 +362,7 @@ public enum Stock {
                 UnitFactory unitString = new UnitFactory(this, Faction.Predator, new T("7,10,2"));
                 unitString.setMoveset("[Melee]");
                 unitString.setMoveset("Backstep");
+                traits.load(this, new T("[Bloodless,1],[Painless,1],[Inorganic,1]"));
             }
             public float getReach(){
                 return 280;
@@ -562,11 +563,11 @@ public enum Stock {
         Item product = new Item(map, name(), name(), seed, Item.Material.Cloth, Item.ItemType.Scroll, 4){
             public boolean use(Man host){
                 if (super.use(host)){
-                    String[] recipes = data.get(1).get().split(";");
+                    T recipes = data.get(1);
                     boolean learned = false;
-                    for (String i : recipes){
-                        if (!host.crafting.contains(i)){
-                            host.crafting.add(i);
+                    for (T i : recipes){
+                        if (!host.crafting.contains(i.get())){
+                            host.crafting.add(i.get());
                             learned = true;
                         }
                     }
@@ -806,7 +807,7 @@ public enum Stock {
                             if (subId < Global.hour) {
                                 Menu.menu.showDialog("Safe", "How long would you like to use this storage? " + Dialog.money(100) + " per hour." +
                                                 "\nWARNING - The safe is not responsible for any items stolen after hours are over.",
-                                        new String[]{"1 hour", "1 day (6 hours)", "1 week (42 hours)", "1 month (180 hours)"}, new Performer[]{
+                                        new String[]{"1 hour", "1 day/6 hours", "1 week/42 hours", "1 month/180 hours"}, new Performer[]{
                                             new Performer() {
                                                 public void perform() {
                                                     if (p.requireGold(100)) subId = 1 + Global.hour;
@@ -864,7 +865,7 @@ public enum Stock {
         return product;
     }},
     Scrap{ Prop make(Map map, int id, int seed){
-        Item product = new Item(map, name(), name(), seed, null, Item.ItemType.Throwing, 1){
+        Item product = new Item(map, name(), name(), seed, null, Item.ItemType.Throwing){
             public void onCreate(){
                 imbueMaterial(Item.Material.values());
             }
@@ -877,10 +878,10 @@ public enum Stock {
         return product;
     }},
     Repairkit{ Prop make(Map map, int id, int seed){
-        int level = (seed % 9)+1;
-        Item product = new Item(map, name(), name(), seed, null, Item.ItemType.Scroll, 20*level){
+        Item product = new Item(map, name(), name(), seed, null, Item.ItemType.Scroll){
             public void onCreate(){
                 imbueMaterial(Material.values());
+                durability = uses = 50;
             }
             public boolean use(Man host){
                 if (host == Global.player && super.use(host)) {
@@ -908,9 +909,6 @@ public enum Stock {
                     Menu.menu.showDialog("Use Repairkit", "Select a weapon or an armor to repair", itemList, perf);
                 }
                 return true;
-            }
-            public String getName(){
-                return getMaterial().name() + " " + super.getName();
             }
             public String getDescription(){
                 return super.getDescription()+"Use this trinket to repair items made of same material. Takes 1 hour.";
@@ -940,7 +938,7 @@ public enum Stock {
                                 P tip = host.weapon.getLine().ptd;
                                 final Item wpn = host.weapon;
                                 int str = host.stats.strength.getMax();
-                                int speed = (int) (40 + Global.clamp(str * 12 + 20, 48, 120) - (SyncRand.r.nextFloat() * (44 / str)));
+                                int speed = (int) (40 + Global.clamp(str * 12 + 20, 48, 120) - SyncRand.getFloat(44 / str));
                                 final Projectile pj = new Projectile(host.map, "Arrow", tip, host.getHand().getAdd(host.target), speed) {
                                     public void onField() {}
                                     public void onAttack(Unit p) {
@@ -1111,7 +1109,7 @@ public enum Stock {
                 imbueMaterial(new Item.Material[]{Item.Material.Steel, Item.Material.Bone, Item.Material.Copper, Item.Material.Iron, Item.Material.Titanium, Item.Material.Glass});
             }
             public boolean use(final com.ga.unit.man.Man host){
-                if (!host.clip.organs[BodyHumanoid.FIST].amputated && super.use(host) && isUsable(true, 1)) {
+                if (super.use(host) && isUsable(true, 1)) {
                     host.delay.performer = new Performer() {
                         public void perform() {
                             final Projectile p = new Projectile(map, name(), host.pos.getAdd(host.clip.organs[BodyHumanoid.OFIST].ptd), host.pos.getAdd(host.target), 70) {
@@ -1121,7 +1119,7 @@ public enum Stock {
                                     super.stuck();
                                 }
                             };
-                            p.rotSpeed = 0;
+                            p.rotSpeed = 1;
                             p.faction = host.faction;
                             p.damage = getDamage();
                             p.gravity = false;
@@ -1314,6 +1312,80 @@ public enum Stock {
         product.value = 2800;
         return product;
     }},
+    Tranquilizer{ Prop make(Map map, int id, int seed){
+        int level = (seed % 2) + 1;
+        Item product = new Item(map, name(), name(), seed, Item.Material.Glass, Item.ItemType.Darting, level * 2){
+            public boolean use(final com.ga.unit.man.Man host){
+                if (super.use(host) && isUsable(true, 1)) {
+                    host.delay.performer = new Performer() {
+                        public void perform() {
+                            final Projectile p = new Projectile(map, name(), host.pos.getAdd(host.clip.organs[BodyHumanoid.OFIST].ptd), host.pos.getAdd(host.target), 100) {
+                                public void stuck() {
+                                    if (tangible) Particle.implode(map, "Spark", getDepth(), pos, 18, 10, false, 20);
+                                    super.stuck();
+                                }
+                                public void onAttack(Unit p){
+                                    super.onAttack(p);
+                                    p.setState(Actions.Down);
+                                    p.buff(Buffs.Tranquilized, 1);
+                                }
+                            };
+                            p.rotSpeed = 0;
+                            p.faction = host.faction;
+                            p.gravity = false;
+                            p.setDepth(host.getDepth());
+                            p.delay.set(6);
+                            p.delay.performer = new Performer() {
+                                @Override
+                                public void perform() {
+                                    p.gravity = true;
+                                }
+                            };
+                        }
+                    };
+                    return true;
+                }
+                return false;
+            }
+            public String getFullName(){
+                return level == 2 ? "Heavy " : "" + super.getFullName();
+            }
+        };
+        product.weight = level;
+        product.range = 500;
+        product.value = 10000 * level;
+        return product;
+    }},
+    Generator{ Prop make(Map map, int id, int seed){
+        int level = seed % 3 + 1;
+        Item product = new Item(map, name(), name(),seed, Item.Material.Crystal, Item.ItemType.Bashing){
+            public String getFullName(){
+                return "Level " + level + " " + super.getFullName();
+            }
+            public boolean trigger(Unit host){
+                if (cooldown.isReady()) {
+                    if (isUsable(true, 1)) {
+                        if (host == Global.player){
+                            if (!host.map.isSnowing()) {
+                                if (host.map.updater.sleep(1, true)){
+                                    Particle.sparkle(host.map, "Glare", host.getDepth(), host.getHand(), 24, 6);
+                                    Global.player.rechargeMana(10);
+                                    cooldown.reset();
+                                    return true;
+                                }
+                            } else host.say("Ambient temperature is too cold to generate energy!");
+                        }
+                    }
+                } else host.say("");
+                return false;
+            }
+            public String getDescription(){
+                return super.getDescription()+"\nThis item can generate energy.";
+            }
+        };
+        product.disposable = false;
+        return product;
+    }},
     Energy_Necklace{ Prop make(Map map, int id, int seed){
         int level = seed % 3 + 1;
         Armor product = new Armor(map, "Energy Necklace","Jewelry",seed,null,4, level-1,0, 0, 0){
@@ -1333,44 +1405,9 @@ public enum Stock {
         product.tags.add(Tag.Energy);
         return product;
     }},
-    Power_Necklace{ Prop make(Map map, int id, int seed){
-        int level = seed % 3 + 1;
-        Armor product = new Armor(map, "Power Necklace", "Jewelry",seed,null,4, level, 0, 0, 0){
-            public void onCreate(){
-                imbueMaterial(new Item.Material[]{Item.Material.Stone, Item.Material.Glass, Item.Material.Crystal, Item.Material.Obsidian});
-            }
-            public String getFullName(){
-                return "Level " + level + " " + super.getFullName();
-            }
-            public boolean trigger(Unit host){
-                if (cooldown.isReady()) {
-                    if (isUsable(true, 1)) {
-                        if (host == Global.player){
-                            if (host.map.isSnowing()) {
-                                if (host.map.updater.sleep(1, true)){
-                                    Particle.sparkle(host.map, "Glare", host.getDepth(), host.getHand(), 24, 6);
-                                    Global.player.rechargeMana(10);
-                                    cooldown.reset();
-                                    return true;
-                                }
-                            } else host.say("I need to be in freezing temperature to generate energy!");
-                        }
-                    }
-                } else host.say("");
-                return false;
-            }
-            public String getDescription(){
-                return super.getDescription()+"\nThis item can store Energy for magical applications. This item can also be activated to generate energy in cold environments.";
-            }
-        };
-        product.durability = level * level * 4;
-        product.disposable = false;
-        product.tags.add(Tag.Energy);
-        return product;
-    }},
-    Swordcollar{ Prop make(Map map, int id, int seed){
+    Bladecollar{ Prop make(Map map, int id, int seed){
         int level = seed % 8 + 1;
-        Armor product = new Armor(map, "Swordcollar", "Jewelry",seed,Item.Material.Stone
+        Armor product = new Armor(map, "Bladecollar", "Jewelry",seed,Item.Material.Stone
                 ,4,1,0, 20, 0){
             public boolean trigger(Unit host){
                 if (cooldown.isReady()) {
@@ -1391,31 +1428,32 @@ public enum Stock {
                 return super.getDescription()+"\nUsing this trinket will cast level "+level+" Ethersword.";
             }
         };
-        product.name = "Swordcollar";
         product.disposable = false;
         return product;
     }},
-    Memoryfoam_Necklace{ Prop make(Map map, int id, int seed){
-        return new Armor(map, "Memoryfoam Necklace", "Jewelry",seed,Item.Material.Other,4,1,0,0, 0){
-            private String location;
+    Memoryfoam{ Prop make(Map map, int id, int seed){
+        return new Armor(map, name(), "Jewelry",seed,Item.Material.Other,4,1,0,0, 0){
+            private T location = new T("");
             public void onCreate(){
                 imbueMeta(true, false, 0);
             }
             public boolean trigger(Unit host){
                 if (host == Global.player && isUsable(true, 1) && cooldown.isReady()) {
                     cooldown.reset();
-                    String[] location = this.location.split(",");
-                    if (host.map.name.toString().equals(location[0])){
-                        host.pos.add(new P(location[1]).getSubtract(host.pos));
+                    if (host.map.name.toString().equals(location.get(0).get())){
+                        host.pos.add(new P(location.get(1).get()).getSubtract(host.pos));
                         Particle.holyExplosion(host.map, host.getHead(), host.getDepth());
-                    } else {
+                    } else if (!location.get().isEmpty()){
+                        for (Unit i : host.map.updater.unitsLoaded){
+                            if (i.brain.target == host) i.brain.target = null;
+                        }
                         Global.server.afterMapChange = new Performer() {
                             public void perform() {
-                                Global.player.pos = new P(location[1]);
+                                Global.player.pos = new P(location.get(1).get());
                                 Particle.holyExplosion(host.map, host.getHead(), host.getDepth());
                             }
                         };
-                        Global.server.requestChangeMap(location[0] + ",0");
+                        Global.server.requestChangeMap(location.get(0).get() + ",0");
                     }
                     return true;
                 }
@@ -1423,7 +1461,7 @@ public enum Stock {
             }
             public boolean use(com.ga.unit.man.Man host){
                 if (super.use(host)){
-                    location = host.map.name+","+host.pos.toString();
+                    location = new T(T.wrap(host.map.name+","+host.pos.toString()));
                     return true;
                 }
                 return false;
@@ -1433,16 +1471,16 @@ public enum Stock {
             }
             public void load(T p){
                 super.load(p);
-                location = p.get(8).get();
+                location = p.get(9);
             }
             public String toString(){
-                return super.toString()+","+location;
+                return super.toString()+","+location.toString();
             }
         };
     }},
-    Rogue_Cloak{ Prop make(Map map, int id, int seed){
+    Rogloak{ Prop make(Map map, int id, int seed){
         int level = (seed % 2)+1;
-        Armor product = new Armor(map, "Rogue Cloak", "Night_Cloak",seed,Item.Material.Silk,3,level*2-1,0, 0, 0){
+        Armor product = new Armor(map, name(), "Night_Cloak",seed,Item.Material.Silk,3,level*2-1,0, 0, 0){
             public String getFullName(){
                 if (level == 1) return super.getFullName();
                 else return "Master "+super.getFullName();
@@ -1451,9 +1489,9 @@ public enum Stock {
         for (int i=0;i<level;i++) product.tags.add(Tag.Athletics);
         return product;
     }},
-    Rogue_Bracelet{ Prop make(Map map, int id, int seed){
+    Roglet{ Prop make(Map map, int id, int seed){
         int level = (seed % 2)+1;
-        Armor product = new Armor(map, "Rogue Bracelet", "Jewelry",seed,Item.Material.Silk,4,level*2-1,0,0, 0){
+        Armor product = new Armor(map, name(), "Jewelry",seed,Item.Material.Silk,4,level*2-1,0,0, 0){
             public String getFullName(){
                 if (level == 1) return super.getFullName();
                 else return "Master "+super.getFullName();
@@ -1462,9 +1500,9 @@ public enum Stock {
         for (int i=0;i<level;i++) product.tags.add(Tag.Athletics);
         return product;
     }},
-    Rogue_Dagger{ Prop make(Map map, int id, int seed){
+    Bloodsucker{ Prop make(Map map, int id, int seed){
         int level = (seed % 2)+1;
-        Weapon product = new Weapon(map, "Rogue Dagger", "Knife", seed, Item.Material.Obsidian, Item.ItemType.Sword){
+        Weapon product = new Weapon(map, name(), "Knife", seed, Item.Material.Obsidian, Item.ItemType.Sword){
             public boolean trigger(Unit target){
                 boolean r = super.trigger(target);
                 for (Item item : owner.armor.armor) item.isUsable(true, -level);
@@ -1477,39 +1515,6 @@ public enum Stock {
             }
         };
         product.name = name();
-        return product;
-    }},
-    Jeweled_Scarf{ Prop make(Map map, int id, int seed){
-        Armor product = new Armor(map, "Jeweled Scarf", "Jewelry",seed,Item.Material.Silk,3,4,0, 10, 0);
-        product.name = "Jewel_Scarf";
-        product.tags.add(Tag.Channeling);
-        product.tags.add(Tag.Conjuration);
-        product.tags.add(Tag.Fire);
-        product.tags.add(Tag.Enchant);
-        product.tags.add(Tag.Curse);
-        product.tags.add(Tag.Void);
-        return product;
-    }},
-    Jeweled_Bracelet{ Prop make(Map map, int id, int seed){
-        Armor product = new Armor(map, "Jeweled Bracelet", "Jewelry",seed,Item.Material.Gold,4,4,0, 0, 0);
-        product.name = "Jewel_Bracelet";
-        product.tags.add(Tag.Channeling);
-        product.tags.add(Tag.Conjuration);
-        product.tags.add(Tag.Fire);
-        product.tags.add(Tag.Curse);
-        product.tags.add(Tag.Air);
-        product.tags.add(Tag.Void);
-        return product;
-    }},
-    Jeweled_Crown{ Prop make(Map map, int id, int seed){
-        Armor product = new Armor(map, "Jeweled Crown", "Jewelry",seed,Item.Material.Gold,0,4,0, 0, 0);
-        product.name = "Jewel_Crown";
-        product.tags.add(Tag.Channeling);
-        product.tags.add(Tag.Conjuration);
-        product.tags.add(Tag.Fire);
-        product.tags.add(Tag.Curse);
-        product.tags.add(Tag.Air);
-        product.tags.add(Tag.Void);
         return product;
     }};
     private static HashMap<String, String> extRegistry = new HashMap<>();
@@ -1577,15 +1582,13 @@ class UnitFactory {
         unit.stats.attack = host.rand.nextInt(10)-8;
         setAI(2, 0);
     }
-    void setEquipment(T weapon, T armor, T helms){
+    void setEquipment(T weapon, T top, T bottom, T helms){
         Man man = (Man) host;
         if (!weapon.get().isEmpty()) man.setWeapon((Item) Stock.createByName(host.map, weapon.get(host.seed % weapon.size()).get(), -1));
-        String armorName = armor.get(host.seed % armor.size()).get();
-        String helmName = helms.get(host.seed % helms.size()).get();
-        man.armor = new ArmorSet(man, helmName.isEmpty() ? null : (Item) Stock.createByName(man.map, helmName, -1),
-                armorName.isEmpty() ? null : (Item) Stock.createByName(man.map, armorName + " Torso", -1),
-                armorName.isEmpty() ? null : (Item) Stock.createByName(man.map, armorName + " Pants", -1),
-                null, null);
+        Item armor = top.size() == 0 ? null : (Item) Stock.createByName(man.map, top.get(host.seed % top.size()).get(), -1);
+        Item pants = bottom.size() == 0 ? null : (Item) Stock.createByName(man.map, bottom.get(host.seed % bottom.size()).get(), -1);
+        Item helm = helms.size() == 0 ? null : (Item) Stock.createByName(man.map, helms.get(host.seed % helms.size()).get(), -1);
+        man.armor = new ArmorSet(man, helm, armor, pants, null, null);
     }
     void addInventory(T items){
         Man man = (Man) host;

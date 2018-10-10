@@ -27,17 +27,19 @@ public class Food extends Item {
     }
     @Override
     public boolean use(Man p){
-        if (isUsable(true, 1) && super.use(p)) {
-            int perishTime = perish - Global.hour;
-            if (perishTime <= 0 && seed % 10 < getPoisonChance()){
-                p.buff(Buffs.Poison, 1);
-                p.say("Gawrrrr! That didn't taste good...");
-            } else {
-                p.stats.motivation.add(taste, false);
+        if (!p.stats.nutrition.isFull()) {
+            if (isUsable(true, 1) && super.use(p)) {
+                int perishTime = perish - Global.hour;
+                if (perishTime <= 0 && seed % 10 < getPoisonChance()) {
+                    p.buff(Buffs.Poison, 1);
+                    p.say("Gawrrrr! That didn't taste good...");
+                } else {
+                    p.stats.motivation.add(taste, false);
+                }
+                p.stats.nutrition.add(nutrition, false);
+                return true;
             }
-            p.stats.nutrition.add(nutrition, false);
-            return true;
-        }
+        } else p.say("Too full!");
         return false;
     }
     private int getPoisonChance(){ // 0 to 10

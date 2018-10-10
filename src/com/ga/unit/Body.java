@@ -158,7 +158,7 @@ public class Body {
     }
 
     P randomPoint(){
-        return organs[SyncRand.r.nextInt(organs.length)].ptd;
+        return organs[SyncRand.getInt(organs.length)].ptd;
     }
 
     public boolean isStateValid(String p){
@@ -266,7 +266,6 @@ public class Body {
             if (i.type != 0) i.setImage(Picture.load("/"+p+"/32/64/"+(i.type-1)+"/0",null));
         }
     }
-
     int getHead(){
         for (int i=0;i<organs.length;i++) {
             if (organs[i].vital && !organs[i].amputated) return i;

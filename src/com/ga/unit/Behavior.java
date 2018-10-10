@@ -15,6 +15,7 @@ import java.util.ArrayList;
 public enum Behavior {
     Idle {
         boolean update(Unit host) {
+            host.setState(Actions.Idle);
             return host.brain.taskProgress++ > 32;
         }
     }, Wander {
@@ -99,7 +100,7 @@ public enum Behavior {
         public void blocked(Unit host, boolean fall) {
         }
         void load(Unit host, String p){
-            if (!p.equals("x")) host.brain.target = Updater.getActor(Integer.parseInt(p));
+            if (!p.isEmpty()) host.brain.target = Updater.getActor(Integer.parseInt(p));
         }
         String getVar(Unit host){
             return ""+host.brain.target.controlId;
@@ -146,7 +147,7 @@ public enum Behavior {
             host.setState(Actions.Jump);
         }
         void load(Unit host, String p){
-            if (!p.equals("x")) host.brain.target = Updater.getActor(Integer.parseInt(p));
+            if (!p.isEmpty()) host.brain.target = Updater.getActor(Integer.parseInt(p));
         }
         String getVar(Unit host){
             return host.brain.target == null ? "" : ""+host.brain.target.controlId;
@@ -170,11 +171,10 @@ public enum Behavior {
             return false;
         }
     };
-
     void load(Unit host, String p){
     }
     String getVar(Unit host){
-        return "x";
+        return "";
     }
     int getAlertness(){
         return 0;
@@ -183,7 +183,6 @@ public enum Behavior {
         return true;
     }
     void blocked(Unit host, boolean fall){
-
     }
     public String toString(Unit host){
         return "["+ordinal()+","+getVar(host)+"]";

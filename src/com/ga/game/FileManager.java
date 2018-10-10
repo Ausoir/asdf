@@ -95,6 +95,11 @@ public class FileManager {
     public static void loadPlayer(){
         String data = read("Data/map/Player.user");
         String keymap = read("Data/Keymap.txt");
+        boolean veryFirst = false;
+        if (data.isEmpty()){
+            veryFirst = true;
+            data = read(FileManager.makeDirectory("Data/map/Template.user"));
+        }
         MainPlayer player = ((MainPlayer) Stock.Player.create(null, 1, 0));
         Global.display.input = player.input;
         player.load(new T(data));
@@ -106,7 +111,7 @@ public class FileManager {
         player.map.render();
         Global.camera = player.map.mapEdgeCenter(player.map.size.getMult(.5f, .5f));
         player.start();
-        Menu.init();
+        Menu.init(veryFirst);
     }
 
     public static void loadActors(){

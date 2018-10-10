@@ -17,6 +17,7 @@ import java.util.ArrayList;
  * Created by Ga on 7/29/2016. asd
  */
 public class Organ extends Line {
+    public String name;
     private int strokeSize = 10;
     public ShadedPicture image;
     public boolean amputated = false;
@@ -82,6 +83,7 @@ public class Organ extends Line {
                     }
                 }
             };
+            flyingOrgan.vel.x *= 3;
             flyingOrgan.image = image.copy();
             flyingOrgan.rotation = getAtan()-1.57f;
             flyingOrgan.dir = host.dir;

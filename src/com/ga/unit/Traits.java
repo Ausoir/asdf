@@ -9,50 +9,28 @@ import java.util.ArrayList;
  */
 public class Traits {
     public enum Trait {
-        Tough(0,"Resist flinching from being hit."),
+        Painless(0,"Resist flinching from being hit."),
+        Bloodless(0,"Immune to bleeding."),
+        Inorganic(0,"Immune to burning damage."),
+        Restless(0,"Does not require Stamina to perform actions."),
+        Overcharged(0,"Energy is full when performing actions."),
 
+        Learner(1,"Gain 1 motivation every hour."),
+        Instinct(1,"Evade decapitations using a Vitality point."),
         Literacy(1,"Learn to read runes. You may now identify scrolls."),
         Alchemy(1,"Gain familiarity with alchemy. You may now identify potions."),
-        Affinity(1,"Utilize energy from your body. The energy store is equal to your Intelligence."),
+        Affinity(1,"Utilize energy from your body. The energy capacity is equal to your Intelligence."),
 
+        // ----- Type 2 Unimplemented
         Lung_Injury(2,"Rest time quadrupled."),
         Damaged_Liver(2,"Nutrition from food -1. Potions do no effect."),
-        Blindness(2,"Cannot read books or scrolls. Cannot target properly. Cannot see any objects."),
-        Brain_Damage(2,"Lose all traits and skills."){
-            public void onSet(Unit host){
-                for (Trait i : host.traits.trait){
-                    if (i.type != 2) host.traits.forget(host, i);
-                }
-                host.moveset.clear();
-            }
-        },
+        Blindness(2,"Cannot target with cursor. Cannot read books or scrolls."),
+        Depression(2,"Lose 1 motivation every hour."),
+        Brain_Damage(2,"Lose all traits and skills."),
+        // -----
 
         Energy(3,"Learn energy generation methods."){
             Tag tag = Tag.Energy;
-            public void onSet(Unit host){
-                onAdd(host);
-            }
-            public void onAdd(Unit host){
-                host.tags.add(tag);
-            }
-            public void onRemove(Unit host){
-                host.tags.remove(tag);
-            }
-        },
-        Pyromancy(3,"Forge energy into roaring flames."){
-            Tag tag = Tag.Fire;
-            public void onSet(Unit host){
-                onAdd(host);
-            }
-            public void onAdd(Unit host){
-                host.tags.add(tag);
-            }
-            public void onRemove(Unit host){
-                host.tags.remove(tag);
-            }
-        },
-        Infusion(3,"Create matter and soul from energy."){
-            Tag tag = Tag.Conjuration;
             public void onSet(Unit host){
                 onAdd(host);
             }
@@ -75,7 +53,31 @@ public class Traits {
                 host.tags.remove(tag);
             }
         },
-        Aeromancy(3,"Guide air with energy."){
+        Pyromancy(3,"Forge energy into damaging fire."){
+            Tag tag = Tag.Fire;
+            public void onSet(Unit host){
+                onAdd(host);
+            }
+            public void onAdd(Unit host){
+                host.tags.add(tag);
+            }
+            public void onRemove(Unit host){
+                host.tags.remove(tag);
+            }
+        },
+        Infusion(3,"Conjure matter from energy."){
+            Tag tag = Tag.Conjuration;
+            public void onSet(Unit host){
+                onAdd(host);
+            }
+            public void onAdd(Unit host){
+                host.tags.add(tag);
+            }
+            public void onRemove(Unit host){
+                host.tags.remove(tag);
+            }
+        },
+        Aeromancy(3,"Manipulate air with energy."){
             Tag tag = Tag.Air;
             public void onSet(Unit host){
                 onAdd(host);
@@ -99,7 +101,7 @@ public class Traits {
                 host.tags.remove(tag);
             }
         },
-        Bloodcraft(3,"Use blood magic to manipulate entities with enchantments and curses."){
+        Bloodcraft(3,"Use blood to manipulate entities with enchantments and curses."){
             Tag tag = Tag.Enchant;
             Tag tag2 = Tag.Curse;
             public void onSet(Unit host){

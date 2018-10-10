@@ -27,6 +27,7 @@ public abstract class AI implements Observer {
     }
     public void update(){
         if (host.state != Actions.Dead) {
+            blocked(host.dir);
             perceive(160);
             if (tasks.peek().update(host)) {
                 removeTask();
@@ -34,13 +35,16 @@ public abstract class AI implements Observer {
             }
         }
     }
+    public Behavior getDefaultTask(){
+        return Behavior.Wander;
+    }
     public void setTask(Behavior p){
         tasks.push(p);
         setTraveler();
     }
     void removeTask(){
         tasks.pop();
-        if (tasks.empty()) setTask(Behavior.Wander);
+        if (tasks.empty()) setTask(getDefaultTask());
         else setTraveler();
     }
     private void setTraveler(){
@@ -62,7 +66,7 @@ public abstract class AI implements Observer {
         if (Math.abs(host.map.mapEdge(front)-5) == 1) blocked = true;
         else {
             Line pp = new Line(host.pos, front);
-            Line pp2 = new Line(front.getAdd(0, -40), front.getAdd(0, 40));
+            Line pp2 = new Line(front.getAdd(0, -1), front.getAdd(0, 60));
             for (Line i : host.map.land) {
                 if (i.lineCross(pp) && (Math.abs(i.getSlope()) > Line.MAXSLOPE || !i.clockwise())) {
                     blocked = true;
@@ -86,10 +90,9 @@ public abstract class AI implements Observer {
                 return perceived(t);
             }
         }
-        blocked(host.dir);
         return false;
     }
-    boolean perceived(Prop p){
+    public boolean perceived(Prop p){
         return false;
     }
     void load(T p) {
@@ -114,6 +117,9 @@ class NeutralAI extends AI{
     String ad = "@talk";
     NeutralAI(Unit host) {
         super(host);
+    }
+    public Behavior getDefaultTask(){
+        return Behavior.Idle;
     }
     void load(T p){
         super.load(p);

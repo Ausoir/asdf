@@ -13,7 +13,7 @@ Signpost,Signpost,2,1,0,[0,0],1,0
 Streetlight,Streetlight,2,1,0,[0,0],1,0
 Pole,Pole,2,1,0,[0,.2],1,0
 Ladder,Ladder,2,0,0,[0,0],0,8
-Table,Shorttable,2,1,0,[0,0],1,8
+Short Table,Shorttable,2,1,0,[0,0],1,8
 Chair,Shortchair,2,1,0,[0,0],1,8
 Floodlight,Floodlight,1,1,0,[0,0],1,0
 Decoration,Decoration,1,0,0,[.1,.1],1,0
@@ -23,7 +23,7 @@ Desk,Desk,2,0,0,[.2,.2],1,8
 Bench,Bench,2,0,0,[.1,0],1,8
 Counter,Counter,2,0,0,[.3,.1],1,16
 Bottler,Bottler,2,0,0,[.2,.2],1,8
-Table,Smalltable,2,0,0,[0,0],1,8
+Small Table,Smalltable,2,0,0,[0,0],1,8
 Painting,Painting,1,0,0,[.2,.2],1,0
 Bed,Bed,2,0,0,[.2,.2],1,8
 Frozen Tree,Snowtree,2,1,0,[.3,.3],1,0

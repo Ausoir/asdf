@@ -1,4 +1,4 @@
-Fruit,Fruit,1,1,1,0 //Name, Uses, Nutrition, Taste, Perish
+Fruit,Fruit,1,1,1,0 //Name, ImageName, Uses, Nutrition, Taste, Perish
 Fish,Fish,1,1,0,1
 Meat,Meat,1,1,-4,2
 Poultry,Bird_Meat,1,1,-3,3

@@ -6,7 +6,6 @@ import com.ga.tool.Performer;
 import com.ga.tool.T;
 import com.ga.unit.Prop;
 import com.ga.unit.Stock;
-import com.ga.unit.Tag;
 import com.ga.unit.man.Man;
 import com.ga.unit.skill.Actions;
 import com.ga.unit.skill.Buffs;
@@ -17,20 +16,66 @@ import java.util.ArrayList;
  * Created by Ga on 3/26/2017. asd
  */
 public enum Crafts {
-    Make_Scrap(new String[]{"Time:0", "Hard:1"}){
+    Forage(new String[]{"Time:1"}, "Forage firewood from trees, sticks from bushes, vegetables from weed, fish from reed, or a rock if nothing is available."){
         public void craft(Man host, int time){
-            host.say("Turned "+host.weapon.getName()+" into scrap.");
-            Item item = (Item) Stock.Scrap.create(host.map, 1, -1).start();
-            item.setMaterial(host.weapon.getMaterial());
-            host.weapon.remove();
-            host.setWeapon(item);
+            ArrayList<Prop> props = host.getAvailableProps(e -> true);
+            int count = 0;
+            for (Prop i : props){
+                count++;
+                if (count <= 3) {
+                    switch (i.name) {
+                        case "Tree":
+                            Stock.createByName(host.map, "Firewood", 0, -1).start().pos.set(host.pos);
+                            break;
+                        case "Bush":
+                            Stock.createByName(host.map, "Stick", 0, -1).start().pos.set(host.pos);
+                            break;
+                        case "Weed":
+                            Stock.createByName(host.map, "Vegetables", 0, -1).start().pos.set(host.pos);
+                            break;
+                        case "Reed":
+                            Stock.createByName(host.map, "Fish", 0, -1).start().pos.set(host.pos);
+                            break;
+                        default:
+                            count--;
+                            break;
+                    }
+                }
+            }
+            if (count == 0) Stock.createByName(host.map, "Rock", 0, -1).start().pos.set(host.pos);
         }
-    }, Treat_Wound(new String[]{"Time:1", "Sharp:1", "Resin:1"}){
+    }, Scrap(new String[]{"Time:0","Rock:0"},"Turns the item being held into scrap of corresponding material"){
+        public void craft(Man host, int time){
+            if (!host.wieldingNone()) {
+                host.say("Turned " + host.weapon.getFullName() + " into scrap.");
+                Item item = (Item) Stock.Scrap.create(host.map, 1, -1).start();
+                item.setMaterial(host.weapon.getMaterial());
+                item.durability = item.uses = host.weapon.uses;
+                host.weapon.remove();
+                host.setWeapon(item);
+            } else host.say("Not holding anything I can turn into scrap...");
+        }
+    }, Repairkit(new String[]{"Time:0"},"Creates a repairkit with scrap. Requires a table or a desk nearby."){
+        public void craft(Man host, int time){
+            if (host.getAvailableProps(e -> e.name.toLowerCase().contains("table") || e.name.toLowerCase().contains("desk")).getFirst() == null)
+                host.say("Need a table to create a Repairkit!");
+            else {
+                if (host.weapon.factoryId == Stock.Scrap.ordinal()) {
+                    Item item = (Item) Stock.Repairkit.create(host.map, 1, 4).start();
+                    item.setMaterial(host.weapon.getMaterial());
+                    item.durability = item.uses = host.weapon.uses;
+                    host.weapon.remove();
+                    host.setWeapon(item);
+                    host.say("Made a " + item.getFullName() + ".");
+                } else host.say("Need a scrap in hand to create a Repairkit!");
+            }
+        }
+    }, Gauze(new String[]{"Time:0","Scrap Cloth:10"},"Treat bleeding."){
         public void craft(Man host, int time){
             host.say("Treated wound.");
             host.status.triggerEffect(Buffs.Bleed);
         }
-    }, Scribe_Scroll(new String[]{"Time:0", "Scrap_Cloth:*"}){
+    }, Scribe(new String[]{"Time:0", "Scrap Cloth:1"},"Create magical scrolls from spells you know. Scrolls can be used without energy."){
         public void craft(Man host, int time){
             ArrayList<Actions> skills = Actions.getScribables();
             skills.removeIf(e -> host.getStateLevel(e) < 1);
@@ -51,22 +96,35 @@ public enum Crafts {
             }
             Menu.menu.showDialog("Scribe Spell", "Choose a spell to scribe from currently available spells (Your catalysts: "+host.getTags()+")", skillNames, performers);
         }
-    }, Brew_Potion(new String[]{"Time:1", "Pot:0", "Water:1", "Weed:*"}){
+    }, Brew(new String[]{"Time:1", "Pot:0", "Water:1", "Vegetables:1"},"Create potions. Requires corresponding catalysts."){
         public void craft(Man host, int time){
-            host.say("Wound patch applied.");
-            host.status.triggerEffect(Buffs.Bleed);
-        }
-    }, Turret(new String[]{"Time:2", "Rock:*", "Rock:*", "Rock:*", "Bush:*", "Pot:*"}){
-        public void craft(Man host, int time){
-            host.say("Turret built.");
-            Stock.createByName(host.map, "Resident", -1).start().pos.set(host.pos.getAdd(host.target));
+            ArrayList<Actions> skills = Actions.getScribables();
+            skills.removeIf(e -> host.getStateLevel(e) < 1);
+            skills.add(Actions.Identify);
+            String[] skillNames = new String[skills.size()];
+            Performer[] performers = new Performer[skills.size()];
+            for (int i = 0; i < skillNames.length - 1; i++) {
+                Actions skill = skills.get(i);
+                skillNames[i] = "Scribe "+skill.name() + " (requires "+skill.getEnergy()+" Energy)";
+                performers[i] = new Performer() {
+                    public void perform() {
+                        if (host.requireMana(skill.getEnergy())) {
+                            Item scroll = (Item) Stock.Scroll.create(host.map, 0, Actions.getScribables().indexOf(skill));
+                            host.setWeapon(scroll);
+                        } else host.say("Not enough Energy!");
+                    }
+                };
+            }
+            Menu.menu.showDialog("Scribe Spell", "Choose a spell to scribe from currently available spells (Your catalysts: "+host.getTags()+")", skillNames, performers);
         }
     };
 
     private static T recipes = FileManager.readLiterals("Data/raw/Recipe.txt");
     private String[] ingreds;
-    Crafts(String[] ingredients){
+    private String description;
+    Crafts(String[] ingredients, String description){
         this.ingreds = ingredients;
+        this.description = description;
     }
     public static String[] getRecipe(String p){
         Crafts craft = getByName(p);
@@ -78,15 +136,25 @@ public enum Crafts {
         if (r != null) return r.get(1).get().split(",");
         return new String[]{};
     }
+    public static String getDescription(String p){
+        Crafts craft = getByName(p);
+        if (craft != null) return craft.description;
+        else return ((Item) Stock.createByName(null, p, -1)).getDescription();
+    }
     public static void craftByName(Man host, String p) {
-        int time = canCraft(host, p);
-        if (time >= 0){
+        T r = craft(false, host, p);
+        int time = 0;
+        for (T i : r){
+            if (i.get(0).get().equals("Time")) time = i.get(2).getInt();
+            else if (i.get(1).getInt() < i.get(2).getInt()) return;
+        }
+        if (craft(true, host, p) != null) {
             Crafts craft = getByName(p);
             if (craft != null) craft.craft(host, time);
-            else craftRaw(host, p, time);
+            else craftFromReg(host, p, time);
         }
     }
-    private static void craftRaw(Man host, String p, int time) {
+    private static void craftFromReg(Man host, String p, int time) {
         Prop result;
         if (p.contains(":")) {
             result = Stock.createByName(host.map, p.split(":")[0], -1);
@@ -100,7 +168,8 @@ public enum Crafts {
     }
     public void craft(Man host, int time) {
     }
-    public static int canCraft(Man host, String p) {
+    public static T craft(boolean craft, Man host, String p) {
+        T r = new T();
         String[] recipes = getRecipe(p);
         if (recipes != null){
             ArrayList<String> ingredients = new ArrayList<>();
@@ -110,59 +179,21 @@ public enum Crafts {
                 ingredients.add(v[0]);
                 usage.add(v[1]);
             }
-            for (Tag tag : host.getTags()){
-                int index = ingredients.indexOf(tag.name());
-                if (index != -1 && host.requireMana(1)){
-                    int cUsage = Integer.parseInt(usage.get(index));
-                    if (cUsage > 1){
-                        usage.set(index,(cUsage-1)+"");
-                    } else {
-                        ingredients.remove(index);
-                        usage.remove(index);
-                    }
-                }
-            }
+            if (craft && !host.map.updater.sleep(Integer.parseInt(usage.get(0)), true)) return null;
             ArrayList<Prop> availables = host.getAvailableItems();
-            availables.addAll(host.getAvailableProps());
-            for (Prop i : availables){
-                int index = -1;
-                indexOf:
-                for (int ii=0;ii<ingredients.size();ii++){
-                    String current = ingredients.get(ii);
-                    String[] currents;
-                    if (current.contains("/")) currents = current.split("/");
-                    else currents = new String[]{current};
-                    for (String current1 : currents) {
-                        if (current1.equals(i.name)) {
-                            index = ii;
-                            break indexOf;
-                        }
+            for (int i=0;i<ingredients.size();i++) {
+                String ingred = ingredients.get(i);
+                int q = 0;
+                for (Prop prop : availables) {
+                    if (ingred.equals(prop.name)) {
+                        if (craft) ((Item) prop).isUsable(true, Integer.parseInt(usage.get(i)));
+                        q += ((Item) prop).uses;
                     }
                 }
-                if (index == -1) {
-                    for (Tag tag : i.tags){
-                        index = ingredients.indexOf(tag.name());
-                        if (index != -1 && host.requireMana(1)){
-                            ingredients.remove(index);
-                            usage.remove(index);
-                            index = -1;
-                            break;
-                        }
-                    }
-                }
-                if (index != -1){
-                    ingredients.remove(index);
-                    String use = usage.remove(index);
-                    if (use.equals("*")) i.remove();
-                    else if (!use.equals("0") && i instanceof Item) ((Item) i).isUsable(true, Integer.parseInt(use));
-                }
-            }
-            if (ingredients.size() == 1){
-                int time = Integer.parseInt(usage.get(0));
-                if (host.stats.nutrition.get() >= time) return time;
+                r.add(new T().add(ingred).add(q+"").add(usage.get(i)));
             }
         }
-        return -1;
+        return r.build();
     }
 
     public static Crafts getByName(String p) {

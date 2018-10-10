@@ -24,7 +24,9 @@ import static com.ga.unit.man.BodyHumanoid.BODY;
  */
 public class MainPlayer extends Player {
     private Indicator statBar;
-    public String respawnInfo;
+    public int guild = -1, guildVar = 0;
+    public String insuranceMap = "";
+    public int insuranceExpiry, insuranceCost;
 
     public MainPlayer(Map map, int seed) {
         super(map, seed);
@@ -33,12 +35,16 @@ public class MainPlayer extends Player {
     }
 
     public void load(T p){
-        super.load(p.get(1));
-        respawnInfo = p.get(0).get(); //Expiry, Map, Location
+        super.load(p.get(2));
+        guild = p.get(0).get(0).getInt();
+        guildVar = p.get(0).get(1).getInt();
+        insuranceMap = p.get(1).get(0).get();
+        insuranceExpiry = p.get(1).get(1).getInt();
+        insuranceCost = p.get(1).get(2).getInt();
     }
     public String toString(){
         String r = super.toString();
-        return "[["+respawnInfo+"],["+r+"]]";
+        return "[["+guild+","+guildVar+"],["+insuranceMap+","+insuranceExpiry+","+insuranceCost+"],["+r+"]]";
     }
 
     @Override
@@ -89,7 +95,7 @@ public class MainPlayer extends Player {
                 Stat decayStat;
                 int count = 0;
                 do {
-                    decayStat = mainStats[SyncRand.r.nextInt(mainStats.length)];
+                    decayStat = mainStats[SyncRand.getInt(mainStats.length)];
                 } while (++count < 9 && decayStat.getMax() <= 1);
                 if (count >= 9){
                     stats.level.add(-1, true);
@@ -111,21 +117,21 @@ public class MainPlayer extends Player {
             public void perform(){
                 delay.time = -1;
                 String msg = "Cause: "+cause+"\n";
-                if (respawnInfo.isEmpty()) msg += "You have no insurance to cover this death.";
-                else {
-                    String[] data = respawnInfo.split(",");
-                    int expiry = Integer.parseInt(data[0]) - Global.hour;
+                if (!insuranceMap.isEmpty()) {
+                    int expiry = insuranceExpiry - Global.hour;
                     if (expiry < 0) msg += "Your insurance expired "+expiry+" hours ago.";
+                    else if (insuranceCost > 0) msg += "The medical guild leaves you to die as you have not payed off your last debt.";
                     else {
                         map.updater.forceSleep(1);
-                        Menu.menu.showDialog("You fall unconscious...", msg+"Your guild agents haul your body back into the guild hall for revival...");
-                        respawnInfo = "";
+                        Menu.menu.showDialog("You fall unconscious...", msg+"Your medical guild agents haul your body back into the guild hospital for revival...");
                         revive();
-                        Global.server.requestChangeMap(data[1]+",911");
+                        Global.server.requestChangeMap(insuranceMap+",911");
+                        insuranceCost = -insuranceCost;
                         return;
                     }
                 }
-                FileManager.save(FileManager.makeDirectory("Data/map/Player.user"),FileManager.read(FileManager.makeDirectory("Data/map/Template.user")));
+                FileManager.save(FileManager.makeDirectory("Data/map/Player.user"),"");
+                FileManager.save(FileManager.makeDirectory("Data/map/Actors.map"),"");
                 FileManager.save(FileManager.makeDirectory("Data/map/World.map"),"");
                 FileManager.save(FileManager.makeDirectory("Data/Keymap.txt"),"");
                 FileManager.cleanMaps();

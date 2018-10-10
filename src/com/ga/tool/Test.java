@@ -22,7 +22,7 @@ public class Test {
                     i.get(8).get();
                 }
             }
-            data.refresh();
+            data.build();
             FileManager.saveLiterals(dir.getPath(), data);
         }
     }

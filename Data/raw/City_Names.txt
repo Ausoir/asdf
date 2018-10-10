@@ -1,29 +1,22 @@
-Aarling
-Aeona
-Antarctica
-Atlantis
-Bay End
-Bay Capitol
-Bubble
-Burlington
-Cattles
-Cat Tail
-Crimean
-Crust Valley
-Dhi Jeta
-Di Losetta
-Dreamtown
-Dwellington
-Earwig Mountain Town
-El Death
-Entnest
-Exio
-Faffy's End
-Feef's End
-Food Valley
-Fuuf's End
-
-The Names
-The Other Town
-Los Banos
-Los Banjos
+Los,Dhi,El,Into,Front,New,New,New,New //prefix
+vill,ville,burg,City,land,ton,s,Valley,'s End,Capitol,Town //suffix
+Aarling,4 //0 = none, 1 = prefix, 2 = suffix, 3 = either, 4 = both or either
+Aeona,4
+Antarctica,1
+Atlantis,1
+Bay,3
+Bubble,4
+Berling,4
+Cattle,4
+Cat Tail,2
+Crimean,0
+Crust Valley,1
+Death,1
+Dreamtown,0
+Dwelling,4
+Earwig Mountain,2
+Entnest,0
+Exio,1
+Faffy,2
+Jeta,1
+Losetta,1

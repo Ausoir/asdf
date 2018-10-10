@@ -3,6 +3,7 @@ package com.ga.game;
 import com.ga.map.Global;
 import com.ga.map.Picture;
 import com.ga.tool.Performer;
+import com.ga.tool.T;
 import com.ga.unit.PlayerInput;
 import com.ga.unit.Prop;
 import com.ga.unit.Tag;
@@ -263,24 +264,26 @@ public class MenuPlayer extends Panel {
             result.setHorizontalTextPosition(JLabel.CENTER);
             result.setVerticalTextPosition(JLabel.TOP);
             result.setBorder(emptyborder);
+            MouseAdapter adapter;
             if (type == -1) {
                 if (Global.player.wieldingNone()) panel.setVisible(false);
-                result.addMouseListener(new MouseAdapter() {
+                adapter = new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
                         Global.player.input.inputDirect("Wield", 0, 0);
                         Menu.menu.showMenu();
                     }
-                });
+                };
             } else { //armor
-                result.addMouseListener(new MouseAdapter() {
+                adapter = new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
                         Global.player.input.inputDirect("_WI"+type,0,0);
                         Menu.menu.showMenu();
                     }
-                });
+                };
             }
+            result.addMouseListener(adapter);
             JPanel options = new JPanel();
             options.setOpaque(false);
             options.setLayout(new BoxLayout(options,BoxLayout.LINE_AXIS));
@@ -293,6 +296,7 @@ public class MenuPlayer extends Panel {
                 }
             });
             final JLabel drop = new JLabel(item.getFullName()+" ("+Math.round(item.getPercentage()*100)+"%)             ");
+            drop.addMouseListener(adapter);
             drop.setForeground(item.getRarityColor());
             options.add(describe);
             options.add(drop);
@@ -625,7 +629,7 @@ public class MenuPlayer extends Panel {
         void refresh() {
             panel.removeAll();
             panel.add(makeOption("Level Up","lvl","Level up with sufficient Motivation points and time."));
-            panel.add(makeOption("Rest","h","Rest for an hour, removing curable debuffs and restoring fatigue. Restore fatigue twice more near chairs and benches, and three times more near beds."));
+            panel.add(makeOption("Rest","h","Rest for an hour, removing curable debuffs and restoring fatigue. Restores double near chairs and benches, and triple near beds. Note that valuable items on ground disappear when time passes."));
             if (Global.player.stats.nutrition.get() == 0){
                 if (Global.player.stats.agility.get() > 0) panel.add(makeOption("Starve", "st", "Starve, gaining 1 Nutrition point at the cost of 1 Vitality."));
                 else panel.add(makeOption("STARVE TO DEATH", "st", "Submit to starvation and die."));
@@ -733,98 +737,78 @@ public class MenuPlayer extends Panel {
     private class CraftPanel extends JPanel{
         private ArrayList<String> items, props;
         private JPanel panel;
-        private JPanel other;
+        private JScrollPane scroll;
         CraftPanel(){
             setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
             setVisible(false);
             setBackground(Panel.forecolor2);
             panel = new JPanel();
             panel.setOpaque(false);
-            other = new JPanel();
-            other.setOpaque(false);
+            panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+            scroll = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            scroll.getVerticalScrollBar().setUI(new ScrollBar());
+            scroll.getVerticalScrollBar().setOpaque(false);
+            scroll.getVerticalScrollBar().setUnitIncrement(24);
+            scroll.getViewport().setOpaque(false);
+            scroll.setBorder(null);
+            scroll.setOpaque(false);
+            add(scroll, BorderLayout.LINE_START);
         }
         void refresh() {
-            ArrayList<String> craftables = new ArrayList<>();
             items = new ArrayList<>();
             props = new ArrayList<>();
             for (Prop i : Global.player.getAvailableItems()){
                 items.add(i.name);
                 for (Tag ii : i.tags) items.add(ii.name());
             }
-            for (Prop i : Global.player.getAvailableProps()){
-                props.add(i.name);
-                for (Tag ii : i.tags) props.add(ii.name());
-            }
             panel.removeAll();
-            panel.add(makeOption("[Available Items]","?","Show all items available for crafting."));
+            makeSlot("[Available Items]","?","Show all items available for crafting.");
+            T slots = new T();
             for (String i : Global.player.crafting){
-                if (Crafts.canCraft(Global.player, i) >= 0){
-                    StringBuilder t = new StringBuilder();
-                    craftables.add(i);
-                    for (String ii : Crafts.getRecipe(i)) t.append(ii).append(", ");
-                    panel.add(makeOption(i, i, "Craft " + i + " using ["+t.substring(0,t.length()-2)+"]"));
+                T reqs = Crafts.craft(false, Global.player, i);
+                T desc = new T();
+                boolean craftable = true;
+                for (T req : reqs) {
+                    if (req.get(0).get().equals("Time")) desc.add(req.get(2).getInt() + " Hours");
+                    else {
+                        String t = req.get(0).get() + " (" + req.get(1).getInt() + "/" + req.get(2).getInt() + ")";
+                        if (req.get(1).getInt() < req.get(2).getInt()) {
+                            desc.add("<font color='#CC3333'>" + t + "</font>");
+                            craftable = false;
+                        } else desc.add(t);
+                    }
                 }
+                String msg = i + " - " + desc.toDisplayString(", ");
+                if (craftable) slots.add(0, new T().add(i).add(msg));
+                else slots.add(new T().add(i).add(msg));
             }
-            TitledBorder b = BorderFactory.createTitledBorder(BorderFactory.createMatteBorder(2,2,2,2,Panel.forecolor));
-            b.setTitle("Craftable");
-            panel.setBorder(b);
-            add(panel, BorderLayout.CENTER);
-
-            other.removeAll();
-            for (String i : Global.player.crafting){
-                if (!craftables.contains(i)) {
-                    StringBuilder t = new StringBuilder();
-                    for (String ii : Crafts.getRecipe(i)) t.append(ii).append(", ");
-                    other.add(makeOption(i, "=", "Crafting "+i+" requires ["+t.substring(0, t.length() - 2)+"]"));
-                }
+            for (T i : slots){
+                makeSlot(i.get(0).get(), i.get(0).get(), i.get(1).get());
             }
-            b = BorderFactory.createTitledBorder(BorderFactory.createMatteBorder(2,2,2,2,Panel.forecolor));
-            b.setTitle("Known");
-            other.setBorder(b);
-            add(other, BorderLayout.CENTER);
         }
-        JPanel makeOption(final String p, final String cmd, final String description){
-            JPanel subpanel = new JPanel();
-            final JLabel button = new JLabel(" "+p+" ");
-            button.setFont(Panel.font);
-            button.setForeground(Panel.fontcolor);
-            button.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mousePressed(MouseEvent e) {
-                    button.setForeground(Color.CYAN);
-                }
-                @Override
-                public void mouseReleased(MouseEvent e) {
-                    button.setForeground(Panel.fontcolor);
-                }
-                @Override
-                public void mouseEntered(MouseEvent e) {
-                    button.setBackground(Panel.forecolor2);
-                }
-                @Override
-                public void mouseExited(MouseEvent e) {
-                    button.setBackground(Panel.forecolor);
-                }
-                @Override
-                public void mouseClicked(MouseEvent e){
-                    if (cmd.equals("="))
-                        Menu.menu.showDialog(p,description);
-                    else command(cmd);
-                }
-            });
-            JLabel desc = new JLabel("");
+        void makeSlot(String p, String cmd, String description){
+            JPanel panel = new JPanel();
+            panel.setOpaque(false);
+            panel.setLayout(new BoxLayout(panel,BoxLayout.LINE_AXIS));
+            panel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
+            final JLabel desc = new JLabel();
             desc.setIcon(iconDescribe);
             desc.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Menu.menu.showDialog(p,description);
+                    Menu.menu.showDialog(p, Crafts.getDescription(p));
                 }
             });
-            subpanel.setOpaque(false);
-            subpanel.setBorder(BorderFactory.createMatteBorder(1,1,1,1,Panel.forecolor));
-            subpanel.add(button);
-            subpanel.add(desc);
-            return subpanel;
+            final JLabel craft = new JLabel("<html> "+description+"</html>");
+            craft.addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent e) {
+                    command(cmd);
+                }
+            });
+            panel.add(desc);
+            panel.add(craft);
+            this.panel.add(panel);
+            this.panel.add(Box.createRigidArea(new Dimension(0,4)));
         }
         private void command(String p){
             Menu.menu.showMenu();
@@ -942,7 +926,7 @@ public class MenuPlayer extends Panel {
         button.addActionListener(e -> command(cmd));
         return button;
     }
-    private void command(String p){
+    void command(String p){
         optionpanel.setVisible(false);
         actionpanel.setVisible(false);
         statspanel.setVisible(false);

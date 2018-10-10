@@ -99,8 +99,8 @@ public class Picture {
             if (file == null) {
                 Integer num = multiples.get(dir);
                 if (num != null) {
-                    if (rand == null) rand = SyncRand.r;
-                    dir += "-" + rand.nextInt(num);
+                    if (rand == null) dir += "-" + SyncRand.getInt(num);
+                    else dir += "-" + rand.nextInt(num);
                     file = directory.get(dir);
                 }
             }

@@ -30,8 +30,7 @@ public class Command {
                 else if (cmd[0].equals("seed")) host.weapon.seed = Integer.parseInt(cmd[1]);
                 else if (cmd[0].equals("time")) Global.timePass(Integer.parseInt(cmd[1]));
                 else if (cmd[0].equals("hour")){
-                    Global.hour++;
-                    for (Map map : Global.maps) map.onTimeChange();
+                    Global.player.map.updater.forceSleep(1);
                 } else if (cmd[0].equals("heal")) {
                     host.stats.strength.heal();
                     host.stats.agility.heal();

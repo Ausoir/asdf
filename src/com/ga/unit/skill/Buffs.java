@@ -38,15 +38,14 @@ public enum Buffs {
             }
         };
     }},
-    Alert(1,"You alert all nearby enemies.",new Tags(){{
-        add(Tag.Curse);
+    Alert(1,"You are alerted when moving objects are nearby. Alerts nearby enemies when first used.",new Tags(){{
+        add(Tag.Enchant);
     }}){ Buff makeLocal(int level) {
-        return new Buff(level, 1) {
+        return new Buff(level, 100) {
+            int turn = 0;
             public void onSet() {
-                Particle.sparkle(host.map, "Fire", host.getDepth(), host.getRandomPoint(), 8, 5);
-                for (Unit i : host.map.updater.collideUnit(host.pos,1600*level, Faction.Destructive)){
-                    i.brain.target = host;
-                    i.brain.onHit();
+                for (Unit i : host.map.updater.collideUnit(host.pos,1200*level, Faction.Destructive)){
+                    i.brain.perceived(host);
                 }
             }
             public void onStack(int level){
@@ -55,7 +54,9 @@ public enum Buffs {
             }
 
             public boolean update() {
-                Particle.sparkle(host.map, "Fire", host.getDepth(), host.getRandomPoint(), 8, 5);
+                if (turn++ % 40 == 0 && host.map.updater.collideUnit(host.pos, 1200*level, host.faction).size() > 0) {
+                    Particle.explode(host.map, "Fire", host.getDepth(), host.getHead(), P.blank, 16, 12, 0, false, 6);
+                }
                 return super.update();
             }
         };
@@ -251,7 +252,7 @@ public enum Buffs {
             }
         };
     }},
-    Bleed(1,"You are bleeding, but it will heal if left alone. Be careful however, at 5 stacks you will die of blood loss.",new Tags(){{
+    Bleed(1,"You are bleeding, but it will heal if left alone. At over 4 stacks you will start taking Vitality damage from additional Bleeding.",new Tags(){{
         add(Tag.Curse);
     }}){
         final int[] bleedRate = new int[]{999, 80, 24, 8, 2, 2};
@@ -260,7 +261,10 @@ public enum Buffs {
                 private int tick = 0;
                 public void onSet(){
                     time = Global.time + 80;
-                    if (level >= 5) host.die("Bleeding");
+                    if (level >= 5){
+                        onTrigger();
+                        if (!host.stats.agility.require(1)) host.die("Bleeding");
+                    }
                 }
                 public void onStack(int level){
                     this.level += level;
@@ -282,12 +286,11 @@ public enum Buffs {
                 }
             };
         }},
-    Morph(1,"You are transformed into something else. You can only take simple actions in this new form.",new Tags(){{
-        add(Tag.Curse);
-        add(Tag.Enchant);
+    Morph(1,"You are transformed into something else. You can only take simple actions in this form.",new Tags(){{
+        add(Tag.Conjuration);
         add(Tag.Channeling);
     }}){
-        private String[] targets = new String[]{"Man", "Slime", "Dog", "Bird", "Crawler"};
+        private String[] targets = new String[]{"Slime", "Dog", "Bird"};
         private Body origForm;
         Buff makeLocal(int level){
             return new Buff(level, 0) {
@@ -302,7 +305,7 @@ public enum Buffs {
                 }
                 private void morph(){
                     origForm = host.clip;
-                    host.clip = new Body(host, targets[level % targets.length]);
+                    host.clip = new Body(host, targets[SyncRand.getInt(targets.length)]);
                     if (host instanceof Man) ((Man) host).armor.drop();
                 }
                 public void onFinish(){
@@ -353,7 +356,7 @@ public enum Buffs {
         };
     }},
     Degenerate(1,"Your attributes are lowered.",new Tags(){{
-        add(Tag.Enchant);
+        add(Tag.Curse);
     }}){ Buff makeLocal(int level) {
         return new Buff(level, 20) {
             public void onSet() {
@@ -381,8 +384,22 @@ public enum Buffs {
             }
         };
     }},
+    Warmth(2,"You are more resistant to ambient cold temperature. Provides 1 warmth per level.",new Tags(){{
+        add(Tag.Enchant);
+        add(Tag.Channeling);
+        add(Tag.Fire);
+    }}){ Buff makeLocal(int level){
+        return new Buff(level, 10) {
+            private int tick = 1;
+            public boolean update() {
+                if (tick++ % 16 == 0 && (tick/10) % 3 != 0) Particle.implode(host.map, "Flame", host.getDepth(), host.getRandomPoint(), 3, 15, true, 5);
+                return super.update();
+            }
+        };
+    }},
     Firewalk(2,"You leave trails of fire.",new Tags(){{
         add(Tag.Enchant);
+        add(Tag.Channeling);
         add(Tag.Fire);
     }}){ Buff makeLocal(int level){
         return new Buff(level, 6) {
@@ -456,9 +473,26 @@ public enum Buffs {
             }
         };
     }},
+    Frenzy(2,"Your cooldowns are rapidly diminished.",new Tags(){{
+        add(Tag.Enchant);
+        add(Tag.Energy);
+    }}){ Buff makeLocal(int level){
+        return new Buff(level, 4) {
+            private int turn = 0;
+            public boolean update() {
+                if (turn++ % Math.max(1,40/level) == 0) {
+                    for (Map.Entry pair : host.cooldown.entrySet()) {
+                        ((Cooldown) pair.getValue()).time--;
+                    }
+                    Particle.explode(host.map, "Spark", host.getDepth(), host.getHead(), new P(0,-1), 6, 10,20,true, 6);
+                }
+                return super.update();
+            }
+        };
+    }},
     Haste(2,"Your action speed is increased.",new Tags(){{
         add(Tag.Enchant);
-        add(Tag.Athletics);
+        add(Tag.Fire);
     }}){ Buff makeLocal(int level) {
         return new Buff(level, 10) {
             public void onSet() {
@@ -487,7 +521,7 @@ public enum Buffs {
                 }
                 var = -1;
                 if (amputables.size() > 0){
-                    var = SyncRand.r.nextInt(amputables.size());
+                    var = SyncRand.getInt(amputables.size());
                     host.clip.organs[var].amputated = true;
                 } else {
                     host.buff(Bleed, 1);
@@ -501,9 +535,8 @@ public enum Buffs {
     }},
     Stun(2,"You cannot perform any actions.",new Tags(){{
         add(Tag.Curse);
-        add(Tag.Air);
     }}){ Buff makeLocal(int level){
-        return new Buff(level, 3) {
+        return new Buff(level, 4) {
             public void onSet() {
                 Sound.play(host.map, host.pos, "stun");
                 host.vel.x = 0;
@@ -542,25 +575,8 @@ public enum Buffs {
             }
         };
     }},
-    Frenzy(2,"Your cooldowns are rapidly diminished.",new Tags(){{
+    Evade(3,"You are impervious to attacks.",new Tags(){{
         add(Tag.Enchant);
-    }}){ Buff makeLocal(int level){
-        return new Buff(level, 4) {
-            private int turn = 0;
-            public boolean update() {
-                if (turn++ % Math.max(1,40/level) == 0) {
-                    for (Map.Entry pair : host.cooldown.entrySet()) {
-                        ((Cooldown) pair.getValue()).time--;
-                    }
-                    Particle.explode(host.map, "Spark", host.getDepth(), host.getHead(), new P(0,-1), 6, 10,20,true, 6);
-                }
-                return super.update();
-            }
-        };
-    }},
-    Evade(3,"You are invincible.",new Tags(){{
-        add(Tag.Enchant);
-        add(Tag.Strength);
     }}){ Buff makeLocal(int level){
         return new Buff(level, 3) {
             public void onSet() {
@@ -584,7 +600,7 @@ public enum Buffs {
     }},
     Rejuvenate(3,"You are regenerating Stamina.",new Tags(){{
         add(Tag.Enchant);
-        add(Tag.Strength);
+        add(Tag.Channeling);
     }}){ Buff makeLocal(int level){
         return new Buff(level, 9){
             private int tick = 0;
@@ -594,7 +610,7 @@ public enum Buffs {
             }
         };
     }},
-    Poison(3,"You will die unless treated. Find a cure!",new Tags(){{
+    Poison(3,"You will take Vitality damage when this effect expires.",new Tags(){{
         add(Tag.Curse);
     }}){ Buff makeLocal(int level){
         return new Buff(level, 100) {
@@ -611,8 +627,14 @@ public enum Buffs {
             private void set(){
                 time = Global.time + (200/level);
             }
+            public void finish(){
+                var = 1;
+                super.finish();
+            }
             public void onFinish(){
-                if (var == 0) host.die("Poisoning");
+                if (var == 0){
+                    if (!host.stats.agility.require(level)) host.die("Poisoning");
+                }
             }
             public boolean onTrigger(){
                 if (level > 0) level--;
@@ -625,6 +647,22 @@ public enum Buffs {
             public boolean update() {
                 if (tick++ % (level+2) == 0){
                     Particle.explode(host.map, "Poison", host.getDepth(),host.getRandomPoint(),new P(), 1,5,0,true,24);
+                    return super.update();
+                }
+                return false;
+            }
+        };
+    }},
+    Tranquilized(3,"You will drop your armor on death.",new Tags(){{
+        add(Tag.Curse);
+        add(Tag.Channeling);
+        add(Tag.Void);
+    }}){ Buff makeLocal(int level) {
+        return new Buff(level, 20) {
+            int tick = 0;
+            public boolean update() {
+                if (tick++ % 6 == 0){
+                    Particle.implode(host.map, "Poison", host.getDepth(),host.getHead(),3,16,true,6);
                     return super.update();
                 }
                 return false;
@@ -646,6 +684,7 @@ public enum Buffs {
     }},
     Invisibility(3,"You are invisible.",new Tags(){{
         add(Tag.Enchant);
+        add(Tag.Channeling);
         add(Tag.Void);
     }}){ Buff makeLocal(int level){
         return new Buff(level, 4) {
@@ -664,18 +703,46 @@ public enum Buffs {
             }
         };
     }},
-    Shadowcurse(3,"You are haunted by Phantoms.",new Tags(){{
-        add(Tag.Curse);
+    Blizzard(3,"You are surrounded by a blizzard.",new Tags(){{
+        add(Tag.Enchant);
+        add(Tag.Channeling);
         add(Tag.Conjuration);
     }}){ Buff makeLocal(int level) {
         return new Buff(level, 1) {
-            private Man unit;
-            public void onSet() {
-                unit = (Man) Stock.createByName(host.map, "Phantom",-1).start();
-                unit.brain.target = host;
-                unit.brain.setTask(Behavior.Hunt);
-                unit.pos.set(host.pos.x, host.pos.y);
-                unit.buff(Banishment, level);
+            int tick = 0;
+            public boolean update() {
+                if (tick++ % (200/level) == 0){
+                    final Projectile p = new Projectile(host.map, "Ice", host.pos.getAdd(Global.nextGaussian(500), -500), host.pos.getAdd(Global.nextGaussian(500), 0), 8 + SyncRand.getInt(6 * host.stateLevel)) {
+                        @Override
+                        public void stuck() {
+                            Particle.explode(host.map, "Ice", getDepth(), pos, new P(), 30, 20, 0, false, 1);
+                            ArrayList<Unit> t = host.map.updater.collideUnit(pos, 96, host.faction);
+                            for (Unit i : t) {
+                                i.hit(host.getPosLine(), getDamage());
+                                i.buff(Buffs.Freeze, 16);
+                            }
+                            remove();
+                        }
+
+                        @Override
+                        public void update() {
+                            super.update();
+                            Particle.explode(host.map, "Ice", getDepth(), pos, new P(), 3, 10, 0, false, 1);
+                        }
+                    };
+                    p.faction = host.faction;
+                    p.damage = 4;
+                    p.gravity = false;
+                    p.delay.set(150);
+                    p.delay.performer = new Performer() {
+                        @Override
+                        public void perform() {
+                            p.stuck();
+                        }
+                    };
+                    return super.update();
+                }
+                return false;
             }
         };
     }},
@@ -688,7 +755,7 @@ public enum Buffs {
             public boolean isDangerous() { return true; }
             public void onFinish() {
                 if (host instanceof MainPlayer){
-                    Global.server.requestChangeMap(FileManager.makeDirectory("ins/_")+(SyncRand.r.nextInt(20*level)-(10*level))+",1");
+                    Global.server.requestChangeMap(FileManager.makeDirectory("ins/_")+(SyncRand.getInt(20*level)-(10*level))+",1");
                     Global.server.afterMapChange = new Performer(){
                         public void perform(){
                             host.pos.set(Global.r.nextInt((int) host.map.size.x-64)+36, 48);
@@ -752,6 +819,9 @@ public enum Buffs {
         public void onLoad(){}
         public boolean onTrigger(){
             return true;
+        }
+        public void finish(){
+            time = Global.time;
         }
         public void onFinish(){}
         public void onStack(int level){

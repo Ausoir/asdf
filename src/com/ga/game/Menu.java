@@ -14,13 +14,17 @@ public class Menu extends JPanel {
     private Panel current;
     private MenuPlayer menuPlayer = new MenuPlayer();
 
-    static void init(){
+    static void init(boolean veryFirst){
         menu.current = new Panel();
         menu.setLayout(null);
         menu.resize();
         menu.setOpaque(false);
         menu.setFocusable(false);
         Global.display.add(menu);
+        if (veryFirst){
+            menu.showMenu();
+            menu.menuPlayer.command("act");
+        }
     }
     private void select(Panel p){
         remove(current);

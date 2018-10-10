@@ -116,9 +116,7 @@ public class Prop extends Thing {
                 else if (edge == 8) vel.y = 0;
             }
             pos.add(vel);
-            if (gravity) {
-                vel.y = Math.min(vel.y+Settings.gravity, Settings.gravityMax);
-            }
+            if (gravity) vel.y = Math.min(vel.y + Settings.gravity, Settings.gravityMax);
             vel.x *= .94f;
         }
     }

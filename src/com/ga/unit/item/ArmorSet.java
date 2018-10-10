@@ -6,7 +6,9 @@ import com.ga.map.Shader;
 import com.ga.tool.T;
 import com.ga.unit.Organ;
 import com.ga.unit.Tags;
+import com.ga.unit.man.BodyHumanoid;
 import com.ga.unit.man.Man;
+import com.ga.unit.skill.Buffs;
 
 import java.awt.*;
 
@@ -40,7 +42,7 @@ public class ArmorSet {
         Organ[] organs = host.clip.organs;
         display = new Organ[organs.length];
         for (int i = 0; i< organs.length; i++){
-            if (i == 5){
+            if (i == BodyHumanoid.HEAD){
                 display[i] = new Organ(null, true){
                     public void draw(Graphics2D g) {
                         float x = host.pos.x+pt.x, y = host.pos.y+pt.y;
@@ -70,31 +72,31 @@ public class ArmorSet {
         if (p == null) p = bare[piece];
         armor[piece] = p;
         if (p == bare[piece]) {
-            if (piece == 0) display[5].setImage(null);
+            if (piece == 0) display[BodyHumanoid.HEAD].setImage(null);
             else if (piece == 1) {
-                display[0].setImage(null);
-                display[3].setImage(null);
-                display[4].setImage(null);
+                display[BodyHumanoid.FIST].setImage(null);
+                display[BodyHumanoid.BODY].setImage(null);
+                display[BodyHumanoid.OFIST].setImage(null);
             } else if (piece == 2){
-                display[1].setImage(null);
-                display[2].setImage(null);
+                display[BodyHumanoid.LLEG].setImage(null);
+                display[BodyHumanoid.RLEG].setImage(null);
             }
         } else {
             if (piece == 0){
-                display[5].setImage(p.image.image);
-                display[5].image.modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 10));
+                display[BodyHumanoid.HEAD].setImage(Picture.load(p.imageName, null));
+                display[BodyHumanoid.HEAD].image.modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 10));
             } else if (piece == 1) {
-                display[0].setImage(Picture.load("/"+p.imageName+"/32/64/1/0", null));
-                display[3].setImage(p.image.image);
-                display[4].setImage(Picture.load("/"+p.imageName+"/32/64/1/0", null));
-                display[0].image.modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 10));
-                display[3].image.modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 10));
-                display[4].image.modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 10));
+                display[BodyHumanoid.BODY].setImage(Picture.load("/"+p.imageName+"/32/64/0/0", null));
+                display[BodyHumanoid.FIST].setImage(Picture.load("/"+p.imageName+"/32/64/1/0", null));
+                display[BodyHumanoid.OFIST].setImage(Picture.load("/"+p.imageName+"/32/64/1/0", null));
+                display[BodyHumanoid.BODY].image.modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 10));
+                display[BodyHumanoid.FIST].image.modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 10));
+                display[BodyHumanoid.OFIST].image.modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 10));
             } else if (piece == 2){
-                display[1].setImage(p.image.image);
-                display[2].setImage(p.image.image);
-                display[1].image.modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 10));
-                display[2].image.modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 10));
+                display[BodyHumanoid.LLEG].setImage(Picture.load("/"+p.imageName+"/32/64/2/0", null));
+                display[BodyHumanoid.RLEG].setImage(Picture.load("/"+p.imageName+"/32/64/2/0", null));
+                display[BodyHumanoid.LLEG].image.modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 10));
+                display[BodyHumanoid.RLEG].image.modify(Shader.Tatter, Math.round(armor[piece].getPercentage() * 10));
             }
         }
         updateStatus();
@@ -112,9 +114,9 @@ public class ArmorSet {
         set(armor[2], 2);
     }
     public int getOrganArmor(int organ){
-        if (organ == 0 || organ == 3 || organ == 4) return 1;
-        else if (organ == 1 || organ == 2) return 2;
-        assert organ == 5;
+        if (organ == BodyHumanoid.BODY || organ == BodyHumanoid.FIST || organ == BodyHumanoid.OFIST) return 1;
+        else if (organ == BodyHumanoid.LLEG || organ == BodyHumanoid.RLEG) return 2;
+        assert organ == BodyHumanoid.HEAD;
         return 0;
     }
     public boolean isBare(){
@@ -137,7 +139,7 @@ public class ArmorSet {
         }
     }
     public void drop(){
-        for (int i=0;i<4;i++) {
+        for (int i=0;i<5;i++) {
             if (!isBare(i)) {
                 armor[i].onUnequip(host);
                 armor[i].start();
@@ -162,7 +164,7 @@ public class ArmorSet {
     public int getWarmth(){
         int r = 0;
         for (Armor i : armor) r += i.getWarmth();
-        return r;
+        return r + host.status.getEffectLevel(Buffs.Warmth);
     }
     public String getDescription(){
         if (isBare(0) && isBare(1) && isBare(2)) return "Nothing";

@@ -1,0 +1,1 @@
+-65:Idle;1:Use;65:Left;3:Offhand;-68:Idle;68:Right;38:_UP;9:_MENU;10:_SAY;16:Rest;81:Throw;17:_CTRL;82:Wield;83:Drop;87:Jump;90:Activate;27:_EXIT

@@ -12,6 +12,7 @@ import com.ga.unit.skill.Buffs;
 
 import java.awt.*;
 import java.util.Collections;
+import java.util.function.Predicate;
 
 import static com.ga.unit.man.BodyHumanoid.FIST;
 import static com.ga.unit.man.BodyHumanoid.HEAD;
@@ -107,6 +108,12 @@ public class Man extends Unit {
     }
     public int getAttackSpeed(){
         return super.getAttackSpeed()+weapon.getSpeed();
+    }
+    protected void onFallDamage(){
+        super.onFallDamage();
+        for (Organ i : clip.organs){
+            if (!i.vital && SyncRand.getInt(clip.organs.length+2) == 0) i.amputated = true;
+        }
     }
     protected void stateOnSet(Actions state){
         state.onSet(this);
@@ -298,6 +305,9 @@ public class Man extends Unit {
 
     public void die(String cause) {
         say("@x");
+        if (status.getEffectLevel(Buffs.Tranquilized) > 0){
+            armor.drop();
+        }
         if (rand.nextBoolean()) weapon.drop(this);
         weapon.remove();
         super.die(cause);
@@ -361,20 +371,18 @@ public class Man extends Unit {
 
     public void setFace(String p){
         face = p;
-        clip.organs[5].setImage(image.load(p));
+        clip.organs[BodyHumanoid.HEAD].setImage(image.load(p));
     }
 
     public L<Prop> getAvailableItems(){
-        L<Prop> items = map.updater.collideProp(pos,100);
-        items.removeIf(o -> !(o instanceof Item) || o == weapon);
+        L<Prop> items = getAvailableProps(e -> e instanceof Item && e != fist);
         items.addAll(inventory.getItems());
-        if (!wieldingNone()) items.add(weapon);
         return items;
     }
-    public L<Prop> getAvailableProps() {
-        L<Prop> items = map.updater.collideProp(pos,120);
-        items.removeIf(o -> (o instanceof Item));
-        items.removeIf(o -> !o.image.visible);
+
+    public L<Prop> getAvailableProps(Predicate<Prop> check) {
+        L<Prop> items = map.updater.collideProp(pos,100);
+        items.removeIf(e -> !check.test(e));
         return items;
     }
 

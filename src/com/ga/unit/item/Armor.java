@@ -38,9 +38,6 @@ public class Armor extends Item {
         return emod != null && emod.tags.contains(Tag.Curse) || super.isCursed();
     }
     public void randomSize(P sizeVariance) {}
-    private float getArmor(){
-        return Math.max(0,material.hardness);
-    }
     int getWarmth(){
         return Math.max(0, warmth+material.getWarmth());
     }
@@ -49,7 +46,8 @@ public class Armor extends Item {
         super.remove();
     }
     public boolean checkBreak(boolean blunt, int damage){ //damage reduction
-        int r = (int) Math.max(0, blunt?damage:damage - getArmor());
+        if (damage == 0) return false;
+        int r = Math.max(1, blunt?damage:damage - material.hardness);
         if (isUsable(false, 1)){
             isUsable(true, Math.min(r, uses));
             if (owner != null) trigger(owner);
@@ -83,17 +81,14 @@ public class Armor extends Item {
     }
     @Override
     public String getName(){
-        String r = material.name() + " " + super.getName();
-        if (piece == 1) r+=" Armor";
-        else if (piece == 2) r+=" Pants";
-        return r;
+        return material.name() + " " + super.getName();
     }
     public String getDescription(){
         String r = super.getDescription();
         r = r.replace(" uses "," durability ");
         if (encumbrance > 0) r += "Encumbrance: "+encumbrance+"\n";
         if (emod != null) r += "This armor has "+(int)(probability*100)+"% chance of activating its enchantment on being hit. ";
-        if (getArmor() > 0) r += "This armor decreases damage by "+getArmor()+" points. ";
+        if (material.hardness > 0) r += "This armor decreases cutting damage by "+material.hardness+" points. ";
         if (getWarmth() > 0) r += "This armor provides "+getWarmth()+" warmth. ";
         if (pocket > 0) r += "This armor has "+pocket+" pockets. ";
         return r;

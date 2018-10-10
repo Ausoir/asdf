@@ -180,6 +180,8 @@ public class Unit extends Prop {
         return r / Math.max(1,tags.size());
     }
     public int setState(Actions state) {
+        if (traits.getTraitLevel(Traits.Trait.Restless) > 0) stats.strength.heal();
+        if (traits.getTraitLevel(Traits.Trait.Overcharged) > 0) stats.intelligence.heal();
         return state.set(this);
     }
     public int getStateLevel(Actions state){
@@ -229,6 +231,8 @@ public class Unit extends Prop {
     }
 
     public void buff(Buffs buff, int level){
+        if (buff == Buffs.Bleed && traits.getTraitLevel(Traits.Trait.Bloodless) > 0) return;
+        if (buff == Buffs.Burn && traits.getTraitLevel(Traits.Trait.Inorganic) > 0) return;
         status.addEffect(buff, level);
     }
 
@@ -242,7 +246,7 @@ public class Unit extends Prop {
         int timeout = 0;
         do {
             timeout++;
-            organ = SyncRand.r.nextInt(clip.organs.length);
+            organ = SyncRand.getInt(clip.organs.length);
         } while (timeout < clip.organs.length+3 && clip.organs[organ].amputated);
         return clip.organs[organ].getIntersector().getAdd(pos);
     }
@@ -261,7 +265,7 @@ public class Unit extends Prop {
                     if (mid.getSubtract(pos.getAdd(0, -clip.getHeight())).getDist() < radius + getSize()) {
                         delay.performer = null;
                         grounded = false;
-                        if (blunt && !traits.has(Traits.Trait.Tough)) {
+                        if (blunt && !traits.has(Traits.Trait.Painless)) {
                             vel.x = damage/2 * Float.compare(pos.x, hitBox.pt.x);
                             vel.y -= damage/3;
                             setState(Actions.Hit);
@@ -272,11 +276,10 @@ public class Unit extends Prop {
                     if (damageBreakthrough(i, blunt, damage) || status.triggerEffect(Buffs.Mark)) {
                         if (stats.agility.require(1)) {
                             Particle.explode(map, "Blood", getDepth()+.01f, getRandomPoint(), new P(), 9, 5, 0, true, 24);
+                            buff(Buffs.Bleed, 1);
                             if (!blunt){
-                                buff(Buffs.Bleed, 1);
-                                clip.organs[i].amputate(hitBox, damage);
-                            } else {
-                                buff(Buffs.Bleed, 1);
+                                if (!clip.organs[i].vital || traits.getTraitLevel(Traits.Trait.Instinct) == 0 || !stats.agility.require(1))
+                                    clip.organs[i].amputate(hitBox, damage);
                             }
                         } else die("Lack of Vitality");
                     }
@@ -321,8 +324,7 @@ public class Unit extends Prop {
             if (vel.y > 0){
                 if (vel.y >= Settings.gravityMax) {
                     if (hittable(Faction.Destructive)) {
-                        setState(Actions.Down);
-                        delay.time = (int) (160f / stats.agility.getMax());
+                        onFallDamage();
                     }
                 } else if (state == Actions.Jump && stateDuration > 1) {
                     Sound.play(map, pos, "land");
@@ -331,6 +333,10 @@ public class Unit extends Prop {
                 }
             }
         }
+    }
+    protected void onFallDamage(){
+        setState(Actions.Down);
+        buff(Buffs.Bleed, 1);
     }
     protected void stateOnSet(Actions state){
         stateLevel = Math.max(1, stateLevel);
@@ -363,7 +369,7 @@ public class Unit extends Prop {
             i.hit(new Line(hand, hand.getAdd(dir*5,0)), getDamage());
             onAttack(i);
             if (status.triggerEffect(Buffs.Might)){
-                i.vel.add(i.pos.x-pos.x>0?100:-100,-50);
+                i.vel.add(i.pos.x-pos.x>0?100:-100,-60);
                 i.setState(Actions.Down);
             } else return i;
         }

@@ -3,8 +3,14 @@ package com.ga.tool;
 import java.util.Random;
 
 public class SyncRand {
-    public static Random r = new Random();
-    public static void synchronize(int seed){
-        r = new Random(seed);
+    private static Random r = new Random();
+    public static int getInt(int p){
+        return r.nextInt(p);
+    }
+    public static float getFloat(float p){
+        return r.nextFloat() * p;
+    }
+    public static boolean getBool(){
+        return r.nextBoolean();
     }
 }

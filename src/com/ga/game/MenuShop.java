@@ -102,7 +102,7 @@ public class MenuShop extends Panel {
         this.panel.add(panel);
     }
     private void describe(final Item item, final int price, final Performer action){
-        Menu.menu.showDialog(item.getFullName(),"This is "+item.getDescription()+" It is being sold for "+Dialog.money(price)+".",
+        Menu.menu.showDialog("Selling ["+item.getFullName()+"]",item.getDescription()+"\nIt is being sold for "+Dialog.money(price)+".",
                 new String[]{"Buy"}, new Performer[]{new Performer(){
                     public void perform(){
                         Player player = Global.player;

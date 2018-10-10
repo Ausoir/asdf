@@ -53,6 +53,9 @@ public class Item extends Prop {
             int getWarmth(){
                 return 1;
             }
+            public void onSet(Item host){
+                host.tags.add(Tag.Fire);
+            }
         },
         Silk(.2f,2,1,10,2000){
             public void onSet(Item host){
@@ -70,11 +73,11 @@ public class Item extends Prop {
                 return -1;
             }
         },
-        Leather(.3f,1,2,40,1500,new Color(133, 78, 32,80)),
+        Leather(.3f,1,2,34,1500,new Color(133, 78, 32,80)),
         Glass(.1f,1,7,7,2000),
         Other(0,0,0,1,0),
         Organic(.4f,0,0,1,0),
-        Stone(.3f,6,4,30,0,new Color(107, 107, 107,200)),
+        Stone(.3f,6,4,10,0,new Color(107, 107, 107,200)),
         Copper(.4f,3,3,40,1500,new Color(133, 92, 38,80)){
             public void onSet(Item host){
                 host.tags.add(Tag.Channeling);
@@ -83,24 +86,24 @@ public class Item extends Prop {
                 return -1;
             }
         },
-        Bronze(.4f,4,4,50,2000,new Color(112, 27, 7, 100)){
+        Bronze(.4f,4,4,45,2000,new Color(112, 27, 7, 100)){
             int getWarmth(){
                 return -1;
             }
         },
-        Iron(.5f,5,5,60,2500),
-        Silver(.2f,7,3,40,3000){
+        Iron(.5f,5,5,45,2500),
+        Silver(.2f,7,3,30,3000){
             public void onSet(Item host){
                 host.tags.add(Tag.Enchant);
             }
         },
-        Gold(.1f,8,3,40,10000){
+        Gold(.1f,8,3,30,10000){
             public void onSet(Item host){
                 host.tags.add(Tag.Enchant);
             }
         },
-        Steel(.3f,5,7,80,7000),
-        Titanium(.1f,4,7,100,16000){
+        Steel(.3f,5,7,50,7000),
+        Titanium(.1f,4,7,60,16000){
             public void onSet(Item host){
                 host.tags.add(Tag.Strength);
             }
@@ -128,6 +131,13 @@ public class Item extends Prop {
             public void onSet(Item host){
                 host.tags.add(Tag.Curse);
                 host.tags.add(Tag.Conjuration);
+            }
+        },
+        Web(.1f,0,0,14,3000){
+            public void onSet(Item host){
+                host.tags.add(Tag.Enchant);
+                host.tags.add(Tag.Curse);
+                host.tags.add(Tag.Channeling);
             }
         };
         int weight, hardness, value, durability;
@@ -478,7 +488,7 @@ public class Item extends Prop {
         return false;
     }
     public boolean trigger(Unit target){
-        if (emod != null && cooldown.isReady() && SyncRand.r.nextFloat() < probability && isUsable(true, 1)){
+        if (emod != null && cooldown.isReady() && SyncRand.getFloat(1) < probability && isUsable(true, 1)){
             cooldown.reset();
             target.buff(emod, ademod.level);
             return true;
@@ -542,17 +552,19 @@ public class Item extends Prop {
     @Override
     public void load(T p){
         super.load(p);
-        uses = p.get(5).getInt();
         cooldown.time = p.get(6).getInt();
         loadMeta(p.get(7));
         Material mat = Material.values()[p.get(8).getInt()];
         if (mat != material) setMaterial(mat);
+        if (p.get(5).size() == 0) uses = p.get(5).getInt(); //asdfasdfafasfadfasdf
+        else {uses = p.get(5).get(0).getInt();
+        durability = p.get(5).get(1).getInt();}
     }
     @Override
     public String toString(){
         String t = super.toString();
         String meta = T.wrap(smod+","+admod+","+(emod==null?"":emod.ordinal())+","+ademod);
-        if (!t.isEmpty()) t += ","+uses+","+cooldown.toString()+","+meta+","+material.ordinal();
+        if (!t.isEmpty()) t += ",["+uses+","+durability+"],"+cooldown.toString()+","+meta+","+material.ordinal();
         return t;
     }
 }

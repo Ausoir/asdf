@@ -1,53 +1,89 @@
-Comfortwear Torso,Comfortwear,1,0,0,[Cloth],0,1 //Name, Image Name, Type, Encumbrance, Pockets, Materials, Warmth, DurabilityMod
-Comfortwear Pants,Comfortwear,2,0,1,[Cloth],0,0
-Sportswear Torso,Sportswear,1,0,0,[Nylon],-6,0
-Sportswear Pants,Sportswear,2,0,0,[Nylon],-6,0
+  ***** Encumbrance 0, Tier 1/3 ***** //Name, Image Name, Type, Encumbrance, Pockets, Materials, Warmth, DurabilityMod
+Shirt,Comfortwear,1,0,0,[Cloth],1,0
+Pants,Comfortwear,2,0,1,[Cloth],0,0
+Sports Shirt,Sportswear,1,0,0,[Nylon],0,-6 // Tier 2
+Shorts,Sportswear,2,0,0,[Nylon],0,-6
 Spring Suit Torso,Spring_Suit,1,0,1,[Cloth],0,0
 Spring Suit Pants,Spring_Suit,2,0,1,[Cloth],0,0
-Robe Torso,Robe,1,1,1,[Cloth,Silk],20,1 //Encumbrance Rank 1: 1 pocket || nylon/wool/silk/leather || 1 warmth
-Robe Pants,Robe,2,0,1,[Cloth,Silk],20,1
-Jumpsuit Torso,Jumpsuit,1,1,2,[Cloth],0,0
-Jumpsuit Pants,Jumpsuit,2,1,2,[Cloth],0,0
-Jean Torso,Jean,1,1,0,[Cloth],40,1
-Jean Pants,Jean,2,1,1,[Cloth],40,0
-Suit Torso,Suit,1,2,2,[Cloth,Silk],12,1 //Encumbrance Rank 2: Rank 1 + 1 advantage
-Suit Pants,Suit,2,1,2,[Cloth,Silk],0,0
-Brown Suit Torso,Brown_Suit,1,2,1,[Silk,Leather],-4,1
-Brown Suit Pants,Brown_Suit,2,1,1,[Silk,Leather],-4,0
-Sweat Suit Torso,Sweat_Suit,1,2,1,[Wool],24,1
-Sweat Suit Pants,Sweat_Suit,2,1,2,[Wool],24,0
-Labwear Torso,Labwear,1,2,2,[Cloth],4,1
-Labwear Pants,Labwear,2,2,3,[Cloth],4,0
-Dustset Torso,Dustset,1,2,1,[Leather],0,1
-Dustset Pants,Dustset,2,2,2,[Leather],0,0
-Shadowrobe Torso,Shadowrobe,1,3,2,[Cloth,Nylon,Wool,Silk],40,1 //Encumbrance Rank 3
-Shadowrobe Pants,Shadowrobe,2,2,2,[Cloth,Nylon,Wool,Silk],40,0
-Adventurewear Torso,Adventurewear,1,3,2,[Cloth,Leather,Nylon],40,2
-Adventurewear Pants,Adventurewear,2,3,3,[Cloth,Leather,Nylon],40,1
-Chainmail Torso,Chainmail,1,3,2,[Iron,Silver],0,2
-Chainmail Pants,Chainmail,2,3,3,[Iron,Silver,Steel],0,1
-Platemail Torso,Platemail,1,3,2,[Copper,Iron,Steel,Crystal,Gold,Obsidian,Titanium],0,1
-Platemail Pants,Platemail,2,3,3,[Copper,Iron,Steel,Crystal,Gold,Obsidian,Titanium],0,0
-Battlewear Torso,Battlewear,1,4,3,[Steel,Titanium],60,2 //Encumbrance Rank 4
-Battlewear Pants,Battlewear,2,4,3,[Steel,Titanium],60,2
-Buzzcut,Buzzcut,0,0,0,[Organic],10,0
-Blondecut,Blondecut,0,0,0,[Organic],10,0
-Gingercut,Gingercut,0,0,0,[Organic],10,0
-Baldcut,Baldcut,0,0,0,[Organic],10,0
-Ponytail,Ponytail,0,0,0,[Organic],10,0
-Bandana,Bandana,0,0,0,[Cloth],0,0
-Mask,Mask,0,0,0,[Cloth],0,0
-Strawhat,Strawhat,0,1,0,[Cloth],20,0
-Glasses,Glasses,0,1,0,[Glass,Crystal],10,0
-Sunglass,Sunglass,0,1,0,[Obsidian],3,0
-Cap,Cap,0,1,0,[Nylon,Cloth],20,0
+Robe Top,Robe,1,0,0,[Cloth],0,30
+Robe Pants,Robe,2,0,1,[Cloth],0,10
+Hoodie,Cargo,1,0,0,[Cloth],2,0 // Tier 3
+Cargo Pants,Cargo,2,0,2,[Cloth],0,0
+Jumpsuit Torso,Jumpsuit,1,0,1,[Cloth],0,20
+Jumpsuit Pants,Jumpsuit,2,0,2,[Cloth],0,0
+Jean Jacket,Jean,1,0,0,[Cloth],0,60
+Jeans,Jean,2,0,1,[Cloth],0,40
+Sweater,Sweater,1,0,0,[Wool],0,0
+Lined Pants,Sweater,2,0,1,[Wool],0,0
+Camo Top,Camo,1,0,0,[Nylon,Web],0,10
+Camo Shorts,Camo,2,0,1,[Nylon,Web],0,10
+  ***** Encumbrance 1, Tier 1/3 *****
+Suit Torso,Suit,1,1,1,[Cloth,Silk],0,10
+Suit Pants,Suit,2,1,2,[Cloth,Silk],0,10
+Custom Suit Torso,Brown_Suit,1,1,1,[Leather],0,0 // Tier 2
+Custom Suit Pants,Brown_Suit,2,1,2,[Leather],0,0
+Sweat Suit Torso,Sweat_Suit,1,1,1,[Wool],0,10
+Sweat Suit Pants,Sweat_Suit,2,1,2,[Wool],0,10
+Lab Coat,Labwear,1,1,2,[Cloth],0,-5 // Tier 3
+Lab Pants,Labwear,2,1,3,[Cloth],0,-5
+Leather Jacket,Leather,1,1,0,[Leather],0,40
+Leather Pants,Leather,2,1,1,[Leather],0,40
+Rogue Turtleneck,Rogue,1,1,1,[Nylon,Silk,Web],0,0
+Rogue Tights,Rogue,2,1,2,[Nylon,Silk,Web],0,0
+Uniform Top,Uniform,1,1,1,[Copper,Bronze],0,0
+Uniform Bottom,Uniform,2,1,2,[Copper,Bronze],0,0
+  ***** Encumbrance 2, Tier 1/2 *****
+Burlap Armor,Burlap,1,2,0,[Wooden],0,70
+Burlap Loins,Burlap,2,2,0,[Wooden],0,70
+Dustset Jacket,Dustset,1,2,0,[Leather],0,100 // Tier 2
+Dustset Pants,Dustset,2,2,1,[Leather],0,80
+Padded Vest,Pad,1,2,0,[Iron,Steel],0,0
+Padded Leggings,Pad,2,2,1,[Iron,Steel],0,0
+Infantry Jacket,Infantry,1,2,1,[Nylon],1,70
+Infantry Pants,Infantry,2,2,2,[Nylon],0,70
+Mythringmail Torso,Mythringmail,1,2,0,[Silver,Gold,Steel,Obsidian,Crystal],0,0
+Mythringmail Leggings,Mythringmail,2,2,1,[Silver,Gold,Crystal],0,0
+Scavenger Jacket,Scavenger,1,2,4,[Cloth],0,20
+Scavenger Pants,Scavenger,2,2,4,[Cloth],0,20
+Adventure Torso,Adventurewear,1,2,2,[Nylon,Wool],1,60
+Adventure Pants,Adventurewear,2,2,3,[Nylon,Wool],0,60
+  ***** Encumbrance 3, Tier 1/2 *****
+Chainmail Armor,Chainmail,1,3,1,[Iron,Silver,Steel],0,20
+Chainmail Leggings,Chainmail,2,3,2,[Iron,Silver,Steel],0,20
+Breastplate,Platemail,1,3,1,[Copper,Iron,Steel,Crystal,Gold,Obsidian],0,20 // Tier 2
+Greaves,Platemail,2,3,1,[Copper,Iron,Steel,Crystal,Gold,Obsidian],0,20
+Security Armor,Security,1,3,1,[Nylon,Silk,Web,Wool],2,80
+Security Tights,Security,2,3,2,[Nylon,Silk,Web,Wool],1,80
+Shadowrobe Torso,Shadowrobe,1,3,4,[Bone],1,0
+Shadowrobe Pants,Shadowrobe,2,3,4,[Bone],1,0
+Robotic Upper Body,Robot,1,3,0,[Copper],5,0
+Robotic Lower Body,Robot,2,3,1,[Copper],4,0
+Crystal Breastplate,Crystal,1,3,1,[Crystal],0,150
+Crystal Greaves,Crystal,2,3,1,[Crystal],0,150
+  ***** Encumbrance 4, Tier 1/1 *****
+Battle Armor,Battlewear,1,4,1,[Titanium],2,20
+Battle Lower Armor,Battlewear,2,4,2,[Titanium],1,20
+  -----
+Baldcut,Baldcut,0,0,0,[Organic],0,0
+Gingercut,Gingercut,0,0,0,[Organic],0,0
+Blondecut,Blondecut,0,0,0,[Organic],0,0
+Ponytail,Ponytail,0,0,0,[Organic],0,0
+Buzzcut,Buzzcut,0,0,0,[Organic],0,0
+Bandana,Bandana,0,0,0,[Cloth],0,8 // Tier 2
+Mask,Mask,0,0,0,[Cloth],0,8
+Fur Hat,Fur_Hat,0,0,0,[Wool],0,0
+Balaclava,Balaclava,0,0,0,[Nylon],0,0
+Straw Hat,Straw_Hat,0,1,0,[Wooden],0,40 // Encumbrance 1
+Glasses,Glasses,0,1,0,[Glass,Crystal],0,0
+Sunglass,Sunglass,0,1,0,[Obsidian],-1,0
+Cap,Cap,0,1,0,[Nylon,Cloth],0,30
 Tophat,Tophat,0,1,1,[Cloth],0,0
-Mouthwrap,Mouthwrap,0,1,0,[Cloth,Wool,Leather],0,1
-Balaclava,Balaclava,0,1,0,[Cloth,Nylon,Wool,Leather],20,0
-Lace Helm,Lace_Helm,0,2,0,[Copper],0,0
-Full Helm,Full_Helm,0,2,0,[Copper,Iron],0,0
-Legion Helm,Legion_Helm,0,3,0,[Iron,Steel],0,0
-Military Helmet,Military_Helmet,0,3,0,[Steel,Titanium],-30,0
+Mouthwrap,Mouthwrap,0,1,0,[Wool,Leather],1,20
+Lace Helm,Lace_Helm,0,2,0,[Copper],0,0 // Encumbrance 2
+Legion Helm,Legion_Helm,0,2,0,[Iron,Steel],0,0
+Full Helm,Full_Helm,0,2,0,[Iron,Steel],0,0
+Military Helmet,Military_Helmet,0,2,0,[Steel,Titanium],0,-20
+  -----
 Cloak,Cloak,3,0,0,[Cloth,Nylon,Wool],0,0
 Double_Cloak,Double_Cloak,3,1,0,[Nylon,Wool],0,1
 Night Cloak,Night_Cloak,3,2,1,[Nylon,Wool],0,1

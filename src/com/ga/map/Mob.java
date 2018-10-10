@@ -16,7 +16,7 @@ public class Mob {
         float landSize = Math.abs(land.ptd.x-land.pt.x);
         if (landSize > 64) {
             T types = root.startsWith(p);
-            T mobs = types.get(SyncRand.r.nextInt(types.size()));
+            T mobs = types.get(SyncRand.getInt(types.size()));
             for (T unit : mobs) {
                 for (int i = 0; i < unit.get(1).getInt(); i++) {
                     int tx = (int) (Global.r.nextFloat() * (land.ptd.x - land.pt.x));

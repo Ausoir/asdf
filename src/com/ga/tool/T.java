@@ -9,7 +9,8 @@ public class T extends L<T> {
     public static String unwrap(String p){
         return p.substring(1, p.length()-1);
     }
-    private String value;
+    private String value = "";
+    public T(){}
     public T(String p){
         if (p != null) {
             boolean addOne = false;
@@ -31,7 +32,7 @@ public class T extends L<T> {
                 } else current.append(ch);
             }
             if (addOne) add(new T(current.toString()));
-        } else value = "";
+        }
     }
     public T startsWith(String p){
         for (T i : this){
@@ -44,16 +45,6 @@ public class T extends L<T> {
     }
     public String get(){
         return value;
-    }
-    public void refresh(){
-        if (size() > 0) {
-            for (T i : this) i.refresh();
-            StringBuilder v = new StringBuilder();
-            for (int i = 0; i < size(); i++) {
-                v.append(get(i).toString()).append((i == size() - 1) ? "" : ",");
-            }
-            value = v.toString();
-        }
     }
     public T get(int index){
         if (size() <= index) return new T(""); //Performance Optimized
@@ -73,10 +64,33 @@ public class T extends L<T> {
     public float getFloat(){
         return Float.parseFloat(value);
     }
+    public T add(String p){
+        add(new T(p));
+        return this;
+    }
+    public T build(){
+        if (size() > 0) {
+            for (T i : this) i.build();
+            StringBuilder v = new StringBuilder();
+            for (int i = 0; i < size(); i++) {
+                v.append(get(i).toString()).append((i == size() - 1) ? "" : ",");
+            }
+            value = v.toString();
+        }
+        return this;
+    }
     public boolean equals(String p){
         return value.equals(p);
     }
     public String toString(){
         return size() > 0 ? wrap(value) : value;
+    }
+    public String toDisplayString(String delimiter) {
+        StringBuilder r = new StringBuilder();
+        for (T i : this){
+            r.append(i).append(delimiter);
+        }
+        if (r.length() > delimiter.length()) r = new StringBuilder(r.substring(0, r.length() - delimiter.length()));
+        return r.toString();
     }
 }

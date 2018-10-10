@@ -169,9 +169,10 @@ public class Updater {
     private void onTimeChange(){
         for (Prop i : props) i.onTimeChange();
     }
-    public boolean sleep(int p, boolean checkEnemy){
+    public boolean sleep(int p, boolean checkHostile){
+        if (p == 0) return true;
         for (Unit i : unitsLoaded) {
-            if (i.map == Global.player.map && i.hittable(Global.player.faction) && (checkEnemy || i.brain.target == Global.player)) {
+            if (i.map == Global.player.map && i.hittable(Global.player.faction) && (checkHostile || i.brain.target == Global.player)) {
                 Global.player.say("There are enemies on the map!");
                 return false;
             }
@@ -203,6 +204,7 @@ public class Updater {
         map.weather.fadeIn();
         //Hour pass
         Global.player.stats.strength.heal();
+        if (Global.player.traits.getTraitLevel(Traits.Trait.Learner) > 0) Global.player.stats.motivation.add(p, false);
         Global.timePass(p*100);
         Global.hour+=p;
         for (Map i : Global.maps) i.onTimeChange();

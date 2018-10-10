@@ -28,7 +28,7 @@ public class Generator {
         for (String[] i : FileManager.fileCache.get("map")){
             if (i[1].startsWith(FileManager.makeDirectory("Data/map/building")) && !i[1].startsWith(FileManager.makeDirectory("Data/map/building/inside"))) {
                 String meta = FileManager.read(FileManager.makeDirectory(i[1])).split("%")[0];
-                buildings.put(i[0], new T(meta).get(2).get(0).getInt());
+                buildings.put(i[0], (int) new T(meta).get(2).get(0).getFloat());
             }
         }
     }

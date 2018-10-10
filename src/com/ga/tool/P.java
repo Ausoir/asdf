@@ -99,8 +99,8 @@ public class P {
     }
     public P disperse(int x, int y) {
         int dX = 0, dY = 0;
-        if (x > 0) dX = SyncRand.r.nextInt(x) - (x / 2);
-        if (y > 0) dY = SyncRand.r.nextInt(y) - (y / 2);
+        if (x > 0) dX = SyncRand.getInt(x) - (x / 2);
+        if (y > 0) dY = SyncRand.getInt(y) - (y / 2);
         return getAdd(dX, dY);
     }
     public String toString(){

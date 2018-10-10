@@ -48,8 +48,8 @@ public enum Strategy {
         int x = (int) (target.x - (host.pos.x + host.vel.x));
         int y = (int) (target.y - host.pos.y);
         if (Math.abs(x) <= host.getSpeed()*400) {
-            if (y > 0) return Actions.Drop;
-            else return Actions.Jump;
+            if (y > 4) return Actions.Drop;
+            else if (y < -4) return Actions.Jump;
         }
         if (Math.abs(x) > 100 && host.moveset.contains(Actions.Sprint)) return Actions.Sprint;
         return host.dir == 1 ? Actions.Right : Actions.Left;
@@ -79,9 +79,9 @@ public enum Strategy {
                 if (!added) moves.add(act);
             }
         }
-        if (moves.size() > 0 && SyncRand.r.nextInt(3) != 0) action = moves.get(0);
-        else if (moves.size() > 1 && SyncRand.r.nextInt(3) != 0) action = moves.get(1);
-        else if (moves.size() > 2) action = moves.get(SyncRand.r.nextInt(moves.size()));
+        if (moves.size() > 0 && SyncRand.getInt(3) != 0) action = moves.get(0);
+        else if (moves.size() > 1 && SyncRand.getInt(3) != 0) action = moves.get(1);
+        else if (moves.size() > 2) action = moves.get(SyncRand.getInt(moves.size()));
         else action = getMove(host, host.brain.target.pos);
         int fb = micromanage(host, action, dist);
 //        host.say(host.strength.toString() + " " + action.name() + " " + fb);

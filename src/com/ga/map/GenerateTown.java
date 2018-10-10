@@ -11,7 +11,7 @@ class GenerateTown {
     private static HashMap<Integer, String[]> buildings = new HashMap<>(){{
         put(1,new String[]{"House1","House2","House3","House4","Bighouse1","Bighouse2","Inn","Scrapyard"});
         put(2,new String[]{"Hideout","House1","House2","House3","House4","Restaurant","Inn","Shop","Clothier","School"});
-        put(3,new String[]{"Sewer","Restaurant","Shop","Pawnshop","Laboratory","Guild","Armory","Safehouse"});
+        put(3,new String[]{"Sewer","Restaurant","Shop","Pawnshop","Laboratory","Hospital","Armory","Safehouse"});
     }};
     static void generate(Map map, int cityType){
         Generator generator = new Generator(map, 0);
@@ -33,10 +33,10 @@ class GenerateTown {
         for (Line l : beforeBuilding) {
             if (l.opt > 0 && l.tid >= 0 && l.clockwise() && Math.abs(l.getSlope()) < .1f) {
                 if (cityType > 1) {
-                    for (int ii = 0; ii < Creation.r.nextInt(9); ii++) map.placeProp(l, Stock.createByName(map, "Scrap", -1));
-                    for (int ii = 0; ii < Creation.r.nextInt(9); ii++) map.placeProp(l, Stock.createByName(map, "Streetlight", -1));
-                    for (int ii = 0; ii < Creation.r.nextInt(9); ii++) map.placeProp(l, Stock.createByName(map, "Cone", -1));
-                    for (int ii = 0; ii < Creation.r.nextInt(9); ii++) map.placeProp(l, Stock.createByName(map, "Pole", -1));
+                    for (int ii = 0; ii < Creation.r.nextInt(7); ii++) map.placeProp(l, Stock.createByName(map, "Scrap", -1));
+                    for (int ii = 0; ii < Creation.r.nextInt(6); ii++) map.placeProp(l, Stock.createByName(map, "Cone", -1));
+                    for (int ii = 0; ii < Creation.r.nextInt(5); ii++) map.placeProp(l, Stock.createByName(map, "Pole", -1));
+                    for (int ii = 0; ii < Creation.r.nextInt(4); ii++) map.placeProp(l, Stock.createByName(map, "Streetlight", 0));
                 }
                 for (int ii = 0; ii < Creation.r.nextInt(9); ii++) map.placeProp(l, Stock.createByName(map, map.isSnowing()?"Frozen Bush":"Bush", -1));
                 for (int ii = 0; ii < Creation.r.nextInt(9); ii++) map.placeProp(l, Stock.createByName(map, map.isSnowing()?"Frozen Tree":"Tree", -1));
