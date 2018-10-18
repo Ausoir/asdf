@@ -52,8 +52,7 @@ public class Command {
                     Item item;
                     if (cmd.length > 2) item = (Item) Stock.createByName(host.map, cmd[1], Integer.parseInt(cmd[2]), -1);
                     else item = (Item) Stock.createByName(host.map, cmd[1], -1);
-                    item.start();
-                    host.setWeapon(item);
+                    item.start().pos = host.pos.getAdd(0,0);
                 } else if (cmd[0].equals("build")) new Generator(host.map, 99).generateBuilding(cmd[1], host.pos.getAdd(host.target), 9999);
                 else if (cmd[0].equals("tp")) host.pos.add(Integer.parseInt(cmd[1].split(",")[0]),Integer.parseInt(cmd[1].split(",")[1]));
                 else if (cmd[0].equals("to")){

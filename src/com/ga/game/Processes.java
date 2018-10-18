@@ -3,7 +3,6 @@ package com.ga.game;
 import com.ga.map.Global;
 import com.ga.map.Map;
 
-import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -28,10 +27,14 @@ public class Processes {
         update = new Timer();
         controllers = new Timer();
         controllers.scheduleAtFixedRate(new TimerTask() {
+            private int turn = 0;
             @Override
             public void run(){
-                ArrayList<Map> maps = (ArrayList<Map>) Global.maps.clone();
-                for (Map i : maps) i.updater.updateControl();
+                for (Map i : Global.maps){
+                    if (turn < i.updater.controllee.size())
+                        i.updater.controllee.get(turn++).update();
+                    else turn = 0;
+                }
             }
         }, 300, Settings.spc);
         display.scheduleAtFixedRate(new TimerTask() {
@@ -43,8 +46,7 @@ public class Processes {
         update.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run(){ //Same speed same thread = no stutter
-                ArrayList<Map> maps = (ArrayList<Map>) Global.maps.clone();
-                for (Map i : maps) i.updater.update();
+                for (Map i : Global.maps) i.updater.update();
                 Global.update();
             }
         }, 100, (int) ((1f/Settings.ups)*1000));

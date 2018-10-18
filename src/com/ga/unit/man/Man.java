@@ -51,16 +51,8 @@ public class Man extends Unit {
                 (Item) Stock.get(map, p.get(20).get()),(Item) Stock.get(map, p.get(21).get()));
         for (T i : p.get(22)) inventory.addItem((Item) Stock.get(map, i.get()));
         final Man me = this;
-        clip.organs[FIST].onAmputate = new Performer(){
-            public void perform(){
-                weapon.drop(me);
-            }
-        };
-        clip.organs[HEAD].onAmputate = new Performer(){
-            public void perform(){
-                armor.set(null, 0);
-            }
-        };
+        clip.organs[FIST].onAmputate = new Performer(()-> weapon.drop(me));
+        clip.organs[HEAD].onAmputate = new Performer(()-> armor.set(null, 0));
     }
     @Override
     public String toString(){
@@ -103,8 +95,13 @@ public class Man extends Unit {
             weapon.drop(this);
             setWeapon(null);
         } else return null;
-        say("Dropping " + p.getFullName());
         return t;
+    }
+    public void onStatChange(){
+        super.onStatChange();
+        for (int i=0;i<5;i++){
+            if (getVacancy() < 0) armor.drop(i);
+        }
     }
     public int getAttackSpeed(){
         return super.getAttackSpeed()+weapon.getSpeed();
@@ -145,7 +142,7 @@ public class Man extends Unit {
     }
 
     public float getReach(){
-        return weapon.getSize()+2;
+        return weapon.getSize()+4;
     }
 
     void stepSound(){
@@ -305,11 +302,10 @@ public class Man extends Unit {
 
     public void die(String cause) {
         say("@x");
-        if (status.getEffectLevel(Buffs.Tranquilized) > 0){
-            armor.drop();
-        }
         if (rand.nextBoolean()) weapon.drop(this);
         weapon.remove();
+        if (status.getEffectLevel(Buffs.Tranquilized) > 0) armor.drop();
+        else armor.remove();
         super.die(cause);
     }
     public P getInteractPoint(){

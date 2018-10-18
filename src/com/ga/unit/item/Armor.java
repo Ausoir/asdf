@@ -60,21 +60,19 @@ public class Armor extends Item {
         if (host.getVacancy() >= encumbrance) {
             host.setState(type.action);
             final Armor me = this;
-            host.delay.performer = new Performer() {
-                public void perform() {
-                    if (host.clip instanceof BodyHumanoid) {
-                        if (host.armor.isBare(piece)) {
-                            Sound.play(host.map, host.pos, "wear");
-                            me.remove();
-                            host.setWeapon(null);
-                            host.armor.set(me, piece);
-                            owner = host;
-                        } else {
-                            host.setState(Actions.Wield);
-                        }
+            host.delay.performer = new Performer(()->{
+                if (host.clip instanceof BodyHumanoid) {
+                    if (host.armor.isBare(piece)) {
+                        Sound.play(host.map, host.pos, "wear");
+                        me.remove();
+                        host.setWeapon(null);
+                        host.armor.set(me, piece);
+                        owner = host;
+                    } else {
+                        host.setState(Actions.Wield);
                     }
                 }
-            };
+            });
             return true;
         } else host.say("Too encumbering!");
         return false;

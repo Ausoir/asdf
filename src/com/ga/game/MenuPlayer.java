@@ -6,7 +6,6 @@ import com.ga.tool.Performer;
 import com.ga.tool.T;
 import com.ga.unit.PlayerInput;
 import com.ga.unit.Prop;
-import com.ga.unit.Tag;
 import com.ga.unit.Traits;
 import com.ga.unit.item.Crafts;
 import com.ga.unit.item.Item;
@@ -26,7 +25,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 
 /**
  * Created by Ga on 8/6/2016. asd
@@ -36,10 +34,10 @@ public class MenuPlayer extends Panel {
         private Stat[] stats = new Stat[]{Global.player.stats.strength, Global.player.stats.agility, Global.player.stats.intelligence};
         private GridBagConstraints statgrid = new GridBagConstraints();
         private JButton[] statButtons = new JButton[3];
-        private JLabel level = new JLabel();
+        private JLabel level = new JLabel(), points = new JLabel();
         private JLabel motivation = new JLabel(), nutrition = new JLabel(), fatigue = new JLabel();
         private JLabel stamina = new JLabel(), vitality = new JLabel(), energy = new JLabel();
-        private JLabel points = new JLabel();
+        private JLabel guild = new JLabel(), insured = new JLabel();
         StatPanel(){
             setLayout(new GridBagLayout());
             setBackground(Panel.forecolor2);
@@ -59,30 +57,33 @@ public class MenuPlayer extends Panel {
             statgrid.gridx = 0;
             add(level, statgrid);
             statgrid.gridy = 1;
+            add(guild, statgrid);
+            statgrid.gridx = 1;
+            add(insured, statgrid);
+            statgrid.gridx = 0;
+            statgrid.gridy = 2;
             statButtons[0] = makeStatButton("Strength");
             statButtons[1] = makeStatButton("Agility");
             statButtons[2] = makeStatButton("Intelligence");
             statgrid.gridx = 1;
-            statgrid.gridy = 1;
+            statgrid.gridy = 2;
             statgrid.ipady = 32;
             for (int i=0;i<3;i++){
                 final int var = i;
                 JButton button = makeStatButton("");
                 button.setIcon(iconDescribe);
-                final Performer perf = new Performer() {
-                    public void perform() {
-                        if (Global.player.stats.level.require(1))
-                            stats[var].addTotal(1);
-                    }
-                };
+                final Performer perf = new Performer(()->{
+                    if (Global.player.stats.level.require(1))
+                        stats[var].addTotal(1);
+                });
                 statButtons[var].addActionListener(e -> {
-                    perf.perform();
+                    perf.run();
                     refresh();
                 });
                 button.addActionListener(e -> Menu.menu.showDialog(stats[var].name,Dialog.get("?"+stats[var])));
             }
             statgrid.gridx = 0;
-            statgrid.gridy = stats.length+1;
+            statgrid.gridy = stats.length+2;
             statgrid.ipady = 12;
             add(new JLabel(""), statgrid);
             statgrid.gridy++;
@@ -167,6 +168,13 @@ public class MenuPlayer extends Panel {
             level.setFont(Panel.font);
             level.setForeground(Panel.fontcolor);
             level.setText("Level "+player.stats.level.getMax());
+            guild.setFont(Panel.optionfont);
+            guild.setForeground(Panel.fontcolor);
+            guild.setText(player.getTitle());
+            insured.setFont(Panel.optionfont);
+            insured.setForeground(Panel.fontcolor2);
+            int expiry = player.insuranceExpiry-Global.hour;
+            insured.setText((!player.insuranceMap.isEmpty() && player.insuranceCost <= 0 && expiry >= 0) ? "Insured for "+expiry+" hours":"");
             motivation.setFont(Panel.smallfont);
             motivation.setForeground(Panel.fontcolor);
             motivation.setText("Motivation - "+player.stats.motivation.toString().replace(",", "/"));
@@ -628,8 +636,9 @@ public class MenuPlayer extends Panel {
         }
         void refresh() {
             panel.removeAll();
+            String restMenu = Global.player.map.isSnowing()?"Rest (Cold)":"Rest";
             panel.add(makeOption("Level Up","lvl","Level up with sufficient Motivation points and time."));
-            panel.add(makeOption("Rest","h","Rest for an hour, removing curable debuffs and restoring fatigue. Restores double near chairs and benches, and triple near beds. Note that valuable items on ground disappear when time passes."));
+            panel.add(makeOption(restMenu,"h","Rest for an hour, removing curable debuffs and restoring fatigue. Restores double near chairs and benches, and triple near beds. Note that valuable items on ground disappear when time passes."));
             if (Global.player.stats.nutrition.get() == 0){
                 if (Global.player.stats.agility.get() > 0) panel.add(makeOption("Starve", "st", "Starve, gaining 1 Nutrition point at the cost of 1 Vitality."));
                 else panel.add(makeOption("STARVE TO DEATH", "st", "Submit to starvation and die."));
@@ -705,16 +714,14 @@ public class MenuPlayer extends Panel {
                     Menu.menu.showDialog("Level Up", message,
                             new String[]{"Begin Training!"},
                             new Performer[]{
-                                    new Performer(){
-                                        public void perform(){
-                                            if (Global.player.stats.motivation.get() >= reqMot){
-                                                if (Global.player.map.updater.sleep(reqTime, true)) {
-                                                    Global.player.level();
-                                                    Global.player.stats.motivation.require(reqMot);
-                                                }
-                                            } else Global.player.say("Not enough Motivation..");
+                                new Performer(()->{
+                                    if (Global.player.stats.motivation.get() >= reqMot){
+                                        if (Global.player.map.updater.sleep(reqTime, true)) {
+                                            Global.player.level();
+                                            Global.player.stats.motivation.require(reqMot);
                                         }
-                                    }
+                                    } else Global.player.say(Dialog.get("!m"));
+                                })
                             });
                     break;
                 case "?":
@@ -735,7 +742,6 @@ public class MenuPlayer extends Panel {
     }
 
     private class CraftPanel extends JPanel{
-        private ArrayList<String> items, props;
         private JPanel panel;
         private JScrollPane scroll;
         CraftPanel(){
@@ -755,12 +761,6 @@ public class MenuPlayer extends Panel {
             add(scroll, BorderLayout.LINE_START);
         }
         void refresh() {
-            items = new ArrayList<>();
-            props = new ArrayList<>();
-            for (Prop i : Global.player.getAvailableItems()){
-                items.add(i.name);
-                for (Tag ii : i.tags) items.add(ii.name());
-            }
             panel.removeAll();
             makeSlot("[Available Items]","?","Show all items available for crafting.");
             T slots = new T();
@@ -768,6 +768,7 @@ public class MenuPlayer extends Panel {
                 T reqs = Crafts.craft(false, Global.player, i);
                 T desc = new T();
                 boolean craftable = true;
+                assert reqs != null;
                 for (T req : reqs) {
                     if (req.get(0).get().equals("Time")) desc.add(req.get(2).getInt() + " Hours");
                     else {
@@ -778,7 +779,7 @@ public class MenuPlayer extends Panel {
                         } else desc.add(t);
                     }
                 }
-                String msg = i + " - " + desc.toDisplayString(", ");
+                String msg = i + " - " + desc.toDisplayString("Free", ", ");
                 if (craftable) slots.add(0, new T().add(i).add(msg));
                 else slots.add(new T().add(i).add(msg));
             }
@@ -814,15 +815,9 @@ public class MenuPlayer extends Panel {
             Menu.menu.showMenu();
             switch (p) {
                 case "?": {
-                    StringBuilder t = new StringBuilder();
-                    for (String i : items) {
-                        if (!i.equals("Time") && !i.equals("Fist")) t.append(i).append(", ");
-                    }
-                    for (String i : props) {
-                        t.append(i).append(", ");
-                    }
-                    String result = t.toString().equals("") ? "None" : t.substring(0, t.length() - 2);
-                    Menu.menu.showDialog("Available Items", result);
+                    T items = new T();
+                    for (Prop i : Global.player.getAvailableItems()) items.add(i.name);
+                    Menu.menu.showDialog("Available Items", items.toDisplayString("None", ", "));
                     break;
                 }
                 default:

@@ -1,5 +1,6 @@
 package com.ga.unit.item;
 
+import com.ga.game.Dialog;
 import com.ga.game.FileManager;
 import com.ga.game.Menu;
 import com.ga.tool.Performer;
@@ -85,14 +86,12 @@ public enum Crafts {
             for (int i = 0; i < skillNames.length - 1; i++) {
                 Actions skill = skills.get(i);
                 skillNames[i] = "Scribe "+skill.name() + " (requires "+skill.getEnergy()+" Energy)";
-                performers[i] = new Performer() {
-                    public void perform() {
-                        if (host.requireMana(skill.getEnergy())) {
-                            Item scroll = (Item) Stock.Scroll.create(host.map, 0, Actions.getScribables().indexOf(skill));
-                            host.setWeapon(scroll);
-                        } else host.say("Not enough Energy!");
-                    }
-                };
+                performers[i] = new Performer(()->{
+                    if (host.requireMana(skill.getEnergy())) {
+                        Item scroll = (Item) Stock.Scroll.create(host.map, 0, Actions.getScribables().indexOf(skill));
+                        host.setWeapon(scroll);
+                    } else host.say(Dialog.get("!i"));
+                });
             }
             Menu.menu.showDialog("Scribe Spell", "Choose a spell to scribe from currently available spells (Your catalysts: "+host.getTags()+")", skillNames, performers);
         }
@@ -106,14 +105,12 @@ public enum Crafts {
             for (int i = 0; i < skillNames.length - 1; i++) {
                 Actions skill = skills.get(i);
                 skillNames[i] = "Scribe "+skill.name() + " (requires "+skill.getEnergy()+" Energy)";
-                performers[i] = new Performer() {
-                    public void perform() {
-                        if (host.requireMana(skill.getEnergy())) {
-                            Item scroll = (Item) Stock.Scroll.create(host.map, 0, Actions.getScribables().indexOf(skill));
-                            host.setWeapon(scroll);
-                        } else host.say("Not enough Energy!");
-                    }
-                };
+                performers[i] = new Performer(()->{
+                    if (host.requireMana(skill.getEnergy())) {
+                        Item scroll = (Item) Stock.Scroll.create(host.map, 0, Actions.getScribables().indexOf(skill));
+                        host.setWeapon(scroll);
+                    } else host.say(Dialog.get("!i"));
+                });
             }
             Menu.menu.showDialog("Scribe Spell", "Choose a spell to scribe from currently available spells (Your catalysts: "+host.getTags()+")", skillNames, performers);
         }
@@ -144,6 +141,7 @@ public enum Crafts {
     public static void craftByName(Man host, String p) {
         T r = craft(false, host, p);
         int time = 0;
+        assert r != null;
         for (T i : r){
             if (i.get(0).get().equals("Time")) time = i.get(2).getInt();
             else if (i.get(1).getInt() < i.get(2).getInt()) return;

@@ -114,7 +114,7 @@ public class Server {
                 FileManager.loadPlayer();
                 FileManager.loadActors();
                 Processes.resume();
-                if (afterMapChange != null) afterMapChange.perform();
+                if (afterMapChange != null) afterMapChange.run();
             }
         }, 1);
     }

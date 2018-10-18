@@ -343,6 +343,7 @@ public enum Buffs {
                 host.stats.strength.addTotal(p);
                 host.stats.agility.addTotal(p);
                 host.stats.intelligence.addTotal(p);
+                host.onStatChange();
             }
             public void onFinish() {
                 augment(-var);
@@ -372,6 +373,7 @@ public enum Buffs {
                 host.stats.strength.addTotal(-p);
                 host.stats.agility.addTotal(-p);
                 host.stats.intelligence.addTotal(-p);
+                host.onStatChange();
             }
             public void onFinish() {
                 augment(-var);
@@ -431,11 +433,7 @@ public enum Buffs {
                     p.faction = host.faction;
                     p.gravity = true;
                     p.delay.set(50);
-                    p.delay.performer = new Performer() {
-                        public void perform() {
-                            p.remove();
-                        }
-                    };
+                    p.delay.performer = new Performer(p::remove);
                 }
                 return super.update();
             }
@@ -536,7 +534,7 @@ public enum Buffs {
     Stun(2,"You cannot perform any actions.",new Tags(){{
         add(Tag.Curse);
     }}){ Buff makeLocal(int level){
-        return new Buff(level, 4) {
+        return new Buff(level, 3) {
             public void onSet() {
                 Sound.play(host.map, host.pos, "stun");
                 host.vel.x = 0;
@@ -734,12 +732,7 @@ public enum Buffs {
                     p.damage = 4;
                     p.gravity = false;
                     p.delay.set(150);
-                    p.delay.performer = new Performer() {
-                        @Override
-                        public void perform() {
-                            p.stuck();
-                        }
-                    };
+                    p.delay.performer = new Performer(p::stuck);
                     return super.update();
                 }
                 return false;
@@ -756,11 +749,7 @@ public enum Buffs {
             public void onFinish() {
                 if (host instanceof MainPlayer){
                     Global.server.requestChangeMap(FileManager.makeDirectory("ins/_")+(SyncRand.getInt(20*level)-(10*level))+",1");
-                    Global.server.afterMapChange = new Performer(){
-                        public void perform(){
-                            host.pos.set(Global.r.nextInt((int) host.map.size.x-64)+36, 48);
-                        }
-                    };
+                    Global.server.afterMapChange = new Performer(()-> host.pos.set(Global.r.nextInt((int) host.map.size.x-64)+36, 48));
                 } else host.remove();
             }
             public boolean update() {

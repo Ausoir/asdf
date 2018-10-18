@@ -162,8 +162,8 @@ public class EditorInput extends Drawable implements Input, Updatable {
             if (cmd.length > 3) currentO.name = cmd[3];
             make(currentO);
             message("Travel to ["+cmd[1]+" @ "+cmd[2]+"] spawned");
-        } else if (cmd[0].equals("spawner")) { //name, interval, max
-            if (cmd.length == 1) message("spawner name, interval, max");
+        } else if (cmd[0].equals("spawner")) { //name, max, interval
+            if (cmd.length == 1) message("spawner name, max, interval");
             selectTool(Tool.OBJECT);
             currentO = Stock.Spawner.create(map, Integer.parseInt(cmd[2]), Integer.parseInt(cmd[3]));
             currentO.name = cmd[1];
@@ -496,14 +496,12 @@ public class EditorInput extends Drawable implements Input, Updatable {
                         Prop prop = list.get(i);
                         listString[i] = i+" - "+prop.name+" (obj:"+Stock.values()[prop.factoryId].name()+", id:"+prop.subId+", seed:"+prop.seed+", depth:"+prop.getDepth()+", rot:"+prop.rotation+")";
                         final int finalI = i;
-                        performers[i] = new Performer(){
-                            public void perform(){
-                                selectTool(Tool.OBJECT);
-                                currentO.remove();
-                                currentO = list.get(finalI);
-                                message("["+listString[finalI] + "] was selected");
-                            }
-                        };
+                        performers[i] = new Performer(()->{
+                            selectTool(Tool.OBJECT);
+                            currentO.remove();
+                            currentO = list.get(finalI);
+                            message("["+listString[finalI] + "] was selected");
+                        });
                     }
                     Menu.menu.showDialog("List of Props","", listString, performers);
                 }

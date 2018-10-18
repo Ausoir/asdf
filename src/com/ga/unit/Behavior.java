@@ -158,15 +158,13 @@ public enum Behavior {
                 return true;
             } else {
                 host.face(host.brain.target.pos.x>host.pos.x?1:-1, true);
-                if (host.delay.over()) {
-                    if (host.map == target.map) {
-                        Strategy.values()[host.brain.type].update(host);
-                    } else if (target.map != null) {
-                        host.brain.setTask(Travel);
-                        host.brain.tasks.peek().load(host, target.map.name.toString());
-                    }
-                    if (target.state == Actions.Dead) host.brain.target = null;
+                if (host.map == target.map) {
+                    Strategy.values()[host.brain.type].update(host);
+                } else if (target.map != null) {
+                    host.brain.setTask(Travel);
+                    host.brain.tasks.peek().load(host, target.map.name.toString());
                 }
+                if (target.state == Actions.Dead) host.brain.target = null;
             }
             return false;
         }

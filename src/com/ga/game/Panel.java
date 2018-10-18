@@ -13,6 +13,7 @@ public class Panel extends JPanel {
     static Color forecolor = new Color(68, 102, 120, 240);
     static Color forecolor2 = new Color(95, 112, 120, 255);
     static Color fontcolor = new Color(205, 209, 227, 255);
+    static Color fontcolor2 = new Color(120, 180, 140, 200);
     static Font font = new Font("Helvetica",Font.PLAIN,18);
     static Font smallfont = new Font("Helvetica",Font.PLAIN,16);
     static Font titlefont = new Font("Helvetica",Font.BOLD,18);

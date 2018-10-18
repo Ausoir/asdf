@@ -104,7 +104,7 @@ public class Unit extends Prop {
     private int getMemorySize(){
         return moveset.size()-1+traits.getMemorySize();
     }
-    private boolean canLearn(){
+    protected boolean canLearn(){
         return getMemorySize() < stats.intelligence.getMax();
     }
     public boolean learnSkill(Actions move){
@@ -120,6 +120,10 @@ public class Unit extends Prop {
             return true;
         }
         return false;
+    }
+    public void onStatChange(){
+        for (int i=0;i<getMemorySize()-stats.intelligence.getMax();i++) moveset.remove(0);
+        for (int i=0;i<getMemorySize()-stats.intelligence.getMax();i++) traits.forget(this, traits.getTraits().get(0));
     }
 
     public P getRandomPoint(){
@@ -293,6 +297,7 @@ public class Unit extends Prop {
     }
 
     public void die(String cause) {
+        status.clearBuffs();
         save = false;
         onInteract = null;
         setState(Actions.Dead);

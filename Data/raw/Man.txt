@@ -1,20 +1,25 @@
 Stander,,,punk,[3,3,3],Evil,[0,0],[Use],,[Shirt],[Pants],,, //Humanoids-Name,Speech Type,Stat,Faction,AI Type,AI Subtype,Moveset,Face,Weapons,Armors,Headgears,Trait
 Resident,,,resident,[3,3,3],Neutral,[1,0],[Backstep],[,,,,,,,,Crowbar,Alcohol,Scroll,Parasol,Cane],[Shirt,Spring Suit Torso,Hoodie,Sweater],[Pants,Spring Suit Pants,Cargo Pants,Lined Pants],[Glasses,Sunglass,Cap,Tophat,Buzzcut,Blondecut,Gingercut,Ponytail,Baldcut,],,
+  ***** Merchants *****
 Shopkeeper,,,merchant,[3,3,3],Neutral,[3,0],[Backstep],,[Spring Suit Torso],[Spring Suit Pants],[Glasses,],,
 Waiter,,,merchant,[3,3,3],Neutral,[3,1],[Backstep],,[Suit Torso],[Suit Pants],[Baldcut],,
 Blacksmith,,,merchant,[9,5,3],Neutral,[3,4],[Use,Dash,Whirlwind],[Longhammer],,[Robe Pants],[Bandana],,
-Armorsmith,,,merchant,[5,9,3],Neutral,[3,3],[Use,Hold,Charge],[Hammer],[Robotic Upper Body],[Robotic Lower Body],[Bandana],,
+Armorsmith,,,merchant,[5,9,3],Neutral,[3,3],[Use,Hold,Charge],[Hammer],[Mythringmail Armor],[Mythringmail Leggings],[Bandana],,
 Tailor,,,merchant,[3,3,3],Neutral,[3,2],[Backstep],,[Custom Suit Torso],[Custom Suit Pants],[Glasses],,
 Technician,,,merchant,[3,3,9],Neutral,[3,5],[Backstep,Shock,Lightning],,[Jumpsuit Torso],[Jumpsuit Pants],[Glasses],[Battery],[[Affinity,1],[Aeromancy,3],[Channeling,2]]
 Librarian,,,merchant,[1,1,5],Neutral,[3,6],[Backstep],,[Shirt],[Pants],[Glasses],,
+Huntsman,,,merchant,[3,3,3],Neutral,[3,7],[Backstep,Use],[Firearm],[Camo Shirt],[Camo Shorts],[Cap],,
 Innkeep,,,merchant,[3,3,3],Neutral,[4,0],[Backstep],,[Suit Torso],[Suit Pants],,,
 Trainer,,,merchant,[7,3,3],Neutral,[5,0],[Punch,Kick],,[Sports Shirt],[Shorts],[Bandana],,
 Dealer,,,merchant,[3,3,3],Neutral,[6,0],[Backstep],,[Spring Suit Torso],[Cargo Pants],[Glasses],,
 Insurer,,,merchant,[3,3,3],Neutral,[7,0],[Backstep],[Scroll],[Suit Torso],[Suit Pants],[Blondecut,Sunglass],,
-Doctor,,,merchant,[3,3,8],Neutral,[8,0],[Use,Lunge,Kick,Glowshot],[Scroll],[Lab Coat],[Lab Pants],[Baldcut],[Battery],[[Infusion,3]]
-Administrator,,,merchant,[8,8,8],Neutral,[9,1],[Use,Lunge,Kick,Glowshot],[Scroll],[Sweat Suit Torso],[Sweat Suit Pants],[Baldcut],[Battery],[[Infusion,3]]
-Guildsman,,,merchant,[8,8,8],Neutral,[9,2],[Use,Lunge,Kick,Glowshot],[Scroll],[Uniform Top],[Uniform Bottom],[Baldcut],[Battery],[[Infusion,3]]
-Recruitment Officer,,,merchant,[8,8,8],Neutral,[9,3],[Use,Lunge,Kick,Glowshot],[Scroll],[Infantry Jacket],[Infantry Pants],[Baldcut],[Battery],[[Infusion,3]]
+Doctor,,,merchant,[3,3,8],Neutral,[8,0],[Use,Backstep,Calling],[Scroll],[Lab Coat],[Lab Pants],[Baldcut],[Battery],[[Infusion,3]]
+Transporter,,,merchant,[3,3,8],Neutral,[9,0],[Backstep],[Scroll],[Robotic Upper Body],[Robotic Lower Body],[Baldcut],,
+Administrator,,,merchant,[8,8,8],Neutral,[10,1],[Use,Lunge,Kick,Glowshot],[Scroll],[Sweat Suit Torso],[Sweat Suit Pants],[Baldcut],[Battery],[[Infusion,3]]
+Guildsman,,,merchant,[8,8,8],Neutral,[10,2],[Use,Lunge,Kick,Glowshot],[Scroll],[Uniform Top],[Uniform Bottom],[Baldcut],[Battery],[[Infusion,3]]
+Recruiter,,,merchant,[8,8,8],Neutral,[10,3],[Use,Backstep],[Firearm],[Infantry Jacket],[Infantry Pants],[Baldcut],[Ammunition],[[Infusion,3]]
+  ***** Mobs *****
+Security,,,soldier,[7,7,7],Neutral,[2,1],[Use,Kick,Shock],[Staff],[Security Armor],[Security Tights],[Blondecut,Sunglass],,[[Aeromancy,3],[Affinity,1],[Overcharged,1]]
 Looter,,,punk,[3,3,3],Punk,[2,1],[Use,Backstep,Kick],[Stick,Bamboo Spear],[Shirt,Hoodie],[Pants,Cargo Pants,Jeans],,,
 Punk,,,punk,[4,3,2],Punk,[2,1],[Use,Charge,Dash,Uppercut],[Knife,Crowbar,Baseball Bat],[Jean Jacket],[Jeans],[Buzzcut],,
 Yeller,,,punk,[3,3,5],Punk,[2,1],[Use,Backstep,Calling],[Stick],[Sweater,Hoodie],[Lined Pants],[Mouthwrap],[Battery],[[Infusion,3],[Overcharged,1]]
@@ -27,8 +32,7 @@ Wizard,,,,[3,5,10],Rogue,[2,1],[Backstep,Blink,Fireball,Fireblast,Meteorform],[S
 Archer,,,soldier,[8,10,3],Rogue,[2,2],[Use,Kick,Backstep],[Bow],[Chainmail Armor],[Chainmail Leggings],[Lace Helm],[Quiver],
 Spearman,,,soldier,[8,8,5],Rogue,[2,1],[Backstep,Kick,Dash,Hold,Use],[Spear,Halberd],[Chainmail Armor],[Chainmail Leggings],[Legion Helm],,
 Knight,,,soldier,[10,10,3],Rogue,[2,1],[Use,Hold,Underhand,Dash,Whirlwind],[Broadsword,Spear,Mace],[Breastplate],[Greaves],[Full Helm],,
-Security,,,soldier,[4,7,8],Neutral,[2,1],[Use,Kick,Shock],[Staff],[Security Armor],[Security Tights],[Blondecut,Sunglass],,[[Aeromancy,3],[Affinity,1],[Overcharged,1]]
 Witch,,Zombie_skin,punk,[1,9,5],Evil,[2,1],[Blink,Enchant,Calling,Mark,Swap],,[Crystal Breastplate],[Crystal Greaves],[Mask],,[[Affinity,1],[Infusion,3],[Bloodcraft,4],[Shadoweaving,3],[Overcharged,1]]
-Skeleton,Skull,Skeleton_skin,undead,[12,4,1],Evil,[2,1],[Use],[Broadsword,Spear,Cutlass,Machete],,[Lace_Helm,Legion_Helm,Full_Helm],,[[Painless,1],[Restless,1]]
-Zombie,Zombie,Zombie_skin,undead,[8,24,3],Evil,[2,1],[Punch,Charge],,,,,[[Painless,1],[Restless,1]]
-Phantom,Phantom,Shadowrobe,,[12,7,12],Evil,[2,1],[Whirlwind,Use,Shadowstep,Glowshot,Shock,Lightning,Greatsword,Halberd,Warhammer],[Shadowrobe],,,[[Shadoweaving,2],[Aeromancy,2],[Infusion,4],[Restless,1],[Affinity,1],[Instinct,1],[Overcharged,1]]
+Skeleton,Skull,Skeleton_skin,undead,[12,4,1],Evil,[2,1],[Use],[Broadsword,Spear,Cutlass,Machete],,,[Lace_Helm,Legion_Helm,Full_Helm],,[[Painless,1],[Restless,1]]
+Zombie,Zombie,Zombie_skin,undead,[8,24,3],Evil,[2,1],[Punch,Charge],,,,,,[[Painless,1],[Restless,1],[Instinct,1]]
+Phantom,Phantom,Shadowrobe,,[12,7,12],Evil,[2,1],[Whirlwind,Use,Shadowstep,Glowshot,Shock,Lightning],[Greatsword,Halberd,Warhammer],[Shadowrobe Torso],[Shadowrobe Pants],,,[[Shadoweaving,2],[Aeromancy,2],[Infusion,4],[Restless,1],[Affinity,1],[Instinct,1],[Overcharged,1]]

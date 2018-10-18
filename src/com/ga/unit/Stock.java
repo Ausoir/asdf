@@ -381,11 +381,7 @@ public enum Stock {
                             p.setState(Actions.Hit);
                         }
                     };
-                    pj.delay = new EventTimer(9, false, new Performer() {
-                        public void perform() {
-                            pj.remove();
-                        }
-                    });
+                    pj.delay = new EventTimer(9, false, new Performer(()-> pj.remove()));
                     pj.dir = dir;
                     pj.rotSpeed = 0;
                     pj.blunt = false;
@@ -808,23 +804,15 @@ public enum Stock {
                                 Menu.menu.showDialog("Safe", "How long would you like to use this storage? " + Dialog.money(100) + " per hour." +
                                                 "\nWARNING - The safe is not responsible for any items stolen after hours are over.",
                                         new String[]{"1 hour", "1 day/6 hours", "1 week/42 hours", "1 month/180 hours"}, new Performer[]{
-                                            new Performer() {
-                                                public void perform() {
-                                                    if (p.requireGold(100)) subId = 1 + Global.hour;
-                                                }
-                                            }, new Performer() {
-                                                public void perform() {
-                                                    if (p.requireGold(600)) subId = 6 + Global.hour;
-                                                }
-                                            }, new Performer() {
-                                                public void perform() {
-                                                    if (p.requireGold(4200)) subId = 42 + Global.hour;
-                                                }
-                                            }, new Performer() {
-                                            public void perform() {
-                                                    if (p.requireGold(18000)) subId = 180 + Global.hour;
-                                            }
-                                        }
+                                            new Performer(()-> {
+                                                if (p.requireGold(100)) subId = 1 + Global.hour;
+                                            }), new Performer(()-> {
+                                                if (p.requireGold(600)) subId = 6 + Global.hour;
+                                            }), new Performer(()-> {
+                                                if (p.requireGold(4200)) subId = 42 + Global.hour;
+                                            }), new Performer(()-> {
+                                                if (p.requireGold(18000)) subId = 180 + Global.hour;
+                                            })
                                         });
                             } else if (store == null) {
                                 L<Item> items = Global.player.inventory.getItems();
@@ -833,14 +821,12 @@ public enum Stock {
                                 for (int i = 0; i < perf.length; i++) {
                                     Item item = items.get(i);
                                     itemList[i] = "Store " + item.getFullName();
-                                    perf[i] = new Performer() {
-                                        public void perform() {
-                                            Global.player.say("Stored "+item.getFullName()+"!");
-                                            store = item.forceToString();
-                                            Global.player.dropItem(item);
-                                            item.remove();
-                                        }
-                                    };
+                                    perf[i] = new Performer(()-> {
+                                        Global.player.say("Stored "+item.getFullName()+"!");
+                                        store = item.forceToString();
+                                        Global.player.dropItem(item);
+                                        item.remove();
+                                    });
                                 }
                                 Menu.menu.showDialog("Store Item","Select an item to store for "+(subId-Global.hour)+" hours.", itemList, perf);
                             } else {
@@ -894,17 +880,15 @@ public enum Stock {
                     for (int i = 0; i < itemList.length; i++) {
                         Item item = (Item) items.get(i);
                         itemList[i] = "Repair " + item.getFullName();
-                        perf[i] = new Performer() {
-                            public void perform() {
-                                if (isUsable(false, 1) && cooldown.isReady() && host.map.updater.sleep(1, true)) {
-                                    cooldown.reset();
-                                    int fixAmount = Math.min(item.durability - item.uses, repairkit.uses);
-                                    item.isUsable(true, -fixAmount);
-                                    repairkit.isUsable(true, fixAmount);
-                                    host.armor.refresh();
-                                }
+                        perf[i] = new Performer(()-> {
+                            if (isUsable(false, 1) && cooldown.isReady() && host.map.updater.sleep(1, true)) {
+                                cooldown.reset();
+                                int fixAmount = Math.min(item.durability - item.uses, repairkit.uses);
+                                item.isUsable(true, -fixAmount);
+                                repairkit.isUsable(true, fixAmount);
+                                host.armor.refresh();
                             }
-                        };
+                        });
                     }
                     Menu.menu.showDialog("Use Repairkit", "Select a weapon or an armor to repair", itemList, perf);
                 }
@@ -933,54 +917,48 @@ public enum Stock {
                         host.clip.setState("Shoot_Arrow");
                         host.delay.time = Math.max(0, 70 - host.getAttackSpeed());
                         host.weapon.rotateTo(host.target.getMult(host.dir, host.dir));
-                        host.delay.performer = new Performer() {
-                            public void perform() {
-                                P tip = host.weapon.getLine().ptd;
-                                final Item wpn = host.weapon;
-                                int str = host.stats.strength.getMax();
-                                int speed = (int) (40 + Global.clamp(str * 12 + 20, 48, 120) - SyncRand.getFloat(44 / str));
-                                final Projectile pj = new Projectile(host.map, "Arrow", tip, host.getHand().getAdd(host.target), speed) {
-                                    public void onField() {}
-                                    public void onAttack(Unit p) {
-                                        wpn.trigger(p);
-                                        Sound.play(host.map, host.pos, "hit_bloody");
-                                        remove();
-                                    }
-                                    public void collide() {
-                                        super.collide();
-                                    }
-                                    public void update() {
-                                        super.update();
-                                        if (tangible || lastLand.depth == 0) rotateTo(vel);
-                                    }
-                                };
-                                pj.vel.y -= 4;
-                                pj.setDepth(300);
-                                pj.blunt = false;
-                                pj.lastLand = host.lastLand;
-                                pj.rotSpeed = 0;
-                                pj.rotation = pj.vel.getAtan();
-                                pj.gravity = true;
-                                pj.faction = host.faction;
-                                pj.damage = damage + getDamage();
-                                host.weapon.rotation += host.dir * .3f;
-                                host.setState(Actions.Idle);
-                            }
-                        };
-                        return true;
-                    } else {
-                        L<Prop> items = host.getAvailableItems();
-                        items.removeIf(e -> !(e instanceof Item) || !e.name.equals("Quiver") || ((Item) e).uses == 0);
-                        Item item = (Item) items.getFirst();
-                        if (item != null && item.isUsable(true, 1)) {
-                            host.clip.setState("Wield");
-                            host.delay.time = 20;
-                            host.delay.performer = new Performer() {
-                                public void perform() {
-                                    thisItem.isUsable(true, -1);
-                                    host.stateSet(Actions.Idle);
+                        host.delay.performer = new Performer(()-> {
+                            P tip = host.weapon.getLine().ptd;
+                            final Item wpn = host.weapon;
+                            int str = host.stats.strength.getMax();
+                            int speed = (int) (40 + Global.clamp(str * 12 + 20, 48, 120) - SyncRand.getFloat(44 / str));
+                            final Projectile pj = new Projectile(host.map, "Arrow", tip, host.getHand().getAdd(host.target), speed) {
+                                public void onField() {}
+                                public void onAttack(Unit p) {
+                                    wpn.trigger(p);
+                                    Sound.play(host.map, host.pos, "hit_bloody");
+                                    remove();
+                                }
+                                public void collide() {
+                                    super.collide();
+                                }
+                                public void update() {
+                                    super.update();
+                                    if (tangible || lastLand.depth == 0) rotateTo(vel);
                                 }
                             };
+                            pj.vel.y -= 4;
+                            pj.setDepth(300);
+                            pj.blunt = false;
+                            pj.lastLand = host.lastLand;
+                            pj.rotSpeed = 0;
+                            pj.rotation = pj.vel.getAtan();
+                            pj.gravity = true;
+                            pj.faction = host.faction;
+                            pj.damage = damage + getDamage();
+                            host.weapon.rotation += host.dir * .3f;
+                            host.setState(Actions.Idle);
+                        });
+                        return true;
+                    } else {
+                        Item item = host.armor.armor[3];
+                        if (item.name.equals("Quiver") && item.isUsable(true, 1)) {
+                            host.clip.setState("Wield");
+                            host.delay.time = 20;
+                            host.delay.performer = new Performer(()-> {
+                                thisItem.isUsable(true, -1);
+                                host.stateSet(Actions.Idle);
+                            });
                         } else host.say("Out of arrows!");
                     }
                 }
@@ -1042,40 +1020,34 @@ public enum Stock {
                         host.delay.time = Math.max(0, 27 - shootSpeed);
                         host.weapon.rotateTo(host.target.getMult(host.dir, host.dir));
                         host.weapon.rotation += .1 * host.dir;
-                        host.delay.performer = new Performer() {
-                            public void perform() {
-                                host.vel.x = host.dir * -1;
-                                P tip = host.weapon.getLine().ptd;
-                                final Projectile pj = new Projectile(host.map, "Bullet", tip, host.getHand().getAdd(host.target), (int) (40 + (thisItem.rand.nextFloat() * 40))) {
-                                    public void stuck() {
-                                        Particle.explode(host.map, "Fire", getDepth(), tip, vel, 4, 12, 20, false, 3);
-                                        remove();
-                                    }
-                                    public void onAttack(Unit p){
-                                        super.onAttack(p);
-                                        p.setState(Actions.Hit);
-                                        thisItem.trigger(p);
-                                    }
-                                };
-                                pj.delay = new EventTimer(clipRange, false, new Performer() {
-                                    public void perform() {
-                                        pj.remove();
-                                    }
-                                });
-                                pj.dir = host.dir;
-                                pj.rotSpeed = 0;
-                                pj.blunt = false;
-                                pj.rotateTo(host.target.getSubtract(tip).add(host.getHand()));
-                                pj.faction = host.faction;
-                                pj.damage = getDamage()+ammoDamage;
-                                Particle.smoke(host.map, pj.pos, pj.getDepth());
-                                Particle.explode(host.map, "Fire", pj.getDepth(), tip, pj.vel, 3, 12, 20, false, 3);
-                                float start = host.rand.nextFloat();
-                                pj.pos.add(pj.vel.getMult(start, start));
-                                host.weapon.rotation += host.dir * -.3f;
-                                host.setState(Actions.Idle);
-                            }
-                        };
+                        host.delay.performer = new Performer(()-> {
+                            host.vel.x = host.dir * -1;
+                            P tip = host.weapon.getLine().ptd;
+                            final Projectile pj = new Projectile(host.map, "Bullet", tip, host.getHand().getAdd(host.target), (int) (40 + (thisItem.rand.nextFloat() * 40))) {
+                                public void stuck() {
+                                    Particle.explode(host.map, "Fire", getDepth(), tip, vel, 4, 12, 20, false, 3);
+                                    remove();
+                                }
+                                public void onAttack(Unit p){
+                                    super.onAttack(p);
+                                    p.setState(Actions.Hit);
+                                    thisItem.trigger(p);
+                                }
+                            };
+                            pj.delay = new EventTimer(clipRange, false, new Performer(pj::remove));
+                            pj.dir = host.dir;
+                            pj.rotSpeed = 0;
+                            pj.blunt = false;
+                            pj.rotateTo(host.target.getSubtract(tip).add(host.getHand()));
+                            pj.faction = host.faction;
+                            pj.damage = getDamage()+ammoDamage;
+                            Particle.smoke(host.map, pj.pos, pj.getDepth());
+                            Particle.explode(host.map, "Fire", pj.getDepth(), tip, pj.vel, 3, 12, 20, false, 3);
+                            float start = host.rand.nextFloat();
+                            pj.pos.add(pj.vel.getMult(start, start));
+                            host.weapon.rotation += host.dir * -.3f;
+                            host.setState(Actions.Idle);
+                        });
                         return true;
                     } else {
                         L<Prop> items = host.getAvailableItems();
@@ -1086,12 +1058,10 @@ public enum Stock {
                             item.isUsable(true, ammos);
                             host.clip.setState("Wield");
                             host.delay.time = 80;
-                            host.delay.performer = new Performer(){
-                                public void perform(){
-                                    thisItem.isUsable(true, -ammos);
-                                    host.stateSet(Actions.Idle);
-                                }
-                            };
+                            host.delay.performer = new Performer(()->{
+                                thisItem.isUsable(true, -ammos);
+                                host.stateSet(Actions.Idle);
+                            });
                         } else host.say("Out of ammo!");
                     }
                 }
@@ -1110,29 +1080,22 @@ public enum Stock {
             }
             public boolean use(final com.ga.unit.man.Man host){
                 if (super.use(host) && isUsable(true, 1)) {
-                    host.delay.performer = new Performer() {
-                        public void perform() {
-                            final Projectile p = new Projectile(map, name(), host.pos.getAdd(host.clip.organs[BodyHumanoid.OFIST].ptd), host.pos.getAdd(host.target), 70) {
-                                @Override
-                                public void stuck() {
-                                    if (tangible) Particle.explode(map, "Fire", getDepth(), pos, vel, 20, 10, 15, true, 3);
-                                    super.stuck();
-                                }
-                            };
-                            p.rotSpeed = 1;
-                            p.faction = host.faction;
-                            p.damage = getDamage();
-                            p.gravity = false;
-                            p.setDepth(host.getDepth());
-                            p.delay.set(8);
-                            p.delay.performer = new Performer() {
-                                @Override
-                                public void perform() {
-                                    p.gravity = true;
-                                }
-                            };
-                        }
-                    };
+                    host.delay.performer = new Performer(()-> {
+                        final Projectile p = new Projectile(map, name(), host.pos.getAdd(host.clip.organs[BodyHumanoid.OFIST].ptd), host.pos.getAdd(host.target), 70) {
+                            @Override
+                            public void stuck() {
+                                if (tangible) Particle.explode(map, "Fire", getDepth(), pos, vel, 20, 10, 15, true, 3);
+                                super.stuck();
+                            }
+                        };
+                        p.rotSpeed = 1;
+                        p.faction = host.faction;
+                        p.damage = getDamage();
+                        p.gravity = false;
+                        p.setDepth(host.getDepth());
+                        p.delay.set(8);
+                        p.delay.performer = new Performer(()-> p.gravity = true);
+                    });
                     return true;
                 }
                 return false;
@@ -1150,38 +1113,32 @@ public enum Stock {
                 if (super.use(host) && isUsable(true, 1)) {
                     final int explosionDamage = rand.nextInt(36)+24;
                     host.delay.time = 10;
-                    host.delay.performer = new Performer() {
-                        public void perform() {
-                            final Projectile p = new Projectile(map, getName(), host.pos.getAdd(host.clip.organs[BodyHumanoid.FIST].ptd),
-                                    host.pos.getAdd(host.target), 48) {
-                                @Override
-                                public void stuck() {
-                                    Particle.explosion(map, pos, getDepth());
-                                    ArrayList<Unit> t = map.updater.collideUnit(pos,96,Faction.Destructive);
-                                    for (Unit i : t){
-                                        i.hit(i.getPosLine(), explosionDamage);
-                                    }
-                                    remove();
+                    host.delay.performer = new Performer(()-> {
+                        final Projectile p = new Projectile(map, getName(), host.pos.getAdd(host.clip.organs[BodyHumanoid.FIST].ptd),
+                                host.pos.getAdd(host.target), 48) {
+                            @Override
+                            public void stuck() {
+                                Particle.explosion(map, pos, getDepth());
+                                ArrayList<Unit> t = map.updater.collideUnit(pos,96,Faction.Destructive);
+                                for (Unit i : t){
+                                    i.hit(i.getPosLine(), explosionDamage);
                                 }
+                                remove();
+                            }
 
-                                @Override
-                                public void update() {
-                                    super.update();
-                                    Particle.explode(map, "Fire", getDepth(), pos, new P(0, -1), 6, 1, 4, true, 3);
-                                }
-                            };
-                            p.faction = host.faction;
-                            p.damage = 0;
-                            p.gravity = true;
-                            p.delay.set(50);
-                            p.delay.performer = new Performer() {
-                                public void perform() {
-                                    p.stuck();
-                                }
-                            };
-                            p.pos = pos;
-                        }
-                    };
+                            @Override
+                            public void update() {
+                                super.update();
+                                Particle.explode(map, "Fire", getDepth(), pos, new P(0, -1), 6, 1, 4, true, 3);
+                            }
+                        };
+                        p.faction = host.faction;
+                        p.damage = 0;
+                        p.gravity = true;
+                        p.delay.set(50);
+                        p.delay.performer = new Performer(p::stuck);
+                        p.pos = pos;
+                    });
                     return true;
                 }
                 return false;
@@ -1198,53 +1155,51 @@ public enum Stock {
                 if (super.use(host) && isUsable(true, 1)) {
                     host.stateSet(Actions.Dart);
                     final Item me = this;
-                    host.delay.performer = new Performer() {
-                        public void perform() {
-                            final Projectile p = new Projectile(map, getName(), host.pos.getAdd(host.clip.organs[BodyHumanoid.FIST].ptd),
-                                    host.pos.getAdd(host.target), 56) {
-                                private BasicStroke stroke = new BasicStroke(4);
-                                public void onAttack(Unit p){
-                                    pos = p.pos;
+                    host.delay.performer = new Performer(()-> {
+                        final Projectile p = new Projectile(map, getName(), host.pos.getAdd(host.clip.organs[BodyHumanoid.FIST].ptd),
+                                host.pos.getAdd(host.target), 56) {
+                            private BasicStroke stroke = new BasicStroke(4);
+                            public void onAttack(Unit p){
+                                pos = p.pos;
+                            }
+                            public void stuck() {
+                                super.stuck();
+                                Particle.groundSlam(map, pos, getDepth());
+                                host.stateSet(Actions.Jump);
+                                host.delay.set(999);
+                                host.mobile = false;
+                                gravity = false;
+                                mobile = false;
+                            }
+                            public void update(){
+                                super.update();
+                                if (!tangible) {
+                                    if (host.pos.getSubtract(pos).getDist() < 16){
+                                        host.lastLand = new Line();
+                                        host.pos.add(0,-24);
+                                        host.stateSet(Actions.Jump);
+                                        host.vel.set(0,0);
+                                        host.mobile = true;
+                                        remove();
+                                        me.image.visible = true;
+                                    } else host.pos.add(pos.getSubtract(host.pos).mult(.1f));
                                 }
-                                public void stuck() {
-                                    super.stuck();
-                                    Particle.groundSlam(map, pos, getDepth());
-                                    host.stateSet(Actions.Jump);
-                                    host.delay.set(999);
-                                    host.mobile = false;
-                                    gravity = false;
-                                    mobile = false;
-                                }
-                                public void update(){
-                                    super.update();
-                                    if (!tangible) {
-                                        if (host.pos.getSubtract(pos).getDist() < 16){
-                                            host.lastLand = new Line();
-                                            host.pos.add(0,-24);
-                                            host.stateSet(Actions.Jump);
-                                            host.vel.set(0,0);
-                                            host.mobile = true;
-                                            remove();
-                                            me.image.visible = true;
-                                        } else host.pos.add(pos.getSubtract(host.pos).mult(.1f));
-                                    }
-                                }
-                                public void draw(Graphics2D g){
-                                    super.draw(g);
-                                    g.setColor(Color.darkGray);
-                                    g.setStroke(stroke);
-                                    P from = host.getHand().add(Global.rel);
-                                    g.drawLine(from.x(), from.y(), (int) (pos.x+Global.rel.x), (int) (pos.y+Global.rel.y));
-                                }
-                                public float getDepth(){
-                                    return host.getDepth();
-                                }
-                            };
-                            p.faction = host.faction;
-                            p.gravity = true;
-                            me.image.visible = false;
-                        }
-                    };
+                            }
+                            public void draw(Graphics2D g){
+                                super.draw(g);
+                                g.setColor(Color.darkGray);
+                                g.setStroke(stroke);
+                                P from = host.getHand().add(Global.rel);
+                                g.drawLine(from.x(), from.y(), (int) (pos.x+Global.rel.x), (int) (pos.y+Global.rel.y));
+                            }
+                            public float getDepth(){
+                                return host.getDepth();
+                            }
+                        };
+                        p.faction = host.faction;
+                        p.gravity = true;
+                        me.image.visible = false;
+                    });
                     return true;
                 }
                 return false;
@@ -1317,32 +1272,27 @@ public enum Stock {
         Item product = new Item(map, name(), name(), seed, Item.Material.Glass, Item.ItemType.Darting, level * 2){
             public boolean use(final com.ga.unit.man.Man host){
                 if (super.use(host) && isUsable(true, 1)) {
-                    host.delay.performer = new Performer() {
-                        public void perform() {
-                            final Projectile p = new Projectile(map, name(), host.pos.getAdd(host.clip.organs[BodyHumanoid.OFIST].ptd), host.pos.getAdd(host.target), 100) {
-                                public void stuck() {
-                                    if (tangible) Particle.implode(map, "Spark", getDepth(), pos, 18, 10, false, 20);
-                                    super.stuck();
-                                }
-                                public void onAttack(Unit p){
-                                    super.onAttack(p);
-                                    p.setState(Actions.Down);
-                                    p.buff(Buffs.Tranquilized, 1);
-                                }
-                            };
-                            p.rotSpeed = 0;
-                            p.faction = host.faction;
-                            p.gravity = false;
-                            p.setDepth(host.getDepth());
-                            p.delay.set(6);
-                            p.delay.performer = new Performer() {
-                                @Override
-                                public void perform() {
-                                    p.gravity = true;
-                                }
-                            };
-                        }
-                    };
+                    host.delay.performer = new Performer(()-> {
+                        final Projectile p = new Projectile(map, name(), host.pos.getAdd(host.clip.organs[BodyHumanoid.OFIST].ptd), host.pos.getAdd(host.target), 100) {
+                            public void stuck() {
+                                if (tangible) Particle.implode(map, "Spark", getDepth(), pos, 18, 10, false, 20);
+                                super.stuck();
+                            }
+                            public void onAttack(Unit p){
+                                super.onAttack(p);
+                                p.setState(Actions.Down);
+                                p.buff(Buffs.Tranquilized, 1);
+                            }
+                        };
+                        p.rotSpeed = 0;
+                        p.faction = host.faction;
+                        p.gravity = false;
+                        p.setDepth(host.getDepth());
+                        p.delay.set(6);
+                        p.delay.performer = new Performer(()-> {
+                                p.gravity = true;
+                        });
+                    });
                     return true;
                 }
                 return false;
@@ -1447,12 +1397,10 @@ public enum Stock {
                         for (Unit i : host.map.updater.unitsLoaded){
                             if (i.brain.target == host) i.brain.target = null;
                         }
-                        Global.server.afterMapChange = new Performer() {
-                            public void perform() {
-                                Global.player.pos = new P(location.get(1).get());
-                                Particle.holyExplosion(host.map, host.getHead(), host.getDepth());
-                            }
-                        };
+                        Global.server.afterMapChange = new Performer(()-> {
+                            Global.player.pos = new P(location.get(1).get());
+                            Particle.holyExplosion(host.map, host.getHead(), host.getDepth());
+                        });
                         Global.server.requestChangeMap(location.get(0).get() + ",0");
                     }
                     return true;

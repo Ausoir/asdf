@@ -1,21 +1,16 @@
 package com.ga.unit.man;
 
-import com.ga.game.FileManager;
-import com.ga.game.Menu;
-import com.ga.game.Settings;
-import com.ga.game.Sound;
+import com.ga.game.*;
 import com.ga.map.Global;
 import com.ga.map.Map;
 import com.ga.map.MapName;
 import com.ga.tool.Line;
 import com.ga.tool.Performer;
-import com.ga.tool.SyncRand;
 import com.ga.tool.T;
 import com.ga.unit.Faction;
 import com.ga.unit.Particle;
 import com.ga.unit.Traits;
 import com.ga.unit.skill.Actions;
-import com.ga.unit.skill.Stat;
 
 import static com.ga.unit.man.BodyHumanoid.BODY;
 
@@ -23,6 +18,7 @@ import static com.ga.unit.man.BodyHumanoid.BODY;
  * Created by Ga on 12/29/2016. asd
  */
 public class MainPlayer extends Player {
+    private static int[] reqMot = new int[]{10,20,30,50,80,130,210,340,550,1000};
     private Indicator statBar;
     public int guild = -1, guildVar = 0;
     public String insuranceMap = "";
@@ -47,6 +43,25 @@ public class MainPlayer extends Player {
         return "[["+guild+","+guildVar+"],["+insuranceMap+","+insuranceExpiry+","+insuranceCost+"],["+r+"]]";
     }
 
+    public String getTitle(){
+        if (guild == 1) return "Member";
+        else if (guild == 2 && guildVar == 0) return "Contractor";
+        else if (guild == 2 && guildVar == 1) return "Guildsman";
+        else if (guild == 3) {
+            if (guildVar <= 1) return "Associate";
+            else if (guildVar <= 2) return "Veteran";
+            else if (guildVar <= 3) return "Operative";
+            else if (guildVar <= 4) return "Veteran Operative";
+            else if (guildVar <= 5) return "Specialist";
+            else if (guildVar <= 6) return "Veteran Specialist";
+            else if (guildVar <= 7) return "Agent";
+            else if (guildVar <= 8) return "Veteran Agent";
+            else if (guildVar <= 9) return "Special Agent";
+            else if (guildVar <= 10) return "Veteran Special Agent";
+        }
+        return "";
+    }
+
     @Override
     public int setState(Actions state) {
         if (state == Actions.Rest && (this.state == Actions.Right || this.state == Actions.Left)) {
@@ -66,7 +81,7 @@ public class MainPlayer extends Player {
                 say("Cannot cast!");
             } else if (r == 5) say("This action is beyond my abilities!");
             else if (r == 6) say("I'm missing a required limb!");
-            else if (r == 8) say("Not enough Energy!");
+            else if (r == 8) say(Dialog.get("!i"));
         }
         return r;
     }
@@ -78,72 +93,45 @@ public class MainPlayer extends Player {
     }
 
     public void level() {
+        int level = stats.level.getMax();
         Sound.play(map, pos, "heal");
         Particle.holyExplosion(map, pos.getAdd(clip.organs[BODY].ptd), getDepth());
-        String statChangeNotice = "";
-        int level = stats.level.getMax();
-        stats.level.addTotal(1);
-        stats.motivation.setTotal((level+1)*10, true);
-        if (level > 1) {
-            int i, current = 1, prev;
-            for (i = 1; i < level; i += prev) {
-                prev = current;
-                current = i;
-            }
-            if (i != level) { //not fibo
-                Stat[] mainStats = new Stat[]{Global.player.stats.strength, Global.player.stats.agility, Global.player.stats.intelligence};
-                Stat decayStat;
-                int count = 0;
-                do {
-                    decayStat = mainStats[SyncRand.getInt(mainStats.length)];
-                } while (++count < 9 && decayStat.getMax() <= 1);
-                if (count >= 9){
-                    stats.level.add(-1, true);
-                    statChangeNotice += "No stat point is obtained on this level.";
-                } else {
-                    decayStat.addTotal(-1);
-                    statChangeNotice += decayStat.name + " decayed by 1.";
-                }
-            }
-        }
-        say("Leveled up! " + statChangeNotice);
+        if (reqMot.length > level) {
+            stats.level.addTotal(1);
+            stats.motivation.setTotal(reqMot[level], true);
+            say("Leveled up!");
+        } else say("Level cannot increase any higher!");
     }
 
     public void die(String cause) {
         super.die(cause);
         map.weather.fadeOut();
         delay.time = 100;
-        delay.performer = new Performer(){
-            public void perform(){
-                delay.time = -1;
-                String msg = "Cause: "+cause+"\n";
-                if (!insuranceMap.isEmpty()) {
-                    int expiry = insuranceExpiry - Global.hour;
-                    if (expiry < 0) msg += "Your insurance expired "+expiry+" hours ago.";
-                    else if (insuranceCost > 0) msg += "The medical guild leaves you to die as you have not payed off your last debt.";
-                    else {
-                        map.updater.forceSleep(1);
-                        Menu.menu.showDialog("You fall unconscious...", msg+"Your medical guild agents haul your body back into the guild hospital for revival...");
-                        revive();
-                        Global.server.requestChangeMap(insuranceMap+",911");
-                        insuranceCost = -insuranceCost;
-                        return;
-                    }
+        delay.performer = new Performer(()->{
+            delay.time = -1;
+            String msg = "Cause: "+cause+"\n";
+            if (!insuranceMap.isEmpty()) {
+                int expiry = insuranceExpiry - Global.hour;
+                if (expiry < 0) msg += "Your insurance expired "+expiry+" hours ago.";
+                else if (insuranceCost > 0) msg += "The medical guild leaves you to die as you have not payed off your last debt.";
+                else {
+                    map.updater.forceSleep(1);
+                    Menu.menu.showDialog("You fall unconscious...", msg+"Your medical guild agents haul your body back into the guild hospital for revival...");
+                    revive();
+                    Global.server.requestChangeMap(insuranceMap+",911");
+                    insuranceCost = -insuranceCost;
+                    return;
                 }
-                FileManager.save(FileManager.makeDirectory("Data/map/Player.user"),"");
-                FileManager.save(FileManager.makeDirectory("Data/map/Actors.map"),"");
-                FileManager.save(FileManager.makeDirectory("Data/map/World.map"),"");
-                FileManager.save(FileManager.makeDirectory("Data/Keymap.txt"),"");
-                FileManager.cleanMaps();
-                Menu.menu.showDialog("You die...", msg + "\n GAME OVER!", new String[]{"Click here to exit"}, new Performer[]{
-                        new Performer(){
-                            public void perform(){
-                                System.exit(0);
-                            }
-                        }
-                });
             }
-        };
+            FileManager.save(FileManager.makeDirectory("Data/map/Player.user"),"");
+            FileManager.save(FileManager.makeDirectory("Data/map/Actors.map"),"");
+            FileManager.save(FileManager.makeDirectory("Data/map/World.map"),"");
+            FileManager.save(FileManager.makeDirectory("Data/Keymap.txt"),"");
+            FileManager.cleanMaps();
+            Menu.menu.showDialog("You die...", msg + "\n GAME OVER!", new String[]{"Click here to exit"}, new Performer[]{
+                new Performer(()-> System.exit(0))
+            });
+        });
     }
 
     public void revive() {

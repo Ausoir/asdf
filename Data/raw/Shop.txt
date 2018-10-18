@@ -1,8 +1,9 @@
 Baseball Bat;Parasol;Repairkit;Battery;Fannypack;Backpack;Knapsack;Sunglass;Cap;Grill;Pot;Frying Pan;Glasses //Grocery
 Ration;Fruit;Fish;Vegetables;Cheese;Bread;Meat;Poultry;Meal;Drumstick;Steak;Burger;Sandwich;Jerky //Restaurant
-Cloak;Straw Hat;Shirt;Pants;Sports Shirt;Shorts;Spring Suit Torso;Spring Suit Pants;Suit Torso;Suit Pants //Tailor
+Cloak;Straw Hat;Shirt;Pants;Sports Shirt;Shorts;Spring Suit Torso;Spring Suit Pants;Suit Torso;Suit Pants;Hoodie;Cargo Pants;Sweat Suit Torso;Sweat Suit Pants //Tailor
 Chainmail Armor;Chainmail Leggings;Breastplate;Greaves;Battle Armor;Battle Lower Armor //Armorsmith
 Machete;Broadsword;Axe;Lancesword;Cutlass;Claymore;Mace;Spear;Halberd;Cleaver;Pickaxe;Rapier;Warhammer;Greatsword;Striker;Shuriken;Knife;Longhammer //Weaponsmith
-Scroll;Potion;Scroll;Potion;Battery;Grappler;Generator;Bomb //Lab
+Scroll;Potion;Scroll;Potion;Battery;Generator;Bomb;Memoryfoam //Lab
 Manual;Textbook;Book //Library
-Katana;Tanto;Dagger;Claw;Knuckleblade;Firearm;Bow;Throwing Knife;Fireball;Ration //Exotic
+Dagger;Bow;Ration;Grappler;Repairkit;Quiver;Ammunition;Firearm //Ranch
+Baldcut,Gingercut,Blondecut,Buzzcut,Ponytail //Salon

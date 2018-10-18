@@ -78,7 +78,7 @@ public class MenuDialog extends Panel {
                     @Override
                     public void mouseClicked(MouseEvent e) {
                         setVisible(false);
-                        if (actions[ii] != null) actions[ii].perform();
+                        if (actions[ii] != null) actions[ii].run();
                     }
                 });
                 options1[i].setFont(optionfont);

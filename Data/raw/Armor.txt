@@ -41,7 +41,7 @@ Padded Vest,Pad,1,2,0,[Iron,Steel],0,0
 Padded Leggings,Pad,2,2,1,[Iron,Steel],0,0
 Infantry Jacket,Infantry,1,2,1,[Nylon],1,70
 Infantry Pants,Infantry,2,2,2,[Nylon],0,70
-Mythringmail Torso,Mythringmail,1,2,0,[Silver,Gold,Steel,Obsidian,Crystal],0,0
+Mythringmail Armor,Mythringmail,1,2,0,[Silver,Gold,Steel,Obsidian,Crystal],0,0
 Mythringmail Leggings,Mythringmail,2,2,1,[Silver,Gold,Crystal],0,0
 Scavenger Jacket,Scavenger,1,2,4,[Cloth],0,20
 Scavenger Pants,Scavenger,2,2,4,[Cloth],0,20
@@ -64,28 +64,35 @@ Crystal Greaves,Crystal,2,3,1,[Crystal],0,150
 Battle Armor,Battlewear,1,4,1,[Titanium],2,20
 Battle Lower Armor,Battlewear,2,4,2,[Titanium],1,20
   -----
-Baldcut,Baldcut,0,0,0,[Organic],0,0
-Gingercut,Gingercut,0,0,0,[Organic],0,0
-Blondecut,Blondecut,0,0,0,[Organic],0,0
-Ponytail,Ponytail,0,0,0,[Organic],0,0
-Buzzcut,Buzzcut,0,0,0,[Organic],0,0
-Bandana,Bandana,0,0,0,[Cloth],0,8 // Tier 2
-Mask,Mask,0,0,0,[Cloth],0,8
+Baldcut,Baldcut,0,0,0,[Organic],1,0
+Gingercut,Gingercut,0,0,0,[Organic],1,0
+Blondecut,Blondecut,0,0,0,[Organic],1,0
+Ponytail,Ponytail,0,0,0,[Organic],1,0
+Buzzcut,Buzzcut,0,0,0,[Organic],1,0
+Bandana,Bandana,0,0,0,[Cloth],0,4
+Mask,Bandana_Mask,0,0,0,[Cloth],0,4
+Headband,Headband,0,0,0,[Nylon],0,4 // Tier 2
 Fur Hat,Fur_Hat,0,0,0,[Wool],0,0
-Balaclava,Balaclava,0,0,0,[Nylon],0,0
-Straw Hat,Straw_Hat,0,1,0,[Wooden],0,40 // Encumbrance 1
+Straw Hat,Straw_Hat,0,1,0,[Wooden],0,20 // Encumbrance 1
+Balaclava,Balaclava,0,0,0,[Nylon],1,10
+Camo Hat,Camo_Hat,0,0,0,[Nylon],0,30
 Glasses,Glasses,0,1,0,[Glass,Crystal],0,0
 Sunglass,Sunglass,0,1,0,[Obsidian],-1,0
-Cap,Cap,0,1,0,[Nylon,Cloth],0,30
-Tophat,Tophat,0,1,1,[Cloth],0,0
+Cap,Cap,0,1,0,[Cloth],1,40
+Bright Cap,Cap2,0,1,0,[Cloth],0,50
+Top Hat,Tophat,0,1,1,[Cloth],0,0
 Mouthwrap,Mouthwrap,0,1,0,[Wool,Leather],1,20
-Lace Helm,Lace_Helm,0,2,0,[Copper],0,0 // Encumbrance 2
-Legion Helm,Legion_Helm,0,2,0,[Iron,Steel],0,0
-Full Helm,Full_Helm,0,2,0,[Iron,Steel],0,0
-Military Helmet,Military_Helmet,0,2,0,[Steel,Titanium],0,-20
+Hood,Hood,0,1,0,[Cloth],2,20
+Beanie,Beanie,0,1,0,[Cloth],3,0
+Mask,Mask,0,1,0,[Nylon],2,40 // Encumbrance 2
+Lace Helm,Lace_Helm,0,2,0,[Copper],1,30
+Riot Helmet,Riot_Helmet,0,2,1,[Copper],0,20
+Legion Helm,Legion_Helm,0,3,0,[Iron,Steel],1,0 // Encumbrance 3
+Full Helm,Full_Helm,0,3,0,[Iron,Steel],1,0
+Military Helmet,Military_Helmet,0,3,0,[Steel,Titanium],1,-20
   -----
 Cloak,Cloak,3,0,0,[Cloth,Nylon,Wool],0,0
-Double_Cloak,Double_Cloak,3,1,0,[Nylon,Wool],0,1
+Double Cloak,Double_Cloak,3,1,0,[Nylon,Wool],0,1
 Night Cloak,Night_Cloak,3,2,1,[Nylon,Wool],0,1
 Fannypack,Fannypack,3,0,1,[Cloth,Leather],0,0
 Knapsack,Knapsack,3,1,2,[Cloth,Leather],0,0

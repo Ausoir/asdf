@@ -27,7 +27,7 @@ public class Organ extends Line {
     private int maxLength = 80;
     public boolean vital = false;
     boolean leg = false, hand = false;
-    public Performer onAmputate = new Performer();
+    public Performer onAmputate = new Performer(null);
 
     public Organ(Organ p, boolean tip){
         if (p != null) {
@@ -83,25 +83,20 @@ public class Organ extends Line {
                     }
                 }
             };
-            flyingOrgan.vel.x *= 3;
+            flyingOrgan.vel.x *= 2;
             flyingOrgan.image = image.copy();
             flyingOrgan.rotation = getAtan()-1.57f;
             flyingOrgan.dir = host.dir;
             flyingOrgan.setDepth(host.getDepth());
             flyingOrgan.gravity = true;
             flyingOrgan.delay.set(600);
-            flyingOrgan.delay.performer = new Performer(){
-                @Override
-                public void perform(){
-                    flyingOrgan.remove();
-                }
-            };
+            flyingOrgan.delay.performer = new Performer(flyingOrgan::remove);
             image.visible = false;
         }
         Particle.explode(host.map, "Blood", host.getDepth(), p.ptd, new P(), 2, 40, 0, true, 2);
         amputated = true;
         for (Organ i : children) i.amputate(p, intensity);
-        onAmputate.perform();
+        onAmputate.run();
         host.clip.updateStatus();
     }
     boolean checkHit(Line p){

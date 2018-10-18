@@ -89,7 +89,7 @@ public class Prop extends Thing {
                 onCollide(land);
                 vel.set(0, 0);
                 break;
-            } else if (cw && lineY >= pos.y) {
+            } else if (cw && lineY >= pos.y && vel.y > 0) {
                 onCollide(land);
                 float atan = (float) Math.atan(slope);
                 if (vel.x > 0 != atan > 0) vel.x = vel.x * Global.cos(atan);

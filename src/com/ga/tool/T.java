@@ -85,7 +85,8 @@ public class T extends L<T> {
     public String toString(){
         return size() > 0 ? wrap(value) : value;
     }
-    public String toDisplayString(String delimiter) {
+    public String toDisplayString(String def, String delimiter) {
+        if (size() == 0) return def;
         StringBuilder r = new StringBuilder();
         for (T i : this){
             r.append(i).append(delimiter);

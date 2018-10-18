@@ -93,11 +93,9 @@ public class Map {
                     }
                 }.start();
             }
-            Global.display.onResize.add(new Performer(){
-                public void perform(){
-                    for (Thing i : panorama) i.setImage(i.name);
-                }
-            });
+            Global.display.onResize.add(new Performer(()->{
+                for (Thing i : panorama) i.setImage(i.name);
+            }));
         }
         this.temperature = s.get(3, new T("0")).getInt();
         if (data.size() > 1) {
@@ -130,11 +128,10 @@ public class Map {
             if (it.hasNext()) result.append(",");
         }
         result.append("\n");
-        ArrayList<Line> landRawClone = (ArrayList<Line>) landRaw.clone();
-        for (Line i : landRawClone) {
+        for (Line i : landRaw) {
             if (!i.toString().equals("")) result.append(i).append(",");
         }
-        if (landRawClone.size() > 0) result = new StringBuilder(result.substring(0, result.length() - 1));
+        if (landRaw.size() > 0) result = new StringBuilder(result.substring(0, result.length() - 1));
         result.append("\n").append(updater.toString());
         return result.toString();
     }
@@ -271,7 +268,7 @@ public class Map {
         return new P(size.x / 2, 36);
     }
 
-    public void onTimeChange() {
+    void onTimeChange() {
         if (panorama != null && !panoramaName.equals("")) {
             for (int i=0;i<panorama.length;i++){
                 panorama[i].name = panoramaName + ("_"+i) + (weather.isNight() ? "_Night" : "");

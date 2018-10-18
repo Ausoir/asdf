@@ -17,7 +17,7 @@ public class Settings {
     public static int gravityMax;
     static int fps;
     static int ups;
-    static int spc;
+    public static int spc;
     static int spo;
     static int volumn;
     static void init(){

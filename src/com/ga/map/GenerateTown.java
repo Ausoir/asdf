@@ -9,9 +9,9 @@ import java.util.HashMap;
 
 class GenerateTown {
     private static HashMap<Integer, String[]> buildings = new HashMap<>(){{
-        put(1,new String[]{"House1","House2","House3","House4","Bighouse1","Bighouse2","Inn","Scrapyard"});
-        put(2,new String[]{"Hideout","House1","House2","House3","House4","Restaurant","Inn","Shop","Clothier","School"});
-        put(3,new String[]{"Sewer","Restaurant","Shop","Pawnshop","Laboratory","Hospital","Armory","Safehouse"});
+        put(1,new String[]{"House1","House2","House3","House4","Bighouse1","Bighouse2","Inn","Scrapyard","Outpost"});
+        put(2,new String[]{"Hideout","Restaurant","Inn","Shop","Clothier","School","Ranch"});
+        put(3,new String[]{"Sewer","Restaurant","Shop","Bazaar","Laboratory","Hospital","Armory","Safehouse"});
     }};
     static void generate(Map map, int cityType){
         Generator generator = new Generator(map, 0);

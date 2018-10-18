@@ -103,24 +103,22 @@ public class MenuShop extends Panel {
     }
     private void describe(final Item item, final int price, final Performer action){
         Menu.menu.showDialog("Selling ["+item.getFullName()+"]",item.getDescription()+"\nIt is being sold for "+Dialog.money(price)+".",
-                new String[]{"Buy"}, new Performer[]{new Performer(){
-                    public void perform(){
-                        Player player = Global.player;
-                        if (player.inventory.vacant() || player.wieldingNone()) {
-                            if (player.requireGold(price)) {
-                                if (player.wieldingNone()) player.setWeapon(item);
-                                else {
-                                    item.pos = player.pos.getAdd(0, 0);
-                                }
-                                action.perform();
-                            } else {
-                                Global.player.say("Not enough money..");
+                new String[]{"Buy"}, new Performer[]{new Performer(()->{
+                    Player player = Global.player;
+                    if (player.inventory.vacant() || player.wieldingNone()) {
+                        if (player.requireGold(price)) {
+                            if (player.wieldingNone()) player.setWeapon(item);
+                            else {
+                                item.pos = player.pos.getAdd(0, 0);
                             }
+                            action.run();
                         } else {
-                            Global.player.say("Not enough inventory space..");
+                            Global.player.say(Dialog.get("!$"));
                         }
-                        setVisible(false);
+                    } else {
+                        Global.player.say("Not enough inventory space..");
                     }
-                }});
+                    setVisible(false);
+                })});
     }
 }

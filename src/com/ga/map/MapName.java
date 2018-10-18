@@ -15,7 +15,8 @@ public class MapName {
         value = FileManager.makeDirectory(p);
     }
     public int getIndex(){
-        return Integer.parseInt(getMapname().substring(1));
+        String[] nameSplit = getMapname().split("_");
+        return Integer.parseInt(nameSplit[1]);
     }
     public MapName getNext(int dir){
         return new MapName(instance+"_"+(getIndex()+dir));

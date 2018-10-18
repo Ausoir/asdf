@@ -32,7 +32,7 @@ public class Display extends JPanel {
                 Settings.setScreenSize(getWidth(), getHeight());
                 Menu.menu.resize();
                 chatbox.setBounds(0,Settings.screenY-40,500,40);
-                for (Performer i : onResize) i.perform();
+                for (Performer i : onResize) i.run();
             }
         });
         addFocusListener(new FocusListener(){

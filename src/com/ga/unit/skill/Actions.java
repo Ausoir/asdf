@@ -42,6 +42,9 @@ public enum Actions {
         public void update(Unit p){
             if (Math.abs(p.vel.x) < 1f) p.vel.x = 0;
         }
+        public void specialOrder(Unit host, float dist){
+            host.delay.time = 40;
+        }
     }, Left {
         public boolean isDynamicAnimation(){ return false; }
         public int canSet(Unit p){
@@ -61,6 +64,9 @@ public enum Actions {
         }
         public void update(Unit p){
             p.vel.x += p.getSpeed()*p.dir;
+        }
+        public void specialOrder(Unit host, float dist){
+            host.delay.time = 40;
         }
     }, Right {
         public boolean isDynamicAnimation(){ return false; }
@@ -183,9 +189,6 @@ public enum Actions {
             }
         }
     }, Use{
-        public int getRange(Unit host){
-            return ((Man) host).weapon.range;
-        }
         public int canSet(Unit host){
             Man man = (Man) host;
             Actions action = man.weapon.type.action;
@@ -208,57 +211,53 @@ public enum Actions {
         }
     }, Interact(16){
         public void onSet(final Man host){
-            host.delay.performer = new Performer() {
-                public void perform() {
-                    P reach = host.getHand();
-                    L<Prop> result = new L<>();
-                    for (Prop i : host.map.updater.props){
-                        if (i.onInteract != null) {
-                            if (i.getInteractPoint().getSubtract(reach).getDist() <= 24) result.add(i);
-                        }
-                    }
-                    for (Unit i : host.map.updater.unitsLoaded){
-                        if (i.onInteract != null) {
-                            if (i.getInteractPoint().getSubtract(reach).getDist() <= 24) result.add(i);
-                        }
-                    }
-                    Prop obj = result.getFirst();
-                    if (obj != null) {
-                        if (obj.onInteract != null) {
-                            obj.onInteract.interact(host);
-                            host.stateSet(Idle);
-                            host.delay.time = 20;
-                        }
+            host.delay.performer = new Performer(()-> {
+                P reach = host.getHand();
+                L<Prop> result = new L<>();
+                for (Prop i : host.map.updater.props){
+                    if (i.onInteract != null) {
+                        if (i.getInteractPoint().getSubtract(reach).getDist() <= 24) result.add(i);
                     }
                 }
-            };
+                for (Unit i : host.map.updater.unitsLoaded){
+                    if (i.onInteract != null) {
+                        if (i.getInteractPoint().getSubtract(reach).getDist() <= 24) result.add(i);
+                    }
+                }
+                Prop obj = result.getFirst();
+                if (obj != null) {
+                    if (obj.onInteract != null) {
+                        obj.onInteract.interact(host);
+                        host.stateSet(Idle);
+                        host.delay.time = 20;
+                    }
+                }
+            });
         }
     }, Offhand(16) {
         public void onSet(final Man host){
-            host.delay.performer = new Performer() {
-                public void perform() {
-                    P reach = host.pos.getAdd(host.clip.organs[BodyHumanoid.OFIST].ptd);
-                    L<Prop> result = new L<>();
-                    for (Prop i : host.map.updater.props){
-                        if (i.onInteract != null) {
-                            if (i.getInteractPoint().getSubtract(reach).getDist() <= 24) result.add(i);
-                        }
-                    }
-                    for (Unit i : host.map.updater.unitsLoaded){
-                        if (i.onInteract != null) {
-                            if (i.getInteractPoint().getSubtract(reach).getDist() <= 24) result.add(i);
-                        }
-                    }
-                    Prop obj = result.getFirst();
-                    if (obj != null) {
-                        if (obj.onInteract != null) {
-                            obj.onInteract.interact(host);
-                            host.stateSet(Idle);
-                            host.delay.time = 20;
-                        }
+            host.delay.performer = new Performer(()-> {
+                P reach = host.pos.getAdd(host.clip.organs[BodyHumanoid.OFIST].ptd);
+                L<Prop> result = new L<>();
+                for (Prop i : host.map.updater.props){
+                    if (i.onInteract != null) {
+                        if (i.getInteractPoint().getSubtract(reach).getDist() <= 24) result.add(i);
                     }
                 }
-            };
+                for (Unit i : host.map.updater.unitsLoaded){
+                    if (i.onInteract != null) {
+                        if (i.getInteractPoint().getSubtract(reach).getDist() <= 24) result.add(i);
+                    }
+                }
+                Prop obj = result.getFirst();
+                if (obj != null) {
+                    if (obj.onInteract != null) {
+                        obj.onInteract.interact(host);
+                        host.stateSet(Idle);
+                        host.delay.time = 20;
+                    }
+                }
+            });
         }
     }, Sprint(15,1,5,1,0,new int[]{RLEG, LLEG},new Tags(){{
         add(Tag.Athletics);
@@ -310,9 +309,6 @@ public enum Actions {
     },
     Melee(24,1,0,0,0,new Tags(){{
     }}){
-        public int getRange(Unit host){
-            return (int) host.getReach();
-        }
         public void trigger(Unit host){
             Sound.play(host.map, host.pos, "swing_normal");
             host.attack();
@@ -689,12 +685,10 @@ public enum Actions {
     }}){
         public void onSet(final Unit p){
             p.damageMod = .5f;
-            p.delay.performer = new Performer(){
-                public void perform(){
-                    p.setState(Actions.Rest);
-                    p.delay.set(80);
-                }
-            };
+            p.delay.performer = new Performer(()->{
+                p.setState(Actions.Rest);
+                p.delay.set(80);
+            });
         }
         public void update(Man host) {
             if (host.delay.time < 40) {
@@ -1052,9 +1046,6 @@ public enum Actions {
         public void update(Man host){
             Particle.sparkle(host.map, "Glare", host.getDepth(), host.getHand(), 4, 3);
         }
-        public void specialOrder(Unit host, float dist){
-            host.target.y -= dist/16;
-        }
     },
     Ethersword(4,0,2,2,1,new Tags(){{
         add(Tag.Conjuration);
@@ -1167,11 +1158,7 @@ public enum Actions {
             p.faction = host.faction;
             p.damage = level*30;
             p.delay.set(2);
-            p.delay.performer = new Performer(){
-                public void perform(){
-                    p.faction = Faction.Destructive;
-                }
-            };
+            p.delay.performer = new Performer(()-> p.faction = Faction.Destructive);
         }
     },
     Meteorform(40,3,17,1,2,new Tags(){{
@@ -1217,11 +1204,7 @@ public enum Actions {
             p.damage = host.stateLevel*30;
             p.setDepth(host.getDepth());
             p.delay.set(50);
-            p.delay.performer = new Performer() {
-                public void perform() {
-                    p.stuck();
-                }
-            };
+            p.delay.performer = new Performer(p::stuck);
         }
     },
     Fireblast(60,1,7,1,1,new int[]{FIST, OFIST},new Tags(){{
@@ -1260,11 +1243,7 @@ public enum Actions {
                 p.damage = level;
                 p.gravity = false;
                 p.delay.set(4 + level);
-                p.delay.performer = new Performer() {
-                    public void perform() {
-                        p.stuck();
-                    }
-                };
+                p.delay.performer = new Performer(p::stuck);
                 float atan = host.target.getAtan();
                 host.vel.add(Global.cos(atan) * -.1f, Global.sin(atan) * -level);
                 if (host.stateDuration % 84 == 0 && !host.requireMana(1)) host.stateSet(Idle);
@@ -1388,7 +1367,7 @@ public enum Actions {
                 p.faction = host.faction;
                 p.clip.setState("Buff");
                 p.start();
-            } else host.say("Not enough vitality!");
+            } else host.say(Dialog.get("!a"));
             host.setState(Down);
         }
     },
@@ -1525,7 +1504,7 @@ public enum Actions {
                 float atan = host.target.getAdd(host.pos.getSubtract(origin)).getAtan();
                 P[] points = new P[num * 2 - 2];
                 for (int ii = 0; ii < Global.r.nextInt(2) + 2; ii++) {
-                    Terrain lightning = new Terrain(host.map, "_255,255,0,255", Shader.None, host.getDepth()){
+                    Terrain lightning = new Terrain(host.map, "/255/255/0/255", Shader.None, host.getDepth()){
                         public void draw(Graphics2D g) {
                             super.draw(g);
                             remove();
@@ -1590,11 +1569,7 @@ public enum Actions {
                 p.faction = Faction.Destructive;
                 p.gravity = false;
                 p.delay.set(15);
-                p.delay.performer = new Performer() {
-                    public void perform() {
-                        p.stuck();
-                    }
-                };
+                p.delay.performer = new Performer(p::stuck);
             }
         }
     },
@@ -1630,12 +1605,7 @@ public enum Actions {
                 p.damage = 4;
                 p.gravity = false;
                 p.delay.set(150);
-                p.delay.performer = new Performer() {
-                    @Override
-                    public void perform() {
-                        p.stuck();
-                    }
-                };
+                p.delay.performer = new Performer(p::stuck);
             }
         }
         public boolean onFinish(Unit host){
@@ -1674,7 +1644,7 @@ public enum Actions {
                 float atan = host.target.getAdd(host.pos.getSubtract(origin)).getAtan();
                 P[] points = new P[num * 2 - 2];
                 for (int ii = 0; ii < 2; ii++) {
-                    Terrain lightning = new Terrain(host.map, "_255,255,0,255", Shader.None, host.getDepth()) {
+                    Terrain lightning = new Terrain(host.map, "/255/255/0/255", Shader.None, host.getDepth()) {
                         int turn = 0;
                         public void draw(Graphics2D g) {
                             super.draw(g);
@@ -1738,17 +1708,15 @@ public enum Actions {
                 for (int i = 0; i < buffNames.length - 1; i++) {
                     Buffs buff = buffs.get(i);
                     buffNames[i] = "[Enchant Level " + buff.value + "] " + buff.name();
-                    performers[i] = new Performer() {
-                        public void perform() {
-                            if (host.status.getEffectLevel(Buffs.Bleed) < 4) {
-                                host.buff(Buffs.Bleed, 1);
-                                host.buff(Buffs.Hex, buff.ordinal());
-                            } else {
-                                Particle.explode(host.map, "Blood", host.getDepth(), host.getHand(), P.blank, 5, 24, 0, true, 28);
-                                host.setState(Down);
-                            }
+                    performers[i] = new Performer(()-> {
+                        if (host.status.getEffectLevel(Buffs.Bleed) < 4) {
+                            host.buff(Buffs.Bleed, 1);
+                            host.buff(Buffs.Hex, buff.ordinal());
+                        } else {
+                            Particle.explode(host.map, "Blood", host.getDepth(), host.getHand(), P.blank, 5, 24, 0, true, 28);
+                            host.setState(Down);
                         }
-                    };
+                    });
                 }
                 Global.player.delay.time = 100;
                 Menu.menu.showDialog("Available Enchantments", "", buffNames, performers);
@@ -2013,7 +1981,7 @@ public enum Actions {
     }
 
     public int getRange(Unit p) {
-        return 48;
+        return (int) p.getReach();
     }
 
     public int getDifficulty() {

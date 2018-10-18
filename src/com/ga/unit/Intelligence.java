@@ -3,6 +3,7 @@ package com.ga.unit;
 import com.ga.game.Dialog;
 import com.ga.game.FileManager;
 import com.ga.game.Menu;
+import com.ga.map.GenerateBiome;
 import com.ga.map.Global;
 import com.ga.tool.Performer;
 import com.ga.tool.T;
@@ -139,15 +140,12 @@ public enum Intelligence {
                         int value = fluctuate(item.getValue());
                         products[i] = item;
                         prices[i] = value;
-                        final int ii = i;
-                        actions[i] = new Performer() {
-                            final int index = ii;
-                            public void perform() {
-                                host.map.updater.addQueue.add(products[index]);
-                                products[index] = null;
-                                host.say("@sold");
-                            }
-                        };
+                        final int finalI = i;
+                        actions[i] = new Performer(()->{
+                            host.map.updater.addQueue.add(products[finalI]);
+                            products[finalI] = null;
+                            host.say("@sold");
+                        });
                         if (i < 8) {
                             if (i == Math.min(7, length - 1)) r += "and " + item.getFullName() + "!";
                             else r += item.getFullName() + ", ";
@@ -182,8 +180,7 @@ public enum Intelligence {
                             "Rest for 3 hours? Costs "+Dialog.money(price)+". Heal 1 Vitality, 9 Fatigue, and gain 10 Motivation. Food is paid for.",
                             new String[]{"Pay"},
                             new Performer[]{
-                                    new Performer(){
-                                        public void perform(){
+                                    new Performer(()->{
                                             if (Global.player.requireGold(price)) {
                                                 Global.player.stats.nutrition.add(3, true);
                                                 if (Global.player.map.updater.sleep(3, true)){
@@ -196,10 +193,9 @@ public enum Intelligence {
                                                     Global.player.obtainGold(price);
                                                 }
                                             } else {
-                                                Global.player.say("Not enough money..");
+                                                Global.player.say(Dialog.get("!$"));
                                             }
-                                        }
-                                    }, new Performer(){}
+                                    })
                             });
                 }
             });
@@ -218,26 +214,28 @@ public enum Intelligence {
                 void shop() {
                     super.shop();
                     int reqMot = 20, reqTime = 2;
-                    String message = "I can teach you useful things if you have the time, motivation, and money.";
+                    String message = "I can teach you useful things if you have the time, motivation, and money. You will, of course, need an extra memory slot.";
                     message += "\nRequires "+Dialog.money(price)+", "+reqMot+" motivation, and "+reqTime+" hours.";
                     message += "\n\nCurrent motivation: "+Global.player.stats.motivation.get();
                     message += "\nCurrent nutrition: "+Global.player.stats.nutrition.get();
                     Menu.menu.showDialog("Trainer", message,
                         new String[]{"Begin training"},
                         new Performer[]{
-                            new Performer(){
-                                public void perform(){
-                                    if (Global.player.stats.motivation.get() >= reqMot){
-                                        if (Global.player.getGold() >= price) {
-                                            if (Global.player.map.updater.sleep(reqTime, true)) {
-                                                Global.player.learnTrait(trait);
-                                                Global.player.stats.motivation.require(reqMot);
-                                                Global.player.requireGold(price);
-                                            }
-                                        } else Global.player.say("Not enough money...");
-                                    } else Global.player.say("Not enough Motivation..");
-                                }
-                            }
+                            new Performer(()->{
+                                if (Global.player.traits.canLearn(trait)) {
+                                    if (Global.player.canLearn()) {
+                                        if (Global.player.stats.motivation.get() >= reqMot) {
+                                            if (Global.player.getGold() >= price) {
+                                                if (Global.player.map.updater.sleep(reqTime, true)) {
+                                                    Global.player.learnTrait(trait);
+                                                    Global.player.stats.motivation.require(reqMot);
+                                                    Global.player.requireGold(price);
+                                                }
+                                            } else Global.player.say(Dialog.get("!$"));
+                                        } else Global.player.say(Dialog.get("!m"));
+                                    } else Global.player.say(Dialog.get("!I"));
+                                } else Global.player.say("Already at max level!");
+                            })
                         });
                 }
             });
@@ -260,45 +258,45 @@ public enum Intelligence {
 
                 void shop() {
                     super.shop();
-                    ArrayList<Prop> inventory = Global.player.getAvailableItems();
-                    ArrayList<Prop> available = new ArrayList<>();
-                    ArrayList<Float> fluctuation = new ArrayList<>();
-                    for (Prop i : inventory){
-                        for (int ii=0;ii<wanted.size();ii++){
-                            if (i.name.equals(wanted.get(ii).get())){
-                                available.add(i);
-                                fluctuation.add(priceR[ii]);
-                                break;
+                    if (Global.player.guild == 2) {
+                        ArrayList<Prop> inventory = Global.player.getAvailableItems();
+                        ArrayList<Prop> available = new ArrayList<>();
+                        ArrayList<Float> fluctuation = new ArrayList<>();
+                        for (Prop i : inventory) {
+                            for (int ii = 0; ii < wanted.size(); ii++) {
+                                if (i.name.equals(wanted.get(ii).get())) {
+                                    available.add(i);
+                                    fluctuation.add(priceR[ii]);
+                                    break;
+                                }
                             }
                         }
-                    }
-                    if (available.size() == 0){
-                        String list = "I'm a broker. I buy ";
-                        for (int i=0;i<wanted.size();i++){
-                            if (i != wanted.size()-1) list += wanted.get(i)+"s, ";
-                            else if (i > 0) list += "or "+wanted.get(i)+"s.";
-                            else list += wanted.get(i)+"s.";
-                        }
-                        Menu.menu.showDialog("Buyer", list+" Do you need something?");
-                    } else {
-                        Performer[] action = new Performer[available.size()];
-                        String[] options = new String[action.length];
-                        for (int i = 0; i < action.length; i++) {
-                            final Item item = (Item) available.get(i);
-                            final int price = (int) (item.getValue() * fluctuation.get(i));
-                            options[i] = item.getFullName() + " - "+ Dialog.money(price);
-                            action[i] = new Performer() {
-                                public void perform() {
+                        if (available.size() == 0) {
+                            String list = "I'm a broker. I buy ";
+                            for (int i = 0; i < wanted.size(); i++) {
+                                if (i != wanted.size() - 1) list += wanted.get(i) + "s, ";
+                                else if (i > 0) list += "or " + wanted.get(i) + "s.";
+                                else list += wanted.get(i) + "s.";
+                            }
+                            Menu.menu.showDialog("Merchant Guild Broker", list + " Do you need something?");
+                        } else {
+                            Performer[] action = new Performer[available.size()];
+                            String[] options = new String[action.length];
+                            for (int i = 0; i < action.length; i++) {
+                                final Item item = (Item) available.get(i);
+                                final int price = (int) (item.getValue() * fluctuation.get(i));
+                                options[i] = item.getFullName() + " - " + Dialog.money(price);
+                                action[i] = new Performer(()-> {
                                     Global.player.dropItem(item).remove();
                                     Global.player.obtainGold(price);
-                                    Global.player.say("Sold "+item.getName()+" for "+Dialog.money(price)+"!");
+                                    Global.player.say("Sold " + item.getName() + " for " + Dialog.money(price) + "!");
                                     host.say("@sold");
-                                }
-                            };
+                                });
+                            }
+                            Menu.menu.showDialog("List",
+                                    "We buy from the listed items.", options, action);
                         }
-                        Menu.menu.showDialog("Wanted list",
-                                "What would you like to sell?", options, action);
-                    }
+                    } else Menu.menu.showDialog("Merchants Guild Insurer", "I'm sorry, you must be a member of the Merchants Guild to use my services.");
                 }
             });
         }
@@ -329,75 +327,63 @@ public enum Intelligence {
                     super.shop();
                     int week = hourly*42;
                     int month = hourly*180;
-                    if (Global.player.insuranceMap.isEmpty()) {
-                        Menu.menu.showDialog("Medical Guild Insurer", "Would you like to buy our health insurance plan?\n\n"+
-                                " Every time you are in a critical accident, we will bring you here and revive you. We cover all accidents ranging from food poisoning to decapitation.\n"+
-                                " The membership fee is "+Dialog.money(hourly)+" per hour."+
-                                " The cost per accident is "+Dialog.money(price)+". All insurance coverage is halted until you pay this amount back after an accident.",
-                                new String[]{"Sign a contract for a week/42 hours - "+Dialog.money(week),
-                                        "Sign a contract for a month/180 hours - "+Dialog.money(month)},
-                                new Performer[]{
-                                        new Performer() {
-                                            public void perform() {
-                                                if (Global.player.requireGold(week)) {
-                                                    Global.player.insuranceMap = host.map.name.toString();
-                                                    Global.player.insuranceExpiry = 42 + Global.hour;
-                                                    Global.player.insuranceCost = -price;
-                                                    host.say("@sold");
-                                                } else Global.player.say("Not enough money...");
-                                            }
-                                        }, new Performer() {
-                                    public void perform() {
-                                                if (Global.player.requireGold(month)) {
-                                                    Global.player.insuranceMap = host.map.name.toString();
-                                                    Global.player.insuranceExpiry = 180 + Global.hour;
-                                                    Global.player.insuranceCost = -price;
-                                                    host.say("@sold");
-                                                } else Global.player.say("Not enough money...");
-                                    }
-                                }
-                                });
-                    } else if (Global.player.insuranceCost > 0){ //in debt
-                        if (Global.hour % 42 == 0 && Global.player.guild == 1 && Global.player.guildVar != Global.hour){
-                            Global.player.guildVar = Global.hour;
-                            Global.player.insuranceMap = "";
-                            Menu.menu.showDialog("Medical Guild Insurer", "I have cleared your debt of "+Dialog.money(Global.player.insuranceCost)
-                                    +". Your next debt void will be in 42 hours.");
-                        } else {
+                    if (Global.player.guild == 1) {
+                        if (Global.player.insuranceMap.isEmpty()) {
+                            Menu.menu.showDialog("Medical Guild Insurer", "Would you like to buy our health insurance plan?\n\n" +
+                                            " Every time you are in a critical accident, we will bring you here and revive you. We cover all accidents ranging from food poisoning to decapitation.\n" +
+                                            " The membership fee is " + Dialog.money(hourly) + " per hour." +
+                                            " The cost per accident is " + Dialog.money(price) + ". All insurance coverage is halted until you pay this amount back after an accident.",
+                                    new String[]{"Sign a contract for a week/42 hours - " + Dialog.money(week),
+                                            "Sign a contract for a month/180 hours - " + Dialog.money(month)},
+                                    new Performer[]{
+                                        new Performer(()-> {
+                                            if (Global.player.requireGold(week)) {
+                                                Global.player.insuranceMap = host.map.name.toString();
+                                                Global.player.insuranceExpiry = 42 + Global.hour;
+                                                Global.player.insuranceCost = -price;
+                                                host.say("@sold");
+                                            } else Global.player.say(Dialog.get("!$"));
+                                        }), new Performer(()-> {
+                                            if (Global.player.requireGold(month)) {
+                                                Global.player.insuranceMap = host.map.name.toString();
+                                                Global.player.insuranceExpiry = 180 + Global.hour;
+                                                Global.player.insuranceCost = -price;
+                                                host.say("@sold");
+                                            } else Global.player.say(Dialog.get("!$"));
+                                        })
+                                    });
+                        } else if (Global.player.insuranceCost > 0) { //in debt
                             Menu.menu.showDialog("Medical Guild Insurer - \"You are in debt\"", "You are in debt from your previous insurance contract.",
                                     new String[]{"Pay off my debt of " + Dialog.money(Global.player.insuranceCost)}, new Performer[]{
-                                            new Performer() {
-                                                public void perform() {
-                                                    if (Global.player.requireGold(Global.player.insuranceCost)) {
-                                                        Global.player.insuranceMap = "";
-                                                        Global.player.say("Payed off debt!");
-                                                    }
-                                                }
+                                        new Performer(()-> {
+                                            if (Global.player.requireGold(Global.player.insuranceCost)) {
+                                                Global.player.insuranceMap = "";
+                                                Global.player.say("Payed off debt!");
                                             }
+                                        })
                                     });
+                        } else { //already in contract
+                            int time = Global.player.insuranceExpiry - Global.hour;
+                            if (time < 0) {
+                                Menu.menu.showDialog("Medical Guild Insurer - \"Contract expired\"", "Your previous contract expired " + time + " hours ago. Speak to me again for another contract.");
+                                Global.player.insuranceMap = "";
+                            } else {
+                                String msg = "You are already in contract" +
+                                        ". Your current contract's cost per accident is " + Dialog.money(-Global.player.insuranceCost) +
+                                        ". Contract will last for " + time + " more hours.";
+                                if (!Global.player.insuranceMap.equals(host.map.name.toString()))
+                                    msg += "\nNow, compare this to our insurance:" +
+                                            " Hourly membership fee of " + Dialog.money(hourly) + " and " + Dialog.money(price) + " down payment per accident!";
+                                Menu.menu.showDialog("Insurer - \"Review your contract\"", msg,
+                                        new String[]{"Terminate current contract early"}, new Performer[]{
+                                            new Performer(()-> {
+                                                Global.player.insuranceMap = "";
+                                                Global.player.say("Current insurance policy has been terminated early!");
+                                            })
+                                        });
+                            }
                         }
-                    } else { //already in contract
-                        int time = Global.player.insuranceExpiry - Global.hour;
-                        if (time < 0){
-                            Menu.menu.showDialog("Medical Guild Insurer - \"Contract expired\"", "Your previous contract expired "+time+" hours ago. Speak to me again for another contract.");
-                            Global.player.insuranceMap = "";
-                        } else {
-                            String msg = "You are already in contract"+
-                                    ". Your current contract's cost per accident is "+Dialog.money(-Global.player.insuranceCost)+
-                                    ". Contract will last for "+time+" more hours.";
-                            if (!Global.player.insuranceMap.equals(host.map.name.toString())) msg += "\nNow, compare this to our insurance:"+
-                                    " Hourly membership fee of "+Dialog.money(hourly)+" and "+Dialog.money(price)+" down payment per accident!";
-                            Menu.menu.showDialog("Insurer - \"Review your contract\"", msg,
-                                    new String[]{"Terminate current contract early"}, new Performer[]{
-                                            new Performer(){
-                                                public void perform(){
-                                                    Global.player.insuranceMap = "";
-                                                    Global.player.say("Current insurance policy has been terminated early!");
-                                                }
-                                            }
-                                    });
-                        }
-                    }
+                    } else Menu.menu.showDialog("Medical Guild Insurer", "I'm sorry, you must be a member of the Medical Guild to use my services.");
                 }
             });
         }
@@ -422,87 +408,137 @@ public enum Intelligence {
                     for (Organ i : Global.player.clip.organs){
                         if (i.amputated) {
                             optionNames.add("Get prosthetics for amputated " + i.name + " - " + Dialog.money(price));
-                            optionActions.add(new Performer() {
-                                public void perform() {
-                                    if (Global.player.requireGold(price)) {
-                                        i.stitch();
-                                        host.say("@sold");
-                                    } else Global.player.say("Not enough money...");
-                                }
-                            });
+                            optionActions.add(new Performer(()-> {
+                                if (Global.player.requireGold(price)) {
+                                    i.stitch();
+                                    host.say("@sold");
+                                } else Global.player.say(Dialog.get("!$"));
+                            }));
                         }
                     }
                     for (Buffs.Buff i : Global.player.status.getEffects()){
                         optionNames.add("Cure "+i.buff.name()+" - "+Dialog.money(price/2));
-                        optionActions.add(new Performer(){
-                            public void perform(){
-                                if (Global.player.requireGold(price)){
-                                    i.finish();
-                                    host.say("@sold");
-                                } else Global.player.say("Not enough money...");
-                            }
-                        });
+                        optionActions.add(new Performer(()->{
+                            if (Global.player.requireGold(price)){
+                                i.finish();
+                                host.say("@sold");
+                            } else Global.player.say(Dialog.get("!$"));
+                        }));
                     }
                     Menu.menu.showDialog("Medical Guild Doctor", "What do you need?",
                             optionNames.toArray(new String[0]), optionActions.toArray(new Performer[0]));
                 }
             });
         }
-    }, Guildsman{
+    }, Transporter{
         public AI make(Unit host) {
             return process(new NeutralAI(host) {
                 void shop() {
+                    ArrayList<String> options = new ArrayList<>();
+                    ArrayList<Performer> actions = new ArrayList<>();
+                    int cost = 1000;
+                    int mapVar = host.map.name.getIndex();
+                    int east = 0, west = 0;
+                    for (int i=0;i<20;i++){
+                        int finalI = i;
+                        if (east == 1 && GenerateBiome.getTown(mapVar + i)){
+                            options.add("Travel East - "+i+" hours away)");
+                            actions.add(new Performer(()->{
+                                if (Global.player.requireGold(cost)){
+                                    if (Global.player.map.updater.sleep(1, true)){
+                                        Global.server.requestChangeMap(Global.player.map.name.getNext(finalI).toString() +",2");
+                                    }
+                                } else Global.player.say(Dialog.get("!$"));
+                            }));
+                            east = 2;
+                        } else if (east == 0) east = 1; //disconnected
+                        if (west == 1 && GenerateBiome.getTown(mapVar + i)){
+                            options.add("Travel West - "+i+" hours away)");
+                            actions.add(new Performer(()->{
+                                if (Global.player.requireGold(cost)){
+                                    if (Global.player.map.updater.sleep(1, true)){
+                                        Global.server.requestChangeMap(Global.player.map.name.getNext(-finalI).toString() +",1");
+                                    }
+                                } else Global.player.say(Dialog.get("!$"));
+                            }));
+                            west = 2;
+                        } else if (west == 0) west = 1;
+                    }
+                    Menu.menu.showDialog("Merchant Guild Translocator", "I can translocate you to the nearest towns for "+Dialog.money(cost)
+                                    +" in 1 hour regardless of distance.",
+                            options.toArray(new String[0]), actions.toArray(new Performer[0]));
+                }
+            });
+        }
+    }, Guildsman{
+        public AI make(Unit host) {
+            int entranceFee = 10000, exitFee = 10000;
+            return process(new NeutralAI(host) {
+                void shop() {
+                    super.shop();
                     String title = "Guild ";
                     String desc = "";
                     if (type == 1){
                         title = "Medical Guild";
-                        desc = ", where patients come first. We are a massive conglomerate of hospitals and alchemists who work together to eradicate all suffering in the world. "+
-                                "If you join us, we can void your insurance debt every week.";
+                        desc = "We are a massive conglomerate of hospitals and alchemists around the world working together for a better world. "+
+                                "If you join us, we can implement you with our great health track system, which means you will be revived after any accident, for a fee.";
                     } else if (type == 2){
                         title = "Merchants Guild";
-                        desc = "! We are a mighty combination of translocaters and pawnbrokers who will certainly make your life easier. Join us, and access our massive stock of memoryfoam"+
-                        " as well as our brokers who would love to buy from you.";
+                        desc = "We are the guild of brokers continuing the legacy of the once-powerful translocation guild. We are a powerful group of middlemen who can make you a whole lot richer. "+
+                                "You may sell various items to us for profit if you join us.";
                     } else if (type == 3){
                         title = "Mercenary Guild";
-                        desc = ". We are the main military force of these lands. Anyone is welcome to use our services and help handle quests, but only members will rise in ranks."
-                        +" Ranking officers are given troops to command.";
+                        desc = "We are the main military force of these lands. A powerful united force comprised of individually operated mercenaries from all over the world, we pay our loyalty to our traditional allies. "+
+                                "Join us, and carry out duties together with fellow mercenary companions.";
                     }
                     if (Global.player.guild == -1) {
-                        Menu.menu.showDialog(title + " " + host.name, "Welcome to the "+title+desc+" \nRegistration fee is "
-                                        + Dialog.money(10000) + ". Registration will override any other guild membership you may already have. Do you wish to join us?",
-                                new String[]{"Join the " + title}, new Performer[]{new Performer() {
-                                    public void perform() {
-                                        if (Global.player.requireGold(10000)) {
+                        String finalTitle = title + " " + host.name;
+                        Menu.menu.showDialog(finalTitle, "Welcome to the "+title+". "+desc+" \nRegistration fee is "
+                                        + Dialog.money(entranceFee) + ". If you change your mind later and wish to join another guild you must pay an exit fee of "+Dialog.money(exitFee)
+                                        + ". Do you wish to join us?",
+                                new String[]{"Join the " + title}, new Performer[]{new Performer(()->{
+                                        if (Global.player.requireGold(entranceFee)) {
                                             Global.player.guild = type;
                                             Global.player.guildVar = 0;
-                                        }
-                                    }
-                                }});
-                    } else if (Global.player.guild == 1){
-                        Menu.menu.showDialog(title + " " + host.name, "Welcome, member."+
-                                (Global.hour % 42 == 0?"The debt voiding is in effect right now. Speak to your insurer to void your debt."
-                                        :" Your next debt void will be in "+(Global.hour % 42)+" hours."));
-                    } else if (Global.player.guild == 2){
-                        Menu.menu.showDialog(title + " " + host.name, "Welcome. How can I be of service?",new String[]{"Buy a memoryfoam for "+Dialog.money(500)},
-                                new Performer[]{new Performer(){
-                                    public void perform(){
-                                        if (Global.player.requireGold(500)) Global.player.setWeapon((Item) Stock.Memoryfoam.create(host.map,0,0));
-                                        else Global.player.say("Not enough money...");
-                                    }
-                                }});
-                    } else if (Global.player.guild == 3){
-                        String rank = "soldier (rank 0)";
-                        if (Global.player.guildVar == 1) rank = "specialist (rank 1)";
-                        else if (Global.player.guildVar == 2) rank = "leader (rank 2)";
-                        else if (Global.player.guildVar == 3) rank = "sergeant (rank 3)";
-                        Menu.menu.showDialog(title + " " + host.name, "Welcome, "+rank,new String[]{"Take a member"},
-                                new Performer[]{new Performer(){
-                                    public void perform(){
-                                        if (Global.player.guildVar > 0){
-                                        } else Global.player.say("Rank not high enough...");
-                                    }
-                                }});
+                                            if (type == 1)
+                                                Menu.menu.showDialog(finalTitle, "If you wish to register with our health insurance system, please talk to our insurer.");
+                                            else if (type == 2)
+                                                Menu.menu.showDialog(finalTitle, "Thank you for your patronage. Our brokers are now at your service.");
+                                            else if (type == 3)
+                                                Menu.menu.showDialog(finalTitle, "You are now a Mercenary Associate. Report to your officer as soon as possible.");
+                                        } else Global.player.say(Dialog.get("!$"));
+                                })});
+                    } else {
+                        Menu.menu.showDialog(title + " " + host.name, "Welcome, member. How can I help you?",
+                                new String[]{"Pay an exit fee of "+Dialog.money(exitFee)+" and terminate affiliation"}, new Performer[]{new Performer(()->{
+                                    if (Global.player.requireGold(exitFee)) {
+                                        Global.player.guild = -1;
+                                        Global.player.guildVar = 0;
+                                    } else Global.player.say(Dialog.get("!$"));
+                                })});
                     }
+                }
+            });
+        }
+    }, Officer{
+        public AI make(Unit host) {
+            return process(new NeutralAI(host) {
+                void shop() {
+                    super.shop();
+                    if (Global.player.guild == 3) {
+                        int time = Global.hour % 3;
+                        if (time == 0) {
+                            int seed = (host.seed * Global.player.guildVar) % 4;
+                            if (seed == 0) Menu.menu.showDialog("Mercenary Guild Officer", "We have a patrol mission requested by the Medical Guild.",
+                                    new String[]{"Depart to mission","Bail out and lose 1 rank"}, new Performer[]{new Performer(()->{
+                                        Global.player.guild = 3;
+                                        Global.server.requestChangeMap("stuffstuffstuff blahblahblah");
+                                    }), new Performer(()->{
+                                    })});
+                        } else {
+                            Menu.menu.showDialog("Mercenary Guild Officer", "You are free to go right now. Our next mission is in "+time+" hours.");
+                        }
+                    } else Menu.menu.showDialog("Mercenary Guild Officer", "Hello. Speak to our recruiter if you wish to join us.");
                 }
             });
         }

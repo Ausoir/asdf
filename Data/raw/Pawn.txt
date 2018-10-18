@@ -1,5 +1,10 @@
-Shell,Bone,Resin,Jewelry
-Striker,Rapier,Lancesword,Claw,Katana,Tanto
-Bread,Poultry,Meat,Cheese
-Battery,Grappler,Fireball,Scroll,Potion,Lockpick
-Ammunition,Bandage,Vitamin,Rum,Mead
+Shell,Bone,Resin,Water,Jewelry
+Bread,Poultry,Meat,Cheese,Sandwich
+Drumstick,Steak,Burger,Meal,Jerky
+Ration,Sandwich,Jerky,Shirt,Pants
+Battery,Grappler,Scroll,Crowbar
+Ammunition,Bandage,Vitamin,Rum,Mead,Potion
+Quiver,Bow,Camo Top,Camo Shorts,Ammunition
+Robe Top,Robe Pants,Water,Bread,Scroll
+Sweater,Lined Pants,Battery,Mead
+Crystal Breastplate,Crystal Greaves,Padded Vest,Padded Leggings,Scavenger Jacket,Scavenger Pants,Military Helmet,Riot Helmet,Night Cloak

@@ -140,11 +140,14 @@ public class ArmorSet {
     }
     public void drop(){
         for (int i=0;i<5;i++) {
-            if (!isBare(i)) {
-                armor[i].onUnequip(host);
-                armor[i].start();
-                set(null, i);
-            }
+            drop(i);
+        }
+    }
+    public void drop(int i){
+        if (!isBare(i)) {
+            armor[i].onUnequip(host);
+            armor[i].start().pos.set(host.pos);
+            set(null, i);
         }
     }
     public void setVisible(boolean visible){

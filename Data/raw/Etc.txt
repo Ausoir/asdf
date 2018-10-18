@@ -1,7 +1,7 @@
 Error Item,Error,1,0,0,[Other],This should not exist. //Weapon, Image Type, Weight, Value, Material, Description
 Rock,Rock,2,1,0,[Stone]
 Water,Water,2,0,0,[Other]
-Shell,Shell,2,0,250,[Bone],[Sharp]
+Shell,Shell,2,0,500,[Bone],[Sharp]
 Starfish,Starfish,2,0,250,[Organic],A cooking ingredient.
 Flowerpot,Flowerpot,2,1,500,[Organic]
 Chair,Chair,2,6,1500,[Wooden,Stone]
@@ -14,7 +14,7 @@ Jug,Jug,2,4,1,[Glass]
 Stool,Stool,2,6,1000,[Wooden,Other]
 Candle,Candle,2,0,200,[Other]
 Threadball,Threadball,2,0,200,[Cloth]
-Bone,Bone,1,1,0,[Bone],Cannot be eaten raw. Used as a cooking ingredient.
+Bone,Bone,1,1,500,[Bone],Cannot be eaten raw. Used as a cooking ingredient.
 Pitcher,Pitcher,2,2,200,[Glass,Stone,Iron,Copper]
 Lightstand,Lightstand,2,1,400,[Wooden,Iron]
 Cone,Cone,2,1,100,[Other]

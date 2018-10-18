@@ -26,7 +26,7 @@ public abstract class AI implements Observer {
         host.map.updater.addQueue.add(this);
     }
     public void update(){
-        if (host.state != Actions.Dead) {
+        if (host.state != Actions.Dead && host.delay.over()) {
             blocked(host.dir);
             perceive(160);
             if (tasks.peek().update(host)) {

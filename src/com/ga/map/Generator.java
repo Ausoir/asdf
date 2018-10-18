@@ -197,7 +197,7 @@ public class Generator {
             }
         }
         assert blocker != null;
-        blocker.finish(depth+"&_0,0,0,255&none");
+        blocker.finish(depth+",/0/0/0/255,none");
         blocker.reverse();
         Iterator it = map.landRaw.iterator();
         Line i;

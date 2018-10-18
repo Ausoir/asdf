@@ -17,7 +17,7 @@ public class Updater {
     private L<Particle> effects = new L<>();
     private L<Updatable> updatee = new L<>();
     public L<Prop> props = new L<>();
-    L<AI> controllee = new L<>();
+    public L<AI> controllee = new L<>();
     public L<Unit> unitsLoaded = new L<>();
     public L<Observer> addQueue = new L<>();
     private L<Observer> removeQueue = new L<>();
@@ -35,9 +35,6 @@ public class Updater {
         controllee.clear();
         props.clear();
         Global.display.removeSpeech();
-    }
-    public void updateControl(){
-        for (AI i : controllee) i.update();
     }
     void addUpdatee(Updatable p){
         updatee.add(p);
