@@ -116,7 +116,7 @@ public class Display extends JPanel {
                 String key = input.getKeyMap(e.getKeyCode());
                 if (key != null) {
                     switch (key) {
-                        case "_SAY":
+                        case "_CHAT":
                             chat();
                             break;
                         case "_UP":

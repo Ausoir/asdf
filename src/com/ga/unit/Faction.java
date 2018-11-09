@@ -5,7 +5,7 @@ package com.ga.unit;
  */
 public enum Faction {
     Player(1),
-    Player2(11),
+    Player2(1),
     Helpless(1),
     Neutral(1),
     Punk(2),

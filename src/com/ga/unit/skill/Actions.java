@@ -303,7 +303,8 @@ public enum Actions {
             if (host.stateDuration > 0 && host.stateDuration % term == 0) host.stats.strength.add(1, false);
         }
         public boolean onFinish(Unit host){
-            host.stats.strength.add(1, false);
+            if (host.stats.fatigue.require(1)) host.stats.strength.add(1, false);
+            else host.say("Out of Fatigue!");
             return true;
         }
     },
@@ -1008,6 +1009,9 @@ public enum Actions {
     Glowshot(40,1,2,1,1,new Tags(){{
         add(Tag.Conjuration);
     }}){
+        public boolean isDynamicAnimation(){
+            return false;
+        }
         public int getRange(Unit host){
             return 600;
         }
@@ -1017,14 +1021,13 @@ public enum Actions {
         public void trigger(final Man host){
             P tip = host.weapon.getLine().ptd;
             final Projectile pj = new Projectile(host.map, "Arrow", tip, host.getHand().getAdd(host.target), 80) {
-                public void onField() {
-                }
                 public void onAttack(Unit p) {
                     Sound.play(host.map, host.pos, "hit_bloody");
-                    remove();
+                    super.onAttack(p);
                 }
-                public void collide() {
-                    super.collide();
+                public void stuck(){
+                    Particle.holyExplosion(map, pos, getDepth());
+                    remove();
                 }
                 public void update() {
                     super.update();

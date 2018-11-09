@@ -19,6 +19,7 @@ Remap:Select an action to re-map its keybinding.
 !a:Not enough Vitality!
 !I:Not enough memory slots...
 !i:Not enough Energy!
+!f:Out of Fatigue!
 ?itemEnc:This $ item is magically enchanted with $. This item's cooldown is $ seconds.
 itemEncRdy:This item needs $ more seconds to recharge.
 reqInput:Press a key

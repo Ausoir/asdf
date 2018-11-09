@@ -177,7 +177,7 @@ public enum Intelligence {
                 void shop() {
                     super.shop();
                     Menu.menu.showDialog("Inn",
-                            "Rest for 3 hours? Costs "+Dialog.money(price)+". Heal 1 Vitality, 9 Fatigue, and gain 10 Motivation. Food is paid for.",
+                            "Rest for 3 hours? Costs "+Dialog.money(price)+". Restore Fatigue, heal 1 Vitality, and gain 10 Motivation. Food is paid for.",
                             new String[]{"Pay"},
                             new Performer[]{
                                     new Performer(()->{
@@ -185,7 +185,7 @@ public enum Intelligence {
                                                 Global.player.stats.nutrition.add(3, true);
                                                 if (Global.player.map.updater.sleep(3, true)){
                                                     Global.player.stats.motivation.add(10,false);
-                                                    Global.player.stats.fatigue.add(9,false);
+                                                    Global.player.stats.fatigue.heal();
                                                     Global.player.stats.agility.add(1, false);
                                                     Global.player.stats.strength.heal();
                                                 } else {
@@ -443,8 +443,9 @@ public enum Intelligence {
                         int finalI = i;
                         if (east == 1 && GenerateBiome.getTown(mapVar + i)){
                             options.add("Travel East - "+i+" hours away)");
+                            final int fCost = cost + 1000 * i;
                             actions.add(new Performer(()->{
-                                if (Global.player.requireGold(cost)){
+                                if (Global.player.requireGold(fCost)){
                                     if (Global.player.map.updater.sleep(1, true)){
                                         Global.server.requestChangeMap(Global.player.map.name.getNext(finalI).toString() +",2");
                                     }
@@ -454,8 +455,9 @@ public enum Intelligence {
                         } else if (east == 0) east = 1; //disconnected
                         if (west == 1 && GenerateBiome.getTown(mapVar + i)){
                             options.add("Travel West - "+i+" hours away)");
+                            final int fCost = cost + 1000 * i;
                             actions.add(new Performer(()->{
-                                if (Global.player.requireGold(cost)){
+                                if (Global.player.requireGold(fCost)){
                                     if (Global.player.map.updater.sleep(1, true)){
                                         Global.server.requestChangeMap(Global.player.map.name.getNext(-finalI).toString() +",1");
                                     }
@@ -481,14 +483,14 @@ public enum Intelligence {
                     if (type == 1){
                         title = "Medical Guild";
                         desc = "We are a massive conglomerate of hospitals and alchemists around the world working together for a better world. "+
-                                "If you join us, we can implement you with our great health track system, which means you will be revived after any accident, for a fee.";
+                                "Register to become a member and you will be qualified to join our health track program, which allows us to revive you for a fee.";
                     } else if (type == 2){
                         title = "Merchants Guild";
-                        desc = "We are the guild of brokers continuing the legacy of the once-powerful translocation guild. We are a powerful group of middlemen who can make you a whole lot richer. "+
+                        desc = "Merchants guild is a guild of brokers continuing the legacy of the once-powerful translocation guild. We are a powerful group of middlemen who can make you a whole lot richer. "+
                                 "You may sell various items to us for profit if you join us.";
                     } else if (type == 3){
                         title = "Mercenary Guild";
-                        desc = "We are the main military force of these lands. A powerful united force comprised of individually operated mercenaries from all over the world, we pay our loyalty to our traditional allies. "+
+                        desc = "We are the main military force of these lands. A powerful organization consisting of different mercenary bands from all over the world, we are both loyal and public. "+
                                 "Join us, and carry out duties together with fellow mercenary companions.";
                     }
                     if (Global.player.guild == -1) {
@@ -526,18 +528,12 @@ public enum Intelligence {
                 void shop() {
                     super.shop();
                     if (Global.player.guild == 3) {
-                        int time = Global.hour % 3;
-                        if (time == 0) {
-                            int seed = (host.seed * Global.player.guildVar) % 4;
-                            if (seed == 0) Menu.menu.showDialog("Mercenary Guild Officer", "We have a patrol mission requested by the Medical Guild.",
-                                    new String[]{"Depart to mission","Bail out and lose 1 rank"}, new Performer[]{new Performer(()->{
-                                        Global.player.guild = 3;
-                                        Global.server.requestChangeMap("stuffstuffstuff blahblahblah");
-                                    }), new Performer(()->{
-                                    })});
-                        } else {
-                            Menu.menu.showDialog("Mercenary Guild Officer", "You are free to go right now. Our next mission is in "+time+" hours.");
-                        }
+                        Menu.menu.showDialog("Mercenary Guild Officer", "Recruit",
+                                new String[]{"Depart to mission"}, new Performer[]{new Performer(()->{
+                                    String mapName = Global.player.map.name.getMapname();
+                                    mapName = mapName.substring(0,mapName.lastIndexOf("_"))+"1";
+                                    Global.server.requestChangeMap(FileManager.makeDirectory(mapName+",1"));
+                                })});
                     } else Menu.menu.showDialog("Mercenary Guild Officer", "Hello. Speak to our recruiter if you wish to join us.");
                 }
             });

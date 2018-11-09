@@ -9,6 +9,7 @@ Tailor,,,merchant,[3,3,3],Neutral,[3,2],[Backstep],,[Custom Suit Torso],[Custom 
 Technician,,,merchant,[3,3,9],Neutral,[3,5],[Backstep,Shock,Lightning],,[Jumpsuit Torso],[Jumpsuit Pants],[Glasses],[Battery],[[Affinity,1],[Aeromancy,3],[Channeling,2]]
 Librarian,,,merchant,[1,1,5],Neutral,[3,6],[Backstep],,[Shirt],[Pants],[Glasses],,
 Huntsman,,,merchant,[3,3,3],Neutral,[3,7],[Backstep,Use],[Firearm],[Camo Shirt],[Camo Shorts],[Cap],,
+Officer,,,merchant,[3,3,3],Neutral,[3,8],[Backstep,Use],[Firearm],[Infantry Jacket],[Infantry Pants],[Cap],,
 Innkeep,,,merchant,[3,3,3],Neutral,[4,0],[Backstep],,[Suit Torso],[Suit Pants],,,
 Trainer,,,merchant,[7,3,3],Neutral,[5,0],[Punch,Kick],,[Sports Shirt],[Shorts],[Bandana],,
 Dealer,,,merchant,[3,3,3],Neutral,[6,0],[Backstep],,[Spring Suit Torso],[Cargo Pants],[Glasses],,

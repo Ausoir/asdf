@@ -131,7 +131,7 @@ public class PlayerInput implements Input {
         if (p.startsWith("_")) {
             if (p.startsWith("_EXIT")) System.exit(1);
             else if (p.startsWith("_CTRL")) ctrl = !ctrl;
-            else if (p.startsWith("_SAY")) Global.display.startChat();
+            else if (p.startsWith("_CHAT")) Global.display.startChat();
             else if (p.startsWith("_MENU")) Menu.menu.showMenu();
             else if (p.startsWith("_WI")) {
                 selectingItem = Integer.parseInt(p.substring(3));
@@ -181,7 +181,7 @@ public class PlayerInput implements Input {
             keyActionMap.put(90, Actions.Activate.name());
             keyActionMap.put(3, Actions.Offhand.name());
             keyActionMap.put(17, "_CTRL");
-            keyActionMap.put(10, "_SAY");
+            keyActionMap.put(10, "_CHAT");
             keyActionMap.put(9, "_MENU");
             keyActionMap.put(38, "_UP");
             keyActionMap.put(27, "_EXIT");

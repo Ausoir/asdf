@@ -11,58 +11,58 @@ Hoodie,Cargo,1,0,0,[Cloth],2,0 // Tier 3
 Cargo Pants,Cargo,2,0,2,[Cloth],0,0
 Jumpsuit Torso,Jumpsuit,1,0,1,[Cloth],0,20
 Jumpsuit Pants,Jumpsuit,2,0,2,[Cloth],0,0
-Jean Jacket,Jean,1,0,0,[Cloth],0,60
-Jeans,Jean,2,0,1,[Cloth],0,40
+Jean Jacket,Jean,1,0,0,[Cloth],0,50
+Jeans,Jean,2,0,1,[Cloth],0,30
 Sweater,Sweater,1,0,0,[Wool],0,0
 Lined Pants,Sweater,2,0,1,[Wool],0,0
-Camo Top,Camo,1,0,0,[Nylon,Web],0,10
+Camo Top,Camo,1,0,0,[Nylon,Web],0,16
 Camo Shorts,Camo,2,0,1,[Nylon,Web],0,10
   ***** Encumbrance 1, Tier 1/3 *****
 Suit Torso,Suit,1,1,1,[Cloth,Silk],0,10
 Suit Pants,Suit,2,1,2,[Cloth,Silk],0,10
 Custom Suit Torso,Brown_Suit,1,1,1,[Leather],0,0 // Tier 2
 Custom Suit Pants,Brown_Suit,2,1,2,[Leather],0,0
-Sweat Suit Torso,Sweat_Suit,1,1,1,[Wool],0,10
-Sweat Suit Pants,Sweat_Suit,2,1,2,[Wool],0,10
+Sweat Suit Torso,Sweat_Suit,1,1,1,[Wool],0,14
+Sweat Suit Pants,Sweat_Suit,2,1,2,[Wool],0,8
 Lab Coat,Labwear,1,1,2,[Cloth],0,-5 // Tier 3
 Lab Pants,Labwear,2,1,3,[Cloth],0,-5
 Leather Jacket,Leather,1,1,0,[Leather],0,40
-Leather Pants,Leather,2,1,1,[Leather],0,40
+Leather Pants,Leather,2,1,1,[Leather],0,16
 Rogue Turtleneck,Rogue,1,1,1,[Nylon,Silk,Web],0,0
 Rogue Tights,Rogue,2,1,2,[Nylon,Silk,Web],0,0
 Uniform Top,Uniform,1,1,1,[Copper,Bronze],0,0
 Uniform Bottom,Uniform,2,1,2,[Copper,Bronze],0,0
   ***** Encumbrance 2, Tier 1/2 *****
-Burlap Armor,Burlap,1,2,0,[Wooden],0,70
-Burlap Loins,Burlap,2,2,0,[Wooden],0,70
-Dustset Jacket,Dustset,1,2,0,[Leather],0,100 // Tier 2
-Dustset Pants,Dustset,2,2,1,[Leather],0,80
+Burlap Armor,Burlap,1,2,0,[Wooden],0,60
+Burlap Loins,Burlap,2,2,0,[Wooden],0,60
+Dustset Jacket,Dustset,1,2,0,[Leather],0,90 // Tier 2
+Dustset Pants,Dustset,2,2,1,[Leather],0,60
 Padded Vest,Pad,1,2,0,[Iron,Steel],0,0
 Padded Leggings,Pad,2,2,1,[Iron,Steel],0,0
 Infantry Jacket,Infantry,1,2,1,[Nylon],1,70
-Infantry Pants,Infantry,2,2,2,[Nylon],0,70
+Infantry Pants,Infantry,2,2,2,[Nylon],0,40
 Mythringmail Armor,Mythringmail,1,2,0,[Silver,Gold,Steel,Obsidian,Crystal],0,0
 Mythringmail Leggings,Mythringmail,2,2,1,[Silver,Gold,Crystal],0,0
 Scavenger Jacket,Scavenger,1,2,4,[Cloth],0,20
 Scavenger Pants,Scavenger,2,2,4,[Cloth],0,20
 Adventure Torso,Adventurewear,1,2,2,[Nylon,Wool],1,60
-Adventure Pants,Adventurewear,2,2,3,[Nylon,Wool],0,60
+Adventure Pants,Adventurewear,2,2,3,[Nylon,Wool],0,40
   ***** Encumbrance 3, Tier 1/2 *****
 Chainmail Armor,Chainmail,1,3,1,[Iron,Silver,Steel],0,20
-Chainmail Leggings,Chainmail,2,3,2,[Iron,Silver,Steel],0,20
+Chainmail Leggings,Chainmail,2,3,2,[Iron,Silver,Steel],0,0
 Breastplate,Platemail,1,3,1,[Copper,Iron,Steel,Crystal,Gold,Obsidian],0,20 // Tier 2
 Greaves,Platemail,2,3,1,[Copper,Iron,Steel,Crystal,Gold,Obsidian],0,20
 Security Armor,Security,1,3,1,[Nylon,Silk,Web,Wool],2,80
-Security Tights,Security,2,3,2,[Nylon,Silk,Web,Wool],1,80
+Security Tights,Security,2,3,2,[Nylon,Silk,Web,Wool],1,50
 Shadowrobe Torso,Shadowrobe,1,3,4,[Bone],1,0
 Shadowrobe Pants,Shadowrobe,2,3,4,[Bone],1,0
 Robotic Upper Body,Robot,1,3,0,[Copper],5,0
 Robotic Lower Body,Robot,2,3,1,[Copper],4,0
-Crystal Breastplate,Crystal,1,3,1,[Crystal],0,150
-Crystal Greaves,Crystal,2,3,1,[Crystal],0,150
+Crystal Breastplate,Crystal,1,3,1,[Crystal],0,110
+Crystal Greaves,Crystal,2,3,1,[Crystal],0,110
   ***** Encumbrance 4, Tier 1/1 *****
 Battle Armor,Battlewear,1,4,1,[Titanium],2,20
-Battle Lower Armor,Battlewear,2,4,2,[Titanium],1,20
+Battle Lower Armor,Battlewear,2,4,2,[Titanium],1,0
   -----
 Baldcut,Baldcut,0,0,0,[Organic],1,0
 Gingercut,Gingercut,0,0,0,[Organic],1,0

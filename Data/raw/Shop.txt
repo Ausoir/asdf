@@ -6,4 +6,5 @@ Machete;Broadsword;Axe;Lancesword;Cutlass;Claymore;Mace;Spear;Halberd;Cleaver;Pi
 Scroll;Potion;Scroll;Potion;Battery;Generator;Bomb;Memoryfoam //Lab
 Manual;Textbook;Book //Library
 Dagger;Bow;Ration;Grappler;Repairkit;Quiver;Ammunition;Firearm //Ranch
+Firearm;Riot Helmet;Military Helmet;Infantry Jacket;Infantry Pants;Security Armor;Security Tights;Padded Vest;Padded Leggings //Mercenary
 Baldcut,Gingercut,Blondecut,Buzzcut,Ponytail //Salon

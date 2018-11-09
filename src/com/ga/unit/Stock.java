@@ -256,7 +256,7 @@ public enum Stock {
                 int agi = rand.nextInt(8)+1;
                 UnitFactory unit = new UnitFactory(this, Faction.Predator, new T("3,"+agi+",3"));
                 unit.setMoveset("[Melee]");
-                traits.load(this, new T("[Bloodless,1],[Inorganic,1],[Instinct,1]"));
+                traits.load(this, new T("[[Bloodless,1],[Inorganic,1],[Instinct,1]]"));
                 stats.speed = 8;
             }
             public void die(String p){
@@ -511,7 +511,7 @@ public enum Stock {
     }},
     Textbook{ Prop make(Map map, final int id, int seed){
         Item product = new Item(map, name(), name(), seed, Item.Material.Cloth, Item.ItemType.Scroll, -1){
-            private Traits.Trait trait = Traits.Trait.getByName(Tags.trainables[seed % Tags.trainables.length].name());
+            private Traits.Trait trait = Traits.Trait.getByName(Traits.Trait.getByType(3).get(seed % Traits.Trait.getByType(3).size()).name());
             public void onCreate(){
                 super.onCreate();
                 if (id == -1) subId = rand.nextInt(4)+1;
@@ -542,7 +542,7 @@ public enum Stock {
                 return prefix + " " + super.getName();
             }
             public String getDescription(){
-                String req = " This book contains information for those with understanding of "+trait.name()+" level "+(subId+1)+".";
+                String req = " This book teaches "+trait.name()+" level "+(subId+1)+".";
                 int understanding = Global.player.traits.getTraitLevel(trait);
                 req += " Your current "+trait.name()+" level: "+understanding+".";
                 if (understanding == subId) req += " You may learn from the contents of this book.";
@@ -680,6 +680,12 @@ public enum Stock {
         Prop product = new Prop(map, name(), name(), seed);
         product.onInteract = new Interactive(){
             public void interact(com.ga.unit.man.Man p){
+                Menu.menu.showDialog("Translocation Machine", "Choose a destination",
+                        new String[]{"Travel to the box"}, new Performer[]{new Performer(()->{
+                            String mapName = Global.player.map.name.getMapname();
+                            mapName = mapName.substring(0,mapName.lastIndexOf("_"))+"1";
+                            Global.server.requestChangeMap(FileManager.makeDirectory(mapName+",1"));
+                        })});
             }
         };
         return product;
@@ -718,7 +724,10 @@ public enum Stock {
                         if (prop.factoryId != factoryId && prop.name.equals(name)) count++;
                     }
                     if (count < id){
-                        for (int i=0;i<Math.min(id-count, ((Global.hour-rotation)/seed)+1);i++) {
+                        int amount;
+                        if (seed == 0) amount = id-count;
+                        else amount = (int) Math.min(id-count, ((Global.hour-rotation)/seed)+1);
+                        for (int i=0;i<amount;i++) {
                             Stock.createByName(map, name, -1).start().pos.set(pos);
                         }
                     }
@@ -1210,7 +1219,7 @@ public enum Stock {
         return product;
     }},
     Battery{ Prop make(Map map, int id, int seed){
-        Item product = new Item(map, name(), name(),seed,Item.Material.Copper,Item.ItemType.Consumable,10){
+        Item product = new Item(map, name(), name(),seed,Item.Material.Copper,Item.ItemType.Consumable,8){
             public String getDescription(){
                 return super.getDescription()+"\nThis item can store Energy for magical applications.";
             }
@@ -1481,8 +1490,10 @@ public enum Stock {
         return t;
     }
     public static Prop createByName(Map map, String p, int id, int seed){ // Return to reflection
+        if (p == null) return null;
+        String stockName = p.replace(" ", "_");
         for (Stock i : values()){
-            if (i.name().equals(p.replace(" ","_"))){
+            if (i.name().equals(stockName)){
                 return i.create(map, id, seed);
             }
         }
@@ -1528,6 +1539,9 @@ class UnitFactory {
         unit.stats.level = new Stat(str+agi+wis);
         unit.stats.speed = 18+host.rand.nextInt(8);
         unit.stats.attack = host.rand.nextInt(10)-8;
+        unit.stats.motivation = new Stat(100);
+        unit.stats.nutrition = new Stat(5);
+        unit.stats.fatigue = new Stat(1000);
         setAI(2, 0);
     }
     void setEquipment(T weapon, T top, T bottom, T helms){

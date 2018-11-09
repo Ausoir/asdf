@@ -52,8 +52,8 @@ public class Generator {
         }
         ArrayList<String[]> resultBuildings = new ArrayList<>(); //Build buildings according to estate
         if (possibleBuildings.size() > 0) {
-            while (true) {
-                String[] building = possibleBuildings.get(Creation.r.nextInt(possibleBuildings.size()));
+            while (possibleBuildings.size() > 0) {
+                String[] building = possibleBuildings.remove(Creation.r.nextInt(possibleBuildings.size()));
                 if (estate < Integer.parseInt(building[1])) break;
                 estate -= Integer.parseInt(building[1]);
                 resultBuildings.add(building);
@@ -123,8 +123,8 @@ public class Generator {
                     if (prop.subId == 1) { //overmap
                         Global.p("Unimplemented travel ID 1 found."); //NOT IMPLEMENTED
                     } else if (prop.subId == 2) { //outside to inside
-                        String newmap = map.name.getModifiedMapname("B"+map.name.getMapname()+"_"+bid);
-                        makeTravelPath(prop, 0, bid,
+                        String newmap = map.name.changeMapName("B"+map.name.getMapname()+"_"+bid);
+                        generateBuildingInsides(prop, 0, bid,
                                 newmap+"_0", //Something like B_1_14
                                 FileManager.makeDirectory("building/inside/") + building+"_0");
                     }
@@ -137,7 +137,7 @@ public class Generator {
         blueprint.updater.addQueue.clear();
         return highestBid;
     }
-    private void makeTravelPath(Prop travel, int index, int returnSeedOffset, String newMapName, String mapToLoad){
+    private void generateBuildingInsides(Prop travel, int index, int returnSeedOffset, String newMapName, String mapToLoad){
         travel.name = newMapName;
         Map house = new Map(mapToLoad);
         house.start();
@@ -147,7 +147,7 @@ public class Generator {
                 String newMapNameWithoutIndex = newMapName.substring(0,newMapName.lastIndexOf("_"));
                 if (ob.subId == 2) { //inside to inside
                     String newLoadMapWithoutIndex = mapToLoad.substring(0,mapToLoad.lastIndexOf("_"));
-                    makeTravelPath(ob, ++index, returnSeedOffset,
+                    generateBuildingInsides(ob, ++index, returnSeedOffset,
                             newMapNameWithoutIndex+"_"+index,
                             newLoadMapWithoutIndex+"_"+index); //Something like B_1_14_1
                 } else if (ob.subId == 3) { //inside to outside

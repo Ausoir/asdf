@@ -30,13 +30,13 @@ public class Player extends Man {
     }
 
     public void rest(){
-        int level = 2;
+        int level = 4;
         ArrayList<Prop> props = getAvailableProps(e -> true);
         for (Prop i : props){
             if (i.name.equals("Bed")){
-                level = 4;
+                level = 24;
                 break;
-            } else if (i.name.equals("Chair") || i.name.equals("Shortchair") || i.name.equals("Bench")) level = 3;
+            } else if (i.name.equals("Chair") || i.name.equals("Shortchair") || i.name.equals("Bench")) level = 12;
         }
         stats.fatigue.add(level, false);
         map.updater.sleep(1, true);

@@ -205,7 +205,7 @@ public enum Buffs {
             }
             public boolean onTrigger(){
                 if (level > 1) level--;
-                else time = Global.time;
+                else super.onTrigger();
                 return true;
             }
             public boolean update() {
@@ -240,7 +240,7 @@ public enum Buffs {
                 mark.save = false;
             }
             public boolean onTrigger(){
-                time = Global.time;
+                super.onTrigger();
                 return mark != null;
             }
             public void onFinish() {
@@ -272,6 +272,7 @@ public enum Buffs {
                 }
                 public boolean onTrigger(){
                     if (level > 0) level--;
+                    else super.onTrigger();
                     return true;
                 }
                 public boolean update() {
@@ -583,10 +584,6 @@ public enum Buffs {
             public void onLoad(){
                 host.tangible = false;
             }
-            public boolean onTrigger(){
-                time = Global.time;
-                return true;
-            }
             public void onFinish(){
                 host.tangible = true;
             }
@@ -638,7 +635,7 @@ public enum Buffs {
                 if (level > 0) level--;
                 if (level == 0) {
                     var = 1;
-                    time = Global.time;
+                    super.onTrigger();
                 }
                 return true;
             }
@@ -675,7 +672,7 @@ public enum Buffs {
         return new Buff(level, 16) {
             public boolean onTrigger(){
                 if (level > 1) level--;
-                else time = Global.time;
+                else super.onTrigger();
                 return true;
             }
         };
@@ -807,6 +804,7 @@ public enum Buffs {
         public void onSet(){}
         public void onLoad(){}
         public boolean onTrigger(){
+            time = Global.time;
             return true;
         }
         public void finish(){

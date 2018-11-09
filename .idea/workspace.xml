@@ -2,72 +2,55 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="79d7eda2-caee-46bf-a9ab-c399133bfcef" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/Data/map/building/Bazaar.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Data/map/building/Outpost.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Data/map/building/inside/Bazaar_0.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Data/map/building/inside/Outpost_0.map" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/item/armor/Chainmail.png" beforeDir="false" afterPath="$PROJECT_DIR$/Data/item/armor/Chainmail.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/item/armor/Crystal.png" beforeDir="false" afterPath="$PROJECT_DIR$/Data/item/armor/Crystal.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/item/armor/Dustset.png" beforeDir="false" afterPath="$PROJECT_DIR$/Data/item/armor/Dustset.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/item/armor/Infantry.png" beforeDir="false" afterPath="$PROJECT_DIR$/Data/item/armor/Infantry.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/item/armor/Leather.png" beforeDir="false" afterPath="$PROJECT_DIR$/Data/item/armor/Leather.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/item/armor/Mythringmail.png" beforeDir="false" afterPath="$PROJECT_DIR$/Data/item/armor/Mythringmail.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/item/armor/Pad.png" beforeDir="false" afterPath="$PROJECT_DIR$/Data/item/armor/Pad.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/item/armor/Platemail.png" beforeDir="false" afterPath="$PROJECT_DIR$/Data/item/armor/Platemail.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/item/armor/Security.png" beforeDir="false" afterPath="$PROJECT_DIR$/Data/item/armor/Security.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/item/armor/Spring_Suit.png" beforeDir="false" afterPath="$PROJECT_DIR$/Data/item/armor/Spring_Suit.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/item/armor/Suit.png" beforeDir="false" afterPath="$PROJECT_DIR$/Data/item/armor/Suit.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/item/armor/Sweat_Suit.png" beforeDir="false" afterPath="$PROJECT_DIR$/Data/item/armor/Sweat_Suit.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/item/helmet/Mask.png" beforeDir="false" afterPath="$PROJECT_DIR$/Data/item/helmet/Mask.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/New.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/New.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Data/Editor_Keymap.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Data/Editor_Keymap.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Data/Keymap.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Data/Keymap.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Data/map/Player.user" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/Player.user" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Data/map/Template.user" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/Template.user" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Data/map/World.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/World.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/Pawnshop.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/Ranch.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/Scrapyard.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/Scrapyard.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/map/building/inside/Pawnshop_0.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/inside/Ranch_0.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Data/map/building/Sewer.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/Sewer.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Data/map/building/inside/Cave_0.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/inside/Cave_0.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Data/map/building/inside/Hospital_0.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/inside/Hospital_0.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Data/map/building/inside/House4_0.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/inside/House4_0.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Data/map/building/inside/House4_1.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/inside/House4_1.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Data/map/building/inside/Outpost_0.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/building/inside/Outpost_0.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_10_0.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/ins/B_1_10_0.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_11_0.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/ins/B_1_11_0.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_13_0.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/ins/B_1_13_0.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_14_0.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/ins/B_1_14_0.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_15_0.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_16_0.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_17_0.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_18_0.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Data/map/ins/B_1_19_0.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Data/map/ins/_1.map" beforeDir="false" afterPath="$PROJECT_DIR$/Data/map/ins/_1.map" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Data/raw/Armor.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Data/raw/Armor.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Data/raw/Dialog.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Data/raw/Dialog.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/raw/Etc.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Data/raw/Etc.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Data/raw/Man.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Data/raw/Man.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/raw/Pawn.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Data/raw/Pawn.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/raw/Settings.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Data/raw/Settings.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Data/raw/Object.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Data/raw/Object.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Data/raw/Recipe.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Data/raw/Recipe.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Data/raw/Shop.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Data/raw/Shop.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/raw/Weapon.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Data/raw/Weapon.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/game/Command.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/game/Command.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/game/Settings.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/game/Settings.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Data/unit/Man.2d" beforeDir="false" afterPath="$PROJECT_DIR$/Data/unit/Man.2d" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Data/unit/Slime.2d" beforeDir="false" afterPath="$PROJECT_DIR$/Data/unit/Slime.2d" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/map/Map.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/map/Map.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Unit.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/asdf/com/ga/unit/Unit.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/connection/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/connection/Server.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/game/Command.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/game/Command.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ga/game/Display.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/game/Display.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/game/MenuDialog.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/game/MenuDialog.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ga/game/MenuPlayer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/game/MenuPlayer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/game/MenuShop.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/game/MenuShop.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/game/Panel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/game/Panel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/game/Processes.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/game/Processes.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/game/Settings.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/game/Settings.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/map/EditorInput.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/map/EditorInput.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/ga/map/GenerateForest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/map/GenerateForest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/ga/map/GeneratePlains.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/map/GeneratePlains.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ga/map/GenerateTown.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/map/GenerateTown.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ga/map/Generator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/map/Generator.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ga/map/Map.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/map/Map.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ga/map/MapName.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/map/MapName.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ga/map/Updater.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/map/Updater.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/tool/EventTimer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/tool/EventTimer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/tool/Performer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/tool/Performer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/tool/T.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/tool/T.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/unit/AI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/AI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/unit/Behavior.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/Behavior.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/ga/unit/Faction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/Faction.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ga/unit/Intelligence.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/Intelligence.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/unit/Organ.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/Organ.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/unit/Prop.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/Prop.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/ga/unit/PlayerInput.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/PlayerInput.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ga/unit/Stock.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/Stock.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/unit/Strategy.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/Strategy.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ga/unit/Unit.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/Unit.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/unit/item/Armor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/item/Armor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/unit/item/ArmorSet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/item/ArmorSet.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ga/unit/item/Crafts.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/item/Crafts.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ga/unit/man/MainPlayer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/man/MainPlayer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ga/unit/man/Man.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/man/Man.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/ga/unit/man/Player.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/man/Player.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ga/unit/skill/Actions.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/skill/Actions.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ga/unit/skill/Buffs.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ga/unit/skill/Buffs.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/todo" beforeDir="false" afterPath="$PROJECT_DIR$/todo" afterDir="false" />
@@ -85,13 +68,331 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="todo" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/todo">
+      <file leaf-file-name="Intelligence.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Intelligence.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="45">
-              <caret line="3" lean-forward="true" selection-start-line="3" selection-end-line="3" />
+            <state relative-caret-position="317">
+              <caret line="441" column="43" lean-forward="true" selection-start-line="441" selection-start-column="43" selection-end-line="441" selection-end-column="43" />
+              <folding>
+                <element signature="docComment;class#Intelligence#0" />
+                <element signature="class#473:628" />
+                <element signature="method#make#0;class#473:628" />
+                <element signature="class#530:618" />
+                <element signature="class#637:2321" />
+                <element signature="method#make#0;class#637:2321" />
+                <element signature="class#693:2312" />
+                <element signature="method#load#0;class#693:2312" />
+                <element signature="method#hear#0;class#693:2312" />
+                <element signature="method#perceived#0;class#693:2312" />
+                <element signature="method#update#0;class#693:2312" />
+                <element signature="class#2329:3830" />
+                <element signature="method#make#0;class#2329:3830" />
+                <element signature="class#2385:3812" />
+                <element signature="method#onAttack#0;class#2385:3812" />
+                <element signature="method#hear#0;class#2385:3812" />
+                <element signature="method#perceived#0;class#2385:3812" />
+                <element signature="method#process#0;class#Intelligence#0" />
+                <element signature="method#load#0;class#Intelligence#0" />
+              </folding>
             </state>
           </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Stock.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Stock.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="257">
+              <caret line="1291" column="57" lean-forward="true" selection-start-line="1291" selection-start-column="57" selection-end-line="1291" selection-end-column="57" />
+              <folding>
+                <element signature="docComment;class#Stock#0" />
+                <element signature="class#622:868" />
+                <element signature="method#make#0;class#622:868" />
+                <element signature="class#880:1592" />
+                <element signature="method#make#0;class#880:1592" />
+                <element signature="class#959:1228" />
+                <element signature="method#load#0;class#959:1228" />
+                <element signature="class#1602:2301" />
+                <element signature="method#make#0;class#1602:2301" />
+                <element signature="class#1681:1948" />
+                <element signature="method#load#0;class#1681:1948" />
+                <element signature="class#2313:3836" />
+                <element signature="method#make#0;class#2313:3836" />
+                <element signature="class#2546:3351" />
+                <element signature="method#onField#0;class#2546:3351" />
+                <element signature="class#3008:3317" />
+                <element signature="class#3847:4404" />
+                <element signature="method#make#0;class#3847:4404" />
+                <element signature="class#3984:4233" />
+                <element signature="method#onCreate#0;class#3984:4233" />
+                <element signature="class#4413:5424" />
+                <element signature="method#make#0;class#4413:5424" />
+                <element signature="class#4561:5117" />
+                <element signature="method#onCreate#0;class#4561:5117" />
+                <element signature="class#5433:6315" />
+                <element signature="method#make#0;class#5433:6315" />
+                <element signature="class#5566:6004" />
+                <element signature="method#onCreate#0;class#5566:6004" />
+                <element signature="method#getDescription#0;class#5566:6004" />
+                <element signature="class#6327:6785" />
+                <element signature="method#make#0;class#6327:6785" />
+                <element signature="class#6463:6725" />
+                <element signature="method#onCreate#0;class#6463:6725" />
+                <element signature="class#6796:7351" />
+                <element signature="method#make#0;class#6796:7351" />
+                <element signature="class#6931:7291" />
+                <element signature="method#onCreate#0;class#6931:7291" />
+                <element signature="class#7361:7696" />
+                <element signature="method#make#0;class#7361:7696" />
+                <element signature="class#7708:7847" />
+                <element signature="method#make#0;class#7708:7847" />
+                <element signature="class#7856:9333" />
+                <element signature="method#make#0;class#7856:9333" />
+                <element signature="class#7924:9251" />
+                <element signature="method#stateSet#0;class#7924:9251" />
+                <element signature="method#attack#0;class#7924:9251" />
+                <element signature="method#stateUpdate#0;class#7924:9251" />
+                <element signature="method#die#0;class#7924:9251" />
+                <element signature="method#onCreate#0;class#7924:9251" />
+                <element signature="class#9344:11107" />
+                <element signature="method#make#0;class#9344:11107" />
+                <element signature="class#9412:11025" />
+                <element signature="method#stateSet#0;class#9412:11025" />
+                <element signature="method#moveTriggered#0;class#9412:11025" />
+                <element signature="method#buff#0;class#9412:11025" />
+                <element signature="method#onCreate#0;class#9412:11025" />
+                <element signature="method#die#0;class#9412:11025" />
+                <element signature="class#11117:12589" />
+                <element signature="method#make#0;class#11117:12589" />
+                <element signature="class#11185:12419" />
+                <element signature="method#collide#0;class#11185:12419" />
+                <element signature="method#stateSet#0;class#11185:12419" />
+                <element signature="method#die#0;class#11185:12419" />
+                <element signature="method#onCreate#0;class#11185:12419" />
+                <element signature="class#12603:14075" />
+                <element signature="method#make#0;class#12603:14075" />
+                <element signature="class#12671:13960" />
+                <element signature="method#collide#0;class#12671:13960" />
+                <element signature="method#update#0;class#12671:13960" />
+                <element signature="method#onCreate#0;class#12671:13960" />
+                <element signature="class#14087:14552" />
+                <element signature="method#make#0;class#14087:14552" />
+                <element signature="class#14155:14437" />
+                <element signature="method#onCreate#0;class#14155:14437" />
+                <element signature="class#14565:16561" />
+                <element signature="method#make#0;class#14565:16561" />
+                <element signature="class#14633:16479" />
+                <element signature="method#onCreate#0;class#14633:16479" />
+                <element signature="method#moveTriggered#0;class#14633:16479" />
+                <element signature="class#15289:15759" />
+                <element signature="method#stuck#0;class#15289:15759" />
+                <element signature="method#onAttack#0;class#15289:15759" />
+                <element signature="method#die#0;class#14633:16479" />
+                <element signature="class#16571:17487" />
+                <element signature="method#make#0;class#16571:17487" />
+                <element signature="class#16638:17322" />
+                <element signature="method#use#0;class#16638:17322" />
+                <element signature="class#17501:18391" />
+                <element signature="method#make#0;class#17501:18391" />
+                <element signature="class#17568:18319" />
+                <element signature="method#use#0;class#17568:18319" />
+                <element signature="method#getDescription#0;class#17568:18319" />
+                <element signature="class#18403:21349" />
+                <element signature="method#make#0;class#18403:21349" />
+                <element signature="class#18470:21289" />
+                <element signature="method#onCreate#0;class#18470:21289" />
+                <element signature="method#load#0;class#18470:21289" />
+                <element signature="method#checkIngredients#0;class#18470:21289" />
+                <element signature="method#use#0;class#18470:21289" />
+                <element signature="method#getDescription#0;class#18470:21289" />
+                <element signature="class#21363:23736" />
+                <element signature="method#make#0;class#21363:23736" />
+                <element signature="class#21436:23674" />
+                <element signature="method#onCreate#0;class#21436:23674" />
+                <element signature="method#use#0;class#21436:23674" />
+                <element signature="method#getName#0;class#21436:23674" />
+                <element signature="method#getDescription#0;class#21436:23674" />
+                <element signature="class#23746:24671" />
+                <element signature="method#make#0;class#23746:24671" />
+                <element signature="class#23886:24567" />
+                <element signature="method#use#0;class#23886:24567" />
+                <element signature="class#24683:25605" />
+                <element signature="method#make#0;class#24683:25605" />
+                <element signature="class#24750:25544" />
+                <element signature="method#use#0;class#24750:25544" />
+                <element signature="method#getFullName#0;class#24750:25544" />
+                <element signature="method#load#0;class#24750:25544" />
+                <element signature="class#25617:26993" />
+                <element signature="method#make#0;class#25617:26993" />
+                <element signature="class#25684:26899" />
+                <element signature="method#use#0;class#25684:26899" />
+                <element signature="method#makeSpell#0;class#25684:26899" />
+                <element signature="method#load#0;class#25684:26899" />
+                <element signature="method#getName#0;class#25684:26899" />
+                <element signature="class#27009:27770" />
+                <element signature="method#make#0;class#27009:27770" />
+                <element signature="class#27078:27675" />
+                <element signature="method#remove#0;class#27078:27675" />
+                <element signature="method#trigger#0;class#27078:27675" />
+                <element signature="method#onUnequip#0;class#27078:27675" />
+                <element signature="class#27781:28475" />
+                <element signature="method#make#0;class#27781:28475" />
+                <element signature="e#28622#29762#0" expanded="true" />
+                <element signature="e#29761#29762#0" expanded="true" />
+                <element signature="class#28768:29062" />
+                <element signature="method#make#0;class#28768:29062" />
+                <element signature="class#28833:29054" />
+                <element signature="method#update#0;class#28833:29054" />
+                <element signature="class#29075:30636" />
+                <element signature="method#make#0;class#29075:30636" />
+                <element signature="class#29149:30533" />
+                <element signature="method#load#0;class#29149:30533" />
+                <element signature="method#timeUpdate#0;class#29149:30533" />
+                <element signature="class#30652:33071" />
+                <element signature="method#make#0;class#30652:33071" />
+                <element signature="class#30804:31605" />
+                <element signature="method#onField#0;class#30804:31605" />
+                <element signature="class#31193:31464" />
+                <element signature="class#33081:37201" />
+                <element signature="method#make#0;class#33081:37201" />
+                <element signature="class#33154:37129" />
+                <element signature="method#onField#0;class#33154:37129" />
+                <element signature="class#33662:33933" />
+                <element signature="e#34629#34778#0" />
+                <element signature="e#34795#34944#0" />
+                <element signature="e#34961#35112#0" />
+                <element signature="e#35129#35282#0" />
+                <element signature="e#35904#36236#0" />
+                <element signature="method#load#0;class#33154:37129" />
+                <element signature="method#toString#0;class#33154:37129" />
+                <element signature="class#37212:37667" />
+                <element signature="method#make#0;class#37212:37667" />
+                <element signature="class#37279:37599" />
+                <element signature="method#setMaterial#0;class#37279:37599" />
+                <element signature="class#37682:39751" />
+                <element signature="method#make#0;class#37682:39751" />
+                <element signature="class#37749:39683" />
+                <element signature="method#onCreate#0;class#37749:39683" />
+                <element signature="method#use#0;class#37749:39683" />
+                <element signature="e#38781#39295#0" />
+                <element signature="method#getDescription#0;class#37749:39683" />
+                <element signature="class#39760:43373" />
+                <element signature="method#make#0;class#39760:43373" />
+                <element signature="class#39851:43265" />
+                <element signature="method#onCreate#0;class#39851:43265" />
+                <element signature="method#getDescription#0;class#39851:43265" />
+                <element signature="method#use#0;class#39851:43265" />
+                <element signature="e#40771#42570#0" />
+                <element signature="class#41142:41957" />
+                <element signature="method#onAttack#0;class#41142:41957" />
+                <element signature="method#update#0;class#41142:41957" />
+                <element signature="e#42952#43110#0" />
+                <element signature="class#43386:48271" />
+                <element signature="method#make#0;class#43386:48271" />
+                <element signature="class#44578:48129" />
+                <element signature="method#getDescription#0;class#44578:48129" />
+                <element signature="method#use#0;class#44578:48129" />
+                <element signature="e#45353#47127#0" />
+                <element signature="class#45533:46201" />
+                <element signature="method#stuck#0;class#45533:46201" />
+                <element signature="method#onAttack#0;class#45533:46201" />
+                <element signature="e#47815#47976#0" />
+                <element signature="class#48285:49931" />
+                <element signature="method#make#0;class#48285:49931" />
+                <element signature="class#48352:49800" />
+                <element signature="method#onCreate#0;class#48352:49800" />
+                <element signature="method#use#0;class#48352:49800" />
+                <element signature="e#48829#49693#0" />
+                <element signature="class#48885:49314" />
+                <element signature="method#stuck#0;class#48885:49314" />
+                <element signature="class#49941:51916" />
+                <element signature="method#make#0;class#49941:51916" />
+                <element signature="class#50008:51825" />
+                <element signature="method#use#0;class#50008:51825" />
+                <element signature="e#50405#51718#0" />
+                <element signature="class#50461:51418" />
+                <element signature="method#stuck#0;class#50461:51418" />
+                <element signature="method#update#0;class#50461:51418" />
+                <element signature="class#51930:55047" />
+                <element signature="method#make#0;class#51930:55047" />
+                <element signature="class#51997:54957" />
+                <element signature="method#use#0;class#51997:54957" />
+                <element signature="e#52373#54850#0" />
+                <element signature="class#52429:54685" />
+                <element signature="method#stuck#0;class#52429:54685" />
+                <element signature="method#update#0;class#52429:54685" />
+                <element signature="method#draw#0;class#52429:54685" />
+                <element signature="class#55060:55484" />
+                <element signature="method#make#0;class#55060:55484" />
+                <element signature="class#55127:55378" />
+                <element signature="method#getDescription#0;class#55127:55378" />
+                <element signature="class#55497:56165" />
+                <element signature="method#make#0;class#55497:56165" />
+                <element signature="class#55641:56157" />
+                <element signature="method#getDescription#0;class#55641:56157" />
+                <element signature="method#use#0;class#55641:56157" />
+                <element signature="class#56178:56741" />
+                <element signature="method#make#0;class#56178:56741" />
+                <element signature="class#56237:56733" />
+                <element signature="method#use#0;class#56237:56733" />
+                <element signature="class#56754:57502" />
+                <element signature="method#make#0;class#56754:57502" />
+                <element signature="class#56827:57440" />
+                <element signature="method#use#0;class#56827:57440" />
+                <element signature="e#59123#59124#0" expanded="true" />
+                <element signature="e#59210#59211#0" expanded="true" />
+                <element signature="class#59368:60748" />
+                <element signature="method#make#0;class#59368:60748" />
+                <element signature="class#59469:60680" />
+                <element signature="method#trigger#0;class#59469:60680" />
+                <element signature="class#60769:61637" />
+                <element signature="method#make#0;class#60769:61637" />
+                <element signature="class#60871:61483" />
+                <element signature="method#onCreate#0;class#60871:61483" />
+                <element signature="method#getDescription#0;class#60871:61483" />
+                <element signature="class#61654:62735" />
+                <element signature="method#make#0;class#61654:62735" />
+                <element signature="class#61756:62667" />
+                <element signature="method#trigger#0;class#61756:62667" />
+                <element signature="method#getDescription#0;class#61756:62667" />
+                <element signature="class#62751:64902" />
+                <element signature="method#make#0;class#62751:64902" />
+                <element signature="class#62810:64894" />
+                <element signature="method#trigger#0;class#62810:64894" />
+                <element signature="e#63751#63956#0" />
+                <element signature="method#use#0;class#62810:64894" />
+                <element signature="method#getDescription#0;class#62810:64894" />
+                <element signature="method#load#0;class#62810:64894" />
+                <element signature="class#64915:65378" />
+                <element signature="method#make#0;class#64915:65378" />
+                <element signature="class#65017:65279" />
+                <element signature="method#getFullName#0;class#65017:65279" />
+                <element signature="class#65390:65848" />
+                <element signature="method#make#0;class#65390:65848" />
+                <element signature="class#65492:65749" />
+                <element signature="method#getFullName#0;class#65492:65749" />
+                <element signature="class#65865:66555" />
+                <element signature="method#make#0;class#65865:66555" />
+                <element signature="class#65968:66492" />
+                <element signature="method#trigger#0;class#65968:66492" />
+                <element signature="method#getFullName#0;class#65968:66492" />
+                <element signature="e#66635#67093#0" />
+                <element signature="e#67098#67482#0" />
+                <element signature="e#67630#67937#0" />
+                <element signature="e#67942#68154#0" />
+                <element signature="e#68213#68519#0" />
+                <element signature="class#UnitFactory#0" />
+                <element signature="method#UnitFactory#0;class#UnitFactory#0" />
+                <element signature="method#setEquipment#0;class#UnitFactory#0" />
+                <element signature="method#addInventory#0;class#UnitFactory#0" />
+                <element signature="method#setMoveset#0;class#UnitFactory#0" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="todo" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/todo">
+          <provider selected="true" editor-type-id="text-editor" />
         </entry>
       </file>
     </leaf>
@@ -105,36 +406,36 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>Shadow</find>
-      <find>Glowshot</find>
-      <find>item</find>
-      <find>Hunt</find>
-      <find>stateset</find>
+      <find>Nutri</find>
+      <find>2:0</find>
+      <find>-2</find>
+      <find>Slime</find>
+      <find>reqMot</find>
+      <find>sleep</find>
+      <find>Inn</find>
+      <find>fatigue</find>
+      <find>canset</find>
       <find>Rest\(</find>
-      <find>speci</find>
-      <find>specialOrder</find>
-      <find>host.targ</find>
-      <find>Slash</find>
-      <find>getRan</find>
-      <find>rang</find>
-      <find>getRange</find>
-      <find>ran</find>
-      <find>Use\</find>
-      <find>getDist</find>
-      <find>Stun\(</find>
-      <find>Shock</find>
-      <find>Left</find>
-      <find>Item&quot;</find>
-      <find>Spear</find>
-      <find>Padd</find>
-      <find>Bone</find>
+      <find>Not en</find>
+      <find>!i</find>
+      <find>stats</find>
+      <find>Tree</find>
+      <find>Down</find>
+      <find>drop</find>
+      <find>exha</find>
+      <find>Rest</find>
+      <find>onAtta</find>
+      <find>Battery</find>
+      <find>Encum</find>
+      <find>Stamina</find>
+      <find>Paper</find>
+      <find>Silv</find>
       <find>Resin</find>
-      <find>Jewel</find>
-      <find>Merchan</find>
-      <find>Recr</find>
-      <find>target</find>
-      <find>Performer(</find>
-      <find>Performer()</find>
+      <find>Banda</find>
+      <find>Memory</find>
+      <find>hit(</find>
+      <find>onTrig</find>
+      <find>Tranq</find>
     </findStrings>
     <replaceStrings>
       <replace>Icepath</replace>
@@ -168,57 +469,57 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/Data/map/Player.user" />
-        <option value="$PROJECT_DIR$/Data/raw/Recipe.txt" />
-        <option value="$PROJECT_DIR$/Data/raw/Object.txt" />
-        <option value="$PROJECT_DIR$/src/com/ga/unit/item/Item.java" />
-        <option value="$PROJECT_DIR$/src/com/ga/game/Panel.java" />
-        <option value="$PROJECT_DIR$/src/com/ga/tool/T.java" />
-        <option value="$PROJECT_DIR$/Data/map/building/Scrapyard.map" />
-        <option value="$PROJECT_DIR$/Data/map/building/inside/Pawnshop_0.map" />
-        <option value="$PROJECT_DIR$/Data/map/New.map" />
-        <option value="$PROJECT_DIR$/src/com/ga/map/Generator.java" />
-        <option value="$PROJECT_DIR$/Data/map/building/inside/Ranch_0.map" />
-        <option value="$PROJECT_DIR$/src/com/ga/map/GenerateTown.java" />
-        <option value="$PROJECT_DIR$/Data/map/building/Bazaar.map" />
-        <option value="$PROJECT_DIR$/Data/map/building/Outpost.map" />
-        <option value="$PROJECT_DIR$/src/com/ga/unit/Prop.java" />
-        <option value="$PROJECT_DIR$/Data/map/ins/_1.map" />
-        <option value="$PROJECT_DIR$/Data/map/building/inside/Bazaar_0.map" />
-        <option value="$PROJECT_DIR$/src/com/ga/map/MapName.java" />
-        <option value="$PROJECT_DIR$/src/com/ga/unit/Unit.java" />
-        <option value="$PROJECT_DIR$/src/com/ga/unit/item/ArmorSet.java" />
-        <option value="$PROJECT_DIR$/Data/raw/Dialog.txt" />
-        <option value="$PROJECT_DIR$/Data/map/ins/B_1_18_0.map" />
-        <option value="$PROJECT_DIR$/Data/raw/Man.txt" />
-        <option value="$PROJECT_DIR$/src/com/ga/map/Updater.java" />
-        <option value="$PROJECT_DIR$/Data/raw/Settings.txt" />
-        <option value="$PROJECT_DIR$/src/com/ga/game/Command.java" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/Behavior.java" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/AI.java" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/Strategy.java" />
-        <option value="$PROJECT_DIR$/todo" />
         <option value="$PROJECT_DIR$/Data/raw/Weapon.txt" />
         <option value="$PROJECT_DIR$/Data/raw/Etc.txt" />
-        <option value="$PROJECT_DIR$/Data/raw/Shop.txt" />
-        <option value="$PROJECT_DIR$/Data/raw/Armor.txt" />
         <option value="$PROJECT_DIR$/Data/raw/Pawn.txt" />
         <option value="$PROJECT_DIR$/Data/map/building/inside/Outpost_0.map" />
         <option value="$PROJECT_DIR$/src/com/ga/game/Processes.java" />
-        <option value="$PROJECT_DIR$/src/com/ga/unit/Intelligence.java" />
-        <option value="$PROJECT_DIR$/src/com/ga/map/EditorInput.java" />
         <option value="$PROJECT_DIR$/src/com/ga/game/MenuShop.java" />
-        <option value="$PROJECT_DIR$/src/com/ga/map/Map.java" />
-        <option value="$PROJECT_DIR$/src/com/ga/game/MenuPlayer.java" />
-        <option value="$PROJECT_DIR$/src/com/ga/unit/Stock.java" />
-        <option value="$PROJECT_DIR$/src/com/ga/unit/man/MainPlayer.java" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/man/Man.java" />
         <option value="$PROJECT_DIR$/src/com/ga/tool/Performer.java" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/Organ.java" />
-        <option value="$PROJECT_DIR$/src/com/ga/unit/skill/Buffs.java" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/item/Armor.java" />
-        <option value="$PROJECT_DIR$/src/com/ga/unit/item/Crafts.java" />
+        <option value="$PROJECT_DIR$/src/com/ga/unit/PlayerInput.java" />
+        <option value="$PROJECT_DIR$/src/com/ga/game/Display.java" />
+        <option value="$PROJECT_DIR$/Data/Editor_Keymap.txt" />
+        <option value="$PROJECT_DIR$/Data/Keymap.txt" />
+        <option value="$PROJECT_DIR$/src/com/ga/map/EditorInput.java" />
+        <option value="$PROJECT_DIR$/src/com/ga/map/MapName.java" />
+        <option value="$PROJECT_DIR$/Data/raw/Man.txt" />
+        <option value="$PROJECT_DIR$/Data/raw/Shop.txt" />
+        <option value="$PROJECT_DIR$/Data/map/ins/_0.map" />
+        <option value="$PROJECT_DIR$/src/com/ga/map/Generator.java" />
+        <option value="$PROJECT_DIR$/Data/map/ins/_2.map" />
+        <option value="$PROJECT_DIR$/Data/map/building/inside/Hospital_0.map" />
+        <option value="$PROJECT_DIR$/Data/map/building/inside/Cave_0.map" />
+        <option value="$PROJECT_DIR$/src/com/ga/map/Updater.java" />
+        <option value="$PROJECT_DIR$/Data/map/Template.user" />
+        <option value="$PROJECT_DIR$/src/com/ga/unit/man/Player.java" />
+        <option value="$PROJECT_DIR$/src/com/ga/unit/man/MainPlayer.java" />
+        <option value="$PROJECT_DIR$/Data/map/ins/_1.map" />
+        <option value="$PROJECT_DIR$/Data/raw/Object.txt" />
+        <option value="$PROJECT_DIR$/src/com/ga/unit/Faction.java" />
+        <option value="$PROJECT_DIR$/src/com/ga/map/Map.java" />
+        <option value="$PROJECT_DIR$/src/com/ga/map/GenerateForest.java" />
+        <option value="$PROJECT_DIR$/src/com/ga/map/GenerateTown.java" />
+        <option value="$PROJECT_DIR$/Data/map/Player.user" />
+        <option value="$PROJECT_DIR$/src/com/ga/map/GeneratePlains.java" />
+        <option value="$PROJECT_DIR$/Data/unit/Man.2d" />
+        <option value="$PROJECT_DIR$/Data/unit/Slime.2d" />
         <option value="$PROJECT_DIR$/src/com/ga/unit/skill/Actions.java" />
+        <option value="$PROJECT_DIR$/Data/raw/Dialog.txt" />
+        <option value="$PROJECT_DIR$/src/com/ga/game/MenuPlayer.java" />
+        <option value="$PROJECT_DIR$/Data/raw/Recipe.txt" />
+        <option value="$PROJECT_DIR$/src/com/ga/unit/item/Crafts.java" />
+        <option value="$PROJECT_DIR$/Data/raw/Armor.txt" />
+        <option value="$PROJECT_DIR$/todo" />
+        <option value="$PROJECT_DIR$/src/com/ga/unit/Unit.java" />
+        <option value="$PROJECT_DIR$/src/com/ga/unit/skill/Buffs.java" />
+        <option value="$PROJECT_DIR$/src/com/ga/unit/Stock.java" />
+        <option value="$PROJECT_DIR$/src/com/ga/unit/Intelligence.java" />
       </list>
     </option>
   </component>
@@ -232,6 +533,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -242,28 +544,20 @@
             <path>
               <item name="asdf" type="b2602c69:ProjectViewProjectNode" />
               <item name="asdf" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="Data" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="asdf" type="b2602c69:ProjectViewProjectNode" />
               <item name="asdf" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="ga" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="asdf" type="b2602c69:ProjectViewProjectNode" />
-              <item name="asdf" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="ga" type="462c0819:PsiDirectoryNode" />
+              <item name="Data" type="462c0819:PsiDirectoryNode" />
               <item name="map" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
       <pane id="AndroidView" />
-      <pane id="Scope" />
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -318,6 +612,11 @@
       <module name="asdf" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
     </configuration>
+    <configuration name="Standalone_BiomeTest" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.ga.tool.Standalone_BiomeTest" />
+      <module name="asdf" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    </configuration>
     <configuration name="Standalone_ImageTool" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.ga.tool.Standalone_ImageTool" />
       <module name="asdf" />
@@ -356,10 +655,12 @@
       <item itemvalue="Application.Main" />
       <item itemvalue="Application.Test" />
       <item itemvalue="Application.Standalone_ImageTool" />
+      <item itemvalue="Application.Standalone_BiomeTest" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Application.Main" />
+        <item itemvalue="Application.Standalone_BiomeTest" />
         <item itemvalue="Application.Standalone_ImageTool" />
         <item itemvalue="Application.Test" />
       </list>
@@ -380,12 +681,13 @@
     <layout>
       <window_info anchor="right" id="Palette" order="3" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32965517" />
+      <window_info anchor="bottom" id="Messages" order="9" sideWeight="0.49739584" weight="0.2262069" />
       <window_info anchor="right" id="Palette&#9;" order="6" />
       <window_info id="Image Layers" order="6" />
       <window_info anchor="right" id="Capture Analysis" order="4" />
-      <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.50390625" side_tool="true" weight="0.2910345" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49544272" weight="0.27310345" />
+      <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.5052083" side_tool="true" weight="0.24827586" />
       <window_info anchor="bottom" id="Version Control" order="8" weight="0.25931033" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49479166" weight="0.24827586" />
       <window_info id="Capture Tool" order="3" />
       <window_info id="Designer" order="2" />
       <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49931034" visible="true" weight="0.16145833" />
@@ -393,15 +695,14 @@
       <window_info id="Structure" order="1" sideWeight="0.5006896" side_tool="true" weight="0.13541667" />
       <window_info id="UI Designer" order="4" />
       <window_info anchor="right" id="Theme Preview" order="5" />
-      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49609375" weight="0.2910345" />
       <window_info id="Favorites" order="5" sideWeight="0.5008696" side_tool="true" weight="0.13541667" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49544272" weight="0.2910345" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info anchor="bottom" id="Messages" order="9" sideWeight="0.49739584" weight="0.2262069" />
     </layout>
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -435,18 +736,14 @@
     <MESSAGE value="Stat rework" />
     <MESSAGE value="Data structure overhaul" />
     <MESSAGE value="Armors tiered, medical guild, crafting overhaul" />
-    <option name="LAST_COMMIT_MESSAGE" value="Armors tiered, medical guild, crafting overhaul" />
+    <MESSAGE value="Headgears, Performer overhaul, guild improve" />
+    <option name="LAST_COMMIT_MESSAGE" value="Headgears, Performer overhaul, guild improve" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="508" />
+      <option name="time" value="519" />
     </breakpoint-manager>
-    <watches-manager>
-      <configuration name="Application">
-        <watch expression="items.get()" language="JAVA" />
-      </configuration>
-    </watches-manager>
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="breakpointCondition">
@@ -504,52 +801,52 @@
     </expressions>
     <expressions id="watch">
       <expression>
+        <expression-string>Tags.trainables[seed % Tags.trainables.length].name()</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>Tags.trainables[seed % Tags.trainables.length].name</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>Tags.trainables[seed % Tags.trainables.length]</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>Traits.Trait.getByName(Tags.trainables[seed % Tags.trainables.length].name())</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>propString.get()</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>propString</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>prop</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>possibleBuildings</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>estate</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
         <expression-string>items.get()</expression-string>
-        <language-id>JAVA</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>items</expression-string>
-        <language-id>JAVA</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>items.size()</expression-string>
-        <language-id>JAVA</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>&quot;B_1_10_0&quot;.split(&quot;_&quot;)</expression-string>
-        <language-id>JAVA</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>&quot;_1&quot;.split(&quot;_&quot;)</expression-string>
-        <language-id>JAVA</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>Panel.forecolor2</expression-string>
-        <language-id>JAVA</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>player.getTitle()</expression-string>
-        <language-id>JAVA</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>Math.round(armor[piece].getPercentage() * 10)</expression-string>
-        <language-id>JAVA</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>host.getAvailableProps(e -&gt; e.name.toLowerCase().contains(&quot;table&quot;) || e.name.toLowerCase().contains(&quot;desk&quot;)).getFirst()</expression-string>
-        <language-id>JAVA</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>host.getAvailableProps(e -&gt; e.name.toLowerCase().contains(&quot;table&quot;) || e.name.toLowerCase().contains(&quot;desk&quot;))</expression-string>
         <language-id>JAVA</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
@@ -563,352 +860,688 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/item/Item.java">
+    <entry file="file://$PROJECT_DIR$/Data/Editor_Keymap.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="158">
-          <caret line="510" column="70" lean-forward="true" selection-start-line="510" selection-start-column="70" selection-end-line="510" selection-end-column="70" />
-          <folding>
-            <element signature="e#10193#10194#0" expanded="true" />
-            <element signature="e#10251#10252#0" expanded="true" />
-            <element signature="e#15726#15727#0" expanded="true" />
-            <element signature="e#15771#15772#0" expanded="true" />
-            <element signature="e#18006#18007#0" expanded="true" />
-            <element signature="e#18092#18093#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Data/raw/Dialog.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="16" column="27" lean-forward="true" selection-start-line="16" selection-start-column="27" selection-end-line="16" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/connection/Server.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="305">
-          <caret line="109" selection-start-line="109" selection-end-line="109" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/map/MapName.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="20" column="19" selection-start-line="20" selection-start-column="19" selection-end-line="20" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://C:/Program Files/Java/jdk-10.0.1/lib/src.zip!/java.base/java/util/ArrayList.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="167">
-          <caret line="890" selection-start-line="890" selection-end-line="890" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/item/Food.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="57" column="16" selection-start-line="57" selection-start-column="16" selection-end-line="57" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Data/map/ins/B_1_18_0.map">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="102">
-          <caret line="3" column="5265" selection-start-line="3" selection-start-column="5265" selection-end-line="3" selection-end-column="5265" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/man/Inventory.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="422">
-          <caret line="49" selection-start-line="49" selection-end-line="49" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Prop.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="422">
-          <caret line="122" selection-start-line="122" selection-end-line="122" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/item/ArmorSet.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="155">
-          <caret line="127" column="16" selection-start-line="127" selection-start-column="16" selection-end-line="127" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Data/raw/Man.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="425">
-          <caret line="38" lean-forward="true" selection-start-line="38" selection-end-line="38" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Data/map/Player.user">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="13" selection-start-column="13" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/map/Updater.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="38" column="5" selection-start-line="38" selection-start-column="5" selection-end-line="38" selection-end-column="5" />
-          <folding>
-            <element signature="e#5410#5411#0" expanded="true" />
-            <element signature="e#5463#5464#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/game/Settings.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="167">
-          <caret line="19" column="15" selection-start-line="19" selection-start-column="15" selection-end-line="19" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/man/Player.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="223">
-          <caret line="28" column="28" lean-forward="true" selection-start-line="28" selection-start-column="28" selection-end-line="28" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/PlayerInput.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="144" column="30" selection-start-line="144" selection-start-column="30" selection-end-line="144" selection-end-column="30" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Data/raw/Settings.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" column="5" selection-start-line="10" selection-start-column="5" selection-end-line="10" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Body.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="177">
-          <caret line="204" column="19" selection-start-line="204" selection-start-column="19" selection-end-line="204" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/man/BodyHumanoid.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="56" column="31" selection-start-line="56" selection-start-column="16" selection-end-line="56" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Unit.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="157" selection-start-line="157" selection-end-line="157" />
-          <folding>
-            <element signature="e#3786#3787#0" expanded="true" />
-            <element signature="e#3854#3855#0" expanded="true" />
-            <element signature="e#4613#4614#0" expanded="true" />
-            <element signature="e#4645#4646#0" expanded="true" />
-            <element signature="e#5256#5257#0" expanded="true" />
-            <element signature="e#5288#5289#0" expanded="true" />
-            <element signature="e#11978#11979#0" expanded="true" />
-            <element signature="e#12017#12018#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Behavior.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="269">
-          <caret line="161" selection-start-line="161" selection-end-line="161" />
-          <folding>
-            <element signature="e#6517#6518#0" expanded="true" />
-            <element signature="e#6544#6545#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Strategy.java">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/game/Command.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="192">
-          <caret line="51" column="30" lean-forward="true" selection-start-line="51" selection-start-column="30" selection-end-line="51" selection-end-column="30" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Data/raw/Weapon.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="427">
-          <caret line="35" column="33" selection-start-line="35" selection-start-column="33" selection-end-line="35" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Data/raw/Etc.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="20" column="14" selection-start-line="20" selection-start-column="14" selection-end-line="20" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Data/raw/Recipe.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="20" column="42" lean-forward="true" selection-start-line="20" selection-start-column="42" selection-end-line="20" selection-end-column="42" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Data/raw/Shop.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" column="158" selection-start-line="2" selection-start-column="158" selection-end-line="2" selection-end-column="158" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Data/raw/Armor.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="475">
-          <caret line="93" selection-start-line="93" selection-end-line="93" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Data/raw/Pawn.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="9" selection-start-line="9" selection-end-line="9" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Data/map/building/inside/Outpost_0.map">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" selection-start-line="2" selection-end-line="2" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/AI.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="505">
-          <caret line="164" column="9" selection-start-line="164" selection-start-column="9" selection-end-line="164" selection-end-column="9" />
-          <folding>
-            <element signature="e#5076#5077#0" expanded="true" />
-            <element signature="e#5114#5115#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/game/Dialog.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="19" column="25" selection-start-line="19" selection-start-column="25" selection-end-line="19" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Data/item/Threadball.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/game/Processes.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="205">
-          <caret line="54" column="28" lean-forward="true" selection-start-line="54" selection-start-column="28" selection-end-line="54" selection-end-column="28" />
-          <folding>
-            <element signature="e#2684#2685#0" expanded="true" />
-            <element signature="e#2720#2721#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://C:/Program Files/Java/jdk-10.0.1/lib/src.zip!/java.base/java/lang/Thread.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-450">
-          <caret line="403" column="48" selection-start-line="403" selection-start-column="48" selection-end-line="403" selection-end-column="48" />
-          <folding>
-            <element signature="e#17393#17394#0" expanded="true" />
-            <element signature="e#17459#17460#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://C:/Program Files/Java/jdk-10.0.1/lib/src.zip!/java.base/java/lang/Runnable.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="580">
-          <caret line="67" column="25" selection-start-line="67" selection-start-column="25" selection-end-line="67" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Intelligence.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="378">
-          <caret line="534" selection-start-line="534" selection-end-line="534" />
-          <folding>
-            <element signature="docComment;class#Intelligence#0" />
-            <element signature="class#473:628" />
-            <element signature="method#make#0;class#473:628" />
-            <element signature="class#530:618" />
-            <element signature="class#637:2321" />
-            <element signature="method#make#0;class#637:2321" />
-            <element signature="class#693:2312" />
-            <element signature="method#load#0;class#693:2312" />
-            <element signature="method#hear#0;class#693:2312" />
-            <element signature="method#perceived#0;class#693:2312" />
-            <element signature="method#update#0;class#693:2312" />
-            <element signature="class#2329:3830" />
-            <element signature="method#make#0;class#2329:3830" />
-            <element signature="class#2385:3812" />
-            <element signature="method#onAttack#0;class#2385:3812" />
-            <element signature="method#hear#0;class#2385:3812" />
-            <element signature="method#perceived#0;class#2385:3812" />
-            <element signature="method#perceived#0;class#21767:23995" />
-            <element signature="method#process#0;class#Intelligence#0" />
-            <element signature="method#load#0;class#Intelligence#0" />
-          </folding>
+        <state relative-caret-position="15">
+          <caret line="1" column="8" selection-start-line="1" selection-start-column="8" selection-end-line="1" selection-end-column="8" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/ga/map/EditorInput.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="252">
-          <caret line="502" column="79" lean-forward="true" selection-start-line="502" selection-start-column="79" selection-end-line="502" selection-end-column="79" />
+        <state relative-caret-position="285">
+          <caret line="177" selection-start-line="177" selection-end-line="177" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/game/MenuShop.java">
+    <entry file="file://$PROJECT_DIR$/Data/raw/Man.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="332">
-          <caret line="106" column="1" selection-start-line="106" selection-start-column="1" selection-end-line="106" selection-end-column="1" />
+        <state relative-caret-position="165">
+          <caret line="11" column="28" selection-start-line="11" selection-start-column="28" selection-end-line="11" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Data/raw/Shop.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="8" selection-start-line="8" selection-end-line="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Data/map/ins/_2.map" />
+    <entry file="file://$PROJECT_DIR$/src/com/ga/tool/Standalone_BiomeTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="16" column="39" lean-forward="true" selection-start-line="16" selection-start-column="39" selection-end-line="16" selection-end-column="39" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Data/map/building/inside/Hospital_0.map">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" selection-start-line="1" selection-end-line="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/map/Generator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="423">
+          <caret line="131" selection-start-line="131" selection-end-line="131" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Data/map/building/Hospital.map">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Data/map/building/Cave.map">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="61" lean-forward="true" selection-start-line="3" selection-start-column="61" selection-end-line="3" selection-end-column="61" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Data/map/building/inside/Cave_0.map">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="303" lean-forward="true" selection-start-line="3" selection-start-column="303" selection-end-line="3" selection-end-column="303" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/item/Item.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="175">
+          <caret line="552" column="16" selection-start-line="552" selection-start-column="16" selection-end-line="552" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Traits.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-405" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/map/Updater.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="175" selection-start-line="175" selection-end-line="175" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/game/Command.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="183">
+          <caret line="39" column="35" selection-start-line="39" selection-start-column="35" selection-end-line="39" selection-end-column="35" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Data/item/armor/Template.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Data/map/Template.user">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="82" lean-forward="true" selection-start-column="82" selection-end-column="82" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/man/Player.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="480">
+          <caret line="38" selection-start-line="38" selection-end-line="38" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/man/MainPlayer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="84" selection-start-line="84" selection-end-line="84" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/skill/Stat.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="13" selection-start-line="13" selection-end-line="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Data/map/ins/_0.map" />
+    <entry file="file://$PROJECT_DIR$/Data/map/ins/_1.map">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Data/raw/Object.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="490">
+          <caret line="34" column="35" lean-forward="true" selection-start-line="34" selection-start-column="35" selection-end-line="34" selection-end-column="35" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Faction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="18" column="5" lean-forward="true" selection-start-line="18" selection-start-column="5" selection-end-line="18" selection-end-column="5" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/ga/map/Map.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="132" selection-start-line="132" selection-end-line="132" />
+        <state relative-caret-position="407">
+          <caret line="341" column="5" lean-forward="true" selection-start-line="341" selection-start-column="5" selection-end-line="341" selection-end-column="5" />
+          <folding>
+            <element signature="e#12756#12757#0" expanded="true" />
+            <element signature="e#12795#12796#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/game/MenuPlayer.java">
+    <entry file="file://$PROJECT_DIR$/src/com/ga/map/GenerateForest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="147" column="50" lean-forward="true" selection-start-line="147" selection-start-column="50" selection-end-line="147" selection-end-column="50" />
+        <state relative-caret-position="210">
+          <caret line="14" column="60" lean-forward="true" selection-start-line="14" selection-start-column="60" selection-end-line="14" selection-end-column="60" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Data/unit/Dog.2d">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Data/map/Player.user">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="103" selection-start-column="103" selection-end-column="103" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/map/Terrain.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="315">
+          <caret line="21" column="20" lean-forward="true" selection-start-line="21" selection-start-column="20" selection-end-line="21" selection-end-column="20" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/tool/T.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="4" column="13" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/map/GeneratePlains.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="218">
+          <caret line="20" selection-start-line="20" selection-end-line="20" />
+          <folding>
+            <element signature="e#587#588#0" expanded="true" />
+            <element signature="e#655#656#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/map/GenerateBiome.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="257">
+          <caret line="26" column="81" selection-start-line="26" selection-start-column="81" selection-end-line="26" selection-end-column="81" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Data/unit/Man.2d">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="405">
+          <caret line="27" column="30" lean-forward="true" selection-start-line="27" selection-start-column="30" selection-end-line="27" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Data/unit/Slime.2d">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="5" selection-start-line="3" selection-start-column="5" selection-end-line="3" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Prop.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="368">
+          <caret line="61" column="16" selection-start-line="61" selection-start-column="16" selection-end-line="61" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/item/Projectile.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="273">
+          <caret line="44" column="16" selection-start-line="44" selection-start-column="16" selection-end-line="44" selection-end-column="16" />
+          <folding>
+            <element signature="e#1078#1079#0" expanded="true" />
+            <element signature="e#1101#1102#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/skill/Actions.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="517" column="6" lean-forward="true" selection-start-line="517" selection-start-column="6" selection-end-line="517" selection-end-column="6" />
+          <folding>
+            <element signature="docComment;class#Actions#0" />
+            <element signature="class#626:1336" />
+            <element signature="method#isDynamicAnimation#0;class#626:1336" />
+            <element signature="method#canSet#0;class#626:1336" />
+            <element signature="method#onSet#1;class#626:1336" />
+            <element signature="class#1343:2151" />
+            <element signature="method#isDynamicAnimation#0;class#1343:2151" />
+            <element signature="method#canSet#0;class#1343:2151" />
+            <element signature="method#onSet#1;class#1343:2151" />
+            <element signature="class#2159:2865" />
+            <element signature="method#isDynamicAnimation#0;class#2159:2865" />
+            <element signature="method#canSet#0;class#2159:2865" />
+            <element signature="method#onSet#1;class#2159:2865" />
+            <element signature="class#2875:3246" />
+            <element signature="method#onSet#0;class#2875:3246" />
+            <element signature="class#3255:3772" />
+            <element signature="method#isDynamicAnimation#0;class#3255:3772" />
+            <element signature="method#canSet#0;class#3255:3772" />
+            <element signature="method#onFinish#0;class#3255:3772" />
+            <element signature="class#3782:4319" />
+            <element signature="method#isDynamicAnimation#0;class#3782:4319" />
+            <element signature="method#canSet#0;class#3782:4319" />
+            <element signature="method#onSet#0;class#3782:4319" />
+            <element signature="method#onFinish#0;class#3782:4319" />
+            <element signature="class#4330:4878" />
+            <element signature="method#isDynamicAnimation#0;class#4330:4878" />
+            <element signature="method#canSet#0;class#4330:4878" />
+            <element signature="method#onFinish#0;class#4330:4878" />
+            <element signature="class#4889:6483" />
+            <element signature="method#onSet#0;class#4889:6483" />
+            <element signature="method#onFinish#0;class#4889:6483" />
+            <element signature="class#6497:6731" />
+            <element signature="method#onSet#0;class#6497:6731" />
+            <element signature="class#6736:7439" />
+            <element signature="method#canSet#0;class#6736:7439" />
+            <element signature="method#onSet#0;class#6736:7439" />
+            <element signature="class#7462:7543" />
+            <element signature="class#7557:8584" />
+            <element signature="method#onSet#0;class#7557:8584" />
+            <element signature="e#7651#8566#0" />
+            <element signature="class#8598:9668" />
+            <element signature="method#onSet#0;class#8598:9668" />
+            <element signature="e#8692#9650#0" />
+            <element signature="class#9714:9757" />
+            <element signature="initializer##0;class#9714:9757" />
+            <element signature="class#9758:10890" />
+            <element signature="method#isDynamicAnimation#0;class#9758:10890" />
+            <element signature="method#onSet#0;class#9758:10890" />
+            <element signature="method#update#0;class#9758:10890" />
+            <element signature="method#checkEnemy#0;class#9758:10890" />
+            <element signature="class#10916:10959" />
+            <element signature="initializer##0;class#10916:10959" />
+            <element signature="class#10960:11663" />
+            <element signature="method#onSet#0;class#10960:11663" />
+            <element signature="method#update#0;class#10960:11663" />
+            <element signature="method#onFinish#0;class#10960:11663" />
+            <element signature="class#11690:11705" />
+            <element signature="initializer##0;class#11690:11705" />
+            <element signature="class#11706:12742" />
+            <element signature="method#trigger#0;class#11706:12742" />
+            <element signature="method#trigger#1;class#11706:12742" />
+            <element signature="class#12211:12634" />
+            <element signature="method#draw#0;class#12211:12634" />
+            <element signature="class#12785:12827" />
+            <element signature="initializer##0;class#12785:12827" />
+            <element signature="class#12828:14660" />
+            <element signature="method#trigger#0;class#12828:14660" />
+            <element signature="class#13430:14241" />
+            <element signature="method#stuck#0;class#13430:14241" />
+            <element signature="method#onAttack#0;class#13430:14241" />
+            <element signature="method#update#0;class#13430:14241" />
+            <element signature="class#14708:14751" />
+            <element signature="initializer##0;class#14708:14751" />
+            <element signature="class#14752:15337" />
+            <element signature="method#onSet#0;class#14752:15337" />
+            <element signature="class#15367:15382" />
+            <element signature="initializer##0;class#15367:15382" />
+            <element signature="class#15383:15574" />
+            <element signature="class#15619:15661" />
+            <element signature="initializer##0;class#15619:15661" />
+            <element signature="class#15662:15928" />
+            <element signature="method#onSet#0;class#15662:15928" />
+            <element signature="method#trigger#0;class#15662:15928" />
+            <element signature="class#15971:16013" />
+            <element signature="initializer##0;class#15971:16013" />
+            <element signature="class#16014:16899" />
+            <element signature="method#onSet#0;class#16014:16899" />
+            <element signature="method#update#0;class#16014:16899" />
+            <element signature="class#16924:16966" />
+            <element signature="initializer##0;class#16924:16966" />
+            <element signature="class#16967:17545" />
+            <element signature="method#trigger#0;class#16967:17545" />
+            <element signature="class#17588:17630" />
+            <element signature="initializer##0;class#17588:17630" />
+            <element signature="class#17631:19771" />
+            <element signature="method#trigger#0;class#17631:19771" />
+            <element signature="class#18148:19134" />
+            <element signature="method#onUnequip#0;class#18148:19134" />
+            <element signature="method#getLine#0;class#18148:19134" />
+            <element signature="method#update#0;class#18148:19134" />
+            <element signature="class#19822:19892" />
+            <element signature="initializer##0;class#19822:19892" />
+            <element signature="class#19893:20778" />
+            <element signature="method#onSet#0;class#19893:20778" />
+            <element signature="method#update#0;class#19893:20778" />
+            <element signature="class#20828:20870" />
+            <element signature="initializer##0;class#20828:20870" />
+            <element signature="class#20871:21709" />
+            <element signature="method#onSet#0;class#20871:21709" />
+            <element signature="method#update#0;class#20871:21709" />
+            <element signature="class#21756:21798" />
+            <element signature="initializer##0;class#21756:21798" />
+            <element signature="class#21799:23389" />
+            <element signature="method#canSet#0;class#21799:23389" />
+            <element signature="method#onSet#0;class#21799:23389" />
+            <element signature="method#update#0;class#21799:23389" />
+            <element signature="class#23431:23473" />
+            <element signature="initializer##0;class#23431:23473" />
+            <element signature="class#23474:25280" />
+            <element signature="method#trigger#0;class#23474:25280" />
+            <element signature="method#update#0;class#23474:25280" />
+            <element signature="class#24323:24782" />
+            <element signature="method#draw#0;class#24323:24782" />
+            <element signature="class#25323:25365" />
+            <element signature="initializer##0;class#25323:25365" />
+            <element signature="class#25366:26453" />
+            <element signature="method#trigger#0;class#25366:26453" />
+            <element signature="class#25926:26349" />
+            <element signature="method#draw#0;class#25926:26349" />
+            <element signature="class#26508:26550" />
+            <element signature="initializer##0;class#26508:26550" />
+            <element signature="class#26551:27227" />
+            <element signature="method#onSet#0;class#26551:27227" />
+            <element signature="e#26671#26765#0" />
+            <element signature="method#update#0;class#26551:27227" />
+            <element signature="class#27270:27312" />
+            <element signature="initializer##0;class#27270:27312" />
+            <element signature="class#27313:27494" />
+            <element signature="method#trigger#0;class#27313:27494" />
+            <element signature="class#27543:27585" />
+            <element signature="initializer##0;class#27543:27585" />
+            <element signature="class#27586:28309" />
+            <element signature="method#onSet#0;class#27586:28309" />
+            <element signature="method#update#0;class#27586:28309" />
+            <element signature="method#trigger#0;class#27586:28309" />
+            <element signature="class#28357:28427" />
+            <element signature="initializer##0;class#28357:28427" />
+            <element signature="class#28428:29398" />
+            <element signature="method#canSet#0;class#28428:29398" />
+            <element signature="method#onSet#0;class#28428:29398" />
+            <element signature="class#29454:29496" />
+            <element signature="initializer##0;class#29454:29496" />
+            <element signature="class#29497:30093" />
+            <element signature="method#onSet#0;class#29497:30093" />
+            <element signature="method#update#0;class#29497:30093" />
+            <element signature="method#trigger#0;class#29497:30093" />
+            <element signature="class#30160:30202" />
+            <element signature="initializer##0;class#30160:30202" />
+            <element signature="class#30203:30604" />
+            <element signature="method#trigger#0;class#30203:30604" />
+            <element signature="class#30640:31153" />
+            <element signature="method#onSet#0;class#30640:31153" />
+            <element signature="class#31195:31237" />
+            <element signature="initializer##0;class#31195:31237" />
+            <element signature="class#31264:31306" />
+            <element signature="initializer##0;class#31264:31306" />
+            <element signature="class#31307:31543" />
+            <element signature="method#trigger#0;class#31307:31543" />
+            <element signature="class#31572:31614" />
+            <element signature="initializer##0;class#31572:31614" />
+            <element signature="class#31615:31901" />
+            <element signature="method#onSet#0;class#31615:31901" />
+            <element signature="class#31928:31970" />
+            <element signature="initializer##0;class#31928:31970" />
+            <element signature="class#31971:32135" />
+            <element signature="class#32195:32237" />
+            <element signature="initializer##0;class#32195:32237" />
+            <element signature="class#32238:34292" />
+            <element signature="method#isDynamicAnimation#0;class#32238:34292" />
+            <element signature="method#canSet#0;class#32238:34292" />
+            <element signature="method#onSet#0;class#32238:34292" />
+            <element signature="method#update#0;class#32238:34292" />
+            <element signature="class#33152:33575" />
+            <element signature="method#draw#0;class#33152:33575" />
+            <element signature="class#34319:34386" />
+            <element signature="initializer##0;class#34319:34386" />
+            <element signature="class#34387:35200" />
+            <element signature="method#canSet#0;class#34387:35200" />
+            <element signature="method#trigger#0;class#34387:35200" />
+            <element signature="class#35249:35291" />
+            <element signature="initializer##0;class#35249:35291" />
+            <element signature="class#35292:35546" />
+            <element signature="method#trigger#0;class#35292:35546" />
+            <element signature="class#35592:35637" />
+            <element signature="initializer##0;class#35592:35637" />
+            <element signature="class#35638:38590" />
+            <element signature="method#onSet#0;class#35638:38590" />
+            <element signature="class#36738:36908" />
+            <element signature="class#38150:38336" />
+            <element signature="class#38620:38665" />
+            <element signature="initializer##0;class#38620:38665" />
+            <element signature="class#38666:40191" />
+            <element signature="method#trigger#0;class#38666:40191" />
+            <element signature="class#38953:39522" />
+            <element signature="method#onAttack#0;class#38953:39522" />
+            <element signature="method#stuck#0;class#39034:39610" />
+            <element signature="method#update#0;class#38953:39522" />
+            <element signature="class#40222:40267" />
+            <element signature="initializer##0;class#40222:40267" />
+            <element signature="class#40268:40587" />
+            <element signature="method#trigger#0;class#40268:40587" />
+            <element signature="class#40617:40662" />
+            <element signature="initializer##0;class#40617:40662" />
+            <element signature="class#40663:41398" />
+            <element signature="method#trigger#0;class#40663:41398" />
+            <element signature="class#41444:41489" />
+            <element signature="initializer##0;class#41444:41489" />
+            <element signature="class#41490:43046" />
+            <element signature="method#update#0;class#41490:43046" />
+            <element signature="class#43092:43160" />
+            <element signature="initializer##0;class#43092:43160" />
+            <element signature="class#43161:44784" />
+            <element signature="method#trigger#0;class#43161:44784" />
+            <element signature="class#43441:44553" />
+            <element signature="method#stuck#0;class#43441:44553" />
+            <element signature="method#update#0;class#43441:44553" />
+            <element signature="class#44817:44881" />
+            <element signature="initializer##0;class#44817:44881" />
+            <element signature="class#44882:46586" />
+            <element signature="method#trigger#0;class#44882:46586" />
+            <element signature="class#45115:46191" />
+            <element signature="method#stuck#0;class#45115:46191" />
+            <element signature="method#update#0;class#45115:46191" />
+            <element signature="class#46640:46707" />
+            <element signature="initializer##0;class#46640:46707" />
+            <element signature="class#46708:48329" />
+            <element signature="method#update#0;class#46708:48329" />
+            <element signature="method#update#1;class#46708:48329" />
+            <element signature="class#47374:47899" />
+            <element signature="class#48360:48449" />
+            <element signature="initializer##0;class#48360:48449" />
+            <element signature="class#48450:50361" />
+            <element signature="method#update#0;class#48450:50361" />
+            <element signature="class#48889:50021" />
+            <element signature="method#onAttack#0;class#48889:50021" />
+            <element signature="method#stuck#0;class#48889:50021" />
+            <element signature="method#update#0;class#48889:50021" />
+            <element signature="class#50387:50425" />
+            <element signature="initializer##0;class#50387:50425" />
+            <element signature="class#50426:51181" />
+            <element signature="method#onSet#0;class#50426:51181" />
+            <element signature="class#51207:51245" />
+            <element signature="initializer##0;class#51207:51245" />
+            <element signature="class#51246:51834" />
+            <element signature="method#trigger#0;class#51246:51834" />
+            <element signature="class#51868:51936" />
+            <element signature="initializer##0;class#51868:51936" />
+            <element signature="class#51937:53289" />
+            <element signature="method#trigger#0;class#51937:53289" />
+            <element signature="class#52359:52697" />
+            <element signature="method#die#0;class#52359:52697" />
+            <element signature="class#53337:53397" />
+            <element signature="initializer##0;class#53337:53397" />
+            <element signature="class#53398:56549" />
+            <element signature="method#onSet#0;class#53398:56549" />
+            <element signature="class#54828:55197" />
+            <element signature="method#draw#0;class#54828:55197" />
+            <element signature="class#56593:56631" />
+            <element signature="initializer##0;class#56593:56631" />
+            <element signature="class#56632:57494" />
+            <element signature="method#trigger#0;class#56632:57494" />
+            <element signature="class#57537:57575" />
+            <element signature="initializer##0;class#57537:57575" />
+            <element signature="class#57576:58352" />
+            <element signature="method#trigger#0;class#57576:58352" />
+            <element signature="class#58401:58438" />
+            <element signature="initializer##0;class#58401:58438" />
+            <element signature="class#58439:60968" />
+            <element signature="method#trigger#0;class#58439:60968" />
+            <element signature="class#59545:59797" />
+            <element signature="method#draw#0;class#59545:59797" />
+            <element signature="class#61012:61078" />
+            <element signature="initializer##0;class#61012:61078" />
+            <element signature="class#61079:62571" />
+            <element signature="method#update#0;class#61079:62571" />
+            <element signature="class#61582:62314" />
+            <element signature="method#onAttack#0;class#61582:62314" />
+            <element signature="method#update#0;class#61582:62314" />
+            <element signature="class#62624:62690" />
+            <element signature="initializer##0;class#62624:62690" />
+            <element signature="class#62691:64276" />
+            <element signature="method#update#0;class#62691:64276" />
+            <element signature="class#62994:63963" />
+            <element signature="method#stuck#0;class#62994:63963" />
+            <element signature="method#update#0;class#62994:63963" />
+            <element signature="class#64330:64396" />
+            <element signature="initializer##0;class#64330:64396" />
+            <element signature="class#64397:67328" />
+            <element signature="method#onFinish#0;class#64397:67328" />
+            <element signature="method#trigger#0;class#64397:67328" />
+            <element signature="method#update#0;class#64397:67328" />
+            <element signature="class#65747:66054" />
+            <element signature="method#draw#0;class#65747:66054" />
+            <element signature="class#67373:67414" />
+            <element signature="initializer##0;class#67373:67414" />
+            <element signature="class#67415:69899" />
+            <element signature="method#trigger#0;class#67415:69899" />
+            <element signature="e#68973#69432#0" />
+            <element signature="method#update#0;class#67415:69899" />
+            <element signature="class#69929:69970" />
+            <element signature="initializer##0;class#69929:69970" />
+            <element signature="class#69971:70780" />
+            <element signature="method#canSet#0;class#69971:70780" />
+            <element signature="class#70809:70872" />
+            <element signature="initializer##0;class#70809:70872" />
+            <element signature="class#70873:71415" />
+            <element signature="method#trigger#0;class#70873:71415" />
+            <element signature="class#71444:71484" />
+            <element signature="initializer##0;class#71444:71484" />
+            <element signature="class#71485:71904" />
+            <element signature="method#update#0;class#71485:71904" />
+            <element signature="class#71935:71999" />
+            <element signature="initializer##0;class#71935:71999" />
+            <element signature="class#72000:73275" />
+            <element signature="method#onSet#0;class#72000:73275" />
+            <element signature="class#72180:73258" />
+            <element signature="method#update#0;class#72180:73258" />
+            <element signature="class#73307:73347" />
+            <element signature="initializer##0;class#73307:73347" />
+            <element signature="class#73348:76256" />
+            <element signature="method#update#0;class#73348:76256" />
+            <element signature="class#74583:74836" />
+            <element signature="method#draw#0;class#74583:74836" />
+            <element signature="class#76287:76327" />
+            <element signature="initializer##0;class#76287:76327" />
+            <element signature="class#76328:76632" />
+            <element signature="method#update#0;class#76328:76632" />
+            <element signature="class#76661:76724" />
+            <element signature="initializer##0;class#76661:76724" />
+            <element signature="class#76725:78109" />
+            <element signature="method#trigger#0;class#76725:78109" />
+            <element signature="class#76904:78078" />
+            <element signature="method#update#0;class#76904:78078" />
+            <element signature="e#78361#78669#0" />
+            <element signature="e#78674#78865#0" />
+            <element signature="e#78870#79881#0" />
+            <element signature="e#80329#80464#0" />
+            <element signature="e#81625#81740#0" />
+            <element signature="e#82133#82356#0" />
+            <element signature="e#82361#82753#0" />
+            <element signature="e#82758#82952#0" />
+            <element signature="e#83019#83400#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/map/GenerateTown.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Data/raw/Dialog.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="10" column="96" lean-forward="true" selection-start-line="10" selection-start-column="96" selection-end-line="10" selection-end-column="96" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/game/MenuPlayer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="113" column="56" lean-forward="true" selection-start-line="113" selection-start-column="56" selection-end-line="113" selection-end-column="56" />
+          <folding>
+            <element signature="e#4249#4489#0" expanded="true" />
+            <element signature="e#4488#4489#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Data/raw/Weapon.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="6" column="30" lean-forward="true" selection-start-line="6" selection-start-column="30" selection-end-line="6" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Data/raw/Etc.txt">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/item/Crafts.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="272">
+          <caret line="87" selection-start-line="87" selection-end-line="87" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Data/raw/Armor.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="460">
+          <caret line="62" selection-start-line="62" selection-end-line="62" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Data/raw/Recipe.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="12" column="68" lean-forward="true" selection-start-line="12" selection-start-column="68" selection-end-line="12" selection-end-column="68" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/todo">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Data/object/Map.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/skill/Buffs.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="168">
+          <caret line="804" column="29" selection-start-line="804" selection-start-column="29" selection-end-line="804" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Unit.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="452">
+          <caret line="291" selection-start-line="291" selection-end-line="291" />
+          <folding>
+            <element signature="e#2107#2479#0" expanded="true" />
+            <element signature="e#2478#2479#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Stock.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="1312" column="26" selection-start-line="1312" selection-start-column="26" selection-end-line="1312" selection-end-column="26" />
+        <state relative-caret-position="257">
+          <caret line="1291" column="57" lean-forward="true" selection-start-line="1291" selection-start-column="57" selection-end-line="1291" selection-end-column="57" />
           <folding>
             <element signature="docComment;class#Stock#0" />
             <element signature="class#622:868" />
@@ -959,324 +1592,267 @@
             <element signature="method#stateUpdate#0;class#7924:9251" />
             <element signature="method#die#0;class#7924:9251" />
             <element signature="method#onCreate#0;class#7924:9251" />
-            <element signature="class#9344:11105" />
-            <element signature="method#make#0;class#9344:11105" />
-            <element signature="class#9412:11023" />
-            <element signature="method#stateSet#0;class#9412:11023" />
-            <element signature="method#moveTriggered#0;class#9412:11023" />
-            <element signature="method#buff#0;class#9412:11023" />
-            <element signature="method#onCreate#0;class#9412:11023" />
-            <element signature="method#die#0;class#9412:11023" />
-            <element signature="class#11115:12587" />
-            <element signature="method#make#0;class#11115:12587" />
-            <element signature="class#11183:12417" />
-            <element signature="method#collide#0;class#11183:12417" />
-            <element signature="method#stateSet#0;class#11183:12417" />
-            <element signature="method#die#0;class#11183:12417" />
-            <element signature="method#onCreate#0;class#11183:12417" />
-            <element signature="class#12601:14073" />
-            <element signature="method#make#0;class#12601:14073" />
-            <element signature="class#12669:13958" />
-            <element signature="method#collide#0;class#12669:13958" />
-            <element signature="method#update#0;class#12669:13958" />
-            <element signature="method#onCreate#0;class#12669:13958" />
-            <element signature="class#14085:14550" />
-            <element signature="method#make#0;class#14085:14550" />
-            <element signature="class#14153:14435" />
-            <element signature="method#onCreate#0;class#14153:14435" />
-            <element signature="class#15287:15757" />
-            <element signature="method#stuck#0;class#15287:15757" />
-            <element signature="method#onAttack#0;class#15287:15757" />
-            <element signature="e#53144#53145#0" expanded="true" />
-            <element signature="e#53227#53228#0" expanded="true" />
-            <element signature="e#55133#55134#0" expanded="true" />
-            <element signature="e#55227#55228#0" expanded="true" />
-            <element signature="e#56509#56510#0" expanded="true" />
-            <element signature="e#56595#56596#0" expanded="true" />
-            <element signature="e#57200#57201#0" expanded="true" />
-            <element signature="e#57302#57303#0" expanded="true" />
-            <element signature="e#59268#59269#0" expanded="true" />
-            <element signature="e#59355#59356#0" expanded="true" />
-            <element signature="e#59731#59732#0" expanded="true" />
-            <element signature="e#59814#59815#0" expanded="true" />
-            <element signature="e#60718#60719#0" expanded="true" />
-            <element signature="e#60814#60815#0" expanded="true" />
-            <element signature="e#61372#61373#0" expanded="true" />
-            <element signature="e#61455#61456#0" expanded="true" />
-            <element signature="e#62558#62559#0" expanded="true" />
-            <element signature="e#62635#62636#0" expanded="true" />
-            <element signature="e#63100#63101#0" expanded="true" />
-            <element signature="e#63157#63158#0" expanded="true" />
-            <element signature="e#65034#65035#0" expanded="true" />
-            <element signature="e#65113#65114#0" expanded="true" />
-            <element signature="e#67702#67703#0" expanded="true" />
-            <element signature="e#67779#67780#0" expanded="true" />
+            <element signature="class#9344:11107" />
+            <element signature="method#make#0;class#9344:11107" />
+            <element signature="class#9412:11025" />
+            <element signature="method#stateSet#0;class#9412:11025" />
+            <element signature="method#moveTriggered#0;class#9412:11025" />
+            <element signature="method#buff#0;class#9412:11025" />
+            <element signature="method#onCreate#0;class#9412:11025" />
+            <element signature="method#die#0;class#9412:11025" />
+            <element signature="class#11117:12589" />
+            <element signature="method#make#0;class#11117:12589" />
+            <element signature="class#11185:12419" />
+            <element signature="method#collide#0;class#11185:12419" />
+            <element signature="method#stateSet#0;class#11185:12419" />
+            <element signature="method#die#0;class#11185:12419" />
+            <element signature="method#onCreate#0;class#11185:12419" />
+            <element signature="class#12603:14075" />
+            <element signature="method#make#0;class#12603:14075" />
+            <element signature="class#12671:13960" />
+            <element signature="method#collide#0;class#12671:13960" />
+            <element signature="method#update#0;class#12671:13960" />
+            <element signature="method#onCreate#0;class#12671:13960" />
+            <element signature="class#14087:14552" />
+            <element signature="method#make#0;class#14087:14552" />
+            <element signature="class#14155:14437" />
+            <element signature="method#onCreate#0;class#14155:14437" />
+            <element signature="class#14565:16561" />
+            <element signature="method#make#0;class#14565:16561" />
+            <element signature="class#14633:16479" />
+            <element signature="method#onCreate#0;class#14633:16479" />
+            <element signature="method#moveTriggered#0;class#14633:16479" />
+            <element signature="class#15289:15759" />
+            <element signature="method#stuck#0;class#15289:15759" />
+            <element signature="method#onAttack#0;class#15289:15759" />
+            <element signature="method#die#0;class#14633:16479" />
+            <element signature="class#16571:17487" />
+            <element signature="method#make#0;class#16571:17487" />
+            <element signature="class#16638:17322" />
+            <element signature="method#use#0;class#16638:17322" />
+            <element signature="class#17501:18391" />
+            <element signature="method#make#0;class#17501:18391" />
+            <element signature="class#17568:18319" />
+            <element signature="method#use#0;class#17568:18319" />
+            <element signature="method#getDescription#0;class#17568:18319" />
+            <element signature="class#18403:21349" />
+            <element signature="method#make#0;class#18403:21349" />
+            <element signature="class#18470:21289" />
+            <element signature="method#onCreate#0;class#18470:21289" />
+            <element signature="method#load#0;class#18470:21289" />
+            <element signature="method#checkIngredients#0;class#18470:21289" />
+            <element signature="method#use#0;class#18470:21289" />
+            <element signature="method#getDescription#0;class#18470:21289" />
+            <element signature="class#21363:23736" />
+            <element signature="method#make#0;class#21363:23736" />
+            <element signature="class#21436:23674" />
+            <element signature="method#onCreate#0;class#21436:23674" />
+            <element signature="method#use#0;class#21436:23674" />
+            <element signature="method#getName#0;class#21436:23674" />
+            <element signature="method#getDescription#0;class#21436:23674" />
+            <element signature="class#23746:24671" />
+            <element signature="method#make#0;class#23746:24671" />
+            <element signature="class#23886:24567" />
+            <element signature="method#use#0;class#23886:24567" />
+            <element signature="class#24683:25605" />
+            <element signature="method#make#0;class#24683:25605" />
+            <element signature="class#24750:25544" />
+            <element signature="method#use#0;class#24750:25544" />
+            <element signature="method#getFullName#0;class#24750:25544" />
+            <element signature="method#load#0;class#24750:25544" />
+            <element signature="class#25617:26993" />
+            <element signature="method#make#0;class#25617:26993" />
+            <element signature="class#25684:26899" />
+            <element signature="method#use#0;class#25684:26899" />
+            <element signature="method#makeSpell#0;class#25684:26899" />
+            <element signature="method#load#0;class#25684:26899" />
+            <element signature="method#getName#0;class#25684:26899" />
+            <element signature="class#27009:27770" />
+            <element signature="method#make#0;class#27009:27770" />
+            <element signature="class#27078:27675" />
+            <element signature="method#remove#0;class#27078:27675" />
+            <element signature="method#trigger#0;class#27078:27675" />
+            <element signature="method#onUnequip#0;class#27078:27675" />
+            <element signature="class#27781:28475" />
+            <element signature="method#make#0;class#27781:28475" />
+            <element signature="e#28622#29762#0" expanded="true" />
+            <element signature="e#29761#29762#0" expanded="true" />
+            <element signature="class#28768:29062" />
+            <element signature="method#make#0;class#28768:29062" />
+            <element signature="class#28833:29054" />
+            <element signature="method#update#0;class#28833:29054" />
+            <element signature="class#29075:30636" />
+            <element signature="method#make#0;class#29075:30636" />
+            <element signature="class#29149:30533" />
+            <element signature="method#load#0;class#29149:30533" />
+            <element signature="method#timeUpdate#0;class#29149:30533" />
+            <element signature="class#30652:33071" />
+            <element signature="method#make#0;class#30652:33071" />
+            <element signature="class#30804:31605" />
+            <element signature="method#onField#0;class#30804:31605" />
+            <element signature="class#31193:31464" />
+            <element signature="class#33081:37201" />
+            <element signature="method#make#0;class#33081:37201" />
+            <element signature="class#33154:37129" />
+            <element signature="method#onField#0;class#33154:37129" />
+            <element signature="class#33662:33933" />
+            <element signature="e#34629#34778#0" />
+            <element signature="e#34795#34944#0" />
+            <element signature="e#34961#35112#0" />
+            <element signature="e#35129#35282#0" />
+            <element signature="e#35904#36236#0" />
+            <element signature="method#load#0;class#33154:37129" />
+            <element signature="method#toString#0;class#33154:37129" />
+            <element signature="class#37212:37667" />
+            <element signature="method#make#0;class#37212:37667" />
+            <element signature="class#37279:37599" />
+            <element signature="method#setMaterial#0;class#37279:37599" />
+            <element signature="class#37682:39751" />
+            <element signature="method#make#0;class#37682:39751" />
+            <element signature="class#37749:39683" />
+            <element signature="method#onCreate#0;class#37749:39683" />
+            <element signature="method#use#0;class#37749:39683" />
+            <element signature="e#38781#39295#0" />
+            <element signature="method#getDescription#0;class#37749:39683" />
+            <element signature="class#39760:43373" />
+            <element signature="method#make#0;class#39760:43373" />
+            <element signature="class#39851:43265" />
+            <element signature="method#onCreate#0;class#39851:43265" />
+            <element signature="method#getDescription#0;class#39851:43265" />
+            <element signature="method#use#0;class#39851:43265" />
+            <element signature="e#40771#42570#0" />
+            <element signature="class#41142:41957" />
+            <element signature="method#onAttack#0;class#41142:41957" />
+            <element signature="method#update#0;class#41142:41957" />
+            <element signature="e#42952#43110#0" />
+            <element signature="class#43386:48271" />
+            <element signature="method#make#0;class#43386:48271" />
+            <element signature="class#44578:48129" />
+            <element signature="method#getDescription#0;class#44578:48129" />
+            <element signature="method#use#0;class#44578:48129" />
+            <element signature="e#45353#47127#0" />
+            <element signature="class#45533:46201" />
+            <element signature="method#stuck#0;class#45533:46201" />
+            <element signature="method#onAttack#0;class#45533:46201" />
+            <element signature="e#47815#47976#0" />
+            <element signature="class#48285:49931" />
+            <element signature="method#make#0;class#48285:49931" />
+            <element signature="class#48352:49800" />
+            <element signature="method#onCreate#0;class#48352:49800" />
+            <element signature="method#use#0;class#48352:49800" />
+            <element signature="e#48829#49693#0" />
+            <element signature="class#48885:49314" />
+            <element signature="method#stuck#0;class#48885:49314" />
+            <element signature="class#49941:51916" />
+            <element signature="method#make#0;class#49941:51916" />
+            <element signature="class#50008:51825" />
+            <element signature="method#use#0;class#50008:51825" />
+            <element signature="e#50405#51718#0" />
+            <element signature="class#50461:51418" />
+            <element signature="method#stuck#0;class#50461:51418" />
+            <element signature="method#update#0;class#50461:51418" />
+            <element signature="class#51930:55047" />
+            <element signature="method#make#0;class#51930:55047" />
+            <element signature="class#51997:54957" />
+            <element signature="method#use#0;class#51997:54957" />
+            <element signature="e#52373#54850#0" />
+            <element signature="class#52429:54685" />
+            <element signature="method#stuck#0;class#52429:54685" />
+            <element signature="method#update#0;class#52429:54685" />
+            <element signature="method#draw#0;class#52429:54685" />
+            <element signature="class#55060:55484" />
+            <element signature="method#make#0;class#55060:55484" />
+            <element signature="class#55127:55378" />
+            <element signature="method#getDescription#0;class#55127:55378" />
+            <element signature="class#55497:56165" />
+            <element signature="method#make#0;class#55497:56165" />
+            <element signature="class#55641:56157" />
+            <element signature="method#getDescription#0;class#55641:56157" />
+            <element signature="method#use#0;class#55641:56157" />
+            <element signature="class#56178:56741" />
+            <element signature="method#make#0;class#56178:56741" />
+            <element signature="class#56237:56733" />
+            <element signature="method#use#0;class#56237:56733" />
+            <element signature="class#56754:57502" />
+            <element signature="method#make#0;class#56754:57502" />
+            <element signature="class#56827:57440" />
+            <element signature="method#use#0;class#56827:57440" />
+            <element signature="e#59123#59124#0" expanded="true" />
+            <element signature="e#59210#59211#0" expanded="true" />
+            <element signature="class#59368:60748" />
+            <element signature="method#make#0;class#59368:60748" />
+            <element signature="class#59469:60680" />
+            <element signature="method#trigger#0;class#59469:60680" />
+            <element signature="class#60769:61637" />
+            <element signature="method#make#0;class#60769:61637" />
+            <element signature="class#60871:61483" />
+            <element signature="method#onCreate#0;class#60871:61483" />
+            <element signature="method#getDescription#0;class#60871:61483" />
+            <element signature="class#61654:62735" />
+            <element signature="method#make#0;class#61654:62735" />
+            <element signature="class#61756:62667" />
+            <element signature="method#trigger#0;class#61756:62667" />
+            <element signature="method#getDescription#0;class#61756:62667" />
+            <element signature="class#62751:64902" />
+            <element signature="method#make#0;class#62751:64902" />
+            <element signature="class#62810:64894" />
+            <element signature="method#trigger#0;class#62810:64894" />
+            <element signature="e#63751#63956#0" />
+            <element signature="method#use#0;class#62810:64894" />
+            <element signature="method#getDescription#0;class#62810:64894" />
+            <element signature="method#load#0;class#62810:64894" />
+            <element signature="class#64915:65378" />
+            <element signature="method#make#0;class#64915:65378" />
+            <element signature="class#65017:65279" />
+            <element signature="method#getFullName#0;class#65017:65279" />
+            <element signature="class#65390:65848" />
+            <element signature="method#make#0;class#65390:65848" />
+            <element signature="class#65492:65749" />
+            <element signature="method#getFullName#0;class#65492:65749" />
+            <element signature="class#65865:66555" />
+            <element signature="method#make#0;class#65865:66555" />
+            <element signature="class#65968:66492" />
+            <element signature="method#trigger#0;class#65968:66492" />
+            <element signature="method#getFullName#0;class#65968:66492" />
+            <element signature="e#66635#67093#0" />
+            <element signature="e#67098#67482#0" />
+            <element signature="e#67630#67937#0" />
+            <element signature="e#67942#68154#0" />
+            <element signature="e#68213#68519#0" />
+            <element signature="class#UnitFactory#0" />
             <element signature="method#UnitFactory#0;class#UnitFactory#0" />
             <element signature="method#setEquipment#0;class#UnitFactory#0" />
+            <element signature="method#addInventory#0;class#UnitFactory#0" />
             <element signature="method#setMoveset#0;class#UnitFactory#0" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/man/MainPlayer.java">
+    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Intelligence.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="132" column="15" lean-forward="true" selection-start-line="132" selection-start-column="15" selection-end-line="132" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/man/Man.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="99" column="31" lean-forward="true" selection-start-line="99" selection-start-column="31" selection-end-line="99" selection-end-column="31" />
+        <state relative-caret-position="317">
+          <caret line="441" column="43" lean-forward="true" selection-start-line="441" selection-start-column="43" selection-end-line="441" selection-end-column="43" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="docComment;class#Intelligence#0" />
+            <element signature="class#473:628" />
+            <element signature="method#make#0;class#473:628" />
+            <element signature="class#530:618" />
+            <element signature="class#637:2321" />
+            <element signature="method#make#0;class#637:2321" />
+            <element signature="class#693:2312" />
+            <element signature="method#load#0;class#693:2312" />
+            <element signature="method#hear#0;class#693:2312" />
+            <element signature="method#perceived#0;class#693:2312" />
+            <element signature="method#update#0;class#693:2312" />
+            <element signature="class#2329:3830" />
+            <element signature="method#make#0;class#2329:3830" />
+            <element signature="class#2385:3812" />
+            <element signature="method#onAttack#0;class#2385:3812" />
+            <element signature="method#hear#0;class#2385:3812" />
+            <element signature="method#perceived#0;class#2385:3812" />
+            <element signature="method#process#0;class#Intelligence#0" />
+            <element signature="method#load#0;class#Intelligence#0" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/tool/Performer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="12" column="28" selection-start-line="12" selection-start-column="28" selection-end-line="12" selection-end-column="28" />
-          <folding>
-            <element signature="e#152#153#0" expanded="true" />
-            <element signature="e#178#179#0" expanded="true" />
-            <element signature="e#202#203#0" expanded="true" />
-            <element signature="e#249#250#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/Organ.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="197">
-          <caret line="94" selection-start-line="94" selection-end-line="94" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/skill/Buffs.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="557" column="21" lean-forward="true" selection-start-line="557" selection-start-column="21" selection-end-line="557" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/item/Armor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="435">
-          <caret line="75" selection-start-line="75" selection-end-line="75" />
-          <folding>
-            <element signature="e#2766#2767#0" expanded="true" />
-            <element signature="e#2828#2829#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/item/Crafts.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="482">
-          <caret line="143" column="19" selection-start-line="143" selection-start-column="19" selection-end-line="143" selection-end-column="19" />
-          <folding>
-            <element signature="e#9437#9438#0" expanded="true" />
-            <element signature="e#9493#9494#0" expanded="true" />
-            <element signature="e#9524#9525#0" expanded="true" />
-            <element signature="e#9553#9554#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ga/unit/skill/Actions.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="940" selection-start-line="940" selection-end-line="940" />
-          <folding>
-            <element signature="e#1165#1166#0" expanded="true" />
-            <element signature="e#1228#1229#0" expanded="true" />
-            <element signature="e#1285#1286#0" expanded="true" />
-            <element signature="e#1329#1330#0" expanded="true" />
-            <element signature="e#2100#2101#0" expanded="true" />
-            <element signature="e#2144#2145#0" expanded="true" />
-            <element signature="e#27593#27594#0" expanded="true" />
-            <element signature="e#27632#27633#0" expanded="true" />
-            <element signature="e#27868#27869#0" expanded="true" />
-            <element signature="e#27902#27903#0" expanded="true" />
-            <element signature="e#28710#28711#0" expanded="true" />
-            <element signature="e#28747#28748#0" expanded="true" />
-            <element signature="e#28784#28785#0" expanded="true" />
-            <element signature="e#28818#28819#0" expanded="true" />
-            <element signature="e#30922#30923#0" expanded="true" />
-            <element signature="e#30959#30960#0" expanded="true" />
-            <element signature="e#32253#32254#0" expanded="true" />
-            <element signature="e#32293#32294#0" expanded="true" />
-            <element signature="e#32328#32329#0" expanded="true" />
-            <element signature="e#32373#32374#0" expanded="true" />
-            <element signature="e#34669#34670#0" expanded="true" />
-            <element signature="e#34709#34710#0" expanded="true" />
-            <element signature="e#35577#35578#0" expanded="true" />
-            <element signature="e#35612#35613#0" expanded="true" />
-            <element signature="e#35920#35921#0" expanded="true" />
-            <element signature="e#35957#35958#0" expanded="true" />
-            <element signature="e#37077#37078#0" expanded="true" />
-            <element signature="e#37134#37135#0" expanded="true" />
-            <element signature="e#38493#38494#0" expanded="true" />
-            <element signature="e#38558#38559#0" expanded="true" />
-            <element signature="e#38951#38952#0" expanded="true" />
-            <element signature="e#38985#38986#0" expanded="true" />
-            <element signature="e#39022#39023#0" expanded="true" />
-            <element signature="e#39066#39067#0" expanded="true" />
-            <element signature="e#39532#39533#0" expanded="true" />
-            <element signature="e#39587#39588#0" expanded="true" />
-            <element signature="e#40331#40332#0" expanded="true" />
-            <element signature="e#40429#40430#0" expanded="true" />
-            <element signature="e#40550#40551#0" expanded="true" />
-            <element signature="e#40587#40588#0" expanded="true" />
-            <element signature="e#40948#40949#0" expanded="true" />
-            <element signature="e#40982#40983#0" expanded="true" />
-            <element signature="e#41019#41020#0" expanded="true" />
-            <element signature="e#41056#41057#0" expanded="true" />
-            <element signature="e#41772#41773#0" expanded="true" />
-            <element signature="e#41809#41810#0" expanded="true" />
-            <element signature="e#43248#43249#0" expanded="true" />
-            <element signature="e#43284#43285#0" expanded="true" />
-            <element signature="e#43446#43447#0" expanded="true" />
-            <element signature="e#43480#43481#0" expanded="true" />
-            <element signature="e#43517#43518#0" expanded="true" />
-            <element signature="e#43554#43555#0" expanded="true" />
-            <element signature="e#44591#44592#0" expanded="true" />
-            <element signature="e#44680#44681#0" expanded="true" />
-            <element signature="e#44721#44722#0" expanded="true" />
-            <element signature="e#44783#44784#0" expanded="true" />
-            <element signature="e#45255#45256#0" expanded="true" />
-            <element signature="e#45289#45290#0" expanded="true" />
-            <element signature="e#45326#45327#0" expanded="true" />
-            <element signature="e#45363#45364#0" expanded="true" />
-            <element signature="e#46420#46421#0" expanded="true" />
-            <element signature="e#46509#46510#0" expanded="true" />
-            <element signature="e#47174#47175#0" expanded="true" />
-            <element signature="e#47211#47212#0" expanded="true" />
-            <element signature="e#47255#47256#0" expanded="true" />
-            <element signature="e#47291#47292#0" expanded="true" />
-            <element signature="e#48011#48012#0" expanded="true" />
-            <element signature="e#48067#48068#0" expanded="true" />
-            <element signature="e#48119#48120#0" expanded="true" />
-            <element signature="e#48192#48193#0" expanded="true" />
-            <element signature="e#48239#48240#0" expanded="true" />
-            <element signature="e#48309#48310#0" expanded="true" />
-            <element signature="e#49028#49029#0" expanded="true" />
-            <element signature="e#49065#49066#0" expanded="true" />
-            <element signature="e#49109#49110#0" expanded="true" />
-            <element signature="e#49145#49146#0" expanded="true" />
-            <element signature="e#50473#50474#0" expanded="true" />
-            <element signature="e#50543#50544#0" expanded="true" />
-            <element signature="e#51004#51005#0" expanded="true" />
-            <element signature="e#51044#51045#0" expanded="true" />
-            <element signature="e#51824#51825#0" expanded="true" />
-            <element signature="e#51864#51865#0" expanded="true" />
-            <element signature="e#52518#52519#0" expanded="true" />
-            <element signature="e#52552#52553#0" expanded="true" />
-            <element signature="e#52589#52590#0" expanded="true" />
-            <element signature="e#52626#52627#0" expanded="true" />
-            <element signature="e#52664#52665#0" expanded="true" />
-            <element signature="e#52713#52714#0" expanded="true" />
-            <element signature="e#53976#53977#0" expanded="true" />
-            <element signature="e#54016#54017#0" expanded="true" />
-            <element signature="e#54056#54057#0" expanded="true" />
-            <element signature="e#54114#54115#0" expanded="true" />
-            <element signature="e#57210#57211#0" expanded="true" />
-            <element signature="e#57250#57251#0" expanded="true" />
-            <element signature="e#57290#57291#0" expanded="true" />
-            <element signature="e#57348#57349#0" expanded="true" />
-            <element signature="e#58154#58155#0" expanded="true" />
-            <element signature="e#58194#58195#0" expanded="true" />
-            <element signature="e#58234#58235#0" expanded="true" />
-            <element signature="e#58292#58293#0" expanded="true" />
-            <element signature="e#59017#59018#0" expanded="true" />
-            <element signature="e#59054#59055#0" expanded="true" />
-            <element signature="e#59094#59095#0" expanded="true" />
-            <element signature="e#59128#59129#0" expanded="true" />
-            <element signature="e#61657#61658#0" expanded="true" />
-            <element signature="e#61694#61695#0" expanded="true" />
-            <element signature="e#61738#61739#0" expanded="true" />
-            <element signature="e#61774#61775#0" expanded="true" />
-            <element signature="e#62766#62767#0" expanded="true" />
-            <element signature="e#62836#62837#0" expanded="true" />
-            <element signature="e#63381#63382#0" expanded="true" />
-            <element signature="e#63418#63419#0" expanded="true" />
-            <element signature="e#65028#65029#0" expanded="true" />
-            <element signature="e#65064#65065#0" expanded="true" />
-            <element signature="e#65229#65230#0" expanded="true" />
-            <element signature="e#65266#65267#0" expanded="true" />
-            <element signature="e#65306#65307#0" expanded="true" />
-            <element signature="e#65340#65341#0" expanded="true" />
-            <element signature="e#68250#68251#0" expanded="true" />
-            <element signature="e#68284#68285#0" expanded="true" />
-            <element signature="e#68321#68322#0" expanded="true" />
-            <element signature="e#68358#68359#0" expanded="true" />
-            <element signature="e#70900#70901#0" expanded="true" />
-            <element signature="e#70937#70938#0" expanded="true" />
-            <element signature="e#71802#71803#0" expanded="true" />
-            <element signature="e#71839#71840#0" expanded="true" />
-            <element signature="e#72414#72415#0" expanded="true" />
-            <element signature="e#72451#72452#0" expanded="true" />
-            <element signature="e#72929#72930#0" expanded="true" />
-            <element signature="e#72966#72967#0" expanded="true" />
-            <element signature="e#74073#74074#0" expanded="true" />
-            <element signature="e#74135#74136#0" expanded="true" />
-            <element signature="e#74277#74278#0" expanded="true" />
-            <element signature="e#74317#74318#0" expanded="true" />
-            <element signature="e#74361#74362#0" expanded="true" />
-            <element signature="e#74397#74398#0" expanded="true" />
-            <element signature="e#77257#77258#0" expanded="true" />
-            <element signature="e#77297#77298#0" expanded="true" />
-            <element signature="e#77654#77655#0" expanded="true" />
-            <element signature="e#77694#77695#0" expanded="true" />
-            <element signature="e#78881#78882#0" expanded="true" />
-            <element signature="e#78951#78952#0" expanded="true" />
-            <element signature="e#79157#79158#0" expanded="true" />
-            <element signature="e#79180#79181#0" expanded="true" />
-            <element signature="e#79202#79203#0" expanded="true" />
-            <element signature="e#79247#79248#0" expanded="true" />
-            <element signature="e#80800#80801#0" expanded="true" />
-            <element signature="e#80827#80828#0" expanded="true" />
-            <element signature="e#80857#80858#0" expanded="true" />
-            <element signature="e#80886#80887#0" expanded="true" />
-            <element signature="e#80913#80914#0" expanded="true" />
-            <element signature="e#80939#80940#0" expanded="true" />
-            <element signature="e#80971#80972#0" expanded="true" />
-            <element signature="e#81002#81003#0" expanded="true" />
-            <element signature="e#81037#81038#0" expanded="true" />
-            <element signature="e#81078#81079#0" expanded="true" />
-            <element signature="e#81112#81113#0" expanded="true" />
-            <element signature="e#81145#81146#0" expanded="true" />
-            <element signature="e#81187#81188#0" expanded="true" />
-            <element signature="e#81214#81215#0" expanded="true" />
-            <element signature="e#82341#82342#0" expanded="true" />
-            <element signature="e#82368#82369#0" expanded="true" />
-            <element signature="e#82399#82400#0" expanded="true" />
-            <element signature="e#82431#82432#0" expanded="true" />
-            <element signature="e#82583#82584#0" expanded="true" />
-            <element signature="e#82616#82617#0" expanded="true" />
-            <element signature="e#82652#82653#0" expanded="true" />
-            <element signature="e#82689#82690#0" expanded="true" />
-            <element signature="e#82725#82726#0" expanded="true" />
-            <element signature="e#82766#82767#0" expanded="true" />
-            <element signature="e#82848#82849#0" expanded="true" />
-            <element signature="e#82875#82876#0" expanded="true" />
-            <element signature="e#82907#82908#0" expanded="true" />
-            <element signature="e#82938#82939#0" expanded="true" />
-            <element signature="e#83796#83797#0" expanded="true" />
-            <element signature="e#83825#83826#0" expanded="true" />
-            <element signature="e#84241#84242#0" expanded="true" />
-            <element signature="e#84270#84271#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/todo">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" lean-forward="true" selection-start-line="3" selection-end-line="3" />
         </state>
       </provider>
     </entry>

@@ -26,9 +26,9 @@ public class Unit extends Prop {
             speed = p.get(0).getInt();
             attack = p.get(1).getInt();
             level = new Stat("Level", p.get(2));
-            if (!p.get(3).equals("null")) motivation = new Stat("Motivation", p.get(3));
-            if (!p.get(4).equals("null")) nutrition = new Stat("Nutrition", p.get(4));
-            if (!p.get(5).equals("null")) fatigue = new Stat("Fatigue", p.get(5));
+            motivation = new Stat("Motivation", p.get(3));
+            nutrition = new Stat("Nutrition", p.get(4));
+            fatigue = new Stat("Fatigue", p.get(5));
             strength = new Stat("Strength", p.get(6));
             agility = new Stat("Agility", p.get(7));
             intelligence = new Stat("Intelligence", p.get(8));
@@ -290,6 +290,7 @@ public class Unit extends Prop {
                 } else {
                     clip.organs[i].hit(hitBox);
                 }
+                status.triggerEffect(Buffs.Stun);
                 return true;
             }
         }

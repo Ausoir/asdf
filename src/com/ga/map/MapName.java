@@ -27,14 +27,14 @@ public class MapName {
     public boolean equals(String p){
         return toString().equals(p);
     }
-    String getMapname(){
+    public String getMapname(){
         return value.substring(value.lastIndexOf(File.separator)+1);
     }
     String getDir(){
         int index = value.lastIndexOf(File.separator);
         return index == -1 ? "" : value.substring(0, index);
     }
-    String getModifiedMapname(String p){
+    String changeMapName(String p){
         return getDir()+File.separator+p;
     }
     public String toString(){

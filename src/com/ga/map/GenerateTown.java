@@ -10,13 +10,15 @@ import java.util.HashMap;
 class GenerateTown {
     private static HashMap<Integer, String[]> buildings = new HashMap<>(){{
         put(1,new String[]{"House1","House2","House3","House4","Bighouse1","Bighouse2","Inn","Scrapyard","Outpost"});
-        put(2,new String[]{"Hideout","Restaurant","Inn","Shop","Clothier","School","Ranch"});
-        put(3,new String[]{"Sewer","Restaurant","Shop","Bazaar","Laboratory","Hospital","Armory","Safehouse"});
+        put(2,new String[]{"House1","House2","House3","House4","Restaurant","Inn","Shop","Clothier","School","Ranch"});
+        put(3,new String[]{"Sewer","Hideout","Restaurant","Shop","Bazaar","Laboratory","Hospital","Armory","Safehouse"});
     }};
     static void generate(Map map, int cityType){
         Generator generator = new Generator(map, 0);
-        map.size = new P(6000+Creation.r.nextInt(4000), 1400);
-        String[] landTexture = new String[]{"dirt,grass","dirt,road_unpaved","dirt,road_normal","dirt,road_highway"};
+        map.size = new P(4000+Creation.r.nextInt(3000), 1400);
+        String[] landTexture;
+        if (map.isSnowing()) landTexture = new String[]{"dirt,snow"};
+        else landTexture = new String[]{"dirt,grass","dirt,road_unpaved","dirt,road_normal","dirt,road_highway"};
         int max = Creation.r.nextInt(4)+2;
 
         TerrainTrail trail = new TerrainTrail(map, new P(-40, map.size.y+40));

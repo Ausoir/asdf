@@ -82,6 +82,7 @@ public class MainPlayer extends Player {
             } else if (r == 5) say("This action is beyond my abilities!");
             else if (r == 6) say("I'm missing a required limb!");
             else if (r == 8) say(Dialog.get("!i"));
+            else if (r == 9) say(Dialog.get("!f"));
         }
         return r;
     }

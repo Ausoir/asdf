@@ -11,8 +11,8 @@ class GenerateForest {
         ground.move(map.size.x()+80, 0);
         ground.move(0, 640);
         ground.climbable();
-        if (map.isSnowing()) ground.finish("4,dirt,snow,[Frozen Tree=1]");
-        else ground.finish("4,dirt,grass,[Tree=1]");
+        if (map.isSnowing()) ground.finish("4,grass,snow,[Frozen Tree=1]");
+        else ground.finish("4,grass,Road_Unpaved,[Tree=1]");
         generator.makeEdgeSpawns();
         if (Creation.r.nextBoolean()) generator.generateBuilding("Mound", 360);
     }

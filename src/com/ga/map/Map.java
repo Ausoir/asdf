@@ -200,15 +200,16 @@ public class Map {
                             for (int ii = 0; ii < size; ii++) {
                                 T propString = formProps.get(3, new T(defaultProps.get(formProps.get(2).get())));
                                 if (!propString.isEmpty()) {
-                                    String prop = null; //[0,[4,dirt,road_unpaved,[Grass=.1,Bush=1]]]
+                                    String propName = null; //[0,[4,dirt,road_unpaved,[Grass=.1,Bush=1]]]
                                     float rand = Creation.r.nextFloat();
                                     for (T i : propString) {
                                         if (rand < Float.parseFloat(i.get().split("=")[1])){
-                                            prop = i.get().split("=")[0];
+                                            propName = i.get().split("=")[0];
                                             break;
                                         }
                                     }
-                                    placeProp(l, Stock.createByName(this, prop, -1));
+                                    Prop prop = Stock.createByName(this, propName, -1);
+                                    if (prop != null) placeProp(l, prop);
                                 }
                             }
                         }

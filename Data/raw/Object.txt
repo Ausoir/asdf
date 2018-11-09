@@ -4,9 +4,9 @@ Reed,Reed,2,1,0,[.3,.3],1,0
 Root,Root,2,1,0,[.3,.3],1,0
 Vine,Vine,2,0,0,[.3,.3],1,0
 Stone,Stone,2,1,0,[.3,.3],1,0
-Bush,Bush,2,1,0,[.3,.3],1,0
-Dead Bush,Deadbush,2,1,0,[.3,.3],1,0
-Tree,Tree,2,1,0,[.3,.3],1,0
+Bush,Bush,2,1,0,[.2,.2],1,0
+Dead Bush,Deadbush,2,1,0,[.2,.2],1,0
+Tree,Tree,2,1,0,[.2,.2],1,0
 Appliance,Appliance,1,1,0,[.1,.1],1,0
 Door,Door,2,0,0,[0,0],1,0
 Signpost,Signpost,2,1,0,[0,0],1,0
@@ -26,8 +26,8 @@ Bottler,Bottler,2,0,0,[.2,.2],1,8
 Small Table,Smalltable,2,0,0,[0,0],1,8
 Painting,Painting,1,0,0,[.2,.2],1,0
 Bed,Bed,2,0,0,[.2,.2],1,8
-Frozen Tree,Snowtree,2,1,0,[.3,.3],1,0
-Frozen Bush,Snowbush,2,1,0,[.3,.3],1,0
+Frozen Tree,Snowtree,2,1,0,[.2,.2],1,0
+Frozen Bush,Snowbush,2,1,0,[.2,.2],1,0
 Vent,Vent,2,0,0,[.2,.2],1,8
 Warning,Warning,1,0,0,[.1,.1],1,8
 Dungeon,Dungeon,1,0,0,[.2,.2],1,0

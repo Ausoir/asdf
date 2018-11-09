@@ -178,10 +178,6 @@ public class Updater {
             Global.player.say("I am inflicted with dangerous status effect!");
             return false;
         }
-        if (Global.player.stats.fatigue.get() < p){
-            Global.player.say("I am too tired! I need "+(p-Global.player.stats.fatigue.get())+" more Fatigue points.");
-            return false;
-        }
         if (Global.player.stats.nutrition.get() < p){
             Global.player.say("I am too hungry! I need "+(p-Global.player.stats.nutrition.get())+" more Nutrition points.");
             return false;
@@ -192,7 +188,6 @@ public class Updater {
                 return false;
             } else Global.player.say("Vitality decreased by "+p+" from cold temperature.");
         }
-        Global.player.stats.fatigue.require(p);
         Global.player.stats.nutrition.require(p);
         forceSleep(p);
         return true;

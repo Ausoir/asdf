@@ -71,6 +71,25 @@ public enum Crafts {
                 } else host.say("Need a scrap in hand to create a Repairkit!");
             }
         }
+    }, Gold(new String[]{"Time:1","Scrap Gold:4","Hammer:1"},"Craft "+Dialog.money(2000)+" worth of gold."){
+        public void craft(Man host, int time){
+            Item item = (Item) Stock.Moneybag.create(host.map, 0, -1).start();
+            item.durability = item.uses = 2000;
+            host.setWeapon(item);
+        }
+    }, Silver(new String[]{"Time:1","Scrap Silver:20","Hammer:1"},"Craft "+Dialog.money(1000)+"."){
+        public void craft(Man host, int time){
+            Item item = (Item) Stock.Moneybag.create(host.map, 1, 4).start();
+            item.durability = item.uses = 1000;
+            host.setWeapon(item);
+        }
+    }, Recharge(new String[]{"Time:1","Battery:0","Resin:1"},"Recharge a battery."){
+        public void craft(Man host, int time){
+            if (host.weapon.factoryId == Stock.Battery.ordinal()) {
+                host.weapon.uses = host.weapon.durability;
+                host.say("Recharged a battery.");
+            } else host.say("Need to hold the battery to recharge it.");
+        }
     }, Gauze(new String[]{"Time:0","Scrap Cloth:10"},"Treat bleeding."){
         public void craft(Man host, int time){
             host.say("Treated wound.");

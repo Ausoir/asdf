@@ -16,7 +16,7 @@ class GeneratePlains {
         generate(map, theme, 3);
     }
     static void generateDesert(Map map){
-        generate(map, "dirt,sand,[Rock=.1,Dead Bush=.2]", 1);
+        generate(map, "sand,sand,[Rock=.1,Dead Bush=.2]", 1);
     }
     private static void generate(Map map, String theme, int type){
         Generator generator = new Generator(map, 0);

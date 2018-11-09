@@ -105,28 +105,28 @@ public class MenuPlayer extends Panel {
             fatigue.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Menu.menu.showDialog("Fatigue", "You require 1 fatigue every hour.");
+                    Menu.menu.showDialog("Fatigue", "You require 1 fatigue every rest or spells cast.");
                 }
             });
             stamina.setIcon(iconDescribe);
             stamina.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Menu.menu.showDialog("Stamina", "You need Stamina to do most actions.");
+                    Menu.menu.showDialog("Stamina", "Most actions require Stamina.");
                 }
             });
             vitality.setIcon(iconDescribe);
             vitality.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Menu.menu.showDialog("Vitality", "When you are hit or otherwise hurt you will die unless you have Vitality.");
+                    Menu.menu.showDialog("Vitality", "Vitality prevents most form of death.");
                 }
             });
             energy.setIcon(iconDescribe);
             energy.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Menu.menu.showDialog("Energy", "You use Energy to cast magic.");
+                    Menu.menu.showDialog("Energy", "Most spells require Energy.");
                 }
             });
             add(stamina, statgrid);
@@ -416,7 +416,7 @@ public class MenuPlayer extends Panel {
             makeSlot("_EXIT");
             makeSlot("_MENU");
             makeSlot("_CTRL");
-            makeSlot("_SAY");
+            makeSlot("_CHAT");
             for (Actions i : PlayerInput.basicMoves){
                 if (i != Actions.Idle) makeSlot(i);
             }
