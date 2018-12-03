@@ -4,9 +4,7 @@ import com.ga.map.Global;
 import com.ga.map.Picture;
 import com.ga.tool.Performer;
 import com.ga.tool.T;
-import com.ga.unit.PlayerInput;
-import com.ga.unit.Prop;
-import com.ga.unit.Traits;
+import com.ga.unit.*;
 import com.ga.unit.item.Crafts;
 import com.ga.unit.item.Item;
 import com.ga.unit.man.Inventory;
@@ -547,12 +545,22 @@ public class MenuPlayer extends Panel {
         void refresh(){
             panel.removeAll();
             panel.add(Box.createRigidArea(new Dimension(0,12)));
+            Tags tags = Global.player.getTags();
+            int ath = 0;
+            for (Tag i : tags) ath += (i == Tag.Athletics ? 1 : 0);
+            if (Global.player.getTags().contains(Tag.Athletics)){
+                makeSlot("Athletics", "Athletics - "+Dialog.get("lvl")+" "+ath, Dialog.get("?Athletics"));
+            }
             for (Traits.Trait i : Global.player.traits.getTraits()){
-                makeSlot(i);
+                String display = i.name();
+                if (i.type == 3){
+                    int level = Global.player.traits.getTraitLevel(i);
+                    display += " - "+Dialog.get("pwr")+" "+level+(level==Traits.MAXLEVEL?" [MAX]":"");
+                }
+                makeSlot(i.name(), display, i.getDescription());
             }
         }
-        void makeSlot(final Traits.Trait move){
-            final String displayName = Dialog.get(move.name());
+        void makeSlot(String name, String display, String desc){
             JPanel panel = new JPanel();
             panel.setOpaque(false);
             panel.setLayout(new BoxLayout(panel,BoxLayout.LINE_AXIS));
@@ -561,14 +569,11 @@ public class MenuPlayer extends Panel {
             describe.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Menu.menu.showDialog(move.name(), move.getDescription());
+                    Menu.menu.showDialog(name, desc);
                 }
             });
-            int level = Global.player.traits.getTraitLevel(move);
-            String label = displayName;
-            if (move.type == 3) label += " - "+Dialog.get("pwr")+" "+level+(level==Traits.MAXLEVEL?" [MAX]":"");
-            final JLabel equip = new JLabel(label);
-            if (!move.getDescription().equals("")) panel.add(describe);
+            final JLabel equip = new JLabel(display);
+            panel.add(describe);
             panel.add(equip);
             this.panel.add(panel);
             this.panel.add(Box.createRigidArea(new Dimension(0,4)));
@@ -639,10 +644,7 @@ public class MenuPlayer extends Panel {
             String restMenu = Global.player.map.isSnowing()?"Rest (Cold)":"Rest";
             panel.add(makeOption("Level Up","lvl","Level up with sufficient Motivation points and time."));
             panel.add(makeOption(restMenu,"h","Rest for an hour, removing curable debuffs and restoring fatigue. Restores double near chairs and benches, and triple near beds. Note that valuable items on ground disappear when time passes."));
-            if (Global.player.stats.nutrition.get() == 0){
-                if (Global.player.stats.agility.get() > 0) panel.add(makeOption("Starve", "st", "Starve, gaining 1 Nutrition point at the cost of 1 Vitality."));
-                else panel.add(makeOption("STARVE TO DEATH", "st", "Submit to starvation and die."));
-            }
+            panel.add(makeOption("STARVE", "q", "Succumb to starvation."));
             TitledBorder b = BorderFactory.createTitledBorder(BorderFactory.createMatteBorder(2,2,2,2,Panel.forecolor));
             b.setTitle("Strategic");
             panel.setBorder(b);
@@ -730,11 +732,8 @@ public class MenuPlayer extends Panel {
                 case "opt":
                     Menu.menu.showDialog("Options", "apparently none.");
                     break;
-                case "st":
-                    if (Global.player.stats.agility.require(1)){
-                        Global.player.stats.nutrition.add(1, false);
-                        Global.player.say("I have "+Global.player.stats.agility.get()+" Vitality left!");
-                    } else Global.player.die("Starvation");
+                case "q":
+                    Global.player.die(Unit.DEATH_STARVATION, "Starvation");
                     Menu.menu.showMenu();
                     break;
             }
@@ -881,7 +880,7 @@ public class MenuPlayer extends Panel {
         mainpanel.add(buttons[2] = makeOption(Dialog.get("Attributes"), "status"));
         mainpanel.add(buttons[3] = makeOption(Dialog.get("Equipment"), "equip"));
         mainpanel.add(buttons[4] = makeOption(Dialog.get("Inventory"), "inventory"));
-        mainpanel.add(buttons[5] = makeOption(Dialog.get("Traits"), "trait"));
+        mainpanel.add(buttons[5] = makeOption(Dialog.get("Mastery"), "trait"));
         mainpanel.add(buttons[6] = makeOption(Dialog.get("Crafting"), "craft"));
         mainpanel.add(buttons[7] = makeOption(Dialog.get("Status"), "buff"));
         grid.gridx = 0;
@@ -982,7 +981,7 @@ public class MenuPlayer extends Panel {
         else buttons[3].setVisible(true);
         if (Global.player.inventory.getItemSize() == 0) buttons[4].setVisible(false);
         else buttons[4].setVisible(true);
-        if (Global.player.traits.getTraits().size() == 0) buttons[5].setVisible(false);
+        if (Global.player.traits.getTraits().size() == 0 && !Global.player.armor.tags.contains(Tag.Athletics)) buttons[5].setVisible(false);
         else buttons[5].setVisible(true);
         if (Global.player.crafting.size() == 0) buttons[6].setVisible(false);
         else buttons[6].setVisible(true);

@@ -296,16 +296,16 @@ public enum Actions {
         }
         public void onSet(Unit host){
             if (host.stats.strength.isFull()) host.delay.time = 0;
-            else host.delay.set(host.delay.time + 200/host.stateLevel);
+            else host.delay.set(host.delay.time + 100/host.stateLevel);
         }
         public void update(Unit host) {
             int term = host.delay.max / host.stats.strength.getMax();
-            if (host.stateDuration > 0 && host.stateDuration % term == 0) host.stats.strength.add(1, false);
-        }
-        public boolean onFinish(Unit host){
-            if (host.stats.fatigue.require(1)) host.stats.strength.add(1, false);
-            else host.say("Out of Fatigue!");
-            return true;
+            if (host.stateDuration % term == term-12){
+                if (!host.stats.strength.isFull()) {
+                    if (host.stats.fatigue.require(1)) host.stats.strength.add(1, false);
+                    else host.say("Out of Fatigue!");
+                }
+            }
         }
     },
     Melee(24,1,0,0,0,new Tags(){{
@@ -467,7 +467,7 @@ public enum Actions {
             host.delay.time = 200;
         }
     },
-    Grab(15,3,12,5,0,new int[]{FIST},new Tags(){{
+    Grab(15,3,12,7,0,new int[]{FIST},new Tags(){{
         add(Tag.Strength);
     }}){
         public String getClipName(){
@@ -607,6 +607,8 @@ public enum Actions {
                         if (victim != null) {
                             host.damageMod = 0;
                             host.stats.strength.add(1, false);
+                            victim.vel.y -= 10;
+                            victim.vel.x = host.dir * 10;
                         }
                     }
                 }
@@ -681,7 +683,7 @@ public enum Actions {
             }
         }
     },
-    Whirlwind(46,5,27,9,0,new int[]{FIST, OFIST},new Tags(){{
+    Whirlwind(46,5,27,7,0,new int[]{FIST, OFIST},new Tags(){{
         add(Tag.Strength);
     }}){
         public void onSet(final Unit p){
@@ -790,7 +792,7 @@ public enum Actions {
             host.vel.set((8+host.stateLevel*2)*host.dir,-4);
         }
     },
-    Underhand(32,9,13,6,0,new int[]{LLEG, RLEG, FIST, OFIST},new Tags(){{
+    Underhand(32,4,13,5,0,new int[]{LLEG, RLEG, FIST, OFIST},new Tags(){{
         add(Tag.Strength);
     }}){
         public void trigger(Man host){
@@ -829,7 +831,7 @@ public enum Actions {
             if (t != null) t.buff(Buffs.Mark, host.stateLevel);
         }
     },
-    Warcry(60,3,20,8,0,new Tags(){{
+    Warcry(60,3,20,6,0,new Tags(){{
         add(Tag.Strength);
     }}){
         public void onSet(Unit host){
@@ -1353,8 +1355,8 @@ public enum Actions {
                 Sound.play(host.map, host.pos, "shadowstep");
                 Man p = new Man(host.map, "Shadowtwin", host.seed) {
                     @Override
-                    public void die(String p) {
-                        super.die(p);
+                    public void die(int cause, String desc) {
+                        super.die(cause, desc);
                         remove();
                         Particle.explode(host.map, "Smoke", getDepth(), pos, new P(), 16, 10, 0, true, 80);
                     }
@@ -1673,7 +1675,7 @@ public enum Actions {
                 }
                 if (host.stateDuration % 4 == 0) {
                     target.buff(Buffs.Shock, 1);
-                    if (host.stateDuration % 80 == 0 && !target.stats.agility.require(1)) target.die("Electrocution");
+                    if (host.stateDuration % 80 == 0 && !target.stats.agility.require(1)) target.die(Unit.DEATH_ELECTROCUTION, "Electrocution");
                 }
             }
             if (host.stateDuration % 160 == 0 && !host.requireMana(1)) host.stateSet(Idle);

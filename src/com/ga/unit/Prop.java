@@ -106,13 +106,16 @@ public class Prop extends Thing {
     protected void onMapEdge(int dir){
         vel.x = 0;
     }
+    protected void fallOffEdge(){
+        remove();
+    }
     public void update(){
         if (mobile) {
             collide();
             int edge = map.mapEdge(pos.getAdd(vel));
             if (edge > 0) {
                 if (Math.abs(edge-5) == 1) onMapEdge(edge-5);
-                else if (edge == 2) remove();
+                else if (edge == 2) fallOffEdge();
                 else if (edge == 8) vel.y = 0;
             }
             pos.add(vel);

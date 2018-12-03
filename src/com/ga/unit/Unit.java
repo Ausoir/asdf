@@ -17,6 +17,13 @@ import java.util.HashMap;
  * Created by Ga on 5/7/2016. asd
  */
 public class Unit extends Prop {
+    public static final int DEATH_VITALITY = 1;
+    public static final int DEATH_DECAPITATION = 2;
+    public static final int DEATH_STARVATION = 3;
+    public static final int DEATH_BLEEDING = 4;
+    public static final int DEATH_POISON = 5;
+    public static final int DEATH_ELECTROCUTION = 6;
+    public static final int DEATH_FALL = 7;
     private static final float OFFSET_UNIT = .0001f;
     public class Stats{
         public int speed, attack;
@@ -40,7 +47,6 @@ public class Unit extends Prop {
     public Stats stats = new Stats();
     public HashMap<Actions, Cooldown> cooldown = new HashMap<>();
     public int controlId;
-    public boolean traveler = false;
     public Body clip;
     public Actions state = Actions.Idle;
     public boolean grounded = false;
@@ -105,7 +111,7 @@ public class Unit extends Prop {
         return moveset.size()-1+traits.getMemorySize();
     }
     protected boolean canLearn(){
-        return getMemorySize() < stats.intelligence.getMax();
+        return getMemorySize() < stats.intelligence.getMax()+traits.getTraitLevel(Traits.Trait.Tattoo);
     }
     public boolean learnSkill(Actions move){
         if (!moveset.contains(move) && canLearn()){
@@ -270,8 +276,8 @@ public class Unit extends Prop {
                         delay.performer = null;
                         grounded = false;
                         if (blunt && !traits.has(Traits.Trait.Painless)) {
-                            vel.x = damage/2 * Float.compare(pos.x, hitBox.pt.x);
-                            vel.y -= damage/3;
+                            vel.x = damage/2f * Float.compare(pos.x, hitBox.pt.x);
+                            vel.y -= damage/3f;
                             setState(Actions.Hit);
                         }
                         brain.onHit();
@@ -285,7 +291,7 @@ public class Unit extends Prop {
                                 if (!clip.organs[i].vital || traits.getTraitLevel(Traits.Trait.Instinct) == 0 || !stats.agility.require(1))
                                     clip.organs[i].amputate(hitBox, damage);
                             }
-                        } else die("Lack of Vitality");
+                        } else die(DEATH_VITALITY, "Beaten to death");
                     }
                 } else {
                     clip.organs[i].hit(hitBox);
@@ -296,8 +302,10 @@ public class Unit extends Prop {
         }
         return false;
     }
-
-    public void die(String cause) {
+    protected void fallOffEdge(){
+        die(DEATH_FALL,"Falling");
+    }
+    public void die(int cause, String desc) {
         status.clearBuffs();
         save = false;
         onInteract = null;

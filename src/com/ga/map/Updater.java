@@ -108,18 +108,9 @@ public class Updater {
             if (i.save) result.append(T.wrap(i.toString())).append(",");
         }
         for (Unit i : unitsLoaded){
-            if (i.save && !i.traveler) result.append(T.wrap(i.toString())).append(",");
+            if (i.save) result.append(T.wrap(i.toString())).append(",");
         }
         if (result.length() > 0) result = new StringBuilder(result.substring(0, result.length() - 1));
-        return result.toString();
-    }
-    public static String toActorString(){
-        StringBuilder result = new StringBuilder();
-        for (Map map : Global.maps) {
-            for (Unit i : map.updater.unitsLoaded) {
-                if (i.save && i.traveler) result.append(i.toString()).append("\n");
-            }
-        }
         return result.toString();
     }
     public static Unit getActor(int p){
@@ -167,29 +158,33 @@ public class Updater {
         for (Prop i : props) i.onTimeChange();
     }
     public boolean sleep(int p, boolean checkHostile){
-        if (p == 0) return true;
+        if (isSafe(p, checkHostile)) forceSleep(p);
+        return true;
+    }
+    public boolean isSafe(int p, boolean checkHostile){
         for (Unit i : unitsLoaded) {
             if (i.map == Global.player.map && i.hittable(Global.player.faction) && (checkHostile || i.brain.target == Global.player)) {
                 Global.player.say("There are enemies on the map!");
                 return false;
             }
         }
-        if (Global.player.status.isDangerous()){
-            Global.player.say("I am inflicted with dangerous status effect!");
-            return false;
-        }
-        if (Global.player.stats.nutrition.get() < p){
-            Global.player.say("I am too hungry! I need "+(p-Global.player.stats.nutrition.get())+" more Nutrition points.");
-            return false;
-        }
-        if (Global.player.armor.getWarmth() < map.temperature){
-            if (!Global.player.stats.agility.require(p)) {
-                Global.player.say("It's too cold!");
+        if (p > 0) {
+            if (Global.player.status.isDangerous()) {
+                Global.player.say("I am inflicted with dangerous status effect!");
                 return false;
-            } else Global.player.say("Vitality decreased by "+p+" from cold temperature.");
+            }
+            if (Global.player.stats.nutrition.get() < p) {
+                Global.player.say("I am too hungry! I need " + (p - Global.player.stats.nutrition.get()) + " more Nutrition points.");
+                return false;
+            }
+            if (Global.player.armor.getWarmth() < map.temperature) {
+                if (!Global.player.stats.agility.require(p)) {
+                    Global.player.say("It's too cold!");
+                    return false;
+                } else Global.player.say("Vitality decreased by " + p + " from cold temperature.");
+            }
+            Global.player.stats.nutrition.require(p);
         }
-        Global.player.stats.nutrition.require(p);
-        forceSleep(p);
         return true;
     }
     public void forceSleep(int p){

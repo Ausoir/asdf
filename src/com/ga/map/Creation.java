@@ -20,7 +20,6 @@ public class Creation {
         }
         r = new Random(seed);
         FileManager.loadPlayer();
-        FileManager.loadActors();
     }
     static void prepareRandom(int id){
         r = new Random((id*789)+seed);

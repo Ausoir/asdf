@@ -29,10 +29,7 @@ public abstract class AI implements Observer {
         if (host.state != Actions.Dead && host.delay.over()) {
             blocked(host.dir);
             perceive(160);
-            if (tasks.peek().update(host)) {
-                removeTask();
-                taskProgress = 0;
-            }
+            tasks.peek().update(host);
         }
     }
     public Behavior getDefaultTask(){
@@ -40,19 +37,14 @@ public abstract class AI implements Observer {
     }
     public void setTask(Behavior p){
         tasks.push(p);
-        setTraveler();
     }
     void removeTask(){
+        taskProgress = 0;
         tasks.pop();
         if (tasks.empty()) setTask(getDefaultTask());
-        else setTraveler();
-    }
-    private void setTraveler(){
-        Behavior behavior = tasks.peek();
-        host.traveler = behavior == Behavior.Travel || behavior == Behavior.Hunt;
     }
     public void onAttack(){}
-    public void onHit(){
+    void onHit(){
         if (!perceive(400)){
             if (tasks.peek().getAlertness() < 1){
                 setTask(Behavior.Search);

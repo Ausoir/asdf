@@ -162,7 +162,7 @@ public enum Intelligence {
 
                 private int fluctuate(int value) {
                     float itemFluc = host.rand.nextFloat()*.4f+.8f;
-                    return (int) ((value/100 * fluctuation * itemFluc + .25f) * 100);
+                    return (int) ((value/100f * fluctuation * itemFluc + .25f) * 100);
                 }
             });
         }
@@ -240,7 +240,8 @@ public enum Intelligence {
                 }
             });
         }
-    }, Dealer{
+    },
+    Dealer{
         public AI make(Unit host) {
             return process(new NeutralAI(host) {
                 private T wanted;
@@ -258,45 +259,43 @@ public enum Intelligence {
 
                 void shop() {
                     super.shop();
-                    if (Global.player.guild == 2) {
-                        ArrayList<Prop> inventory = Global.player.getAvailableItems();
-                        ArrayList<Prop> available = new ArrayList<>();
-                        ArrayList<Float> fluctuation = new ArrayList<>();
-                        for (Prop i : inventory) {
-                            for (int ii = 0; ii < wanted.size(); ii++) {
-                                if (i.name.equals(wanted.get(ii).get())) {
-                                    available.add(i);
-                                    fluctuation.add(priceR[ii]);
-                                    break;
-                                }
+                    ArrayList<Prop> inventory = Global.player.getAvailableItems();
+                    ArrayList<Prop> available = new ArrayList<>();
+                    ArrayList<Float> fluctuation = new ArrayList<>();
+                    for (Prop i : inventory) {
+                        for (int ii = 0; ii < wanted.size(); ii++) {
+                            if (i.name.equals(wanted.get(ii).get())) {
+                                available.add(i);
+                                fluctuation.add(priceR[ii]);
+                                break;
                             }
                         }
-                        if (available.size() == 0) {
-                            String list = "I'm a broker. I buy ";
-                            for (int i = 0; i < wanted.size(); i++) {
-                                if (i != wanted.size() - 1) list += wanted.get(i) + "s, ";
-                                else if (i > 0) list += "or " + wanted.get(i) + "s.";
-                                else list += wanted.get(i) + "s.";
-                            }
-                            Menu.menu.showDialog("Merchant Guild Broker", list + " Do you need something?");
-                        } else {
-                            Performer[] action = new Performer[available.size()];
-                            String[] options = new String[action.length];
-                            for (int i = 0; i < action.length; i++) {
-                                final Item item = (Item) available.get(i);
-                                final int price = (int) (item.getValue() * fluctuation.get(i));
-                                options[i] = item.getFullName() + " - " + Dialog.money(price);
-                                action[i] = new Performer(()-> {
-                                    Global.player.dropItem(item).remove();
-                                    Global.player.obtainGold(price);
-                                    Global.player.say("Sold " + item.getName() + " for " + Dialog.money(price) + "!");
-                                    host.say("@sold");
-                                });
-                            }
-                            Menu.menu.showDialog("List",
-                                    "We buy from the listed items.", options, action);
+                    }
+                    if (available.size() == 0) {
+                        String list = "I'm a broker. I buy ";
+                        for (int i = 0; i < wanted.size(); i++) {
+                            if (i != wanted.size() - 1) list += wanted.get(i) + "s, ";
+                            else if (i > 0) list += "or " + wanted.get(i) + "s.";
+                            else list += wanted.get(i) + "s.";
                         }
-                    } else Menu.menu.showDialog("Merchants Guild Insurer", "I'm sorry, you must be a member of the Merchants Guild to use my services.");
+                        Menu.menu.showDialog("Merchant Guild Broker", list + " Do you need something?");
+                    } else {
+                        Performer[] action = new Performer[available.size()];
+                        String[] options = new String[action.length];
+                        for (int i = 0; i < action.length; i++) {
+                            final Item item = (Item) available.get(i);
+                            final int price = (int) (item.getValue() * fluctuation.get(i));
+                            options[i] = item.getFullName() + " - " + Dialog.money(price);
+                            action[i] = new Performer(()-> {
+                                Global.player.dropItem(item).remove();
+                                Global.player.obtainGold(price);
+                                Global.player.say("Sold " + item.getName() + " for " + Dialog.money(price) + "!");
+                                host.say("@sold");
+                            });
+                        }
+                        Menu.menu.showDialog("List",
+                                "We buy from the listed items.", options, action);
+                    }
                 }
             });
         }
@@ -474,7 +473,7 @@ public enum Intelligence {
         }
     }, Guildsman{
         public AI make(Unit host) {
-            int entranceFee = 10000, exitFee = 10000;
+            int entranceFee = 10000, exitFee = 100000;
             return process(new NeutralAI(host) {
                 void shop() {
                     super.shop();
@@ -487,11 +486,11 @@ public enum Intelligence {
                     } else if (type == 2){
                         title = "Merchants Guild";
                         desc = "Merchants guild is a guild of brokers continuing the legacy of the once-powerful translocation guild. We are a powerful group of middlemen who can make you a whole lot richer. "+
-                                "You may sell various items to us for profit if you join us.";
+                                "You may join us and our journeys in the art of investments, which is the secret art of making money with money.";
                     } else if (type == 3){
                         title = "Mercenary Guild";
-                        desc = "We are the main military force of these lands. A powerful organization consisting of different mercenary bands from all over the world, we are both loyal and public. "+
-                                "Join us, and carry out duties together with fellow mercenary companions.";
+                        desc = "We are the main military force of these lands. A powerful organization consisting of countless mercenary bands from all over the world, we are both loyal and public. "+
+                                "Join us, and access our highly competent mercenary companions for hire.";
                     }
                     if (Global.player.guild == -1) {
                         String finalTitle = title + " " + host.name;
@@ -503,21 +502,50 @@ public enum Intelligence {
                                             Global.player.guild = type;
                                             Global.player.guildVar = 0;
                                             if (type == 1)
-                                                Menu.menu.showDialog(finalTitle, "If you wish to register with our health insurance system, please talk to our insurer.");
+                                                Menu.menu.showDialog(finalTitle, "If you wish to register with our health insurance system, please speak to our insurer.");
                                             else if (type == 2)
-                                                Menu.menu.showDialog(finalTitle, "Thank you for your patronage. Our brokers are now at your service.");
+                                                Menu.menu.showDialog(finalTitle, "Thank you for your patronage. Speak to me again to make an investment.");
                                             else if (type == 3)
-                                                Menu.menu.showDialog(finalTitle, "You are now a Mercenary Associate. Report to your officer as soon as possible.");
+                                                Menu.menu.showDialog(finalTitle, "Welcome to the world of mercenaries. Speak to me again for services.");
                                         } else Global.player.say(Dialog.get("!$"));
                                 })});
                     } else {
+                        ArrayList<String> options = new ArrayList<>(){{add("Pay an exit fee of "+Dialog.money(exitFee)+" and terminate affiliation");}};
+                        ArrayList<Performer> actions = new ArrayList<>(){{add(new Performer(()->{
+                            if (Global.player.requireGold(exitFee)) {
+                                Global.player.guild = -1;
+                                Global.player.guildVar = 0;
+                            } else Global.player.say(Dialog.get("!$"));
+                        }));}};
+                        if (type == 1) {
+                            options.add("Buy vitamins - "+Dialog.money(4000));
+                            actions.add(new Performer(()->{
+                                if (Global.player.requireGold(4000)){
+                                    Global.player.setWeapon((Item) Stock.Vitamin.create(Global.player.map, 1, -1).start());
+                                    Global.player.say("Bought Vitamins.");
+                                } else Global.player.say(Dialog.get("!$"));
+                            }));
+                        } else if (type == 2){
+                            options.add("Join investment group - "+Dialog.money(40000)+", ");
+                        } else if (type == 3){
+                            options.add("Hire a mercenary trooper - "+Dialog.money(8000));
+                            options.add("Hire a mercenary gunman - "+Dialog.money(20000));
+                            options.add("Buy a tranquilizer - "+Dialog.money(15000));
+                            actions.add(new Performer(()->{
+                                if (Global.player.requireGold(8000)){
+                                    Global.player.setWeapon((Item) Stock.Radio.create(Global.player.map, 1, -1).start());
+                                    Global.player.say("Bought a mercenary.");
+                                } else Global.player.say(Dialog.get("!$"));
+                            }));
+                            actions.add(new Performer(()->{
+                                if (Global.player.requireGold(8000)){
+                                    Global.player.setWeapon((Item) Stock.Vitamin.create(Global.player.map, 1, -1).start());
+                                    Global.player.say("Bought a tranquilizer.");
+                                } else Global.player.say(Dialog.get("!$"));
+                            }));
+                        }
                         Menu.menu.showDialog(title + " " + host.name, "Welcome, member. How can I help you?",
-                                new String[]{"Pay an exit fee of "+Dialog.money(exitFee)+" and terminate affiliation"}, new Performer[]{new Performer(()->{
-                                    if (Global.player.requireGold(exitFee)) {
-                                        Global.player.guild = -1;
-                                        Global.player.guildVar = 0;
-                                    } else Global.player.say(Dialog.get("!$"));
-                                })});
+                                options.toArray(new String[0]), actions.toArray(new Performer[0]));
                     }
                 }
             });

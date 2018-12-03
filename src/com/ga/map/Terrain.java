@@ -14,6 +14,7 @@ import java.util.ArrayList;
  */
 public class Terrain extends Drawable {
     private static final float ZOOM = 1.5f;
+    private static final BasicStroke stroke = new BasicStroke(1.5f);
     private ShadedPicture image;
     private Polygon polygon;
     private TexturePaint imageTexture;
@@ -21,7 +22,7 @@ public class Terrain extends Drawable {
     private ArrayList<Line> lines = new ArrayList<>();
     protected P pos;
     private int length = 0; //polygon size is always multiples of 4
-    private int offset = 0;
+    private int offset;
     private P finalSize;
     Map map;
     public Terrain(Map map, String texture, Shader shader, float depth){
@@ -44,7 +45,7 @@ public class Terrain extends Drawable {
         setDepth(depth);
         polygon = new Polygon();
 //        int c = Global.r.nextInt(255);
-//        if (image.image == null) this.color = new Color(c,c,c,Integer.parseInt(texture.substring(1).split(",")[3]));
+//        if (image.image == null) this.color = new Color(c,c,c,Integer.parseInt(texture.substring(1).split("/")[3]));
 //        else this.color = new Color(c,c,c,255);
 
         if (image.image == null){
@@ -102,8 +103,11 @@ public class Terrain extends Drawable {
         if (image.visible && pos.x > Global.camera.x-Settings.centerX-finalSize.x && pos.y > Global.camera.y-Settings.centerY-finalSize.y
                 && pos.x < Global.camera.x+Settings.centerX && pos.y < Global.camera.y+Settings.centerY) {
             g.drawImage(image.image,(int)(pos.x+Global.rel.x),(int)(pos.y+Global.rel.y),finalSize.x(),finalSize.y(),null);
-//            for (Line i : lines) g.drawLine((int)(t.x+i.pt.x),(int)(t.y+i.pt.y),(int)(t.x+i.ptd.x),(int)(t.y+i.ptd.y));
         }
+        P t = Global.rel;
+        g.setColor(Color.BLACK);
+        g.setStroke(stroke);
+        for (Line i : lines) g.drawLine((int)(t.x+i.pt.x),(int)(t.y+i.pt.y),(int)(t.x+i.ptd.x),(int)(t.y+i.ptd.y));
     }
     public void setDepth(float depth) {
         super.setDepth(depth);

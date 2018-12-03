@@ -9,14 +9,15 @@ import java.util.ArrayList;
  */
 public class Traits {
     public enum Trait {
-        Painless(0,"Resist flinching from being hit."),
+        Painless(0,"Does not flinch."),
         Bloodless(0,"Immune to bleeding."),
         Inorganic(0,"Immune to burning damage."),
-        Restless(0,"Does not require Stamina to perform actions."),
-        Overcharged(0,"Energy is full when performing actions."),
+        Restless(0,"Does not require Stamina."),
+        Overcharged(0,"Does not require Energy."),
 
         Learner(1,"Gain 1 motivation every hour."),
-        Instinct(1,"Evade decapitations using a Vitality point."),
+        Instinct(1,"Evade decapitation using a Vitality point."),
+        Tattoo(1,"Gain 1 extra memory slot."),
         Literacy(1,"Learn to read runes. You may now identify scrolls."),
         Alchemy(1,"Gain familiarity with alchemy. You may now identify potions."),
         Affinity(1,"Utilize energy from your body. The energy capacity is equal to your Intelligence."),
@@ -176,6 +177,11 @@ public class Traits {
         int index = trait.indexOf(p);
         if (index == -1) return 0;
         return level.get(index);
+    }
+    void forgetAll(Unit host){
+        for (Trait i : trait){
+            if (i.type == 3) forget(host, i);
+        }
     }
     public boolean forget(Unit host, Trait p){
         if (has(p)){

@@ -1,20 +1,17 @@
 package com.ga.map;
 
+import com.ga.game.FileManager;
 import com.ga.tool.Line;
 import com.ga.tool.P;
+import com.ga.tool.T;
 import com.ga.unit.Stock;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 class GenerateTown {
-    private static HashMap<Integer, String[]> buildings = new HashMap<>(){{
-        put(1,new String[]{"House1","House2","House3","House4","Bighouse1","Bighouse2","Inn","Scrapyard","Outpost"});
-        put(2,new String[]{"House1","House2","House3","House4","Restaurant","Inn","Shop","Clothier","School","Ranch"});
-        put(3,new String[]{"Sewer","Hideout","Restaurant","Shop","Bazaar","Laboratory","Hospital","Armory","Safehouse"});
-    }};
     static void generate(Map map, int cityType){
         Generator generator = new Generator(map, 0);
+        map.type = 1;
         map.size = new P(4000+Creation.r.nextInt(3000), 1400);
         String[] landTexture;
         if (map.isSnowing()) landTexture = new String[]{"dirt,snow"};
@@ -32,6 +29,7 @@ class GenerateTown {
         map.size.y -= 1600;
         int bid = 10;
         ArrayList<Line> beforeBuilding = (ArrayList<Line>) map.landRaw.clone();
+        T buildings = FileManager.readLiteral("Data/raw/Town.txt", cityType);
         for (Line l : beforeBuilding) {
             if (l.opt > 0 && l.tid >= 0 && l.clockwise() && Math.abs(l.getSlope()) < .1f) {
                 if (cityType > 1) {
@@ -47,7 +45,7 @@ class GenerateTown {
                         map.placeProp(l, Stock.createByName(map, "Resident", -1));
                 }
                 if (Math.abs(l.getSlope()) < .01f) {
-                    bid = generator.generateBuildings(buildings.get(cityType), l, bid) + 1;
+                    bid = generator.generateBuildings(buildings, l, bid) + 1;
                 }
             }
         }

@@ -43,12 +43,12 @@ public class Generator {
             generateBuilding(building, validLands.get(Creation.r.nextInt(validLands.size())).getMidpoint(), 10);
         }
     }
-    int generateBuildings(String[] p, Line land, int bid) {
+    int generateBuildings(T p, Line land, int bid) {
         int estate = land.ptd.x() - land.pt.x();
         ArrayList<String[]> possibleBuildings = new ArrayList<>(); //Get all buildings that fit the estate
-        for (String i : p) {
-            int size = buildings.get(i);
-            if (size <= estate) possibleBuildings.add(new String[]{i, size + ""});
+        for (T i : p) {
+            int size = buildings.get(i.get());
+            if (size <= estate) possibleBuildings.add(new String[]{i.get(), size + ""});
         }
         ArrayList<String[]> resultBuildings = new ArrayList<>(); //Build buildings according to estate
         if (possibleBuildings.size() > 0) {

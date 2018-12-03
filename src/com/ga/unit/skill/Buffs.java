@@ -1,6 +1,5 @@
 package com.ga.unit.skill;
 
-import com.ga.game.FileManager;
 import com.ga.game.Sound;
 import com.ga.map.Global;
 import com.ga.map.Shader;
@@ -263,7 +262,7 @@ public enum Buffs {
                     time = Global.time + 80;
                     if (level >= 5){
                         onTrigger();
-                        if (!host.stats.agility.require(1)) host.die("Bleeding");
+                        if (!host.stats.agility.require(1)) host.die(Unit.DEATH_BLEEDING, "Bleeding");
                     }
                 }
                 public void onStack(int level){
@@ -628,7 +627,7 @@ public enum Buffs {
             }
             public void onFinish(){
                 if (var == 0){
-                    if (!host.stats.agility.require(level)) host.die("Poisoning");
+                    if (!host.stats.agility.require(level)) host.die(Unit.DEATH_POISON, "Poisoning");
                 }
             }
             public boolean onTrigger(){
@@ -648,22 +647,6 @@ public enum Buffs {
             }
         };
     }},
-    Tranquilized(3,"You will drop your armor on death.",new Tags(){{
-        add(Tag.Curse);
-        add(Tag.Channeling);
-        add(Tag.Void);
-    }}){ Buff makeLocal(int level) {
-        return new Buff(level, 20) {
-            int tick = 0;
-            public boolean update() {
-                if (tick++ % 6 == 0){
-                    Particle.implode(host.map, "Poison", host.getDepth(),host.getHead(),3,16,true,6);
-                    return super.update();
-                }
-                return false;
-            }
-        };
-    }},
     Affinity(3,"Your energy costing actions are free.",new Tags(){{
         add(Tag.Enchant);
         add(Tag.Channeling);
@@ -674,27 +657,6 @@ public enum Buffs {
                 if (level > 1) level--;
                 else super.onTrigger();
                 return true;
-            }
-        };
-    }},
-    Invisibility(3,"You are invisible.",new Tags(){{
-        add(Tag.Enchant);
-        add(Tag.Channeling);
-        add(Tag.Void);
-    }}){ Buff makeLocal(int level){
-        return new Buff(level, 4) {
-            public void onSet() {
-                Sound.play(host.map, host.pos, "shadowstep");
-                for (Unit i : host.map.updater.unitsLoaded){
-                    if (i.brain.target == host) i.brain.target = null;
-                }
-                onLoad();
-            }
-            public void onLoad(){
-                host.setVisible(false);
-            }
-            public void onFinish(){
-                host.setVisible(true);
             }
         };
     }},
@@ -745,14 +707,62 @@ public enum Buffs {
             public boolean isDangerous() { return true; }
             public void onFinish() {
                 if (host instanceof MainPlayer){
-                    Global.server.requestChangeMap(FileManager.makeDirectory("ins/_")+(SyncRand.getInt(20*level)-(10*level))+",1");
-                    Global.server.afterMapChange = new Performer(()-> host.pos.set(Global.r.nextInt((int) host.map.size.x-64)+36, 48));
+                    T maps = new T();
+                    maps.add(host.map.name.toString());
+                    for (Prop i : host.map.updater.props){
+                        if (i.factoryId == Stock.Travel.ordinal()){
+                            maps.add(i.name);
+                        }
+                    }
+                    for (T i : maps){
+                        Global.server.requestChangeMap(i.get()+",0");
+                        Global.server.afterMapChange = new Performer(()-> host.pos.set(SyncRand.getInt((int) host.map.size.x-64)+36, 48));
+                    }
                 } else host.remove();
             }
             public boolean update() {
                 if (turn++ % 2 == 0)
-                    Particle.explode(host.map, "Smoke", host.getDepth(), host.getRandomPoint(), new P(), 1, 10, 0, true, 12);
+                    Particle.implode(host.map, "Smoke", host.getDepth(), host.getRandomPoint(), 3, 10, false, 9);
                 return super.update();
+            }
+        };
+    }},
+    Tranquilized(4,"You will drop your armor on death.",new Tags(){{
+        add(Tag.Curse);
+        add(Tag.Channeling);
+        add(Tag.Void);
+    }}){ Buff makeLocal(int level) {
+        return new Buff(level, 20) {
+            int tick = 0;
+            public boolean update() {
+                if (tick++ % 6 == 0){
+                    Particle.implode(host.map, "Poison", host.getDepth(),host.getHead(),3,16,true,6);
+                    return super.update();
+                }
+                return false;
+            }
+        };
+    }},
+    Invisibility(4,"You are invisible.",new Tags(){{
+        add(Tag.Enchant);
+        add(Tag.Channeling);
+        add(Tag.Void);
+    }}){ Buff makeLocal(int level){
+        return new Buff(level, 4) {
+            private int tick = 0;
+            public void onSet() {
+                Sound.play(host.map, host.pos, "shadowstep");
+                for (Unit i : host.map.updater.unitsLoaded){
+                    if (i.brain.target == host) i.brain.target = null;
+                }
+                onLoad();
+            }
+            public boolean update(){
+                if (tick++ % 50 == 0) host.setVisible(false);
+                return super.update();
+            }
+            public void onFinish(){
+                host.setVisible(true);
             }
         };
     }};

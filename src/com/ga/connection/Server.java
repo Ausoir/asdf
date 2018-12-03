@@ -112,7 +112,6 @@ public class Server {
                 Global.maps.clear();
                 FileManager.loadWorld();
                 FileManager.loadPlayer();
-                FileManager.loadActors();
                 Processes.resume();
                 if (afterMapChange != null) afterMapChange.run();
             }
@@ -199,7 +198,7 @@ public class Server {
                     clients.put(udp.getClientIP(), newest);
                     FileManager.saveCharacter();
                     FileManager.saveWorld();
-                    FileManager.save(FileManager.makeDirectory("Data/map/multiplayer/serverActors.map"), Global.player.map.updater.toActorString());
+//                    FileManager.save(FileManager.makeDirectory("Data/map/multiplayer/serverActors.map"), Global.player.map.updater.toActorString());
                     Global.p("Connection established with client at "+udp.getClientIP()+"/"+udp.getClientPort());
                     newest.message("START}"+player.controlId);
                     tcpUploader.upload(FileManager.makeDirectory("Data/map/World.map"));
@@ -301,7 +300,7 @@ public class Server {
                             player.start();
                             Global.p("Player assigned "+Global.player.controlId);
                             Global.p("Host assigned "+player.controlId);
-                            FileManager.loadActors();
+//                            FileManager.loadActors();
                         } else {
                             Global.player.say("Server found, but failed to connect!");
                         }

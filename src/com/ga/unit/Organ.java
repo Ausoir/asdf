@@ -26,6 +26,7 @@ public class Organ extends Line {
     public int type;
     private int maxLength = 80;
     public boolean vital = false;
+    boolean amputable = true;
     boolean leg = false, hand = false;
     public Performer onAmputate = new Performer(null);
 
@@ -65,6 +66,7 @@ public class Organ extends Line {
         ptd.set(pt.getAdd(p.getAtan(maxLength)));
     }
     public void amputate(Line p, int damage){
+        if (!amputable) return;
         Sound.play(host.map, host.pos, "hit_bloody");
         int intensity = 16 + damage;
         if (image != null) {

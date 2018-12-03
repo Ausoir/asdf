@@ -1,0 +1,3 @@
+House1,House2,House3,House4,Bighouse1,Bighouse2,Inn,Scrapyard,Outpost
+House1,House2,House3,House4,Restaurant,Inn,Shop,Clothier,School,Ranch
+Sewer,Hideout,Restaurant,Shop,Bazaar,Laboratory,Hospital,Armory,Safehouse

@@ -300,13 +300,15 @@ public class Man extends Unit {
         return r;
     }
 
-    public void die(String cause) {
+    public void die(int cause, String desc) {
         say("@x");
         if (rand.nextBoolean()) weapon.drop(this);
         weapon.remove();
-        if (status.getEffectLevel(Buffs.Tranquilized) > 0) armor.drop();
-        else armor.remove();
-        super.die(cause);
+        if (status.getEffectLevel(Buffs.Tranquilized) > 0){
+            armor.drop();
+            remove();
+        } else armor.remove();
+        super.die(cause, desc);
     }
     public P getInteractPoint(){
         return getHand();

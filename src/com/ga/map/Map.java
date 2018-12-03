@@ -42,6 +42,7 @@ public class Map {
     private Thing[] panorama = new Thing[3];
     public Updater updater;
     public int temperature = 0;
+    public int type = 0;
 
     Map(String name) {
         this.name = new MapName(name);
@@ -70,8 +71,10 @@ public class Map {
             panorama[0] = new Thing(this, "Panorama", null, 0, 0) {
                 @Override
                 public void draw(Graphics2D g) {
-                    g.setColor(Color.black);
+                    g.setColor(Color.white);
                     g.fillRect(0, 0, Settings.screenX, Settings.screenY);
+                    g.setColor(Color.black);
+                    g.setStroke(new BasicStroke(4));
                 }
             }.start();
         } else {
@@ -97,7 +100,8 @@ public class Map {
                 for (Thing i : panorama) i.setImage(i.name);
             }));
         }
-        this.temperature = s.get(3, new T("0")).getInt();
+        this.temperature = s.get(3).getInt();
+        this.type = s.get(4, new T("0")).getInt();
         if (data.size() > 1) {
             s = data.get(1);
             for (T i : s) formTextures.put(i.get(0).getInt(), i.get(1).get());
@@ -120,7 +124,7 @@ public class Map {
 
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder(callname + "," + panoramaName + "," + size.toString() + "," + temperature + "\n");
+        StringBuilder result = new StringBuilder(callname + "," + panoramaName + "," + size.toString() + "," + temperature + "," + type + "\n");
         Iterator it = formTextures.entrySet().iterator();
         while (it.hasNext()) {
             java.util.Map.Entry pair = (java.util.Map.Entry) it.next();
@@ -156,7 +160,7 @@ public class Map {
         return nextPolygon;
     }
 
-    public void setTexture() {
+    public void setTexture() { //todo: test disable textured terrain
         for (final Line i : landRaw) {
             if (i.tid >= 0) {
                 String formTexture = formTextures.get(i.tid);

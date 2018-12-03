@@ -18,8 +18,9 @@ public class Stat {
         setTotal(p, false);
     }
     public void setTotal(int p, boolean force){
-        if (!force) current += p-max;
+        if (!force) current = Math.max(0, current + p-max);
         max = p;
+        max = Math.max(1, p);
     }
     public void set(int p, boolean force){
         current = p;

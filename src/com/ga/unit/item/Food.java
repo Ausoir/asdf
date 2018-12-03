@@ -23,7 +23,7 @@ public class Food extends Item {
         onTimeChange();
     }
     public int getValue(){
-        return (int) Math.max(0, ((uses*(taste+nutrition)+.4f*(perish-Global.hour))*100));
+        return (int) Math.max(100, ((uses*(taste+nutrition)+.4f*(perish-Global.hour))*100))*2;
     }
     @Override
     public boolean use(Man p){

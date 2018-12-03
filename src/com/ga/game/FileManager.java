@@ -3,12 +3,10 @@ package com.ga.game;
 import com.ga.map.Creation;
 import com.ga.map.Global;
 import com.ga.map.Map;
-import com.ga.map.Updater;
 import com.ga.tool.Line;
 import com.ga.tool.T;
 import com.ga.unit.Clip;
 import com.ga.unit.Stock;
-import com.ga.unit.Unit;
 import com.ga.unit.man.MainPlayer;
 import com.ga.unit.skill.Actions;
 
@@ -112,16 +110,6 @@ public class FileManager {
         Global.camera = player.map.mapEdgeCenter(player.map.size.getMult(.5f, .5f));
         player.start();
         Menu.init(veryFirst);
-    }
-
-    public static void loadActors(){
-        String data = read("Data/map/Actors.map");
-        if (!data.isEmpty()) {
-            String[] actors = data.split("%");
-            for (String i : actors) {
-                ((Unit) Stock.get(null, i).start()).traveler = true;
-            }
-        }
     }
 
     private static int[] readClipFrames(String[] data) {
@@ -243,7 +231,6 @@ public class FileManager {
 
     public static void saveWorld(){
         save(FileManager.makeDirectory("Data/map/World.map"), Creation.seed + "," + Global.hour + "," + Global.controlId);
-        save(FileManager.makeDirectory("Data/map/Actors.map"), Updater.toActorString());
     }
 
     public static void cleanMaps() {

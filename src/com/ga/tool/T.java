@@ -44,6 +44,7 @@ public class T extends L<T> {
         return get(rand.nextInt(size()));
     }
     public String get(){
+        build();
         return value;
     }
     public T get(int index){

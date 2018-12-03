@@ -104,20 +104,20 @@ public class MainPlayer extends Player {
         } else say("Level cannot increase any higher!");
     }
 
-    public void die(String cause) {
-        super.die(cause);
+    public void die(int cause, String desc) {
+        super.die(cause, desc);
         map.weather.fadeOut();
         delay.time = 100;
         delay.performer = new Performer(()->{
             delay.time = -1;
-            String msg = "Cause: "+cause+"\n";
+            String msg = "Sign of death: "+ desc +".\n";
             if (!insuranceMap.isEmpty()) {
                 int expiry = insuranceExpiry - Global.hour;
                 if (expiry < 0) msg += "Your insurance expired "+expiry+" hours ago.";
                 else if (insuranceCost > 0) msg += "The medical guild leaves you to die as you have not payed off your last debt.";
                 else {
                     map.updater.forceSleep(1);
-                    Menu.menu.showDialog("You fall unconscious...", msg+"Your medical guild agents haul your body back into the guild hospital for revival...");
+                    Menu.menu.showDialog("You fall unconscious...", msg+"Your guild agents haul your body back into the guild hospital for revival...");
                     revive();
                     Global.server.requestChangeMap(insuranceMap+",911");
                     insuranceCost = -insuranceCost;
@@ -125,7 +125,6 @@ public class MainPlayer extends Player {
                 }
             }
             FileManager.save(FileManager.makeDirectory("Data/map/Player.user"),"");
-            FileManager.save(FileManager.makeDirectory("Data/map/Actors.map"),"");
             FileManager.save(FileManager.makeDirectory("Data/map/World.map"),"");
             FileManager.save(FileManager.makeDirectory("Data/Keymap.txt"),"");
             FileManager.cleanMaps();

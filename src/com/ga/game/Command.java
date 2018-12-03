@@ -24,7 +24,7 @@ public class Command {
                 String[] cmd = i.split("@");
                 if (cmd[0].equals("say")) host.say(cmd[1]);
                 else if (cmd[0].equals("menuDialog")) Menu.menu.showDialog(cmd[1],cmd[2]);
-                else if (cmd[0].equals("die")) host.die("Unknown");
+                else if (cmd[0].equals("die")) host.die(0,"Unknown");
                 else if (cmd[0].equals("crft")) Crafts.craftByName(host, cmd[1]);
                 else if (cmd[0].equals("buff")) host.buff(Buffs.valueOf(cmd[1]), Integer.parseInt(cmd[2]));
                 else if (cmd[0].equals("seed")) host.weapon.seed = Integer.parseInt(cmd[1]);
@@ -53,6 +53,7 @@ public class Command {
                     if (cmd.length > 2) item = (Item) Stock.createByName(host.map, cmd[1], Integer.parseInt(cmd[2]), -1);
                     else item = (Item) Stock.createByName(host.map, cmd[1], -1);
                     item.start().pos = host.pos.getAdd(0,0);
+                    item.setDepth(host.getDepth());
                 } else if (cmd[0].equals("build")) new Generator(host.map, 99).generateBuilding(cmd[1], host.pos.getAdd(host.target), 9999);
                 else if (cmd[0].equals("tp")) host.pos.add(Integer.parseInt(cmd[1].split(",")[0]),Integer.parseInt(cmd[1].split(",")[1]));
                 else if (cmd[0].equals("to")){

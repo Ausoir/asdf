@@ -20,6 +20,7 @@ class GeneratePlains {
     }
     private static void generate(Map map, String theme, int type){
         Generator generator = new Generator(map, 0);
+        map.type = 2;
         map.size = new P(Creation.r.nextInt(4000)+2000, Creation.r.nextInt(4000)+2000);
         int depth = 4;
         P start = new P(-64, Creation.r.nextInt(map.size.y()-128)+64);

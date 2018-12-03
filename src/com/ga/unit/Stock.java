@@ -47,7 +47,9 @@ public enum Stock {
         product.image.visible = false;
         product.onInteract = new Interactive(){
             public void interact(com.ga.unit.man.Man p){
-                if (p == Global.player) Global.server.requestChangeMap(product.name+","+seed);
+                if (p == Global.player){
+                    if (Global.player.map.updater.isSafe(0, true)) Global.server.requestChangeMap(product.name+","+seed);
+                }
             }
         };
         return product;
@@ -214,9 +216,9 @@ public enum Stock {
                 super.stateUpdate();
                 if (state == Actions.Melee) attack();
             }
-            public void die(String p){
+            public void die(int cause, String desc){
                 Stock.createByName(map, "Meat", -1).start().pos.set(pos);
-                super.die(p);
+                super.die(cause, desc);
             }
             public void onCreate(){
                 UnitFactory unitString = new UnitFactory(this, Faction.Predator, new T("3,2,1"));
@@ -259,9 +261,9 @@ public enum Stock {
                 traits.load(this, new T("[[Bloodless,1],[Inorganic,1],[Instinct,1]]"));
                 stats.speed = 8;
             }
-            public void die(String p){
+            public void die(int cause, String desc){
                 Stock.createByName(map, "Resin", -1).start().pos.set(pos);
-                super.die(p);
+                super.die(cause, desc);
             }
         };
         product.clip = new Body(product, name());
@@ -292,9 +294,9 @@ public enum Stock {
             public void buff(Buffs buff, int level){
                 super.buff(buff, level*2);
             }
-            public void die(String p){
+            public void die(int cause, String desc){
                 Stock.createByName(map, "Poultry", -1).start().pos.set(pos);
-                super.die(p);
+                super.die(cause, desc);
             }
             public void onCreate(){
                 UnitFactory unitString = new UnitFactory(this, Faction.Predator, new T("3,5,3"));
@@ -392,9 +394,9 @@ public enum Stock {
                     Particle.explode(map, "Fire", pj.getDepth(), tip, pj.vel, 3, 12, 20, false, 3);
                 }
             }
-            public void die(String p){
+            public void die(int cause, String desc){
                 Stock.createByName(map, "Ammunition", 0).start().pos.set(pos);
-                super.die(p);
+                super.die(cause, desc);
             }
         };
         product.clip = new Body(product, name());
@@ -444,7 +446,7 @@ public enum Stock {
                 return uses;
             }
             public String getDescription(){
-                return super.getDescription()+"This is your standard currency. Contains "+Dialog.money(uses)+".";
+                return super.getDescription()+" This is your standard currency. Contains "+Dialog.money(uses)+".";
             }
         };
         product.tags.add(Tag.Currency);
@@ -597,6 +599,9 @@ public enum Stock {
                 super.load(p);
                 value = 100 + emod.value*ademod.level*100;
             }
+            public String getDescription(){
+                return super.getDescription() + " Drink this potion to receive its effect.";
+            }
         };
         product.range = 600;
         return product;
@@ -631,6 +636,9 @@ public enum Stock {
             public String getName(){
                 if (!Global.player.traits.has(Traits.Trait.Literacy)) return super.getName();
                 return super.getName()+" of "+spell.name();
+            }
+            public String getDescription(){
+                return super.getDescription() + " Rip this scroll to cast a spell inscribed within.";
             }
         };
         product.probability = 1;
@@ -716,22 +724,30 @@ public enum Stock {
             }
             private void timeUpdate(){
                 if (!Global.editor && (Global.hour >= rotation)) {
-                    int count = 0;
-                    for (Unit unit : map.updater.unitsLoaded){
-                        if (unit.name.equals(name)) count++;
-                    }
-                    for (Prop prop : map.updater.props){
-                        if (prop.factoryId != factoryId && prop.name.equals(name)) count++;
-                    }
-                    if (count < id){
-                        int amount;
-                        if (seed == 0) amount = id-count;
-                        else amount = (int) Math.min(id-count, ((Global.hour-rotation)/seed)+1);
-                        for (int i=0;i<amount;i++) {
-                            Stock.createByName(map, name, -1).start().pos.set(pos);
+                    if (id % 3 != 0 || SyncRand.getBool()) {
+                        int spawnerCount = 0;
+                        int unitCount = 0;
+                        for (Unit unit : map.updater.unitsLoaded) {
+                            if (unit.name.equals(name)) unitCount++;
                         }
+                        for (Prop prop : map.updater.props) {
+                            if (prop.factoryId != factoryId && prop.name.equals(name)) unitCount++;
+                        }
+                        for (Prop prop : map.updater.props) {
+                            if (prop.factoryId == factoryId) spawnerCount++;
+                        }
+                        if (unitCount < spawnerCount) {
+                            int amount;
+                            if (seed == 0) amount = spawnerCount - unitCount;
+                            else
+                                amount = (int) Math.min(spawnerCount - unitCount, ((Global.hour - rotation) / seed) + 1);
+                            for (int i = 0; i < amount; i++) {
+                                Stock.createByName(map, name, -1).start().pos.set(pos);
+                            }
+                        }
+                        rotation = Global.hour + seed;
                     }
-                    rotation = Global.hour + seed;
+                    if (id % 2 == 0) remove();
                 }
             }
         };
@@ -812,9 +828,9 @@ public enum Stock {
                             if (subId < Global.hour) {
                                 Menu.menu.showDialog("Safe", "How long would you like to use this storage? " + Dialog.money(100) + " per hour." +
                                                 "\nWARNING - The safe is not responsible for any items stolen after hours are over.",
-                                        new String[]{"1 hour", "1 day/6 hours", "1 week/42 hours", "1 month/180 hours"}, new Performer[]{
+                                        new String[]{"2 hours", "1 day/6 hours", "1 week/42 hours", "1 month/180 hours"}, new Performer[]{
                                             new Performer(()-> {
-                                                if (p.requireGold(100)) subId = 1 + Global.hour;
+                                                if (p.requireGold(200)) subId = 2 + Global.hour;
                                             }), new Performer(()-> {
                                                 if (p.requireGold(600)) subId = 6 + Global.hour;
                                             }), new Performer(()-> {
@@ -904,7 +920,7 @@ public enum Stock {
                 return true;
             }
             public String getDescription(){
-                return super.getDescription()+"Use this trinket to repair items made of same material. Takes 1 hour.";
+                return super.getDescription()+" Use this trinket to repair items made of same material. Takes 1 hour.";
             }
         };
         product.disposable = false;
@@ -1221,7 +1237,7 @@ public enum Stock {
     Battery{ Prop make(Map map, int id, int seed){
         Item product = new Item(map, name(), name(),seed,Item.Material.Copper,Item.ItemType.Consumable,8){
             public String getDescription(){
-                return super.getDescription()+"\nThis item can store Energy for magical applications.";
+                return super.getDescription()+" This item can store Energy for magical applications.";
             }
         };
         product.disposable = false;
@@ -1232,7 +1248,7 @@ public enum Stock {
         String name = new String[]{"Beer","Cocktail","Mead","Rum","Grog"}[seed % 5];
         return new Item(map, name,name,seed,Item.Material.Organic,Item.ItemType.Consumable,((seed % 5)*2)+1) {
             public String getDescription() {
-                return super.getDescription() + "\nDrink to restore Energy into your body.";
+                return super.getDescription() + " Drink to restore Energy into your body.";
             }
             @Override
             public boolean use(Man p) {
@@ -1306,6 +1322,9 @@ public enum Stock {
                 }
                 return false;
             }
+            public String getDescription(){
+                return super.getDescription()+" A target hit with this item will be tranquilized. If a target dies while tranquilized they drop all their belongings.";
+            }
             public String getFullName(){
                 return level == 2 ? "Heavy " : "" + super.getFullName();
             }
@@ -1339,7 +1358,7 @@ public enum Stock {
                 return false;
             }
             public String getDescription(){
-                return super.getDescription()+"\nThis item can generate energy.";
+                return super.getDescription()+" This item can generate energy.";
             }
         };
         product.disposable = false;
@@ -1356,7 +1375,7 @@ public enum Stock {
                 return "Level " + level + " " + super.getFullName();
             }
             public String getDescription(){
-                return super.getDescription()+"\nThis item can store Energy for magical applications.";
+                return super.getDescription()+" This item can store Energy for magical applications.";
             }
         };
         product.durability = level * level * 4;
@@ -1384,7 +1403,7 @@ public enum Stock {
                 return "Level "+level+" "+super.getFullName();
             }
             public String getDescription(){
-                return super.getDescription()+"\nUsing this trinket will cast level "+level+" Ethersword.";
+                return super.getDescription()+" Using this trinket will cast level "+level+" Ethersword.";
             }
         };
         product.disposable = false;
@@ -1424,7 +1443,7 @@ public enum Stock {
                 return false;
             }
             public String getDescription(){
-                return super.getDescription()+"\nThis trinket will remember the location of where you had put it on. Activate to return to the location.";
+                return super.getDescription()+" This trinket will remember the location of where you had put it on. Activate to return to the location.";
             }
             public void load(T p){
                 super.load(p);
@@ -1472,6 +1491,59 @@ public enum Stock {
             }
         };
         product.name = name();
+        return product;
+    }},
+    Radio{ Prop make(Map map, int id, int seed){
+        Item product = new Item(map, name(), name(), seed, Item.Material.Steel, Item.ItemType.Bashing, 1){
+            @Override
+            public boolean use(com.ga.unit.man.Man host){
+                if (host instanceof MainPlayer && super.use(host) && isUsable(false, 1)) {
+                    host.say("Requesting backup!");
+                    return true;
+                }
+                return false;
+            }
+            public String getDescription(){
+                return super.getDescription()+" This drug will make you forget all your skills forever.";
+            }
+        };
+        product.value = 2000;
+        return product;
+    }},
+    Memoryfoam_Pill1{ Prop make(Map map, final int id, int seed){
+        Item product = new Item(map, "Red Memoryfoam Pill", "Vitamin", seed, Item.Material.Organic, Item.ItemType.Consumable, 1){
+            @Override
+            public boolean use(com.ga.unit.man.Man host){
+                if (host instanceof MainPlayer && super.use(host) && isUsable(true, 1)) {
+                    host.moveset.clear();
+                    host.say("Forgot all my skills!");
+                    return true;
+                }
+                return false;
+            }
+            public String getDescription(){
+                return super.getDescription()+" This drug will make you forget all your skills forever.";
+            }
+        };
+        product.value = 2000;
+        return product;
+    }},
+    Memoryfoam_Pill2{ Prop make(Map map, final int id, int seed){
+        Item product = new Item(map, "Blue Memoryfoam Pill", "Vitamin", seed, Item.Material.Organic, Item.ItemType.Consumable, 1){
+            @Override
+            public boolean use(com.ga.unit.man.Man host){
+                if (host instanceof MainPlayer && super.use(host) && isUsable(true, 1)) {
+                    host.traits.forgetAll(host);
+                    host.say("Lost all my masteries!");
+                    return true;
+                }
+                return false;
+            }
+            public String getDescription(){
+                return super.getDescription()+" This drug will make you forget all your masteries forever.";
+            }
+        };
+        product.value = 2000;
         return product;
     }};
     private static HashMap<String, String> extRegistry = new HashMap<>();

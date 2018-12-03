@@ -49,6 +49,10 @@ public class Body {
         for (int i=0;i<organs.length;i++){
             organs[i].setSize(p[0][i]);
             int type = p[1][i];
+            if (type >= 10){
+                organs[i].amputable = false;
+                type -= 10;
+            }
             if (type >= 4){
                 organs[i].vital = true;
                 type -= 4;
@@ -235,7 +239,7 @@ public class Body {
                 if (o.leg) legCurrent--;
                 if (o.vital) {
                     setState("Down");
-                    host.die("Decapitation");
+                    host.die(Unit.DEATH_DECAPITATION, "Decapitation");
                     return;
                 }
             }

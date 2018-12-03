@@ -22,7 +22,7 @@ Recruiter,,,merchant,[8,8,8],Neutral,[10,3],[Use,Backstep],[Firearm],[Infantry J
   ***** Mobs *****
 Security,,,soldier,[7,7,7],Neutral,[2,1],[Use,Kick,Shock],[Staff],[Security Armor],[Security Tights],[Blondecut,Sunglass],,[[Aeromancy,3],[Affinity,1],[Overcharged,1]]
 Looter,,,punk,[3,3,3],Punk,[2,1],[Use,Backstep,Kick],[Stick,Bamboo Spear],[Shirt,Hoodie],[Pants,Cargo Pants,Jeans],,,
-Punk,,,punk,[4,3,2],Punk,[2,1],[Use,Charge,Dash,Uppercut],[Knife,Crowbar,Baseball Bat],[Jean Jacket],[Jeans],[Buzzcut],,
+Punk,,,punk,[4,3,2],Punk,[2,1],[Use,Charge,Dash,Uppercut],[Knife,Crowbar,Baseball Bat],[Jean Jacket],[Jeans],[Buzzcut,Cap,Buzzcut,Blondecut,Gingercut],,
 Yeller,,,punk,[3,3,5],Punk,[2,1],[Use,Backstep,Calling],[Stick],[Sweater,Hoodie],[Lined Pants],[Mouthwrap],[Battery],[[Infusion,3],[Overcharged,1]]
 Hillbird,,,punk,[7,7,2],Punk,[2,1],[Use,Lunge,Dash,Shadowstep],[Dagger,Tanto,Claw],[Burlap Armor],[Burlap Loins],[Mask,Bandana,Straw Hat],,
 Monk,,,punk,[3,7,6],Rogue,[2,1],[Backstep,Use,Punch,Kick,Dash,Leap],[,Spear,Bamboo Spear,Threadball,Throwing Knife,Scroll,Potion],[Robe Top],[Robe Pants],,,
@@ -37,3 +37,4 @@ Witch,,Zombie_skin,punk,[1,9,5],Evil,[2,1],[Blink,Enchant,Calling,Mark,Swap],,[C
 Skeleton,Skull,Skeleton_skin,undead,[12,4,1],Evil,[2,1],[Use],[Broadsword,Spear,Cutlass,Machete],,,[Lace_Helm,Legion_Helm,Full_Helm],,[[Painless,1],[Restless,1]]
 Zombie,Zombie,Zombie_skin,undead,[8,24,3],Evil,[2,1],[Punch,Charge],,,,,,[[Painless,1],[Restless,1],[Instinct,1]]
 Phantom,Phantom,Shadowrobe,,[12,7,12],Evil,[2,1],[Whirlwind,Use,Shadowstep,Glowshot,Shock,Lightning],[Greatsword,Halberd,Warhammer],[Shadowrobe Torso],[Shadowrobe Pants],,,[[Shadoweaving,2],[Aeromancy,2],[Infusion,4],[Restless,1],[Affinity,1],[Instinct,1],[Overcharged,1]]
+Hobo,,,punk,[3,3,3],Punk,[2,1],[Use,Backstep,Kick],[Test],,,,,
