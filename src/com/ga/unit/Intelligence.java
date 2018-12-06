@@ -518,29 +518,37 @@ public enum Intelligence {
                             } else Global.player.say(Dialog.get("!$"));
                         }));}};
                         if (type == 1) {
-                            options.add("Buy vitamins - "+Dialog.money(4000));
+                            options.add("Buy vitamins - "+Dialog.money(2400));
                             actions.add(new Performer(()->{
-                                if (Global.player.requireGold(4000)){
+                                if (Global.player.requireGold(2400)){
                                     Global.player.setWeapon((Item) Stock.Vitamin.create(Global.player.map, 1, -1).start());
                                     Global.player.say("Bought Vitamins.");
                                 } else Global.player.say(Dialog.get("!$"));
                             }));
                         } else if (type == 2){
                             options.add("Join investment group - "+Dialog.money(40000)+", ");
-                        } else if (type == 3){
-                            options.add("Hire a mercenary trooper - "+Dialog.money(8000));
-                            options.add("Hire a mercenary gunman - "+Dialog.money(20000));
-                            options.add("Buy a tranquilizer - "+Dialog.money(15000));
                             actions.add(new Performer(()->{
-                                if (Global.player.requireGold(8000)){
-                                    Global.player.setWeapon((Item) Stock.Radio.create(Global.player.map, 1, -1).start());
-                                    Global.player.say("Bought a mercenary.");
+                                if (Global.player.requireGold(40000)){
+                                    Global.player.say("Joined investment group.");
+                                } else Global.player.say(Dialog.get("!$"));
+                            }));
+                        } else if (type == 3){
+                            options.add("Upgrade mercenary services - "+Dialog.money(10000));
+                            options.add("Change mercenary service type - "+Dialog.money(500));
+                            actions.add(new Performer(()->{
+                                if (Global.player.requireGold(10000)){
+                                    Global.player.guildVar++;
+                                    if (Global.player.getAvailableItems().removeIfReuse(e -> e.factoryId != Stock.Radio.ordinal()).isEmpty()) {
+                                        Global.player.setWeapon((Item) Stock.Radio.create(Global.player.map, 1, -1).start());
+                                        Global.player.say("Received call radio.");
+                                    } else Global.player.say("Upgraded service.");
                                 } else Global.player.say(Dialog.get("!$"));
                             }));
                             actions.add(new Performer(()->{
-                                if (Global.player.requireGold(8000)){
-                                    Global.player.setWeapon((Item) Stock.Vitamin.create(Global.player.map, 1, -1).start());
-                                    Global.player.say("Bought a tranquilizer.");
+                                if (Global.player.requireGold(500)){
+                                    Global.player.guildVar *= -1;
+                                    if (Global.player.guildVar < 0) Global.player.say("Now employing melee mercenaries.");
+                                    else Global.player.say("Now employing ranged mercenaries.");
                                 } else Global.player.say(Dialog.get("!$"));
                             }));
                         }

@@ -191,6 +191,7 @@ public class Updater {
         map.weather.fadeIn();
         //Hour pass
         Global.player.stats.strength.heal();
+        Global.player.stats.intelligence.heal();
         if (Global.player.traits.getTraitLevel(Traits.Trait.Learner) > 0) Global.player.stats.motivation.add(p, false);
         Global.timePass(p*100);
         Global.hour+=p;

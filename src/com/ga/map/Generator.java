@@ -96,7 +96,7 @@ public class Generator {
             map.formTextures.put(((int) pair.getKey()) + next, newTexture);
         }
         for (java.util.Map.Entry pair : blueprint.terrains.entrySet()) {
-            Terrain terrain = (Terrain) pair.getValue();
+            Shape terrain = (Shape) pair.getValue();
             terrain.setDepth(startDepth + terrain.depth * depthScale);
             terrain.map = this.map;
             terrain.render();
@@ -188,16 +188,22 @@ public class Generator {
                 else blocker.add(i.pt.x, i.pt.y);
                 if (i == high){
                     blocker.add(map.size.x+128, -128);
+                    blocker.lastOpt(0);
                     blocker.add(-128, -128);
+                    blocker.lastOpt(0);
                     blocker.add(-128, map.size.y+128);
+                    blocker.lastOpt(0);
                     blocker.add(map.size.x+128, map.size.y+128);
+                    blocker.lastOpt(0);
                     blocker.add(map.size.x+128, -128);
+                    blocker.lastOpt(0);
                     blocker.add(i.pt.x, i.pt.y);
+                    blocker.lastOpt(0);
                 }
             }
         }
         assert blocker != null;
-        blocker.finish(depth+",/0/0/0/255,none");
+        blocker.finish(depth+",/0/0/0/255,");
         blocker.reverse();
         Iterator it = map.landRaw.iterator();
         Line i;

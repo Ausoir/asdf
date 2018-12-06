@@ -113,7 +113,10 @@ public class Server {
                 FileManager.loadWorld();
                 FileManager.loadPlayer();
                 Processes.resume();
-                if (afterMapChange != null) afterMapChange.run();
+                if (afterMapChange != null){
+                    afterMapChange.run();
+                    afterMapChange = null;
+                }
             }
         }, 1);
     }

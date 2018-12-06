@@ -1,6 +1,7 @@
 package com.ga.tool;
 
 import java.util.ArrayList;
+import java.util.function.Predicate;
 
 public class L<T> extends ArrayList<T> {
     public L(){
@@ -17,6 +18,10 @@ public class L<T> extends ArrayList<T> {
         for (T i : p){
             add(i);
         }
+    }
+    public L<T> removeIfReuse(Predicate<? super T> p){
+        super.removeIf(p);
+        return this;
     }
     public String toString(){
         if (size() == 0) return "";

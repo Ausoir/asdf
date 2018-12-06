@@ -9,7 +9,6 @@ import com.ga.tool.Performer;
 import com.ga.tool.T;
 import com.ga.unit.Faction;
 import com.ga.unit.Particle;
-import com.ga.unit.Traits;
 import com.ga.unit.skill.Actions;
 
 import static com.ga.unit.man.BodyHumanoid.BODY;
@@ -104,34 +103,46 @@ public class MainPlayer extends Player {
         } else say("Level cannot increase any higher!");
     }
 
-    public void die(int cause, String desc) {
-        super.die(cause, desc);
-        map.weather.fadeOut();
-        delay.time = 100;
-        delay.performer = new Performer(()->{
-            delay.time = -1;
-            String msg = "Sign of death: "+ desc +".\n";
+    public boolean die(int cause, String desc) {
+        if (super.die(cause, desc)) {
+            map.weather.fadeOut();
+            boolean revive = false;
+            String msg = "Sign of death: " + desc + ".\n";
             if (!insuranceMap.isEmpty()) {
                 int expiry = insuranceExpiry - Global.hour;
-                if (expiry < 0) msg += "Your insurance expired "+expiry+" hours ago.";
-                else if (insuranceCost > 0) msg += "The medical guild leaves you to die as you have not payed off your last debt.";
+                if (expiry < 0) msg += "Your insurance expired " + expiry + " hours ago.";
+                else if (insuranceCost > 0)
+                    msg += "The medical guild leaves you to die as you have not payed off your last debt.";
                 else {
-                    map.updater.forceSleep(1);
-                    Menu.menu.showDialog("You fall unconscious...", msg+"Your guild agents haul your body back into the guild hospital for revival...");
-                    revive();
-                    Global.server.requestChangeMap(insuranceMap+",911");
-                    insuranceCost = -insuranceCost;
-                    return;
+                    revive = true;
                 }
             }
-            FileManager.save(FileManager.makeDirectory("Data/map/Player.user"),"");
-            FileManager.save(FileManager.makeDirectory("Data/map/World.map"),"");
-            FileManager.save(FileManager.makeDirectory("Data/Keymap.txt"),"");
-            FileManager.cleanMaps();
-            Menu.menu.showDialog("You die...", msg + "\n GAME OVER!", new String[]{"Click here to exit"}, new Performer[]{
-                new Performer(()-> System.exit(0))
+            if (!revive) {
+                FileManager.save(FileManager.makeDirectory("Data/map/Player.user"), "");
+                FileManager.save(FileManager.makeDirectory("Data/map/World.map"), "");
+                FileManager.save(FileManager.makeDirectory("Data/Keymap.txt"), "");
+                FileManager.cleanMaps();
+            }
+            delay.time = 100;
+            boolean finalRevive = revive;
+            String finalMsg = msg;
+            delay.performer = new Performer(() -> {
+                delay.time = -1;
+                if (finalRevive) {
+                    map.updater.forceSleep(1);
+                    Menu.menu.showDialog("You fall unconscious...", finalMsg + "Your guild agents haul your body back into the guild hospital for revival...");
+                    revive();
+                    Global.server.requestChangeMap(insuranceMap + ",911");
+                    insuranceCost = -insuranceCost;
+                } else {
+                    Menu.menu.showDialog("You die...", finalMsg + "\n GAME OVER!", new String[]{"Click here to exit"}, new Performer[]{
+                            new Performer(() -> System.exit(0))
+                    });
+                }
             });
-        });
+            return true;
+        }
+        return false;
     }
 
     public void revive() {
@@ -146,7 +157,7 @@ public class MainPlayer extends Player {
     }
 
     public boolean requireMana(int p) {
-        if (traits.getTraitLevel(Traits.Trait.Affinity) > 0) statBar.show(2, 1);
+        statBar.show(2, 1);
         return super.requireMana(p);
     }
 

@@ -48,7 +48,7 @@ public class Armor extends Item {
     public boolean checkBreak(boolean blunt, int damage){ //damage reduction
         if (damage == 0) return false;
         int r = Math.max(1, blunt?damage:damage - material.hardness);
-        if (isUsable(false, 1)){
+        if (r <= uses){
             isUsable(true, Math.min(r, uses));
             if (owner != null) trigger(owner);
             return false;

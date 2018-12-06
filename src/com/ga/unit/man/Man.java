@@ -239,9 +239,7 @@ public class Man extends Unit {
     }
     public int getMana(){
         int total = 0;
-        if (traits.getTraitLevel(Traits.Trait.Affinity) > 0) {
-            total += stats.intelligence.get();
-        }
+        total += stats.intelligence.get();
         L<Item> items = new L<>(inventory.getItems());
         items.add(weapon);
         Collections.addAll(items, armor.armor);
@@ -256,31 +254,27 @@ public class Man extends Unit {
     public boolean requireMana(int p){
         if (p == 0) return true;
         if (status.triggerEffect(Buffs.Affinity)) return true;
-        if (traits.getTraitLevel(Traits.Trait.Affinity) > 0) {
-            int mana = Math.min(stats.intelligence.get(), p);
-            p -= mana;
-            stats.intelligence.add(-mana, false);
-            if (p == 0) return true;
-        }
+        int mana = Math.min(stats.intelligence.get(), p);
+        p -= mana;
+        stats.intelligence.add(-mana, false);
+        if (p == 0) return true;
         L<Item> items = new L<>(inventory.getItems());
         items.add(weapon);
         Collections.addAll(items, armor.armor);
         for (Item i : items){
             if (i.tags.contains(Tag.Energy)){
-                int mana = Math.min(i.uses, p);
-                if (i.isUsable(true,mana)) p -= mana;
+                int mana2 = Math.min(i.uses, p);
+                if (i.isUsable(true,mana2)) p -= mana2;
                 if (p == 0) return true;
             }
         }
         return false;
     }
     public boolean rechargeMana(int p){
-        if (traits.getTraitLevel(Traits.Trait.Affinity) > 0) {
-            int vacant = Math.min(p, (stats.intelligence.getMax() - stats.intelligence.get()));
-            p -= vacant;
-            stats.intelligence.add(vacant, false);
-            if (p == 0) return true;
-        }
+        int vacant = Math.min(p, (stats.intelligence.getMax() - stats.intelligence.get()));
+        p -= vacant;
+        stats.intelligence.add(vacant, false);
+        if (p == 0) return true;
         L<Item> items = new L<>(inventory.getItems());
         items.add(weapon);
         Collections.addAll(items, armor.armor);
@@ -300,15 +294,18 @@ public class Man extends Unit {
         return r;
     }
 
-    public void die(int cause, String desc) {
-        say("@x");
-        if (rand.nextBoolean()) weapon.drop(this);
-        weapon.remove();
-        if (status.getEffectLevel(Buffs.Tranquilized) > 0){
-            armor.drop();
-            remove();
-        } else armor.remove();
-        super.die(cause, desc);
+    public boolean die(int cause, String desc) {
+        if (super.die(cause, desc)) {
+            say("@x");
+            if (rand.nextBoolean()) weapon.drop(this);
+            weapon.remove();
+            if (status.getEffectLevel(Buffs.Tranquilized) > 0) {
+                armor.drop();
+                remove();
+            } else armor.remove();
+            return true;
+        }
+        return false;
     }
     public P getInteractPoint(){
         return getHand();

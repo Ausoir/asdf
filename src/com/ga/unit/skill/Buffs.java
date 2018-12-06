@@ -79,7 +79,7 @@ public enum Buffs {
         add(Tag.Curse);
         add(Tag.Air);
     }}){ Buff makeLocal(int level){
-        return new Buff(level, 4) {
+        return new Buff(level, 3) {
             public void onSet(){
                 Particle.shock(host.map, host.getRandomPoint(), host.getDepth());
                 spike();
@@ -702,7 +702,7 @@ public enum Buffs {
         add(Tag.Curse);
         add(Tag.Void);
     }}){ Buff makeLocal(int level) {
-        return new Buff(level, 8) {
+        return new Buff(level, 7) {
             private int turn = 0;
             public boolean isDangerous() { return true; }
             public void onFinish() {
@@ -714,10 +714,15 @@ public enum Buffs {
                             maps.add(i.name);
                         }
                     }
-                    for (T i : maps){
-                        Global.server.requestChangeMap(i.get()+",0");
-                        Global.server.afterMapChange = new Performer(()-> host.pos.set(SyncRand.getInt((int) host.map.size.x-64)+36, 48));
-                    }
+                    Global.server.requestChangeMap(maps.getRand(SyncRand.get())+",0");
+                    Global.server.afterMapChange = new Performer(()-> {
+                        ArrayList<Line> lines = new ArrayList<>();
+                        for (Line l : Global.player.map.land){
+                            if (l.landable() && !l.vertical()) lines.add(l);
+                        }
+                        Line destination = lines.get(SyncRand.getInt(lines.size()));
+                        Global.player.pos.set(destination.getMidpoint().add(0,-8));
+                    });
                 } else host.remove();
             }
             public boolean update() {

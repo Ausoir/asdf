@@ -201,7 +201,7 @@ public class MenuPlayer extends Panel {
             else stamina.setVisible(true);
             if (player.stats.agility.isFull()) vitality.setVisible(false);
             else vitality.setVisible(true);
-            if (!player.traits.has(Traits.Trait.Affinity) || player.stats.intelligence.isFull()) energy.setVisible(false);
+            if (player.stats.intelligence.isFull()) energy.setVisible(false);
             else energy.setVisible(true);
             if (player.stats.motivation.get() == 0) motivation.setVisible(false);
             else motivation.setVisible(true);
@@ -547,9 +547,9 @@ public class MenuPlayer extends Panel {
             panel.add(Box.createRigidArea(new Dimension(0,12)));
             Tags tags = Global.player.getTags();
             int ath = 0;
-            for (Tag i : tags) ath += (i == Tag.Athletics ? 1 : 0);
-            if (Global.player.getTags().contains(Tag.Athletics)){
-                makeSlot("Athletics", "Athletics - "+Dialog.get("lvl")+" "+ath, Dialog.get("?Athletics"));
+            for (Tag i : tags) ath += (i == Tag.Strength ? 1 : 0);
+            if (Global.player.getTags().contains(Tag.Strength)){
+                makeSlot("Strength", "Strength - "+Dialog.get("lvl")+" "+ath, Dialog.get("?Athletics"));
             }
             for (Traits.Trait i : Global.player.traits.getTraits()){
                 String display = i.name();
@@ -703,7 +703,7 @@ public class MenuPlayer extends Panel {
         private void command(String p){
             switch (p) {
                 case "h":
-                    Global.player.rest();
+                    Global.player.map.updater.sleep(1, true);
                     Menu.menu.showMenu();
                     break;
                 case "lvl":
@@ -981,7 +981,7 @@ public class MenuPlayer extends Panel {
         else buttons[3].setVisible(true);
         if (Global.player.inventory.getItemSize() == 0) buttons[4].setVisible(false);
         else buttons[4].setVisible(true);
-        if (Global.player.traits.getTraits().size() == 0 && !Global.player.armor.tags.contains(Tag.Athletics)) buttons[5].setVisible(false);
+        if (Global.player.traits.getTraits().size() == 0 && !Global.player.armor.tags.contains(Tag.Strength)) buttons[5].setVisible(false);
         else buttons[5].setVisible(true);
         if (Global.player.crafting.size() == 0) buttons[6].setVisible(false);
         else buttons[6].setVisible(true);

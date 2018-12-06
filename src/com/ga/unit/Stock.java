@@ -48,7 +48,7 @@ public enum Stock {
         product.onInteract = new Interactive(){
             public void interact(com.ga.unit.man.Man p){
                 if (p == Global.player){
-                    if (Global.player.map.updater.isSafe(0, true)) Global.server.requestChangeMap(product.name+","+seed);
+                    if (Global.player.map.updater.isSafe(0, false)) Global.server.requestChangeMap(product.name+","+seed);
                 }
             }
         };
@@ -216,9 +216,12 @@ public enum Stock {
                 super.stateUpdate();
                 if (state == Actions.Melee) attack();
             }
-            public void die(int cause, String desc){
-                Stock.createByName(map, "Meat", -1).start().pos.set(pos);
-                super.die(cause, desc);
+            public boolean die(int cause, String desc){
+                if (super.die(cause, desc)){
+                    Stock.createByName(map, "Meat", -1).start().pos.set(pos);
+                    return true;
+                }
+                return false;
             }
             public void onCreate(){
                 UnitFactory unitString = new UnitFactory(this, Faction.Predator, new T("3,2,1"));
@@ -261,9 +264,12 @@ public enum Stock {
                 traits.load(this, new T("[[Bloodless,1],[Inorganic,1],[Instinct,1]]"));
                 stats.speed = 8;
             }
-            public void die(int cause, String desc){
-                Stock.createByName(map, "Resin", -1).start().pos.set(pos);
-                super.die(cause, desc);
+            public boolean die(int cause, String desc){
+                if (super.die(cause, desc)){
+                    Stock.createByName(map, "Resin", -1).start().pos.set(pos);
+                    return true;
+                }
+                return false;
             }
         };
         product.clip = new Body(product, name());
@@ -294,9 +300,12 @@ public enum Stock {
             public void buff(Buffs buff, int level){
                 super.buff(buff, level*2);
             }
-            public void die(int cause, String desc){
-                Stock.createByName(map, "Poultry", -1).start().pos.set(pos);
-                super.die(cause, desc);
+            public boolean die(int cause, String desc){
+                if (super.die(cause, desc)) {
+                    Stock.createByName(map, "Poultry", -1).start().pos.set(pos);
+                    return true;
+                }
+                return false;
             }
             public void onCreate(){
                 UnitFactory unitString = new UnitFactory(this, Faction.Predator, new T("3,5,3"));
@@ -337,7 +346,6 @@ public enum Stock {
                 else moves = "Fireblast";
                 UnitFactory unit = new UnitFactory(this, Faction.Predator, new T("3,4,9"));
                 stats.intelligence.setTotal(20, true);
-                traits.learn(this, Traits.Trait.Affinity);
                 for (int i=0;i<8;i++) traits.learn(this, Traits.Trait.Pyromancy);
                 unit.setMoveset(moves);
             }
@@ -383,7 +391,7 @@ public enum Stock {
                             p.setState(Actions.Hit);
                         }
                     };
-                    pj.delay = new EventTimer(9, false, new Performer(()-> pj.remove()));
+                    pj.delay = new EventTimer(9, false, new Performer(pj::remove));
                     pj.dir = dir;
                     pj.rotSpeed = 0;
                     pj.blunt = false;
@@ -394,9 +402,12 @@ public enum Stock {
                     Particle.explode(map, "Fire", pj.getDepth(), tip, pj.vel, 3, 12, 20, false, 3);
                 }
             }
-            public void die(int cause, String desc){
-                Stock.createByName(map, "Ammunition", 0).start().pos.set(pos);
-                super.die(cause, desc);
+            public boolean die(int cause, String desc){
+                if (super.die(cause, desc)) {
+                    Stock.createByName(map, "Ammunition", 0).start().pos.set(pos);
+                    return true;
+                }
+                return false;
             }
         };
         product.clip = new Body(product, name());
@@ -946,7 +957,7 @@ public enum Stock {
                             P tip = host.weapon.getLine().ptd;
                             final Item wpn = host.weapon;
                             int str = host.stats.strength.getMax();
-                            int speed = (int) (40 + Global.clamp(str * 12 + 20, 48, 120) - SyncRand.getFloat(44 / str));
+                            int speed = (int) (40 + Global.clamp(str * 12 + 20, 48, 120) - SyncRand.getFloat(44f / str));
                             final Projectile pj = new Projectile(host.map, "Arrow", tip, host.getHand().getAdd(host.target), speed) {
                                 public void onField() {}
                                 public void onAttack(Unit p) {
@@ -1289,7 +1300,7 @@ public enum Stock {
                 return super.getDescription()+" This drug will restore Vitality by 1.";
             }
         };
-        product.value = 2800;
+        product.value = 4000;
         return product;
     }},
     Tranquilizer{ Prop make(Map map, int id, int seed){
@@ -1314,9 +1325,7 @@ public enum Stock {
                         p.gravity = false;
                         p.setDepth(host.getDepth());
                         p.delay.set(6);
-                        p.delay.performer = new Performer(()-> {
-                                p.gravity = true;
-                        });
+                        p.delay.performer = new Performer(()-> p.gravity = true);
                     });
                     return true;
                 }
@@ -1335,32 +1344,8 @@ public enum Stock {
         return product;
     }},
     Generator{ Prop make(Map map, int id, int seed){
-        int level = seed % 3 + 1;
-        Item product = new Item(map, name(), name(),seed, Item.Material.Crystal, Item.ItemType.Bashing){
-            public String getFullName(){
-                return "Level " + level + " " + super.getFullName();
-            }
-            public boolean trigger(Unit host){
-                if (cooldown.isReady()) {
-                    if (isUsable(true, 1)) {
-                        if (host == Global.player){
-                            if (!host.map.isSnowing()) {
-                                if (host.map.updater.sleep(1, true)){
-                                    Particle.sparkle(host.map, "Glare", host.getDepth(), host.getHand(), 24, 6);
-                                    Global.player.rechargeMana(10);
-                                    cooldown.reset();
-                                    return true;
-                                }
-                            } else host.say("Ambient temperature is too cold to generate energy!");
-                        }
-                    }
-                } else host.say("");
-                return false;
-            }
-            public String getDescription(){
-                return super.getDescription()+" This item can generate energy.";
-            }
-        };
+        Item product = new Item(map, name(), name(),seed, Item.Material.Crystal, Item.ItemType.Bashing);
+        product.tags.add(Tag.Energy);
         product.disposable = false;
         return product;
     }},
@@ -1378,7 +1363,7 @@ public enum Stock {
                 return super.getDescription()+" This item can store Energy for magical applications.";
             }
         };
-        product.durability = level * level * 4;
+        product.durability = level * 4;
         product.disposable = false;
         product.tags.add(Tag.Energy);
         return product;
@@ -1454,45 +1439,6 @@ public enum Stock {
             }
         };
     }},
-    Rogloak{ Prop make(Map map, int id, int seed){
-        int level = (seed % 2)+1;
-        Armor product = new Armor(map, name(), "Night_Cloak",seed,Item.Material.Silk,3,level*2-1,0, 0, 0){
-            public String getFullName(){
-                if (level == 1) return super.getFullName();
-                else return "Master "+super.getFullName();
-            }
-        };
-        for (int i=0;i<level;i++) product.tags.add(Tag.Athletics);
-        return product;
-    }},
-    Roglet{ Prop make(Map map, int id, int seed){
-        int level = (seed % 2)+1;
-        Armor product = new Armor(map, name(), "Jewelry",seed,Item.Material.Silk,4,level*2-1,0,0, 0){
-            public String getFullName(){
-                if (level == 1) return super.getFullName();
-                else return "Master "+super.getFullName();
-            }
-        };
-        for (int i=0;i<level;i++) product.tags.add(Tag.Athletics);
-        return product;
-    }},
-    Bloodsucker{ Prop make(Map map, int id, int seed){
-        int level = (seed % 2)+1;
-        Weapon product = new Weapon(map, name(), "Knife", seed, Item.Material.Obsidian, Item.ItemType.Sword){
-            public boolean trigger(Unit target){
-                boolean r = super.trigger(target);
-                for (Item item : owner.armor.armor) item.isUsable(true, -level);
-                owner.armor.refresh();
-                return r;
-            }
-            public String getFullName(){
-                if (level == 1) return super.getFullName();
-                else return "Master "+super.getFullName();
-            }
-        };
-        product.name = name();
-        return product;
-    }},
     Radio{ Prop make(Map map, int id, int seed){
         Item product = new Item(map, name(), name(), seed, Item.Material.Steel, Item.ItemType.Bashing, 1){
             @Override
@@ -1544,6 +1490,23 @@ public enum Stock {
             }
         };
         product.value = 2000;
+        return product;
+    }},
+    Bloodsucker{ Prop make(Map map, int id, int seed){
+        int level = (seed % 2)+1;
+        Weapon product = new Weapon(map, name(), "Knife", seed, Item.Material.Obsidian, Item.ItemType.Sword){
+            public boolean trigger(Unit target){
+                boolean r = super.trigger(target);
+                for (Item item : owner.armor.armor) item.isUsable(true, -level);
+                owner.armor.refresh();
+                return r;
+            }
+            public String getFullName(){
+                if (level == 1) return super.getFullName();
+                else return "Master "+super.getFullName();
+            }
+        };
+        product.name = name();
         return product;
     }};
     private static HashMap<String, String> extRegistry = new HashMap<>();

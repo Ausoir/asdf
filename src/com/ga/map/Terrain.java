@@ -1,32 +1,22 @@
 package com.ga.map;
 
-import com.ga.game.Settings;
 import com.ga.tool.Line;
 import com.ga.tool.P;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 
 /**
  * Created by Ga on 1/10/2017. xhfsdxghf
  */
-public class Terrain extends Drawable {
-    private static final float ZOOM = 1.5f;
-    private static final BasicStroke stroke = new BasicStroke(1.5f);
+public class Terrain extends Shape {
     private ShadedPicture image;
-    private Polygon polygon;
     private TexturePaint imageTexture;
-    private Color color;
-    private ArrayList<Line> lines = new ArrayList<>();
-    protected P pos;
-    private int length = 0; //polygon size is always multiples of 4
-    private int offset;
-    private P finalSize;
-    Map map;
+    private boolean outline = false;
     public Terrain(Map map, String texture, Shader shader, float depth){
-        image = new ShadedPicture(null, texture.startsWith("/")?null:Picture.load(texture,null), shader){
+        super(map, depth);
+        image = new ShadedPicture(null, Picture.load(texture,null), shader){
             @Override
             public void shade(int p){
                 if (shader != null) {
@@ -41,73 +31,42 @@ public class Terrain extends Drawable {
                 }
             }
         };
-        this.map = map;
-        setDepth(depth);
-        polygon = new Polygon();
-//        int c = Global.r.nextInt(255);
-//        if (image.image == null) this.color = new Color(c,c,c,Integer.parseInt(texture.substring(1).split("/")[3]));
-//        else this.color = new Color(c,c,c,255);
-
-        if (image.image == null){
-            String[] data = texture.substring(1).split("/");
-            this.color = new Color(Integer.parseInt(data[0]),Integer.parseInt(data[1]),Integer.parseInt(data[2]),Integer.parseInt(data[3]));
-        } else {
-            imageTexture = new TexturePaint(image.image, new Rectangle2D.Double(0, 0, image.getSize().x, image.getSize().y));
-        }
+        imageTexture = new TexturePaint(image.image, new Rectangle2D.Double(0, 0, image.getSize().x, image.getSize().y));
         offset = shader.getOffset();
+        if (shader != Shader.None) outline = false;
     }
     public void start(){
         map.updater.addQueue.add(this);
     }
-    void addLine(Line p){
-        lines.add(p);
-        p.depth = depth;
-    }
-    public void addPoint(float x, float y){
-        polygon.addPoint((int)(x/ZOOM), (int)(y/ZOOM));
-        length++;
-    }
     public void render(){
-        int lowX = polygon.xpoints[0], lowY = polygon.ypoints[0], highX = polygon.xpoints[0], highY = polygon.ypoints[0];
-        for (int i=0;i<length;i++){
-            polygon.ypoints[i] += offset;
-            if (polygon.xpoints[i] < lowX) lowX = polygon.xpoints[i];
-            if (polygon.ypoints[i] < lowY) lowY = polygon.ypoints[i];
-            if (polygon.xpoints[i] > highX) highX = polygon.xpoints[i];
-            if (polygon.ypoints[i] > highY) highY = polygon.ypoints[i];
-        }
-        for (int i=0;i<polygon.xpoints.length;i++) {
-            polygon.xpoints[i] -= lowX;
-            polygon.ypoints[i] -= lowY;
-        }
-        setSize(highX-lowX, highY-lowY);
-        pos = new P(lowX, lowY);
-        pos.mult(ZOOM);
+        super.render();
         P size = image.getSize();
         if (size.x > 0 && size.y > 0) {
             image.image = new BufferedImage((int) size.x, (int) size.y, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = image.image.createGraphics();
-            if (imageTexture != null) g.setPaint(imageTexture);
-            else g.setColor(color);
+            g.setPaint(imageTexture);
             g.fill(polygon);
             image.shade(0);
         } else {
             Global.p("Terrain size violation at "+pos.toString());
         }
     }
-    private void setSize(float x, float y){
+    void setSize(float x, float y){
+        super.setSize(x, y);
         image.setSize(x, y);
-        finalSize = new P(x*ZOOM, y*ZOOM);
     }
     public void draw(Graphics2D g){
-        if (image.visible && pos.x > Global.camera.x-Settings.centerX-finalSize.x && pos.y > Global.camera.y-Settings.centerY-finalSize.y
-                && pos.x < Global.camera.x+Settings.centerX && pos.y < Global.camera.y+Settings.centerY) {
-            g.drawImage(image.image,(int)(pos.x+Global.rel.x),(int)(pos.y+Global.rel.y),finalSize.x(),finalSize.y(),null);
+        if (checkDraw(g)) {
+            int x = (int)(pos.x+Global.rel.x), y = (int)(pos.y+Global.rel.y);
+            g.drawImage(image.image,x,y,finalSize.x(),finalSize.y(),null);
+            if (outline) {
+                g.setColor(Color.BLACK);
+                g.setStroke(stroke);
+                polygon.translate(x, y);
+                g.drawPolygon(polygon);
+                polygon.translate(-x, -y);
+            }
         }
-        P t = Global.rel;
-        g.setColor(Color.BLACK);
-        g.setStroke(stroke);
-        for (Line i : lines) g.drawLine((int)(t.x+i.pt.x),(int)(t.y+i.pt.y),(int)(t.x+i.ptd.x),(int)(t.y+i.ptd.y));
     }
     public void setDepth(float depth) {
         super.setDepth(depth);

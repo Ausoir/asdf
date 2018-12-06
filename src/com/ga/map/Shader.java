@@ -529,6 +529,7 @@ public enum Shader{
     }
     public static Shader getByName(String p){
         if (p != null) {
+            if (p.isEmpty()) return Shader.None;
             for (Shader s : values()) {
                 if (s.name().toLowerCase().equals(p.toLowerCase())) {
                     return s;

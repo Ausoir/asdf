@@ -20,7 +20,6 @@ public class Traits {
         Tattoo(1,"Gain 1 extra memory slot."),
         Literacy(1,"Learn to read runes. You may now identify scrolls."),
         Alchemy(1,"Gain familiarity with alchemy. You may now identify potions."),
-        Affinity(1,"Utilize energy from your body. The energy capacity is equal to your Intelligence."),
 
         // ----- Type 2 Unimplemented
         Lung_Injury(2,"Rest time quadrupled."),

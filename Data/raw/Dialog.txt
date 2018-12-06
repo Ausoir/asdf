@@ -11,7 +11,7 @@ mem:Intelligence
 ?Strength:You can use items with weight lower than or equal to strength. Also determines stamina.
 ?Agility:Increases maximum encumbrance by 1. Also determines vitality.
 ?Intelligence:You can learn number of skills and traits up to your intelligence score. Also determines innate energy.
-?Athletics:Increases jump height and sprint speed. Increases Rest efficiency.
+?Athletics:Provides extra Strength for the purpose of using skills.
 Remap:Select an action to re-map its keybinding.
 !$:Not enough money...
 !m:Not enough motivation...

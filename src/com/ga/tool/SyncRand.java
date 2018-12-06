@@ -4,6 +4,9 @@ import java.util.Random;
 
 public class SyncRand {
     private static Random r = new Random();
+    public static Random get(){
+        return r;
+    }
     public static int getInt(int p){
         return r.nextInt(p);
     }

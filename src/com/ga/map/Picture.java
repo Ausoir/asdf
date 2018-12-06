@@ -85,7 +85,7 @@ public class Picture {
     public void setCenterType(int p){
         type = p;
         if (type == 1) halfSize = new P(size.x/2, size.y/2);
-        else if (type == 2) halfSize = new P(size.x/2, size.y-8);
+        else if (type == 2) halfSize = new P(size.x/2, size.y-1);
         else if (type == 3) halfSize = new P(8, size.y/2);
     }
     public static BufferedImage load(String dir, Random rand){

@@ -5,6 +5,7 @@ import com.ga.map.Picture;
 import com.ga.map.Shader;
 import com.ga.tool.T;
 import com.ga.unit.Organ;
+import com.ga.unit.Tag;
 import com.ga.unit.Tags;
 import com.ga.unit.man.BodyHumanoid;
 import com.ga.unit.man.Man;
@@ -104,8 +105,9 @@ public class ArmorSet {
     private void updateStatus(){
         tags.clear();
         for (Armor i : armor){
-            tags.addAll(i.tags);
+            if (i != armor[4] && i.tags.contains(Tag.Strength)) tags.add(Tag.Strength);
         }
+        tags.addAll(armor[4].tags);
         host.inventory.setMaxSize(getPockets());
     }
     public void refresh(){

@@ -50,7 +50,7 @@ public class Line {
         this.depth = depth;
     }
     public boolean landable(){
-        return opt >= 1;
+        return clockwise() && opt >= 1;
     }
     public boolean droppable(){
         return opt != 3;

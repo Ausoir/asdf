@@ -3,8 +3,8 @@ Ration;Fruit;Fish;Vegetables;Cheese;Bread;Meat;Poultry;Meal;Drumstick;Steak;Burg
 Cloak;Straw Hat;Shirt;Pants;Sports Shirt;Shorts;Spring Suit Torso;Spring Suit Pants;Suit Torso;Suit Pants;Hoodie;Cargo Pants;Sweat Suit Torso;Sweat Suit Pants //Tailor
 Chainmail Armor;Chainmail Leggings;Breastplate;Greaves;Battle Armor;Battle Lower Armor //Armorsmith
 Machete;Broadsword;Axe;Lancesword;Cutlass;Claymore;Mace;Spear;Halberd;Cleaver;Pickaxe;Rapier;Warhammer;Greatsword;Striker;Shuriken;Knife;Longhammer //Weaponsmith
-Scroll;Potion;Scroll;Potion;Battery;Generator;Bomb;Memoryfoam //Lab
+Scroll;Potion;Scroll;Potion;Battery;Generator;Bomb;Memoryfoam;Memoryfoam_Pill1;Memoryfoam_Pill2;Vitamin //Lab
 Manual;Textbook;Book //Library
-Dagger;Bow;Ration;Grappler;Repairkit;Quiver;Ammunition;Firearm //Ranch
+Dagger;Bow;Ration;Grappler;Repairkit;Quiver;Ammunition;Firearm;Tranquilizer //Ranch
 Firearm;Riot Helmet;Military Helmet;Infantry Jacket;Infantry Pants;Security Armor;Security Tights;Padded Vest;Padded Leggings //Mercenary
 Baldcut,Gingercut,Blondecut,Buzzcut,Ponytail //Salon

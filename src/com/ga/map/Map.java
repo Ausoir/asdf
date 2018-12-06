@@ -25,7 +25,7 @@ public class Map {
     public ArrayList<Line> land = new ArrayList<>();
     ArrayList<Line> landRaw = new ArrayList<>();
     HashMap<Integer, String> formTextures = new HashMap<>();
-    public HashMap<Integer, Terrain> terrains = new HashMap<>();
+    public HashMap<Integer, Shape> terrains = new HashMap<>();
     private static HashMap<String, String> defaultProps = new HashMap<>() {{
         put("", null);
         put("grass", "Rock=.1,Bush=.2,Weed=1");
@@ -71,10 +71,8 @@ public class Map {
             panorama[0] = new Thing(this, "Panorama", null, 0, 0) {
                 @Override
                 public void draw(Graphics2D g) {
-                    g.setColor(Color.white);
-                    g.fillRect(0, 0, Settings.screenX, Settings.screenY);
                     g.setColor(Color.black);
-                    g.setStroke(new BasicStroke(4));
+                    g.fillRect(0, 0, Settings.screenX, Settings.screenY);
                 }
             }.start();
         } else {
@@ -160,15 +158,16 @@ public class Map {
         return nextPolygon;
     }
 
-    public void setTexture() { //todo: test disable textured terrain
+    public void setTexture() {
         for (final Line i : landRaw) {
             if (i.tid >= 0) {
                 String formTexture = formTextures.get(i.tid);
-                String[] formName = formTexture.split(",");
+                String[] formName = formTexture.split(",",-1);
                 float depth = Float.parseFloat(formName[0]);
-                Terrain terrain = terrains.get(i.tid);
+                Shape terrain = terrains.get(i.tid);
                 if (terrain == null) {
-                    terrain = new Terrain(this, formName[1], Shader.getByName(formName[2]), depth);
+                    if (formName[1].startsWith("/")) terrain = new Land(this, formName[1], depth);
+                    else terrain = new Terrain(this, formName[1], Shader.getByName(formName[2]), depth);
                     terrains.put(i.tid, terrain);
                     terrain.start();
                 }
@@ -185,14 +184,14 @@ public class Map {
     public void render() {
         for (Object o : terrains.entrySet()) {
             java.util.Map.Entry pair = (java.util.Map.Entry) o;
-            Terrain terrain = (Terrain) pair.getValue();
+            Shape terrain = (Shape) pair.getValue();
             terrain.render();
         }
     }
 
     void generateProps() {
         for (Line l : landRaw) { //generation happens before loading into land from landRaw
-            if (l.clockwise() && l.opt > 0) {
+            if (l.landable()) {
                 if (Math.abs(l.getSlope()) < Line.MAXSLOPE
                         && (l.pt.y < size.y || l.ptd.y < size.y) && (l.pt.x < size.x || l.ptd.x < size.x)
                         && (l.pt.y > 0 || l.ptd.y > 0) && (l.pt.x > 0 || l.ptd.x > 0)) {
@@ -329,7 +328,7 @@ public class Map {
         int maxDiffX = (int) (high.x - low.x) + margin.x();
         int maxDiffY = (int) (high.y - low.y) + margin.y();
         size = new P(maxDiffX, maxDiffY);
-        P adjustment = new P(-low.x + marginX / 2, -low.y + marginY / 2);
+        P adjustment = new P(-low.x + marginX / 2f, -low.y + marginY / 2f);
         adjust(adjustment);
         if (updater != null) updater.adjust(adjustment);
     }

@@ -1,1 +1,4 @@
 opt 1 - buy a ticket to last biome with $$$ - city must have a harbor (building)
+
+every inside maps need their blocker options set to 0 to prevent banishment and other landables landing on blockers
+every inside maps need to adjust props to y + 8

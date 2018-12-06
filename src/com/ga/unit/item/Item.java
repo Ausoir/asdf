@@ -67,7 +67,7 @@ public class Item extends Prop {
         },
         Nylon(.2f,1,0,14,2000){
             public void onSet(Item host){
-                host.tags.add(Tag.Athletics);
+                host.tags.add(Tag.Strength);
             }
             int getWarmth(){
                 return -1;
